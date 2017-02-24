@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+import functools
 import os
 import pkgutil
 import sys
@@ -14,44 +13,41 @@ from django.core.management.base import (
     BaseCommand, CommandError, CommandParser, handle_default_options,
 )
 from django.core.management.color import color_style
-from django.utils import autoreload, lru_cache, six
-from django.utils._os import npath, upath
+from django.utils import autoreload
 from django.utils.encoding import force_text
 
 
 def find_commands(management_dir):
     """
-    Given a path to a management directory, returns a list of all the command
+    Given a path to a management directory, return a list of all the command
     names that are available.
-
-    Returns an empty list if no commands are defined.
     """
     command_dir = os.path.join(management_dir, 'commands')
-    return [name for _, name, is_pkg in pkgutil.iter_modules([npath(command_dir)])
+    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
             if not is_pkg and not name.startswith('_')]
 
 
 def load_command_class(app_name, name):
     """
-    Given a command name and an application name, returns the Command
-    class instance. All errors raised by the import process
-    (ImportError, AttributeError) are allowed to propagate.
+    Given a command name and an application name, return the Command
+    class instance. Allow all errors raised by the import process
+    (ImportError, AttributeError) to propagate.
     """
     module = import_module('%s.management.commands.%s' % (app_name, name))
     return module.Command()
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_commands():
     """
-    Returns a dictionary mapping command names to their callback applications.
+    Return a dictionary mapping command names to their callback applications.
 
-    This works by looking for a management.commands package in django.core, and
-    in each installed application -- if a commands package exists, all commands
-    in that package are registered.
+    Look for a management.commands package in django.core, and in each
+    installed application -- if a commands package exists, register all
+    commands in that package.
 
     Core commands are always included. If a settings module has been
-    specified, user-defined commands will also be included.
+    specified, also include user-defined commands.
 
     The dictionary is in the format {command_name: app_name}. Key-value
     pairs from this dictionary can then be used in calls to
@@ -64,7 +60,7 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    commands = {name: 'django.core' for name in find_commands(upath(__path__[0]))}
+    commands = {name: 'django.core' for name in find_commands(__path__[0])}
 
     if not settings.configured:
         return commands
@@ -78,7 +74,7 @@ def get_commands():
 
 def call_command(command_name, *args, **options):
     """
-    Calls the given command, with the given options and args/kwargs.
+    Call the given command, with the given options and args/kwargs.
 
     This is the primary API you should use for calling specific commands.
 
@@ -116,7 +112,7 @@ def call_command(command_name, *args, **options):
     parser = command.create_parser('', command_name)
     # Use the `dest` option name from the parser option
     opt_mapping = {
-        sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
+        min(s_opt.option_strings).lstrip('-').replace('-', '_'): s_opt.dest
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
@@ -130,12 +126,9 @@ def call_command(command_name, *args, **options):
     return command.execute(*args, **defaults)
 
 
-class ManagementUtility(object):
+class ManagementUtility:
     """
-    Encapsulates the logic of the django-admin and manage.py utilities.
-
-    A ManagementUtility has a number of commands, which can be manipulated
-    by editing the self.commands dictionary.
+    Encapsulate the logic of the django-admin and manage.py utilities.
     """
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
@@ -143,9 +136,7 @@ class ManagementUtility(object):
         self.settings_exception = None
 
     def main_help_text(self, commands_only=False):
-        """
-        Returns the script's main help text, as a string.
-        """
+        """Return the script's main help text, as a string."""
         if commands_only:
             usage = sorted(get_commands().keys())
         else:
@@ -156,7 +147,7 @@ class ManagementUtility(object):
                 "Available subcommands:",
             ]
             commands_dict = defaultdict(lambda: [])
-            for name, app in six.iteritems(get_commands()):
+            for name, app in get_commands().items():
                 if app == 'django.core':
                     app = 'django'
                 else:
@@ -179,7 +170,7 @@ class ManagementUtility(object):
 
     def fetch_command(self, subcommand):
         """
-        Tries to fetch the given subcommand, printing a message with the
+        Try to fetch the given subcommand, printing a message with the
         appropriate command called from the command line (usually
         "django-admin" or "manage.py") if it can't be found.
         """
@@ -263,19 +254,18 @@ class ManagementUtility(object):
                     pass
             parser = subcommand_cls.create_parser('', cwords[0])
             options.extend(
-                (sorted(s_opt.option_strings)[0], s_opt.nargs != 0)
+                (min(s_opt.option_strings), s_opt.nargs != 0)
                 for s_opt in parser._actions if s_opt.option_strings
             )
             # filter out previously specified options from available options
-            prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
-            options = [opt for opt in options if opt[0] not in prev_opts]
+            prev_opts = {x.split('=')[0] for x in cwords[1:cword - 1]}
+            options = (opt for opt in options if opt[0] not in prev_opts)
 
             # filter options by current input
             options = sorted((k, v) for k, v in options if k.startswith(curr))
-            for option in options:
-                opt_label = option[0]
+            for opt_label, require_arg in options:
                 # append '=' to options which require args
-                if option[1]:
+                if require_arg:
                     opt_label += '='
                 print(opt_label)
         # Exit code of the bash completion function is never passed back to
@@ -285,8 +275,8 @@ class ManagementUtility(object):
 
     def execute(self):
         """
-        Given the command-line arguments, this figures out which subcommand is
-        being run, creates a parser appropriate to that command, and runs it.
+        Given the command-line arguments, figure out which subcommand is being
+        run, create a parser appropriate to that command, and run it.
         """
         try:
             subcommand = self.argv[1]
@@ -359,8 +349,6 @@ class ManagementUtility(object):
 
 
 def execute_from_command_line(argv=None):
-    """
-    A simple method that runs a ManagementUtility.
-    """
+    """Run a ManagementUtility."""
     utility = ManagementUtility(argv)
     utility.execute()

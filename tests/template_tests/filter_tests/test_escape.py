@@ -1,7 +1,5 @@
 from django.template.defaultfilters import escape
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import SimpleTestCase
 from django.utils.functional import Promise, lazy
 from django.utils.safestring import mark_safe
 
@@ -24,22 +22,18 @@ class EscapeTests(SimpleTestCase):
         output = self.engine.render_to_string('escape02', {"a": "x&y", "b": mark_safe("x&y")})
         self.assertEqual(output, "x&amp;y x&y")
 
-    # It is only applied once, regardless of the number of times it
-    # appears in a chain (to be changed in Django 2.0).
-    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'escape03': '{% autoescape off %}{{ a|escape|escape }}{% endautoescape %}'})
     def test_escape03(self):
         output = self.engine.render_to_string('escape03', {"a": "x&y"})
         self.assertEqual(output, "x&amp;y")
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'escape04': '{{ a|escape|escape }}'})
     def test_escape04(self):
         output = self.engine.render_to_string('escape04', {"a": "x&y"})
         self.assertEqual(output, "x&amp;y")
 
     def test_escape_lazy_string(self):
-        add_html = lazy(lambda string: string + 'special characters > here', six.text_type)
+        add_html = lazy(lambda string: string + 'special characters > here', str)
         escaped = escape(add_html('<some html & '))
         self.assertIsInstance(escaped, Promise)
         self.assertEqual(escaped, '&lt;some html &amp; special characters &gt; here')

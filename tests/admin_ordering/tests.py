@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import User
@@ -11,11 +9,11 @@ from .models import (
 )
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
 
@@ -163,12 +161,12 @@ class TestRelatedFieldsAdminOrdering(TestCase):
             def formfield_for_foreignkey(self, db_field, request, **kwargs):
                 if db_field.name == 'band':
                     kwargs["queryset"] = Band.objects.filter(rank__gt=2)
-                return super(SongAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
             def formfield_for_manytomany(self, db_field, request, **kwargs):
                 if db_field.name == 'other_interpreters':
                     kwargs["queryset"] = Band.objects.filter(rank__gt=2)
-                return super(SongAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
         class StaticOrderingBandAdmin(admin.ModelAdmin):
             ordering = ('rank',)

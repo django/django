@@ -4,9 +4,8 @@ from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
-from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 __all__ = ['HStoreField']
 
@@ -22,15 +21,15 @@ class HStoreField(Field):
         return 'hstore'
 
     def get_transform(self, name):
-        transform = super(HStoreField, self).get_transform(name)
+        transform = super().get_transform(name)
         if transform:
             return transform
         return KeyTransformFactory(name)
 
     def validate(self, value, model_instance):
-        super(HStoreField, self).validate(value, model_instance)
+        super().validate(value, model_instance)
         for key, val in value.items():
-            if not isinstance(val, six.string_types) and val is not None:
+            if not isinstance(val, str) and val is not None:
                 raise exceptions.ValidationError(
                     self.error_messages['not_a_string'],
                     code='not_a_string',
@@ -38,7 +37,7 @@ class HStoreField(Field):
                 )
 
     def to_python(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = json.loads(value)
         return value
 
@@ -50,10 +49,10 @@ class HStoreField(Field):
             'form_class': forms.HStoreField,
         }
         defaults.update(kwargs)
-        return super(HStoreField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
     def get_prep_value(self, value):
-        value = super(HStoreField, self).get_prep_value(value)
+        value = super().get_prep_value(value)
 
         if isinstance(value, dict):
             prep_value = {}
@@ -81,7 +80,7 @@ class KeyTransform(Transform):
     output_field = TextField()
 
     def __init__(self, key_name, *args, **kwargs):
-        super(KeyTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.key_name = key_name
 
     def as_sql(self, compiler, connection):
@@ -89,7 +88,7 @@ class KeyTransform(Transform):
         return "(%s -> '%s')" % (lhs, self.key_name), params
 
 
-class KeyTransformFactory(object):
+class KeyTransformFactory:
 
     def __init__(self, key_name):
         self.key_name = key_name

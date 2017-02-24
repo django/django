@@ -1,9 +1,10 @@
+from io import StringIO
+
 from django.apps import apps
 from django.core import management
 from django.db import migrations
 from django.db.models import signals
 from django.test import TransactionTestCase, override_settings
-from django.utils import six
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
 SIGNAL_ARGS = ['app_config', 'verbosity', 'interactive', 'using', 'plan', 'apps']
@@ -12,7 +13,7 @@ MIGRATE_VERBOSITY = 1
 MIGRATE_INTERACTIVE = False
 
 
-class Receiver(object):
+class Receiver:
     def __init__(self, signal):
         self.call_counter = 0
         self.call_args = None
@@ -23,7 +24,7 @@ class Receiver(object):
         self.call_args = kwargs
 
 
-class OneTimeReceiver(object):
+class OneTimeReceiver:
     """
     Special receiver for handle the fact that test runner calls migrate for
     several databases and several times for some of them.
@@ -70,7 +71,7 @@ class MigrateSignalTests(TransactionTestCase):
         post_migrate_receiver = Receiver(signals.post_migrate)
         management.call_command(
             'migrate', database=MIGRATE_DATABASE, verbosity=MIGRATE_VERBOSITY,
-            interactive=MIGRATE_INTERACTIVE, stdout=six.StringIO(),
+            interactive=MIGRATE_INTERACTIVE, stdout=StringIO(),
         )
 
         for receiver in [pre_migrate_receiver, post_migrate_receiver]:
@@ -91,7 +92,7 @@ class MigrateSignalTests(TransactionTestCase):
         """
         pre_migrate_receiver = Receiver(signals.pre_migrate)
         post_migrate_receiver = Receiver(signals.post_migrate)
-        stdout = six.StringIO()
+        stdout = StringIO()
         management.call_command(
             'migrate', database=MIGRATE_DATABASE, verbosity=MIGRATE_VERBOSITY,
             interactive=MIGRATE_INTERACTIVE, stdout=stdout,

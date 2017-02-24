@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-
 import threading
 import time
+from unittest import mock
 
 from multiple_database.routers import TestRouter
 
@@ -9,7 +8,7 @@ from django.db import (
     DatabaseError, connection, connections, router, transaction,
 )
 from django.test import (
-    TransactionTestCase, mock, override_settings, skipIfDBFeature,
+    TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext

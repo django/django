@@ -1,10 +1,9 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import time
 from datetime import datetime, timedelta
+from http import cookies
 from io import BytesIO
 from itertools import chain
+from urllib.parse import urlencode
 
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
@@ -14,12 +13,8 @@ from django.http import (
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
-from django.test.utils import freeze_time, str_prefix
-from django.utils import six
-from django.utils.encoding import force_str
-from django.utils.http import cookie_date, urlencode
-from django.utils.six.moves import http_cookies
-from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
+from django.test.utils import freeze_time
+from django.utils.http import cookie_date
 from django.utils.timezone import utc
 
 
@@ -62,17 +57,17 @@ class RequestsTests(SimpleTestCase):
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<HttpRequest: GET '/somepath/'>"))
+        self.assertEqual(repr(request), "<HttpRequest: GET '/somepath/'>")
 
     def test_httprequest_repr_invalid_method_and_path(self):
         request = HttpRequest()
-        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        self.assertEqual(repr(request), "<HttpRequest>")
         request = HttpRequest()
         request.method = "GET"
-        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        self.assertEqual(repr(request), "<HttpRequest>")
         request = HttpRequest()
         request.path = ""
-        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        self.assertEqual(repr(request), "<HttpRequest>")
 
     def test_wsgirequest(self):
         request = WSGIRequest({
@@ -161,19 +156,18 @@ class RequestsTests(SimpleTestCase):
 
     def test_wsgirequest_repr(self):
         request = WSGIRequest({'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
-        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/'>"))
+        self.assertEqual(repr(request), "<WSGIRequest: GET '/'>")
         request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
         request.GET = {'get-key': 'get-value'}
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/somepath/'>"))
+        self.assertEqual(repr(request), "<WSGIRequest: GET '/somepath/'>")
 
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info, encoding='utf-8'):
-            path_info = path_info.encode(encoding)           # Actual URL sent by the browser (bytestring)
-            if six.PY3:
-                path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
+            path_info = path_info.encode(encoding)  # Actual URL sent by the browser (bytestring)
+            path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
             return path_info
         # Regression for #19468
         request = WSGIRequest({'PATH_INFO': wsgi_str("/سلام/"), 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
@@ -267,7 +261,7 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertIn('; %s' % http_cookies.Morsel._reserved['httponly'], str(example_cookie))
+        self.assertIn('; %s' % cookies.Morsel._reserved['httponly'], str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
 
     def test_unicode_cookie(self):
@@ -275,7 +269,7 @@ class RequestsTests(SimpleTestCase):
         response = HttpResponse()
         cookie_value = '清風'
         response.set_cookie('test', cookie_value)
-        self.assertEqual(force_str(cookie_value), response.cookies['test'].value)
+        self.assertEqual(cookie_value, response.cookies['test'].value)
 
     def test_limited_stream(self):
         # Read all of a limited stream
@@ -385,7 +379,7 @@ class RequestsTests(SimpleTestCase):
         """
         Test a POST with non-utf-8 payload encoding.
         """
-        payload = FakePayload(original_urlencode({'key': 'España'.encode('latin-1')}))
+        payload = FakePayload(urlencode({'key': 'España'.encode('latin-1')}))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_LENGTH': len(payload),
@@ -586,7 +580,7 @@ class RequestsTests(SimpleTestCase):
         request = WSGIRequest({
             'REQUEST_METHOD': 'GET',
             'wsgi.input': '',
-            'QUERY_STRING': b'name=Hello%20G%C3%BCnter' if six.PY2 else 'name=Hello%20G%C3%BCnter'
+            'QUERY_STRING': 'name=Hello%20G%C3%BCnter',
         })
         self.assertEqual(request.GET, {'name': ['Hello Günter']})
         request.encoding = 'iso-8859-16'

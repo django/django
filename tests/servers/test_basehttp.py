@@ -8,7 +8,7 @@ from django.test.client import RequestFactory
 from django.test.utils import patch_logger
 
 
-class Stub(object):
+class Stub:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -60,7 +60,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         handler = WSGIRequestHandler(request, '192.168.0.2', None)
 
         with patch_logger('django.server', 'error') as messages:
-            handler.log_message("GET %s %s", str('\x16\x03'), "4")
+            handler.log_message("GET %s %s", '\x16\x03', "4")
         self.assertIn(
             "You're accessing the development server over HTTPS, "
             "but it only supports HTTP.",
@@ -81,7 +81,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                 '%s:%s' % (k, v) for k, v in environ.items()
                 if k.startswith('HTTP_')
             )
-            yield (','.join(http_environ_items)).encode('utf-8')
+            yield (','.join(http_environ_items)).encode()
 
         rfile = BytesIO()
         rfile.write(b"GET / HTTP/1.0\r\n")

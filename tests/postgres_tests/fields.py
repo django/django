@@ -6,18 +6,18 @@ from django.db import models
 
 try:
     from django.contrib.postgres.fields import (
-        ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
-        DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
-        JSONField,
+        ArrayField, BigIntegerRangeField, CICharField, CIEmailField,
+        CITextField, DateRangeField, DateTimeRangeField, FloatRangeField,
+        HStoreField, IntegerRangeField, JSONField,
     )
     from django.contrib.postgres.search import SearchVectorField
 except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
-            super(DummyArrayField, self).__init__(**kwargs)
+            super().__init__(**kwargs)
 
         def deconstruct(self):
-            name, path, args, kwargs = super(DummyArrayField, self).deconstruct()
+            name, path, args, kwargs = super().deconstruct()
             kwargs.update({
                 'base_field': '',
                 'size': 1,
@@ -26,10 +26,12 @@ except ImportError:
 
     class DummyJSONField(models.Field):
         def __init__(self, encoder=None, **kwargs):
-            super(DummyJSONField, self).__init__(**kwargs)
+            super().__init__(**kwargs)
 
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
+    CICharField = models.Field
+    CIEmailField = models.Field
     CITextField = models.Field
     DateRangeField = models.Field
     DateTimeRangeField = models.Field

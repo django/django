@@ -1,12 +1,8 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -18,7 +14,6 @@ class Place(models.Model):
         return "%s the place" % self.name
 
 
-@python_2_unicode_compatible
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
@@ -27,7 +22,6 @@ class Restaurant(Place):
         return "%s the restaurant" % self.name
 
 
-@python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
@@ -35,7 +29,6 @@ class ItalianRestaurant(Restaurant):
         return "%s the italian restaurant" % self.name
 
 
-@python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
     parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
@@ -67,7 +60,6 @@ class ParkingLot4B(Place, ParkingLot4):
     pass
 
 
-@python_2_unicode_compatible
 class Supplier(models.Model):
     name = models.CharField(max_length=50)
     restaurant = models.ForeignKey(Restaurant, models.CASCADE)
@@ -97,7 +89,6 @@ class SelfRefChild(SelfRefParent):
     child_data = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
@@ -132,7 +123,6 @@ class QualityControl(Evaluation):
     assignee = models.CharField(max_length=50)
 
 
-@python_2_unicode_compatible
 class BaseM(models.Model):
     base_name = models.CharField(max_length=100)
 
@@ -140,7 +130,6 @@ class BaseM(models.Model):
         return self.base_name
 
 
-@python_2_unicode_compatible
 class DerivedM(BaseM):
     customPK = models.IntegerField(primary_key=True)
     derived_name = models.CharField(max_length=100)
@@ -168,7 +157,6 @@ class InternalCertificationAudit(CertificationAudit):
 
 
 # Abstract classes don't get m2m tables autocreated.
-@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=100)
 
@@ -179,7 +167,6 @@ class Person(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class AbstractEvent(models.Model):
     name = models.CharField(max_length=100)
     attendees = models.ManyToManyField(Person, related_name="%(class)s_set")
@@ -217,7 +204,6 @@ class Station(SearchableLocation):
 
 
 class BusStation(Station):
-    bus_routes = models.CommaSeparatedIntegerField(max_length=128)
     inbound = models.BooleanField(default=False)
 
 

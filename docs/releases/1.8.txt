@@ -61,7 +61,7 @@ built-in support for the Django template language and for
 :class:`~django.template.backends.jinja2.Jinja2`. It supports rendering
 templates with multiple engines within the same project. Learn more about the
 new features in the :doc:`topic guide </topics/templates>` and check the
-:doc:`upgrade instructions </ref/templates/upgrading>` for details.
+upgrade instructions in older versions of the documentation.
 
 Security enhancements
 ---------------------
@@ -445,7 +445,7 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
-* The new :option:`makemigrations --exit` option allows exiting with an error
+* The new ``makemigrations --exit`` option allows exiting with an error
   code if no migrations are created.
 
 * The new :djadmin:`showmigrations` command allows listing all migrations and
@@ -1522,9 +1522,6 @@ Both classes provide a ``render()`` method, however, the former takes a
 :class:`dict`. This change is enforced through a deprecation path for Django
 templates.
 
-Since it's easier to understand with examples, the :ref:`upgrade guide
-<get_template-upgrade-django-18>` shows how to adapt affected code.
-
 All this also applies to :func:`~django.template.loader.select_template()`.
 
 :class:`~django.template.Template` and :class:`~django.template.Context` classes in template responses
@@ -1641,7 +1638,7 @@ Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
 added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``auth.get_user()`` and, for backwards compatibility, enabled only if
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
-:setting:`MIDDLEWARE_CLASSES`.
+``MIDDLEWARE_CLASSES``.
 
 In Django 1.10, session verification will be enabled regardless of whether or not
 ``SessionAuthenticationMiddleware`` is enabled (at which point

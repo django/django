@@ -27,8 +27,6 @@ import stat
 import tarfile
 import zipfile
 
-from django.utils import six
-
 
 class ArchiveException(Exception):
     """
@@ -51,7 +49,7 @@ def extract(path, to_path=''):
         archive.extract(to_path)
 
 
-class Archive(object):
+class Archive:
     """
     The external API class that encapsulates an archive implementation.
     """
@@ -61,7 +59,7 @@ class Archive(object):
     @staticmethod
     def _archive_cls(file):
         cls = None
-        if isinstance(file, six.string_types):
+        if isinstance(file, str):
             filename = file
         else:
             try:
@@ -95,7 +93,7 @@ class Archive(object):
         self._archive.close()
 
 
-class BaseArchive(object):
+class BaseArchive:
     """
     Base Archive class.  Implementations should inherit this class.
     """
@@ -121,8 +119,8 @@ class BaseArchive(object):
 
     def has_leading_dir(self, paths):
         """
-        Returns true if all the paths have the same leading path name
-        (i.e., everything is in one subdirectory in an archive)
+        Return True if all the paths have the same leading path name
+        (i.e., everything is in one subdirectory in an archive).
         """
         common_prefix = None
         for path in paths:

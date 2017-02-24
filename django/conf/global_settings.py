@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Default Django settings. Override these with settings in the module pointed to
 by the DJANGO_SETTINGS_MODULE environment variable.
 """
-from __future__ import unicode_literals
 
 
 # This is defined here as a do-nothing function because we can't import
@@ -447,12 +445,7 @@ SECURE_PROXY_SSL_HEADER = None
 # List of middleware to use. Order is important; in the request phase, these
 # middleware will be applied in the order given, and in the response
 # phase the middleware will be applied in reverse order.
-MIDDLEWARE_CLASSES = [
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-]
-
-MIDDLEWARE = None
+MIDDLEWARE = []
 
 ############
 # SESSIONS #

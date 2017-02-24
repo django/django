@@ -1,12 +1,8 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 # Forward declared intermediate model
-@python_2_unicode_compatible
 class Membership(models.Model):
     person = models.ForeignKey('Person', models.CASCADE)
     group = models.ForeignKey('Group', models.CASCADE)
@@ -17,7 +13,6 @@ class Membership(models.Model):
 
 
 # using custom id column to test ticket #11107
-@python_2_unicode_compatible
 class UserMembership(models.Model):
     id = models.AutoField(db_column='usermembership_id', primary_key=True)
     user = models.ForeignKey(User, models.CASCADE)
@@ -28,7 +23,6 @@ class UserMembership(models.Model):
         return "%s is a user and member of %s" % (self.user.username, self.group.name)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=128)
 
@@ -36,7 +30,6 @@ class Person(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=128)
     # Membership object defined as a class
@@ -67,7 +60,6 @@ class B(models.Model):
 
 
 # Using to_field on the through model
-@python_2_unicode_compatible
 class Car(models.Model):
     make = models.CharField(max_length=20, unique=True, null=True)
     drivers = models.ManyToManyField('Driver', through='CarDriver')
@@ -76,7 +68,6 @@ class Car(models.Model):
         return "%s" % self.make
 
 
-@python_2_unicode_compatible
 class Driver(models.Model):
     name = models.CharField(max_length=20, unique=True, null=True)
 
@@ -87,7 +78,6 @@ class Driver(models.Model):
         ordering = ('name',)
 
 
-@python_2_unicode_compatible
 class CarDriver(models.Model):
     car = models.ForeignKey('Car', models.CASCADE, to_field='make')
     driver = models.ForeignKey('Driver', models.CASCADE, to_field='name')

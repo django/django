@@ -1269,8 +1269,8 @@ to remove usage of these features.
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
   defined with no default value for its ``form_class`` argument is removed.
 
-* The following settings are removed, and :doc:`you must upgrade
-  </ref/templates/upgrading>` to the :setting:`TEMPLATES` setting:
+* The following settings are removed, and you must upgrade to the
+  :setting:`TEMPLATES` setting:
 
   * ``ALLOWED_INCLUDE_ROOTS``
   * ``TEMPLATE_CONTEXT_PROCESSORS``

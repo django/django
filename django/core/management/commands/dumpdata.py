@@ -166,8 +166,7 @@ class Command(BaseCommand):
                     if count_only:
                         yield queryset.order_by().count()
                     else:
-                        for obj in queryset.iterator():
-                            yield obj
+                        yield from queryset.iterator()
 
         try:
             self.stdout.ending = None

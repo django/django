@@ -9,7 +9,7 @@ register = template.Library()
 @register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)
 def prepopulated_fields_js(context):
     """
-    Creates a list of prepopulated_fields that should render Javascript for
+    Create a list of prepopulated_fields that should render Javascript for
     the prepopulated fields for both the admin form and inlines.
     """
     prepopulated_fields = []
@@ -42,7 +42,7 @@ def prepopulated_fields_js(context):
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
     """
-    Displays the row of buttons for delete and save.
+    Display the row of buttons for delete and save.
     """
     change = context['change']
     is_popup = context['is_popup']
@@ -68,7 +68,7 @@ def submit_row(context):
 
 @register.filter
 def cell_count(inline_admin_form):
-    """Returns the number of cells used in a tabular inline"""
+    """Return the number of cells used in a tabular inline."""
     count = 1  # Hidden cell with hidden 'id' field
     for fieldset in inline_admin_form:
         # Loop through all the fields (one per cell)

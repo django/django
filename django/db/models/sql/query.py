@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 import copy
-import warnings
 from collections import Counter, Iterator, Mapping, OrderedDict
 from itertools import chain, count, product
 from string import ascii_uppercase
@@ -18,6 +17,7 @@ from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
 from django.db.models.fields.related_lookups import MultiColSource
+from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q, check_rel_lookup_compatibility, refs_expression,
 )
@@ -30,8 +30,6 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 
@@ -45,7 +43,7 @@ def get_field_names_from_opts(opts):
     ))
 
 
-class RawQuery(object):
+class RawQuery:
     """
     A single raw SQL query
     """
@@ -105,7 +103,7 @@ class RawQuery(object):
         if params_type is tuple:
             params = tuple(adapter(val) for val in self.params)
         elif params_type is dict:
-            params = dict((key, adapter(val)) for key, val in six.iteritems(self.params))
+            params = {key: adapter(val) for key, val in self.params.items()}
         else:
             raise RuntimeError("Unexpected params type: %s" % params_type)
 
@@ -113,7 +111,7 @@ class RawQuery(object):
         self.cursor.execute(self.sql, params)
 
 
-class Query(object):
+class Query:
     """
     A single SQL query.
     """
@@ -185,6 +183,11 @@ class Query(object):
         self._annotations = None  # Maps alias -> Annotation Expression
         self.annotation_select_mask = None
         self._annotation_select_cache = None
+
+        # Set combination attributes
+        self.combinator = None
+        self.combinator_all = False
+        self.combined_queries = ()
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
@@ -303,6 +306,9 @@ class Query(object):
         # used.
         obj._annotation_select_cache = None
         obj.max_depth = self.max_depth
+        obj.combinator = self.combinator
+        obj.combinator_all = self.combinator_all
+        obj.combined_queries = self.combined_queries
         obj._extra = self._extra.copy() if self._extra is not None else None
         if self.extra_select_mask is None:
             obj.extra_select_mask = None
@@ -358,11 +364,20 @@ class Query(object):
         orig_exprs = annotation.get_source_expressions()
         new_exprs = []
         for expr in orig_exprs:
+            # FIXME: These conditions are fairly arbitrary. Identify a better
+            # method of having expressions decide which code path they should
+            # take.
             if isinstance(expr, Ref):
                 # Its already a Ref to subquery (see resolve_ref() for
                 # details)
                 new_exprs.append(expr)
-            elif isinstance(expr, Col):
+            elif isinstance(expr, (WhereNode, Lookup)):
+                # Decompose the subexpressions further. The code here is
+                # copied from the else clause, but this condition must appear
+                # before the contains_aggregate/is_summary condition below.
+                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
+                new_exprs.append(new_expr)
+            elif isinstance(expr, Col) or (expr.contains_aggregate and not expr.is_summary):
                 # Reference to column. Make sure the referenced column
                 # is selected.
                 col_cnt += 1
@@ -649,23 +664,23 @@ class Query(object):
             # slight complexity here is handling fields that exist on parent
             # models.
             workset = {}
-            for model, values in six.iteritems(seen):
+            for model, values in seen.items():
                 for field in model._meta.fields:
                     if field in values:
                         continue
                     m = field.model._meta.concrete_model
                     add_to_dict(workset, m, field)
-            for model, values in six.iteritems(must_include):
+            for model, values in must_include.items():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
                 # empty set means "include all fields". That's why there's no
                 # "else" branch here.
                 if model in workset:
                     workset[model].update(values)
-            for model, values in six.iteritems(workset):
+            for model, values in workset.items():
                 callback(target, model, values)
         else:
-            for model, values in six.iteritems(must_include):
+            for model, values in must_include.items():
                 if model in seen:
                     seen[model].update(values)
                 else:
@@ -679,7 +694,7 @@ class Query(object):
             for model in orig_opts.get_parent_list():
                 if model not in seen:
                     seen[model] = set()
-            for model, values in six.iteritems(seen):
+            for model, values in seen.items():
                 callback(target, model, values)
 
     def table_alias(self, table_name, create=False):
@@ -797,7 +812,7 @@ class Query(object):
                 (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
-        for old_alias, new_alias in six.iteritems(change_map):
+        for old_alias, new_alias in change_map.items():
             if old_alias not in self.alias_map:
                 continue
             alias_data = self.alias_map[old_alias].relabeled_clone(change_map)
@@ -1177,10 +1192,12 @@ class Query(object):
             return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                                       can_reuse, e.names_with_path)
 
-        if can_reuse is not None:
-            can_reuse.update(join_list)
+        # Update used_joins before trimming since they are reused to determine
+        # which joins could be later promoted to INNER.
         used_joins = set(used_joins).union(set(join_list))
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
+        if can_reuse is not None:
+            can_reuse.update(join_list)
 
         if field.is_relation:
             # No support for transforms for relational fields
@@ -1302,19 +1319,6 @@ class Query(object):
             except FieldDoesNotExist:
                 if name in self.annotation_select:
                     field = self.annotation_select[name].output_field
-                elif pos == 0:
-                    for rel in opts.related_objects:
-                        if (name == rel.related_model._meta.model_name and
-                                rel.related_name == rel.related_model._meta.default_related_name):
-                            related_name = rel.related_name
-                            field = opts.get_field(related_name)
-                            warnings.warn(
-                                "Query lookup '%s' is deprecated in favor of "
-                                "Meta.default_related_name '%s'."
-                                % (name, related_name),
-                                RemovedInDjango20Warning, 2
-                            )
-                            break
 
             if field is not None:
                 # Fields that contain one-to-many relations with a generic
@@ -1327,7 +1331,12 @@ class Query(object):
                         "querying. If it is a GenericForeignKey, consider "
                         "adding a GenericRelation." % name
                     )
-                model = field.model._meta.concrete_model
+                try:
+                    model = field.model._meta.concrete_model
+                except AttributeError:
+                    # QuerySet.annotate() may introduce fields that aren't
+                    # attached to a model.
+                    model = None
             else:
                 # We didn't find the current field, so move position back
                 # one step.
@@ -1695,7 +1704,7 @@ class Query(object):
             self.group_by.append(col)
 
         if self.annotation_select:
-            for alias, annotation in six.iteritems(self.annotation_select):
+            for alias, annotation in self.annotation_select.items():
                 for col in annotation.get_group_by_cols():
                     self.group_by.append(col)
 
@@ -2047,7 +2056,7 @@ def is_reverse_o2o(field):
     return field.is_relation and field.one_to_one and not field.concrete
 
 
-class JoinPromoter(object):
+class JoinPromoter:
     """
     A class to abstract away join promotion problems for complex filter
     conditions.

@@ -1,13 +1,10 @@
 """
 Internationalization support.
 """
-from __future__ import unicode_literals
-
 import re
 import warnings
+from contextlib import ContextDecorator
 
-from django.utils import six
-from django.utils.decorators import ContextDecorator
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
@@ -41,7 +38,7 @@ class TranslatorCommentWarning(SyntaxWarning):
 # replace the functions with their real counterparts (once we do access the
 # settings).
 
-class Trans(object):
+class Trans:
     """
     The purpose of this class is to store the actual translation function upon
     receiving the first call to that function. After this is done, changes to
@@ -81,16 +78,16 @@ def gettext(message):
     return _trans.gettext(message)
 
 
+# An alias since Django 2.0
+ugettext = gettext
+
+
 def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
 
 
-def ugettext(message):
-    return _trans.ugettext(message)
-
-
-def ungettext(singular, plural, number):
-    return _trans.ungettext(singular, plural, number)
+# An alias since Django 2.0
+ungettext = ngettext
 
 
 def pgettext(context, message):
@@ -101,13 +98,12 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 
-gettext_lazy = lazy(gettext, str)
-ugettext_lazy = lazy(ugettext, six.text_type)
-pgettext_lazy = lazy(pgettext, six.text_type)
+gettext_lazy = ugettext_lazy = lazy(gettext, str)
+pgettext_lazy = lazy(pgettext, str)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    if isinstance(number, six.integer_types):
+    if isinstance(number, int):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
@@ -116,9 +112,6 @@ def lazy_number(func, resultclass, number=None, **kwargs):
         class NumberAwareString(resultclass):
             def __bool__(self):
                 return bool(kwargs['singular'])
-
-            def __nonzero__(self):  # Python 2 compatibility
-                return type(self).__bool__(self)
 
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
@@ -154,12 +147,12 @@ def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
 
 
-def ungettext_lazy(singular, plural, number=None):
-    return lazy_number(ungettext, six.text_type, singular=singular, plural=plural, number=number)
+# An alias since Django 2.0
+ungettext_lazy = ngettext_lazy
 
 
 def npgettext_lazy(context, singular, plural, number=None):
-    return lazy_number(npgettext, six.text_type, context=context, singular=singular, plural=plural, number=number)
+    return lazy_number(npgettext, str, context=context, singular=singular, plural=plural, number=number)
 
 
 def activate(language):
@@ -236,7 +229,7 @@ def _string_concat(*strings):
     return ''.join(force_text(s) for s in strings)
 
 
-string_concat = lazy(_string_concat, six.text_type)
+string_concat = lazy(_string_concat, str)
 
 
 def get_language_info(lang_code):
@@ -257,7 +250,7 @@ def get_language_info(lang_code):
             raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
 
     if info:
-        info['name_translated'] = ugettext_lazy(info['name'])
+        info['name_translated'] = gettext_lazy(info['name'])
     return info
 
 

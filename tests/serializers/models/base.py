@@ -4,13 +4,9 @@ Serialization
 ``django.core.serializers`` provides interfaces to converting Django
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
-from __future__ import unicode_literals
-
 from decimal import Decimal
 
 from django.db import models
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class CategoryMetaDataManager(models.Manager):
@@ -19,7 +15,6 @@ class CategoryMetaDataManager(models.Manager):
         return self.get(kind=kind, name=name)
 
 
-@python_2_unicode_compatible
 class CategoryMetaData(models.Model):
     kind = models.CharField(max_length=10)
     name = models.CharField(max_length=10)
@@ -36,7 +31,6 @@ class CategoryMetaData(models.Model):
         return (self.kind, self.name)
 
 
-@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
     meta_data = models.ForeignKey(CategoryMetaData, models.SET_NULL, null=True, default=None)
@@ -48,7 +42,6 @@ class Category(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=20)
 
@@ -59,7 +52,6 @@ class Author(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     headline = models.CharField(max_length=50)
@@ -74,7 +66,6 @@ class Article(models.Model):
         return self.headline
 
 
-@python_2_unicode_compatible
 class AuthorProfile(models.Model):
     author = models.OneToOneField(Author, models.CASCADE, primary_key=True)
     date_of_birth = models.DateField()
@@ -83,7 +74,6 @@ class AuthorProfile(models.Model):
         return "Profile of %s" % self.author
 
 
-@python_2_unicode_compatible
 class Actor(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
 
@@ -94,7 +84,6 @@ class Actor(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Movie(models.Model):
     actor = models.ForeignKey(Actor, models.CASCADE)
     title = models.CharField(max_length=50)
@@ -111,8 +100,7 @@ class Score(models.Model):
     score = models.FloatField()
 
 
-@python_2_unicode_compatible
-class Team(object):
+class Team:
     def __init__(self, title):
         self.title = title
 
@@ -126,10 +114,10 @@ class Team(object):
 class TeamField(models.CharField):
 
     def __init__(self):
-        super(TeamField, self).__init__(max_length=100)
+        super().__init__(max_length=100)
 
     def get_db_prep_save(self, value, connection):
-        return six.text_type(value.title)
+        return str(value.title)
 
     def to_python(self, value):
         if isinstance(value, Team):
@@ -143,12 +131,11 @@ class TeamField(models.CharField):
         return self.value_from_object(obj).to_string()
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TeamField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         del kwargs['max_length']
         return name, path, args, kwargs
 
 
-@python_2_unicode_compatible
 class Player(models.Model):
     name = models.CharField(max_length=50)
     rank = models.IntegerField()

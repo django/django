@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import unicode_literals
-
 import copy
 import io
 import os
+import pickle
 import re
 import shutil
 import tempfile
@@ -14,6 +11,7 @@ import threading
 import time
 import unittest
 import warnings
+from unittest import mock
 
 from django.conf import settings
 from django.core import management, signals
@@ -34,24 +32,18 @@ from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
-    ignore_warnings, mock, override_settings,
+    ignore_warnings, override_settings,
 )
 from django.test.signals import setting_changed
-from django.utils import six, timezone, translation
+from django.utils import timezone, translation
 from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control,
     patch_response_headers, patch_vary_headers,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
-
-try:    # Use the same idiom as in cache backends
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
 
 # functions/classes for complex data type tests
@@ -64,14 +56,9 @@ class C:
         return 24
 
 
-class Unpicklable(object):
+class Unpicklable:
     def __getstate__(self):
         raise pickle.PickleError()
-
-
-class UnpicklableType(object):
-    # Unpicklable using the default pickling protocol on Python 2.
-    __slots__ = 'a',
 
 
 @override_settings(CACHES={
@@ -96,7 +83,7 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("addkey1"))
 
     def test_non_existent(self):
-        "Non-existent keys aren't found in the dummy cache backend"
+        "Nonexistent keys aren't found in the dummy cache backend"
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
@@ -259,7 +246,7 @@ def caches_setting_for_tests(base=None, exclude=None, **params):
     return setting
 
 
-class BaseCacheTests(object):
+class BaseCacheTests:
     # A common set of tests to apply to all cache backends
 
     def setUp(self):
@@ -293,8 +280,7 @@ class BaseCacheTests(object):
         self.assertEqual(caches['prefix'].get('somekey'), 'value2')
 
     def test_non_existent(self):
-        # Non-existent cache keys return as None/default
-        # get with non-existent keys
+        """Nonexistent cache keys return as None/default."""
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
@@ -900,13 +886,13 @@ class BaseCacheTests(object):
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
-        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
+        self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
         update_middleware.process_response(request, get_cache_data)
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
-        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
+        self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
     def test_add_fail_on_pickleerror(self):
@@ -932,11 +918,7 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
     def test_get_or_set_version(self):
-        msg = (
-            "get_or_set() missing 1 required positional argument: 'default'"
-            if six.PY3
-            else 'get_or_set() takes at least 3 arguments'
-        )
+        msg = "get_or_set() missing 1 required positional argument: 'default'"
         cache.get_or_set('brian', 1979, version=2)
         with self.assertRaisesMessage(TypeError, msg):
             cache.get_or_set('brian')
@@ -966,12 +948,12 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def setUp(self):
         # The super calls needs to happen first for the settings override.
-        super(DBCacheTests, self).setUp()
+        super().setUp()
         self.create_table()
 
     def tearDown(self):
         # The super call needs to happen first because it uses the database.
-        super(DBCacheTests, self).tearDown()
+        super().tearDown()
         self.drop_table()
 
     def create_table(self):
@@ -986,7 +968,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
 
     def test_second_call_doesnt_crash(self):
-        out = six.StringIO()
+        out = io.StringIO()
         management.call_command('createcachetable', stdout=out)
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
@@ -996,7 +978,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         LOCATION='createcachetable_dry_run_mode'
     ))
     def test_createcachetable_dry_run_mode(self):
-        out = six.StringIO()
+        out = io.StringIO()
         management.call_command('createcachetable', dry_run=True, stdout=out)
         output = out.getvalue()
         self.assertTrue(output.startswith("CREATE TABLE"))
@@ -1007,7 +989,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         specifying the table name).
         """
         self.drop_table()
-        out = six.StringIO()
+        out = io.StringIO()
         management.call_command(
             'createcachetable',
             'test cache table',
@@ -1022,7 +1004,7 @@ class DBCacheWithTimeZoneTests(DBCacheTests):
     pass
 
 
-class DBCacheRouter(object):
+class DBCacheRouter:
     """A router that puts the cache table on the 'other' database."""
 
     def db_for_read(self, model, **hints):
@@ -1073,7 +1055,7 @@ class CreateCacheTableForDBCacheTests(TestCase):
                                     verbosity=0, interactive=False)
 
 
-class PicklingSideEffect(object):
+class PicklingSideEffect:
 
     def __init__(self, cache):
         self.cache = cache
@@ -1091,7 +1073,7 @@ class PicklingSideEffect(object):
 class LocMemCacheTests(BaseCacheTests, TestCase):
 
     def setUp(self):
-        super(LocMemCacheTests, self).setUp()
+        super().setUp()
 
         # LocMem requires a hack to make the other caches
         # share a data store with the 'normal' cache.
@@ -1338,7 +1320,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     """
 
     def setUp(self):
-        super(FileBasedCacheTests, self).setUp()
+        super().setUp()
         self.dirname = tempfile.mkdtemp()
         # Caches location cannot be modified through override_settings / modify_settings,
         # hence settings are manipulated directly here and the setting_changed signal
@@ -1348,7 +1330,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
-        super(FileBasedCacheTests, self).tearDown()
+        super().tearDown()
         # Call parent first, as cache.clear() may recreate cache base directory
         shutil.rmtree(self.dirname)
 
@@ -1371,18 +1353,14 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         cache.set('foo', 'bar')
         os.path.exists(self.dirname)
 
-    def test_cache_write_unpicklable_type(self):
-        # This fails if not using the highest pickling protocol on Python 2.
-        cache.set('unpicklable', UnpicklableType())
-
     def test_get_ignores_enoent(self):
         cache.set('foo', 'bar')
         os.unlink(cache._key_to_file('foo'))
         # Returns the default instead of erroring.
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
 
-    def test_get_does_not_ignore_non_enoent_errno_values(self):
-        with mock.patch.object(io, 'open', side_effect=IOError):
+    def test_get_does_not_ignore_non_filenotfound_exceptions(self):
+        with mock.patch('builtins.open', side_effect=IOError):
             with self.assertRaises(IOError):
                 cache.get('foo')
 
@@ -1809,7 +1787,7 @@ class CacheI18nTest(TestCase):
         request = self.factory.get(self.path)
         # This is tightly coupled to the implementation,
         # but it's the most straightforward way to test the key.
-        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
+        tz = timezone.get_current_timezone_name()
         tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
@@ -1821,7 +1799,7 @@ class CacheI18nTest(TestCase):
     def test_cache_key_no_i18n(self):
         request = self.factory.get(self.path)
         lang = translation.get_language()
-        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
+        tz = timezone.get_current_timezone_name()
         tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
@@ -1933,10 +1911,6 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertIsNone(get_cache_data)
 
-        # This test passes on Python < 3.3 even without the corresponding code
-        # in UpdateCacheMiddleware, because pickling a StreamingHttpResponse
-        # fails (http://bugs.python.org/issue14288). LocMemCache silently
-        # swallows the exception and doesn't store the response in cache.
         content = ['Check for cache with streaming content.']
         response = StreamingHttpResponse(content)
         UpdateCacheMiddleware().process_response(request, response)
@@ -1983,7 +1957,7 @@ def csrf_view(request):
 class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
-        super(CacheMiddlewareTest, self).setUp()
+        super().setUp()
         self.factory = RequestFactory()
         self.default_cache = caches['default']
         self.other_cache = caches['other']
@@ -1991,7 +1965,7 @@ class CacheMiddlewareTest(SimpleTestCase):
     def tearDown(self):
         self.default_cache.clear()
         self.other_cache.clear()
-        super(CacheMiddlewareTest, self).tearDown()
+        super().tearDown()
 
     def test_constructor(self):
         """

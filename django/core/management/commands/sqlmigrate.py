@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
@@ -30,7 +27,7 @@ class Command(BaseCommand):
         # no_color=True so that the BEGIN/COMMIT statements added by
         # output_transaction don't get colored either.
         options['no_color'] = True
-        return super(Command, self).execute(*args, **options)
+        return super().execute(*args, **options)
 
     def handle(self, *args, **options):
         # Get the database we're operating from

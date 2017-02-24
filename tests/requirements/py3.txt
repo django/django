@@ -1,2 +1,15 @@
--r base.txt
+argon2-cffi >= 16.1.0
+bcrypt
+docutils
+geoip2
+jinja2 >= 2.9.2
+numpy
+Pillow
+# pylibmc/libmemcached can't be built on Windows.
+pylibmc; sys.platform != 'win32'
 python3-memcached
+pytz
+PyYAML
+selenium
+sqlparse
+tblib

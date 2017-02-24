@@ -307,7 +307,7 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
     name = 'djangohtml'
 
     def finish(self):
-        super(DjangoStandaloneHTMLBuilder, self).finish()
+        super().finish()
         self.info(bold("writing templatebuiltins.js..."))
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {

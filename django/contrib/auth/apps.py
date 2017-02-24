@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.core import checks
 from django.db.models.signals import post_migrate
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .checks import check_models_permissions, check_user_model
 from .management import create_permissions

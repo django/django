@@ -1,17 +1,16 @@
-from __future__ import unicode_literals
-
 import difflib
 import json
 import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy
 from functools import wraps
 from unittest.util import safe_repr
+from urllib.parse import unquote, urljoin, urlparse, urlsplit
+from urllib.request import url2pathname
 
 from django.apps import apps
 from django.conf import settings
@@ -22,7 +21,7 @@ from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
-from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
+from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -34,14 +33,8 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils import six
 from django.utils.decorators import classproperty
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import (
-    unquote, urljoin, urlparse, urlsplit, urlunsplit,
-)
-from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -73,10 +66,10 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
     def __init__(self, test_case, num, connection):
         self.test_case = test_case
         self.num = num
-        super(_AssertNumQueriesContext, self).__init__(connection)
+        super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         executed = len(self)
@@ -91,7 +84,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         )
 
 
-class _AssertTemplateUsedContext(object):
+class _AssertTemplateUsedContext:
     def __init__(self, test_case, template_name):
         self.test_case = test_case
         self.template_name = template_name
@@ -137,7 +130,7 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
-class _CursorFailure(object):
+class _CursorFailure:
     def __init__(self, cls_name, wrapped):
         self.cls_name = cls_name
         self.wrapped = wrapped
@@ -164,7 +157,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SimpleTestCase, cls).setUpClass()
+        super().setUpClass()
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
@@ -175,6 +168,7 @@ class SimpleTestCase(unittest.TestCase):
             for alias in connections:
                 connection = connections[alias]
                 connection.cursor = _CursorFailure(cls.__name__, connection.cursor)
+                connection.chunked_cursor = _CursorFailure(cls.__name__, connection.chunked_cursor)
 
     @classmethod
     def tearDownClass(cls):
@@ -182,13 +176,14 @@ class SimpleTestCase(unittest.TestCase):
             for alias in connections:
                 connection = connections[alias]
                 connection.cursor = connection.cursor.wrapped
+                connection.chunked_cursor = connection.chunked_cursor.wrapped
         if hasattr(cls, '_cls_modified_context'):
             cls._cls_modified_context.disable()
             delattr(cls, '_cls_modified_context')
         if hasattr(cls, '_cls_overridden_context'):
             cls._cls_overridden_context.disable()
             delattr(cls, '_cls_overridden_context')
-        super(SimpleTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def __call__(self, result=None):
         """
@@ -208,7 +203,7 @@ class SimpleTestCase(unittest.TestCase):
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
-        super(SimpleTestCase, self).__call__(result)
+        super().__call__(result)
         if not skipped:
             try:
                 self._post_teardown()
@@ -243,7 +238,7 @@ class SimpleTestCase(unittest.TestCase):
         return modify_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200, host=None, msg_prefix='',
+                        target_status_code=200, msg_prefix='',
                         fetch_redirect_response=True):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
@@ -252,12 +247,6 @@ class SimpleTestCase(unittest.TestCase):
         TestClient to do a request (use fetch_redirect_response=False to check
         such links without fetching them).
         """
-        if host is not None:
-            warnings.warn(
-                "The host argument is deprecated and no longer used by assertRedirects",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-
         if msg_prefix:
             msg_prefix += ": "
 
@@ -321,19 +310,6 @@ class SimpleTestCase(unittest.TestCase):
                     msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
                     % (path, redirect_response.status_code, target_status_code)
                 )
-
-        if url != expected_url:
-            # For temporary backwards compatibility, try to compare with a relative url
-            e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
-            relative_url = urlunsplit(('', '', e_path, e_query, e_fragment))
-            if url == relative_url:
-                warnings.warn(
-                    "assertRedirects had to strip the scheme and domain from the "
-                    "expected URL, as it was always added automatically to URLs "
-                    "before Django 1.9. Please update your expected URLs by "
-                    "removing the scheme and domain.",
-                    RemovedInDjango20Warning, stacklevel=2)
-                expected_url = relative_url
 
         self.assertEqual(
             url, expected_url,
@@ -623,14 +599,8 @@ class SimpleTestCase(unittest.TestCase):
             args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
-        # callable_obj was a documented kwarg in Django 1.8 and older.
-        callable_obj = kwargs.pop('callable_obj', None)
-        if callable_obj:
-            warnings.warn(
-                'The callable_obj kwarg is deprecated. Pass the callable '
-                'as a positional argument instead.', RemovedInDjango20Warning
-            )
-        elif len(args):
+        callable_obj = None
+        if len(args):
             callable_obj = args[0]
             args = args[1:]
 
@@ -701,8 +671,7 @@ class SimpleTestCase(unittest.TestCase):
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                six.text_type(dom1).splitlines(),
-                six.text_type(dom2).splitlines(),
+                str(dom1).splitlines(), str(dom2).splitlines(),
             )))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
@@ -739,7 +708,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -756,7 +725,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -778,10 +747,7 @@ class SimpleTestCase(unittest.TestCase):
             if not result:
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 diff = ('\n' + '\n'.join(
-                    difflib.ndiff(
-                        six.text_type(xml1).splitlines(),
-                        six.text_type(xml2).splitlines(),
-                    )
+                    difflib.ndiff(xml1.splitlines(), xml2.splitlines())
                 ))
                 standardMsg = self._truncateMessage(standardMsg, diff)
                 self.fail(self._formatMessage(msg, standardMsg))
@@ -802,12 +768,6 @@ class SimpleTestCase(unittest.TestCase):
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
 
-    if six.PY2:
-        assertCountEqual = unittest.TestCase.assertItemsEqual
-        assertNotRegex = unittest.TestCase.assertNotRegexpMatches
-        assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
-        assertRegex = unittest.TestCase.assertRegexpMatches
-
 
 class TransactionTestCase(SimpleTestCase):
 
@@ -820,6 +780,9 @@ class TransactionTestCase(SimpleTestCase):
 
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
+
+    # Do the tests in this class query non-default databases?
+    multi_db = False
 
     # If transactions aren't available, Django will serialize the database
     # contents into a fixture during setup and flush and reload them
@@ -839,7 +802,7 @@ class TransactionTestCase(SimpleTestCase):
           run with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
-        super(TransactionTestCase, self)._pre_setup()
+        super()._pre_setup()
         if self.available_apps is not None:
             apps.set_available_apps(self.available_apps)
             setting_changed.send(
@@ -867,7 +830,7 @@ class TransactionTestCase(SimpleTestCase):
     def _databases_names(cls, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
         # including mirrors or not. Otherwise, just on the default DB.
-        if getattr(cls, 'multi_db', False):
+        if cls.multi_db:
             return [
                 alias for alias in connections
                 if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']
@@ -921,7 +884,7 @@ class TransactionTestCase(SimpleTestCase):
         """
         try:
             self._fixture_teardown()
-            super(TransactionTestCase, self)._post_teardown()
+            super()._post_teardown()
             if self._should_reload_connections():
                 # Some DB cursors include SQL statements as part of cursor
                 # creation. If you have a test that does a rollback, the effect
@@ -958,7 +921,7 @@ class TransactionTestCase(SimpleTestCase):
                          inhibit_post_migrate=inhibit_post_migrate)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
-        items = six.moves.map(transform, qs)
+        items = map(transform, qs)
         if not ordered:
             return self.assertEqual(Counter(items), Counter(values), msg=msg)
         values = list(values)
@@ -969,8 +932,7 @@ class TransactionTestCase(SimpleTestCase):
                              "against more than one ordered values")
         return self.assertEqual(list(items), values, msg=msg)
 
-    def assertNumQueries(self, num, func=None, *args, **kwargs):
-        using = kwargs.pop("using", DEFAULT_DB_ALIAS)
+    def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
         conn = connections[using]
 
         context = _AssertNumQueriesContext(self, num, conn)
@@ -1020,7 +982,7 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCase, cls).setUpClass()
+        super().setUpClass()
         if not connections_support_transactions():
             return
         cls.cls_atomics = cls._enter_atomics()
@@ -1048,7 +1010,7 @@ class TestCase(TransactionTestCase):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
                 conn.close()
-        super(TestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     @classmethod
     def setUpTestData(cls):
@@ -1058,21 +1020,21 @@ class TestCase(TransactionTestCase):
     def _should_reload_connections(self):
         if connections_support_transactions():
             return False
-        return super(TestCase, self)._should_reload_connections()
+        return super()._should_reload_connections()
 
     def _fixture_setup(self):
         if not connections_support_transactions():
             # If the backend does not support transactions, we should reload
             # class data before each test
             self.setUpTestData()
-            return super(TestCase, self)._fixture_setup()
+            return super()._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
         self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
-            return super(TestCase, self)._fixture_teardown()
+            return super()._fixture_teardown()
         try:
             for db_name in reversed(self._databases_names()):
                 if self._should_check_constraints(connections[db_name]):
@@ -1087,7 +1049,7 @@ class TestCase(TransactionTestCase):
         )
 
 
-class CheckCondition(object):
+class CheckCondition:
     """Descriptor class for deferred condition checking"""
     def __init__(self, *conditions):
         self.conditions = conditions
@@ -1181,7 +1143,7 @@ class FSFilesHandler(WSGIHandler):
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())
-        super(FSFilesHandler, self).__init__()
+        super().__init__()
 
     def _should_handle(self, path):
         """
@@ -1207,7 +1169,7 @@ class FSFilesHandler(WSGIHandler):
                 return self.serve(request)
             except Http404:
                 pass
-        return super(FSFilesHandler, self).get_response(request)
+        return super().get_response(request)
 
     def serve(self, request):
         os_rel_path = self.file_path(request.path)
@@ -1221,7 +1183,7 @@ class FSFilesHandler(WSGIHandler):
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
-        return super(FSFilesHandler, self).__call__(environ, start_response)
+        return super().__call__(environ, start_response)
 
 
 class _StaticFilesHandler(FSFilesHandler):
@@ -1262,7 +1224,7 @@ class LiveServerThread(threading.Thread):
         self.error = None
         self.static_handler = static_handler
         self.connections_override = connections_override
-        super(LiveServerThread, self).__init__()
+        super().__init__()
 
     def run(self):
         """
@@ -1289,7 +1251,7 @@ class LiveServerThread(threading.Thread):
             connections.close_all()
 
     def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
+        return ThreadedWSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1320,7 +1282,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(LiveServerTestCase, cls).setUpClass()
+        super().setUpClass()
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
@@ -1371,10 +1333,10 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         cls._live_server_modified_settings.disable()
-        super(LiveServerTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
 
-class SerializeMixin(object):
+class SerializeMixin:
     """
     Mixin to enforce serialization of TestCases that share a common resource.
 
@@ -1394,9 +1356,9 @@ class SerializeMixin(object):
                 "in the base class.".format(cls.__name__))
         cls._lockfile = open(cls.lockfile)
         locks.lock(cls._lockfile, locks.LOCK_EX)
-        super(SerializeMixin, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(SerializeMixin, cls).tearDownClass()
+        super().tearDownClass()
         cls._lockfile.close()

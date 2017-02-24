@@ -6,7 +6,8 @@ from django.db.models.deletion import (
     CASCADE, DO_NOTHING, PROTECT, SET, SET_DEFAULT, SET_NULL, ProtectedError,
 )
 from django.db.models.expressions import (
-    Case, Expression, ExpressionWrapper, F, Func, Value, When,
+    Case, Exists, Expression, ExpressionWrapper, F, Func, OuterRef, Subquery,
+    Value, When,
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
@@ -62,7 +63,8 @@ __all__ += [
     'ObjectDoesNotExist', 'signals',
     'CASCADE', 'DO_NOTHING', 'PROTECT', 'SET', 'SET_DEFAULT', 'SET_NULL',
     'ProtectedError',
-    'Case', 'Expression', 'ExpressionWrapper', 'F', 'Func', 'Value', 'When',
+    'Case', 'Exists', 'Expression', 'ExpressionWrapper', 'F', 'Func',
+    'OuterRef', 'Subquery', 'Value', 'When',
     'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
     'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',

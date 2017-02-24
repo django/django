@@ -34,7 +34,7 @@ Helper function to return a URL pattern for serving files in debug mode::
     ]
 
 The ``regex`` parameter should be a string or
-:func:`~django.utils.translation.ugettext_lazy()` (see
+:func:`~django.utils.translation.gettext_lazy()` (see
 :ref:`translating-urlpatterns`) that contains a regular expression compatible
 with Python's :py:mod:`re` module. Strings typically use raw string syntax
 (``r''``) so that they can contain sequences like ``\d`` without the need to
@@ -53,10 +53,9 @@ parameter is useful.
 ``include()``
 =============
 
-.. function:: include(module, namespace=None, app_name=None)
+.. function:: include(module, namespace=None)
               include(pattern_list)
               include((pattern_list, app_namespace), namespace=None)
-              include((pattern_list, app_namespace, instance_namespace))
 
     A function that takes a full Python import path to another URLconf module
     that should be "included" in this place. Optionally, the :term:`application
@@ -68,15 +67,12 @@ parameter is useful.
     can be used to set a different instance namespace.
 
     ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns, a 2-tuple containing such iterable plus the names of the
-    application namespaces, or a 3-tuple containing the iterable and the names
-    of both the application and instance namespace.
+    URL patterns or a 2-tuple containing such iterable plus the names of the
+    application namespaces.
 
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: string
-    :arg app_name: Application namespace for the URL entries being included
-    :type app_name: string
     :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
     :arg app_namespace: Application namespace for the URL entries being included
     :type app_namespace: string
@@ -84,20 +80,6 @@ parameter is useful.
     :type instance_namespace: string
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
-
-.. deprecated:: 1.9
-
-    Support for the ``app_name`` argument is deprecated and will be removed in
-    Django 2.0. Specify the ``app_name`` as explained in
-    :ref:`namespaces-and-include` instead.
-
-    Support for passing a 3-tuple is also deprecated and will be removed in
-    Django 2.0. Pass a 2-tuple containing the pattern list and application
-    namespace, and use the ``namespace`` argument instead.
-
-    Lastly, support for an instance namespace without an application namespace
-    has been deprecated and will be removed in Django 2.0. Specify the
-    application namespace or remove the instance namespace.
 
 ``handler400``
 ==============
@@ -108,12 +90,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
-By default, this is ``'django.views.defaults.bad_request'``. If you
+By default, this is :func:`django.views.defaults.bad_request`. If you
 implement a custom view, be sure it returns an
 :class:`~django.http.HttpResponseBadRequest`.
-
-See the documentation about :ref:`the 400 (bad request) view
-<http_bad_request_view>` for more information.
 
 ``handler403``
 ==============
@@ -124,12 +103,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the user doesn't have the permissions required to
 access a resource.
 
-By default, this is ``'django.views.defaults.permission_denied'``. If you
+By default, this is :func:`django.views.defaults.permission_denied`. If you
 implement a custom view, be sure it returns an
 :class:`~django.http.HttpResponseForbidden`.
-
-See the documentation about :ref:`the 403 (HTTP Forbidden) view
-<http_forbidden_view>` for more information.
 
 ``handler404``
 ==============
@@ -139,12 +115,9 @@ See the documentation about :ref:`the 403 (HTTP Forbidden) view
 A callable, or a string representing the full Python import path to the view
 that should be called if none of the URL patterns match.
 
-By default, this is ``'django.views.defaults.page_not_found'``. If you
+By default, this is :func:`django.views.defaults.page_not_found`. If you
 implement a custom view, be sure it returns an
 :class:`~django.http.HttpResponseNotFound`.
-
-See the documentation about :ref:`the 404 (HTTP Not Found) view
-<http_not_found_view>` for more information.
 
 ``handler500``
 ==============
@@ -155,9 +128,6 @@ A callable, or a string representing the full Python import path to the view
 that should be called in case of server errors. Server errors happen when you
 have runtime errors in view code.
 
-By default, this is ``'django.views.defaults.server_error'``. If you
+By default, this is :func:`django.views.defaults.server_error`. If you
 implement a custom view, be sure it returns an
 :class:`~django.http.HttpResponseServerError`.
-
-See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
-<http_internal_server_error_view>` for more information.

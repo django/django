@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+import functools
 import re
 import sys
 import types
@@ -9,11 +8,11 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.urls import Resolver404, resolve
-from django.utils import lru_cache, six, timezone
+from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting.
@@ -24,7 +23,7 @@ HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGN
 CLEANSED_SUBSTITUTE = '********************'
 
 
-class CallableSettingWrapper(object):
+class CallableSettingWrapper:
     """ Object to wrap callable appearing in settings
 
     * Not to call in the debug page (#21345).
@@ -85,7 +84,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         return HttpResponse(html, status=status_code, content_type='text/html')
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_default_exception_reporter_filter():
     # Instantiate the default filter for the first time and cache it.
     return import_string(settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
@@ -96,7 +95,7 @@ def get_exception_reporter_filter(request):
     return getattr(request, 'exception_reporter_filter', default_filter)
 
 
-class ExceptionReporterFilter(object):
+class ExceptionReporterFilter:
     """
     Base for all exception reporter filter classes. All overridable hooks
     contain lenient default behaviors.
@@ -231,7 +230,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         return cleansed.items()
 
 
-class ExceptionReporter(object):
+class ExceptionReporter:
     """
     A class to organize and coordinate reporting on exceptions.
     """
@@ -247,11 +246,6 @@ class ExceptionReporter(object):
         self.template_does_not_exist = False
         self.postmortem = None
 
-        # Handle deprecated string exceptions
-        if isinstance(self.exc_type, six.string_types):
-            self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
-            self.exc_type = type(self.exc_value)
-
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
@@ -264,9 +258,6 @@ class ExceptionReporter(object):
                 frame_vars = []
                 for k, v in frame['vars']:
                     v = pprint(v)
-                    # The force_escape filter assume unicode, make sure that works
-                    if isinstance(v, six.binary_type):
-                        v = v.decode('utf-8', 'replace')  # don't choke on non-utf-8 input
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
@@ -361,9 +352,9 @@ class ExceptionReporter(object):
             return None, [], None, []
 
         # If we just read the source from a file, or if the loader did not
-        # apply tokenize.detect_encoding to decode the source into a Unicode
+        # apply tokenize.detect_encoding to decode the source into a
         # string, then we should do that ourselves.
-        if isinstance(source[0], six.binary_type):
+        if isinstance(source[0], bytes):
             encoding = 'ascii'
             for line in source[:2]:
                 # File coding may be specified. Match pattern from PEP-263
@@ -372,7 +363,7 @@ class ExceptionReporter(object):
                 if match:
                     encoding = match.group(1).decode('ascii')
                     break
-            source = [six.text_type(sline, encoding, 'replace') for sline in source]
+            source = [str(sline, encoding, 'replace') for sline in source]
 
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
@@ -401,11 +392,9 @@ class ExceptionReporter(object):
         if not exceptions:
             return frames
 
-        # In case there's just one exception (always in Python 2,
-        # sometimes in Python 3), take the traceback from self.tb (Python 2
-        # doesn't have a __traceback__ attribute on Exception)
+        # In case there's just one exception, take the traceback from self.tb
         exc_value = exceptions.pop()
-        tb = self.tb if six.PY2 or not exceptions else exc_value.__traceback__
+        tb = self.tb if not exceptions else exc_value.__traceback__
 
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
@@ -440,27 +429,13 @@ class ExceptionReporter(object):
 
             # If the traceback for current exception is consumed, try the
             # other exception.
-            if six.PY2:
-                tb = tb.tb_next
-            elif not tb.tb_next and exceptions:
+            if not tb.tb_next and exceptions:
                 exc_value = exceptions.pop()
                 tb = exc_value.__traceback__
             else:
                 tb = tb.tb_next
 
         return frames
-
-    def format_exception(self):
-        """
-        Return the same data as from traceback.format_exception.
-        """
-        import traceback
-        frames = self.get_traceback_frames()
-        tb = [(f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames]
-        list = ['Traceback (most recent call last):\n']
-        list += traceback.format_list(tb)
-        list += traceback.format_exception_only(self.exc_type, self.exc_value)
-        return list
 
 
 def technical_404_response(request, exception):
@@ -510,7 +485,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': error_url,
         'urlpatterns': tried,
-        'reason': force_bytes(exception, errors='replace'),
+        'reason': str(exception),
         'request': request,
         'settings': get_safe_settings(),
         'raising_view_name': caller,
@@ -867,8 +842,8 @@ Python Version: {{ sys_version_info }}
 Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-{% if settings.MIDDLEWARE is not None %}{{ settings.MIDDLEWARE|pprint }}"""
-"""{% else %}{{ settings.MIDDLEWARE_CLASSES|pprint }}{% endif %}
+{{ settings.MIDDLEWARE|pprint }}"""
+"""
 
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
@@ -1075,8 +1050,8 @@ Server time: {{server_time|date:"r"}}
 Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-{% if settings.MIDDLEWARE is not None %}{{ settings.MIDDLEWARE|pprint }}"""
-"""{% else %}{{ settings.MIDDLEWARE_CLASSES|pprint }}{% endif %}
+{{ settings.MIDDLEWARE|pprint }}"""
+"""
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}

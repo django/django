@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.contrib.sites.models import Site
@@ -17,8 +15,10 @@ from ..models import Article, Author, UrlArticle
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
-    non_existing_urls = ['/non_existing_url/',  # this is in urls.py
-                         '/other_non_existing_url/']  # this NOT in urls.py
+    nonexistent_urls = [
+        '/nonexistent_url/',  # this is in urls.py
+        '/other_nonexistent_url/',  # this NOT in urls.py
+    ]
 
     @classmethod
     def setUpTestData(cls):
@@ -43,7 +43,7 @@ class DefaultsTests(TestCase):
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"
-        for url in self.non_existing_urls:
+        for url in self.nonexistent_urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -62,10 +62,10 @@ class DefaultsTests(TestCase):
         The 404 page should have the csrf_token available in the context
         """
         # See ticket #14565
-        for url in self.non_existing_urls:
+        for url in self.nonexistent_urls:
             response = self.client.get(url)
-            self.assertNotEqual(response.content, 'NOTPROVIDED')
-            self.assertNotEqual(response.content, '')
+            self.assertNotEqual(response.content, b'NOTPROVIDED')
+            self.assertNotEqual(response.content, b'')
 
     def test_server_error(self):
         "The server_error view raises a 500 status"
@@ -103,23 +103,6 @@ class DefaultsTests(TestCase):
         article = UrlArticle.objects.get(pk=1)
         self.assertTrue(getattr(article.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
-
-    @override_settings(DEFAULT_CONTENT_TYPE="text/xml")
-    def test_default_content_type_is_text_html(self):
-        """
-        Content-Type of the default error responses is text/html. Refs #20822.
-        """
-        response = self.client.get('/raises400/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
-        response = self.client.get('/raises403/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
-        response = self.client.get('/non_existing_url/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
-        response = self.client.get('/server_error/')
-        self.assertEqual(response['Content-Type'], 'text/html')
 
     def test_custom_templates_wrong(self):
         """

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from unittest import mock
 
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
@@ -11,7 +10,7 @@ from django.contrib.auth.models import (
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 
 from .models.with_custom_email_field import CustomEmailField
 

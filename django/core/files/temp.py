@@ -9,8 +9,8 @@ if the same flag is not provided [1][2]. Note that this does not address the
 more general issue of opening a file for writing and reading in multiple
 processes in a manner that works across platforms.
 
-Also note that the custom version of NamedTemporaryFile does not support the
-full range of keyword arguments available in Python 2.6+ and 3.0+.
+The custom version of NamedTemporaryFile doesn't support the same keyword
+arguments available in tempfile.NamedTemporaryFile.
 
 1: https://mail.python.org/pipermail/python-list/2005-December/336957.html
 2: http://bugs.python.org/issue14243
@@ -30,10 +30,9 @@ if os.name == 'nt':
         Temporary file object constructor that supports reopening of the
         temporary file in Windows.
 
-        Note that unlike tempfile.NamedTemporaryFile from the standard library,
-        __init__() does not support the 'delete' keyword argument in
-        Python 2.6+, or the 'delete', 'buffering', 'encoding', or 'newline'
-        keyword arguments in Python 3.0+.
+        Unlike tempfile.NamedTemporaryFile from the standard library,
+        __init__() doesn't support the 'delete', 'buffering', 'encoding', or
+        'newline' keyword arguments.
         """
         def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='', dir=None):
             fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)

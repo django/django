@@ -4,13 +4,11 @@ is generated for the table on various manage.py operations.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 #  All of these models are created in the database by Django.
 
 
-@python_2_unicode_compatible
 class A01(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
@@ -22,7 +20,6 @@ class A01(models.Model):
         return self.f_a
 
 
-@python_2_unicode_compatible
 class B01(models.Model):
     fk_a = models.ForeignKey(A01, models.CASCADE)
     f_a = models.CharField(max_length=10, db_index=True)
@@ -37,7 +34,6 @@ class B01(models.Model):
         return self.f_a
 
 
-@python_2_unicode_compatible
 class C01(models.Model):
     mm_a = models.ManyToManyField(A01, db_table='d01')
     f_a = models.CharField(max_length=10, db_index=True)
@@ -54,7 +50,6 @@ class C01(models.Model):
 # since we have told Django they aren't managed by Django.
 
 
-@python_2_unicode_compatible
 class A02(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
 
@@ -66,7 +61,6 @@ class A02(models.Model):
         return self.f_a
 
 
-@python_2_unicode_compatible
 class B02(models.Model):
     class Meta:
         db_table = 'b01'
@@ -82,7 +76,6 @@ class B02(models.Model):
 
 # To re-use the many-to-many intermediate table, we need to manually set up
 # things up.
-@python_2_unicode_compatible
 class C02(models.Model):
     mm_a = models.ManyToManyField(A02, through="Intermediate")
     f_a = models.CharField(max_length=10, db_index=True)

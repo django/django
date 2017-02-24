@@ -1,20 +1,17 @@
-from __future__ import unicode_literals
-
 import string
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save
 from django.http.request import split_domain_port
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 SITE_CACHE = {}
 
 
 def _simple_domain_name_validator(value):
     """
-    Validates that the given value contains no whitespaces to prevent common
+    Validate that the given value contains no whitespaces to prevent common
     typos.
     """
     if not value:
@@ -52,8 +49,8 @@ class SiteManager(models.Manager):
 
     def get_current(self, request=None):
         """
-        Returns the current Site based on the SITE_ID in the project's settings.
-        If SITE_ID isn't defined, it returns the site with domain matching
+        Return the current Site based on the SITE_ID in the project's settings.
+        If SITE_ID isn't defined, return the site with domain matching
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
@@ -72,7 +69,7 @@ class SiteManager(models.Manager):
         )
 
     def clear_cache(self):
-        """Clears the ``Site`` object cache."""
+        """Clear the ``Site`` object cache."""
         global SITE_CACHE
         SITE_CACHE = {}
 
@@ -80,7 +77,6 @@ class SiteManager(models.Manager):
         return self.get(domain=domain)
 
 
-@python_2_unicode_compatible
 class Site(models.Model):
 
     domain = models.CharField(
@@ -107,7 +103,7 @@ class Site(models.Model):
 
 def clear_site_cache(sender, **kwargs):
     """
-    Clears the cache (if primed) each time a site is saved or deleted
+    Clear the cache (if primed) each time a site is saved or deleted.
     """
     instance = kwargs['instance']
     using = kwargs['using']

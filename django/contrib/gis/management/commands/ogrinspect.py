@@ -74,7 +74,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--name-field', dest='name_field',
-            help='Specifies a field name to return for the `__unicode__`/`__str__` function.',
+            help='Specifies a field name to return for the __str__() method.',
         )
         parser.add_argument(
             '--no-imports', action='store_false', dest='imports', default=True,

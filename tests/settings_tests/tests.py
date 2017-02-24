@@ -108,7 +108,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
 
     @classmethod
     def setUpClass(cls):
-        super(ClassDecoratedTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.foo = getattr(settings, 'TEST', 'BUG')
 
     def test_override(self):
@@ -127,7 +127,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         Overriding a method on a super class and then calling that method on
         the super class should not trigger infinite recursion. See #17011.
         """
-        super(ClassDecoratedTestCase, self).test_max_recursion_error()
+        super().test_max_recursion_error()
 
 
 @modify_settings(ITEMS={'append': 'mother'})
@@ -305,8 +305,7 @@ class TestComplexSettingOverride(SimpleTestCase):
                 self.assertEqual(settings.TEST_WARN, 'override')
 
             self.assertEqual(len(w), 1)
-            # File extension may by .py, .pyc, etc. Compare only basename.
-            self.assertEqual(os.path.splitext(w[0].filename)[0], os.path.splitext(__file__)[0])
+            self.assertEqual(w[0].filename, __file__)
             self.assertEqual(str(w[0].message), 'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 

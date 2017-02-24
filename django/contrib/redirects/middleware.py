@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import http
 from django.apps import apps
 from django.conf import settings
@@ -20,7 +18,7 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
                 "You cannot use RedirectFallbackMiddleware when "
                 "django.contrib.sites is not installed."
             )
-        super(RedirectFallbackMiddleware, self).__init__(get_response)
+        super().__init__(get_response)
 
     def process_response(self, request, response):
         # No need to check for a redirect for non-404 responses.

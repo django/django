@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.contrib import admin
@@ -11,11 +9,10 @@ from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context, Template
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
-from django.utils import formats, six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils import formats
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -253,34 +250,6 @@ class ChangeListTests(TestCase):
         with self.assertRaises(IncorrectLookupParameters):
             ChangeList(request, Child, *get_changelist_args(m))
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_result_list_with_allow_tags(self):
-        """
-        Test for deprecation of allow_tags attribute
-        """
-        new_parent = Parent.objects.create(name='parent')
-        for i in range(2):
-            Child.objects.create(name='name %s' % i, parent=new_parent)
-        request = self.factory.get('/child/')
-        m = ChildAdmin(Child, custom_site)
-
-        def custom_method(self, obj=None):
-            return 'Unsafe html <br />'
-        custom_method.allow_tags = True
-
-        # Add custom method with allow_tags attribute
-        m.custom_method = custom_method
-        m.list_display = ['id', 'name', 'parent', 'custom_method']
-
-        cl = ChangeList(request, Child, *get_changelist_args(m))
-        FormSet = m.get_changelist_formset(request)
-        cl.formset = FormSet(queryset=cl.result_list)
-        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
-        table_output = template.render(context)
-        custom_field_html = '<td class="field-custom_method">Unsafe html <br /></td>'
-        self.assertInHTML(custom_field_html, table_output)
-
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
         for i in range(200):
@@ -497,7 +466,7 @@ class ChangeListTests(TestCase):
         event = Event.objects.create(date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_changelist_event_changelist'))
         self.assertContains(response, formats.localize(event.date))
-        self.assertNotContains(response, six.text_type(event.date))
+        self.assertNotContains(response, str(event.date))
 
     def test_dynamic_list_display(self):
         """
@@ -599,10 +568,6 @@ class ChangeListTests(TestCase):
         self.assertNotContains(response, '<a href="%s">' % link)
 
     def test_tuple_list_display(self):
-        """
-        Regression test for #17128
-        (ChangeList failing under Python 2.5 after r16319)
-        """
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow2 = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow_o2o = SwallowOneToOne.objects.create(swallow=swallow2)
@@ -612,9 +577,9 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/swallow/', superuser)
         response = model_admin.changelist_view(request)
         # just want to ensure it doesn't blow up during rendering
-        self.assertContains(response, six.text_type(swallow.origin))
-        self.assertContains(response, six.text_type(swallow.load))
-        self.assertContains(response, six.text_type(swallow.speed))
+        self.assertContains(response, str(swallow.origin))
+        self.assertContains(response, str(swallow.load))
+        self.assertContains(response, str(swallow.speed))
         # Reverse one-to-one relations should work.
         self.assertContains(response, '<td class="field-swallowonetoone">-</td>')
         self.assertContains(response, '<td class="field-swallowonetoone">%s</td>' % swallow_o2o)

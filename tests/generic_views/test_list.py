@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
-from django.utils.encoding import force_str
 from django.views.generic.base import View
 
 from .models import Artist, Author, Book, Page
@@ -238,7 +234,7 @@ class ListViewTests(TestCase):
         self._make_authors(1)
         res = self.client.get('/list/authors/paginated/2/')
         self.assertEqual(res.status_code, 404)
-        self.assertEqual(force_str(res.context.get('reason')), "Invalid page (2): That page contains no results")
+        self.assertEqual(res.context.get('reason'), "Invalid page (2): That page contains no results")
 
     def _make_authors(self, n):
         Author.objects.all().delete()

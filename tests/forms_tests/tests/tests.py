@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -10,7 +7,6 @@ from django.forms import (
 )
 from django.forms.models import ModelFormMetaclass
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
@@ -100,7 +96,7 @@ class ModelFormCallableModelDefault(TestCase):
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
         self.assertEqual(len(choices), 1)
-        self.assertEqual(choices[0], (option.pk, six.text_type(option)))
+        self.assertEqual(choices[0], (option.pk, str(option)))
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"
@@ -175,7 +171,7 @@ class ModelFormCallableModelDefault(TestCase):
 class FormsModelTestCase(TestCase):
     def test_unicode_filename(self):
         # FileModel with unicode filename and data #########################
-        file1 = SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))
+        file1 = SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode())
         f = FileForm(data={}, files={'file1': file1}, auto_id=False)
         self.assertTrue(f.is_valid())
         self.assertIn('file1', f.cleaned_data)
@@ -252,7 +248,7 @@ class RelatedModelFormTests(SimpleTestCase):
             fields = '__all__'
 
         with self.assertRaises(ValueError):
-            ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta})
+            ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):
             pass
@@ -271,7 +267,7 @@ class RelatedModelFormTests(SimpleTestCase):
             model = C
             fields = '__all__'
 
-        self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))
+        self.assertTrue(issubclass(ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta}), ModelForm))
 
 
 class ManyToManyExclusionTestCase(TestCase):

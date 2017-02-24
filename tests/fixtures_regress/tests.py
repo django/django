@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
 # Unittests for fixtures.
-from __future__ import unicode_literals
-
 import json
 import os
 import re
-import unittest
 import warnings
+from io import StringIO
 
-import django
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.base import DeserializationError
@@ -18,9 +14,6 @@ from django.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils import six
-from django.utils._os import upath
-from django.utils.six import PY3, StringIO
 
 from .models import (
     Absolute, Animal, Article, Book, Child, Circle1, Circle2, Circle3,
@@ -32,17 +25,7 @@ from .models import (
     Person, RefToNKChild, Store, Stuff, Thingy, Widget,
 )
 
-_cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
-
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
-
-skipIfNonASCIIPath = unittest.skipIf(
-    not is_ascii(django.__file__) and six.PY2,
-    'Python 2 crashes when checking non-ASCII exception messages.'
-)
+_cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestFixtures(TestCase):
@@ -158,7 +141,7 @@ class TestFixtures(TestCase):
         fixture directory.
         """
         load_absolute_path = os.path.join(
-            os.path.dirname(upath(__file__)),
+            os.path.dirname(__file__),
             'fixtures',
             'absolute.json'
         )
@@ -208,13 +191,12 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
-    @skipIfNonASCIIPath
     @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
     def test_unimportable_serializer(self):
         """
         Failing serializer import raises the proper error
         """
-        with self.assertRaisesRegex(ImportError, r"No module named.*unexistent"):
+        with self.assertRaisesMessage(ImportError, "No module named 'unexistent'"):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -353,8 +335,8 @@ class TestFixtures(TestCase):
             self.assertEqual(
                 self.pre_save_checks,
                 [
-                    ("Count = 42 (<%s 'int'>)" % ('class' if PY3 else 'type'),
-                     "Weight = 1.2 (<%s 'float'>)" % ('class' if PY3 else 'type'))
+                    ("Count = 42 (<class 'int'>)",
+                     "Weight = 1.2 (<class 'float'>)")
                 ]
             )
         finally:
@@ -534,7 +516,6 @@ class TestFixtures(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, "settings.FIXTURE_DIRS contains duplicates."):
             management.call_command('loaddata', 'absolute.json', verbosity=0)
 
-    @skipIfNonASCIIPath
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
     def test_fixture_dirs_with_default_fixture_path(self):
         """
@@ -888,11 +869,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
 class TestTicket11101(TransactionTestCase):
 
-    available_apps = [
-        'fixtures_regress',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-    ]
+    available_apps = ['fixtures_regress']
 
     @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):

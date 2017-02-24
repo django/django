@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import logging
@@ -17,8 +15,6 @@ from django.views.debug import (
 from django.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
-
-from . import BrokenException, except_args
 
 
 def index_page(request):
@@ -72,12 +68,8 @@ class Http404View(View):
         raise Http404("Testing class-based technical 404.")
 
 
-def view_exception(request, n):
-    raise BrokenException(except_args[int(n)])
-
-
-def template_exception(request, n):
-    return render(request, 'debug/template_exception.html', {'arg': except_args[int(n)]})
+def template_exception(request):
+    return render(request, 'debug/template_exception.html')
 
 
 def jsi18n(request):
@@ -243,7 +235,7 @@ def custom_exception_reporter_filter_view(request):
         return technical_500_response(request, *exc_info)
 
 
-class Klass(object):
+class Klass:
 
     @sensitive_variables('sauce')
     def method(self, request):

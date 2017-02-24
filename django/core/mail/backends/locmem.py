@@ -7,7 +7,8 @@ from django.core.mail.backends.base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):
-    """A email backend for use during test sessions.
+    """
+    An email backend for use during test sessions.
 
     The test connection stores email messages in a dummy outbox,
     rather than sending them out on the wire.
@@ -15,7 +16,7 @@ class EmailBackend(BaseEmailBackend):
     The dummy outbox is accessible through the outbox instance attribute.
     """
     def __init__(self, *args, **kwargs):
-        super(EmailBackend, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not hasattr(mail, 'outbox'):
             mail.outbox = []
 

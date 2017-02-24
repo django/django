@@ -77,28 +77,6 @@ The ``Storage`` class
         used will be the current value of ``os.environ['TZ']``; note that this
         is usually set from Django's :setting:`TIME_ZONE`.
 
-    .. method:: accessed_time(name)
-
-        Returns a naive ``datetime`` object containing the last
-        accessed time of the file. For storage systems that aren't
-        able to return the last accessed time this will raise
-        ``NotImplementedError`` instead.
-
-        .. deprecated:: 1.10
-
-            Use :meth:`get_accessed_time` instead.
-
-    .. method:: created_time(name)
-
-        Returns a naive ``datetime`` object containing the creation
-        time of the file.  For storage systems that aren't able to
-        return the creation time this will raise
-        ``NotImplementedError`` instead.
-
-        .. deprecated:: 1.10
-
-            Use :meth:`get_created_time` instead.
-
     .. method:: delete(name)
 
         Deletes the file referenced by ``name``. If deletion is not supported
@@ -112,8 +90,6 @@ The ``Storage`` class
         file.
 
     .. method:: get_accessed_time(name)
-
-        .. versionadded:: 1.10
 
         Returns a :class:`~datetime.datetime` of the last accessed time of the
         file. For storage systems unable to return the last accessed time this
@@ -139,8 +115,6 @@ The ``Storage`` class
 
     .. method:: get_created_time(name)
 
-        .. versionadded:: 1.10
-
         Returns a :class:`~datetime.datetime` of the creation time of the file.
         For storage systems unable to return the creation time this will raise
         :exc:`NotImplementedError`.
@@ -149,8 +123,6 @@ The ``Storage`` class
         otherwise returns a naive ``datetime`` in the local timezone.
 
     .. method:: get_modified_time(name)
-
-        .. versionadded:: 1.10
 
         Returns a :class:`~datetime.datetime` of the last modified time of the
         file. For storage systems unable to return the last modified time this
@@ -165,8 +137,6 @@ The ``Storage`` class
         for use on the target storage system.
 
     .. method:: generate_filename(filename)
-
-        .. versionadded:: 1.10
 
         Validates the ``filename`` by calling :attr:`get_valid_name()` and
         returns a filename to be passed to the :meth:`save` method.
@@ -185,17 +155,6 @@ The ``Storage`` class
         the first item being directories, the second item being files. For
         storage systems that aren't able to provide such a listing, this will
         raise a ``NotImplementedError`` instead.
-
-    .. method:: modified_time(name)
-
-        Returns a naive ``datetime`` object containing the last
-        modified time. For storage systems that aren't able to return
-        the last modified time, this will raise
-        ``NotImplementedError`` instead.
-
-        .. deprecated:: 1.10
-
-            Use :meth:`get_modified_time` instead.
 
     .. method:: open(name, mode='rb')
 

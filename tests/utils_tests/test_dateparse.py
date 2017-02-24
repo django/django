@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import unittest
 from datetime import date, datetime, time, timedelta
 
@@ -108,6 +106,10 @@ class DurationParseTests(unittest.TestCase):
 
     def test_negative(self):
         self.assertEqual(parse_duration('-4 15:30'), timedelta(days=-4, minutes=15, seconds=30))
+        self.assertEqual(parse_duration('-172800'), timedelta(days=-2))
+        self.assertEqual(parse_duration('-15:30'), timedelta(minutes=-15, seconds=30))
+        self.assertEqual(parse_duration('-1:15:30'), timedelta(hours=-1, minutes=15, seconds=30))
+        self.assertEqual(parse_duration('-30.1'), timedelta(seconds=-30, milliseconds=-100))
 
     def test_iso_8601(self):
         self.assertIsNone(parse_duration('P4Y'))

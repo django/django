@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import date
 
 from django import forms
@@ -10,17 +8,19 @@ from django.contrib.admin.options import (
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
 from django.contrib.auth.models import User
+from django.db import models
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import isolate_apps
 
 from .models import Band, Concert
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
 
@@ -91,6 +91,33 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
         self.assertTrue(ma.lookup_allowed('name__nonexistent', 'test_value'))
+
+    @isolate_apps('modeladmin')
+    def test_lookup_allowed_onetoone(self):
+        class Department(models.Model):
+            code = models.CharField(max_length=4, unique=True)
+
+        class Employee(models.Model):
+            department = models.ForeignKey(Department, models.CASCADE, to_field="code")
+
+        class EmployeeProfile(models.Model):
+            employee = models.OneToOneField(Employee, models.CASCADE)
+
+        class EmployeeInfo(models.Model):
+            employee = models.OneToOneField(Employee, models.CASCADE)
+            description = models.CharField(max_length=100)
+
+        class EmployeeProfileAdmin(ModelAdmin):
+            list_filter = [
+                'employee__employeeinfo__description',
+                'employee__department__code',
+            ]
+
+        ma = EmployeeProfileAdmin(EmployeeProfile, self.site)
+        # Reverse OneToOneField
+        self.assertIs(ma.lookup_allowed('employee__employeeinfo__description', 'test_value'), True)
+        # OneToOneField and ForeignKey
+        self.assertIs(ma.lookup_allowed('employee__department__code', 'test_value'), True)
 
     def test_field_arguments(self):
         # If fields is specified, fieldsets_add and fieldsets_change should
@@ -322,7 +349,7 @@ class ModelAdminTests(TestCase):
 
             def get_form(self, request, obj=None, **kwargs):
                 kwargs['exclude'] = ['bio']
-                return super(BandAdmin, self).get_form(request, obj, **kwargs)
+                return super().get_form(request, obj, **kwargs)
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'sign_date'])
@@ -345,7 +372,7 @@ class ModelAdminTests(TestCase):
 
             def get_formset(self, request, obj=None, **kwargs):
                 kwargs['exclude'] = ['opening_band']
-                return super(ConcertInline, self).get_formset(request, obj, **kwargs)
+                return super().get_formset(request, obj, **kwargs)
 
         class BandAdmin(ModelAdmin):
             inlines = [ConcertInline]
@@ -422,7 +449,7 @@ class ModelAdminTests(TestCase):
 
         class AdminConcertForm(forms.ModelForm):
             def __init__(self, *args, **kwargs):
-                super(AdminConcertForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields["main_band"].queryset = Band.objects.filter(name='The Doors')
 
         class ConcertAdminWithForm(ModelAdmin):
@@ -457,7 +484,7 @@ class ModelAdminTests(TestCase):
             def get_formset(self, request, obj=None, **kwargs):
                 if obj:
                     kwargs['form'] = CustomConcertForm
-                return super(ConcertInline, self).get_formset(request, obj, **kwargs)
+                return super().get_formset(request, obj, **kwargs)
 
         class BandAdmin(ModelAdmin):
             inlines = [ConcertInline]
@@ -591,7 +618,7 @@ class ModelAdminTests(TestCase):
 
 class ModelAdminPermissionTests(SimpleTestCase):
 
-    class MockUser(object):
+    class MockUser:
         def has_module_perms(self, app_label):
             if app_label == "modeladmin":
                 return True

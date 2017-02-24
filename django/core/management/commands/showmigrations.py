@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
@@ -43,13 +40,21 @@ class Command(BaseCommand):
         connection = connections[db]
 
         if options['format'] == "plan":
-            return self.show_plan(connection)
+            return self.show_plan(connection, options['app_label'])
         else:
             return self.show_list(connection, options['app_label'])
 
+    def _validate_app_names(self, loader, app_names):
+        invalid_apps = []
+        for app_name in app_names:
+            if app_name not in loader.migrated_apps:
+                invalid_apps.append(app_name)
+        if invalid_apps:
+            raise CommandError('No migrations present for: %s' % (', '.join(sorted(invalid_apps))))
+
     def show_list(self, connection, app_names=None):
         """
-        Shows a list of all migrations on the system, or only those of
+        Show a list of all migrations on the system, or only those of
         some named apps.
         """
         # Load migrations from disk/DB
@@ -57,12 +62,7 @@ class Command(BaseCommand):
         graph = loader.graph
         # If we were passed a list of apps, validate it
         if app_names:
-            invalid_apps = []
-            for app_name in app_names:
-                if app_name not in loader.migrated_apps:
-                    invalid_apps.append(app_name)
-            if invalid_apps:
-                raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))
+            self._validate_app_names(loader, app_names)
         # Otherwise, show all apps in alphabetic order
         else:
             app_names = sorted(loader.migrated_apps)
@@ -88,14 +88,19 @@ class Command(BaseCommand):
             if not shown:
                 self.stdout.write(" (no migrations)", self.style.ERROR)
 
-    def show_plan(self, connection):
+    def show_plan(self, connection, app_names=None):
         """
-        Shows all known migrations in the order they will be applied
+        Show all known migrations (or only those of the specified app_names)
+        in the order they will be applied.
         """
         # Load migrations from disk/DB
         loader = MigrationLoader(connection)
         graph = loader.graph
-        targets = graph.leaf_nodes()
+        if app_names:
+            self._validate_app_names(loader, app_names)
+            targets = [key for key in graph.leaf_nodes() if key[0] in app_names]
+        else:
+            targets = graph.leaf_nodes()
         plan = []
         seen = set()
 

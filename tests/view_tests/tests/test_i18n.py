@@ -1,6 +1,3 @@
-# -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 import gettext
 import json
 from os import path
@@ -10,11 +7,7 @@ from django.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 from django.test.selenium import SeleniumTestCase
-from django.test.utils import ignore_warnings
 from django.urls import reverse
-from django.utils import six
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
@@ -141,34 +134,13 @@ class I18NTests(TestCase):
     def test_setlang_cookie(self):
         # we force saving language to a cookie rather than a session
         # by excluding session middleware and those which do require it
-        test_settings = dict(
-            MIDDLEWARE=['django.middleware.common.CommonMiddleware'],
-            LANGUAGE_COOKIE_NAME='mylanguage',
-            LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
-            LANGUAGE_COOKIE_DOMAIN='.example.com',
-            LANGUAGE_COOKIE_PATH='/test/',
-        )
-        with self.settings(**test_settings):
-            post_data = dict(language='pl', next='/views/')
-            response = self.client.post('/i18n/setlang/', data=post_data)
-            language_cookie = response.cookies.get('mylanguage')
-            self.assertEqual(language_cookie.value, 'pl')
-            self.assertEqual(language_cookie['domain'], '.example.com')
-            self.assertEqual(language_cookie['path'], '/test/')
-            self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_setlang_cookie_middleware_classes(self):
-        # we force saving language to a cookie rather than a session
-        # by excluding session middleware and those which do require it
-        test_settings = dict(
-            MIDDLEWARE=None,
-            MIDDLEWARE_CLASSES=['django.middleware.common.CommonMiddleware'],
-            LANGUAGE_COOKIE_NAME='mylanguage',
-            LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
-            LANGUAGE_COOKIE_DOMAIN='.example.com',
-            LANGUAGE_COOKIE_PATH='/test/',
-        )
+        test_settings = {
+            'MIDDLEWARE': ['django.middleware.common.CommonMiddleware'],
+            'LANGUAGE_COOKIE_NAME': 'mylanguage',
+            'LANGUAGE_COOKIE_AGE': 3600 * 7 * 2,
+            'LANGUAGE_COOKIE_DOMAIN': '.example.com',
+            'LANGUAGE_COOKIE_PATH': '/test/',
+        }
         with self.settings(**test_settings):
             post_data = dict(language='pl', next='/views/')
             response = self.client.post('/i18n/setlang/', data=post_data)
@@ -207,28 +179,6 @@ class I18NTests(TestCase):
         )
         self.assertRedirects(response, '/en/translated/')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(
-        MIDDLEWARE=None,
-        MIDDLEWARE_CLASSES=[
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-        ],
-    )
-    def test_lang_from_translated_i18n_pattern_middleware_classes(self):
-        response = self.client.post(
-            '/i18n/setlang/', data={'language': 'nl'},
-            follow=True, HTTP_REFERER='/en/translated/'
-        )
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
-        self.assertRedirects(response, '/nl/vertaald/')
-        # And reverse
-        response = self.client.post(
-            '/i18n/setlang/', data={'language': 'en'},
-            follow=True, HTTP_REFERER='/nl/vertaald/'
-        )
-        self.assertRedirects(response, '/en/translated/')
-
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTests(SimpleTestCase):
@@ -241,10 +191,7 @@ class JsI18NTests(SimpleTestCase):
         for lang_code in ['es', 'fr', 'ru']:
             with override(lang_code):
                 catalog = gettext.translation('djangojs', locale_dir, [lang_code])
-                if six.PY3:
-                    trans_txt = catalog.gettext('this is to be translated')
-                else:
-                    trans_txt = catalog.ugettext('this is to be translated')
+                trans_txt = catalog.gettext('this is to be translated')
                 response = self.client.get('/jsi18n/')
                 # response content must include a line like:
                 # "this is to be translated": <value of trans_txt Python variable>
@@ -267,7 +214,7 @@ class JsI18NTests(SimpleTestCase):
         """
         with override('de'):
             response = self.client.get('/jsoni18n/')
-            data = json.loads(response.content.decode('utf-8'))
+            data = json.loads(response.content.decode())
             self.assertIn('catalog', data)
             self.assertIn('formats', data)
             self.assertIn('plural', data)
@@ -296,7 +243,7 @@ class JsI18NTests(SimpleTestCase):
         """
         with self.settings(LANGUAGE_CODE='es'), override('en-us'):
             response = self.client.get('/jsoni18n/')
-            data = json.loads(response.content.decode('utf-8'))
+            data = json.loads(response.content.decode())
             self.assertIn('catalog', data)
             self.assertIn('formats', data)
             self.assertIn('plural', data)
@@ -425,7 +372,7 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
     def test_i18n_with_locale_paths(self):
         extended_locale_paths = settings.LOCALE_PATHS + [
             path.join(
-                path.dirname(path.dirname(path.abspath(upath(__file__)))),
+                path.dirname(path.dirname(path.abspath(__file__))),
                 'app3',
                 'locale',
             ),

@@ -1,28 +1,18 @@
-from __future__ import unicode_literals
-
 import logging
-import sys
 import types
-import warnings
 
 from django.conf import settings
-from django.core import signals
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.db import connections, transaction
-from django.urls import get_resolver, get_urlconf, set_urlconf
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.urls import get_resolver, set_urlconf
 from django.utils.module_loading import import_string
 
-from .exception import (
-    convert_exception_to_response, get_exception_response,
-    handle_uncaught_exception,
-)
+from .exception import convert_exception_to_response, get_exception_response
 
 logger = logging.getLogger('django.request')
 
 
-class BaseHandler(object):
+class BaseHandler:
 
     def __init__(self):
         self._request_middleware = None
@@ -34,8 +24,7 @@ class BaseHandler(object):
 
     def load_middleware(self):
         """
-        Populate middleware lists from settings.MIDDLEWARE (or the deprecated
-        MIDDLEWARE_CLASSES).
+        Populate middleware lists from settings.MIDDLEWARE.
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
@@ -45,62 +34,32 @@ class BaseHandler(object):
         self._response_middleware = []
         self._exception_middleware = []
 
-        if settings.MIDDLEWARE is None:
-            warnings.warn(
-                "Old-style middleware using settings.MIDDLEWARE_CLASSES is "
-                "deprecated. Update your middleware and use settings.MIDDLEWARE "
-                "instead.", RemovedInDjango20Warning
-            )
-            handler = convert_exception_to_response(self._legacy_get_response)
-            for middleware_path in settings.MIDDLEWARE_CLASSES:
-                mw_class = import_string(middleware_path)
-                try:
-                    mw_instance = mw_class()
-                except MiddlewareNotUsed as exc:
-                    if settings.DEBUG:
-                        if six.text_type(exc):
-                            logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
-                        else:
-                            logger.debug('MiddlewareNotUsed: %r', middleware_path)
-                    continue
+        handler = convert_exception_to_response(self._get_response)
+        for middleware_path in reversed(settings.MIDDLEWARE):
+            middleware = import_string(middleware_path)
+            try:
+                mw_instance = middleware(handler)
+            except MiddlewareNotUsed as exc:
+                if settings.DEBUG:
+                    if str(exc):
+                        logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                    else:
+                        logger.debug('MiddlewareNotUsed: %r', middleware_path)
+                continue
 
-                if hasattr(mw_instance, 'process_request'):
-                    self._request_middleware.append(mw_instance.process_request)
-                if hasattr(mw_instance, 'process_view'):
-                    self._view_middleware.append(mw_instance.process_view)
-                if hasattr(mw_instance, 'process_template_response'):
-                    self._template_response_middleware.insert(0, mw_instance.process_template_response)
-                if hasattr(mw_instance, 'process_response'):
-                    self._response_middleware.insert(0, mw_instance.process_response)
-                if hasattr(mw_instance, 'process_exception'):
-                    self._exception_middleware.insert(0, mw_instance.process_exception)
-        else:
-            handler = convert_exception_to_response(self._get_response)
-            for middleware_path in reversed(settings.MIDDLEWARE):
-                middleware = import_string(middleware_path)
-                try:
-                    mw_instance = middleware(handler)
-                except MiddlewareNotUsed as exc:
-                    if settings.DEBUG:
-                        if six.text_type(exc):
-                            logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
-                        else:
-                            logger.debug('MiddlewareNotUsed: %r', middleware_path)
-                    continue
+            if mw_instance is None:
+                raise ImproperlyConfigured(
+                    'Middleware factory %s returned None.' % middleware_path
+                )
 
-                if mw_instance is None:
-                    raise ImproperlyConfigured(
-                        'Middleware factory %s returned None.' % middleware_path
-                    )
+            if hasattr(mw_instance, 'process_view'):
+                self._view_middleware.insert(0, mw_instance.process_view)
+            if hasattr(mw_instance, 'process_template_response'):
+                self._template_response_middleware.append(mw_instance.process_template_response)
+            if hasattr(mw_instance, 'process_exception'):
+                self._exception_middleware.append(mw_instance.process_exception)
 
-                if hasattr(mw_instance, 'process_view'):
-                    self._view_middleware.insert(0, mw_instance.process_view)
-                if hasattr(mw_instance, 'process_template_response'):
-                    self._template_response_middleware.append(mw_instance.process_template_response)
-                if hasattr(mw_instance, 'process_exception'):
-                    self._exception_middleware.append(mw_instance.process_exception)
-
-                handler = convert_exception_to_response(mw_instance)
+            handler = convert_exception_to_response(mw_instance)
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
@@ -122,22 +81,6 @@ class BaseHandler(object):
         set_urlconf(settings.ROOT_URLCONF)
 
         response = self._middleware_chain(request)
-
-        # This block is only needed for legacy MIDDLEWARE_CLASSES; if
-        # MIDDLEWARE is used, self._response_middleware will be empty.
-        try:
-            # Apply response middleware, regardless of the response
-            for middleware_method in self._response_middleware:
-                response = middleware_method(request, response)
-                # Complain if the response middleware returned None (a common error).
-                if response is None:
-                    raise ValueError(
-                        "%s.process_response didn't return an "
-                        "HttpResponse object. It returned None instead."
-                        % (middleware_method.__self__.__class__.__name__))
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())
 
         response._closable_objects.append(request)
 
@@ -228,23 +171,3 @@ class BaseHandler(object):
             if response:
                 return response
         raise
-
-    def handle_uncaught_exception(self, request, resolver, exc_info):
-        """Allow subclasses to override uncaught exception handling."""
-        return handle_uncaught_exception(request, resolver, exc_info)
-
-    def _legacy_get_response(self, request):
-        """
-        Apply process_request() middleware and call the main _get_response(),
-        if needed. Used only for legacy MIDDLEWARE_CLASSES.
-        """
-        response = None
-        # Apply request middleware
-        for middleware_method in self._request_middleware:
-            response = middleware_method(request)
-            if response:
-                break
-
-        if response is None:
-            response = self._get_response(request)
-        return response

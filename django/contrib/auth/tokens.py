@@ -1,12 +1,11 @@
 from datetime import date
 
 from django.conf import settings
-from django.utils import six
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
 
-class PasswordResetTokenGenerator(object):
+class PasswordResetTokenGenerator:
     """
     Strategy object used to generate and check tokens for the password
     reset mechanism.
@@ -15,7 +14,7 @@ class PasswordResetTokenGenerator(object):
 
     def make_token(self, user):
         """
-        Returns a token that can be used once to do a password reset
+        Return a token that can be used once to do a password reset
         for the given user.
         """
         return self._make_token_with_timestamp(user, self._num_days(self._today()))
@@ -24,6 +23,8 @@ class PasswordResetTokenGenerator(object):
         """
         Check that a password reset token is correct for a given user.
         """
+        if not (user and token):
+            return False
         # Parse the token
         try:
             ts_b36, hash = token.split("-")
@@ -66,10 +67,7 @@ class PasswordResetTokenGenerator(object):
     def _make_hash_value(self, user, timestamp):
         # Ensure results are consistent across DB backends
         login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
-        return (
-            six.text_type(user.pk) + user.password +
-            six.text_type(login_timestamp) + six.text_type(timestamp)
-        )
+        return str(user.pk) + user.password + str(login_timestamp) + str(timestamp)
 
     def _num_days(self, dt):
         return (dt - date(2001, 1, 1)).days

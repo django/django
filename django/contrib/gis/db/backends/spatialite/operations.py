@@ -4,7 +4,6 @@ https://web.archive.org/web/20130407175746/http://www.gaia-gis.it/gaia-sins/spat
 http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
 import re
-import sys
 
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
@@ -15,7 +14,6 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
-from django.utils import six
 from django.utils.functional import cached_property
 
 
@@ -30,7 +28,7 @@ class SpatiaLiteDistanceOperator(SpatialOperator):
             })
             sql_params.insert(1, len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid')
             return sql_template % template_params, sql_params
-        return super(SpatiaLiteDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
@@ -123,12 +121,13 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """Determine the version of the SpatiaLite library."""
         try:
             version = self.spatialite_version_tuple()[1:]
-        except Exception as msg:
-            new_msg = (
-                'Cannot determine the SpatiaLite version for the "%s" '
-                'database (error was "%s").  Was the SpatiaLite initialization '
-                'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
-            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
+        except Exception as exc:
+            raise ImproperlyConfigured(
+                'Cannot determine the SpatiaLite version for the "%s" database. '
+                'Was the SpatiaLite initialization SQL loaded on this database?' % (
+                    self.connection.settings_dict['NAME'],
+                )
+            ) from exc
         if version < (4, 0, 0):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 4.0.0 and above.')
         return version
@@ -146,14 +145,14 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         """
-        Returns None because geometry columns are added via the
+        Return None because geometry columns are added via the
         `AddGeometryColumn` stored procedure on SpatiaLite.
         """
         return None
 
-    def get_distance(self, f, value, lookup_type, **kwargs):
+    def get_distance(self, f, value, lookup_type):
         """
-        Returns the distance parameters for the given geometry field,
+        Return the distance parameters for the given geometry field,
         lookup value, and lookup type.
         """
         if not value:
@@ -175,7 +174,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geom_placeholder(self, f, value, compiler):
         """
-        Provides a proper substitution value for Geometries that are not in the
+        Provide a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
         Transform() and GeomFromText() function call(s).
         """
@@ -212,11 +211,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return row[0]
 
     def geos_version(self):
-        "Returns the version of GEOS used by SpatiaLite as a string."
+        "Return the version of GEOS used by SpatiaLite as a string."
         return self._get_spatialite_func('geos_version()')
 
     def proj4_version(self):
-        "Returns the version of the PROJ.4 library used by SpatiaLite."
+        "Return the version of the PROJ.4 library used by SpatiaLite."
         return self._get_spatialite_func('proj4_version()')
 
     def lwgeom_version(self):
@@ -224,12 +223,12 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_spatialite_func('lwgeom_version()')
 
     def spatialite_version(self):
-        "Returns the SpatiaLite library version as a string."
+        "Return the SpatiaLite library version as a string."
         return self._get_spatialite_func('spatialite_version()')
 
     def spatialite_version_tuple(self):
         """
-        Returns the SpatiaLite version as a tuple (version string, major,
+        Return the SpatiaLite version as a tuple (version string, major,
         minor, subminor).
         """
         version = self.spatialite_version()
@@ -246,7 +245,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def spatial_aggregate_name(self, agg_name):
         """
-        Returns the spatial aggregate SQL template and function for the
+        Return the spatial aggregate SQL template and function for the
         given Aggregate instance.
         """
         agg_name = 'unionagg' if agg_name.lower() == 'union' else agg_name.lower()
@@ -262,7 +261,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return SpatialiteSpatialRefSys
 
     def get_db_converters(self, expression):
-        converters = super(SpatiaLiteOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         if hasattr(expression.output_field, 'geom_type'):
             converters.append(self.convert_geometry)
         return converters

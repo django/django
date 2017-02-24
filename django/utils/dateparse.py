@@ -8,7 +8,6 @@
 import datetime
 import re
 
-from django.utils import six
 from django.utils.timezone import get_fixed_timezone, utc
 
 date_re = re.compile(
@@ -30,9 +29,9 @@ datetime_re = re.compile(
 standard_duration_re = re.compile(
     r'^'
     r'(?:(?P<days>-?\d+) (days?, )?)?'
-    r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
-    r'(?:(?P<minutes>\d+):)?'
-    r'(?P<seconds>\d+)'
+    r'((?:(?P<hours>-?\d+):)(?=\d+:\d+))?'
+    r'(?:(?P<minutes>-?\d+):)?'
+    r'(?P<seconds>-?\d+)'
     r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
     r'$'
 )
@@ -53,24 +52,24 @@ iso8601_duration_re = re.compile(
 
 
 def parse_date(value):
-    """Parses a string and return a datetime.date.
+    """Parse a string and return a datetime.date.
 
-    Raises ValueError if the input is well formatted but not a valid date.
-    Returns None if the input isn't well formatted.
+    Raise ValueError if the input is well formatted but not a valid date.
+    Return None if the input isn't well formatted.
     """
     match = date_re.match(value)
     if match:
-        kw = {k: int(v) for k, v in six.iteritems(match.groupdict())}
+        kw = {k: int(v) for k, v in match.groupdict().items()}
         return datetime.date(**kw)
 
 
 def parse_time(value):
-    """Parses a string and return a datetime.time.
+    """Parse a string and return a datetime.time.
 
     This function doesn't support time zone offsets.
 
-    Raises ValueError if the input is well formatted but not a valid time.
-    Returns None if the input isn't well formatted, in particular if it
+    Raise ValueError if the input is well formatted but not a valid time.
+    Return None if the input isn't well formatted, in particular if it
     contains an offset.
     """
     match = time_re.match(value)
@@ -78,18 +77,18 @@ def parse_time(value):
         kw = match.groupdict()
         if kw['microsecond']:
             kw['microsecond'] = kw['microsecond'].ljust(6, '0')
-        kw = {k: int(v) for k, v in six.iteritems(kw) if v is not None}
+        kw = {k: int(v) for k, v in kw.items() if v is not None}
         return datetime.time(**kw)
 
 
 def parse_datetime(value):
-    """Parses a string and return a datetime.datetime.
+    """Parse a string and return a datetime.datetime.
 
     This function supports time zone offsets. When the input contains one,
     the output uses a timezone with a fixed offset from UTC.
 
-    Raises ValueError if the input is well formatted but not a valid datetime.
-    Returns None if the input isn't well formatted.
+    Raise ValueError if the input is well formatted but not a valid datetime.
+    Return None if the input isn't well formatted.
     """
     match = datetime_re.match(value)
     if match:
@@ -105,13 +104,13 @@ def parse_datetime(value):
             if tzinfo[0] == '-':
                 offset = -offset
             tzinfo = get_fixed_timezone(offset)
-        kw = {k: int(v) for k, v in six.iteritems(kw) if v is not None}
+        kw = {k: int(v) for k, v in kw.items() if v is not None}
         kw['tzinfo'] = tzinfo
         return datetime.datetime(**kw)
 
 
 def parse_duration(value):
-    """Parses a duration string and returns a datetime.timedelta.
+    """Parse a duration string and return a datetime.timedelta.
 
     The preferred format for durations in Django is '%d %H:%M:%S.%f'.
 
@@ -125,5 +124,7 @@ def parse_duration(value):
         sign = -1 if kw.pop('sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
-        kw = {k: float(v) for k, v in six.iteritems(kw) if v is not None}
+        if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
+            kw['microseconds'] = '-' + kw['microseconds']
+        kw = {k: float(v) for k, v in kw.items() if v is not None}
         return sign * datetime.timedelta(**kw)

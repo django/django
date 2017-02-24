@@ -231,10 +231,6 @@ In ``template.html``, the following paths would be valid::
     {% extends "../base1.html" %}
     {% extends "./my/base3.html" %}
 
-.. versionadded:: 1.10
-
-   The ability to use relative paths was added.
-
 .. templatetag:: filter
 
 ``filter``
@@ -538,8 +534,6 @@ Not contained within. This is the negation of the ``in`` operator.
 ``is`` operator
 ^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.10
-
 Object identity. Tests if two values are the same object. Example::
 
     {% if somevar is True %}
@@ -552,8 +546,6 @@ Object identity. Tests if two values are the same object. Example::
 
 ``is not`` operator
 ^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.10
 
 Negated object identity. Tests if two values are not the same object. This is
 the negation of the ``is`` operator. Example::
@@ -684,10 +676,6 @@ This example includes the contents of the template ``"foo/bar.html"``::
 
 A string argument may be a relative path starting with ``./`` or ``../`` as
 described in the :ttag:`extends` tag.
-
-.. versionadded:: 1.10
-
-   The ability to use a relative path was added.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
@@ -1511,7 +1499,7 @@ For example::
 
     {{ value|default_if_none:"nothing" }}
 
-If ``value`` is ``None``, the output will be the string ``"nothing"``.
+If ``value`` is ``None``, the output will be ``nothing``.
 
 .. templatefilter:: dictsort
 
@@ -1597,10 +1585,6 @@ produce empty output::
 
     {{ values|dictsort:"0" }}
 
-.. versionchanged:: 1.10
-
-    The ability to order a list of lists was added.
-
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
@@ -1636,11 +1620,6 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
-The escaping is only applied when the string is output, so it does not matter
-where in a chained sequence of filters you put ``escape``: it will always be
-applied as though it were the last filter. If you want escaping to be applied
-immediately, use the :tfilter:`force_escape` filter.
-
 Applying ``escape`` to a variable that would normally have auto-escaping
 applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
@@ -1651,12 +1630,6 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
     {% autoescape off %}
         {{ title|escape }}
     {% endautoescape %}
-
-.. deprecated:: 1.10
-
-    The "lazy" behavior of the ``escape`` filter is deprecated. It will change
-    to immediately apply :func:`~django.utils.html.conditional_escape` in
-    Django 2.0.
 
 .. templatefilter:: escapejs
 
@@ -1961,8 +1934,7 @@ If ``value`` is ``Totally LOVING this Album!``, the output will be
 -------------
 
 Returns the value turned into a list. For a string, it's a list of characters.
-For an integer, the argument is cast into an unicode string before creating a
-list.
+For an integer, the argument is cast to a string before creating a list.
 
 For example::
 
@@ -2595,12 +2567,6 @@ slightly different call::
 
     See :class:`~django.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
-
-.. versionchanged:: 1.10
-
-    In older versions, you had to use ``{% load static from staticfiles %}`` in
-    your template to serve files from the storage defined in
-    :setting:`STATICFILES_STORAGE`. This is no longer required.
 
 .. templatetag:: get_static_prefix
 

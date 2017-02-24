@@ -2,10 +2,8 @@ from django.db import models
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Artist(models.Model):
     name = models.CharField(max_length=100)
 
@@ -21,7 +19,6 @@ class Artist(models.Model):
         return reverse('artist_detail', kwargs={'pk': self.id})
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -41,7 +38,6 @@ class DoesNotExistQuerySet(QuerySet):
 DoesNotExistBookManager = BaseManager.from_queryset(DoesNotExistQuerySet)
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=300)
     slug = models.SlugField()

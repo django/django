@@ -71,10 +71,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
           Only set it to ``False`` if you're rendering non-HTML templates!
 
-      .. versionadded:: 1.10
-
-          The ``autoescape`` option was added.
-
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a
       request. These callables take a request object as their argument and
@@ -385,7 +381,7 @@ replaced with the name of the invalid variable.
     idea to turn it on as a 'development default'.
 
     Many templates, including those in the Admin site, rely upon the silence
-    of the template system when a non-existent variable is encountered. If you
+    of the template system when a nonexistent variable is encountered. If you
     assign a value other than ``''`` to ``string_if_invalid``, you will
     experience rendering problems with these templates and sites.
 
@@ -700,11 +696,6 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   and how long it took. The list is in order by database alias and then by
   query. It's lazily generated on access.
 
-.. versionchanged:: 1.10
-
-    In older versions, only the queries for the default database alias were
-    included.
-
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -910,19 +901,6 @@ loaders that come with Django:
             'APP_DIRS': True,
         }]
 
-``django.template.loaders.eggs.Loader``
-
-.. class:: eggs.Loader
-
-    .. deprecated:: 1.9
-
-        Distributing applications as eggs is not recommended.
-
-    Just like ``app_directories`` above, but it loads templates from Python
-    eggs rather than from the filesystem.
-
-    This loader is disabled by default.
-
 ``django.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
@@ -1056,37 +1034,6 @@ Loader methods
         In general, it is enough to define :meth:`get_template_sources` and
         :meth:`get_contents` for custom template loaders. ``get_template()``
         will usually not need to be overridden.
-
-    .. method:: load_template_source(template_name, template_dirs=None)
-
-        Returns a tuple of (``template_string``, ``template_origin``), where
-        ``template_string`` is a string containing the template contents,
-        and ``template_origin`` is a string identifying the template source.
-        A filesystem-based loader may return the full path to the file as the
-        ``template_origin``, for example.
-
-        ``template_dirs`` is an optional argument used to control which
-        directories the loader will search.
-
-        This method is called automatically by :meth:`load_template` and should
-        be overridden when writing custom template loaders.
-
-        .. deprecated:: 1.9
-
-             Custom loaders should use :meth:`get_template` and
-             :meth:`get_contents` instead.
-
-    .. method:: load_template(template_name, template_dirs=None)
-
-        Returns a tuple of (``template``, ``template_origin``), where ``template``
-        is a ``Template`` object and ``template_origin`` is a string identifying
-        the template source. A filesystem-based loader may return the full
-        path to the file as the ``template_origin``, for example.
-
-        .. deprecated:: 1.9
-
-             Custom loaders should use :meth:`get_template` and
-             :meth:`get_contents` instead.
 
 .. admonition:: Building your own
 

@@ -1,14 +1,11 @@
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
-from django.utils import six
 
 from .models import (
-    ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
+    Author, ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
     ProxyModel,
 )
 
@@ -23,11 +20,10 @@ class ContentTypesTests(TestCase):
 
     def test_lookup_cache(self):
         """
-        Make sure that the content type cache (see ContentTypeManager)
-        works correctly. Lookups for a particular content type -- by model, ID
-        or natural key -- should hit the database only on the first lookup.
+        The content type cache (see ContentTypeManager) works correctly.
+        Lookups for a particular content type -- by model, ID, or natural key
+        -- should hit the database only on the first lookup.
         """
-
         # At this point, a lookup for a ContentType should hit the DB
         with self.assertNumQueries(1):
             ContentType.objects.get_for_model(ContentType)
@@ -54,13 +50,26 @@ class ContentTypesTests(TestCase):
         with self.assertNumQueries(0):
             ContentType.objects.get_by_natural_key('contenttypes', 'contenttype')
 
-    def test_get_for_models_empty_cache(self):
-        # Empty cache.
-        with self.assertNumQueries(1):
-            cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
+    def test_get_for_models_creation(self):
+        ContentType.objects.all().delete()
+        with self.assertNumQueries(4):
+            cts = ContentType.objects.get_for_models(ContentType, FooWithUrl, ProxyModel, ConcreteModel)
         self.assertEqual(cts, {
             ContentType: ContentType.objects.get_for_model(ContentType),
             FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
+            ProxyModel: ContentType.objects.get_for_model(ProxyModel),
+            ConcreteModel: ContentType.objects.get_for_model(ConcreteModel),
+        })
+
+    def test_get_for_models_empty_cache(self):
+        # Empty cache.
+        with self.assertNumQueries(1):
+            cts = ContentType.objects.get_for_models(ContentType, FooWithUrl, ProxyModel, ConcreteModel)
+        self.assertEqual(cts, {
+            ContentType: ContentType.objects.get_for_model(ContentType),
+            FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
+            ProxyModel: ContentType.objects.get_for_model(ProxyModel),
+            ConcreteModel: ContentType.objects.get_for_model(ConcreteModel),
         })
 
     def test_get_for_models_partial_cache(self):
@@ -231,11 +240,31 @@ class ContentTypesTests(TestCase):
             app_label='contenttypes',
             model='OldModel',
         )
-        self.assertEqual(six.text_type(ct), 'OldModel')
+        self.assertEqual(str(ct), 'OldModel')
         self.assertIsNone(ct.model_class())
 
-        # Make sure stale ContentTypes can be fetched like any other object.
-        # Before Django 1.6 this caused a NoneType error in the caching mechanism.
-        # Instead, just return the ContentType object and let the app detect stale states.
+        # Stale ContentTypes can be fetched like any other object.
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
+
+
+class TestRouter:
+    def db_for_read(self, model, **hints):
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        return 'default'
+
+
+@override_settings(DATABASE_ROUTERS=[TestRouter()])
+class ContentTypesMultidbTests(TestCase):
+    multi_db = True
+
+    def test_multidb(self):
+        """
+        When using multiple databases, ContentType.objects.get_for_model() uses
+        db_for_read().
+        """
+        ContentType.objects.clear_cache()
+        with self.assertNumQueries(0, using='default'), self.assertNumQueries(1, using='other'):
+            ContentType.objects.get_for_model(Author)

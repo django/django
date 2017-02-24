@@ -281,10 +281,6 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
-.. versionadded:: 1.10
-
-    The ``elidable`` argument was added.
-
 ``RunPython``
 -------------
 
@@ -314,10 +310,7 @@ class in the migration file, and just pass it to ``RunPython``. Here's an
 example of using ``RunPython`` to create some initial objects on a ``Country``
 model::
 
-    # -*- coding: utf-8 -*-
-    from __future__ import unicode_literals
-
-    from django.db import migrations, models
+    from django.db import migrations
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
@@ -400,15 +393,6 @@ if ``atomic=True`` is passed to the ``RunPython`` operation.
     you want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
 
-.. versionadded:: 1.10
-
-    The ``elidable`` argument was added.
-
-.. versionchanged:: 1.10
-
-    The ``atomic`` argument default was changed to ``None``, indicating that
-    the atomicity is controlled by the ``atomic`` attribute of the migration.
-
 ``SeparateDatabaseAndState``
 ----------------------------
 
@@ -420,6 +404,8 @@ A highly specialized operation that let you mix and match the database
 It accepts two list of operations, and when asked to apply state will use the
 state list, and when asked to apply changes to the database will use the database
 list. Do not use this operation unless you're very sure you know what you're doing.
+
+.. _writing-your-own-migration-operation:
 
 Writing your own
 ================
@@ -479,6 +465,21 @@ Some things to note:
 * ``database_forwards`` and ``database_backwards`` both get two states passed
   to them; these just represent the difference the ``state_forwards`` method
   would have applied, but are given to you for convenience and speed reasons.
+
+* If you want to work with model classes or model instances from the
+  ``from_state`` argument in ``database_forwards()`` or
+  ``database_backwards()``, you must render model states using the
+  ``clear_delayed_apps_cache()`` method to make related models available::
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        # This operation should have access to all models. Ensure that all models are
+        # reloaded in case any are delayed.
+        from_state.clear_delayed_apps_cache()
+        ...
+
+  .. versionadded:: 1.11
+
+    This requirement and the ``clear_delayed_apps_cache()`` method is new.
 
 * ``to_state`` in the database_backwards method is the *older* state; that is,
   the one that will be the current state once the migration has finished reversing.

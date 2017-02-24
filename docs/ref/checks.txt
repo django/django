@@ -45,9 +45,9 @@ Constructor arguments are:
 ``obj``
     Optional. An object providing context for the message (for example, the
     model where the problem was discovered). The object should be a model,
-    field, or manager or any other object that defines ``__str__`` method (on
-    Python 2 you need to define ``__unicode__`` method). The method is used
-    while reporting all messages and its result precedes the message.
+    field, or manager or any other object that defines a ``__str__()`` method.
+    The method is used while reporting all messages and its result precedes the
+    message.
 
 ``id``
     Optional string. A unique identifier for the issue. Identifiers should
@@ -83,6 +83,7 @@ Django's system checks are organized using the following tags:
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
+* ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
 * ``urls``: Checks URL configuration.
 
@@ -112,10 +113,12 @@ that might occur as a result of a version upgrade.
   Django 1.8 and the :setting:`TEMPLATES` dictionary takes precedence. You must
   put the values of the following settings into your defaults ``TEMPLATES``
   dict: ``TEMPLATE_DIRS``, ``TEMPLATE_CONTEXT_PROCESSORS``, ``TEMPLATE_DEBUG``,
-  ``TEMPLATE_LOADERS``, ``TEMPLATE_STRING_IF_INVALID``.
+  ``TEMPLATE_LOADERS``, ``TEMPLATE_STRING_IF_INVALID``. *This check was removed
+  in Django 2.0*.
 * **1_10.W001**: The ``MIDDLEWARE_CLASSES`` setting is deprecated in Django
   1.10  and the :setting:`MIDDLEWARE` setting takes precedence. Since you've
-  set ``MIDDLEWARE``, the value of ``MIDDLEWARE_CLASSES`` is ignored.
+  set ``MIDDLEWARE``, the value of ``MIDDLEWARE_CLASSES`` is ignored. *This
+  check was removed in Django 2.0*.
 
 Caches
 ------
@@ -174,7 +177,10 @@ Model fields
   (except in historical migrations) will be removed in Django 1.9. *This check
   appeared in Django 1.7 and 1.8*.
 * **fields.W901**: ``CommaSeparatedIntegerField`` has been deprecated. Support
-  for it (except in historical migrations) will be removed in Django 2.0.
+  for it (except in historical migrations) will be removed in Django 2.0. *This
+  check appeared in Django 1.10 and 1.11*.
+* **fields.E901**: ``CommaSeparatedIntegerField`` is removed except for support
+  in historical migrations.
 
 File fields
 ~~~~~~~~~~~
@@ -275,13 +281,13 @@ Models
 * **models.E010**: ``unique_together`` must be a list or tuple.
 * **models.E011**: All ``unique_together`` elements must be lists or tuples.
 * **models.E012**: ``index_together/unique_together`` refers to the
-  non-existent field ``<field name>``.
+  nonexistent field ``<field name>``.
 * **models.E013**: ``index_together/unique_together`` refers to a
   ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s are not
   supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
-* **models.E015**: ``ordering`` refers to the non-existent field
+* **models.E015**: ``ordering`` refers to the nonexistent field
   ``<field name>``.
 * **models.E016**: ``index_together/unique_together`` refers to field
   ``<field_name>`` which is not local to model ``<model>``.
@@ -320,19 +326,19 @@ The following checks are run if you use the :option:`check --deploy` option:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
-  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES` so the :setting:`SECURE_HSTS_SECONDS`,
+  :setting:`MIDDLEWARE` so the :setting:`SECURE_HSTS_SECONDS`,
   :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
   and :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
-  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, so your pages will not be served with an
+  :setting:`MIDDLEWARE`, so your pages will not be served with an
   ``'x-frame-options'`` header. Unless there is a good reason for your
   site to be served in a frame, you should consider enabling this
   header to help prevent clickjacking attacks.
 * **security.W003**: You don't appear to be using Django's built-in cross-site
   request forgery protection via the middleware
   (:class:`django.middleware.csrf.CsrfViewMiddleware` is not in your
-  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`). Enabling the middleware is the safest
+  :setting:`MIDDLEWARE`). Enabling the middleware is the safest
   approach to ensure you don't leave any holes.
 * **security.W004**: You have not set a value for the
   :setting:`SECURE_HSTS_SECONDS` setting. If your entire site is served only
@@ -369,10 +375,9 @@ The following checks are run if you use the :option:`check --deploy` option:
   sessions.
 * **security.W011**: You have
   :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
-  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, but you have not set
-  :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
-  cookie makes it more difficult for network traffic sniffers to hijack user
-  sessions.
+  :setting:`MIDDLEWARE`, but you have not set :setting:`SESSION_COOKIE_SECURE`
+  to ``True``. Using a secure-only session cookie makes it more difficult for
+  network traffic sniffers to hijack user sessions.
 * **security.W012**: :setting:`SESSION_COOKIE_SECURE` is not set to ``True``.
   Using a secure-only session cookie makes it more difficult for network traffic
   sniffers to hijack user sessions.
@@ -383,10 +388,9 @@ The following checks are run if you use the :option:`check --deploy` option:
   sessions.
 * **security.W014**: You have
   :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
-  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, but you have not set
-  :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
-  cookie makes it more difficult for cross-site scripting attacks to hijack user
-  sessions.
+  :setting:`MIDDLEWARE`, but you have not set :setting:`SESSION_COOKIE_HTTPONLY`
+  to ``True``. Using an ``HttpOnly`` session cookie makes it more difficult for
+  cross-site scripting attacks to hijack user sessions.
 * **security.W015**: :setting:`SESSION_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` session cookie makes it more difficult for cross-site
   scripting attacks to hijack user sessions.
@@ -402,7 +406,7 @@ The following checks are run if you use the :option:`check --deploy` option:
   deployment.
 * **security.W019**: You have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
-  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, but :setting:`X_FRAME_OPTIONS` is not set to
+  :setting:`MIDDLEWARE`, but :setting:`X_FRAME_OPTIONS` is not set to
   ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.
@@ -655,9 +659,9 @@ The following checks are performed when a model contains a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`:
 
 * **contenttypes.E001**: The ``GenericForeignKey`` object ID references the
-  non-existent field ``<field>``.
+  nonexistent field ``<field>``.
 * **contenttypes.E002**: The ``GenericForeignKey`` content type references the
-  non-existent field ``<field>``.
+  nonexistent field ``<field>``.
 * **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
@@ -672,3 +676,14 @@ The following checks are performed on any model using a
   ``<field name>``.
 * **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
   foreign key or a many-to-many field.
+
+``staticfiles``
+---------------
+
+The following checks verify that :mod:`django.contrib.staticfiles` is correctly
+configured:
+
+* **staticfiles.E001**: The :setting:`STATICFILES_DIRS` setting is not a tuple
+  or list.
+* **staticfiles.E002**: The :setting:`STATICFILES_DIRS` setting should not
+  contain the :setting:`STATIC_ROOT` setting.

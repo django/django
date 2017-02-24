@@ -15,13 +15,12 @@ from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
-from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
     get_func_full_args,
 )
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 # Exclude methods starting with these strings from documentation
@@ -38,19 +37,19 @@ class BaseAdminDocsView(TemplateView):
             # Display an error message for people without docutils
             self.template_name = 'admin_doc/missing_docutils.html'
             return self.render_to_response(admin.site.each_context(request))
-        return super(BaseAdminDocsView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs.update({'root_path': reverse('admin:index')})
         kwargs.update(admin.site.each_context(self.request))
-        return super(BaseAdminDocsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class BookmarkletsView(BaseAdminDocsView):
     template_name = 'admin_doc/bookmarklets.html'
 
     def get_context_data(self, **kwargs):
-        context = super(BookmarkletsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({
             'admin_url': "%s://%s%s" % (
                 self.request.scheme, self.request.get_host(), context['root_path'])
@@ -89,7 +88,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
                         'library': tag_library,
                     })
         kwargs.update({'tags': tags})
-        return super(TemplateTagIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TemplateFilterIndexView(BaseAdminDocsView):
@@ -123,7 +122,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
                         'library': tag_library,
                     })
         kwargs.update({'filters': filters})
-        return super(TemplateFilterIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ViewIndexView(BaseAdminDocsView):
@@ -132,12 +131,7 @@ class ViewIndexView(BaseAdminDocsView):
     @staticmethod
     def _get_full_name(func):
         mod_name = func.__module__
-        if six.PY3:
-            return '%s.%s' % (mod_name, func.__qualname__)
-        else:
-            # PY2 does not support __qualname__
-            func_name = getattr(func, '__name__', func.__class__.__name__)
-            return '%s.%s' % (mod_name, func_name)
+        return '%s.%s' % (mod_name, func.__qualname__)
 
     def get_context_data(self, **kwargs):
         views = []
@@ -152,7 +146,7 @@ class ViewIndexView(BaseAdminDocsView):
                 'name': name,
             })
         kwargs.update({'views': views})
-        return super(ViewIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ViewDetailView(BaseAdminDocsView):
@@ -200,7 +194,7 @@ class ViewDetailView(BaseAdminDocsView):
             'body': body,
             'meta': metadata,
         })
-        return super(ViewDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelIndexView(BaseAdminDocsView):
@@ -209,7 +203,7 @@ class ModelIndexView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         m_list = [m._meta for m in apps.get_models()]
         kwargs.update({'models': m_list})
-        return super(ModelIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelDetailView(BaseAdminDocsView):
@@ -302,7 +296,6 @@ class ModelDetailView(BaseAdminDocsView):
                     })
                 else:
                     arguments = get_func_full_args(func)
-                    print_arguments = arguments
                     # Join arguments with ', ' and in case of default value,
                     # join it with '='. Use repr() so that strings will be
                     # correctly displayed.
@@ -340,7 +333,7 @@ class ModelDetailView(BaseAdminDocsView):
             'fields': fields,
             'methods': methods,
         })
-        return super(ModelDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TemplateDetailView(BaseAdminDocsView):
@@ -373,7 +366,7 @@ class TemplateDetailView(BaseAdminDocsView):
             'name': template,
             'templates': templates,
         })
-        return super(TemplateDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 ####################
@@ -392,10 +385,11 @@ def get_return_data_type(func_name):
 
 
 def get_readable_field_data_type(field):
-    """Returns the description for a given field type, if it exists,
-    Fields' descriptions can contain format strings, which will be interpolated
-    against the values of field.__dict__ before being output."""
-
+    """
+    Return the description for a given field type, if it exists. Fields'
+    descriptions can contain format strings, which will be interpolated with
+    the values of field.__dict__ before being output.
+    """
     return field.description % field.__dict__
 
 
@@ -437,7 +431,7 @@ def simplify_regex(pattern):
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
     # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '')
+    pattern = pattern.replace('^', '').replace('$', '').replace('?', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern

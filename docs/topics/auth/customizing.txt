@@ -260,11 +260,6 @@ authenticated users do not.
 Do not forget to test for the ``is_active`` attribute of the user in your own
 backend permission methods.
 
-.. versionchanged:: 1.10
-
-    In older versions, the :class:`~django.contrib.auth.backends.ModelBackend`
-    allowed inactive users to authenticate.
-
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -661,8 +656,6 @@ The following attributes and methods are available on any subclass of
 
     .. method:: clean()
 
-        .. versionadded:: 1.10
-
         Normalizes the username by calling :meth:`normalize_username`. If you
         override this method, be sure to call ``super()`` to retain the
         normalization.
@@ -676,8 +669,6 @@ The following attributes and methods are available on any subclass of
        ``'email'`` if ``EMAIL_FIELD`` isn't specified.
 
     .. classmethod:: normalize_username(username)
-
-        .. versionadded:: 1.10
 
         Applies NFKC Unicode normalization to usernames so that visually
         identical characters with different Unicode code points are considered
@@ -695,22 +686,12 @@ The following attributes and methods are available on any subclass of
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~models.User` instance.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: models.AbstractBaseUser.is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
         differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
         objects. Generally, you should prefer using
         :attr:`~models.User.is_authenticated` to this attribute.
-
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
 
     .. method:: models.AbstractBaseUser.set_password(raw_password)
 
@@ -1079,7 +1060,7 @@ authentication app::
             # The user is identified by their email address
             return self.email
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.email
 
         def has_perm(self, perm, obj=None):
@@ -1130,7 +1111,7 @@ code would be required in the app's ``admin.py`` file::
 
         def save(self, commit=True):
             # Save the provided password in hashed format
-            user = super(UserCreationForm, self).save(commit=False)
+            user = super().save(commit=False)
             user.set_password(self.cleaned_data["password1"])
             if commit:
                 user.save()

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.management.base import BaseCommand
 from django.core.management.sql import sql_flush
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -14,7 +12,7 @@ class Command(BaseCommand):
     output_transaction = True
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to print the SQL for. Defaults to the "default" database.',

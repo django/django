@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 import functools
 import re
+from unittest import mock
 
 from django.apps import apps
 from django.conf import settings
@@ -12,13 +12,13 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.test.utils import isolate_lru_cache
 
 from .models import FoodManager, FoodQuerySet
 
 
-class DeconstructibleObject(object):
+class DeconstructibleObject:
     """
     A custom deconstructible object.
     """

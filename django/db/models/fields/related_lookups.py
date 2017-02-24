@@ -4,7 +4,7 @@ from django.db.models.lookups import (
 )
 
 
-class MultiColSource(object):
+class MultiColSource:
     contains_aggregate = False
 
     def __init__(self, alias, targets, sources, field):
@@ -54,7 +54,7 @@ class RelatedIn(In):
                 # only one as we don't get to the direct value branch otherwise.
                 target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]
                 self.rhs = [target_field.get_prep_value(v) for v in self.rhs]
-        return super(RelatedIn, self).get_prep_lookup()
+        return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, MultiColSource):
@@ -91,10 +91,10 @@ class RelatedIn(In):
                 else:
                     target_field = self.lhs.field.target_field.name
                 self.rhs.add_fields([target_field], True)
-            return super(RelatedIn, self).as_sql(compiler, connection)
+            return super().as_sql(compiler, connection)
 
 
-class RelatedLookupMixin(object):
+class RelatedLookupMixin:
     def get_prep_lookup(self):
         if not isinstance(self.lhs, MultiColSource) and self.rhs_is_direct_value():
             # If we get here, we are dealing with single-column relations.
@@ -109,7 +109,7 @@ class RelatedLookupMixin(object):
                 target_field = self.lhs.output_field.get_path_info()[-1].target_fields[-1]
                 self.rhs = target_field.get_prep_value(self.rhs)
 
-        return super(RelatedLookupMixin, self).get_prep_lookup()
+        return super().get_prep_lookup()
 
     def as_sql(self, compiler, connection):
         if isinstance(self.lhs, MultiColSource):
@@ -122,7 +122,7 @@ class RelatedLookupMixin(object):
                 root_constraint.add(
                     lookup_class(target.get_col(self.lhs.alias, source), val), AND)
             return root_constraint.as_sql(compiler, connection)
-        return super(RelatedLookupMixin, self).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
 
 
 class RelatedExact(RelatedLookupMixin, Exact):

@@ -171,6 +171,24 @@ If you need to add a PostgreSQL extension (like ``hstore``, ``postgis``, etc.)
 using a migration, use the
 :class:`~django.contrib.postgres.operations.CreateExtension` operation.
 
+.. _postgresql-server-side-cursors:
+
+Server-side cursors
+-------------------
+
+.. versionadded:: 1.11
+
+When using :meth:`QuerySet.iterator()
+<django.db.models.query.QuerySet.iterator>`, Django opens a :ref:`server-side
+cursor <psycopg2:server-side-cursors>`. By default, PostgreSQL assumes that
+only the first 10% of the results of cursor queries will be fetched. The query
+planner spends less time planning the query and starts returning results
+faster, but this could diminish performance if more than 10% of the results are
+retrieved. PostgreSQL's assumptions on the number of rows retrieved for a
+cursor query is controlled with the `cursor_tuple_fraction`_ option.
+
+.. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
+
 Test database templates
 -----------------------
 
@@ -255,55 +273,29 @@ running ``migrate``::
 MySQL DB API Drivers
 --------------------
 
-The Python Database API is described in :pep:`249`. MySQL has three prominent
-drivers that implement this API:
+MySQL has a couple drivers that implement the Python Database API described in
+:pep:`249`:
 
-- `MySQLdb`_ is a native driver that has been developed and supported for over
-  a decade by Andy Dustman.
-- `mysqlclient`_ is a fork of ``MySQLdb`` which notably supports Python 3 and
-  can be used as a drop-in replacement for MySQLdb. At the time of this writing,
-  this is **the recommended choice** for using MySQL with Django.
+- `mysqlclient`_ is a native driver. It's **the recommended choice**.
 - `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
   require the MySQL client library or any Python modules outside the standard
   library.
 
-.. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
 .. _mysqlclient: https://pypi.python.org/pypi/mysqlclient
 .. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
 
-All these drivers are thread-safe and provide connection pooling. ``MySQLdb``
-is the only one not supporting Python 3 currently.
+These drivers are thread-safe and provide connection pooling.
 
 In addition to a DB API driver, Django needs an adapter to access the database
-drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
-MySQL Connector/Python includes `its own`_.
+drivers from its ORM. Django provides an adapter for mysqlclient while MySQL
+Connector/Python includes `its own`_.
 
 .. _its own: https://dev.mysql.com/doc/connector-python/en/connector-python-django-backend.html
-
-MySQLdb
-~~~~~~~
-
-Django requires MySQLdb version 1.2.1p2 or later.
-
-At the time of writing, the latest release of MySQLdb (1.2.5) doesn't support
-Python 3. In order to use MySQLdb under Python 3, you'll have to install
-``mysqlclient`` instead.
-
-.. note::
-    There are known issues with the way MySQLdb converts date strings into
-    datetime objects. Specifically, date strings with value ``0000-00-00`` are
-    valid for MySQL but will be converted into ``None`` by MySQLdb.
-
-    This means you should be careful while using :djadmin:`loaddata` and
-    :djadmin:`dumpdata` with rows that may have ``0000-00-00`` values, as they
-    will be converted to ``None``.
 
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.3.3 or later. Note that Python 3.2 is not
-supported. Except for the Python 3.3+ support, mysqlclient should mostly behave
-the same as MySQLDB.
+Django requires `mysqlclient`_ 1.3.3 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -356,46 +348,9 @@ comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
 ``"AA"`` into the same column, since they compare as equal (and, hence,
-non-unique) with the default collation.
-
-In many cases, this default will not be a problem. However, if you really want
-case-sensitive comparisons on a particular column or table, you would change
-the column or table to use the ``utf8_bin`` collation. The main thing to be
-aware of in this case is that if you are using MySQLdb 1.2.2, the database
-backend in Django will then return bytestrings (instead of unicode strings) for
-any character fields it receive from the database. This is a strong variation
-from Django's normal practice of *always* returning unicode strings. It is up
-to you, the developer, to handle the fact that you will receive bytestrings if
-you configure your table(s) to use ``utf8_bin`` collation. Django itself should
-mostly work smoothly with such columns (except for the ``contrib.sessions``
-``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.force_text()`` at
-times if it really wants to work with consistent data -- Django will not do
-this for you (the database backend layer and the model population layer are
-separated internally so the database layer doesn't know it needs to make this
-conversion in this one particular case).
-
-If you're using MySQLdb 1.2.1p2, Django's standard
-:class:`~django.db.models.CharField` class will return unicode strings even
-with ``utf8_bin`` collation. However, :class:`~django.db.models.TextField`
-fields will be returned as an ``array.array`` instance (from Python's standard
-``array`` module). There isn't a lot Django can do about that, since, again,
-the information needed to make the necessary conversions isn't available when
-the data is read in from the database. This problem was `fixed in MySQLdb
-1.2.2`_, so if you want to use :class:`~django.db.models.TextField` with
-``utf8_bin`` collation, upgrading to version 1.2.2 and then dealing with the
-bytestrings (which shouldn't be too difficult) as described above is the
-recommended solution.
-
-Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
-(the default) collation for the ``django.contrib.sessions.models.Session``
-table (usually called ``django_session``) and the
-:class:`django.contrib.admin.models.LogEntry` table (usually called
-``django_admin_log``). Those are the two standard tables that use
-:class:`~django.db.models.TextField` internally.
-
-.. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
+non-unique) with the default collation. If you want case-sensitive comparisons
+on a particular column or table, change the column or table to use the
+``utf8_bin`` collation.
 
 Please note that according to `MySQL Unicode Character Sets`_, comparisons for
 the ``utf8_general_ci`` collation are faster, but slightly less correct, than
@@ -449,12 +404,11 @@ Here's a sample configuration which uses a MySQL option file::
     password = PASSWORD
     default-character-set = utf8
 
-Several other MySQLdb connection options may be useful, such as ``ssl``,
-``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
-more details.
+Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
+``init_command``, and ``sql_mode``.
 
 .. _MySQL option file: https://dev.mysql.com/doc/refman/en/option-files.html
-.. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+.. _MySQLdb connection options: https://mysqlclient.readthedocs.io/en/latest/user_guide.html#functions-and-attributes
 
 .. _mysql-sql-mode:
 
@@ -473,6 +427,38 @@ If you need to customize the SQL mode, you can set the ``sql_mode`` variable
 like other MySQL options: either in a config file or with the entry
 ``'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"`` in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`.
+
+.. _mysql-isolation-level:
+
+Isolation level
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.11
+
+When running concurrent loads, database transactions from different sessions
+(say, separate threads handling different requests) may interact with each
+other. These interactions are affected by each session's `transaction isolation
+level`_. You can set a connection's isolation level with an
+``'isolation_level'`` entry in the :setting:`OPTIONS` part of your database
+configuration in :setting:`DATABASES`. Valid values for
+this entry are the four standard isolation levels:
+
+* ``'read uncommitted'``
+* ``'read committed'``
+* ``'repeatable read'``
+* ``'serializable'``
+
+or ``None`` to use the server's configured isolation level. However, Django
+works best with and defaults to read committed rather than MySQL's default,
+repeatable read. Data loss is possible with repeatable read.
+
+.. versionchanged:: 2.0
+
+    In older versions, the MySQL database backend defaults to using the
+    database's isolation level (which defaults to repeatable read) rather
+    than read committed.
+
+.. _transaction isolation level: https://dev.mysql.com/doc/refman/en/innodb-transaction-isolation-levels.html
 
 Creating your tables
 --------------------
@@ -540,8 +526,7 @@ Character fields
 Any fields that are stored with ``VARCHAR`` column types have their
 ``max_length`` restricted to 255 characters if you are using ``unique=True``
 for the field. This affects :class:`~django.db.models.CharField`,
-:class:`~django.db.models.SlugField` and
-:class:`~django.db.models.CommaSeparatedIntegerField`.
+:class:`~django.db.models.SlugField`.
 
 ``TextField`` limitations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -558,11 +543,7 @@ Fractional seconds support for Time and DateTime fields
 
 MySQL 5.6.4 and later can store fractional seconds, provided that the
 column definition includes a fractional indication (e.g. ``DATETIME(6)``).
-Earlier versions do not support them at all. In addition, versions of MySQLdb
-older than 1.2.5 have `a bug`_ that also prevents the use of fractional seconds
-with MySQL.
-
-.. _a bug: https://github.com/farcepest/MySQLdb1/issues/24
+Earlier versions do not support them at all.
 
 Django will not upgrade existing columns to include fractional seconds if the
 database server supports it. If you want to enable them on an existing database,
@@ -646,35 +627,6 @@ substring filtering.
 
 .. _documented at sqlite.org: https://www.sqlite.org/faq.html#q18
 
-Old SQLite and ``CASE`` expressions
------------------------------------
-
-SQLite 3.6.23.1 and older contains a bug when `handling query parameters`_ in
-a ``CASE`` expression that contains an ``ELSE`` and arithmetic.
-
-SQLite 3.6.23.1 was released in March 2010, and most current binary
-distributions for different platforms include a newer version of SQLite, with
-the notable exception of the Python 2.7 installers for Windows.
-
-As of this writing, the latest release for Windows - Python 2.7.10 - includes
-SQLite 3.6.21. You can install ``pysqlite2`` or replace ``sqlite3.dll`` (by
-default installed in ``C:\Python27\DLLs``) with a newer version from
-https://www.sqlite.org/ to remedy this issue.
-
-.. _handling query parameters: https://code.djangoproject.com/ticket/24148
-
-.. _using-newer-versions-of-pysqlite:
-
-Using newer versions of the SQLite DB-API 2.0 driver
-----------------------------------------------------
-
-Django will use a ``pysqlite2`` module in preference to ``sqlite3`` as shipped
-with the Python standard library if it finds one is available.
-
-This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
-itself to versions newer than the ones included with your particular Python
-binary distribution, if needed.
-
 "Database is locked" errors
 ---------------------------
 
@@ -730,7 +682,7 @@ rather than a list. SQLite does not support this.
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 11.2 and higher. Version
+Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
 5.2 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: http://www.oracle.com/

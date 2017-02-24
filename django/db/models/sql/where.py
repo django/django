@@ -118,6 +118,13 @@ class WhereNode(tree.Node):
             cols.extend(child.get_group_by_cols())
         return cols
 
+    def get_source_expressions(self):
+        return self.children[:]
+
+    def set_source_expressions(self, children):
+        assert len(children) == len(self.children)
+        self.children = children
+
     def relabel_aliases(self, change_map):
         """
         Relabels the alias values of any children. 'change_map' is a dictionary
@@ -160,8 +167,12 @@ class WhereNode(tree.Node):
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
+    @property
+    def is_summary(self):
+        return any(child.is_summary for child in self.children)
 
-class NothingNode(object):
+
+class NothingNode:
     """
     A node that matches nothing.
     """
@@ -171,7 +182,7 @@ class NothingNode(object):
         raise EmptyResultSet
 
 
-class ExtraWhere(object):
+class ExtraWhere:
     # The contents are a black box - assume no aggregates are used.
     contains_aggregate = False
 
@@ -184,7 +195,7 @@ class ExtraWhere(object):
         return " AND ".join(sqls), list(self.params or ())
 
 
-class SubqueryConstraint(object):
+class SubqueryConstraint:
     # Even if aggregates would be used in a subquery, the outer query isn't
     # interested about those.
     contains_aggregate = False

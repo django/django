@@ -1,6 +1,5 @@
 from django.apps.registry import Apps
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 # Because we want to test creation and deletion of these as separate things,
 # these models are all inserted into a separate Apps so the main test
@@ -160,7 +159,6 @@ class TagUniqueRename(models.Model):
 
 
 # Based on tests/reserved_names/models.py
-@python_2_unicode_compatible
 class Thing(models.Model):
     when = models.CharField(max_length=1, primary_key=True)
 

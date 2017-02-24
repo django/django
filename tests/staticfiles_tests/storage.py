@@ -1,4 +1,3 @@
-import errno
 import os
 from datetime import datetime, timedelta
 
@@ -51,9 +50,8 @@ class PathNotImplementedStorage(storage.Storage):
         name = self._path(name)
         try:
             os.remove(name)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
+        except FileNotFoundError:
+            pass
 
     def path(self, name):
         raise NotImplementedError

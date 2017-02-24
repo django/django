@@ -1,7 +1,7 @@
 from functools import update_wrapper
+from weakref import WeakSet
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
@@ -9,14 +9,13 @@ from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
-from django.utils import six
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.i18n import JavaScriptCatalog
 
-system_check_errors = []
+all_sites = WeakSet()
 
 
 class AlreadyRegistered(Exception):
@@ -27,7 +26,7 @@ class NotRegistered(Exception):
     pass
 
 
-class AdminSite(object):
+class AdminSite:
     """
     An AdminSite object encapsulates an instance of the Django admin application, ready
     to be hooked in to your URLconf. Models are registered with the AdminSite using the
@@ -37,13 +36,13 @@ class AdminSite(object):
     """
 
     # Text to put at the end of each page's <title>.
-    site_title = ugettext_lazy('Django site admin')
+    site_title = gettext_lazy('Django site admin')
 
     # Text to put in each page's <h1>.
-    site_header = ugettext_lazy('Django administration')
+    site_header = gettext_lazy('Django administration')
 
     # Text to put at the top of the admin index page.
-    index_title = ugettext_lazy('Site administration')
+    index_title = gettext_lazy('Site administration')
 
     # URL for the "View site" link at the top of each admin page.
     site_url = '/'
@@ -63,20 +62,37 @@ class AdminSite(object):
         self.name = name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
+        all_sites.add(self)
+
+    def check(self, app_configs):
+        """
+        Run the system checks on all ModelAdmins, except if they aren't
+        customized at all.
+        """
+        if app_configs is None:
+            app_configs = apps.get_app_configs()
+        app_configs = set(app_configs)  # Speed up lookups below
+
+        errors = []
+        modeladmins = (o for o in self._registry.values() if o.__class__ is not ModelAdmin)
+        for modeladmin in modeladmins:
+            if modeladmin.model._meta.app_config in app_configs:
+                errors.extend(modeladmin.check())
+        return errors
 
     def register(self, model_or_iterable, admin_class=None, **options):
         """
-        Registers the given model(s) with the given admin class.
+        Register the given model(s) with the given admin class.
 
         The model(s) should be Model classes, not instances.
 
-        If an admin class isn't given, it will use ModelAdmin (the default
-        admin options). If keyword arguments are given -- e.g., list_display --
-        they'll be applied as options to the admin class.
+        If an admin class isn't given, use ModelAdmin (the default admin
+        options). If keyword arguments are given -- e.g., list_display --
+        apply them as options to the admin class.
 
-        If a model is already registered, this will raise AlreadyRegistered.
+        If a model is already registered, raise AlreadyRegistered.
 
-        If a model is abstract, this will raise ImproperlyConfigured.
+        If a model is abstract, raise ImproperlyConfigured.
         """
         if not admin_class:
             admin_class = ModelAdmin
@@ -105,17 +121,13 @@ class AdminSite(object):
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
                 # Instantiate the admin class to save in the registry
-                admin_obj = admin_class(model, self)
-                if admin_class is not ModelAdmin and settings.DEBUG:
-                    system_check_errors.extend(admin_obj.check())
-
-                self._registry[model] = admin_obj
+                self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
         """
-        Unregisters the given model(s).
+        Unregister the given model(s).
 
-        If a model isn't already registered, this will raise NotRegistered.
+        If a model isn't already registered, raise NotRegistered.
         """
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
@@ -140,14 +152,14 @@ class AdminSite(object):
 
     def disable_action(self, name):
         """
-        Disable a globally-registered action. Raises KeyError for invalid names.
+        Disable a globally-registered action. Raise KeyError for invalid names.
         """
         del self._actions[name]
 
     def get_action(self, name):
         """
         Explicitly get a registered global action whether it's enabled or
-        not. Raises KeyError for invalid names.
+        not. Raise KeyError for invalid names.
         """
         return self._global_actions[name]
 
@@ -156,7 +168,7 @@ class AdminSite(object):
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return six.iteritems(self._actions)
+        return iter(self._actions.items())
 
     @property
     def empty_value_display(self):
@@ -168,7 +180,7 @@ class AdminSite(object):
 
     def has_permission(self, request):
         """
-        Returns True if the given HttpRequest has permission to view
+        Return True if the given HttpRequest has permission to view
         *at least one* page in the admin site.
         """
         return request.user.is_active and request.user.is_staff
@@ -186,7 +198,7 @@ class AdminSite(object):
                 def get_urls(self):
                     from django.conf.urls import url
 
-                    urls = super(MyAdminSite, self).get_urls()
+                    urls = super().get_urls()
                     urls += [
                         url(r'^my_view/$', self.admin_view(some_view))
                     ]
@@ -268,7 +280,7 @@ class AdminSite(object):
 
     def each_context(self, request):
         """
-        Returns a dictionary of variables to put in the template context for
+        Return a dictionary of variables to put in the template context for
         *every* page in the admin site.
 
         For sites running on a subpath, use the SCRIPT_NAME value if site_url
@@ -286,7 +298,7 @@ class AdminSite(object):
 
     def password_change(self, request, extra_context=None):
         """
-        Handles the "change password" task -- both form display and validation.
+        Handle the "change password" task -- both form display and validation.
         """
         from django.contrib.admin.forms import AdminPasswordChangeForm
         from django.contrib.auth.views import PasswordChangeView
@@ -303,7 +315,7 @@ class AdminSite(object):
 
     def password_change_done(self, request, extra_context=None):
         """
-        Displays the "success" page after a password change.
+        Display the "success" page after a password change.
         """
         from django.contrib.auth.views import PasswordChangeDoneView
         defaults = {
@@ -316,7 +328,7 @@ class AdminSite(object):
 
     def i18n_javascript(self, request, extra_context=None):
         """
-        Displays the i18n JavaScript that the Django admin requires.
+        Display the i18n JavaScript that the Django admin requires.
 
         `extra_context` is unused but present for consistency with the other
         admin views.
@@ -326,7 +338,7 @@ class AdminSite(object):
     @never_cache
     def logout(self, request, extra_context=None):
         """
-        Logs out the user for the given HttpRequest.
+        Log out the user for the given HttpRequest.
 
         This should *not* assume the user is already logged in.
         """
@@ -348,7 +360,7 @@ class AdminSite(object):
     @never_cache
     def login(self, request, extra_context=None):
         """
-        Displays the login form for the given HttpRequest.
+        Display the login form for the given HttpRequest.
         """
         if request.method == 'GET' and self.has_permission(request):
             # Already logged-in, redirect to admin index
@@ -381,8 +393,8 @@ class AdminSite(object):
 
     def _build_app_dict(self, request, label=None):
         """
-        Builds the app dictionary. Takes an optional label parameters to filter
-        models of a specific app.
+        Build the app dictionary. The optional `label` parameter filters models
+        of a specific app.
         """
         app_dict = {}
 
@@ -446,7 +458,7 @@ class AdminSite(object):
 
     def get_app_list(self, request):
         """
-        Returns a sorted list of all the installed apps that have been
+        Return a sorted list of all the installed apps that have been
         registered in this site.
         """
         app_dict = self._build_app_dict(request)
@@ -463,7 +475,7 @@ class AdminSite(object):
     @never_cache
     def index(self, request, extra_context=None):
         """
-        Displays the main admin index page, which lists all of the installed
+        Display the main admin index page, which lists all of the installed
         apps that have been registered in this site.
         """
         app_list = self.get_app_list(request)

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import time
 import unittest
 
@@ -43,7 +41,7 @@ class DecoratedDispatchView(SimpleView):
 
     @decorator
     def dispatch(self, request, *args, **kwargs):
-        return super(DecoratedDispatchView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class AboutTemplateView(TemplateView):

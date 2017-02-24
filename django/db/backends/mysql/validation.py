@@ -5,7 +5,7 @@ from django.utils.version import get_docs_version
 
 class DatabaseValidation(BaseDatabaseValidation):
     def check(self, **kwargs):
-        issues = super(DatabaseValidation, self).check(**kwargs)
+        issues = super().check(**kwargs)
         issues.extend(self._check_sql_mode(**kwargs))
         return issues
 
@@ -32,7 +32,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
         """
-        errors = super(DatabaseValidation, self).check_field(field, **kwargs)
+        errors = super().check_field(field, **kwargs)
 
         # Ignore any related fields.
         if getattr(field, 'remote_field', None):

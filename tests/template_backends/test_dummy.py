@@ -1,7 +1,3 @@
-# coding: utf-8
-
-from __future__ import unicode_literals
-
 import re
 
 from django.forms import CharField, Form, Media
@@ -22,7 +18,7 @@ class TemplateStringsTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TemplateStringsTests, cls).setUpClass()
+        super().setUpClass()
         params = {
             'DIRS': [],
             'APP_DIRS': True,
@@ -41,9 +37,9 @@ class TemplateStringsTests(SimpleTestCase):
         content = template.render({'name': 'world'})
         self.assertEqual(content, "Hello world!\n")
 
-    def test_get_template_non_existing(self):
+    def test_get_template_nonexistent(self):
         with self.assertRaises(TemplateDoesNotExist) as e:
-            self.engine.get_template('template_backends/non_existing.html')
+            self.engine.get_template('template_backends/nonexistent.html')
         self.assertEqual(e.exception.backend, self.engine)
 
     def test_get_template_syntax_error(self):

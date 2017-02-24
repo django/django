@@ -56,10 +56,6 @@ Raster Support
 lookups are available for raster fields, but spatial database functions and
 aggregates aren't implemented for raster fields.
 
-.. versionchanged:: 1.10
-
-    ``RasterField`` now supports spatial lookups.
-
 Creating and Saving Models with Geometry Fields
 ===============================================
 
@@ -172,8 +168,6 @@ GeoJSON , WKT, or HEXEWKB), and ``rst`` is a
 
 Raster Lookups
 --------------
-
-.. versionadded:: 1.10
 
 The raster lookup syntax is similar to the syntax for geometries. The only
 difference is that a band index can be specified as additional input. If no band
@@ -382,7 +376,7 @@ Function                              PostGIS  Oracle          MySQL        Spat
 :class:`AsGML`                        X        X                            X
 :class:`AsKML`                        X                                     X
 :class:`AsSVG`                        X                                     X
-:class:`BoundingCircle`               X        X (≥ 12.1.0.2)
+:class:`BoundingCircle`               X        X
 :class:`Centroid`                     X        X               X            X
 :class:`Difference`                   X        X               X (≥ 5.6.1)  X
 :class:`Distance`                     X        X               X (≥ 5.6.1)  X

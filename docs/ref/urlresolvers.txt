@@ -4,12 +4,6 @@
 
 .. module:: django.urls
 
-.. deprecated:: 1.10
-
-    In older versions, these functions are located in
-    ``django.core.urlresolvers``. Importing from the old location will continue
-    to work until Django 2.0.
-
 ``reverse()``
 =============
 
@@ -76,9 +70,8 @@ use for reversing. By default, the root URLconf for the current thread is used.
         >>> reverse('cities', args=['Orléans'])
         '.../Orl%C3%A9ans/'
 
-    Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
-    ``urllib.quote``) to the output of ``reverse()`` may produce undesirable
-    results.
+    Applying further encoding (such as :func:`urllib.parse.quote`) to the output
+    of ``reverse()`` may produce undesirable results.
 
 ``reverse_lazy()``
 ==================
@@ -181,9 +174,9 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 One possible use of :func:`~django.urls.resolve` would be to test whether a
 view would raise a ``Http404`` error before redirecting to it::
 
+    from urllib.parse import urlparse
     from django.urls import resolve
     from django.http import HttpResponseRedirect, Http404
-    from django.utils.six.moves.urllib.parse import urlparse
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'

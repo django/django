@@ -25,14 +25,14 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
     )
 
     def __init__(self, *args, **kwargs):
-        super(OracleGISSchemaEditor, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.geometry_sql = []
 
     def geo_quote_name(self, name):
         return self.connection.ops.geo_quote_name(name)
 
     def column_sql(self, model, field, include_default=False):
-        column_sql = super(OracleGISSchemaEditor, self).column_sql(model, field, include_default)
+        column_sql = super().column_sql(model, field, include_default)
         if isinstance(field, GeometryField):
             db_table = model._meta.db_table
             self.geometry_sql.append(
@@ -58,17 +58,17 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
         return column_sql
 
     def create_model(self, model):
-        super(OracleGISSchemaEditor, self).create_model(model)
+        super().create_model(model)
         self.run_geometry_sql()
 
     def delete_model(self, model):
-        super(OracleGISSchemaEditor, self).delete_model(model)
+        super().delete_model(model)
         self.execute(self.sql_clear_geometry_table_metadata % {
             'table': self.geo_quote_name(model._meta.db_table),
         })
 
     def add_field(self, model, field):
-        super(OracleGISSchemaEditor, self).add_field(model, field)
+        super().add_field(model, field)
         self.run_geometry_sql()
 
     def remove_field(self, model, field):
@@ -81,7 +81,7 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
                 self.execute(self.sql_drop_spatial_index % {
                     'index': self.quote_name(self._create_spatial_index_name(model, field)),
                 })
-        super(OracleGISSchemaEditor, self).remove_field(model, field)
+        super().remove_field(model, field)
 
     def run_geometry_sql(self):
         for sql in self.geometry_sql:

@@ -7,18 +7,15 @@ This is a simple server for use in testing or debugging Django apps. It hasn't
 been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
-from __future__ import unicode_literals
-
 import logging
 import socket
+import socketserver
 import sys
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application
-from django.utils import six
 from django.utils.module_loading import import_string
-from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
 
@@ -27,7 +24,7 @@ logger = logging.getLogger('django.server')
 
 def get_internal_wsgi_application():
     """
-    Loads and returns the WSGI application as configured by the user in
+    Load and return the WSGI application as configured by the user in
     ``settings.WSGI_APPLICATION``. With the default ``startproject`` layout,
     this will be the ``application`` object in ``projectname/wsgi.py``.
 
@@ -35,7 +32,7 @@ def get_internal_wsgi_application():
     for Django's internal server (runserver); external WSGI servers should just
     be configured to point to the correct application object directly.
 
-    If settings.WSGI_APPLICATION is not set (is ``None``), we just return
+    If settings.WSGI_APPLICATION is not set (is ``None``), return
     whatever ``django.core.wsgi.get_wsgi_application`` returns.
     """
     from django.conf import settings
@@ -45,16 +42,11 @@ def get_internal_wsgi_application():
 
     try:
         return import_string(app_path)
-    except ImportError as e:
-        msg = (
-            "WSGI application '%(app_path)s' could not be loaded; "
-            "Error importing module: '%(exception)s'" % ({
-                'app_path': app_path,
-                'exception': e,
-            })
-        )
-        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
-                    sys.exc_info()[2])
+    except ImportError as err:
+        raise ImproperlyConfigured(
+            "WSGI application '%s' could not be loaded; "
+            "Error importing module." % app_path
+        ) from err
 
 
 def is_broken_pipe_error():
@@ -62,38 +54,41 @@ def is_broken_pipe_error():
     return issubclass(exc_type, socket.error) and exc_value.args[0] == 32
 
 
-class WSGIServer(simple_server.WSGIServer, object):
+class WSGIServer(simple_server.WSGIServer):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
     request_queue_size = 10
 
-    def __init__(self, *args, **kwargs):
-        if kwargs.pop('ipv6', False):
+    def __init__(self, *args, ipv6=False, allow_reuse_address=True, **kwargs):
+        if ipv6:
             self.address_family = socket.AF_INET6
-        self.allow_reuse_address = kwargs.pop('allow_reuse_address', True)
-        super(WSGIServer, self).__init__(*args, **kwargs)
-
-    def server_bind(self):
-        """Override server_bind to store the server name."""
-        super(WSGIServer, self).server_bind()
-        self.setup_environ()
+        self.allow_reuse_address = allow_reuse_address
+        super().__init__(*args, **kwargs)
 
     def handle_error(self, request, client_address):
         if is_broken_pipe_error():
             logger.info("- Broken pipe from %s\n", client_address)
         else:
-            super(WSGIServer, self).handle_error(request, client_address)
+            super().handle_error(request, client_address)
 
 
-# Inheriting from object required on Python 2.
-class ServerHandler(simple_server.ServerHandler, object):
+class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
+    """A threaded version of the WSGIServer"""
+    pass
+
+
+class ServerHandler(simple_server.ServerHandler):
+    http_version = '1.1'
+
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
-            super(ServerHandler, self).handle_error()
+            super().handle_error()
 
 
-class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
+class WSGIRequestHandler(simple_server.WSGIRequestHandler):
+    protocol_version = 'HTTP/1.1'
+
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
@@ -105,7 +100,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         }
         if args[1][0] == '4':
             # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
-            if args[0].startswith(str('\x16\x03')):
+            if args[0].startswith('\x16\x03'):
                 extra['status_code'] = 500
                 logger.error(
                     "You're accessing the development server over HTTPS, but "
@@ -137,11 +132,17 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             if '_' in k:
                 del self.headers[k]
 
-        return super(WSGIRequestHandler, self).get_environ()
+        return super().get_environ()
 
     def handle(self):
-        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+        """Handle multiple requests if necessary."""
+        self.close_connection = 1
+        self.handle_one_request()
+        while not self.close_connection:
+            self.handle_one_request()
 
+    def handle_one_request(self):
+        """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
             self.requestline = ''
@@ -160,12 +161,12 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         handler.run(self.server.get_app())
 
 
-def run(addr, port, wsgi_handler, ipv6=False, threading=False):
+def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, WSGIServer), {})
+        httpd_cls = type('WSGIServer', (socketserver.ThreadingMixIn, server_cls), {})
     else:
-        httpd_cls = WSGIServer
+        httpd_cls = server_cls
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an

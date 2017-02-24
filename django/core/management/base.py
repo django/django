@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
-from __future__ import unicode_literals
-
 import os
 import sys
 from argparse import ArgumentParser
+from io import TextIOBase
 
 import django
 from django.core import checks
@@ -15,7 +13,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.exceptions import MigrationSchemaMissing
-from django.utils.encoding import force_str
 
 
 class CommandError(Exception):
@@ -48,18 +45,18 @@ class CommandParser(ArgumentParser):
     """
     def __init__(self, cmd, **kwargs):
         self.cmd = cmd
-        super(CommandParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):
         # Catch missing argument for a better error message
         if (hasattr(self.cmd, 'missing_args_message') and
                 not (args or any(not arg.startswith('-') for arg in args))):
             self.error(self.cmd.missing_args_message)
-        return super(CommandParser, self).parse_args(args, namespace)
+        return super().parse_args(args, namespace)
 
     def error(self, message):
         if self.cmd._called_from_command_line:
-            super(CommandParser, self).error(message)
+            super().error(message)
         else:
             raise CommandError("Error: %s" % message)
 
@@ -76,7 +73,7 @@ def handle_default_options(options):
         sys.path.insert(0, options.pythonpath)
 
 
-class OutputWrapper(object):
+class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
     """
@@ -107,10 +104,10 @@ class OutputWrapper(object):
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = style_func or self.style_func
-        self._out.write(force_str(style_func(msg)))
+        self._out.write(style_func(msg))
 
 
-class BaseCommand(object):
+class BaseCommand:
     """
     The base class from which all management commands ultimately
     derive.
@@ -348,10 +345,10 @@ class BaseCommand(object):
     def check(self, app_configs=None, tags=None, display_num_errors=False,
               include_deployment_checks=False, fail_level=checks.ERROR):
         """
-        Uses the system check framework to validate entire Django project.
-        Raises CommandError for any serious message (error or critical errors).
-        If there are only light messages (like warnings), they are printed to
-        stderr and no exception is raised.
+        Use the system check framework to validate entire Django project.
+        Raise CommandError for any serious message (error or critical errors).
+        If there are only light messages (like warnings), print them to stderr
+        and don't raise an exception.
         """
         all_issues = self._run_checks(
             app_configs=app_configs,
@@ -380,9 +377,9 @@ class BaseCommand(object):
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        self.style.ERROR(force_str(e))
+                        self.style.ERROR(str(e))
                         if e.is_serious()
-                        else self.style.WARNING(force_str(e))
+                        else self.style.WARNING(str(e))
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
                     body += '\n%s:\n%s\n' % (group_name, formatted)

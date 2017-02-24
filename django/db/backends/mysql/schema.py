@@ -45,7 +45,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
 
     def add_field(self, model, field):
-        super(DatabaseSchemaEditor, self).add_field(model, field)
+        super().add_field(model, field)
 
         # Simulate the effect of a one-off default.
         # field.default may be unhashable, so a set isn't used for "in" check.
@@ -57,7 +57,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             }, [effective_default])
 
     def _field_should_be_indexed(self, model, field):
-        create_index = super(DatabaseSchemaEditor, self)._field_should_be_indexed(model, field)
+        create_index = super()._field_should_be_indexed(model, field)
         storage = self.connection.introspection.get_storage_engine(
             self.connection.cursor(), model._meta.db_table
         )
@@ -85,7 +85,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             constraint_names = self._constraint_names(model, [first_field.column], index=True)
             if not constraint_names:
                 self.execute(self._create_index_sql(model, [first_field], suffix=""))
-        return super(DatabaseSchemaEditor, self)._delete_composed_index(model, fields, *args)
+        return super()._delete_composed_index(model, fields, *args)
 
     def _set_field_new_type_null_status(self, field, new_type):
         """
@@ -100,8 +100,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super(DatabaseSchemaEditor, self)._alter_column_type_sql(table, old_field, new_field, new_type)
+        return super()._alter_column_type_sql(table, old_field, new_field, new_type)
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super(DatabaseSchemaEditor, self)._rename_field_sql(table, old_field, new_field, new_type)
+        return super()._rename_field_sql(table, old_field, new_field, new_type)

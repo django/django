@@ -1,23 +1,15 @@
 import os
 import shutil
-import unittest
 
 from django import conf
 from django.test import TestCase
-from django.utils import six
-from django.utils._os import upath
 
 
-@unittest.skipIf(
-    six.PY2,
-    'Python 2 cannot import the project template because '
-    'django/conf/project_template doesn\'t have an __init__.py file.'
-)
 class TestStartProjectSettings(TestCase):
     def setUp(self):
         # Ensure settings.py exists
         project_dir = os.path.join(
-            os.path.dirname(upath(conf.__file__)),
+            os.path.dirname(conf.__file__),
             'project_template',
             'project_name',
         )

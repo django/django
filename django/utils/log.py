@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
 from copy import copy
@@ -161,7 +159,7 @@ class RequireDebugTrue(logging.Filter):
 class ServerFormatter(logging.Formatter):
     def __init__(self, *args, **kwargs):
         self.style = color_style()
-        super(ServerFormatter, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def format(self, record):
         msg = record.msg
@@ -189,7 +187,7 @@ class ServerFormatter(logging.Formatter):
             record.server_time = self.formatTime(record, self.datefmt)
 
         record.msg = msg
-        return super(ServerFormatter, self).format(record)
+        return super().format(record)
 
     def uses_server_time(self):
         return self._fmt.find('%(server_time)') >= 0

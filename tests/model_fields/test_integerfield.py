@@ -2,7 +2,6 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from .models import (
     BigIntegerModel, IntegerModel, PositiveIntegerModel,
@@ -121,11 +120,11 @@ class IntegerFieldTests(TestCase):
 
     def test_types(self):
         instance = self.model(value=0)
-        self.assertIsInstance(instance.value, six.integer_types)
+        self.assertIsInstance(instance.value, int)
         instance.save()
-        self.assertIsInstance(instance.value, six.integer_types)
+        self.assertIsInstance(instance.value, int)
         instance = self.model.objects.get()
-        self.assertIsInstance(instance.value, six.integer_types)
+        self.assertIsInstance(instance.value, int)
 
     def test_coercing(self):
         self.model.objects.create(value='10')

@@ -4,12 +4,9 @@ from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
-class BaseManager(object):
+class BaseManager:
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -22,12 +19,12 @@ class BaseManager(object):
 
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
-        obj = super(BaseManager, cls).__new__(cls)
+        obj = super().__new__(cls)
         obj._constructor_args = (args, kwargs)
         return obj
 
     def __init__(self):
-        super(BaseManager, self).__init__()
+        super().__init__()
         self._set_creation_counter()
         self.model = None
         self.name = None
@@ -88,9 +85,7 @@ class BaseManager(object):
             return manager_method
 
         new_methods = {}
-        # Refs http://bugs.python.org/issue1785.
-        predicate = inspect.isfunction if six.PY3 else inspect.ismethod
-        for name, method in inspect.getmembers(queryset_class, predicate=predicate):
+        for name, method in inspect.getmembers(queryset_class, predicate=inspect.isfunction):
             # Only copy missing methods.
             if hasattr(cls, name):
                 continue
@@ -165,9 +160,6 @@ class BaseManager(object):
             self._constructor_args == other._constructor_args
         )
 
-    def __ne__(self, other):
-        return not (self == other)
-
     def __hash__(self):
         return id(self)
 
@@ -176,7 +168,7 @@ class Manager(BaseManager.from_queryset(QuerySet)):
     pass
 
 
-class ManagerDescriptor(object):
+class ManagerDescriptor:
 
     def __init__(self, manager):
         self.manager = manager
@@ -204,8 +196,8 @@ class ManagerDescriptor(object):
 
 class EmptyManager(Manager):
     def __init__(self, model):
-        super(EmptyManager, self).__init__()
+        super().__init__()
         self.model = model
 
     def get_queryset(self):
-        return super(EmptyManager, self).get_queryset().none()
+        return super().get_queryset().none()

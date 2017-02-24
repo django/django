@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Event(models.Model):
@@ -27,7 +26,6 @@ class Band(models.Model):
     genres = models.ManyToManyField(Genre)
 
 
-@python_2_unicode_compatible
 class Musician(models.Model):
     name = models.CharField(max_length=30)
 
@@ -35,7 +33,6 @@ class Musician(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=30)
     members = models.ManyToManyField(Musician, through='Membership')
@@ -97,7 +94,7 @@ class UnorderedObject(models.Model):
 
 class OrderedObjectManager(models.Manager):
     def get_queryset(self):
-        return super(OrderedObjectManager, self).get_queryset().order_by('number')
+        return super().get_queryset().order_by('number')
 
 
 class OrderedObject(models.Model):

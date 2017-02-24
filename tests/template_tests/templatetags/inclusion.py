@@ -1,7 +1,6 @@
 import operator
 
 from django.template import Engine, Library
-from django.utils import six
 
 engine = Engine(app_dirs=True)
 register = Library()
@@ -152,7 +151,7 @@ def inclusion_unlimited_args(one, two='hi', *args):
     return {
         "result": (
             "inclusion_unlimited_args - Expected result: %s" % (
-                ', '.join(six.text_type(arg) for arg in [one, two] + list(args))
+                ', '.join(str(arg) for arg in [one, two] + list(args))
             )
         )
     }
@@ -167,7 +166,7 @@ def inclusion_unlimited_args_from_template(one, two='hi', *args):
     return {
         "result": (
             "inclusion_unlimited_args_from_template - Expected result: %s" % (
-                ', '.join(six.text_type(arg) for arg in [one, two] + list(args))
+                ', '.join(str(arg) for arg in [one, two] + list(args))
             )
         )
     }
@@ -181,7 +180,7 @@ def inclusion_only_unlimited_args(*args):
     """Expected inclusion_only_unlimited_args __doc__"""
     return {
         "result": "inclusion_only_unlimited_args - Expected result: %s" % (
-            ', '.join(six.text_type(arg) for arg in args)
+            ', '.join(str(arg) for arg in args)
         )
     }
 
@@ -194,7 +193,7 @@ def inclusion_only_unlimited_args_from_template(*args):
     """Expected inclusion_only_unlimited_args_from_template __doc__"""
     return {
         "result": "inclusion_only_unlimited_args_from_template - Expected result: %s" % (
-            ', '.join(six.text_type(arg) for arg in args)
+            ', '.join(str(arg) for arg in args)
         )
     }
 
@@ -215,9 +214,9 @@ inclusion_tag_use_l10n.anything = "Expected inclusion_tag_use_l10n __dict__"
 def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     """Expected inclusion_unlimited_args_kwargs __doc__"""
     # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(six.iteritems(kwargs), key=operator.itemgetter(0))
+    sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
     return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join(six.text_type(arg) for arg in [one, two] + list(args)),
+        ', '.join(str(arg) for arg in [one, two] + list(args)),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
     )}
 

@@ -5,7 +5,6 @@ from decimal import Decimal
 
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.utils import six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -24,10 +23,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             c.execute('PRAGMA foreign_keys')
             self._initial_pragma_fk = c.fetchone()[0]
             c.execute('PRAGMA foreign_keys = 0')
-        return super(DatabaseSchemaEditor, self).__enter__()
+        return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        super(DatabaseSchemaEditor, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         with self.connection.cursor() as c:
             # Restore initial FK setting - PRAGMA values can't be parametrized
             c.execute('PRAGMA foreign_keys = %s' % int(self._initial_pragma_fk))
@@ -46,15 +45,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Manual emulation of SQLite parameter quoting
         if isinstance(value, type(True)):
             return str(int(value))
-        elif isinstance(value, (Decimal, float)):
+        elif isinstance(value, (Decimal, float, int)):
             return str(value)
-        elif isinstance(value, six.integer_types):
-            return str(value)
-        elif isinstance(value, six.string_types):
-            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
+        elif isinstance(value, str):
+            return "'%s'" % value.replace("\'", "\'\'")
         elif value is None:
             return "NULL"
-        elif isinstance(value, (bytes, bytearray, six.memoryview)):
+        elif isinstance(value, (bytes, bytearray, memoryview)):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
             # character:
@@ -219,7 +216,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model, handle_autom2m=True):
         if handle_autom2m:
-            super(DatabaseSchemaEditor, self).delete_model(model)
+            super().delete_model(model)
         else:
             # Delete the table (and only that)
             self.execute(self.sql_delete_table % {

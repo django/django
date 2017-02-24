@@ -1,7 +1,3 @@
-# Since this package contains a "jinja2" directory, this is required to
-# silence an ImportWarning warning on Python 2.
-from __future__ import absolute_import
-
 from unittest import skipIf
 
 from django.template import TemplateSyntaxError

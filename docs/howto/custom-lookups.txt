@@ -294,7 +294,7 @@ would override ``get_lookup`` with something like::
                     pass
                 else:
                     return get_coordinate_lookup(dimension)
-            return super(CoordinatesField, self).get_lookup(lookup_name)
+            return super().get_lookup(lookup_name)
 
 You would then define ``get_coordinate_lookup`` appropriately to return a
 ``Lookup`` subclass which handles the relevant value of ``dimension``.

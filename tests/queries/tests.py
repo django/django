@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import pickle
 import unittest
@@ -13,8 +11,6 @@ from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils import six
-from django.utils.six.moves import range
 
 from .models import (
     FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
@@ -408,7 +404,7 @@ class Queries1Tests(TestCase):
         local_recursion_limit = 127
         msg = 'Maximum recursion depth exceeded: too many subqueries.'
         with self.assertRaisesMessage(RuntimeError, msg):
-            for i in six.moves.range(local_recursion_limit * 2):
+            for i in range(local_recursion_limit * 2):
                 x = Tag.objects.filter(pk__in=x)
 
     def test_reasonable_number_of_subq_aliases(self):
@@ -557,9 +553,6 @@ class Queries1Tests(TestCase):
             s.reverse()
             params.reverse()
 
-        # This slightly odd comparison works around the fact that PostgreSQL will
-        # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
-        # using constants here and not a real concern.
         d = Item.objects.extra(select=OrderedDict(s), select_params=params).values('a', 'b')[0]
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
@@ -794,8 +787,7 @@ class Queries1Tests(TestCase):
         n_obj = Note.objects.all()[0]
 
         def g():
-            for i in [n_obj.pk]:
-                yield i
+            yield n_obj.pk
         self.assertQuerysetEqual(Note.objects.filter(pk__in=f()), [])
         self.assertEqual(list(Note.objects.filter(pk__in=g())), [n_obj])
 
@@ -1645,6 +1637,8 @@ class Queries5Tests(TestCase):
     def test_ticket9848(self):
         # Make sure that updates which only filter on sub-tables don't
         # inadvertently update the wrong records (bug #9848).
+        author_start = Author.objects.get(name='a1')
+        ranking_start = Ranking.objects.get(author__name='a1')
 
         # Make sure that the IDs from different tables don't happen to match.
         self.assertQuerysetEqual(
@@ -1652,12 +1646,14 @@ class Queries5Tests(TestCase):
             ['<Ranking: 3: a1>']
         )
         self.assertEqual(
-            Ranking.objects.filter(author__name='a1').update(rank='4'),
+            Ranking.objects.filter(author__name='a1').update(rank=4636),
             1
         )
-        r = Ranking.objects.filter(author__name='a1')[0]
-        self.assertNotEqual(r.id, r.author.id)
-        self.assertEqual(r.rank, 4)
+
+        r = Ranking.objects.get(author__name='a1')
+        self.assertEqual(r.id, ranking_start.id)
+        self.assertEqual(r.author.id, author_start.id)
+        self.assertEqual(r.rank, 4636)
         r.rank = 3
         r.save()
         self.assertQuerysetEqual(
@@ -2247,25 +2243,6 @@ class QuerySetSupportsPythonIdioms(TestCase):
             ]
         )
 
-    @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
-    def test_slicing_works_with_longs(self):
-        # NOQA: long undefined on PY3
-        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')  # NOQA
-        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],  # NOQA
-            ["<Article: Article 2>", "<Article: Article 3>"])
-        self.assertQuerysetEqual(
-            self.get_ordered_articles()[::long(2)], [  # NOQA
-                "<Article: Article 1>",
-                "<Article: Article 3>",
-                "<Article: Article 5>",
-                "<Article: Article 7>"
-            ]
-        )
-
-        # And can be mixed with ints.
-        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],  # NOQA
-            ["<Article: Article 2>", "<Article: Article 3>"])
-
     def test_slicing_without_step_is_lazy(self):
         with self.assertNumQueries(0):
             self.get_ordered_articles()[0:5]
@@ -2849,13 +2826,13 @@ class EmptyStringsAsNullTest(TestCase):
 
     def test_direct_exclude(self):
         self.assertQuerysetEqual(
-            NamedCategory.objects.exclude(name__in=['nonexisting']),
+            NamedCategory.objects.exclude(name__in=['nonexistent']),
             [self.nc.pk], attrgetter('pk')
         )
 
     def test_joined_exclude(self):
         self.assertQuerysetEqual(
-            DumbCategory.objects.exclude(namedcategory__name__in=['nonexisting']),
+            DumbCategory.objects.exclude(namedcategory__name__in=['nonexistent']),
             [self.nc.pk], attrgetter('pk')
         )
 
@@ -2881,11 +2858,11 @@ class ProxyQueryCleanupTest(TestCase):
 
 
 class WhereNodeTest(TestCase):
-    class DummyNode(object):
+    class DummyNode:
         def as_sql(self, compiler, connection):
             return 'dummy', []
 
-    class MockCompiler(object):
+    class MockCompiler:
         def compile(self, node):
             return node.as_sql(self, connection)
 
@@ -2963,8 +2940,6 @@ class QuerySetExceptionTests(TestCase):
 
     def test_invalid_order_by(self):
         msg = "Invalid order_by arguments: ['*']"
-        if six.PY2:
-            msg = msg.replace("[", "[u")
         with self.assertRaisesMessage(FieldError, msg):
             list(Article.objects.order_by('*'))
 
@@ -3170,6 +3145,25 @@ class JoinReuseTest(TestCase):
     def test_revfk_noreuse(self):
         qs = Author.objects.filter(report__name='r4').filter(report__name='r1')
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+    def test_inverted_q_across_relations(self):
+        """
+        When a trimmable join is specified in the query (here school__), the
+        ORM detects it and removes unnecessary joins. The set of reusable joins
+        are updated after trimming the query so that other lookups don't
+        consider that the outer query's filters are in effect for the subquery
+        (#26551).
+        """
+        springfield_elementary = School.objects.create()
+        hogward = School.objects.create()
+        Student.objects.create(school=springfield_elementary)
+        hp = Student.objects.create(school=hogward)
+        Classroom.objects.create(school=hogward, name='Potion')
+        Classroom.objects.create(school=springfield_elementary, name='Main')
+        qs = Student.objects.filter(
+            ~(Q(school__classroom__name='Main') & Q(school__classroom__has_blackboard=None))
+        )
+        self.assertSequenceEqual(qs, [hp])
 
 
 class DisjunctionPromotionTests(TestCase):

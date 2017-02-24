@@ -371,12 +371,6 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
-        .. versionchanged:: 1.10
-
-            In previous versions, inactive users (:attr:`is_active=False
-            <django.contrib.auth.models.User.is_active>`) were not permitted
-            to login.
-
     .. method:: Client.force_login(user, backend=None)
 
         If your site uses Django's :doc:`authentication
@@ -710,13 +704,13 @@ If your tests make any database queries, use subclasses
 
             @classmethod
             def setUpClass(cls):
-                super(MyTestCase, cls).setUpClass()
+                super().setUpClass()
                 ...
 
             @classmethod
             def tearDownClass(cls):
                 ...
-                super(MyTestCase, cls).tearDownClass()
+                super().tearDownClass()
 
     Be sure to account for Python's behavior if an exception is raised during
     ``setUpClass()``. If that happens, neither the tests in the class nor
@@ -794,11 +788,6 @@ The class:
   :class:`TransactionTestCase`.
 
 * Checks deferrable database constraints at the end of each test.
-
-.. versionchanged:: 1.10
-
-    The check for deferrable database constraints at the end of each test was
-    added.
 
 It also provides an additional method:
 
@@ -891,14 +880,14 @@ The code for this test may look as follows::
 
         @classmethod
         def setUpClass(cls):
-            super(MySeleniumTests, cls).setUpClass()
+            super().setUpClass()
             cls.selenium = WebDriver()
             cls.selenium.implicitly_wait(10)
 
         @classmethod
         def tearDownClass(cls):
             cls.selenium.quit()
-            super(MySeleniumTests, cls).tearDownClass()
+            super().tearDownClass()
 
         def test_login(self):
             self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
@@ -1128,7 +1117,7 @@ This test case will flush *all* the test databases before running
 ``test_index_page_view``.
 
 The ``multi_db`` flag also affects into which databases the
-attr:`TransactionTestCase.fixtures` are loaded. By default (when
+:attr:`TransactionTestCase.fixtures` are loaded. By default (when
 ``multi_db=False``), fixtures are only loaded into the ``default`` database.
 If ``multi_db=True``, fixtures are loaded into all databases.
 
@@ -1351,11 +1340,6 @@ your test suite.
         with self.assertRaisesMessage(ValueError, 'invalid literal for int()'):
             int('a')
 
-    .. deprecated:: 1.9
-
-        Passing ``callable`` as a keyword argument called ``callable_obj`` is
-        deprecated. Pass the callable as a positional argument instead.
-
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
     Asserts that a form field behaves correctly with various inputs.
@@ -1478,11 +1462,6 @@ your test suite.
     there isn't any scheme specified in the location where we are redirected to,
     the original request's scheme is used. If present, the scheme in
     ``expected_url`` is the one used to make the comparisons to.
-
-    .. deprecated:: 1.9
-
-        The ``host`` argument is deprecated, as redirections are no longer
-        forced to be absolute URLs.
 
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 
@@ -1614,8 +1593,6 @@ your test suite.
 Tagging tests
 -------------
 
-.. versionadded:: 1.10
-
 You can tag your tests so you can easily run a particular subset. For example,
 you might label fast or slow tests::
 
@@ -1731,9 +1708,9 @@ Management commands can be tested with the
 :func:`~django.core.management.call_command` function. The output can be
 redirected into a ``StringIO`` instance::
 
+    from io import StringIO
     from django.core.management import call_command
     from django.test import TestCase
-    from django.utils.six import StringIO
 
     class ClosepollTest(TestCase):
         def test_command_output(self):

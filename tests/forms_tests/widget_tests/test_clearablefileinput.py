@@ -1,14 +1,12 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import ClearableFileInput
-from django.utils.encoding import python_2_unicode_compatible
 
 from .base import WidgetTest
 
 
-@python_2_unicode_compatible
-class FakeFieldFile(object):
+class FakeFieldFile:
     """
-    Quacks like a FieldFile (has a .url and unicode representation), but
+    Quacks like a FieldFile (has a .url and string representation), but
     doesn't require us to care about storages etc.
     """
     url = 'something'
@@ -39,8 +37,7 @@ class ClearableFileInputTest(WidgetTest):
         A ClearableFileInput should escape name, filename, and URL
         when rendering HTML (#15182).
         """
-        @python_2_unicode_compatible
-        class StrangeFieldFile(object):
+        class StrangeFieldFile:
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
             def __str__(self):
@@ -110,8 +107,7 @@ class ClearableFileInputTest(WidgetTest):
         A ClearableFileInput should not mask exceptions produced while
         checking that it has a value.
         """
-        @python_2_unicode_compatible
-        class FailingURLFieldFile(object):
+        class FailingURLFieldFile:
             @property
             def url(self):
                 raise ValueError('Canary')
@@ -123,8 +119,7 @@ class ClearableFileInputTest(WidgetTest):
             self.widget.render('myfile', FailingURLFieldFile())
 
     def test_url_as_property(self):
-        @python_2_unicode_compatible
-        class URLFieldFile(object):
+        class URLFieldFile:
             @property
             def url(self):
                 return 'https://www.python.org/'
@@ -136,8 +131,7 @@ class ClearableFileInputTest(WidgetTest):
         self.assertInHTML('<a href="https://www.python.org/">value</a>', html)
 
     def test_return_false_if_url_does_not_exists(self):
-        @python_2_unicode_compatible
-        class NoURLFieldFile(object):
+        class NoURLFieldFile:
             def __str__(self):
                 return 'value'
 
@@ -149,3 +143,9 @@ class ClearableFileInputTest(WidgetTest):
         # user to keep the existing, initial value.
         self.assertIs(self.widget.use_required_attribute(None), True)
         self.assertIs(self.widget.use_required_attribute('resume.txt'), False)
+
+    def test_value_omitted_from_data(self):
+        widget = ClearableFileInput()
+        self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(widget.value_omitted_from_data({}, {'field': 'x'}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field-clear': 'y'}, {}, 'field'), False)

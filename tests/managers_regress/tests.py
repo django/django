@@ -1,14 +1,7 @@
-from __future__ import unicode_literals
-
-import warnings
-
 from django.db import models
-from django.db.utils import DatabaseError
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
@@ -154,7 +147,7 @@ class ManagersRegressionTests(TestCase):
 
         self.assertEqual(
             t.render(Context({'related': related})),
-            ''.join([force_text(relation.pk)] * 3),
+            ''.join([str(relation.pk)] * 3),
         )
 
     def test_field_can_be_called_exact(self):
@@ -185,23 +178,20 @@ class TestManagerInheritance(TestCase):
         self.assertIsInstance(PlainModel._default_manager, CustomManager)
 
         class ModelWithAbstractParent(AbstractModel):
-            class Meta:
-                manager_inheritance_from_future = True
+            pass
 
         self.assertIsInstance(ModelWithAbstractParent._base_manager, models.Manager)
         self.assertIsInstance(ModelWithAbstractParent._default_manager, CustomManager)
 
         class ProxyModel(PlainModel):
             class Meta:
-                manager_inheritance_from_future = True
                 proxy = True
 
         self.assertIsInstance(ProxyModel._base_manager, models.Manager)
         self.assertIsInstance(ProxyModel._default_manager, CustomManager)
 
         class MTIModel(PlainModel):
-            class Meta:
-                manager_inheritance_from_future = True
+            pass
 
         self.assertIsInstance(MTIModel._base_manager, models.Manager)
         self.assertIsInstance(MTIModel._default_manager, CustomManager)
@@ -228,21 +218,18 @@ class TestManagerInheritance(TestCase):
         self.assertIsInstance(PlainModel._default_manager, CustomManager)
 
         class ModelWithAbstractParent(AbstractModel):
-            class Meta:
-                manager_inheritance_from_future = True
+            pass
 
         self.assertIsInstance(ModelWithAbstractParent._default_manager, CustomManager)
 
         class ProxyModel(PlainModel):
             class Meta:
-                manager_inheritance_from_future = True
                 proxy = True
 
         self.assertIsInstance(ProxyModel._default_manager, CustomManager)
 
         class MTIModel(PlainModel):
-            class Meta:
-                manager_inheritance_from_future = True
+            pass
 
         self.assertIsInstance(MTIModel._default_manager, CustomManager)
 
@@ -268,21 +255,18 @@ class TestManagerInheritance(TestCase):
         self.assertIsInstance(PlainModel._base_manager, CustomManager)
 
         class ModelWithAbstractParent(AbstractModel):
-            class Meta:
-                manager_inheritance_from_future = True
+            pass
 
         self.assertIsInstance(ModelWithAbstractParent._base_manager, CustomManager)
 
         class ProxyModel(PlainModel):
             class Meta:
-                manager_inheritance_from_future = True
                 proxy = True
 
         self.assertIsInstance(ProxyModel._base_manager, CustomManager)
 
         class MTIModel(PlainModel):
-            class Meta:
-                manager_inheritance_from_future = True
+            pass
 
         self.assertIsInstance(MTIModel._base_manager, CustomManager)
 
@@ -301,355 +285,3 @@ class TestManagerInheritance(TestCase):
 
         self.assertEqual(TestModel._meta.managers, (TestModel.custom_manager,))
         self.assertEqual(TestModel._meta.managers_map, {'custom_manager': TestModel.custom_manager})
-
-
-@isolate_apps('managers_regress')
-class TestManagerDeprecations(TestCase):
-    def test_use_for_related_fields_on_geomanager(self):
-        from django.contrib.gis.db.models import GeoManager
-
-        class MyModel(models.Model):
-            objects = GeoManager()
-
-        # Shouldn't issue any warnings, since GeoManager itself will be
-        # deprecated at the same time as use_for_related_fields, there
-        # is no point annoying users with this deprecation.
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            MyModel._base_manager
-        self.assertEqual(len(warns), 0)
-
-    def test_use_for_related_fields_for_base_manager(self):
-        class MyManager(models.Manager):
-            use_for_related_fields = True
-
-        class MyModel(models.Model):
-            objects = MyManager()
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            MyModel._base_manager
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "use_for_related_fields is deprecated, "
-            "instead set Meta.base_manager_name on "
-            "'managers_regress.MyModel'.",
-        )
-
-        # With the new base_manager_name API there shouldn't be any warnings.
-        class MyModel2(models.Model):
-            objects = MyManager()
-
-            class Meta:
-                base_manager_name = 'objects'
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            MyModel2._base_manager
-        self.assertEqual(len(warns), 0)
-
-    def test_use_for_related_fields_for_many_to_one(self):
-        # Common objects
-        class MyManagerQuerySet(models.QuerySet):
-            pass
-
-        class MyLegacyManagerQuerySet(models.QuerySet):
-            pass
-
-        class MyManager(models.Manager):
-            def get_queryset(self):
-                return MyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
-
-        class MyLegacyManager(models.Manager):
-            use_for_related_fields = True
-
-            def get_queryset(self):
-                return MyLegacyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
-
-        # With legacy config there should be a deprecation warning
-        class MyRelModel(models.Model):
-            objects = MyLegacyManager()
-
-        class MyModel(models.Model):
-            fk = models.ForeignKey(MyRelModel, on_delete=models.DO_NOTHING)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyModel(fk_id=42).fk
-            except DatabaseError:
-                pass
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "use_for_related_fields is deprecated, "
-            "instead set Meta.base_manager_name on "
-            "'managers_regress.MyRelModel'.",
-        )
-
-        # With the new base_manager_name API there shouldn't be any warnings.
-        class MyRelModel2(models.Model):
-            objects = MyManager()
-
-            class Meta:
-                base_manager_name = 'objects'
-
-        class MyModel2(models.Model):
-            fk = models.ForeignKey(MyRelModel2, on_delete=models.DO_NOTHING)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyModel2(fk_id=42).fk
-            except DatabaseError:
-                pass
-        self.assertEqual(len(warns), 0)
-
-        # When mixing base_manager_name and use_for_related_fields, there
-        # should be warnings.
-        class MyRelModel3(models.Model):
-            my_base_manager = MyManager()
-            my_default_manager = MyLegacyManager()
-
-            class Meta:
-                base_manager_name = 'my_base_manager'
-                default_manager_name = 'my_default_manager'
-
-        class MyModel3(models.Model):
-            fk = models.ForeignKey(MyRelModel3, on_delete=models.DO_NOTHING)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyModel3(fk_id=42).fk
-            except DatabaseError:
-                pass
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "use_for_related_fields is deprecated, "
-            "instead set Meta.base_manager_name on "
-            "'managers_regress.MyRelModel3'.",
-        )
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            self.assertIsInstance(MyModel3.fk.get_queryset(), MyLegacyManagerQuerySet)
-
-    def test_use_for_related_fields_for_one_to_one(self):
-        # Common objects
-        class MyManagerQuerySet(models.QuerySet):
-            pass
-
-        class MyLegacyManagerQuerySet(models.QuerySet):
-            pass
-
-        class MyManager(models.Manager):
-            def get_queryset(self):
-                return MyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
-
-        class MyLegacyManager(models.Manager):
-            use_for_related_fields = True
-
-            def get_queryset(self):
-                return MyLegacyManagerQuerySet(model=self.model, using=self._db, hints=self._hints)
-
-        # With legacy config there should be a deprecation warning
-        class MyRelModel(models.Model):
-            objects = MyLegacyManager()
-
-        class MyModel(models.Model):
-            o2o = models.OneToOneField(MyRelModel, on_delete=models.DO_NOTHING)
-            objects = MyLegacyManager()
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyModel(o2o_id=42).o2o
-            except DatabaseError:
-                pass
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "use_for_related_fields is deprecated, "
-            "instead set Meta.base_manager_name on "
-            "'managers_regress.MyRelModel'.",
-        )
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyRelModel(pk=42).mymodel
-            except DatabaseError:
-                pass
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "use_for_related_fields is deprecated, "
-            "instead set Meta.base_manager_name on "
-            "'managers_regress.MyModel'.",
-        )
-
-        # With the new base_manager_name API there shouldn't be any warnings.
-        class MyRelModel2(models.Model):
-            objects = MyManager()
-
-            class Meta:
-                base_manager_name = 'objects'
-
-        class MyModel2(models.Model):
-            o2o = models.OneToOneField(MyRelModel2, on_delete=models.DO_NOTHING)
-            objects = MyManager()
-
-            class Meta:
-                base_manager_name = 'objects'
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyModel2(o2o_id=42).o2o
-            except DatabaseError:
-                pass
-            try:
-                MyRelModel2(pk=42).mymodel2
-            except DatabaseError:
-                pass
-        self.assertEqual(len(warns), 0)
-
-        # When mixing base_manager_name and use_for_related_fields, there
-        # should be warnings.
-        class MyRelModel3(models.Model):
-            my_base_manager = MyManager()
-            my_default_manager = MyLegacyManager()
-
-            class Meta:
-                base_manager_name = 'my_base_manager'
-                default_manager_name = 'my_default_manager'
-
-        class MyModel3(models.Model):
-            o2o = models.OneToOneField(MyRelModel3, on_delete=models.DO_NOTHING)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            try:
-                MyModel3(o2o_id=42).o2o
-            except DatabaseError:
-                pass
-
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            str(warns[0].message),
-            "use_for_related_fields is deprecated, "
-            "instead set Meta.base_manager_name on "
-            "'managers_regress.MyRelModel3'.",
-        )
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            self.assertIsInstance(MyModel3.o2o.get_queryset(), MyLegacyManagerQuerySet)
-
-    def test_legacy_objects_is_created(self):
-        class ConcreteParentWithoutManager(models.Model):
-            pass
-
-        class ConcreteParentWithManager(models.Model):
-            default = models.Manager()
-
-        class AbstractParent(models.Model):
-            default = models.Manager()
-
-            class Meta:
-                abstract = True
-
-        # Shouldn't complain since the inherited manager
-        # is basically the same that would have been created.
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-
-            class MyModel(ConcreteParentWithoutManager):
-                    pass
-            self.assertEqual(len(warns), 0)
-
-        # Should create 'objects' (set as default) and warn that
-        # it will no longer be the case in the future.
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-
-            class MyModel2(ConcreteParentWithManager):
-                pass
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                "Managers from concrete parents will soon qualify as default "
-                "managers. As a result, the 'objects' manager won't be created "
-                "(or recreated) automatically anymore on "
-                "'managers_regress.MyModel2' and 'default' declared on "
-                "'managers_regress.ConcreteParentWithManager' will be promoted "
-                "to default manager. You can declare explicitly "
-                "`objects = models.Manager()` on 'MyModel2' to keep things the "
-                "way they are or you can switch to the new behavior right away "
-                "by setting `Meta.manager_inheritance_from_future` to `True`.",
-            )
-
-            self.assertIs(MyModel2.objects, MyModel2._default_manager)
-
-        # When there is a local manager we shouldn't get any warning
-        # and 'objects' shouldn't be created.
-        class MyModel3(ConcreteParentWithManager):
-            default = models.Manager()
-        self.assertIs(MyModel3.default, MyModel3._default_manager)
-        self.assertIsNone(getattr(MyModel3, 'objects', None))
-
-        # When there is an inherited manager we shouldn't get any warning
-        # and 'objects' shouldn't be created.
-        class MyModel4(AbstractParent, ConcreteParentWithManager):
-            pass
-        self.assertIs(MyModel4.default, MyModel4._default_manager)
-        self.assertIsNone(getattr(MyModel4, 'objects', None))
-
-        # With `manager_inheritance_from_future = True` 'objects'
-        # shouldn't be created.
-        class MyModel5(ConcreteParentWithManager):
-            class Meta:
-                manager_inheritance_from_future = True
-        self.assertIs(MyModel5.default, MyModel5._default_manager)
-        self.assertIsNone(getattr(MyModel5, 'objects', None))
-
-    def test_legacy_default_manager_promotion(self):
-        class ConcreteParent(models.Model):
-            concrete = models.Manager()
-
-        class AbstractParent(models.Model):
-            abstract = models.Manager()
-
-            class Meta:
-                abstract = True
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-
-            class MyModel(ConcreteParent, AbstractParent):
-                pass
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                "Managers from concrete parents will soon qualify as default "
-                "managers if they appear before any other managers in the "
-                "MRO. As a result, 'abstract' declared on "
-                "'managers_regress.AbstractParent' will no longer be the "
-                "default manager for 'managers_regress.MyModel' in favor of "
-                "'concrete' declared on 'managers_regress.ConcreteParent'. "
-                "You can redeclare 'abstract' on 'MyModel' to keep things the "
-                "way they are or you can switch to the new behavior right "
-                "away by setting `Meta.manager_inheritance_from_future` to "
-                "`True`.",
-            )
-            self.assertIs(MyModel.abstract, MyModel._default_manager)
-
-        class MyModel2(ConcreteParent, AbstractParent):
-            abstract = models.Manager()
-        self.assertIs(MyModel2.abstract, MyModel2._default_manager)
-
-        class MyModel3(ConcreteParent, AbstractParent):
-            class Meta:
-                manager_inheritance_from_future = True
-        self.assertIs(MyModel3.concrete, MyModel3._default_manager)

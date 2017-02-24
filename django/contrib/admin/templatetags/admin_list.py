@@ -1,7 +1,4 @@
-from __future__ import unicode_literals
-
 import datetime
-import warnings
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
@@ -18,12 +15,11 @@ from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 register = Library()
 
@@ -33,7 +29,7 @@ DOT = '.'
 @register.simple_tag
 def paginator_number(cl, i):
     """
-    Generates an individual page index link in a paginated list.
+    Generate an individual page index link in a paginated list.
     """
     if i == DOT:
         return '... '
@@ -49,7 +45,7 @@ def paginator_number(cl, i):
 @register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
     """
-    Generates the series of links to the pages in a paginated list.
+    Generate the series of links to the pages in a paginated list.
     """
     paginator, page_num = cl.paginator, cl.page_num
 
@@ -95,7 +91,7 @@ def pagination(cl):
 
 def result_headers(cl):
     """
-    Generates the list column headers.
+    Generate the list column headers.
     """
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
@@ -199,7 +195,7 @@ def _coerce_field_name(field_name, field_index):
 
 def items_for_result(cl, result, form):
     """
-    Generates the actual list of data.
+    Generate the actual list of data.
     """
 
     def link_in_col(is_first, field_name, cl):
@@ -223,17 +219,8 @@ def items_for_result(cl, result, form):
             if f is None or f.auto_created:
                 if field_name == 'action_checkbox':
                     row_classes = ['action-checkbox']
-                allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
                 result_repr = display_for_value(value, empty_value_display, boolean)
-                if allow_tags:
-                    warnings.warn(
-                        "Deprecated allow_tags attribute used on field {}. "
-                        "Use django.utils.html.format_html(), format_html_join(), "
-                        "or django.utils.safestring.mark_safe() instead.".format(field_name),
-                        RemovedInDjango20Warning
-                    )
-                    result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append('nowrap')
             else:
@@ -264,7 +251,7 @@ def items_for_result(cl, result, form):
             else:
                 url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
                 # Convert the pk to something that can be used in Javascript.
-                # Problem cases are long ints (23L) and non-ASCII strings.
+                # Problem cases are non-ASCII strings.
                 if cl.to_field:
                     attr = str(cl.to_field)
                 else:
@@ -298,13 +285,14 @@ def items_for_result(cl, result, form):
 
 
 class ResultList(list):
-    # Wrapper class used to return items in a list_editable
-    # changelist, annotated with the form object for error
-    # reporting purposes. Needed to maintain backwards
-    # compatibility with existing admin templates.
+    """
+    Wrapper class used to return items in a list_editable changelist, annotated
+    with the form object for error reporting purposes. Needed to maintain
+    backwards compatibility with existing admin templates.
+    """
     def __init__(self, form, *items):
         self.form = form
-        super(ResultList, self).__init__(*items)
+        super().__init__(*items)
 
 
 def results(cl):
@@ -326,7 +314,7 @@ def result_hidden_fields(cl):
 @register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):
     """
-    Displays the headers and data list together
+    Display the headers and data list together.
     """
     headers = list(result_headers(cl))
     num_sorted_fields = 0
@@ -343,7 +331,7 @@ def result_list(cl):
 @register.inclusion_tag('admin/date_hierarchy.html')
 def date_hierarchy(cl):
     """
-    Displays the date hierarchy for date drill-down functionality.
+    Display the date hierarchy for date drill-down functionality.
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
@@ -422,7 +410,7 @@ def date_hierarchy(cl):
 @register.inclusion_tag('admin/search_form.html')
 def search_form(cl):
     """
-    Displays a search form for searching the list.
+    Display a search form for searching the list.
     """
     return {
         'cl': cl,

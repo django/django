@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import binascii
 from unittest import skipUnless
 
@@ -8,7 +6,6 @@ from django.contrib.gis.geos import (
     WKTWriter,
 )
 from django.test import SimpleTestCase
-from django.utils.six import memoryview
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
@@ -27,7 +24,7 @@ class GEOSIOTest(SimpleTestCase):
         for geom in (g1, g2):
             self.assertEqual(ref, geom)
 
-        # Should only accept six.string_types objects.
+        # Should only accept string objects.
         with self.assertRaises(TypeError):
             wkt_r.read(1)
         with self.assertRaises(TypeError):

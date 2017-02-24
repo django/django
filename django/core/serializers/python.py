@@ -3,21 +3,18 @@ A Python "serializer". Doesn't do much serializing per se -- just converts to
 and from basic Python data types (lists, dicts, strings, etc.). Useful as a basis for
 other serializers.
 """
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils import six
 from django.utils.encoding import force_text, is_protected_type
 
 
 class Serializer(base.Serializer):
     """
-    Serializes a QuerySet to basic Python objects.
+    Serialize a QuerySet to basic Python objects.
     """
 
     internal_use_only = True
@@ -82,15 +79,13 @@ class Serializer(base.Serializer):
         return self.objects
 
 
-def Deserializer(object_list, **options):
+def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
     """
     Deserialize simple Python objects back into Django ORM instances.
 
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor
     """
-    db = options.pop('using', DEFAULT_DB_ALIAS)
-    ignore = options.pop('ignorenonexistent', False)
     field_names_cache = {}  # Model: <list of field_names>
 
     for d in object_list:
@@ -98,7 +93,7 @@ def Deserializer(object_list, **options):
         try:
             Model = _get_model(d["model"])
         except base.DeserializationError:
-            if ignore:
+            if ignorenonexistent:
                 continue
             else:
                 raise
@@ -115,9 +110,9 @@ def Deserializer(object_list, **options):
         field_names = field_names_cache[Model]
 
         # Handle each field
-        for (field_name, field_value) in six.iteritems(d["fields"]):
+        for (field_name, field_value) in d["fields"].items():
 
-            if ignore and field_name not in field_names:
+            if ignorenonexistent and field_name not in field_names:
                 # skip fields no longer on model
                 continue
 
@@ -133,8 +128,8 @@ def Deserializer(object_list, **options):
                 model = field.remote_field.model
                 if hasattr(model._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
-                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
-                            return model._default_manager.db_manager(db).get_by_natural_key(*value).pk
+                        if hasattr(value, '__iter__') and not isinstance(value, str):
+                            return model._default_manager.db_manager(using).get_by_natural_key(*value).pk
                         else:
                             return force_text(model._meta.pk.to_python(value), strings_only=True)
                 else:
@@ -156,8 +151,8 @@ def Deserializer(object_list, **options):
                         default_manager = model._default_manager
                         field_name = field.remote_field.field_name
                         if hasattr(default_manager, 'get_by_natural_key'):
-                            if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
-                                obj = default_manager.db_manager(db).get_by_natural_key(*field_value)
+                            if hasattr(field_value, '__iter__') and not isinstance(field_value, str):
+                                obj = default_manager.db_manager(using).get_by_natural_key(*field_value)
                                 value = getattr(obj, field.remote_field.field_name)
                                 # If this is a natural foreign key to an object that
                                 # has a FK/O2O as the foreign key, use the FK value
@@ -180,14 +175,12 @@ def Deserializer(object_list, **options):
                 except Exception as e:
                     raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
 
-        obj = base.build_instance(Model, data, db)
+        obj = base.build_instance(Model, data, using)
         yield base.DeserializedObject(obj, m2m_data)
 
 
 def _get_model(model_identifier):
-    """
-    Helper to look up a model from an "app_label.model_name" string.
-    """
+    """Look up a model from an "app_label.model_name" string."""
     try:
         return apps.get_model(model_identifier)
     except (LookupError, TypeError):

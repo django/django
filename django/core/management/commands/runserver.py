@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import errno
 import os
 import re
@@ -9,9 +7,11 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import get_internal_wsgi_application, run
-from django.utils import autoreload, six
-from django.utils.encoding import force_text, get_system_encoding
+from django.core.servers.basehttp import (
+    WSGIServer, get_internal_wsgi_application, run,
+)
+from django.utils import autoreload
+from django.utils.encoding import force_text
 
 
 naiveip_re = re.compile(r"""^(?:
@@ -29,7 +29,11 @@ class Command(BaseCommand):
     requires_system_checks = False
     leave_locale_alone = True
 
+    default_addr = '127.0.0.1'
+    default_addr_ipv6 = '::1'
     default_port = '8000'
+    protocol = 'http'
+    server_cls = WSGIServer
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -54,13 +58,11 @@ class Command(BaseCommand):
             # We rely on the environment because it's currently the only
             # way to reach WSGIRequestHandler. This seems an acceptable
             # compromise considering `runserver` runs indefinitely.
-            os.environ[str("DJANGO_COLORS")] = str("nocolor")
-        super(Command, self).execute(*args, **options)
+            os.environ["DJANGO_COLORS"] = "nocolor"
+        super().execute(*args, **options)
 
     def get_handler(self, *args, **options):
-        """
-        Returns the default WSGI handler for the runner.
-        """
+        """Return the default WSGI handler for the runner."""
         return get_internal_wsgi_application()
 
     def handle(self, *args, **options):
@@ -92,14 +94,12 @@ class Command(BaseCommand):
                 elif self.use_ipv6 and not _fqdn:
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
-            self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
+            self.addr = self.default_addr_ipv6 if self.use_ipv6 else self.default_addr
             self._raw_ipv6 = self.use_ipv6
         self.run(**options)
 
     def run(self, **options):
-        """
-        Runs the server, using the autoreloader if needed
-        """
+        """Run the server, using the autoreloader if needed."""
         use_reloader = options['use_reloader']
 
         if use_reloader:
@@ -123,16 +123,15 @@ class Command(BaseCommand):
         # requires_migrations_check attribute.
         self.check_migrations()
         now = datetime.now().strftime('%B %d, %Y - %X')
-        if six.PY2:
-            now = now.decode(get_system_encoding())
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at http://%(addr)s:%(port)s/\n"
+            "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
+            "protocol": self.protocol,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
@@ -141,7 +140,7 @@ class Command(BaseCommand):
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading)
+                ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
         except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {

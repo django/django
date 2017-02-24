@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 import mimetypes
 import unittest
 from os import path
 
 from django.conf.urls.static import static
+from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
@@ -105,7 +104,7 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_404(self):
-        response = self.client.get('/%s/non_existing_resource' % self.prefix)
+        response = self.client.get('/%s/nonexistent_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
 
     def test_index(self):
@@ -118,13 +117,29 @@ class StaticHelperTest(StaticTests):
     Test case to make sure the static URL pattern helper works as expected
     """
     def setUp(self):
-        super(StaticHelperTest, self).setUp()
+        super().setUp()
         self._old_views_urlpatterns = urls.urlpatterns[:]
         urls.urlpatterns += static('/media/', document_root=media_dir)
 
     def tearDown(self):
-        super(StaticHelperTest, self).tearDown()
+        super().tearDown()
         urls.urlpatterns = self._old_views_urlpatterns
+
+    def test_prefix(self):
+        self.assertEqual(static('test')[0].regex.pattern, '^test(?P<path>.*)$')
+
+    @override_settings(DEBUG=False)
+    def test_debug_off(self):
+        """No URLs are served if DEBUG=False."""
+        self.assertEqual(static('test'), [])
+
+    def test_empty_prefix(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, 'Empty static prefix not permitted'):
+            static('')
+
+    def test_special_prefix(self):
+        """No URLs are served if prefix contains '://'."""
+        self.assertEqual(static('http://'), [])
 
 
 class StaticUtilsTests(unittest.TestCase):

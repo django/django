@@ -1,7 +1,4 @@
-from __future__ import unicode_literals
-
 import copy
-import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 
@@ -13,8 +10,6 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -24,7 +19,7 @@ from .exceptions import InvalidBasesError
 
 
 def _get_app_label_and_model_name(model, app_label=''):
-    if isinstance(model, six.string_types):
+    if isinstance(model, str):
         split = model.split('.', 1)
         return (tuple(split) if len(split) == 2 else (app_label, split[0]))
     else:
@@ -41,7 +36,7 @@ def _get_related_models(m):
     ]
     related_fields_models = set()
     for f in m._meta.get_fields(include_parents=True, include_hidden=True):
-        if f.is_relation and f.related_model is not None and not isinstance(f.related_model, six.string_types):
+        if f.is_relation and f.related_model is not None and not isinstance(f.related_model, str):
             related_fields_models.add(f.model)
             related_models.append(f.related_model)
     # Reverse accessors of foreign keys to proxy models are attached to their
@@ -50,6 +45,17 @@ def _get_related_models(m):
     if opts.proxy and m in related_fields_models:
         related_models.append(opts.concrete_model)
     return related_models
+
+
+def get_related_models_tuples(model):
+    """
+    Return a list of typical (app_label, model_name) tuples for all related
+    models for the given model.
+    """
+    return {
+        (rel_mod._meta.app_label, rel_mod._meta.model_name)
+        for rel_mod in _get_related_models(model)
+    }
 
 
 def get_related_models_recursive(model):
@@ -74,7 +80,7 @@ def get_related_models_recursive(model):
     return seen - {(model._meta.app_label, model._meta.model_name)}
 
 
-class ProjectState(object):
+class ProjectState:
     """
     Represents the entire project's overall state.
     This is the item that is passed around - we do it here rather than at the
@@ -85,6 +91,7 @@ class ProjectState(object):
         self.models = models or {}
         # Apps to include from main registry, usually unmigrated ones
         self.real_apps = real_apps or []
+        self.is_delayed = False
 
     def add_model(self, model_state):
         app_label, model_name = model_state.app_label, model_state.name_lower
@@ -100,66 +107,91 @@ class ProjectState(object):
             # the cache automatically (#24513)
             self.apps.clear_cache()
 
-    def reload_model(self, app_label, model_name):
-        if 'apps' in self.__dict__:  # hasattr would cache the property
-            try:
-                old_model = self.apps.get_model(app_label, model_name)
-            except LookupError:
-                related_models = set()
+    def _find_reload_model(self, app_label, model_name, delay=False):
+        if delay:
+            self.is_delayed = True
+
+        related_models = set()
+
+        try:
+            old_model = self.apps.get_model(app_label, model_name)
+        except LookupError:
+            pass
+        else:
+            # Get all relations to and from the old model before reloading,
+            # as _meta.apps may change
+            if delay:
+                related_models = get_related_models_tuples(old_model)
             else:
-                # Get all relations to and from the old model before reloading,
-                # as _meta.apps may change
                 related_models = get_related_models_recursive(old_model)
 
-            # Get all outgoing references from the model to be rendered
-            model_state = self.models[(app_label, model_name)]
-            # Directly related models are the models pointed to by ForeignKeys,
-            # OneToOneFields, and ManyToManyFields.
-            direct_related_models = set()
-            for name, field in model_state.fields:
-                if field.is_relation:
-                    if field.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT:
-                        continue
-                    rel_app_label, rel_model_name = _get_app_label_and_model_name(field.related_model, app_label)
-                    direct_related_models.add((rel_app_label, rel_model_name.lower()))
+        # Get all outgoing references from the model to be rendered
+        model_state = self.models[(app_label, model_name)]
+        # Directly related models are the models pointed to by ForeignKeys,
+        # OneToOneFields, and ManyToManyFields.
+        direct_related_models = set()
+        for name, field in model_state.fields:
+            if field.is_relation:
+                if field.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT:
+                    continue
+                rel_app_label, rel_model_name = _get_app_label_and_model_name(field.related_model, app_label)
+                direct_related_models.add((rel_app_label, rel_model_name.lower()))
 
-            # For all direct related models recursively get all related models.
-            related_models.update(direct_related_models)
-            for rel_app_label, rel_model_name in direct_related_models:
-                try:
-                    rel_model = self.apps.get_model(rel_app_label, rel_model_name)
-                except LookupError:
-                    pass
+        # For all direct related models recursively get all related models.
+        related_models.update(direct_related_models)
+        for rel_app_label, rel_model_name in direct_related_models:
+            try:
+                rel_model = self.apps.get_model(rel_app_label, rel_model_name)
+            except LookupError:
+                pass
+            else:
+                if delay:
+                    related_models.update(get_related_models_tuples(rel_model))
                 else:
                     related_models.update(get_related_models_recursive(rel_model))
 
-            # Include the model itself
-            related_models.add((app_label, model_name))
+        # Include the model itself
+        related_models.add((app_label, model_name))
 
-            # Unregister all related models
-            with self.apps.bulk_update():
-                for rel_app_label, rel_model_name in related_models:
-                    self.apps.unregister_model(rel_app_label, rel_model_name)
+        return related_models
 
-            states_to_be_rendered = []
-            # Gather all models states of those models that will be rerendered.
-            # This includes:
-            # 1. All related models of unmigrated apps
-            for model_state in self.apps.real_models:
-                if (model_state.app_label, model_state.name_lower) in related_models:
-                    states_to_be_rendered.append(model_state)
+    def reload_model(self, app_label, model_name, delay=False):
+        if 'apps' in self.__dict__:  # hasattr would cache the property
+            related_models = self._find_reload_model(app_label, model_name, delay)
+            self._reload(related_models)
 
-            # 2. All related models of migrated apps
+    def reload_models(self, models, delay=True):
+        if 'apps' in self.__dict__:  # hasattr would cache the property
+            related_models = set()
+            for app_label, model_name in models:
+                related_models.update(self._find_reload_model(app_label, model_name, delay))
+            self._reload(related_models)
+
+    def _reload(self, related_models):
+        # Unregister all related models
+        with self.apps.bulk_update():
             for rel_app_label, rel_model_name in related_models:
-                try:
-                    model_state = self.models[rel_app_label, rel_model_name]
-                except KeyError:
-                    pass
-                else:
-                    states_to_be_rendered.append(model_state)
+                self.apps.unregister_model(rel_app_label, rel_model_name)
 
-            # Render all models
-            self.apps.render_multiple(states_to_be_rendered)
+        states_to_be_rendered = []
+        # Gather all models states of those models that will be rerendered.
+        # This includes:
+        # 1. All related models of unmigrated apps
+        for model_state in self.apps.real_models:
+            if (model_state.app_label, model_state.name_lower) in related_models:
+                states_to_be_rendered.append(model_state)
+
+        # 2. All related models of migrated apps
+        for rel_app_label, rel_model_name in related_models:
+            try:
+                model_state = self.models[rel_app_label, rel_model_name]
+            except KeyError:
+                pass
+            else:
+                states_to_be_rendered.append(model_state)
+
+        # Render all models
+        self.apps.render_multiple(states_to_be_rendered)
 
     def clone(self):
         "Returns an exact copy of this ProjectState"
@@ -169,7 +201,12 @@ class ProjectState(object):
         )
         if 'apps' in self.__dict__:
             new_state.apps = self.apps.clone()
+        new_state.is_delayed = self.is_delayed
         return new_state
+
+    def clear_delayed_apps_cache(self):
+        if self.is_delayed and 'apps' in self.__dict__:
+            del self.__dict__['apps']
 
     @cached_property
     def apps(self):
@@ -196,9 +233,6 @@ class ProjectState(object):
             return False
         return all(model == other.models[key] for key, model in self.models.items())
 
-    def __ne__(self, other):
-        return not (self == other)
-
 
 class AppConfigStub(AppConfig):
     """
@@ -212,7 +246,7 @@ class AppConfigStub(AppConfig):
         # App-label and app-name are not the same thing, so technically passing
         # in the label here is wrong. In practice, migrations don't care about
         # the app name, but we need something unique, and the label works fine.
-        super(AppConfigStub, self).__init__(label, None)
+        super().__init__(label, None)
 
     def import_models(self):
         self.models = self.apps.all_models[self.label]
@@ -237,7 +271,7 @@ class StateApps(Apps):
         # Populate the app registry with a stub for each application.
         app_labels = {model_state.app_label for model_state in models.values()}
         app_configs = [AppConfigStub(label) for label in sorted(real_apps + list(app_labels))]
-        super(StateApps, self).__init__(app_configs)
+        super().__init__(app_configs)
 
         # The lock gets in the way of copying as implemented in clone(), which
         # is called whenever Django duplicates a StateApps before updating it.
@@ -322,7 +356,7 @@ class StateApps(Apps):
             pass
 
 
-class ModelState(object):
+class ModelState:
     """
     Represents a Django Model. We don't use the actual Model class
     as it's not designed to have its options changed - instead, we
@@ -420,8 +454,6 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
-        # Force-convert all options to text_type (#23226)
-        options = cls.force_text_recursive(options)
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:
@@ -458,7 +490,7 @@ class ModelState(object):
             for base in flattened_bases
         )
         # Ensure at least one base inherits from models.Model
-        if not any((isinstance(base, six.string_types) or issubclass(base, models.Model)) for base in bases):
+        if not any((isinstance(base, str) or issubclass(base, models.Model)) for base in bases):
             bases = (models.Model,)
 
         managers = []
@@ -499,23 +531,6 @@ class ModelState(object):
             managers,
         )
 
-    @classmethod
-    def force_text_recursive(cls, value):
-        if isinstance(value, six.string_types):
-            return force_text(value)
-        elif isinstance(value, list):
-            return [cls.force_text_recursive(x) for x in value]
-        elif isinstance(value, tuple):
-            return tuple(cls.force_text_recursive(x) for x in value)
-        elif isinstance(value, set):
-            return set(cls.force_text_recursive(x) for x in value)
-        elif isinstance(value, dict):
-            return {
-                cls.force_text_recursive(k): cls.force_text_recursive(v)
-                for k, v in value.items()
-            }
-        return value
-
     def construct_managers(self):
         "Deep-clone the managers using deconstruction"
         # Sort all managers by their creation counter
@@ -546,11 +561,11 @@ class ModelState(object):
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
-        meta = type(str("Meta"), tuple(), meta_contents)
+        meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
         try:
             bases = tuple(
-                (apps.get_model(base) if isinstance(base, six.string_types) else base)
+                (apps.get_model(base) if isinstance(base, str) else base)
                 for base in self.bases
             )
         except LookupError:
@@ -562,18 +577,8 @@ class ModelState(object):
 
         # Restore managers
         body.update(self.construct_managers())
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore", "Managers from concrete parents will soon qualify as default managers",
-                RemovedInDjango20Warning)
-
-            # Then, make a Model object (apps.register_model is called in __new__)
-            return type(
-                str(self.name),
-                bases,
-                body,
-            )
+        # Then, make a Model object (apps.register_model is called in __new__)
+        return type(self.name, bases, body)
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:
@@ -601,6 +606,3 @@ class ModelState(object):
             (self.bases == other.bases) and
             (self.managers == other.managers)
         )
-
-    def __ne__(self, other):
-        return not (self == other)

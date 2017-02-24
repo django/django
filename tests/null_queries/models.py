@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Poll(models.Model):
     question = models.CharField(max_length=200)
 
@@ -12,7 +8,6 @@ class Poll(models.Model):
         return "Q: %s " % self.question
 
 
-@python_2_unicode_compatible
 class Choice(models.Model):
     poll = models.ForeignKey(Poll, models.CASCADE)
     choice = models.CharField(max_length=200)

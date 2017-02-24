@@ -75,7 +75,7 @@ FLAG_PROPERTIES_FOR_RELATIONS = (
 class FieldFlagsTests(test.SimpleTestCase):
     @classmethod
     def setUpClass(cls):
-        super(FieldFlagsTests, cls).setUpClass()
+        super().setUpClass()
         cls.fields = (
             list(AllFieldsModel._meta.fields) +
             list(AllFieldsModel._meta.private_fields)

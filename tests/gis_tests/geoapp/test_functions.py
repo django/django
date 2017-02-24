@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 from decimal import Decimal
 
@@ -9,7 +7,6 @@ from django.contrib.gis.measure import Area
 from django.db import connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from ..utils import mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
@@ -19,7 +16,6 @@ from .models import City, Country, CountryWebMercator, State, Track
 class GISFunctionsTests(TestCase):
     """
     Testing functions from django/contrib/gis/db/models/functions.py.
-    Several tests are taken and adapted from GeoQuerySetTest.
     Area/Distance/Length/Perimeter are tested in distapp/tests.
 
     Please keep the tests in function's alphabetic order.
@@ -309,10 +305,8 @@ class GISFunctionsTests(TestCase):
         for c in mpoly_qs:
             self.assertEqual(c.mpoly.num_points, c.num_points)
 
-        if not oracle:
-            # Oracle cannot count vertices in Point geometries.
-            for c in City.objects.annotate(num_points=functions.NumPoints('point')):
-                self.assertEqual(1, c.num_points)
+        for c in City.objects.annotate(num_points=functions.NumPoints('point')):
+            self.assertEqual(c.num_points, 1)
 
     @skipUnlessDBFeature("has_PointOnSurface_function")
     def test_point_on_surface(self):
@@ -364,7 +358,7 @@ class GISFunctionsTests(TestCase):
         for bad_args in ((), range(3), range(5)):
             with self.assertRaises(ValueError):
                 Country.objects.annotate(snap=functions.SnapToGrid('mpoly', *bad_args))
-        for bad_args in (('1.0',), (1.0, None), tuple(map(six.text_type, range(4)))):
+        for bad_args in (('1.0',), (1.0, None), tuple(map(str, range(4)))):
             with self.assertRaises(TypeError):
                 Country.objects.annotate(snap=functions.SnapToGrid('mpoly', *bad_args))
 
@@ -462,7 +456,6 @@ class GISFunctionsTests(TestCase):
         "has_Difference_function", "has_Intersection_function",
         "has_SymDifference_function", "has_Union_function")
     def test_diff_intersection_union(self):
-        "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.all().annotate(
             difference=functions.Difference('mpoly', geom),

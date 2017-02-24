@@ -11,12 +11,11 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
-from django.utils.six.moves import zip
 
 FORCE = object()
 
 
-class SQLCompiler(object):
+class SQLCompiler:
     def __init__(self, query, connection, using):
         self.query = query
         self.connection = connection
@@ -309,6 +308,21 @@ class SQLCompiler(object):
         seen = set()
 
         for expr, is_ref in order_by:
+            if self.query.combinator:
+                src = expr.get_source_expressions()[0]
+                # Relabel order by columns to raw numbers if this is a combined
+                # query; necessary since the columns can't be referenced by the
+                # fully qualified name and the simple column names may collide.
+                for idx, (sel_expr, _, col_alias) in enumerate(self.select):
+                    if is_ref and col_alias == src.refs:
+                        src = src.source
+                    elif col_alias:
+                        continue
+                    if src == sel_expr:
+                        expr.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
+                        break
+                else:
+                    raise DatabaseError('ORDER BY term does not match any column in the result set.')
             resolved = expr.resolve_expression(
                 self.query, allow_joins=True, reuse=None)
             sql, params = self.compile(resolved)
@@ -360,6 +374,30 @@ class SQLCompiler(object):
             return node.output_field.select_format(self, sql, params)
         return sql, params
 
+    def get_combinator_sql(self, combinator, all):
+        features = self.connection.features
+        compilers = [
+            query.get_compiler(self.using, self.connection)
+            for query in self.query.combined_queries
+        ]
+        if not features.supports_slicing_ordering_in_compound:
+            for query, compiler in zip(self.query.combined_queries, compilers):
+                if query.low_mark or query.high_mark:
+                    raise DatabaseError('LIMIT/OFFSET not allowed in subqueries of compound statements.')
+                if compiler.get_order_by():
+                    raise DatabaseError('ORDER BY not allowed in subqueries of compound statements.')
+        parts = (compiler.as_sql() for compiler in compilers)
+        combinator_sql = self.connection.ops.set_operators[combinator]
+        if all and combinator == 'union':
+            combinator_sql += ' ALL'
+        braces = '({})' if features.supports_slicing_ordering_in_compound else '{}'
+        sql_parts, args_parts = zip(*((braces.format(sql), args) for sql, args in parts))
+        result = [' {} '.format(combinator_sql).join(sql_parts)]
+        params = []
+        for part in args_parts:
+            params.extend(part)
+        return result, params
+
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Creates the SQL for this query. Returns the SQL string and list of
@@ -377,69 +415,76 @@ class SQLCompiler(object):
             # docstring of get_from_clause() for details.
             from_, f_params = self.get_from_clause()
 
+            for_update_part = None
             where, w_params = self.compile(self.where) if self.where is not None else ("", [])
             having, h_params = self.compile(self.having) if self.having is not None else ("", [])
-            params = []
-            result = ['SELECT']
 
-            if self.query.distinct:
-                result.append(self.connection.ops.distinct_sql(distinct_fields))
+            combinator = self.query.combinator
+            features = self.connection.features
+            if combinator:
+                if not getattr(features, 'supports_select_{}'.format(combinator)):
+                    raise DatabaseError('{} not supported on this database backend.'.format(combinator))
+                result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
+            else:
+                result = ['SELECT']
+                params = []
 
-            out_cols = []
-            col_idx = 1
-            for _, (s_sql, s_params), alias in self.select + extra_select:
-                if alias:
-                    s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
-                elif with_col_aliases:
-                    s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
-                    col_idx += 1
-                params.extend(s_params)
-                out_cols.append(s_sql)
+                if self.query.distinct:
+                    result.append(self.connection.ops.distinct_sql(distinct_fields))
 
-            result.append(', '.join(out_cols))
+                out_cols = []
+                col_idx = 1
+                for _, (s_sql, s_params), alias in self.select + extra_select:
+                    if alias:
+                        s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
+                    elif with_col_aliases:
+                        s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
+                        col_idx += 1
+                    params.extend(s_params)
+                    out_cols.append(s_sql)
 
-            result.append('FROM')
-            result.extend(from_)
-            params.extend(f_params)
+                result.append(', '.join(out_cols))
 
-            for_update_part = None
-            if self.query.select_for_update and self.connection.features.has_select_for_update:
-                if self.connection.get_autocommit():
-                    raise TransactionManagementError("select_for_update cannot be used outside of a transaction.")
+                result.append('FROM')
+                result.extend(from_)
+                params.extend(f_params)
 
-                nowait = self.query.select_for_update_nowait
-                skip_locked = self.query.select_for_update_skip_locked
-                # If it's a NOWAIT/SKIP LOCKED query but the backend doesn't
-                # support it, raise a DatabaseError to prevent a possible
-                # deadlock.
-                if nowait and not self.connection.features.has_select_for_update_nowait:
-                    raise DatabaseError('NOWAIT is not supported on this database backend.')
-                elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
-                    raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
-                for_update_part = self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked)
+                if self.query.select_for_update and self.connection.features.has_select_for_update:
+                    if self.connection.get_autocommit():
+                        raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
 
-            if for_update_part and self.connection.features.for_update_after_from:
-                result.append(for_update_part)
+                    nowait = self.query.select_for_update_nowait
+                    skip_locked = self.query.select_for_update_skip_locked
+                    # If it's a NOWAIT/SKIP LOCKED query but the backend
+                    # doesn't support it, raise a DatabaseError to prevent a
+                    # possible deadlock.
+                    if nowait and not self.connection.features.has_select_for_update_nowait:
+                        raise DatabaseError('NOWAIT is not supported on this database backend.')
+                    elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
+                        raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
+                    for_update_part = self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked)
 
-            if where:
-                result.append('WHERE %s' % where)
-                params.extend(w_params)
+                if for_update_part and self.connection.features.for_update_after_from:
+                    result.append(for_update_part)
 
-            grouping = []
-            for g_sql, g_params in group_by:
-                grouping.append(g_sql)
-                params.extend(g_params)
-            if grouping:
-                if distinct_fields:
-                    raise NotImplementedError(
-                        "annotate() + distinct(fields) is not implemented.")
-                if not order_by:
-                    order_by = self.connection.ops.force_no_ordering()
-                result.append('GROUP BY %s' % ', '.join(grouping))
+                if where:
+                    result.append('WHERE %s' % where)
+                    params.extend(w_params)
 
-            if having:
-                result.append('HAVING %s' % having)
-                params.extend(h_params)
+                grouping = []
+                for g_sql, g_params in group_by:
+                    grouping.append(g_sql)
+                    params.extend(g_params)
+                if grouping:
+                    if distinct_fields:
+                        raise NotImplementedError('annotate() + distinct(fields) is not implemented.')
+                    if not order_by:
+                        order_by = self.connection.ops.force_no_ordering()
+                    result.append('GROUP BY %s' % ', '.join(grouping))
+
+                if having:
+                    result.append('HAVING %s' % having)
+                    params.extend(h_params)
 
             if order_by:
                 ordering = []
@@ -778,7 +823,6 @@ class SQLCompiler(object):
         """
         Returns an iterator over the results from executing this query.
         """
-        converters = None
         if results is None:
             results = self.execute_sql(MULTI)
         fields = [s[0] for s in self.select[0:self.col_count]]
@@ -799,7 +843,7 @@ class SQLCompiler(object):
         self.query.set_extra_mask(['a'])
         return bool(self.execute_sql(SINGLE))
 
-    def execute_sql(self, result_type=MULTI):
+    def execute_sql(self, result_type=MULTI, chunked_fetch=False):
         """
         Run the query against the database and returns the result(s). The
         return value is a single data item if result_type is SINGLE, or an
@@ -823,11 +867,14 @@ class SQLCompiler(object):
                 return iter([])
             else:
                 return
-
-        cursor = self.connection.cursor()
+        if chunked_fetch:
+            cursor = self.connection.chunked_cursor()
+        else:
+            cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
         except Exception:
+            # Might fail for server-side cursors (e.g. connection closed)
             cursor.close()
             raise
 
@@ -852,11 +899,11 @@ class SQLCompiler(object):
             cursor, self.connection.features.empty_fetchmany_value,
             self.col_count
         )
-        if not self.connection.features.can_use_chunked_reads:
+        if not chunked_fetch and not self.connection.features.can_use_chunked_reads:
             try:
                 # If we are using non-chunked reads, we return the same data
                 # structure as normally, but ensure it is all read into memory
-                # before going any further.
+                # before going any further. Use chunked_fetch if requested.
                 return list(result)
             finally:
                 # done with the cursor
@@ -881,7 +928,7 @@ class SQLInsertCompiler(SQLCompiler):
 
     def __init__(self, *args, **kwargs):
         self.return_id = False
-        super(SQLInsertCompiler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def field_as_sql(self, field, val):
         """
@@ -1134,7 +1181,7 @@ class SQLUpdateCompiler(SQLCompiler):
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
+        cursor = super().execute_sql(result_type)
         try:
             rows = cursor.rowcount if cursor else 0
             is_empty = cursor is None
@@ -1170,7 +1217,7 @@ class SQLUpdateCompiler(SQLCompiler):
         query._extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
-        super(SQLUpdateCompiler, self).pre_sql_setup()
+        super().pre_sql_setup()
 
         must_pre_select = count > 1 and not self.connection.features.update_can_self_select
 

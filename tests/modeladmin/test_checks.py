@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
@@ -200,7 +198,7 @@ class FieldsCheckTests(CheckTestCase):
 class FormCheckTests(CheckTestCase):
 
     def test_invalid_type(self):
-        class FakeForm(object):
+        class FakeForm:
             pass
 
         class TestModelAdmin(ModelAdmin):
@@ -580,7 +578,7 @@ class ListFilterTests(CheckTestCase):
         )
 
     def test_not_filter(self):
-        class RandomClass(object):
+        class RandomClass:
             pass
 
         class TestModelAdmin(ModelAdmin):
@@ -592,7 +590,7 @@ class ListFilterTests(CheckTestCase):
             'admin.E113')
 
     def test_not_filter_again(self):
-        class RandomClass(object):
+        class RandomClass:
             pass
 
         class TestModelAdmin(ModelAdmin):
@@ -871,7 +869,7 @@ class InlinesCheckTests(CheckTestCase):
         )
 
     def test_not_model_admin(self):
-        class ValidationTestInline(object):
+        class ValidationTestInline:
             pass
 
         class TestModelAdmin(ModelAdmin):
@@ -896,7 +894,7 @@ class InlinesCheckTests(CheckTestCase):
             'admin.E105')
 
     def test_invalid_model_type(self):
-        class SomethingBad(object):
+        class SomethingBad:
             pass
 
         class ValidationTestInline(TabularInline):
@@ -1036,7 +1034,7 @@ class MinNumCheckTests(CheckTestCase):
 class FormsetCheckTests(CheckTestCase):
 
     def test_invalid_type(self):
-        class FakeFormSet(object):
+        class FakeFormSet:
             pass
 
         class ValidationTestInline(TabularInline):

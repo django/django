@@ -16,21 +16,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cx_Oracle.CLOB: 'TextField',
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
+        cx_Oracle.FIXED_NCHAR: 'CharField',
+        cx_Oracle.NATIVE_FLOAT: 'FloatField',
+        cx_Oracle.NCHAR: 'CharField',
         cx_Oracle.NCLOB: 'TextField',
         cx_Oracle.NUMBER: 'DecimalField',
         cx_Oracle.STRING: 'CharField',
         cx_Oracle.TIMESTAMP: 'DateTimeField',
     }
-
-    try:
-        data_types_reverse[cx_Oracle.NATIVE_FLOAT] = 'FloatField'
-    except AttributeError:
-        pass
-
-    try:
-        data_types_reverse[cx_Oracle.UNICODE] = 'CharField'
-    except AttributeError:
-        pass
 
     cache_bust_counter = 1
 
@@ -48,7 +41,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             elif scale == -127:
                 return 'FloatField'
 
-        return super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        return super().get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
         """
@@ -81,7 +74,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             self.cache_bust_counter))
         description = []
         for desc in cursor.description:
-            name = force_text(desc[0])  # cx_Oracle always returns a 'str' on both Python 2 and 3
+            name = force_text(desc[0])  # cx_Oracle always returns a 'str'
             internal_size, default = field_map[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(FieldInfo(*(name.lower(),) + desc[1:3] + (internal_size,) + desc[4:] + (default,)))
@@ -281,7 +274,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                     "check": False,
                     "index": True,
-                    "type": 'btree' if type_ == 'normal' else type_,
+                    "type": 'idx' if type_ == 'normal' else type_,
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)

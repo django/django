@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings, skipUnlessDBFeature
@@ -98,6 +96,6 @@ class GeoAdminTest(TestCase):
         self.assertEqual(len(logger_calls), 1)
         self.assertEqual(
             logger_calls[0],
-            "Error creating geometry from value 'INVALID()' (String or unicode input "
+            "Error creating geometry from value 'INVALID()' (String input "
             "unrecognized as WKT EWKT, and HEXEWKB.)"
         )

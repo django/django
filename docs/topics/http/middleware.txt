@@ -16,16 +16,6 @@ how to write your own middleware. Django ships with some built-in middleware
 you can use right out of the box. They're documented in the :doc:`built-in
 middleware reference </ref/middleware>`.
 
-.. versionchanged:: 1.10
-
-    A new style of middleware was introduced for use with the new
-    :setting:`MIDDLEWARE` setting. If you're using the old
-    :setting:`MIDDLEWARE_CLASSES` setting, you'll need to :ref:`adapt old,
-    custom middleware <upgrading-middleware>` before using the new setting.
-    This document describes new-style middleware. Refer to this page in older
-    versions of the documentation for a description of how old-style middleware
-    works.
-
 Writing your own middleware
 ===========================
 
@@ -95,15 +85,6 @@ caveats:
 
 * Unlike the ``__call__()`` method which is called once per request,
   ``__init__()`` is called only *once*, when the Web server starts.
-
-.. versionchanged:: 1.10
-
-    In older versions, ``__init__()`` wasn't called until the Web server
-    responded to its first request.
-
-    In older versions, ``__init__()`` didn't accept any arguments. To allow
-    your middleware to be used in Django 1.9 and earlier, make ``get_response``
-    an optional argument (``get_response=None``).
 
 Marking middleware as unused
 ----------------------------
@@ -311,7 +292,7 @@ Upgrading pre-Django 1.10-style middleware
 
 Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease creating
 middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
-old :setting:`MIDDLEWARE_CLASSES`. All middleware classes included with Django
+old ``MIDDLEWARE_CLASSES``. All middleware classes included with Django
 are compatible with both settings.
 
 The mixin provides an ``__init__()`` method that accepts an optional
@@ -325,7 +306,7 @@ The ``__call__()`` method:
 #. Calls ``self.process_response(request, response)`` (if defined).
 #. Returns the response.
 
-If used with :setting:`MIDDLEWARE_CLASSES`, the ``__call__()`` method will
+If used with ``MIDDLEWARE_CLASSES``, the ``__call__()`` method will
 never be used; Django calls ``process_request()`` and ``process_response()``
 directly.
 
@@ -336,9 +317,9 @@ even beneficial to the existing middleware. In a few cases, a middleware class
 may need some changes to adjust to the new semantics.
 
 These are the behavioral differences between using :setting:`MIDDLEWARE` and
-:setting:`MIDDLEWARE_CLASSES`:
+``MIDDLEWARE_CLASSES``:
 
-1. Under :setting:`MIDDLEWARE_CLASSES`, every middleware will always have its
+1. Under ``MIDDLEWARE_CLASSES``, every middleware will always have its
    ``process_response`` method called, even if an earlier middleware
    short-circuited by returning a response from its ``process_request``
    method. Under :setting:`MIDDLEWARE`, middleware behaves more like an onion:
@@ -347,7 +328,7 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    that middleware and the ones before it in :setting:`MIDDLEWARE` will see the
    response.
 
-2. Under :setting:`MIDDLEWARE_CLASSES`, ``process_exception`` is applied to
+2. Under ``MIDDLEWARE_CLASSES``, ``process_exception`` is applied to
    exceptions raised from a middleware ``process_request`` method. Under
    :setting:`MIDDLEWARE`, ``process_exception`` applies only to exceptions
    raised from the view (or from the ``render`` method of a
@@ -355,7 +336,7 @@ These are the behavioral differences between using :setting:`MIDDLEWARE` and
    a middleware are converted to the appropriate HTTP response and then passed
    to the next middleware.
 
-3. Under :setting:`MIDDLEWARE_CLASSES`, if a ``process_response`` method raises
+3. Under ``MIDDLEWARE_CLASSES``, if a ``process_response`` method raises
    an exception, the ``process_response`` methods of all earlier middleware are
    skipped and a ``500 Internal Server Error`` HTTP response is always
    returned (even if the exception raised was e.g. an

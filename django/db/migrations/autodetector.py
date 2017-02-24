@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import functools
 import re
 from itertools import chain
@@ -14,12 +12,11 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
-from django.utils import six
 
 from .topological_sort import stable_topological_sort
 
 
-class MigrationAutodetector(object):
+class MigrationAutodetector:
     """
     Takes a pair of ProjectStates, and compares them to see what the
     first would need doing to make it match the second (the second
@@ -309,7 +306,7 @@ class MigrationAutodetector(object):
                 # Make a migration! Well, only if there's stuff to put in it
                 if dependencies or chopped:
                     if not self.generated_operations[app_label] or chop_mode:
-                        subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                        subclass = type("Migration", (Migration,), {"operations": [], "dependencies": []})
                         instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
                         instance.dependencies = list(dependencies)
                         instance.operations = chopped
@@ -540,7 +537,7 @@ class MigrationAutodetector(object):
             ]
             # Depend on all bases
             for base in model_state.bases:
-                if isinstance(base, six.string_types) and "." in base:
+                if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
             # Depend on the other end of the primary key if it's a relation
@@ -661,7 +658,7 @@ class MigrationAutodetector(object):
             ]
             # Depend on all bases
             for base in model_state.bases:
-                if isinstance(base, six.string_types) and "." in base:
+                if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
             # Generate creation operation

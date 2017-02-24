@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 
 
 def delete_selected(modeladmin, request, queryset):
@@ -37,7 +37,7 @@ def delete_selected(modeladmin, request, queryset):
         queryset, opts, request.user, modeladmin.admin_site, using)
 
     # The user has already confirmed the deletion.
-    # Do the deletion and return a None to display the change list view again.
+    # Do the deletion and return None to display the change list view again.
     if request.POST.get('post') and not protected:
         if perms_needed:
             raise PermissionDenied
@@ -53,10 +53,7 @@ def delete_selected(modeladmin, request, queryset):
         # Return None to display the change list page again.
         return None
 
-    if len(queryset) == 1:
-        objects_name = force_text(opts.verbose_name)
-    else:
-        objects_name = force_text(opts.verbose_name_plural)
+    objects_name = model_ngettext(queryset)
 
     if perms_needed or protected:
         title = _("Cannot delete %(name)s") % {"name": objects_name}
@@ -87,4 +84,4 @@ def delete_selected(modeladmin, request, queryset):
     ], context)
 
 
-delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")
+delete_selected.short_description = gettext_lazy("Delete selected %(verbose_name_plural)s")

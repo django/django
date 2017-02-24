@@ -6,16 +6,14 @@ import time
 import warnings
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 
 
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
-        super(BaseMemcachedCache, self).__init__(params)
-        if isinstance(server, six.string_types):
+        super().__init__(params)
+        if isinstance(server, str):
             self._servers = re.split('[;,]', server)
         else:
             self._servers = server
@@ -32,7 +30,7 @@ class BaseMemcachedCache(BaseCache):
     @property
     def _cache(self):
         """
-        Implements transparent thread-safe access to a memcached client.
+        Implement transparent thread-safe access to a memcached client.
         """
         if getattr(self, '_client', None) is None:
             self._client = self._lib.Client(self._servers, **self._options)
@@ -65,10 +63,6 @@ class BaseMemcachedCache(BaseCache):
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
         return int(timeout)
-
-    def make_key(self, key, version=None):
-        # Python 2 memcache requires the key to be a byte string.
-        return force_str(super(BaseMemcachedCache, self).make_key(key, version))
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -114,7 +108,7 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.incr(key, delta)
 
-        # python-memcache responds to incr on non-existent keys by
+        # python-memcache responds to incr on nonexistent keys by
         # raising a ValueError, pylibmc by raising a pylibmc.NotFound
         # and Cmemcache returns None. In all cases,
         # we should raise a ValueError though.
@@ -132,7 +126,7 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.decr(key, delta)
 
-        # python-memcache responds to incr on non-existent keys by
+        # python-memcache responds to incr on nonexistent keys by
         # raising a ValueError, pylibmc by raising a pylibmc.NotFound
         # and Cmemcache returns None. In all cases,
         # we should raise a ValueError though.
@@ -160,9 +154,7 @@ class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
         import memcache
-        super(MemcachedCache, self).__init__(server, params,
-                                             library=memcache,
-                                             value_not_found_exception=ValueError)
+        super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
 
     @property
     def _cache(self):
@@ -177,9 +169,7 @@ class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
     def __init__(self, server, params):
         import pylibmc
-        super(PyLibMCCache, self).__init__(server, params,
-                                           library=pylibmc,
-                                           value_not_found_exception=pylibmc.NotFound)
+        super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
 
         # The contents of `OPTIONS` was formerly only used to set the behaviors
         # attribute, but is now passed directly to the Client constructor. As such,

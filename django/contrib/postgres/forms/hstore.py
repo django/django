@@ -2,8 +2,7 @@ import json
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 __all__ = ['HStoreField']
 
@@ -44,7 +43,7 @@ class HStoreField(forms.CharField):
         # Cast everything to strings for ease.
         for key, val in value.items():
             if val is not None:
-                val = six.text_type(val)
+                val = str(val)
             value[key] = val
         return value
 
@@ -56,4 +55,4 @@ class HStoreField(forms.CharField):
         # the same as an empty dict, if the data or initial value we get
         # is None, replace it w/ {}.
         initial_value = self.to_python(initial)
-        return super(HStoreField, self).has_changed(initial_value, data)
+        return super().has_changed(initial_value, data)

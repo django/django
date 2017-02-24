@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from collections import OrderedDict
 
@@ -11,19 +9,18 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.six.moves import input
 
 
 class Command(BaseCommand):
     """
-    Command that allows to copy or symlink static files from different
-    locations to the settings.STATIC_ROOT.
+    Copies or symlinks static files from different locations to the
+    settings.STATIC_ROOT.
     """
     help = "Collect static files in a single location."
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
@@ -228,7 +225,7 @@ class Command(BaseCommand):
 
     def clear_dir(self, path):
         """
-        Deletes the given relative path using the destination storage backend.
+        Delete the given relative path using the destination storage backend.
         """
         if not self.storage.exists(path):
             return
@@ -255,7 +252,7 @@ class Command(BaseCommand):
 
     def delete_file(self, path, prefixed_path, source_storage):
         """
-        Checks if the target file should be deleted if it already exists
+        Check if the target file should be deleted if it already exists.
         """
         if self.storage.exists(prefixed_path):
             try:

@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import json
 import os
 import re
 import unittest
+from urllib.parse import parse_qsl, urljoin, urlparse
 
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -32,16 +30,12 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
-from django.utils import formats, six, translation
-from django.utils._os import upath
+from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
-)
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 
 from . import customadmin
 from .admin import CityAdmin, site, site2
@@ -70,7 +64,7 @@ ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
 
 
-class AdminFieldExtractionMixin(object):
+class AdminFieldExtractionMixin:
     """
     Helper methods for extracting data from AdminForm.
     """
@@ -588,24 +582,30 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url)
         self.assertContains(response, '<div id="changelist-filter">')
         filters = {
-            'chap__id__exact': dict(
-                values=[c.id for c in Chapter.objects.all()],
-                test=lambda obj, value: obj.chap.id == value),
-            'chap__title': dict(
-                values=[c.title for c in Chapter.objects.all()],
-                test=lambda obj, value: obj.chap.title == value),
-            'chap__book__id__exact': dict(
-                values=[b.id for b in Book.objects.all()],
-                test=lambda obj, value: obj.chap.book.id == value),
-            'chap__book__name': dict(
-                values=[b.name for b in Book.objects.all()],
-                test=lambda obj, value: obj.chap.book.name == value),
-            'chap__book__promo__id__exact': dict(
-                values=[p.id for p in Promo.objects.all()],
-                test=lambda obj, value: obj.chap.book.promo_set.filter(id=value).exists()),
-            'chap__book__promo__name': dict(
-                values=[p.name for p in Promo.objects.all()],
-                test=lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists()),
+            'chap__id__exact': {
+                'values': [c.id for c in Chapter.objects.all()],
+                'test': lambda obj, value: obj.chap.id == value,
+            },
+            'chap__title': {
+                'values': [c.title for c in Chapter.objects.all()],
+                'test': lambda obj, value: obj.chap.title == value,
+            },
+            'chap__book__id__exact': {
+                'values': [b.id for b in Book.objects.all()],
+                'test': lambda obj, value: obj.chap.book.id == value,
+            },
+            'chap__book__name': {
+                'values': [b.name for b in Book.objects.all()],
+                'test': lambda obj, value: obj.chap.book.name == value,
+            },
+            'chap__book__promo__id__exact': {
+                'values': [p.id for p in Promo.objects.all()],
+                'test': lambda obj, value: obj.chap.book.promo_set.filter(id=value).exists(),
+            },
+            'chap__book__promo__name': {
+                'values': [p.name for p in Promo.objects.all()],
+                'test': lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists(),
+            },
         }
         for filter_path, params in filters.items():
             for value in params['values']:
@@ -924,8 +924,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     # Put this app's and the shared tests templates dirs in DIRS to take precedence
     # over the admin's templates dir.
     'DIRS': [
-        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        os.path.join(os.path.dirname(os.path.dirname(upath(__file__))), 'templates'),
+        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates'),
     ],
     'APP_DIRS': True,
     'OPTIONS': {
@@ -3764,7 +3764,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The ugly(!)
-        # instance representation is set by six.text_type()
+        # instance representation is set by __str__().
         self.assertContains(
             response,
             '<li class="success">The short message "<a href="%s">'
@@ -3811,7 +3811,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The ugly(!)
-        # instance representation is set by six.text_type()
+        # instance representation is set by __str__().
         self.assertContains(
             response,
             '<li class="success">The paper "<a href="%s">'
@@ -3868,8 +3868,8 @@ class AdminInlineFileUploadTest(TestCase):
             "pictures-TOTAL_FORMS": "2",
             "pictures-INITIAL_FORMS": "1",
             "pictures-MAX_NUM_FORMS": "0",
-            "pictures-0-id": six.text_type(self.picture.id),
-            "pictures-0-gallery": six.text_type(self.gallery.id),
+            "pictures-0-id": str(self.picture.id),
+            "pictures-0-gallery": str(self.gallery.id),
             "pictures-0-name": "Test Picture",
             "pictures-0-image": "",
             "pictures-1-id": "",
@@ -4655,7 +4655,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_readonly_get(self):
         response = self.client.get(reverse('admin:admin_views_post_add'))
         self.assertEqual(response.status_code, 200)
@@ -4673,12 +4672,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, 'Multiline<br />test<br />string')
         self.assertContains(response, '<div class="readonly">Multiline<br />html<br />content</div>', html=True)
         self.assertContains(response, 'InlineMultiline<br />test<br />string')
-        # Remove only this last line when the deprecation completes.
-        self.assertContains(
-            response,
-            '<div class="readonly">Multiline<br />html<br />content<br />with allow tags</div>',
-            html=True
-        )
 
         self.assertContains(response, formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
 
@@ -4708,7 +4701,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_post_change', args=(p.pk,)))
         self.assertContains(response, "%d amount of cool" % p.pk)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_readonly_text_field(self):
         p = Post.objects.create(
             title="Readonly test", content="test",
@@ -4802,7 +4794,6 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         field = self.get_admin_readonly_field(response, 'plotdetails')
         self.assertEqual(field.contents(), '-')  # default empty value
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_readonly_field_overrides(self):
         """
         Regression test for #22087 - ModelForm Meta overrides are ignored by
@@ -5148,7 +5139,6 @@ class CSSTest(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_field_prefix_css_classes(self):
         """
         Fields have a CSS class name with a 'field-' prefix.

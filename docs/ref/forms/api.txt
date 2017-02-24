@@ -112,7 +112,7 @@ messages::
     {'sender': ['Enter a valid email address.'], 'subject': ['This field is required.']}
 
 In this dictionary, the keys are the field names, and the values are lists of
-Unicode strings representing the error messages. The error messages are stored
+strings representing the error messages. The error messages are stored
 in lists because a field can have multiple error messages.
 
 You can access :attr:`~Form.errors` without having to call
@@ -357,8 +357,8 @@ it, you can access the clean data via its ``cleaned_data`` attribute::
     {'cc_myself': True, 'message': 'Hi there', 'sender': 'foo@example.com', 'subject': 'hello'}
 
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
-always cleans the input into a Unicode string. We'll cover the encoding
-implications later in this document.
+always cleans the input into a string. We'll cover the encoding implications
+later in this document.
 
 If your data does *not* validate, the ``cleaned_data`` dictionary contains
 only the valid fields::
@@ -490,7 +490,7 @@ Notice the following:
 
 Although ``<table>`` output is the default output style when you ``print`` a
 form, other output styles are available. Each style is available as a method on
-a form object, and each rendering method returns a Unicode object.
+a form object, and each rendering method returns a string.
 
 ``as_p()``
 ----------
@@ -711,8 +711,6 @@ using the ``label_suffix`` parameter to
 
 .. attribute:: Form.use_required_attribute
 
-.. versionadded:: 1.10
-
 When set to ``True`` (the default), required form fields will have the
 ``required`` HTML attribute.
 
@@ -812,12 +810,11 @@ Customizing the error list format
 
 By default, forms use ``django.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
-pass that in at construction time (replace ``__str__`` by ``__unicode__`` on
-Python 2)::
+pass that in at construction time::
 
     >>> from django.forms.utils import ErrorList
     >>> class DivErrorList(ErrorList):
-    ...     def __str__(self):              # __unicode__ on Python 2
+    ...     def __str__(self):
     ...         return self.as_divs()
     ...     def as_divs(self):
     ...         if not self: return ''
@@ -842,8 +839,7 @@ they're not the only way a form object can be displayed.
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
 
-   The ``__str__()`` (``__unicode__`` on Python 2) method of this
-   object displays the HTML for this field.
+   The ``__str__()`` method of this object displays the HTML for this field.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key::

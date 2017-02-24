@@ -3,9 +3,10 @@ import warnings
 from django.db.migrations.exceptions import (
     CircularDependencyError, NodeNotFoundError,
 )
-from django.db.migrations.graph import RECURSION_DEPTH_WARNING, MigrationGraph
+from django.db.migrations.graph import (
+    RECURSION_DEPTH_WARNING, DummyNode, MigrationGraph, Node,
+)
 from django.test import SimpleTestCase
-from django.utils.encoding import force_text
 
 
 class GraphTests(SimpleTestCase):
@@ -395,7 +396,7 @@ class GraphTests(SimpleTestCase):
 
     def test_stringify(self):
         graph = MigrationGraph()
-        self.assertEqual(force_text(graph), "Graph: 0 nodes, 0 edges")
+        self.assertEqual(str(graph), "Graph: 0 nodes, 0 edges")
 
         graph.add_node(("app_a", "0001"), None)
         graph.add_node(("app_a", "0002"), None)
@@ -406,5 +407,30 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
 
-        self.assertEqual(force_text(graph), "Graph: 5 nodes, 3 edges")
+        self.assertEqual(str(graph), "Graph: 5 nodes, 3 edges")
         self.assertEqual(repr(graph), "<MigrationGraph: nodes=5, edges=3>")
+
+
+class NodeTests(SimpleTestCase):
+    def test_node_repr(self):
+        node = Node(('app_a', '0001'))
+        self.assertEqual(repr(node), "<Node: ('app_a', '0001')>")
+
+    def test_dummynode_repr(self):
+        node = DummyNode(
+            key=('app_a', '0001'),
+            origin='app_a.0001',
+            error_message='x is missing',
+        )
+        self.assertEqual(repr(node), "<DummyNode: ('app_a', '0001')>")
+
+    def test_dummynode_promote(self):
+        dummy = DummyNode(
+            key=('app_a', '0001'),
+            origin='app_a.0002',
+            error_message="app_a.0001 (req'd by app_a.0002) is missing!",
+        )
+        dummy.promote()
+        self.assertIsInstance(dummy, Node)
+        self.assertFalse(hasattr(dummy, 'origin'))
+        self.assertFalse(hasattr(dummy, 'error_message'))

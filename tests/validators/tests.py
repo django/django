@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-import io
 import os
 import re
 import types
@@ -20,8 +16,6 @@ from django.core.validators import (
     validate_unicode_slug,
 )
 from django.test import SimpleTestCase
-from django.test.utils import str_prefix
-from django.utils._os import upath
 
 try:
     from PIL import Image  # noqa
@@ -267,15 +261,15 @@ TEST_DATA = [
 
 
 def create_path(filename):
-    return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
 
 
 # Add valid and invalid URL tests.
 # This only tests the validator without extended schemes.
-with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
+with open(create_path('valid_urls.txt'), encoding='utf8') as f:
     for url in f:
         TEST_DATA.append((URLValidator(), url.strip(), None))
-with io.open(create_path('invalid_urls.txt'), encoding='utf8') as f:
+with open(create_path('invalid_urls.txt'), encoding='utf8') as f:
     for url in f:
         TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 
@@ -319,18 +313,18 @@ def create_simple_test_method(validator, expected, value, num):
 class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
-        self.assertEqual(str(v), str_prefix("[%(_)s'Not Valid']"))
-        self.assertEqual(repr(v), str_prefix("ValidationError([%(_)s'Not Valid'])"))
+        self.assertEqual(str(v), "['Not Valid']")
+        self.assertEqual(repr(v), "ValidationError(['Not Valid'])")
 
     def test_message_list(self):
         v = ValidationError(['First Problem', 'Second Problem'])
-        self.assertEqual(str(v), str_prefix("[%(_)s'First Problem', %(_)s'Second Problem']"))
-        self.assertEqual(repr(v), str_prefix("ValidationError([%(_)s'First Problem', %(_)s'Second Problem'])"))
+        self.assertEqual(str(v), "['First Problem', 'Second Problem']")
+        self.assertEqual(repr(v), "ValidationError(['First Problem', 'Second Problem'])")
 
     def test_message_dict(self):
         v = ValidationError({'first': ['First Problem']})
-        self.assertEqual(str(v), str_prefix("{%(_)s'first': [%(_)s'First Problem']}"))
-        self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
+        self.assertEqual(str(v), "{'first': ['First Problem']}")
+        self.assertEqual(repr(v), "ValidationError({'first': ['First Problem']})")
 
     def test_regex_validator_flags(self):
         with self.assertRaises(TypeError):

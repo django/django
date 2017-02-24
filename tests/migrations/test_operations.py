@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import unittest
 
 from django.db import connection, migrations, models, transaction
@@ -20,7 +18,7 @@ except ImportError:
     sqlparse = None
 
 
-class Mixin(object):
+class Mixin:
     pass
 
 
@@ -2344,11 +2342,7 @@ class SwappableOperationTests(OperationTestBase):
     is in a common base class anyway)
     """
 
-    available_apps = [
-        "migrations",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-    ]
+    available_apps = ['migrations']
 
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
     def test_create_ignore_swapped(self):

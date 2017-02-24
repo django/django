@@ -137,10 +137,8 @@ The ``register`` decorator
 
     You can't use this decorator if you have to reference your model admin
     class in its ``__init__()`` method, e.g.
-    ``super(PersonAdmin, self).__init__(*args, **kwargs)``. If you are using
-    Python 3 and don't have to worry about supporting Python 2, you can
-    use ``super().__init__(*args, **kwargs)`` . Otherwise, you'll have to use
-    ``admin.site.register()`` instead of this decorator.
+    ``super(PersonAdmin, self).__init__(*args, **kwargs)``. You can use
+    ``super().__init__(*args, **kwargs)``.
 
 Discovery of admin files
 ------------------------
@@ -543,8 +541,7 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__str__()`` (``__unicode__()`` on Python 2)
-    representation of each object.
+    column that displays the ``__str__()`` representation of each object.
 
     You have four possible values that can be used in ``list_display``:
 
@@ -594,7 +591,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__str__()`` (``__unicode__()`` on Python 2) of the related object.
+      ``__str__()`` of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
@@ -632,14 +629,6 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
-
-      .. deprecated:: 1.9
-
-          In older versions, you could add an ``allow_tags`` attribute to the
-          method to prevent auto-escaping. This attribute is deprecated as it's
-          safer to use :func:`~django.utils.html.format_html`,
-          :func:`~django.utils.html.format_html_join`, or
-          :func:`~django.utils.safestring.mark_safe` instead.
 
     * As some examples have already demonstrated, when using a callable, a
       model method, or a ``ModelAdmin`` method, you can customize the column's
@@ -689,9 +678,8 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
 
-    * The ``__str__()`` (``__unicode__()`` on Python 2) method is just
-      as valid in ``list_display`` as any other model method, so it's
-      perfectly OK to do this::
+    * The ``__str__()`` method is just as valid in ``list_display`` as any
+      other model method, so it's perfectly OK to do this::
 
           list_display = ('__str__', 'some_other_field')
 
@@ -872,7 +860,7 @@ subclass::
            from datetime import date
 
            from django.contrib import admin
-           from django.utils.translation import ugettext_lazy as _
+           from django.utils.translation import gettext_lazy as _
 
            class DecadeBornListFilter(admin.SimpleListFilter):
                # Human-readable title which will be displayed in the
@@ -922,11 +910,11 @@ subclass::
 
                   def lookups(self, request, model_admin):
                       if request.user.is_superuser:
-                          return super(AuthDecadeBornListFilter, self).lookups(request, model_admin)
+                          return super().lookups(request, model_admin)
 
                   def queryset(self, request, queryset):
                       if request.user.is_superuser:
-                          return super(AuthDecadeBornListFilter, self).queryset(request, queryset)
+                          return super().queryset(request, queryset)
 
           Also as a convenience, the ``ModelAdmin`` object is passed to
           the ``lookups`` method, for example if you want to base the
@@ -1159,8 +1147,6 @@ subclass::
 
 .. attribute:: ModelAdmin.save_as_continue
 
-    .. versionadded:: 1.10
-
     When :attr:`save_as=True <save_as>`, the default redirect after saving the
     new object is to the change view for that object. If you set
     ``save_as_continue=False``, the redirect will be to the changelist view.
@@ -1356,7 +1342,7 @@ templates used by the :class:`ModelAdmin` views:
         class ArticleAdmin(admin.ModelAdmin):
             def save_model(self, request, obj, form, change):
                 obj.user = request.user
-                super(ArticleAdmin, self).save_model(request, obj, form, change)
+                super().save_model(request, obj, form, change)
 
 .. method:: ModelAdmin.delete_model(request, obj)
 
@@ -1423,7 +1409,7 @@ templates used by the :class:`ModelAdmin` views:
             search_fields = ('name',)
 
             def get_search_results(self, request, queryset, search_term):
-                queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
+                queryset, use_distinct = super().get_search_results(request, queryset, search_term)
                 try:
                     search_term_as_int = int(search_term)
                 except ValueError:
@@ -1540,7 +1526,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
-                urls = super(MyModelAdmin, self).get_urls()
+                urls = super().get_urls()
                 my_urls = [
                     url(r'^my_view/$', self.my_view),
                 ]
@@ -1592,7 +1578,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
-                urls = super(MyModelAdmin, self).get_urls()
+                urls = super().get_urls()
                 my_urls = [
                     url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
                 ]
@@ -1629,7 +1615,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_form(self, request, obj=None, **kwargs):
                 if request.user.is_superuser:
                     kwargs['form'] = MySuperuserForm
-                return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+                return super().get_form(request, obj, **kwargs)
 
     You may also simply return a custom :class:`~django.forms.ModelForm` class
     directly.
@@ -1662,7 +1648,7 @@ templates used by the :class:`ModelAdmin` views:
             def formfield_for_foreignkey(self, db_field, request, **kwargs):
                 if db_field.name == "car":
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
@@ -1680,7 +1666,7 @@ templates used by the :class:`ModelAdmin` views:
             def formfield_for_manytomany(self, db_field, request, **kwargs):
                 if db_field.name == "cars":
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+                return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 .. method:: ModelAdmin.formfield_for_choice_field(db_field, request, **kwargs)
 
@@ -1699,7 +1685,7 @@ templates used by the :class:`ModelAdmin` views:
                     )
                     if request.user.is_superuser:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
-                return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+                return super().formfield_for_choice_field(db_field, request, **kwargs)
 
     .. admonition:: Note
 
@@ -1754,7 +1740,7 @@ templates used by the :class:`ModelAdmin` views:
         class MyModelAdmin(admin.ModelAdmin):
             def get_changelist_formset(self, request, **kwargs):
                 kwargs['formset'] = MyAdminFormSet
-                return super(MyModelAdmin, self).get_changelist_formset(request, **kwargs)
+                return super().get_changelist_formset(request, **kwargs)
 
 .. method:: ModelAdmin.has_add_permission(request)
 
@@ -1797,7 +1783,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_queryset(self, request):
-                qs = super(MyModelAdmin, self).get_queryset(request)
+                qs = super().get_queryset(request)
                 if request.user.is_superuser:
                     return qs
                 return qs.filter(author=request.user)
@@ -1916,7 +1902,7 @@ provided some extra mapping data that would not otherwise be available::
         def change_view(self, request, object_id, form_url='', extra_context=None):
             extra_context = extra_context or {}
             extra_context['osm_data'] = self.get_osm_info()
-            return super(MyModelAdmin, self).change_view(
+            return super().change_view(
                 request, object_id, form_url, extra_context=extra_context,
             )
 
@@ -1957,10 +1943,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 (version 2.2.3) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
-
-.. versionchanged:: 1.10
-
-    The embedded jQuery was upgraded from 2.1.4 to 2.2.3.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2107,8 +2089,6 @@ The ``InlineModelAdmin`` class adds:
     described in the warning in :ref:`validation-on-modelform`.
 
 .. attribute:: InlineModelAdmin.classes
-
-    .. versionadded:: 1.10
 
     A list or tuple containing extra CSS classes to apply to the fieldset that
     is rendered for the inlines. Defaults to ``None``. As with classes
@@ -2596,11 +2576,6 @@ Templates can override or extend base admin templates as described in
     the current request has ``request.META['SCRIPT_NAME']`` set and uses that
     value if ``site_url`` isn't set to something other than ``/``.
 
-    .. versionchanged:: 1.10
-
-        The ``SCRIPT_NAME`` support described in the previous paragraph was
-        added.
-
 .. attribute:: AdminSite.index_title
 
     The text to put at the top of the admin index page (a string). By default,
@@ -2808,18 +2783,34 @@ a pattern for your new view.
 
 .. _auth_password_reset:
 
-Adding a password-reset feature
+Adding a password reset feature
 -------------------------------
 
-You can add a password-reset feature to the admin site by adding a few lines to
+You can add a password reset feature to the admin site by adding a few lines to
 your URLconf. Specifically, add these four patterns::
 
     from django.contrib.auth import views as auth_views
 
-    url(r'^admin/password_reset/$', auth_views.PasswordResetView.as_view(), name='admin_password_reset'),
-    url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    url(
+        r'^admin/password_reset/$',
+        auth_views.PasswordResetView.as_view(),
+        name='admin_password_reset',
+    ),
+    url(
+        r'^admin/password_reset/done/$',
+        auth_views.PasswordResetDoneView.as_view(),
+        name='password_reset_done',
+    ),
+    url(
+        r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        auth_views.PasswordResetConfirmView.as_view(),
+        name='password_reset_confirm',
+    ),
+    url(
+        r'^reset/done/$',
+        auth_views.PasswordResetCompleteView.as_view(),
+        name='password_reset_complete',
+    ),
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app
@@ -2884,12 +2875,6 @@ password box.
     advised to use the :meth:`get_change_message` method to retrieve this value
     instead of accessing it directly.
 
-    .. versionchanged:: 1.10
-
-        Previously, this attribute was always a plain string. It is
-        now JSON-structured so that the message can be translated in the current
-        user language. Old messages are untouched.
-
 ``LogEntry`` methods
 --------------------
 
@@ -2898,8 +2883,6 @@ password box.
     A shortcut that returns the referenced object.
 
 .. method:: LogEntry.get_change_message()
-
-    .. versionadded:: 1.10
 
     Formats and translates :attr:`change_message` into the current user
     language. Messages created before Django 1.10 will always be displayed in

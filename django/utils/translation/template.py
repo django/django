@@ -1,15 +1,11 @@
-from __future__ import unicode_literals
-
 import re
 import warnings
+from io import StringIO
 
 from django.template.base import (
     TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR, TRANSLATOR_COMMENT_MARK,
     Lexer,
 )
-from django.utils import six
-from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 from . import TranslatorCommentWarning, trim_whitespace
 
@@ -39,13 +35,12 @@ plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
 
-def templatize(src, origin=None, charset='utf-8'):
+def templatize(src, origin=None):
     """
     Turn a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    src = force_text(src, charset)
     out = StringIO('')
     message_context = None
     intrans = False
@@ -57,9 +52,8 @@ def templatize(src, origin=None, charset='utf-8'):
     comment = []
     lineno_comment_map = {}
     comment_lineno_cache = None
-    # Adding the u prefix allows gettext to recognize the Unicode string
-    # (#26093).
-    raw_prefix = 'u' if six.PY3 else ''
+    # Adding the u prefix allows gettext to recognize the string (#26093).
+    raw_prefix = 'u'
 
     def join_tokens(tokens, trim=False):
         message = ''.join(tokens)

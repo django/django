@@ -1,38 +1,42 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import unittest
+from unittest import mock
+from urllib.parse import quote_plus
 
-from django.utils import six
+from django.test import SimpleTestCase
 from django.utils.encoding import (
-    escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
-    smart_text, uri_to_iri,
+    DjangoUnicodeDecodeError, escape_uri_path, filepath_to_uri, force_bytes,
+    force_text, get_system_encoding, iri_to_uri, smart_bytes, smart_text,
+    uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
-from django.utils.http import urlquote_plus
+from django.utils.translation import gettext_lazy
 
 
-class TestEncodingUtils(unittest.TestCase):
+class TestEncodingUtils(SimpleTestCase):
     def test_force_text_exception(self):
         """
-        Broken __unicode__/__str__ actually raises an error.
+        Broken __str__ actually raises an error.
         """
-        class MyString(object):
+        class MyString:
             def __str__(self):
                 return b'\xc3\xb6\xc3\xa4\xc3\xbc'
 
-            __unicode__ = __str__
-
-        # str(s) raises a TypeError on python 3 if the result is not a text type.
-        # python 2 fails when it tries converting from str to unicode (via ASCII).
-        exception = TypeError if six.PY3 else UnicodeError
-        with self.assertRaises(exception):
+        # str(s) raises a TypeError if the result is not a text type.
+        with self.assertRaises(TypeError):
             force_text(MyString())
 
     def test_force_text_lazy(self):
         s = SimpleLazyObject(lambda: 'x')
-        self.assertTrue(issubclass(type(force_text(s)), six.text_type))
+        self.assertTrue(type(force_text(s)), str)
+
+    def test_force_text_DjangoUnicodeDecodeError(self):
+        msg = (
+            "'utf-8' codec can't decode byte 0xff in position 0: invalid "
+            "start byte. You passed in b'\\xff' (<class 'bytes'>)"
+        )
+        with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
+            force_text(b'\xff')
 
     def test_force_bytes_exception(self):
         """
@@ -41,61 +45,65 @@ class TestEncodingUtils(unittest.TestCase):
         """
         error_msg = "This is an exception, voilà"
         exc = ValueError(error_msg)
-        result = force_bytes(exc)
-        self.assertEqual(result, error_msg.encode('utf-8'))
+        self.assertEqual(force_bytes(exc), error_msg.encode())
+        self.assertEqual(force_bytes(exc, encoding='ascii', errors='ignore'), b'This is an exception, voil')
 
     def test_force_bytes_strings_only(self):
         today = datetime.date.today()
         self.assertEqual(force_bytes(today, strings_only=True), today)
 
+    def test_force_bytes_encoding(self):
+        error_msg = 'This is an exception, voilà'.encode()
+        result = force_bytes(error_msg, encoding='ascii', errors='ignore')
+        self.assertEqual(result, b'This is an exception, voil')
+
+    def test_force_bytes_memory_view(self):
+        self.assertEqual(force_bytes(memoryview(b'abc')), b'abc')
+
+    def test_smart_bytes(self):
+        class Test:
+            def __str__(self):
+                return 'ŠĐĆŽćžšđ'
+
+        lazy_func = gettext_lazy('x')
+        self.assertIs(smart_bytes(lazy_func), lazy_func)
+        self.assertEqual(smart_bytes(Test()), b'\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91')
+        self.assertEqual(smart_bytes(1), b'1')
+        self.assertEqual(smart_bytes('foo'), b'foo')
+
     def test_smart_text(self):
         class Test:
-            if six.PY3:
-                def __str__(self):
-                    return 'ŠĐĆŽćžšđ'
-            else:
-                def __str__(self):
-                    return 'ŠĐĆŽćžšđ'.encode('utf-8')
+            def __str__(self):
+                return 'ŠĐĆŽćžšđ'
 
-        class TestU:
-            if six.PY3:
-                def __str__(self):
-                    return 'ŠĐĆŽćžšđ'
-
-                def __bytes__(self):
-                    return b'Foo'
-            else:
-                def __str__(self):
-                    return b'Foo'
-
-                def __unicode__(self):
-                    return '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
-
+        lazy_func = gettext_lazy('x')
+        self.assertIs(smart_text(lazy_func), lazy_func)
         self.assertEqual(smart_text(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_text(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
         self.assertEqual(smart_text(1), '1')
         self.assertEqual(smart_text('foo'), 'foo')
+
+    def test_get_default_encoding(self):
+        with mock.patch('locale.getdefaultlocale', side_effect=Exception):
+            self.assertEqual(get_system_encoding(), 'ascii')
 
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_filepath_to_uri(self):
+        self.assertEqual(filepath_to_uri(None), None)
         self.assertEqual(filepath_to_uri('upload\\чубака.mp4'), 'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4')
-        self.assertEqual(
-            filepath_to_uri('upload\\чубака.mp4'.encode('utf-8')),
-            'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4'
-        )
 
     def test_iri_to_uri(self):
         cases = [
             # Valid UTF-8 sequences are encoded.
             ('red%09rosé#red', 'red%09ros%C3%A9#red'),
             ('/blog/for/Jürgen Münster/', '/blog/for/J%C3%BCrgen%20M%C3%BCnster/'),
-            ('locations/%s' % urlquote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
+            ('locations/%s' % quote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
 
             # Reserved chars remain unescaped.
             ('%&', '%&'),
             ('red&♥ros%#red', 'red&%E2%99%A5ros%#red'),
+            (gettext_lazy('red&♥ros%#red'), 'red&%E2%99%A5ros%#red'),
         ]
 
         for iri, uri in cases:
@@ -106,10 +114,13 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_uri_to_iri(self):
         cases = [
+            (None, None),
             # Valid UTF-8 sequences are decoded.
-            ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
+            ('/%e2%89%Ab%E2%99%a5%E2%89%aB/', '/≫♥≫/'),
             ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
-
+            ('/%41%5a%6B/', '/AZk/'),
+            # Reserved and non-URL valid ASCII chars are not decoded.
+            ('/%25%20%02%41%7b/', '/%25%20%02A%7b/'),
             # Broken UTF-8 sequences remain escaped.
             ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
             ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
@@ -126,11 +137,12 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_complementarity(self):
         cases = [
-            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen M\xfcnster/'),
+            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen%20M\xfcnster/'),
             ('%&', '%&'),
             ('red&%E2%99%A5ros%#red', 'red&♥ros%#red'),
             ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
             ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
+            ('/%25%20%02%7b/', '/%25%20%02%7b/'),
             ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
             ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
             ('/%E2%99%A5%E2%99%E2%99%A5/', '/♥%E2%99♥/'),

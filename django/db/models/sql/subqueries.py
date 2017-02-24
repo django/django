@@ -9,7 +9,6 @@ from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
 )
 from django.db.models.sql.query import Query
-from django.utils import six
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
@@ -89,7 +88,7 @@ class UpdateQuery(Query):
     compiler = 'SQLUpdateCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(UpdateQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._setup_query()
 
     def _setup_query(self):
@@ -104,7 +103,7 @@ class UpdateQuery(Query):
             self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass, related_updates=self.related_updates.copy(), **kwargs)
+        return super().clone(klass, related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
@@ -120,7 +119,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in six.iteritems(values):
+        for name, val in values.items():
             field = self.get_meta().get_field(name)
             direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model
@@ -164,7 +163,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in six.iteritems(self.related_updates):
+        for model, values in self.related_updates.items():
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
@@ -177,7 +176,7 @@ class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(InsertQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
 

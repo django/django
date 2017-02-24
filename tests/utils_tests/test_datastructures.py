@@ -5,7 +5,6 @@ Tests for stuff in django.utils.datastructures.
 import copy
 
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.datastructures import (
     DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
     OrderedSet,
@@ -40,12 +39,12 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
         self.assertEqual(
-            sorted(six.iteritems(d)),
+            sorted(d.items()),
             [('name', 'Simon'), ('position', 'Developer')]
         )
 
         self.assertEqual(
-            sorted(six.iterlists(d)),
+            sorted(d.lists()),
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
 
@@ -60,8 +59,7 @@ class MultiValueDictTests(SimpleTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(sorted(six.itervalues(d)),
-                         ['Developer', 'Simon', 'Willison'])
+        self.assertEqual(sorted(d.values()), ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):
         d = MultiValueDict()
@@ -95,8 +93,8 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(sorted(six.iterkeys(d)), sorted(six.iterkeys(mvd)))
-        for key in six.iterkeys(mvd):
+        self.assertEqual(sorted(d.keys()), sorted(mvd.keys()))
+        for key in mvd.keys():
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())

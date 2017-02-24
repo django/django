@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import escape
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
@@ -36,8 +36,7 @@ class GroupAdmin(admin.ModelAdmin):
             # Avoid a major performance hit resolving permission names which
             # triggers a content_type load:
             kwargs['queryset'] = qs.select_related('content_type')
-        return super(GroupAdmin, self).formfield_for_manytomany(
-            db_field, request=request, **kwargs)
+        return super().formfield_for_manytomany(db_field, request=request, **kwargs)
 
 
 @admin.register(User)
@@ -69,7 +68,7 @@ class UserAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, obj=None):
         if not obj:
             return self.add_fieldsets
-        return super(UserAdmin, self).get_fieldsets(request, obj)
+        return super().get_fieldsets(request, obj)
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -79,7 +78,7 @@ class UserAdmin(admin.ModelAdmin):
         if obj is None:
             defaults['form'] = self.add_form
         defaults.update(kwargs)
-        return super(UserAdmin, self).get_form(request, obj, **defaults)
+        return super().get_form(request, obj, **defaults)
 
     def get_urls(self):
         return [
@@ -88,13 +87,13 @@ class UserAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.user_change_password),
                 name='auth_user_password_change',
             ),
-        ] + super(UserAdmin, self).get_urls()
+        ] + super().get_urls()
 
     def lookup_allowed(self, lookup, value):
         # See #20078: we don't want to allow any lookups involving passwords.
         if lookup.startswith('password'):
             return False
-        return super(UserAdmin, self).lookup_allowed(lookup, value)
+        return super().lookup_allowed(lookup, value)
 
     @sensitive_post_parameters_m
     @csrf_protect_m
@@ -127,8 +126,7 @@ class UserAdmin(admin.ModelAdmin):
             'username_help_text': username_field.help_text,
         }
         extra_context.update(defaults)
-        return super(UserAdmin, self).add_view(request, form_url,
-                                               extra_context)
+        return super().add_view(request, form_url, extra_context)
 
     @sensitive_post_parameters_m
     def user_change_password(self, request, id, form_url=''):
@@ -146,7 +144,7 @@ class UserAdmin(admin.ModelAdmin):
                 form.save()
                 change_message = self.construct_change_message(request, form, None)
                 self.log_change(request, user, change_message)
-                msg = ugettext('Password changed successfully.')
+                msg = gettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(
@@ -195,7 +193,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
         """
-        Determines the HttpResponse for the add_view stage. It mostly defers to
+        Determine the HttpResponse for the add_view stage. It mostly defers to
         its superclass implementation but is customized because the User model
         has a slightly different workflow.
         """
@@ -207,5 +205,4 @@ class UserAdmin(admin.ModelAdmin):
         if '_addanother' not in request.POST and IS_POPUP_VAR not in request.POST:
             request.POST = request.POST.copy()
             request.POST['_continue'] = 1
-        return super(UserAdmin, self).response_add(request, obj,
-                                                   post_url_continue)
+        return super().response_add(request, obj, post_url_continue)

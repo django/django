@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
@@ -8,7 +6,7 @@ from .models import (
 )
 
 
-class AssertionMixin(object):
+class AssertionMixin:
     def assert_delayed(self, obj, num):
         """
         Instances with deferred fields look the same as normal instances when

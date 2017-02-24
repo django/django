@@ -1,12 +1,8 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
-import sys
 import unittest
 from datetime import datetime
 
 from django.test import ignore_warnings
-from django.utils import http, six
+from django.utils import http
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango21Warning
 
@@ -54,15 +50,10 @@ class TestUtilsHttp(unittest.TestCase):
         # reciprocity works
         for n in [0, 1, 1000, 1000000]:
             self.assertEqual(n, http.base36_to_int(http.int_to_base36(n)))
-        if six.PY2:
-            self.assertEqual(sys.maxint, http.base36_to_int(http.int_to_base36(sys.maxint)))
 
         # bad input
         with self.assertRaises(ValueError):
             http.int_to_base36(-1)
-        if six.PY2:
-            with self.assertRaises(ValueError):
-                http.int_to_base36(sys.maxint + 1)
         for n in ['1', 'foo', {1: 2}, (1, 2, 3), 3.141]:
             with self.assertRaises(TypeError):
                 http.int_to_base36(n)
@@ -134,16 +125,6 @@ class TestUtilsHttp(unittest.TestCase):
                 http.is_safe_url(good_url, allowed_hosts={'otherserver', 'testserver'}),
                 "%s should be allowed" % good_url,
             )
-
-        if six.PY2:
-            # Check binary URLs, regression tests for #26308
-            self.assertTrue(
-                http.is_safe_url(b'https://testserver/', allowed_hosts={'testserver'}),
-                "binary URLs should be allowed on Python 2"
-            )
-            self.assertFalse(http.is_safe_url(b'\x08//example.com', allowed_hosts={'testserver'}))
-            self.assertTrue(http.is_safe_url('àview/'.encode('utf-8'), allowed_hosts={'testserver'}))
-            self.assertFalse(http.is_safe_url('àview'.encode('latin-1'), allowed_hosts={'testserver'}))
 
         # Valid basic auth credentials are allowed.
         self.assertTrue(http.is_safe_url(r'http://user:pass@testserver/', allowed_hosts={'user:pass@testserver'}))

@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
@@ -10,7 +7,7 @@ from django.contrib.auth.hashers import (
     check_password, get_hasher, identify_hasher, is_password_usable,
     make_password,
 )
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_bytes
 
@@ -56,7 +53,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded, 'pbkdf2_sha256$36000$seasalt$mEUPPFJkT/xtwDU8rB7Q+puHRZnR07WRjerTkt/3HI0=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -254,7 +251,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password('', encoded))
         self.assertFalse(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'Unknown password hashing algorith'):
             identify_hasher(encoded)
         # Assert that the unusable passwords actually contain a random part.
         # This might fail one day due to a hash collision.
@@ -268,9 +265,13 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(None, make_password('lètmein')))
 
     def test_bad_algorithm(self):
-        with self.assertRaises(ValueError):
+        msg = (
+            "Unknown password hashing algorithm '%s'. Did you specify it in "
+            "the PASSWORD_HASHERS setting?"
+        )
+        with self.assertRaisesMessage(ValueError, msg % 'lolcat'):
             make_password('lètmein', hasher='lolcat')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg % 'lolcat'):
             identify_hasher('lolcat$salt$hash')
 
     def test_bad_encoded(self):
@@ -280,13 +281,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha256$36000$seasalt2$QkIBVCvGmTmyjPJ5yox2y/jQB8isvgUNK98FxOU1UYo=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha1$36000$seasalt2$GoU+9AubJ/xRkO0WD1Xf3WPxWfE=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$100000$seasalt2$dK/dL+ySBZ5zoR0+Zk3SB/VsH0U=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @override_settings(
@@ -427,15 +428,14 @@ class TestUtilsHashPass(SimpleTestCase):
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
     def test_load_library_no_algorithm(self):
-        with self.assertRaises(ValueError) as e:
+        msg = "Hasher 'BasePasswordHasher' doesn't specify a library attribute"
+        with self.assertRaisesMessage(ValueError, msg):
             BasePasswordHasher()._load_library()
-        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a library attribute", str(e.exception))
 
     def test_load_library_importerror(self):
-        PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
-        # Python 3 adds quotes around module name
-        msg = "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"
-        with self.assertRaisesRegex(ValueError, msg):
+        PlainHasher = type('PlainHasher', (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
+        msg = "Couldn't load 'PlainHasher' algorithm library: No module named 'plain'"
+        with self.assertRaisesMessage(ValueError, msg):
             PlainHasher()._load_library()
 
 

@@ -1,6 +1,5 @@
 """Translation helper functions."""
-from __future__ import unicode_literals
-
+import functools
 import gettext as gettext_module
 import os
 import re
@@ -15,8 +14,6 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils import lru_cache, six
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -62,7 +59,7 @@ def reset_cache(**kwargs):
 
 def to_locale(language, to_lower=False):
     """
-    Turns a language name (en-us) into a locale name (en_US). If 'to_lower' is
+    Turn a language name (en-us) into a locale name (en_US). If 'to_lower' is
     True, the last component is lower-cased (en_us).
     """
     p = language.find('-')
@@ -79,7 +76,7 @@ def to_locale(language, to_lower=False):
 
 
 def to_language(locale):
-    """Turns a locale name (en_US) into a language name (en-us)."""
+    """Turn a locale name (en_US) into a language name (en-us)."""
     p = locale.find('_')
     if p >= 0:
         return locale[:p].lower() + '-' + locale[p + 1:].lower()
@@ -89,8 +86,7 @@ def to_language(locale):
 
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
-    This class sets up the GNUTranslations context with regard to output
-    charset.
+    Set up the GNUTranslations context with regard to output charset.
 
     This translation object will be constructed out of multiple GNUTranslations
     objects by merging their catalogs. It will construct an object for the
@@ -104,7 +100,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         gettext_module.GNUTranslations.__init__(self)
         if domain is not None:
             self.domain = domain
-        self.set_output_charset('utf-8')  # For Python 2 gettext() (#25720)
 
         self.__language = language
         self.__to_language = to_language(language)
@@ -142,7 +137,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
         """
-        Returns a mergeable gettext.GNUTranslations instance.
+        Return a mergeable gettext.GNUTranslations instance.
 
         A convenience wrapper. By default gettext uses 'fallback=False'.
         Using param `use_null_fallback` to avoid confusion with any other
@@ -156,14 +151,14 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             fallback=use_null_fallback)
 
     def _init_translation_catalog(self):
-        """Creates a base catalog using global django translations."""
-        settingsfile = upath(sys.modules[settings.__module__].__file__)
+        """Create a base catalog using global django translations."""
+        settingsfile = sys.modules[settings.__module__].__file__
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
         translation = self._new_gnu_trans(localedir)
         self.merge(translation)
 
     def _add_installed_apps_translations(self):
-        """Merges translations from each installed app."""
+        """Merge translations from each installed app."""
         try:
             app_configs = reversed(list(apps.get_app_configs()))
         except AppRegistryNotReady:
@@ -178,13 +173,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 self.merge(translation)
 
     def _add_local_translations(self):
-        """Merges translations defined in LOCALE_PATHS."""
+        """Merge translations defined in LOCALE_PATHS."""
         for localedir in reversed(settings.LOCALE_PATHS):
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
 
     def _add_fallback(self, localedirs=None):
-        """Sets the GNUTranslations() fallback with the default language."""
+        """Set the GNUTranslations() fallback with the default language."""
         # Don't set a fallback for the default language or any English variant
         # (as it's empty, so it'll ALWAYS fall back to the default language)
         if self.__language == settings.LANGUAGE_CODE or self.__language.startswith('en'):
@@ -211,17 +206,17 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._catalog.update(other._catalog)
 
     def language(self):
-        """Returns the translation language."""
+        """Return the translation language."""
         return self.__language
 
     def to_language(self):
-        """Returns the translation language name."""
+        """Return the translation language name."""
         return self.__to_language
 
 
 def translation(language):
     """
-    Returns a translation object in the default 'django' domain.
+    Return a translation object in the default 'django' domain.
     """
     global _translations
     if language not in _translations:
@@ -231,7 +226,7 @@ def translation(language):
 
 def activate(language):
     """
-    Fetches the translation object for a given language and installs it as the
+    Fetch the translation object for a given language and install it as the
     current translation object for the current thread.
     """
     if not language:
@@ -241,8 +236,8 @@ def activate(language):
 
 def deactivate():
     """
-    Deinstalls the currently active translation object so that further _ calls
-    will resolve against the default translation object, again.
+    Uninstall the active translation object so that further _() calls resolve
+    to the default translation object.
     """
     if hasattr(_active, "value"):
         del _active.value
@@ -250,7 +245,7 @@ def deactivate():
 
 def deactivate_all():
     """
-    Makes the active translation object a NullTranslations() instance. This is
+    Make the active translation object a NullTranslations() instance. This is
     useful when we want delayed translations to appear as the original string
     for some reason.
     """
@@ -259,7 +254,7 @@ def deactivate_all():
 
 
 def get_language():
-    """Returns the currently selected language."""
+    """Return the currently selected language."""
     t = getattr(_active, "value", None)
     if t is not None:
         try:
@@ -272,7 +267,7 @@ def get_language():
 
 def get_language_bidi():
     """
-    Returns selected language's BiDi layout.
+    Return selected language's BiDi layout.
 
     * False = left-to-right layout
     * True = right-to-left layout
@@ -287,7 +282,7 @@ def get_language_bidi():
 
 def catalog():
     """
-    Returns the current active catalog for further processing.
+    Return the current active catalog for further processing.
     This can be used if you need to modify the catalog or want to access the
     whole message catalog instead of just translating one string.
     """
@@ -301,27 +296,25 @@ def catalog():
     return _default
 
 
-def do_translate(message, translation_function):
+def gettext(message):
     """
-    Translates 'message' using the given 'translation_function' name -- which
-    will be either gettext or ugettext. It uses the current thread to find the
+    Translate the 'message' string. It uses the current thread to find the
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
     global _default
 
-    # str() is allowing a bytestring message to remain bytestring on Python 2
-    eol_message = message.replace(str('\r\n'), str('\n')).replace(str('\r'), str('\n'))
+    eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
 
     if len(eol_message) == 0:
-        # Returns an empty value of the corresponding type if an empty message
+        # Return an empty value of the corresponding type if an empty message
         # is given, instead of metadata, which is the default gettext behavior.
         result = type(message)("")
     else:
         _default = _default or translation(settings.LANGUAGE_CODE)
         translation_object = getattr(_active, "value", _default)
 
-        result = getattr(translation_object, translation_function)(eol_message)
+        result = translation_object.gettext(eol_message)
 
     if isinstance(message, SafeData):
         return mark_safe(result)
@@ -329,35 +322,19 @@ def do_translate(message, translation_function):
     return result
 
 
-def gettext(message):
-    """
-    Returns a string of the translation of the message.
-
-    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
-    """
-    return do_translate(message, 'gettext')
-
-
-if six.PY3:
-    ugettext = gettext
-else:
-    def ugettext(message):
-        return do_translate(message, 'ugettext')
-
-
 def pgettext(context, message):
     msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
-    result = ugettext(msg_with_ctxt)
+    result = gettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        # force unicode, because lazy version expects unicode
+        # force str, because the lazy version expects str.
         result = force_text(message)
     return result
 
 
 def gettext_noop(message):
     """
-    Marks strings for translation but doesn't translate them now. This can be
+    Mark strings for translation but don't translate them now. This can be
     used to store strings in global variables that should stay in the base
     language (because they might be used externally) and will be translated
     later.
@@ -378,49 +355,36 @@ def do_ntranslate(singular, plural, number, translation_function):
 
 def ngettext(singular, plural, number):
     """
-    Returns a string of the translation of either the singular or plural,
+    Return a string of the translation of either the singular or plural,
     based on the number.
-
-    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
-
-
-if six.PY3:
-    ungettext = ngettext
-else:
-    def ungettext(singular, plural, number):
-        """
-        Returns a unicode strings of the translation of either the singular or
-        plural, based on the number.
-        """
-        return do_ntranslate(singular, plural, number, 'ungettext')
 
 
 def npgettext(context, singular, plural, number):
     msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
                       number)
-    result = ungettext(*msgs_with_ctxt)
+    result = ngettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = ungettext(singular, plural, number)
+        result = ngettext(singular, plural, number)
     return result
 
 
 def all_locale_paths():
     """
-    Returns a list of paths to user-provides languages files.
+    Return a list of paths to user-provides languages files.
     """
     globalpath = os.path.join(
-        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
+        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 
-@lru_cache.lru_cache(maxsize=1000)
+@functools.lru_cache(maxsize=1000)
 def check_for_language(lang_code):
     """
-    Checks whether there is a global language file for the given language
+    Check whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
     available.
 
@@ -437,7 +401,7 @@ def check_for_language(lang_code):
     return False
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_languages():
     """
     Cache of settings.LANGUAGES in an OrderedDict for easy lookups by key.
@@ -445,13 +409,13 @@ def get_languages():
     return OrderedDict(settings.LANGUAGES)
 
 
-@lru_cache.lru_cache(maxsize=1000)
+@functools.lru_cache(maxsize=1000)
 def get_supported_language_variant(lang_code, strict=False):
     """
-    Returns the language-code that's listed in supported languages, possibly
-    selecting a more generic variant. Raises LookupError if nothing found.
+    Return the language-code that's listed in supported languages, possibly
+    selecting a more generic variant. Raise LookupError if nothing is found.
 
-    If `strict` is False (the default), the function will look for an alternative
+    If `strict` is False (the default), look for an alternative
     country-specific variant when the currently checked is not found.
 
     lru_cache should have a maxsize to prevent from memory exhaustion attacks,
@@ -482,7 +446,7 @@ def get_supported_language_variant(lang_code, strict=False):
 
 def get_language_from_path(path, strict=False):
     """
-    Returns the language-code if there is a valid language-code
+    Return the language-code if there is a valid language-code
     found in the `path`.
 
     If `strict` is False (the default), the function will look for an alternative
@@ -500,7 +464,7 @@ def get_language_from_path(path, strict=False):
 
 def get_language_from_request(request, check_path=False):
     """
-    Analyzes the request to find what language the user wants the system to
+    Analyze the request to find what language the user wants the system to
     show. Only languages listed in settings.LANGUAGES are taken into account.
     If the user requests a sublanguage where we have a main language, we send
     out the main language.
@@ -548,10 +512,10 @@ def get_language_from_request(request, check_path=False):
 
 def parse_accept_lang_header(lang_string):
     """
-    Parses the lang_string, which is the body of an HTTP Accept-Language
-    header, and returns a list of (lang, q-value), ordered by 'q' values.
+    Parse the lang_string, which is the body of an HTTP Accept-Language
+    header, and return a list of (lang, q-value), ordered by 'q' values.
 
-    Any format errors in lang_string results in an empty list being returned.
+    Return an empty list if there are any format errors in lang_string.
     """
     result = []
     pieces = accept_language_re.split(lang_string.lower())

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import gettext as gettext_module
 import os
 import stat
 import unittest
+from io import StringIO
 from subprocess import Popen
+from unittest import mock
 
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
@@ -13,12 +12,10 @@ from django.core.management import (
 from django.core.management.commands.makemessages import \
     Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
-from django.utils import six, translation
-from django.utils.encoding import force_text
-from django.utils.six import StringIO
-from django.utils.translation import ugettext
+from django.utils import translation
+from django.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree
 
@@ -51,7 +48,7 @@ class PoFileTests(MessageCompilationTests):
         try:
             call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
             err = err_buffer.getvalue()
-            self.assertIn("not writable location", force_text(err))
+            self.assertIn("not writable location", err)
         finally:
             os.chmod(mo_file_en, old_mode)
 
@@ -73,7 +70,7 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
     MO_FILE_FR = None
 
     def setUp(self):
-        super(MultipleLocaleCompilationTests, self).setUp()
+        super().setUp()
         localedir = os.path.join(self.test_dir, 'locale')
         self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/django.mo')
         self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/django.mo')
@@ -99,7 +96,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
 
     def setUp(self):
-        super(ExcludedLocaleCompilationTests, self).setUp()
+        super().setUp()
         copytree('canned_locale', 'locale')
 
     def test_command_help(self):
@@ -145,20 +142,13 @@ class CompilationErrorHandling(MessageCompilationTests):
         # po file contains invalid msgstr content (triggers non-ascii error content).
         # Make sure the output of msgfmt is unaffected by the current locale.
         env = os.environ.copy()
-        env.update({str('LANG'): str('C')})
+        env.update({'LANG': 'C'})
         with mock.patch('django.core.management.utils.Popen', lambda *args, **kwargs: Popen(*args, env=env, **kwargs)):
-            if six.PY2:
-                # Various assertRaises on PY2 don't support unicode error messages.
-                try:
-                    call_command('compilemessages', locale=['ko'], verbosity=0)
-                except CommandError as err:
-                    self.assertIn("' cannot start a field name", six.text_type(err))
-            else:
-                cmd = MakeMessagesCommand()
-                if cmd.gettext_version < (0, 18, 3):
-                    self.skipTest("python-brace-format is a recent gettext addition.")
-                with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
-                    call_command('compilemessages', locale=['ko'], verbosity=0)
+            cmd = MakeMessagesCommand()
+            if cmd.gettext_version < (0, 18, 3):
+                self.skipTest("python-brace-format is a recent gettext addition.")
+            with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
+                call_command('compilemessages', locale=['ko'], verbosity=0)
 
 
 class ProjectAndAppTests(MessageCompilationTests):
@@ -170,22 +160,22 @@ class ProjectAndAppTests(MessageCompilationTests):
 class FuzzyTranslationTest(ProjectAndAppTests):
 
     def setUp(self):
-        super(FuzzyTranslationTest, self).setUp()
+        super().setUp()
         gettext_module._translations = {}  # flush cache or test will be useless
 
     def test_nofuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
-                self.assertEqual(ugettext('Vodka'), force_text('Vodka'))
+                self.assertEqual(gettext('Lenin'), 'Ленин')
+                self.assertEqual(gettext('Vodka'), 'Vodka')
 
     def test_fuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
-                self.assertEqual(ugettext('Vodka'), force_text('Водка'))
+                self.assertEqual(gettext('Lenin'), 'Ленин')
+                self.assertEqual(gettext('Vodka'), 'Водка')
 
 
 class AppCompilationTest(ProjectAndAppTests):

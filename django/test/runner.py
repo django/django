@@ -8,6 +8,7 @@ import textwrap
 import unittest
 import warnings
 from importlib import import_module
+from io import StringIO
 
 from django.core.management import call_command
 from django.db import connections
@@ -18,7 +19,6 @@ from django.test.utils import (
 )
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.six import StringIO
 
 try:
     import tblib.pickling_support
@@ -30,16 +30,16 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger('django.db.backends')
         self.logger.setLevel(logging.DEBUG)
-        super(DebugSQLTextTestResult, self).__init__(stream, descriptions, verbosity)
+        super().__init__(stream, descriptions, verbosity)
 
     def startTest(self, test):
         self.debug_sql_stream = StringIO()
         self.handler = logging.StreamHandler(self.debug_sql_stream)
         self.logger.addHandler(self.handler)
-        super(DebugSQLTextTestResult, self).startTest(test)
+        super().startTest(test)
 
     def stopTest(self, test):
-        super(DebugSQLTextTestResult, self).stopTest(test)
+        super().stopTest(test)
         self.logger.removeHandler(self.handler)
         if self.showAll:
             self.debug_sql_stream.seek(0)
@@ -47,12 +47,12 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
 
     def addError(self, test, err):
-        super(DebugSQLTextTestResult, self).addError(test, err)
+        super().addError(test, err)
         self.debug_sql_stream.seek(0)
         self.errors[-1] = self.errors[-1] + (self.debug_sql_stream.read(),)
 
     def addFailure(self, test, err):
-        super(DebugSQLTextTestResult, self).addFailure(test, err)
+        super().addFailure(test, err)
         self.debug_sql_stream.seek(0)
         self.failures[-1] = self.failures[-1] + (self.debug_sql_stream.read(),)
 
@@ -66,7 +66,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln("%s" % sql_debug)
 
 
-class RemoteTestResult(object):
+class RemoteTestResult:
     """
     Record information about which tests have succeeded and which have failed.
 
@@ -230,7 +230,7 @@ failure and get a correct traceback.
         self.stop_if_failfast()
 
 
-class RemoteTestRunner(object):
+class RemoteTestRunner:
     """
     Run tests and record everything but don't display anything.
 
@@ -258,8 +258,7 @@ def default_test_processes():
     """
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
-    # On Python 3.4+: if multiprocessing.get_start_method() != 'fork':
-    if not hasattr(os, 'fork'):
+    if multiprocessing.get_start_method() != 'fork':
         return 1
     try:
         return int(os.environ['DJANGO_TEST_PROCESSES'])
@@ -333,7 +332,7 @@ class ParallelTestSuite(unittest.TestSuite):
         self.subsuites = partition_suite_by_case(suite)
         self.processes = processes
         self.failfast = failfast
-        super(ParallelTestSuite, self).__init__()
+        super().__init__()
 
     def run(self, result):
         """
@@ -389,7 +388,7 @@ class ParallelTestSuite(unittest.TestSuite):
         return result
 
 
-class DiscoverRunner(object):
+class DiscoverRunner:
     """
     A Django test runner that uses unittest2 test discovery.
     """
@@ -550,11 +549,11 @@ class DiscoverRunner(object):
         return DebugSQLTextTestResult if self.debug_sql else None
 
     def get_test_runner_kwargs(self):
-        return dict(
-            failfast=self.failfast,
-            resultclass=self.get_resultclass(),
-            verbosity=self.verbosity,
-        )
+        return {
+            'failfast': self.failfast,
+            'resultclass': self.get_resultclass(),
+            'verbosity': self.verbosity,
+        }
 
     def run_checks(self):
         # Checks are run after database creation since some checks require

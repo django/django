@@ -49,34 +49,22 @@ times with multiple contexts)
 '<html></html>'
 """
 
-from __future__ import unicode_literals
-
 import inspect
 import logging
 import re
-import warnings
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils import six
-from django.utils.deprecation import (
-    DeprecationInstanceCheck, RemovedInDjango20Warning,
-)
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
-from django.utils.safestring import (
-    EscapeData, SafeData, mark_for_escaping, mark_safe,
-)
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
 from django.utils.timezone import template_localtime
-from django.utils.translation import pgettext_lazy, ugettext_lazy
+from django.utils.translation import gettext_lazy, pgettext_lazy
 
 from .exceptions import TemplateSyntaxError
 
@@ -119,11 +107,6 @@ tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
 logger = logging.getLogger('django.template')
 
 
-class TemplateEncodingError(Exception):
-    pass
-
-
-@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -131,10 +114,10 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
+        return self.msg % self.params
 
 
-class Origin(object):
+class Origin:
     def __init__(self, name, template_name=None, loader=None):
         self.name = name
         self.template_name = template_name
@@ -152,9 +135,6 @@ class Origin(object):
             self.loader == other.loader
         )
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     @property
     def loader_name(self):
         if self.loader:
@@ -163,18 +143,8 @@ class Origin(object):
             )
 
 
-class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
-    alternative = 'django.template.Origin'
-    deprecation_warning = RemovedInDjango20Warning
-
-
-class Template(object):
+class Template:
     def __init__(self, template_string, origin=None, name=None, engine=None):
-        try:
-            template_string = force_text(template_string)
-        except UnicodeDecodeError:
-            raise TemplateEncodingError("Templates can only be constructed "
-                                        "from unicode or UTF-8 strings.")
         # If Template is instantiated directly rather than from an Engine and
         # exactly one Django template engine is configured, use that engine.
         # This is required to preserve backwards-compatibility for direct use
@@ -192,8 +162,7 @@ class Template(object):
 
     def __iter__(self):
         for node in self.nodelist:
-            for subnode in node:
-                yield subnode
+            yield from node
 
     def _render(self, context):
         return self.nodelist.render(context)
@@ -290,9 +259,9 @@ class Template(object):
         bottom = min(total, line + 1 + context_lines)
 
         # In some rare cases exc_value.args can be empty or an invalid
-        # unicode string.
+        # string.
         try:
-            message = force_text(exception.args[0])
+            message = str(exception.args[0])
         except (IndexError, UnicodeDecodeError):
             message = '(Could not get exception message)'
 
@@ -321,7 +290,7 @@ def linebreak_iter(template_source):
     yield len(template_source) + 1
 
 
-class Token(object):
+class Token:
     def __init__(self, token_type, contents, position=None, lineno=None):
         """
         A token representing a string from the template.
@@ -366,7 +335,7 @@ class Token(object):
         return split
 
 
-class Lexer(object):
+class Lexer:
     def __init__(self, template_string):
         self.template_string = template_string
         self.verbatim = False
@@ -421,7 +390,7 @@ class DebugLexer(Lexer):
         """
         Split a template string into tokens and annotates each token with its
         start and end position in the source. This is slower than the default
-        lexer so we only use it when debug is True.
+        lexer so only use it when debug is True.
         """
         lineno = 1
         result = []
@@ -443,7 +412,7 @@ class DebugLexer(Lexer):
         return result
 
 
-class Parser(object):
+class Parser:
     def __init__(self, tokens, libraries=None, builtins=None, origin=None):
         self.tokens = tokens
         self.tags = {}
@@ -641,12 +610,12 @@ filter_raw_string = r"""
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
 
-filter_re = re.compile(filter_raw_string, re.UNICODE | re.VERBOSE)
+filter_re = re.compile(filter_raw_string, re.VERBOSE)
 
 
-class FilterExpression(object):
+class FilterExpression:
     """
-    Parses a variable token and its optional filters (all as a single string),
+    Parse a variable token and its optional filters (all as a single string),
     and return a list of tuples of the filter name and arguments.
     Sample::
 
@@ -720,7 +689,6 @@ class FilterExpression(object):
                         obj = string_if_invalid
         else:
             obj = self.var
-        escape_isnt_last_filter = True
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -736,22 +704,8 @@ class FilterExpression(object):
                 new_obj = func(obj, *arg_vals)
             if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
-            elif isinstance(obj, EscapeData):
-                with warnings.catch_warnings():
-                    # Ignore mark_for_escaping deprecation as this will be
-                    # removed in Django 2.0.
-                    warnings.simplefilter('ignore', category=RemovedInDjango20Warning)
-                    obj = mark_for_escaping(new_obj)
-                    escape_isnt_last_filter = False
             else:
                 obj = new_obj
-        if not escape_isnt_last_filter:
-            warnings.warn(
-                "escape isn't the last filter in %s and will be applied "
-                "immediately in Django 2.0 so the output may change."
-                % [func.__name__ for func, _ in self.filters],
-                RemovedInDjango20Warning, stacklevel=2
-            )
         return obj
 
     def args_check(name, func, provided):
@@ -776,7 +730,7 @@ class FilterExpression(object):
         return self.token
 
 
-class Variable(object):
+class Variable:
     """
     A template variable, resolvable against a given context. The variable may
     be a hard-coded string (if it begins and ends with single or double quote
@@ -802,7 +756,7 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
-        if not isinstance(var, six.string_types):
+        if not isinstance(var, str):
             raise TypeError(
                 "Variable must be a string or number, got %s" % type(var))
         try:
@@ -857,7 +811,7 @@ class Variable(object):
             if self.message_context:
                 return pgettext_lazy(self.message_context, msgid)
             else:
-                return ugettext_lazy(msgid)
+                return gettext_lazy(msgid)
         return value
 
     def __repr__(self):
@@ -868,7 +822,7 @@ class Variable(object):
 
     def _resolve_lookup(self, context):
         """
-        Performs resolution of a real variable (i.e. not a literal) against the
+        Perform resolution of a real variable (i.e. not a literal) against the
         given context.
 
         As indicated by the method's name, this method is an implementation
@@ -888,7 +842,7 @@ class Variable(object):
                         if isinstance(current, BaseContext) and getattr(type(current), bit):
                             raise AttributeError
                         current = getattr(current, bit)
-                    except (TypeError, AttributeError) as e:
+                    except (TypeError, AttributeError):
                         # Reraise if the exception was raised by a @property
                         if not isinstance(current, BaseContext) and bit in dir(current):
                             raise
@@ -933,7 +887,7 @@ class Variable(object):
         return current
 
 
-class Node(object):
+class Node:
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
     must_be_first = False
@@ -990,7 +944,7 @@ class NodeList(list):
                 bit = node.render_annotated(context)
             else:
                 bit = node
-            bits.append(force_text(bit))
+            bits.append(str(bit))
         return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
@@ -1006,8 +960,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        rep = "<%s: %r>" % (self.__class__.__name__, self.s[:25])
-        return force_str(rep, 'ascii', errors='replace')
+        return "<%s: %r>" % (self.__class__.__name__, self.s[:25])
 
     def render(self, context):
         return self.s
@@ -1015,17 +968,18 @@ class TextNode(Node):
 
 def render_value_in_context(value, context):
     """
-    Converts any value to a string to become part of a rendered template. This
-    means escaping, if required, and conversion to a unicode object. If value
-    is a string, it is expected to have already been translated.
+    Convert any value to a string to become part of a rendered template. This
+    means escaping, if required, and conversion to a string. If value is a
+    string, it's expected to already be translated.
     """
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
-    value = force_text(value)
-    if context.autoescape or isinstance(value, EscapeData):
+    if context.autoescape:
+        if not issubclass(type(value), str):
+            value = str(value)
         return conditional_escape(value)
     else:
-        return value
+        return str(value)
 
 
 class VariableNode(Node):
@@ -1052,22 +1006,19 @@ kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
 
 def token_kwargs(bits, parser, support_legacy=False):
     """
-    A utility method for parsing token keyword arguments.
+    Parse token keyword arguments and return a dictionary of the arguments
+    retrieved from the ``bits`` token list.
 
-    :param bits: A list containing remainder of the token (split by spaces)
-        that is to be checked for arguments. Valid arguments will be removed
-        from this list.
+    `bits` is a list containing the remainder of the token (split by spaces)
+    that is to be checked for arguments. Valid arguments are removed from this
+    list.
 
-    :param support_legacy: If set to true ``True``, the legacy format
-        ``1 as foo`` will be accepted. Otherwise, only the standard ``foo=1``
-        format is allowed.
-
-    :returns: A dictionary of the arguments retrieved from the ``bits`` token
-        list.
+    `support_legacy` - if True, the legacy format ``1 as foo`` is accepted.
+    Otherwise, only the standard ``foo=1`` format is allowed.
 
     There is no requirement for all remaining token ``bits`` to be keyword
-    arguments, so the dictionary will be returned as soon as an invalid
-    argument format is reached.
+    arguments, so return the dictionary as soon as an invalid argument format
+    is reached.
     """
     if not bits:
         return {}

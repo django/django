@@ -2,7 +2,7 @@ from django.apps import AppConfig
 from django.contrib.contenttypes.checks import check_generic_foreign_keys
 from django.core import checks
 from django.db.models.signals import post_migrate, pre_migrate
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .management import (
     create_contenttypes, inject_rename_contenttypes_operations,

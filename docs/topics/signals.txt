@@ -277,8 +277,3 @@ arguments are as described in :meth:`.Signal.connect`. The method returns
 
 The ``receiver`` argument indicates the registered receiver to disconnect. It
 may be ``None`` if ``dispatch_uid`` is used to identify the receiver.
-
-.. deprecated:: 1.9
-
-    The ``weak`` argument is deprecated as it has no effect. It will be removed
-    in Django 2.0.

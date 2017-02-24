@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-
 import datetime
 import pickle
+from io import StringIO
 from operator import attrgetter
 
 from django.contrib.auth.models import User
@@ -11,7 +10,6 @@ from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
@@ -1531,7 +1529,7 @@ class AuthTestCase(TestCase):
         self.assertIn('"email": "alice@example.com"', command_output)
 
 
-class AntiPetRouter(object):
+class AntiPetRouter:
     # A router that only expresses an opinion on migrate,
     # passing pets to the 'other' database
 
@@ -1592,7 +1590,7 @@ class PickleQuerySetTestCase(TestCase):
             self.assertEqual(qs.db, pickle.loads(pickle.dumps(qs)).db)
 
 
-class DatabaseReceiver(object):
+class DatabaseReceiver:
     """
     Used in the tests for the database argument in signals (#13552)
     """
@@ -1600,7 +1598,7 @@ class DatabaseReceiver(object):
         self._database = kwargs['using']
 
 
-class WriteToOtherRouter(object):
+class WriteToOtherRouter:
     """
     A router that sends all writes to the other database.
     """
@@ -1700,7 +1698,7 @@ class SignalTests(TestCase):
         self.assertEqual(receiver._database, "other")
 
 
-class AttributeErrorRouter(object):
+class AttributeErrorRouter:
     "A router to test the exception handling of ConnectionRouter"
     def db_for_read(self, model, **hints):
         raise AttributeError
@@ -1753,7 +1751,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 b.authors.set([p])
 
 
-class ModelMetaRouter(object):
+class ModelMetaRouter:
     "A router to ensure model arguments are real model classes"
     def db_for_write(self, model, **hints):
         if not hasattr(model, '_meta'):
@@ -1787,13 +1785,14 @@ class RouterModelArgumentTestCase(TestCase):
         person.delete()
 
 
-class SyncOnlyDefaultDatabaseRouter(object):
+class SyncOnlyDefaultDatabaseRouter:
     def allow_migrate(self, db, app_label, **hints):
         return db == DEFAULT_DB_ALIAS
 
 
 class MigrateTestCase(TestCase):
 
+    # Limit memory usage when calling 'migrate'.
     available_apps = [
         'multiple_database',
         'django.contrib.auth',
@@ -1835,7 +1834,7 @@ class RouterUsed(Exception):
 class RouteForWriteTestCase(TestCase):
     multi_db = True
 
-    class WriteCheckRouter(object):
+    class WriteCheckRouter:
         def db_for_write(self, model, **hints):
             raise RouterUsed(mode=RouterUsed.WRITE, model=model, hints=hints)
 

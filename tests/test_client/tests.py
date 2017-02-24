@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Testing using the Test Client
 
@@ -20,8 +19,6 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from __future__ import unicode_literals
-
 import tempfile
 
 from django.contrib.auth.models import User

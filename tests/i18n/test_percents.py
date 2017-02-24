@@ -1,17 +1,12 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils._os import upath
-from django.utils.encoding import force_text
 from django.utils.translation import activate, get_language, trans_real
 
 from .utils import POFileAssertionMixin
 
-SAMPLEPROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(upath(__file__))), 'sampleproject')
+SAMPLEPROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sampleproject')
 SAMPLEPROJECT_LOCALE = os.path.join(SAMPLEPROJECT_DIR, 'locale')
 
 
@@ -42,9 +37,9 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
     """
 
     def setUp(self):
-        super(ExtractingStringsWithPercentSigns, self).setUp()
+        super().setUp()
         with open(self.PO_FILE, 'r') as fp:
-            self.po_contents = force_text(fp.read())
+            self.po_contents = fp.read()
 
     def test_trans_tag_with_percent_symbol_at_the_end(self):
         self.assertMsgId('Literal with a percent symbol at the end %%', self.po_contents)

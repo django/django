@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import pickle
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -36,7 +33,7 @@ class FileFieldTest(SimpleTestCase):
             f.clean(SimpleUploadedFile('name', b''))
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
         self.assertIsInstance(
-            f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))),
+            f.clean(SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode())),
             SimpleUploadedFile
         )
         self.assertIsInstance(

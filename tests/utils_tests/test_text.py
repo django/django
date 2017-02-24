@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
 
 from django.test import SimpleTestCase
-from django.utils import six, text
+from django.utils import text
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
-from django.utils.translation import override, ugettext_lazy
+from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
@@ -164,7 +161,6 @@ class TestUtilsText(SimpleTestCase):
         """normalize_newlines should be able to handle bytes too"""
         normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
         self.assertEqual(normalized, "abc\ndef\nghi\n")
-        self.assertIsInstance(normalized, six.text_type)
 
     def test_phone2numeric(self):
         numeric = text.phone2numeric('0800 flowers')
@@ -218,7 +214,7 @@ class TestUtilsText(SimpleTestCase):
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]
         seq = list(json.JSONEncoder().iterencode(data))
-        seq = [s.encode('utf-8') for s in seq]
+        seq = [s.encode() for s in seq]
         actual_length = len(b''.join(seq))
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
@@ -239,7 +235,7 @@ class TestUtilsText(SimpleTestCase):
 
         # The format string can be lazy. (string comes from contrib.admin)
         s = format_lazy(
-            ugettext_lazy("Added {name} \"{object}\"."),
+            gettext_lazy("Added {name} \"{object}\"."),
             name='article', object='My first try',
         )
         with override('fr'):

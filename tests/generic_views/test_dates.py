@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
@@ -20,7 +17,7 @@ def _make_books(n, base_date):
             pubdate=base_date - datetime.timedelta(days=i))
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

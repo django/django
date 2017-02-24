@@ -1,10 +1,10 @@
-from __future__ import unicode_literals
-
 import os
 import sys
 import tempfile
 import unittest
 import warnings
+from io import StringIO
+from unittest import mock
 
 from django.apps import apps
 from django.contrib.sites.models import Site
@@ -14,11 +14,7 @@ from django.core.management import CommandError
 from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
-from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
-)
-from django.utils import six
-from django.utils.encoding import force_text
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
     Article, Category, PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
@@ -49,12 +45,12 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
         self.assertEqual(Article.objects.count(), 0)
 
 
-class DumpDataAssertMixin(object):
+class DumpDataAssertMixin:
 
     def _dumpdata_assert(self, args, output, format='json', filename=None,
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
-        new_io = six.StringIO()
+        new_io = StringIO()
         if filename:
             filename = os.path.join(tempfile.gettempdir(), filename)
         management.call_command('dumpdata', *args, **{'format': format,
@@ -447,7 +443,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_dumpdata_with_uuid_pks(self):
         m1 = PrimaryKeyUUIDModel.objects.create()
         m2 = PrimaryKeyUUIDModel.objects.create()
-        output = six.StringIO()
+        output = StringIO()
         management.call_command(
             'dumpdata', 'fixtures.PrimaryKeyUUIDModel', '--pks', ', '.join([str(m1.id), str(m2.id)]),
             stdout=output,
@@ -473,7 +469,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         stdout is a tty, and verbosity > 0.
         """
         management.call_command('loaddata', 'fixture1.json', verbosity=0)
-        new_io = six.StringIO()
+        new_io = StringIO()
         new_io.isatty = lambda: True
         with NamedTemporaryFile() as file:
             options = {
@@ -487,7 +483,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
             # Test no progress bar when verbosity = 0
             options['verbosity'] = 0
-            new_io = six.StringIO()
+            new_io = StringIO()
             new_io.isatty = lambda: True
             options.update({'stdout': new_io, 'stderr': new_io})
             management.call_command('dumpdata', 'fixtures', **options)
@@ -585,9 +581,9 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_loaddata_verbosity_three(self):
-        output = six.StringIO()
+        output = StringIO()
         management.call_command('loaddata', 'fixture1.json', verbosity=3, stdout=output, stderr=output)
-        command_output = force_text(output.getvalue())
+        command_output = output.getvalue()
         self.assertIn(
             "\rProcessed 1 object(s).\rProcessed 2 object(s)."
             "\rProcessed 3 object(s).\rProcessed 4 object(s).\n",
@@ -685,14 +681,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command('loaddata', 'fixture1', exclude=['fixtures.FooModel'], verbosity=0)
 
 
-class NonExistentFixtureTests(TestCase):
+class NonexistentFixtureTests(TestCase):
     """
     Custom class to limit fixture dirs.
     """
-    available_apps = ['django.contrib.auth', 'django.contrib.contenttypes']
 
     def test_loaddata_not_existent_fixture_file(self):
-        stdout_output = six.StringIO()
+        stdout_output = StringIO()
         with self.assertRaisesMessage(CommandError, "No fixture named 'this_fixture_doesnt_exist' found."):
             management.call_command('loaddata', 'this_fixture_doesnt_exist', stdout=stdout_output)
 
@@ -714,8 +709,6 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 
     available_apps = [
         'fixtures',
-        'django.contrib.contenttypes',
-        'django.contrib.auth',
         'django.contrib.sites',
     ]
 

@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import itertools
 import re
+from urllib.parse import ParseResult, urlparse
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -16,8 +14,6 @@ from django.http import QueryDict
 from django.test import TestCase, override_settings
 from django.test.utils import ignore_warnings, patch_logger
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
@@ -55,7 +51,7 @@ class AuthViewsTestCase(TestCase):
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
         form_errors = list(itertools.chain(*response.context['form'].errors.values()))
-        self.assertIn(force_text(error), form_errors)
+        self.assertIn(str(error), form_errors)
 
     def assertURLEqual(self, url, expected, parse_qs=False):
         """
@@ -195,7 +191,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
-        # We get a 200 response for a non-existent user, not a 404
+        # We get a 200 response for a nonexistent user, not a 404
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
@@ -336,7 +332,7 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
             username='foo',
             password='foo',
         )
-        return super(UUIDUserPasswordResetTest, self)._test_confirm_start()
+        return super()._test_confirm_start()
 
 
 @ignore_warnings(category=RemovedInDjango21Warning)

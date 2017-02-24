@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from xml.dom import minidom
 
 from django.core import serializers
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.test import TestCase, TransactionTestCase
-from django.utils import six
 
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
@@ -37,7 +33,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     def _comparison_value(value):
         # The XML serializer handles everything as strings, so comparisons
         # need to be performed on the stringified value
-        return six.text_type(value)
+        return str(value)
 
     @staticmethod
     def _validate_output(serial_str):

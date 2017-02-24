@@ -86,14 +86,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.content_type
 
-    .. versionadded:: 1.10
-
     A string representing the MIME type of the request, parsed from the
     ``CONTENT_TYPE`` header.
 
 .. attribute:: HttpRequest.content_params
-
-    .. versionadded:: 1.10
 
     A dictionary of key/value parameters included in the ``CONTENT_TYPE``
     header.
@@ -327,10 +323,10 @@ Methods
         'Tony'
         >>> request.get_signed_cookie('name', salt='name-salt')
         'Tony' # assuming cookie was set using the same salt
-        >>> request.get_signed_cookie('non-existing-cookie')
+        >>> request.get_signed_cookie('nonexistent-cookie')
         ...
-        KeyError: 'non-existing-cookie'
-        >>> request.get_signed_cookie('non-existing-cookie', False)
+        KeyError: 'nonexistent-cookie'
+        >>> request.get_signed_cookie('nonexistent-cookie', False)
         False
         >>> request.get_signed_cookie('cookie-that-was-tampered-with')
         ...
@@ -420,7 +416,7 @@ a subclass of dictionary. Exceptions are outlined here:
     ``mutable=True`` to its ``__init__()``.
 
     Strings for setting both keys and values will be converted from ``encoding``
-    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+    to ``str``. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
@@ -484,21 +480,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.items()
         [('a', '3')]
 
-.. method:: QueryDict.iteritems()
-
-    Just like the standard dictionary ``iteritems()`` method. Like
-    :meth:`QueryDict.items()` this uses the same last-value logic as
-    :meth:`QueryDict.__getitem__()`.
-
-    Available only on Python 2.
-
-.. method:: QueryDict.iterlists()
-
-    Like :meth:`QueryDict.iteritems()` except it includes all values, as a list,
-    for each member of the dictionary.
-
-    Available only on Python 2.
-
 .. method:: QueryDict.values()
 
     Just like the standard dictionary ``values()`` method, except this uses the
@@ -507,12 +488,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.values()
         ['3']
-
-.. method:: QueryDict.itervalues()
-
-    Just like :meth:`QueryDict.values()`, except an iterator.
-
-    Available only on Python 2.
 
 In addition, ``QueryDict`` has the following methods:
 
@@ -639,11 +614,6 @@ generators are immediately closed.
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 
-.. versionchanged:: 1.10
-
-    Objects with a ``close()`` method used to be closed when the WSGI server
-    called ``close()`` on the response.
-
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -684,8 +654,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A bytestring representing the content, encoded from a Unicode
-    object if necessary.
+    A bytestring representing the content, encoded from a string if necessary.
 
 .. attribute:: HttpResponse.charset
 
@@ -846,14 +815,10 @@ Methods
 
 .. method:: HttpResponse.readable()
 
-   .. versionadded:: 1.10
-
     Always ``False``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
 
 .. method:: HttpResponse.seekable()
-
-   .. versionadded:: 1.10
 
     Always ``False``. This method makes an :class:`HttpResponse` instance a
     stream-like object.

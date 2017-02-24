@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.forms import ModelForm, modelformset_factory
@@ -29,11 +27,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
                     self.instance, for_concrete_model=self.for_concrete_model),
                 self.ct_fk_field.name: self.instance.pk,
             })
-        super(BaseGenericInlineFormSet, self).__init__(
-            queryset=qs, data=data, files=files,
-            prefix=prefix,
-            **kwargs
-        )
+        super().__init__(queryset=qs, data=data, files=files, prefix=prefix, **kwargs)
 
     @classmethod
     def get_default_prefix(cls):
@@ -55,7 +49,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   validate_max=False, for_concrete_model=True,
                                   min_num=None, validate_min=False):
     """
-    Returns a ``GenericInlineFormSet`` for the given kwargs.
+    Return a ``GenericInlineFormSet`` for the given kwargs.
 
     You must provide ``ct_field`` and ``fk_field`` if they are different from
     the defaults ``content_type`` and ``object_id`` respectively.

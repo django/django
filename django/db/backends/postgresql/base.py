@@ -4,6 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+import threading
 import warnings
 
 from django.conf import settings
@@ -11,10 +12,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
-from django.utils import six
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
+from django.utils.safestring import SafeText
 
 try:
     import psycopg2 as Database
@@ -45,10 +44,6 @@ from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
 from .version import get_version                            # NOQA isort:skip
 
-if six.PY2:
-    psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-    psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
@@ -75,7 +70,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'timestamp with time zone',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
@@ -145,6 +139,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._named_cursor_idx = 0
+
     def get_connection_params(self):
         settings_dict = self.settings_dict
         # None may be used to connect to the default 'postgres' db
@@ -160,7 +158,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
-            conn_params['password'] = force_str(settings_dict['PASSWORD'])
+            conn_params['password'] = settings_dict['PASSWORD']
         if settings_dict['HOST']:
             conn_params['host'] = settings_dict['HOST']
         if settings_dict['PORT']:
@@ -206,10 +204,25 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if not self.get_autocommit():
                 self.connection.commit()
 
-    def create_cursor(self):
-        cursor = self.connection.cursor()
+    def create_cursor(self, name=None):
+        if name:
+            # In autocommit mode, the cursor will be used outside of a
+            # transaction, hence use a holdable cursor.
+            cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
+        else:
+            cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
+
+    def chunked_cursor(self):
+        self._named_cursor_idx += 1
+        return self._cursor(
+            name='_django_curs_%d_%d' % (
+                # Avoid reusing name in other threads
+                threading.current_thread().ident,
+                self._named_cursor_idx,
+            )
+        )
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
@@ -234,7 +247,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def _nodb_connection(self):
-        nodb_connection = super(DatabaseWrapper, self)._nodb_connection
+        nodb_connection = super()._nodb_connection
         try:
             nodb_connection.ensure_connection()
         except (Database.DatabaseError, WrappedDatabaseError):

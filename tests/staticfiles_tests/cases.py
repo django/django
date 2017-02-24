@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import codecs
 import os
 import shutil
@@ -10,13 +7,11 @@ from django.conf import settings
 from django.core.management import call_command
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils import six
-from django.utils.encoding import force_text
 
 from .settings import TEST_SETTINGS
 
 
-class BaseStaticFilesMixin(object):
+class BaseStaticFilesMixin:
     """
     Test case with a couple utility assertions.
     """
@@ -24,7 +19,7 @@ class BaseStaticFilesMixin(object):
     def assertFileContains(self, filepath, text):
         self.assertIn(
             text,
-            self._get_file(force_text(filepath)),
+            self._get_file(filepath),
             "'%s' not in '%s'" % (text, filepath),
         )
 
@@ -33,7 +28,7 @@ class BaseStaticFilesMixin(object):
             self._get_file(filepath)
 
     def render_template(self, template, **kwargs):
-        if isinstance(template, six.string_types):
+        if isinstance(template, str):
             template = Template(template)
         return template.render(Context(**kwargs)).strip()
 
@@ -67,7 +62,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     all these tests.
     """
     def setUp(self):
-        super(CollectionTestCase, self).setUp()
+        super().setUp()
         temp_dir = tempfile.mkdtemp()
         # Override the STATIC_ROOT for all tests from setUp to tearDown
         # rather than as a context manager
@@ -75,14 +70,13 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
         self.patched_settings.enable()
         self.run_collectstatic()
         # Same comment as in runtests.teardown.
-        self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
+        self.addCleanup(shutil.rmtree, temp_dir)
 
     def tearDown(self):
         self.patched_settings.disable()
-        super(CollectionTestCase, self).tearDown()
+        super().tearDown()
 
-    def run_collectstatic(self, **kwargs):
-        verbosity = kwargs.pop('verbosity', 0)
+    def run_collectstatic(self, *, verbosity=0, **kwargs):
         call_command('collectstatic', interactive=False, verbosity=verbosity,
                      ignore_patterns=['*.ignoreme'], **kwargs)
 
@@ -93,7 +87,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
             return f.read()
 
 
-class TestDefaults(object):
+class TestDefaults:
     """
     A few standard test cases.
     """

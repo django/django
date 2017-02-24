@@ -1,7 +1,5 @@
-import io
 import os
 import sys
-import warnings
 from itertools import takewhile
 
 from django.apps import apps
@@ -18,9 +16,6 @@ from django.db.migrations.questioner import (
 from django.db.migrations.state import ProjectState
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.six import iteritems
-from django.utils.six.moves import zip
 
 
 class Command(BaseCommand):
@@ -53,11 +48,6 @@ class Command(BaseCommand):
             help="Use this name for migration file(s).",
         )
         parser.add_argument(
-            '-e', '--exit', action='store_true', dest='exit_code', default=False,
-            help='Exit with error code 1 if no changes needing migrations are found. '
-                 'Deprecated, use the --check option instead.',
-        )
-        parser.add_argument(
             '--check', action='store_true', dest='check_changes',
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
@@ -69,14 +59,7 @@ class Command(BaseCommand):
         self.merge = options['merge']
         self.empty = options['empty']
         self.migration_name = options['name']
-        self.exit_code = options['exit_code']
         check_changes = options['check_changes']
-
-        if self.exit_code:
-            warnings.warn(
-                "The --exit option is deprecated in favor of the --check option.",
-                RemovedInDjango20Warning
-            )
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -116,7 +99,7 @@ class Command(BaseCommand):
         # If app_labels is specified, filter out conflicting migrations for unspecified apps
         if app_labels:
             conflicts = {
-                app_label: conflict for app_label, conflict in iteritems(conflicts)
+                app_label: conflict for app_label, conflict in conflicts.items()
                 if app_label in app_labels
             }
 
@@ -186,9 +169,6 @@ class Command(BaseCommand):
                     self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
                     self.stdout.write("No changes detected")
-
-            if self.exit_code:
-                sys.exit(1)
         else:
             self.write_migration_files(changes)
             if check_changes:
@@ -196,7 +176,7 @@ class Command(BaseCommand):
 
     def write_migration_files(self, changes):
         """
-        Takes a changes dict and writes them out as migration files.
+        Take a changes dict and write them out as migration files.
         """
         directory_created = {}
         for app_label, app_migrations in changes.items():
@@ -229,7 +209,7 @@ class Command(BaseCommand):
                         # We just do this once per app
                         directory_created[app_label] = True
                     migration_string = writer.as_string()
-                    with io.open(writer.path, "w", encoding='utf-8') as fh:
+                    with open(writer.path, "w", encoding='utf-8') as fh:
                         fh.write(migration_string)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --dry-run --verbosity 3
@@ -308,7 +288,7 @@ class Command(BaseCommand):
 
                 if not self.dry_run:
                     # Write the merge migrations file to the disk
-                    with io.open(writer.path, "w", encoding='utf-8') as fh:
+                    with open(writer.path, "w", encoding='utf-8') as fh:
                         fh.write(writer.as_string())
                     if self.verbosity > 0:
                         self.stdout.write("\nCreated new merge migration %s" % writer.path)

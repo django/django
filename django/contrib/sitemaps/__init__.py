@@ -1,11 +1,12 @@
+from urllib.parse import urlencode
+from urllib.request import urlopen
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch, reverse
 from django.utils import translation
-from django.utils.six.moves.urllib.parse import urlencode
-from django.utils.six.moves.urllib.request import urlopen
 
 PING_URL = "https://www.google.com/webmasters/tools/ping"
 
@@ -16,7 +17,7 @@ class SitemapNotFound(Exception):
 
 def ping_google(sitemap_url=None, ping_url=PING_URL):
     """
-    Alerts Google that the sitemap for the current site has been updated.
+    Alert Google that the sitemap for the current site has been updated.
     If sitemap_url is provided, it should be an absolute path to the sitemap
     for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
     function will attempt to deduce it by using urls.reverse().
@@ -49,7 +50,7 @@ def _get_sitemap_full_url(sitemap_url):
     return 'http://%s%s' % (current_site.domain, sitemap_url)
 
 
-class Sitemap(object):
+class Sitemap:
     # This limit is defined by Google. See the index documentation at
     # http://www.sitemaps.org/protocol.html#index.
     limit = 50000

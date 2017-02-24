@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
@@ -16,7 +12,6 @@ class Article(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class Comment(models.Model):
     article = models.ForeignKey(Article, models.CASCADE, related_name="comments")
     text = models.TextField()

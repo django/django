@@ -1,8 +1,9 @@
+from urllib.parse import urljoin
+
 from django.contrib.staticfiles import storage
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms import Media
 from django.test import SimpleTestCase, override_settings
-from django.utils.six.moves.urllib.parse import urljoin
 
 
 class StaticTestStorage(storage.StaticFilesStorage):

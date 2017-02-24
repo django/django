@@ -119,10 +119,12 @@ class GenericRelationTests(TestCase):
         note = Note(note='Deserve a bonus', content_object=team1)
         note.save()
 
-    def test_target_model_nonzero_false(self):
-        """Test related to #13085"""
-        # __nonzero__() returns False -- This actually doesn't currently fail.
-        # This test validates that
+    def test_target_model_bool_false(self):
+        """
+        Saving a model with a GenericForeignKey to a model instance whose
+        __bool__ method returns False (Guild.__bool__() here) shouldn't fail
+        (#13085).
+        """
         g1 = Guild.objects.create(name='First guild')
         note = Note(note='Note for guild', content_object=g1)
         note.save()

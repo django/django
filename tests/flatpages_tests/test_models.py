@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from django.contrib.flatpages.models import FlatPage
 from django.test import SimpleTestCase
 from django.test.utils import override_script_prefix

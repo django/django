@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from datetime import timedelta
+from http import cookies
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
@@ -31,14 +32,12 @@ from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
 )
 from django.test.utils import patch_logger
-from django.utils import six, timezone
-from django.utils.encoding import force_text
-from django.utils.six.moves import http_cookies
+from django.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
 
 
-class SessionTestsMixin(object):
+class SessionTestsMixin:
     # This does not inherit from TestCase to avoid any tests being run with this
     # class, which wouldn't work, and to allow different TestCase subclasses to
     # be used.
@@ -116,37 +115,27 @@ class SessionTestsMixin(object):
         self.assertEqual(list(self.session.values()), [])
         self.assertTrue(self.session.accessed)
         self.session['some key'] = 1
+        self.session.modified = False
+        self.session.accessed = False
         self.assertEqual(list(self.session.values()), [1])
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
 
-    def test_iterkeys(self):
+    def test_keys(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = six.iterkeys(self.session)
-        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertEqual(list(self.session.keys()), ['x'])
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
-        self.assertEqual(list(i), ['x'])
 
-    def test_itervalues(self):
+    def test_items(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = six.itervalues(self.session)
-        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertEqual(list(self.session.items()), [('x', 1)])
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
-        self.assertEqual(list(i), [1])
-
-    def test_iteritems(self):
-        self.session['x'] = 1
-        self.session.modified = False
-        self.session.accessed = False
-        i = six.iteritems(self.session)
-        self.assertTrue(hasattr(i, '__iter__'))
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
-        self.assertEqual(list(i), [('x', 1)])
 
     def test_clear(self):
         self.session['x'] = 1
@@ -398,7 +387,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         session_key = self.session.session_key
         s = self.model.objects.get(session_key=session_key)
 
-        self.assertEqual(force_text(s), session_key)
+        self.assertEqual(str(s), session_key)
 
     def test_session_get_decoded(self):
         """
@@ -519,10 +508,10 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # Reset the file session backend's internal caches
         if hasattr(self.backend, '_storage_path'):
             del self.backend._storage_path
-        super(FileSessionTests, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(FileSessionTests, self).tearDown()
+        super().tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
         shutil.rmtree(self.temp_session_store)
 
@@ -661,7 +650,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
         self.assertIn(
-            http_cookies.Morsel._reserved['httponly'],
+            cookies.Morsel._reserved['httponly'],
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
@@ -679,7 +668,7 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
         self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
-        self.assertNotIn(http_cookies.Morsel._reserved['httponly'],
+        self.assertNotIn(cookies.Morsel._reserved['httponly'],
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     def test_session_save_on_500(self):
@@ -856,7 +845,7 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
     @unittest.expectedFailure
     def test_actual_expiry(self):
         # The cookie backend doesn't handle non-default expiry dates, see #19201
-        super(CookieSessionTests, self).test_actual_expiry()
+        super().test_actual_expiry()
 
     def test_unpickling_exception(self):
         # signed_cookies backend should handle unpickle exceptions gracefully

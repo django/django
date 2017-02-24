@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import gettext
 import os
 import re
@@ -20,7 +17,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField, DateTimeField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
-from django.utils import six, translation
+from django.utils import translation
 
 from .models import (
     Advisor, Album, Band, Bee, Car, City, Company, Event, Fan, Honeycomb, Individual,
@@ -29,7 +26,7 @@ from .models import (
 from .widgetadmin import site as widget_admin_site
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -183,7 +180,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         ma = AdvisorAdmin(Advisor, admin.site)
         f = ma.formfield_for_dbfield(Advisor._meta.get_field('companies'), request=None)
         self.assertEqual(
-            six.text_type(f.help_text),
+            f.help_text,
             'Hold down "Control", or "Command" on a Mac, to select more than one.'
         )
 
@@ -225,7 +222,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         post_data = {
             "main_band": '%s' % pk,
         }
-        # Try posting with a non-existent pk in a raw id field: this
+        # Try posting with a nonexistent pk in a raw id field: this
         # should result in an error message, not a server exception.
         response = self.client.post(reverse('admin:admin_widgets_event_add'), post_data)
         self.assertContains(response, 'Select a valid choice. That choice is not one of the available choices.')
@@ -410,7 +407,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(AdminFileWidgetTests, cls).setUpTestData()
+        super().setUpTestData()
         band = Band.objects.create(name='Linkin Park')
         cls.album = band.album_set.create(
             name='Hybrid Theory', cover_art=r'albums\hybrid_theory.jpg'
@@ -599,6 +596,7 @@ class ManyToManyRawIdWidgetTest(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class RelatedFieldWidgetWrapperTests(SimpleTestCase):
     def test_no_can_add_related(self):
         rel = Individual._meta.get_field('parent').remote_field
@@ -632,6 +630,21 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         self.assertTrue(wrapper.can_add_related)
         self.assertTrue(wrapper.can_change_related)
         self.assertFalse(wrapper.can_delete_related)
+
+    def test_custom_widget_render(self):
+        class CustomWidget(forms.Select):
+            def render(self, *args, **kwargs):
+                return 'custom render output'
+        rel = Album._meta.get_field('band').remote_field
+        widget = CustomWidget()
+        wrapper = widgets.RelatedFieldWidgetWrapper(
+            widget, rel, widget_admin_site,
+            can_add_related=True,
+            can_change_related=True,
+            can_delete_related=True,
+        )
+        output = wrapper.render('name', 'value')
+        self.assertIn('custom render output', output)
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
@@ -857,7 +870,7 @@ class DateTimePickerAltTimezoneSeleniumTests(DateTimePickerShortcutsSeleniumTest
 class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def setUp(self):
-        super(HorizontalVerticalFilterSeleniumTests, self).setUp()
+        super().setUp()
         self.lisa = Student.objects.create(name='Lisa')
         self.john = Student.objects.create(name='John')
         self.bob = Student.objects.create(name='Bob')
@@ -1174,7 +1187,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def setUp(self):
-        super(AdminRawIdWidgetSeleniumTests, self).setUp()
+        super().setUp()
         Band.objects.create(id=42, name='Bogey Blues')
         Band.objects.create(id=98, name='Green Potatoes')
 

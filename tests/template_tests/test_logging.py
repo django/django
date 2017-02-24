@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 from django.template import Context, Engine, Variable, VariableDoesNotExist
@@ -9,7 +7,7 @@ from django.utils.deprecation import RemovedInDjango21Warning
 
 class TestHandler(logging.Handler):
     def __init__(self):
-        super(TestHandler, self).__init__()
+        super().__init__()
         self.log_record = None
 
     def emit(self, record):
@@ -33,7 +31,7 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
     loglevel = logging.DEBUG
 
     def test_log_on_variable_does_not_exist_silent(self):
-        class TestObject(object):
+        class TestObject:
             class SilentDoesNotExist(Exception):
                 silent_variable_failure = True
 
@@ -77,7 +75,7 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
         raised_exception = self.test_handler.log_record.exc_info[1]
         self.assertEqual(
             str(raised_exception),
-            'Failed lookup for key [author] in %r' % ("{%r: %r}" % ('section', 'News'))
+            "Failed lookup for key [author] in {'section': 'News'}"
         )
 
     def test_no_log_when_variable_exists(self):
@@ -90,7 +88,7 @@ class IncludeNodeLoggingTests(BaseTemplateLoggingTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(IncludeNodeLoggingTests, cls).setUpClass()
+        super().setUpClass()
         cls.engine = Engine(loaders=[
             ('django.template.loaders.locmem.Loader', {
                 'child': '{{ raises_exception }}',

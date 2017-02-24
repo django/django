@@ -1,13 +1,7 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
-import sys
-
 import jinja2
 
 from django.conf import settings
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -21,7 +15,7 @@ class Jinja2(BaseEngine):
     def __init__(self, params):
         params = params.copy()
         options = params.pop('OPTIONS').copy()
-        super(Jinja2, self).__init__(params)
+        super().__init__(params)
 
         self.context_processors = options.pop('context_processors', [])
 
@@ -44,22 +38,18 @@ class Jinja2(BaseEngine):
         try:
             return Template(self.env.get_template(template_name), self)
         except jinja2.TemplateNotFound as exc:
-            six.reraise(
-                TemplateDoesNotExist,
-                TemplateDoesNotExist(exc.name, backend=self),
-                sys.exc_info()[2],
-            )
+            raise TemplateDoesNotExist(exc.name, backend=self) from exc
         except jinja2.TemplateSyntaxError as exc:
             new = TemplateSyntaxError(exc.args)
             new.template_debug = get_exception_info(exc)
-            six.reraise(TemplateSyntaxError, new, sys.exc_info()[2])
+            raise new from exc
 
     @cached_property
     def template_context_processors(self):
         return [import_string(path) for path in self.context_processors]
 
 
-class Template(object):
+class Template:
 
     def __init__(self, template, backend):
         self.template = template
@@ -81,7 +71,7 @@ class Template(object):
         return self.template.render(context)
 
 
-class Origin(object):
+class Origin:
     """
     A container to hold debug information as described in the template API
     documentation.
@@ -93,7 +83,7 @@ class Origin(object):
 
 def get_exception_info(exception):
     """
-    Formats exception information for display on the debug page using the
+    Format exception information for display on the debug page using the
     structure described in the template API documentation.
     """
     context_lines = 10

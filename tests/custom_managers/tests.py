@@ -1,8 +1,5 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.test import TestCase
-from django.utils import six
 
 from .models import (
     Book, Car, CustomManager, CustomQuerySet, DeconstructibleCustomManager,
@@ -36,7 +33,7 @@ class CustomManagerTests(TestCase):
             Person.objects.get_fun_people(), [
                 "Bugs Bunny"
             ],
-            six.text_type
+            str
         )
 
     def test_queryset_copied_to_default(self):
@@ -69,12 +66,12 @@ class CustomManagerTests(TestCase):
         for manager_name in self.custom_manager_names:
             manager = getattr(Person, manager_name)
             queryset = manager.filter()
-            self.assertQuerysetEqual(queryset, ["Bugs Bunny"], six.text_type)
+            self.assertQuerysetEqual(queryset, ["Bugs Bunny"], str)
             self.assertIs(queryset._filter_CustomQuerySet, True)
 
             # Specialized querysets inherit from our custom queryset.
             queryset = manager.values_list('first_name', flat=True).filter()
-            self.assertEqual(list(queryset), [six.text_type("Bugs")])
+            self.assertEqual(list(queryset), ["Bugs"])
             self.assertIs(queryset._filter_CustomQuerySet, True)
 
             self.assertIsInstance(queryset.values(), CustomQuerySet)
@@ -101,7 +98,7 @@ class CustomManagerTests(TestCase):
         Queryset method doesn't override the custom manager method.
         """
         queryset = Person.custom_queryset_custom_manager.filter()
-        self.assertQuerysetEqual(queryset, ["Bugs Bunny"], six.text_type)
+        self.assertQuerysetEqual(queryset, ["Bugs Bunny"], str)
         self.assertIs(queryset._filter_CustomManager, True)
 
     def test_related_manager(self):

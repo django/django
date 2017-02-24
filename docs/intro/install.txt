@@ -53,12 +53,11 @@ Install Django
 
 You've got three easy options to install Django:
 
-* Install a version of Django :doc:`provided by your operating system
-  distribution </misc/distributions>`. This is the quickest option for those
-  who have operating systems that distribute Django.
-
 * :ref:`Install an official release <installing-official-release>`. This
   is the best approach for most users.
+
+* Install a version of Django :ref:`provided by your operating system
+  distribution <installing-distribution-package>`.
 
 * :ref:`Install the latest development version
   <installing-development-version>`. This option is for enthusiasts who want

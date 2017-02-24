@@ -512,6 +512,9 @@ class ExecutorTests(MigrationTestBase):
             ('mutate_state_a', None),
         ])
         self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        executor.migrate([
+            ('mutate_state_b', None),
+        ])
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_process_callback(self):
@@ -592,6 +595,7 @@ class ExecutorTests(MigrationTestBase):
                 editor.execute(editor.sql_delete_table % {"table": "author_app_author"})
             self.assertTableNotExists("author_app_author")
             self.assertTableNotExists("book_app_book")
+            executor.migrate([("author_app", None)], fake=True)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_apply_all_replaced_marks_replacement_as_applied(self):
@@ -638,13 +642,13 @@ class ExecutorTests(MigrationTestBase):
         )
 
 
-class FakeLoader(object):
+class FakeLoader:
     def __init__(self, graph, applied):
         self.graph = graph
         self.applied_migrations = applied
 
 
-class FakeMigration(object):
+class FakeMigration:
     """Really all we need is any object with a debug-useful repr."""
     def __init__(self, name):
         self.name = name

@@ -1,6 +1,3 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
 from django.middleware.csrf import get_token
 from django.utils.functional import lazy
 from django.utils.html import format_html

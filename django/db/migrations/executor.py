@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps.registry import apps as global_apps
 from django.db import migrations, router
 
@@ -9,7 +7,7 @@ from .recorder import MigrationRecorder
 from .state import ProjectState
 
 
-class MigrationExecutor(object):
+class MigrationExecutor:
     """
     End-to-end migration execution - loads migrations, and runs them
     up or down to a specified set of targets.

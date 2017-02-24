@@ -1,13 +1,19 @@
 import copy
 import unittest
 from contextlib import contextmanager
+from io import StringIO
+from unittest import mock
 
 from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
-from django.db.backends.postgresql.creation import DatabaseCreation
-from django.test import SimpleTestCase
+from django.db.backends.oracle.creation import \
+    DatabaseCreation as OracleDatabaseCreation
+from django.db.backends.postgresql.creation import \
+    DatabaseCreation as PostgreSQLDatabaseCreation
+from django.db.utils import DatabaseError
+from django.test import SimpleTestCase, TestCase
 
 
 class TestDbSignatureTests(SimpleTestCase):
@@ -69,7 +75,7 @@ class PostgreSQLDatabaseCreationTests(SimpleTestCase):
 
     def check_sql_table_creation_suffix(self, settings, expected):
         with self.changed_test_settings(**settings):
-            creation = DatabaseCreation(connection)
+            creation = PostgreSQLDatabaseCreation(connection)
             suffix = creation.sql_table_creation_suffix()
             self.assertEqual(suffix, expected)
 
@@ -88,3 +94,71 @@ class PostgreSQLDatabaseCreationTests(SimpleTestCase):
     def test_sql_table_creation_suffix_with_encoding_and_template(self):
         settings = dict(CHARSET='UTF8', TEMPLATE='template0')
         self.check_sql_table_creation_suffix(settings, '''WITH ENCODING 'UTF8' TEMPLATE "template0"''')
+
+
+@unittest.skipUnless(connection.vendor == 'oracle', "Oracle specific tests")
+@mock.patch.object(OracleDatabaseCreation, '_maindb_connection', return_value=connection)
+@mock.patch('sys.stdout', new_callable=StringIO)
+@mock.patch('sys.stderr', new_callable=StringIO)
+class OracleDatabaseCreationTests(TestCase):
+
+    def _execute_raise_user_already_exists(self, cursor, statements, parameters, verbosity, allow_quiet_fail=False):
+        # Raise "user already exists" only in test user creation
+        if statements and statements[0].startswith('CREATE USER'):
+            raise DatabaseError("ORA-01920: user name 'string' conflicts with another user or role name")
+
+    def _execute_raise_tablespace_already_exists(
+        self, cursor, statements, parameters, verbosity, allow_quiet_fail=False
+    ):
+        raise DatabaseError("ORA-01543: tablespace 'string' already exists")
+
+    def _execute_raise_insufficient_privileges(
+        self, cursor, statements, parameters, verbosity, allow_quiet_fail=False
+    ):
+        raise DatabaseError("ORA-01031: insufficient privileges")
+
+    def _test_database_passwd(self):
+        # Mocked to avoid test user password changed
+        return connection.settings_dict['SAVED_PASSWORD']
+
+    def patch_execute_statements(self, execute_statements):
+        return mock.patch.object(OracleDatabaseCreation, '_execute_statements', execute_statements)
+
+    @mock.patch.object(OracleDatabaseCreation, '_test_user_create', return_value=False)
+    def test_create_test_db(self, *mocked_objects):
+        creation = OracleDatabaseCreation(connection)
+        # Simulate test database creation raising "tablespace already exists"
+        with self.patch_execute_statements(self._execute_raise_tablespace_already_exists):
+            with mock.patch('builtins.input', return_value='no'):
+                with self.assertRaises(SystemExit):
+                    # SystemExit is raised if the user answers "no" to the
+                    # prompt asking if it's okay to delete the test tablespace.
+                    creation._create_test_db(verbosity=0, keepdb=False)
+            # "Tablespace already exists" error is ignored when keepdb is on
+            creation._create_test_db(verbosity=0, keepdb=True)
+        # Simulate test database creation raising unexpected error
+        with self.patch_execute_statements(self._execute_raise_insufficient_privileges):
+            with self.assertRaises(SystemExit):
+                creation._create_test_db(verbosity=0, keepdb=False)
+            with self.assertRaises(SystemExit):
+                creation._create_test_db(verbosity=0, keepdb=True)
+
+    @mock.patch.object(OracleDatabaseCreation, '_test_database_create', return_value=False)
+    def test_create_test_user(self, *mocked_objects):
+        creation = OracleDatabaseCreation(connection)
+        with mock.patch.object(OracleDatabaseCreation, '_test_database_passwd', self._test_database_passwd):
+            # Simulate test user creation raising "user already exists"
+            with self.patch_execute_statements(self._execute_raise_user_already_exists):
+                with mock.patch('builtins.input', return_value='no'):
+                    with self.assertRaises(SystemExit):
+                        # SystemExit is raised if the user answers "no" to the
+                        # prompt asking if it's okay to delete the test user.
+                        creation._create_test_db(verbosity=0, keepdb=False)
+                # "User already exists" error is ignored when keepdb is on
+                creation._create_test_db(verbosity=0, keepdb=True)
+            # Simulate test user creation raising unexpected error
+            with self.patch_execute_statements(self._execute_raise_insufficient_privileges):
+                with self.assertRaises(SystemExit):
+                    creation._create_test_db(verbosity=0, keepdb=False)
+                with self.assertRaises(SystemExit):
+                    creation._create_test_db(verbosity=0, keepdb=True)

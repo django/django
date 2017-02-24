@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType

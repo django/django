@@ -38,8 +38,6 @@ Available ``Meta`` options
 
 .. attribute:: Options.base_manager_name
 
-    .. versionadded:: 1.10
-
     The name of the manager to use for the model's
     :attr:`~django.db.models.Model._base_manager`.
 
@@ -108,8 +106,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_manager_name
 
-    .. versionadded:: 1.10
-
     The name of the manager to use for the model's
     :attr:`~django.db.models.Model._default_manager`.
 
@@ -129,30 +125,6 @@ Django quotes column and table names behind the scenes.
     replaced respectively by the name of the application the model is in,
     and the name of the model, both lowercased. See the paragraph on
     :ref:`related names for abstract models <abstract-related-name>`.
-
-    .. deprecated:: 1.10
-
-        This attribute now affects ``related_query_name``. The old query lookup
-        name is deprecated::
-
-            from django.db import models
-
-            class Foo(models.Model):
-                pass
-
-            class Bar(models.Model):
-                foo = models.ForeignKey(Foo)
-
-                class Meta:
-                    default_related_name = 'bars'
-
-        ::
-
-            >>> bar = Bar.objects.get(pk=1)
-            >>> # Using model name "bar" as lookup string is deprecated.
-            >>> Foo.objects.get(bar=bar)
-            >>> # You should use default_related_name "bars".
-            >>> Foo.objects.get(bars=bar)
 
 ``get_latest_by``
 -----------------

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import sys
 import traceback
 from io import BytesIO
@@ -11,8 +9,8 @@ from wsgiref import simple_server
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
-class ServerHandler(simple_server.ServerHandler, object):
-    error_status = str("500 INTERNAL SERVER ERROR")
+class ServerHandler(simple_server.ServerHandler):
+    error_status = "500 INTERNAL SERVER ERROR"
 
     def write(self, data):
         """'write()' callable as specified by PEP 3333"""
@@ -36,18 +34,18 @@ class ServerHandler(simple_server.ServerHandler, object):
             self._flush()
 
     def error_output(self, environ, start_response):
-        super(ServerHandler, self).error_output(environ, start_response)
+        super().error_output(environ, start_response)
         return ['\n'.join(traceback.format_exception(*sys.exc_info()))]
 
 
-class DummyHandler(object):
+class DummyHandler:
     def log_request(self, *args, **kwargs):
         pass
 
 
 class FileWrapperHandler(ServerHandler):
     def __init__(self, *args, **kwargs):
-        super(FileWrapperHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request_handler = DummyHandler()
         self._used_sendfile = False
 
@@ -57,12 +55,12 @@ class FileWrapperHandler(ServerHandler):
 
 
 def wsgi_app(environ, start_response):
-    start_response(str('200 OK'), [(str('Content-Type'), str('text/plain'))])
+    start_response('200 OK', [('Content-Type', 'text/plain')])
     return [b'Hello World!']
 
 
 def wsgi_app_file_wrapper(environ, start_response):
-    start_response(str('200 OK'), [(str('Content-Type'), str('text/plain'))])
+    start_response('200 OK', [('Content-Type', 'text/plain')])
     return environ['wsgi.file_wrapper'](BytesIO(b'foo'))
 
 
@@ -99,13 +97,13 @@ class WriteChunkCounterHandler(ServerHandler):
     """
 
     def __init__(self, *args, **kwargs):
-        super(WriteChunkCounterHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request_handler = DummyHandler()
         self.headers_written = False
         self.write_chunk_counter = 0
 
     def send_headers(self):
-        super(WriteChunkCounterHandler, self).send_headers()
+        super().send_headers()
         self.headers_written = True
 
     def _write(self, data):
@@ -115,7 +113,7 @@ class WriteChunkCounterHandler(ServerHandler):
 
 
 def send_big_data_app(environ, start_response):
-    start_response(str('200 OK'), [(str('Content-Type'), str('text/plain'))])
+    start_response('200 OK', [('Content-Type', 'text/plain')])
     # Return a blob of data that is 1.5 times the maximum chunk size.
     return [b'x' * (MAX_SOCKET_CHUNK_SIZE + MAX_SOCKET_CHUNK_SIZE // 2)]
 

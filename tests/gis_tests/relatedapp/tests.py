@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
@@ -37,33 +35,6 @@ class RelatedGeoModelTest(TestCase):
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
                 self.assertEqual(Point(lon, lat, srid=c.location.point.srid), c.location.point)
-
-    @skipUnlessDBFeature("has_transform_method")
-    def test03_transform_related(self):
-        "Testing the `transform` GeoQuerySet method on related geographic models."
-        # All the transformations are to state plane coordinate systems using
-        # US Survey Feet (thus a tolerance of 0 implies error w/in 1 survey foot).
-        tol = 0
-
-        def check_pnt(ref, pnt):
-            self.assertAlmostEqual(ref.x, pnt.x, tol)
-            self.assertAlmostEqual(ref.y, pnt.y, tol)
-            self.assertEqual(ref.srid, pnt.srid)
-
-        # Each city transformed to the SRID of their state plane coordinate system.
-        transformed = (('Kecksburg', 2272, 'POINT(1490553.98959621 314792.131023984)'),
-                       ('Roswell', 2257, 'POINT(481902.189077221 868477.766629735)'),
-                       ('Aurora', 2276, 'POINT(2269923.2484839 7069381.28722222)'),
-                       )
-
-        for name, srid, wkt in transformed:
-            # Doing this implicitly sets `select_related` select the location.
-            # TODO: Fix why this breaks on Oracle.
-            qs = list(City.objects.filter(name=name).transform(srid, field_name='location__point'))
-            check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
-
-        # Relations more than one level deep can be queried.
-        self.assertEqual(list(Parcel.objects.transform(srid, field_name='city__location__point')), [])
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_related_extent_aggregate(self):
@@ -190,13 +161,13 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual('P1', qs[0].name)
 
     def test07_values(self):
-        "Testing values() and values_list() and GeoQuerySets."
+        "Testing values() and values_list()."
         gqs = Location.objects.all()
         gvqs = Location.objects.values()
         gvlqs = Location.objects.values_list()
 
         # Incrementing through each of the models, dictionaries, and tuples
-        # returned by the different types of GeoQuerySets.
+        # returned by each QuerySet.
         for m, d, t in zip(gqs, gvqs, gvlqs):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
@@ -234,7 +205,7 @@ class RelatedGeoModelTest(TestCase):
     # TODO: fix on Oracle -- qs2 returns an empty result for an unknown reason
     @no_oracle
     def test10_combine(self):
-        "Testing the combination of two GeoQuerySets.  See #10807."
+        "Testing the combination of two QuerySets (#10807)."
         buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
         buf2 = City.objects.get(name='Kecksburg').location.point.buffer(0.1)
         qs1 = City.objects.filter(location__point__within=buf1)

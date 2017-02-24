@@ -55,15 +55,6 @@ pitfalls producing this error:
   case, please refer to your system documentation to learn how you can change
   this to a UTF-8 locale.
 
-* You created raw bytestrings, which is easy to do on Python 2::
-
-      my_string = 'café'
-
-  Either use the ``u''`` prefix or even better, add the
-  ``from __future__ import unicode_literals`` line at the top of your file
-  so that your code will be compatible with Python 3.2 which doesn't support
-  the ``u''`` prefix.
-
 Related resources:
 
 * :doc:`Unicode in Django </ref/unicode>`

@@ -97,8 +97,7 @@ The ``File`` class
 
     .. versionchanged:: 1.11
 
-        The ``readable()`` and ``writable()`` methods were added and the
-        ``seekable()`` method was made available on Python 2.
+        The ``readable()`` and ``writable()`` methods were added.
 
 .. currentmodule:: django.core.files.base
 
@@ -111,7 +110,6 @@ The ``ContentFile`` class
     but unlike :class:`~django.core.files.File` it operates on string content
     (bytes also supported), rather than an actual file. For example::
 
-        from __future__ import unicode_literals
         from django.core.files.base import ContentFile
 
         f1 = ContentFile("esta sentencia está en español")

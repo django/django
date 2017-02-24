@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
@@ -11,13 +8,12 @@ from django.forms import (
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 from ..models import ChoiceModel
 
 
-class AssertFormErrorsMixin(object):
+class AssertFormErrorsMixin:
     def assertFormErrors(self, expected, the_callable, *args, **kwargs):
         with self.assertRaises(ValidationError) as cm:
             the_callable(*args, **kwargs)
@@ -219,7 +215,6 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
             def clean(self):
                 raise ValidationError("I like to be awkward.")
 
-        @python_2_unicode_compatible
         class CustomErrorList(utils.ErrorList):
             def __str__(self):
                 return self.as_divs()

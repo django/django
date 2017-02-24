@@ -9,17 +9,13 @@ The canonical example is tags (although this example implementation is *far*
 from complete).
 """
 
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class TaggedItem(models.Model):
     """A tag on an item."""
     tag = models.SlugField()
@@ -48,7 +44,6 @@ class AbstractComparison(models.Model):
     first_obj = GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
 
 
-@python_2_unicode_compatible
 class Comparison(AbstractComparison):
     """
     A model that tests having multiple GenericForeignKeys. One is defined
@@ -63,7 +58,6 @@ class Comparison(AbstractComparison):
         return "%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
 
 
-@python_2_unicode_compatible
 class Animal(models.Model):
     common_name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
@@ -77,7 +71,6 @@ class Animal(models.Model):
         return self.common_name
 
 
-@python_2_unicode_compatible
 class Vegetable(models.Model):
     name = models.CharField(max_length=150)
     is_yucky = models.BooleanField(default=True)
@@ -92,7 +85,6 @@ class Carrot(Vegetable):
     pass
 
 
-@python_2_unicode_compatible
 class Mineral(models.Model):
     name = models.CharField(max_length=150)
     hardness = models.PositiveSmallIntegerField()
@@ -105,7 +97,7 @@ class Mineral(models.Model):
 
 class GeckoManager(models.Manager):
     def get_queryset(self):
-        return super(GeckoManager, self).get_queryset().filter(has_tail=True)
+        return super().get_queryset().filter(has_tail=True)
 
 
 class Gecko(models.Model):

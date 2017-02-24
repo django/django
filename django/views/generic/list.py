@@ -1,11 +1,8 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models.query import QuerySet
 from django.http import Http404
-from django.utils import six
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 
@@ -46,7 +43,7 @@ class MultipleObjectMixin(ContextMixin):
             )
         ordering = self.get_ordering()
         if ordering:
-            if isinstance(ordering, six.string_types):
+            if isinstance(ordering, str):
                 ordering = (ordering,)
             queryset = queryset.order_by(*ordering)
 
@@ -123,11 +120,11 @@ class MultipleObjectMixin(ContextMixin):
         else:
             return None
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
         """
         Get the context for this view.
         """
-        queryset = kwargs.pop('object_list', self.object_list)
+        queryset = object_list if object_list is not None else self.object_list
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
@@ -148,7 +145,7 @@ class MultipleObjectMixin(ContextMixin):
         if context_object_name is not None:
             context[context_object_name] = queryset
         context.update(kwargs)
-        return super(MultipleObjectMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class BaseListView(MultipleObjectMixin, View):
@@ -187,7 +184,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         a list. May not be called if render_to_response is overridden.
         """
         try:
-            names = super(MultipleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.

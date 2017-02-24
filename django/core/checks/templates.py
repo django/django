@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import copy
 
 from django.conf import settings
-from django.utils import six
 
 from . import Error, Tags, register
 
@@ -35,7 +31,7 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
     errors = []
     for conf in settings.TEMPLATES:
         string_if_invalid = conf.get('OPTIONS', {}).get('string_if_invalid', '')
-        if not isinstance(string_if_invalid, six.string_types):
+        if not isinstance(string_if_invalid, str):
             error = copy.copy(E002)
             error.msg = error.msg.format(string_if_invalid, type(string_if_invalid).__name__)
             errors.append(error)

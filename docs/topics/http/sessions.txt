@@ -810,7 +810,7 @@ to query the database for all active sessions for an account)::
             return CustomSession
 
         def create_model_instance(self, data):
-            obj = super(SessionStore, self).create_model_instance(data)
+            obj = super().create_model_instance(data)
             try:
                 account_id = int(data.get('_auth_user_id'))
             except (ValueError, TypeError):

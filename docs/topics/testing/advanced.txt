@@ -333,7 +333,7 @@ Let's take a look inside a couple of those files:
 .. snippet::
     :filename: runtests.py
 
-    #!/usr/bin/env python
+    #!/usr/bin/env python3
     import os
     import sys
 

@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import models
 
 
@@ -50,7 +47,6 @@ class ColumnTypes(models.Model):
     null_bool_field = models.NullBooleanField()
     char_field = models.CharField(max_length=10)
     null_char_field = models.CharField(max_length=10, blank=True, null=True)
-    comma_separated_int_field = models.CommaSeparatedIntegerField(max_length=99)
     date_field = models.DateField()
     date_time_field = models.DateTimeField()
     decimal_field = models.DecimalField(max_digits=6, decimal_places=1)
@@ -59,7 +55,7 @@ class ColumnTypes(models.Model):
     file_path_field = models.FilePathField()
     float_field = models.FloatField()
     int_field = models.IntegerField()
-    gen_ip_adress_field = models.GenericIPAddressField(protocol="ipv4")
+    gen_ip_address_field = models.GenericIPAddressField(protocol="ipv4")
     pos_int_field = models.PositiveIntegerField()
     pos_small_int_field = models.PositiveSmallIntegerField()
     slug_field = models.SlugField()

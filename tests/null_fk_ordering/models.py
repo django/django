@@ -5,10 +5,7 @@ Regression tests for proper working of ForeignKey(null=True). Tests these bugs:
 unexpected results
 
 """
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 # The first two models represent a very simple null FK ordering case.
@@ -16,7 +13,6 @@ class Author(models.Model):
     name = models.CharField(max_length=150)
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=150)
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
@@ -38,7 +34,6 @@ class Forum(models.Model):
     forum_name = models.CharField(max_length=32)
 
 
-@python_2_unicode_compatible
 class Post(models.Model):
     forum = models.ForeignKey(Forum, models.SET_NULL, null=True)
     title = models.CharField(max_length=32)
@@ -47,7 +42,6 @@ class Post(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class Comment(models.Model):
     post = models.ForeignKey(Post, models.SET_NULL, null=True)
     comment_text = models.CharField(max_length=250)

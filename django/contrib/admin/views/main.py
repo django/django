@@ -1,4 +1,3 @@
-import sys
 from collections import OrderedDict
 
 from django.contrib.admin import FieldListFilter
@@ -17,10 +16,9 @@ from django.core.exceptions import (
 from django.core.paginator import InvalidPage
 from django.db import models
 from django.urls import reverse
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 # Changelist settings
 ALL_VAR = 'all'
@@ -34,7 +32,7 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
-class ChangeList(object):
+class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin):
@@ -78,15 +76,15 @@ class ChangeList(object):
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
-            title = ugettext('Select %s')
+            title = gettext('Select %s')
         else:
-            title = ugettext('Select %s to change')
+            title = gettext('Select %s to change')
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 
     def get_filters_params(self, params=None):
         """
-        Returns all params except IGNORED_PARAMS
+        Return all params except IGNORED_PARAMS.
         """
         if not params:
             params = self.params
@@ -151,7 +149,7 @@ class ChangeList(object):
                 use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
         except FieldDoesNotExist as e:
-            six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
+            raise IncorrectLookupParameters(e) from e
 
     def get_query_string(self, new_params=None, remove=None):
         if new_params is None:
@@ -214,10 +212,10 @@ class ChangeList(object):
 
     def get_ordering_field(self, field_name):
         """
-        Returns the proper model field name corresponding to the given
+        Return the proper model field name corresponding to the given
         field_name to use for ordering. field_name may either be the name of a
         proper model field or the name of a method (on the admin or model) or a
-        callable with the 'admin_order_field' attribute. Returns None if no
+        callable with the 'admin_order_field' attribute. Return None if no
         proper model field name can be matched.
         """
         try:
@@ -236,8 +234,8 @@ class ChangeList(object):
 
     def get_ordering(self, request, queryset):
         """
-        Returns the list of ordering fields for the change list.
-        First we check the get_ordering() method in model admin, then we check
+        Return the list of ordering fields for the change list.
+        First check the get_ordering() method in model admin, then check
         the object's default ordering. Then, any manually-specified ordering
         from the query string overrides anything. Finally, a deterministic
         order is guaranteed by ensuring the primary key is used as the last
@@ -280,9 +278,8 @@ class ChangeList(object):
 
     def get_ordering_field_columns(self):
         """
-        Returns an OrderedDict of ordering field column numbers and asc/desc
+        Return an OrderedDict of ordering field column numbers and asc/desc.
         """
-
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()

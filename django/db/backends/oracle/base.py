@@ -3,20 +3,15 @@ Oracle database backend for Django.
 
 Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import os
 import platform
-import sys
-import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -28,7 +23,6 @@ def _setup_environment(environ):
         try:
             import ctypes
         except ImportError as e:
-            from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured("Error loading ctypes: %s; "
                                        "the Oracle backend requires ctypes to "
                                        "operate correctly under Cygwin." % e)
@@ -51,7 +45,6 @@ _setup_environment([
 try:
     import cx_Oracle as Database
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
 # Some of these import cx_Oracle, so import them after checking if it's installed.
@@ -64,7 +57,7 @@ from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime                          # NOQA isort:skip
 
 
-class _UninitializedOperatorsDescriptor(object):
+class _UninitializedOperatorsDescriptor:
 
     def __get__(self, instance, cls=None):
         # If connection.operators is looked up before a connection has been
@@ -92,7 +85,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BinaryField': 'BLOB',
         'BooleanField': 'NUMBER(1)',
         'CharField': 'NVARCHAR2(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'VARCHAR2(%(max_length)s)',
         'DateField': 'DATE',
         'DateTimeField': 'TIMESTAMP',
         'DecimalField': 'NUMBER(%(max_digits)s, %(decimal_places)s)',
@@ -183,7 +175,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
 
@@ -249,7 +241,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not self.get_autocommit():
             self.commit()
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
@@ -267,7 +259,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 x = e.args[0]
                 if hasattr(x, 'code') and hasattr(x, 'message') \
                    and x.code == 2091 and 'ORA-02291' in x.message:
-                    six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                    raise utils.IntegrityError(*tuple(e.args))
                 raise
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
@@ -312,7 +304,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return None
 
 
-class OracleParam(object):
+class OracleParam:
     """
     Wrapper object for formatting parameters for Oracle. If the string
     representation of the value is large enough (greater than 4000 characters)
@@ -327,18 +319,10 @@ class OracleParam(object):
         # without being converted by DateTimeField.get_db_prep_value.
         if settings.USE_TZ and (isinstance(param, datetime.datetime) and
                                 not isinstance(param, Oracle_datetime)):
-            if timezone.is_aware(param):
-                warnings.warn(
-                    "The Oracle database adapter received an aware datetime (%s), "
-                    "probably from cursor.execute(). Update your code to pass a "
-                    "naive datetime in the database connection's time zone (UTC by "
-                    "default).", RemovedInDjango20Warning)
-                param = param.astimezone(timezone.utc).replace(tzinfo=None)
             param = Oracle_datetime.from_datetime(param)
 
         string_size = 0
-        # Oracle doesn't recognize True and False correctly in Python 3.
-        # The conversion done below works both in 2 and 3.
+        # Oracle doesn't recognize True and False correctly.
         if param is True:
             param = 1
         elif param is False:
@@ -351,7 +335,7 @@ class OracleParam(object):
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
             self.force_bytes = force_text(param, cursor.charset, strings_only)
-            if isinstance(self.force_bytes, six.string_types):
+            if isinstance(self.force_bytes, str):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
         if hasattr(param, 'input_size'):
@@ -364,7 +348,7 @@ class OracleParam(object):
             self.input_size = None
 
 
-class VariableWrapper(object):
+class VariableWrapper:
     """
     An adapter class for cursor variables that prevents the wrapped object
     from being converted into a string when used to instantiate an OracleParam.
@@ -388,7 +372,7 @@ class VariableWrapper(object):
             setattr(self.var, key, value)
 
 
-class FormatStylePlaceholderCursor(object):
+class FormatStylePlaceholderCursor:
     """
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
     style. This fixes it -- but note that if you want to use a literal "%s" in
@@ -456,17 +440,12 @@ class FormatStylePlaceholderCursor(object):
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params
             # list. e.g. for input params = [0.75, 2, 0.75, 'sth', 0.75]
-            # params_dict = {
-            #   (2, <type 'int'>): ':arg2',
-            #   (0.75, <type 'float'>): ':arg1',
-            #   ('sth', <type 'str'>): ':arg0',
-            # }
+            # params_dict = {0.75: ':arg0', 2: ':arg1', 'sth': ':arg2'}
             # args = [':arg0', ':arg1', ':arg0', ':arg2', ':arg0']
             # params = {':arg0': 0.75, ':arg1': 2, ':arg2': 'sth'}
-            params = [(param, type(param)) for param in params]
             params_dict = {param: ':arg%d' % i for i, param in enumerate(set(params))}
             args = [params_dict[param] for param in params]
-            params = {value: key[0] for key, value in params_dict.items()}
+            params = {value: key for key, value in params_dict.items()}
             query = query % tuple(args)
         else:
             # Handle params as sequence
@@ -529,7 +508,7 @@ class FormatStylePlaceholderCursor(object):
         return CursorIterator(self.cursor)
 
 
-class CursorIterator(six.Iterator):
+class CursorIterator:
     """
     Cursor iterator wrapper that invokes our custom row factory.
     """
@@ -547,7 +526,7 @@ class CursorIterator(six.Iterator):
 
 def _rowfactory(row, cursor):
     # Cast numeric values as the appropriate Python type based upon the
-    # cursor description, and convert strings to unicode.
+    # cursor description.
     casted = []
     for value, desc in zip(row, cursor.description):
         if value is not None and desc[1] is Database.NUMBER:
@@ -579,18 +558,5 @@ def _rowfactory(row, cursor):
                 value = decimal.Decimal(value)
             else:
                 value = int(value)
-        elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
-                         Database.LONG_STRING):
-            value = to_unicode(value)
         casted.append(value)
     return tuple(casted)
-
-
-def to_unicode(s):
-    """
-    Convert strings to Unicode objects (and return all other data types
-    unchanged).
-    """
-    if isinstance(s, six.string_types):
-        return force_text(s)
-    return s

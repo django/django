@@ -9,9 +9,11 @@ a list of all possible variables.
 import importlib
 import os
 import time
+import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -67,13 +69,13 @@ class LazySettings(LazyObject):
             self.__dict__.clear()
         else:
             self.__dict__.pop(name, None)
-        super(LazySettings, self).__setattr__(name, value)
+        super().__setattr__(name, value)
 
     def __delattr__(self, name):
         """
         Delete a setting and clear it from cache if needed.
         """
-        super(LazySettings, self).__delattr__(name)
+        super().__delattr__(name)
         self.__dict__.pop(name, None)
 
     def configure(self, default_settings=global_settings, **options):
@@ -97,7 +99,7 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
 
-class Settings(object):
+class Settings:
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
@@ -128,6 +130,9 @@ class Settings(object):
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
+        if self.is_overridden('DEFAULT_CONTENT_TYPE'):
+            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -150,7 +155,7 @@ class Settings(object):
         }
 
 
-class UserSettingsHolder(object):
+class UserSettingsHolder:
     """
     Holder for user configured settings.
     """
@@ -173,12 +178,14 @@ class UserSettingsHolder(object):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        super(UserSettingsHolder, self).__setattr__(name, value)
+        if name == 'DEFAULT_CONTENT_TYPE':
+            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+        super().__setattr__(name, value)
 
     def __delattr__(self, name):
         self._deleted.add(name)
         if hasattr(self, name):
-            super(UserSettingsHolder, self).__delattr__(name)
+            super().__delattr__(name)
 
     def __dir__(self):
         return sorted(

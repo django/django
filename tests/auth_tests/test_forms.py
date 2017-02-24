@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import re
-from unittest import skipIf
+from unittest import mock
 
 from django import forms
 from django.contrib.auth.forms import (
@@ -17,11 +14,10 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
-from django.test import SimpleTestCase, TestCase, mock, override_settings
-from django.utils import six, translation
-from django.utils.encoding import force_text
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.utils import translation
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .models.custom_user import (
     CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
@@ -31,7 +27,7 @@ from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -54,7 +50,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [force_text(User._meta.get_field('username').error_messages['unique'])])
+                         [str(User._meta.get_field('username').error_messages['unique'])])
 
     def test_invalid_data(self):
         data = {
@@ -65,7 +61,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         validator = next(v for v in User._meta.get_field('username').validators if v.code == 'invalid')
-        self.assertEqual(form["username"].errors, [force_text(validator.message)])
+        self.assertEqual(form["username"].errors, [str(validator.message)])
 
     def test_password_verification(self):
         # The verification password is incorrect.
@@ -77,13 +73,13 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["password2"].errors,
-                         [force_text(form.error_messages['password_mismatch'])])
+                         [str(form.error_messages['password_mismatch'])])
 
     def test_both_passwords(self):
         # One (or both) passwords weren't given
         data = {'username': 'jsmith'}
         form = UserCreationForm(data)
-        required_error = [force_text(Field.default_error_messages['required'])]
+        required_error = [str(Field.default_error_messages['required'])]
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors, required_error)
         self.assertEqual(form['password2'].errors, required_error)
@@ -117,14 +113,10 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             'password2': 'test123',
         }
         form = UserCreationForm(data)
-        if six.PY3:
-            self.assertTrue(form.is_valid())
-            u = form.save()
-            self.assertEqual(u.username, '宝')
-        else:
-            self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
+        u = form.save()
+        self.assertEqual(u.username, '宝')
 
-    @skipIf(six.PY2, "Python 2 doesn't support unicode usernames by default.")
     def test_normalize_username(self):
         # The normalization happens in AbstractBaseUser.clean() and ModelForm
         # validation calls Model.clean().
@@ -140,7 +132,6 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertNotEqual(user.username, ohm_username)
         self.assertEqual(user.username, 'testΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
 
-    @skipIf(six.PY2, "Python 2 doesn't support unicode usernames by default.")
     def test_duplicate_normalized_unicode(self):
         """
         To prevent almost identical usernames, visually identical but differing
@@ -265,9 +256,9 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.non_field_errors(), [
-                force_text(form.error_messages['invalid_login'] % {
+                form.error_messages['invalid_login'] % {
                     'username': User._meta.get_field('username').verbose_name
-                })
+                }
             ]
         )
 
@@ -279,7 +270,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         }
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
+        self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
     def test_login_failed(self):
         signal_calls = []
@@ -308,7 +299,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             }
             form = AuthenticationForm(None, data)
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
+            self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
         # The user is inactive, but our custom form policy allows them to log in.
@@ -429,7 +420,7 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form["new_password2"].errors,
-            [force_text(form.error_messages['password_mismatch'])]
+            [str(form.error_messages['password_mismatch'])]
         )
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')
@@ -507,7 +498,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["old_password"].errors, [force_text(form.error_messages['password_incorrect'])])
+        self.assertEqual(form["old_password"].errors, [str(form.error_messages['password_incorrect'])])
 
     def test_password_verification(self):
         # The two new passwords do not match.
@@ -519,7 +510,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["new_password2"].errors, [force_text(form.error_messages['password_mismatch'])])
+        self.assertEqual(form["new_password2"].errors, [str(form.error_messages['password_mismatch'])])
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
@@ -565,7 +556,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
         validator = next(v for v in User._meta.get_field('username').validators if v.code == 'invalid')
-        self.assertEqual(form["username"].errors, [force_text(validator.message)])
+        self.assertEqual(form["username"].errors, [str(validator.message)])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the
@@ -573,7 +564,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
 
         class MyUserForm(UserChangeForm):
             def __init__(self, *args, **kwargs):
-                super(MyUserForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['groups'].help_text = 'These groups give users different permissions'
 
             class Meta(UserChangeForm.Meta):
@@ -654,7 +645,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(PasswordResetFormTest, cls).setUpClass()
+        super().setUpClass()
         # This cleanup is necessary because contrib.sites cache
         # makes tests interfere with each other, see #11505
         Site.objects.clear_cache()

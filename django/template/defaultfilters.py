@@ -1,29 +1,25 @@
 """Default variable filters."""
-from __future__ import unicode_literals
-
 import random as random_module
 import re
-import warnings
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
 from pprint import pformat
+from urllib.parse import quote
 
-from django.utils import formats, six
+from django.utils import formats
 from django.utils.dateformat import format, time_format
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
     strip_tags, urlize as _urlize,
 )
-from django.utils.http import urlquote
-from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
 )
 from django.utils.timesince import timesince, timeuntil
-from django.utils.translation import ugettext, ungettext
+from django.utils.translation import gettext, ngettext
 
 from .base import Variable, VariableDoesNotExist
 from .library import Library
@@ -37,14 +33,13 @@ register = Library()
 
 def stringfilter(func):
     """
-    Decorator for filters which should only receive unicode objects. The object
-    passed as the first positional argument will be converted to a unicode
-    object.
+    Decorator for filters which should only receive strings. The object
+    passed as the first positional argument will be converted to a string.
     """
     def _dec(*args, **kwargs):
         if args:
             args = list(args)
-            args[0] = force_text(args[0])
+            args[0] = str(args[0])
             if (isinstance(args[0], SafeData) and
                     getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
@@ -66,7 +61,7 @@ def stringfilter(func):
 @stringfilter
 def addslashes(value):
     """
-    Adds slashes before quotes. Useful for escaping strings in CSV, for
+    Add slashes before quotes. Useful for escaping strings in CSV, for
     example. Less useful for escaping JavaScript; use the ``escapejs``
     filter instead.
     """
@@ -76,37 +71,24 @@ def addslashes(value):
 @register.filter(is_safe=True)
 @stringfilter
 def capfirst(value):
-    """Capitalizes the first character of the value."""
+    """Capitalize the first character of the value."""
     return value and value[0].upper() + value[1:]
 
 
 @register.filter("escapejs")
 @stringfilter
 def escapejs_filter(value):
-    """Hex encodes characters for use in JavaScript strings."""
+    """Hex encode characters for use in JavaScript strings."""
     return escapejs(value)
-
-
-# Values for testing floatformat input against infinity and NaN representations,
-# which differ across platforms and Python versions.  Some (i.e. old Windows
-# ones) are not recognized by Decimal but we want to return them unchanged vs.
-# returning an empty string as we do for completely invalid input.  Note these
-# need to be built up from values that are not inf/nan, since inf/nan values do
-# not reload properly from .pyc files on Windows prior to some level of Python 2.5
-# (see Python Issue757815 and Issue1080440).
-pos_inf = 1e200 * 1e200
-neg_inf = -1e200 * 1e200
-nan = (1e200 * 1e200) // (1e200 * 1e200)
-special_floats = [str(pos_inf), str(neg_inf), str(nan)]
 
 
 @register.filter(is_safe=True)
 def floatformat(text, arg=-1):
     """
-    Displays a float to a specified number of decimal places.
+    Display a float to a specified number of decimal places.
 
-    If called without an argument, it displays the floating point number with
-    one decimal place -- but only if there's a decimal place to be displayed:
+    If called without an argument, display the floating point number with one
+    decimal place -- but only if there's a decimal place to be displayed:
 
     * num1 = 34.23234
     * num2 = 34.00000
@@ -115,35 +97,29 @@ def floatformat(text, arg=-1):
     * {{ num2|floatformat }} displays "34"
     * {{ num3|floatformat }} displays "34.3"
 
-    If arg is positive, it will always display exactly arg number of decimal
-    places:
+    If arg is positive, always display exactly arg number of decimal places:
 
     * {{ num1|floatformat:3 }} displays "34.232"
     * {{ num2|floatformat:3 }} displays "34.000"
     * {{ num3|floatformat:3 }} displays "34.260"
 
-    If arg is negative, it will display arg number of decimal places -- but
-    only if there are places to be displayed:
+    If arg is negative, display arg number of decimal places -- but only if
+    there are places to be displayed:
 
     * {{ num1|floatformat:"-3" }} displays "34.232"
     * {{ num2|floatformat:"-3" }} displays "34"
     * {{ num3|floatformat:"-3" }} displays "34.260"
 
-    If the input float is infinity or NaN, the (platform-dependent) string
-    representation of that value will be displayed.
+    If the input float is infinity or NaN, display the string representation
+    of that value.
     """
-
     try:
         input_val = repr(text)
         d = Decimal(input_val)
-    except UnicodeEncodeError:
-        return ''
     except InvalidOperation:
-        if input_val in special_floats:
-            return input_val
         try:
-            d = Decimal(force_text(float(text)))
-        except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
+            d = Decimal(str(float(text)))
+        except (ValueError, InvalidOperation, TypeError):
             return ''
     try:
         p = int(arg)
@@ -162,43 +138,40 @@ def floatformat(text, arg=-1):
         exp = Decimal(1)
     else:
         exp = Decimal('1.0') / (Decimal(10) ** abs(p))
-    try:
-        # Set the precision high enough to avoid an exception, see #15789.
-        tupl = d.as_tuple()
-        units = len(tupl[1])
-        units += -tupl[2] if m else tupl[2]
-        prec = abs(p) + units + 1
+    # Set the precision high enough to avoid an exception (#15789).
+    tupl = d.as_tuple()
+    units = len(tupl[1])
+    units += -tupl[2] if m else tupl[2]
+    prec = abs(p) + units + 1
 
-        # Avoid conversion to scientific notation by accessing `sign`, `digits`
-        # and `exponent` from `Decimal.as_tuple()` directly.
-        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
-        digits = [six.text_type(digit) for digit in reversed(digits)]
-        while len(digits) <= abs(exponent):
-            digits.append('0')
-        digits.insert(-exponent, '.')
-        if sign:
-            digits.append('-')
-        number = ''.join(reversed(digits))
-        return mark_safe(formats.number_format(number, abs(p)))
-    except InvalidOperation:
-        return input_val
+    # Avoid conversion to scientific notation by accessing `sign`, `digits`,
+    # and `exponent` from Decimal.as_tuple() directly.
+    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    digits = [str(digit) for digit in reversed(digits)]
+    while len(digits) <= abs(exponent):
+        digits.append('0')
+    digits.insert(-exponent, '.')
+    if sign:
+        digits.append('-')
+    number = ''.join(reversed(digits))
+    return mark_safe(formats.number_format(number, abs(p)))
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def iriencode(value):
-    """Escapes an IRI value for use in a URL."""
-    return force_text(iri_to_uri(value))
+    """Escape an IRI value for use in a URL."""
+    return iri_to_uri(value)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
 def linenumbers(value, autoescape=True):
-    """Displays text with line numbers."""
+    """Display text with line numbers."""
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = six.text_type(len(six.text_type(len(lines))))
+    width = str(len(str(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width + "d. %s") % (i + 1, line)
@@ -211,7 +184,7 @@ def linenumbers(value, autoescape=True):
 @register.filter(is_safe=True)
 @stringfilter
 def lower(value):
-    """Converts a string into all lowercase."""
+    """Convert a string into all lowercase."""
     return value.lower()
 
 
@@ -219,7 +192,7 @@ def lower(value):
 @stringfilter
 def make_list(value):
     """
-    Returns the value turned into a list.
+    Return the value turned into a list.
 
     For an integer, it's a list of digits.
     For a string, it's a list of characters.
@@ -231,9 +204,9 @@ def make_list(value):
 @stringfilter
 def slugify(value):
     """
-    Converts to ASCII. Converts spaces to hyphens. Removes characters that
-    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
-    Also strips leading and trailing whitespace.
+    Convert to ASCII. Convert spaces to hyphens. Remove characters that aren't
+    alphanumerics, underscores, or hyphens. Convert to lowercase. Also strip
+    leading and trailing whitespace.
     """
     return _slugify(value)
 
@@ -241,7 +214,7 @@ def slugify(value):
 @register.filter(is_safe=True)
 def stringformat(value, arg):
     """
-    Formats the variable according to the arg, a string formatting specifier.
+    Format the variable according to the arg, a string formatting specifier.
 
     This specifier uses Python string formating syntax, with the exception that
     the leading "%" is dropped.
@@ -250,7 +223,7 @@ def stringformat(value, arg):
     for documentation of Python string formatting.
     """
     try:
-        return ("%" + six.text_type(arg)) % value
+        return ("%" + str(arg)) % value
     except (ValueError, TypeError):
         return ""
 
@@ -258,7 +231,7 @@ def stringformat(value, arg):
 @register.filter(is_safe=True)
 @stringfilter
 def title(value):
-    """Converts a string into titlecase."""
+    """Convert a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
     return re.sub(r"\d([A-Z])", lambda m: m.group(0).lower(), t)
 
@@ -266,11 +239,7 @@ def title(value):
 @register.filter(is_safe=True)
 @stringfilter
 def truncatechars(value, arg):
-    """
-    Truncates a string after a certain number of characters.
-
-    Argument: Number of characters to truncate after.
-    """
+    """Truncate a string after `arg` number of characters."""
     try:
         length = int(arg)
     except ValueError:  # Invalid literal for int().
@@ -282,11 +251,8 @@ def truncatechars(value, arg):
 @stringfilter
 def truncatechars_html(value, arg):
     """
-    Truncates HTML after a certain number of chars.
-
-    Argument: Number of chars to truncate after.
-
-    Newlines in the HTML are preserved.
+    Truncate HTML after `arg` number of chars.
+    Preserve newlines in the HTML.
     """
     try:
         length = int(arg)
@@ -299,11 +265,8 @@ def truncatechars_html(value, arg):
 @stringfilter
 def truncatewords(value, arg):
     """
-    Truncates a string after a certain number of words.
-
-    Argument: Number of words to truncate after.
-
-    Newlines within the string are removed.
+    Truncate a string after `arg` number of words.
+    Remove newlines within the string.
     """
     try:
         length = int(arg)
@@ -316,11 +279,8 @@ def truncatewords(value, arg):
 @stringfilter
 def truncatewords_html(value, arg):
     """
-    Truncates HTML after a certain number of words.
-
-    Argument: Number of words to truncate after.
-
-    Newlines in the HTML are preserved.
+    Truncate HTML after `arg` number of words.
+    Preserve newlines in the HTML.
     """
     try:
         length = int(arg)
@@ -332,7 +292,7 @@ def truncatewords_html(value, arg):
 @register.filter(is_safe=False)
 @stringfilter
 def upper(value):
-    """Converts a string into all uppercase."""
+    """Convert a string into all uppercase."""
     return value.upper()
 
 
@@ -340,23 +300,23 @@ def upper(value):
 @stringfilter
 def urlencode(value, safe=None):
     """
-    Escapes a value for use in a URL.
+    Escape a value for use in a URL.
 
-    Takes an optional ``safe`` parameter used to determine the characters which
-    should not be escaped by Django's ``urlquote`` method. If not provided, the
-    default safe characters will be used (but an empty string can be provided
-    when *all* characters should be escaped).
+    The ``safe`` parameter determines the characters which should not be
+    escaped by Python's quote() function. If not provided, use the default safe
+    characters (but an empty string can be provided when *all* characters
+    should be escaped).
     """
     kwargs = {}
     if safe is not None:
         kwargs['safe'] = safe
-    return urlquote(value, **kwargs)
+    return quote(value, **kwargs)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
 def urlize(value, autoescape=True):
-    """Converts URLs in plain text into clickable links."""
+    """Convert URLs in plain text into clickable links."""
     return mark_safe(_urlize(value, nofollow=True, autoescape=autoescape))
 
 
@@ -364,7 +324,7 @@ def urlize(value, autoescape=True):
 @stringfilter
 def urlizetrunc(value, limit, autoescape=True):
     """
-    Converts URLs into clickable links, truncating URLs to the given character
+    Convert URLs into clickable links, truncating URLs to the given character
     limit, and adding 'rel=nofollow' attribute to discourage spamming.
 
     Argument: Length to truncate URLs to.
@@ -375,56 +335,42 @@ def urlizetrunc(value, limit, autoescape=True):
 @register.filter(is_safe=False)
 @stringfilter
 def wordcount(value):
-    """Returns the number of words."""
+    """Return the number of words."""
     return len(value.split())
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def wordwrap(value, arg):
-    """
-    Wraps words at specified line length.
-
-    Argument: number of characters to wrap the text at.
-    """
+    """Wrap words at `arg` line length."""
     return wrap(value, int(arg))
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def ljust(value, arg):
-    """
-    Left-aligns the value in a field of a given width.
-
-    Argument: field size.
-    """
+    """Left-align the value in a field of a given width."""
     return value.ljust(int(arg))
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def rjust(value, arg):
-    """
-    Right-aligns the value in a field of a given width.
-
-    Argument: field size.
-    """
+    """Right-align the value in a field of a given width."""
     return value.rjust(int(arg))
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def center(value, arg):
-    """Centers the value in a field of a given width."""
+    """Center the value in a field of a given width."""
     return value.center(int(arg))
 
 
 @register.filter
 @stringfilter
 def cut(value, arg):
-    """
-    Removes all values of arg from the given string.
-    """
+    """Remove all values of arg from the given string."""
     safe = isinstance(value, SafeData)
     value = value.replace(arg, '')
     if safe and arg != ';':
@@ -439,21 +385,15 @@ def cut(value, arg):
 @register.filter("escape", is_safe=True)
 @stringfilter
 def escape_filter(value):
-    """
-    Marks the value as a string that should be auto-escaped.
-    """
-    with warnings.catch_warnings():
-        # Ignore mark_for_escaping deprecation -- this will use
-        # conditional_escape() in Django 2.0.
-        warnings.simplefilter('ignore', category=RemovedInDjango20Warning)
-        return mark_for_escaping(value)
+    """Mark the value as a string that should be auto-escaped."""
+    return conditional_escape(value)
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def force_escape(value):
     """
-    Escapes a string's HTML. This returns a new string containing the escaped
+    Escape a string's HTML. Return a new string containing the escaped
     characters (as opposed to "escape", which marks the content for later
     possible escaping).
     """
@@ -464,7 +404,7 @@ def force_escape(value):
 @stringfilter
 def linebreaks_filter(value, autoescape=True):
     """
-    Replaces line breaks in plain text with appropriate HTML; a single
+    Replace line breaks in plain text with appropriate HTML; a single
     newline becomes an HTML line break (``<br />``) and a new line
     followed by a blank line becomes a paragraph break (``</p>``).
     """
@@ -476,7 +416,7 @@ def linebreaks_filter(value, autoescape=True):
 @stringfilter
 def linebreaksbr(value, autoescape=True):
     """
-    Converts all newlines in a piece of plain text to HTML line breaks
+    Convert all newlines in a piece of plain text to HTML line breaks
     (``<br />``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
@@ -489,26 +429,24 @@ def linebreaksbr(value, autoescape=True):
 @register.filter(is_safe=True)
 @stringfilter
 def safe(value):
-    """
-    Marks the value as a string that should not be auto-escaped.
-    """
+    """Mark the value as a string that should not be auto-escaped."""
     return mark_safe(value)
 
 
 @register.filter(is_safe=True)
 def safeseq(value):
     """
-    A "safe" filter for sequences. Marks each element in the sequence,
-    individually, as safe, after converting them to unicode. Returns a list
+    A "safe" filter for sequences. Mark each element in the sequence,
+    individually, as safe, after converting them to strings. Return a list
     with the results.
     """
-    return [mark_safe(force_text(obj)) for obj in value]
+    return [mark_safe(str(obj)) for obj in value]
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def striptags(value):
-    """Strips all [X]HTML tags."""
+    """Strip all [X]HTML tags."""
     return strip_tags(value)
 
 
@@ -545,7 +483,7 @@ def _property_resolver(arg):
 @register.filter(is_safe=False)
 def dictsort(value, arg):
     """
-    Takes a list of dicts, returns that list sorted by the property given in
+    Given a list of dicts, return that list sorted by the property given in
     the argument.
     """
     try:
@@ -557,7 +495,7 @@ def dictsort(value, arg):
 @register.filter(is_safe=False)
 def dictsortreversed(value, arg):
     """
-    Takes a list of dicts, returns that list sorted in reverse order by the
+    Given a list of dicts, return that list sorted in reverse order by the
     property given in the argument.
     """
     try:
@@ -568,7 +506,7 @@ def dictsortreversed(value, arg):
 
 @register.filter(is_safe=False)
 def first(value):
-    """Returns the first item in a list."""
+    """Return the first item in a list."""
     try:
         return value[0]
     except IndexError:
@@ -577,10 +515,7 @@ def first(value):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 def join(value, arg, autoescape=True):
-    """
-    Joins a list with a string, like Python's ``str.join(list)``.
-    """
-    value = map(force_text, value)
+    """Join a list with a string, like Python's ``str.join(list)``."""
     if autoescape:
         value = [conditional_escape(v) for v in value]
     try:
@@ -592,7 +527,7 @@ def join(value, arg, autoescape=True):
 
 @register.filter(is_safe=True)
 def last(value):
-    "Returns the last item in a list"
+    """Return the last item in a list."""
     try:
         return value[-1]
     except IndexError:
@@ -601,7 +536,7 @@ def last(value):
 
 @register.filter(is_safe=False)
 def length(value):
-    """Returns the length of the value - useful for lists."""
+    """Return the length of the value - useful for lists."""
     try:
         return len(value)
     except (ValueError, TypeError):
@@ -610,7 +545,7 @@ def length(value):
 
 @register.filter(is_safe=False)
 def length_is(value, arg):
-    """Returns a boolean of whether the value's length is the argument."""
+    """Return a boolean of whether the value's length is the argument."""
     try:
         return len(value) == int(arg)
     except (ValueError, TypeError):
@@ -619,18 +554,14 @@ def length_is(value, arg):
 
 @register.filter(is_safe=True)
 def random(value):
-    """Returns a random item from the list."""
+    """Return a random item from the list."""
     return random_module.choice(value)
 
 
 @register.filter("slice", is_safe=True)
 def slice_filter(value, arg):
     """
-    Returns a slice of the list.
-
-    Uses the same syntax as Python's list slicing; see
-    http://www.diveintopython3.net/native-datatypes.html#slicinglists
-    for an introduction.
+    Return a slice of the list using the same syntax as Python's list slicing.
     """
     try:
         bits = []
@@ -648,12 +579,12 @@ def slice_filter(value, arg):
 @register.filter(is_safe=True, needs_autoescape=True)
 def unordered_list(value, autoescape=True):
     """
-    Recursively takes a self-nested list and returns an HTML unordered list --
+    Recursively take a self-nested list and return an HTML unordered list --
     WITHOUT opening and closing <ul> tags.
 
-    The list is assumed to be in the proper format. For example, if ``var``
-    contains: ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``,
-    then ``{{ var|unordered_list }}`` would return::
+    Assume the list is in the proper format. For example, if ``var`` contains:
+    ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
+    ``{{ var|unordered_list }}`` returns::
 
         <li>States
         <ul>
@@ -683,7 +614,7 @@ def unordered_list(value, autoescape=True):
                 except StopIteration:
                     yield item, None
                     break
-                if not isinstance(next_item, six.string_types):
+                if not isinstance(next_item, str):
                     try:
                         iter(next_item)
                     except TypeError:
@@ -706,7 +637,7 @@ def unordered_list(value, autoescape=True):
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
                     indent, list_formatter(children, tabs + 1), indent, indent)
             output.append('%s<li>%s%s</li>' % (
-                indent, escaper(force_text(item)), sublist))
+                indent, escaper(item), sublist))
         return '\n'.join(output)
 
     return mark_safe(list_formatter(value))
@@ -718,7 +649,7 @@ def unordered_list(value, autoescape=True):
 
 @register.filter(is_safe=False)
 def add(value, arg):
-    """Adds the arg to the value."""
+    """Add the arg to the value."""
     try:
         return int(value) + int(arg)
     except (ValueError, TypeError):
@@ -731,8 +662,8 @@ def add(value, arg):
 @register.filter(is_safe=False)
 def get_digit(value, arg):
     """
-    Given a whole number, returns the requested digit of it, where 1 is the
-    right-most digit, 2 is the second-right-most digit, etc. Returns the
+    Given a whole number, return the requested digit of it, where 1 is the
+    right-most digit, 2 is the second-right-most digit, etc. Return the
     original value for invalid input (if input or argument is not an integer,
     or if argument is less than 1). Otherwise, output is always an integer.
     """
@@ -755,7 +686,7 @@ def get_digit(value, arg):
 
 @register.filter(expects_localtime=True, is_safe=False)
 def date(value, arg=None):
-    """Formats a date according to the given format."""
+    """Format a date according to the given format."""
     if value in (None, ''):
         return ''
     try:
@@ -769,7 +700,7 @@ def date(value, arg=None):
 
 @register.filter(expects_localtime=True, is_safe=False)
 def time(value, arg=None):
-    """Formats a time according to the given format."""
+    """Format a time according to the given format."""
     if value in (None, ''):
         return ''
     try:
@@ -783,7 +714,7 @@ def time(value, arg=None):
 
 @register.filter("timesince", is_safe=False)
 def timesince_filter(value, arg=None):
-    """Formats a date as the time since that date (i.e. "4 days, 6 hours")."""
+    """Format a date as the time since that date (i.e. "4 days, 6 hours")."""
     if not value:
         return ''
     try:
@@ -796,7 +727,7 @@ def timesince_filter(value, arg=None):
 
 @register.filter("timeuntil", is_safe=False)
 def timeuntil_filter(value, arg=None):
-    """Formats a date as the time until that date (i.e. "4 days, 6 hours")."""
+    """Format a date as the time until that date (i.e. "4 days, 6 hours")."""
     if not value:
         return ''
     try:
@@ -825,15 +756,15 @@ def default_if_none(value, arg):
 
 @register.filter(is_safe=False)
 def divisibleby(value, arg):
-    """Returns True if the value is divisible by the argument."""
+    """Return True if the value is divisible by the argument."""
     return int(value) % int(arg) == 0
 
 
 @register.filter(is_safe=False)
 def yesno(value, arg=None):
     """
-    Given a string mapping values for true, false and (optionally) None,
-    returns one of those strings according to the value:
+    Given a string mapping values for true, false, and (optionally) None,
+    return one of those strings according to the value:
 
     ==========  ======================  ==================================
     Value       Argument                Outputs
@@ -846,7 +777,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
-        arg = ugettext('yes,no,maybe')
+        arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
         return value  # Invalid arg.
@@ -869,13 +800,13 @@ def yesno(value, arg=None):
 @register.filter(is_safe=True)
 def filesizeformat(bytes_):
     """
-    Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
+    Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
     102 bytes, etc.).
     """
     try:
         bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
-        value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
     def filesize_number_format(value):
@@ -892,17 +823,17 @@ def filesizeformat(bytes_):
         bytes_ = -bytes_  # Allow formatting of negative numbers.
 
     if bytes_ < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+        value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
     elif bytes_ < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+        value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+        value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
     elif bytes_ < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+        value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
     elif bytes_ < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
+        value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
     else:
-        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
+        value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
 
     if negative:
         value = "-%s" % value
@@ -912,26 +843,25 @@ def filesizeformat(bytes_):
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
     """
-    Returns a plural suffix if the value is not 1. By default, 's' is used as
-    the suffix:
+    Return a plural suffix if the value is not 1. By default, use 's' as the
+    suffix:
 
-    * If value is 0, vote{{ value|pluralize }} displays "0 votes".
-    * If value is 1, vote{{ value|pluralize }} displays "1 vote".
-    * If value is 2, vote{{ value|pluralize }} displays "2 votes".
+    * If value is 0, vote{{ value|pluralize }} display "0 votes".
+    * If value is 1, vote{{ value|pluralize }} display "1 vote".
+    * If value is 2, vote{{ value|pluralize }} display "2 votes".
 
-    If an argument is provided, that string is used instead:
+    If an argument is provided, use that string instead:
 
-    * If value is 0, class{{ value|pluralize:"es" }} displays "0 classes".
-    * If value is 1, class{{ value|pluralize:"es" }} displays "1 class".
-    * If value is 2, class{{ value|pluralize:"es" }} displays "2 classes".
+    * If value is 0, class{{ value|pluralize:"es" }} display "0 classes".
+    * If value is 1, class{{ value|pluralize:"es" }} display "1 class".
+    * If value is 2, class{{ value|pluralize:"es" }} display "2 classes".
 
-    If the provided argument contains a comma, the text before the comma is
-    used for the singular case and the text after the comma is used for the
-    plural case:
+    If the provided argument contains a comma, use the text before the comma
+    for the singular case and the text after the comma for the plural case:
 
-    * If value is 0, cand{{ value|pluralize:"y,ies" }} displays "0 candies".
-    * If value is 1, cand{{ value|pluralize:"y,ies" }} displays "1 candy".
-    * If value is 2, cand{{ value|pluralize:"y,ies" }} displays "2 candies".
+    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "0 candies".
+    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "1 candy".
+    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "2 candies".
     """
     if ',' not in arg:
         arg = ',' + arg
@@ -956,7 +886,7 @@ def pluralize(value, arg='s'):
 
 @register.filter("phone2numeric", is_safe=True)
 def phone2numeric_filter(value):
-    """Takes a phone number and converts it in to its numerical equivalent."""
+    """Take a phone number and converts it in to its numerical equivalent."""
     return phone2numeric(value)
 
 
@@ -966,4 +896,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s: %s" % (e.__class__.__name__, force_text(e, errors="replace"))
+        return "Error in formatting: %s: %s" % (e.__class__.__name__, e)

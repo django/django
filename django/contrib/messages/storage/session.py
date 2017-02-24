@@ -5,12 +5,11 @@ from django.contrib.messages.storage.base import BaseStorage
 from django.contrib.messages.storage.cookie import (
     MessageDecoder, MessageEncoder,
 )
-from django.utils import six
 
 
 class SessionStorage(BaseStorage):
     """
-    Stores messages in the session (that is, django.contrib.sessions).
+    Store messages in the session (that is, django.contrib.sessions).
     """
     session_key = '_messages'
 
@@ -19,11 +18,11 @@ class SessionStorage(BaseStorage):
             "message storage requires session middleware to be installed, "\
             "and come before the message middleware in the "\
             "MIDDLEWARE%s list." % ("_CLASSES" if settings.MIDDLEWARE is None else "")
-        super(SessionStorage, self).__init__(request, *args, **kwargs)
+        super().__init__(request, *args, **kwargs)
 
     def _get(self, *args, **kwargs):
         """
-        Retrieves a list of messages from the request's session.  This storage
+        Retrieve a list of messages from the request's session. This storage
         always stores everything it is given, so return True for the
         all_retrieved flag.
         """
@@ -31,7 +30,7 @@ class SessionStorage(BaseStorage):
 
     def _store(self, messages, response, *args, **kwargs):
         """
-        Stores a list of messages to the request's session.
+        Store a list of messages to the request's session.
         """
         if messages:
             self.request.session[self.session_key] = self.serialize_messages(messages)
@@ -44,6 +43,6 @@ class SessionStorage(BaseStorage):
         return encoder.encode(messages)
 
     def deserialize_messages(self, data):
-        if data and isinstance(data, six.string_types):
+        if data and isinstance(data, str):
             return json.loads(data, cls=MessageDecoder)
         return data

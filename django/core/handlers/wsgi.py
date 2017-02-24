@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import cgi
 import codecs
 import re
@@ -10,23 +8,14 @@ from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.urls import set_script_prefix
-from django.utils import six
-from django.utils.encoding import (
-    force_str, force_text, repercent_broken_unicode,
-)
+from django.utils.encoding import force_text, repercent_broken_unicode
 from django.utils.functional import cached_property
-
-# encode() and decode() expect the charset to be a native string.
-ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
 
 _slashes_re = re.compile(br'/+')
 
 
-class LimitedStream(object):
-    '''
-    LimitedStream wraps another stream in order to not allow reading from it
-    past specified amount of bytes.
-    '''
+class LimitedStream:
+    """Wrap another stream to disallow reading it past a number of bytes."""
     def __init__(self, stream, limit, buf_size=64 * 1024 * 1024):
         self.stream = stream
         self.remaining = limit
@@ -147,7 +136,7 @@ class WSGIHandler(base.BaseHandler):
     request_class = WSGIRequest
 
     def __init__(self, *args, **kwargs):
-        super(WSGIHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.load_middleware()
 
     def __call__(self, environ, start_response):
@@ -159,28 +148,26 @@ class WSGIHandler(base.BaseHandler):
         response._handler_class = self.__class__
 
         status = '%d %s' % (response.status_code, response.reason_phrase)
-        response_headers = [(str(k), str(v)) for k, v in response.items()]
+        response_headers = list(response.items())
         for c in response.cookies.values():
-            response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
-        start_response(force_str(status), response_headers)
+            response_headers.append(('Set-Cookie', c.output(header='')))
+        start_response(status, response_headers)
         if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
             response = environ['wsgi.file_wrapper'](response.file_to_stream)
         return response
 
 
 def get_path_info(environ):
-    """
-    Returns the HTTP request's PATH_INFO as a unicode string.
-    """
+    """Return the HTTP request's PATH_INFO as a string."""
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    return repercent_broken_unicode(path_info).decode(UTF_8)
+    return repercent_broken_unicode(path_info).decode()
 
 
 def get_script_name(environ):
     """
-    Returns the equivalent of the HTTP request's SCRIPT_NAME environment
-    variable. If Apache mod_rewrite has been used, returns what would have been
+    Return the equivalent of the HTTP request's SCRIPT_NAME environment
+    variable. If Apache mod_rewrite is used, return what would have been
     the script name prior to any rewriting (so it's the script name as seen
     from the client's perspective), unless the FORCE_SCRIPT_NAME setting is
     set (to anything).
@@ -207,29 +194,27 @@ def get_script_name(environ):
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    return script_name.decode(UTF_8)
+    return script_name.decode()
 
 
 def get_bytes_from_wsgi(environ, key, default):
     """
     Get a value from the WSGI environ dictionary as bytes.
 
-    key and default should be str objects. Under Python 2 they may also be
-    unicode objects provided they only contain ASCII characters.
+    key and default should be strings.
     """
-    value = environ.get(str(key), str(default))
-    # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
-    # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
-    # is the default. Re-encode to recover the original bytestring.
-    return value.encode(ISO_8859_1) if six.PY3 else value
+    value = environ.get(key, default)
+    # Non-ASCII values in the WSGI environ are arbitrarily decoded with
+    # ISO-8859-1. This is wrong for Django websites where UTF-8 is the default.
+    # Re-encode to recover the original bytestring.
+    return value.encode('iso-8859-1')
 
 
 def get_str_from_wsgi(environ, key, default):
     """
     Get a value from the WSGI environ dictionary as str.
 
-    key and default should be str objects. Under Python 2 they may also be
-    unicode objects provided they only contain ASCII characters.
+    key and default should be str objects.
     """
     value = get_bytes_from_wsgi(environ, key, default)
-    return value.decode(UTF_8, errors='replace') if six.PY3 else value
+    return value.decode(errors='replace')

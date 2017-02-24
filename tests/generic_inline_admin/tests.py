@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -18,7 +15,7 @@ from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -389,11 +386,11 @@ class NoInlineDeletionTest(SimpleTestCase):
         self.assertFalse(formset.can_delete)
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
 

@@ -1,17 +1,12 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -32,9 +27,9 @@ DEFAULT_MAX_NUM = 1000
 
 class ManagementForm(Form):
     """
-    ``ManagementForm`` is used to keep track of how many form instances
-    are displayed on the page. If adding new forms via javascript, you should
-    increment the count field of this form as well.
+    Keep track of how many form instances are displayed on the page. If adding
+    new forms via JavaScript, you should increment the count field of this form
+    as well.
     """
     def __init__(self, *args, **kwargs):
         self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
@@ -44,12 +39,11 @@ class ManagementForm(Form):
         # code. The POST value of them returned from the client is not checked.
         self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
-        super(ManagementForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 @html_safe
-@python_2_unicode_compatible
-class BaseFormSet(object):
+class BaseFormSet:
     """
     A collection of instances of the same Form class.
     """
@@ -70,26 +64,26 @@ class BaseFormSet(object):
         return self.as_table()
 
     def __iter__(self):
-        """Yields the forms in the order they should be rendered"""
+        """Yield the forms in the order they should be rendered."""
         return iter(self.forms)
 
     def __getitem__(self, index):
-        """Returns the form at the given index, based on the rendering order"""
+        """Return the form at the given index, based on the rendering order."""
         return self.forms[index]
 
     def __len__(self):
         return len(self.forms)
 
     def __bool__(self):
-        """All formsets have a management form which is not included in the length"""
+        """
+        Return True since all formsets have a management form which is not
+        included in the length.
+        """
         return True
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
     @cached_property
     def management_form(self):
-        """Returns the ManagementForm instance for this FormSet."""
+        """Return the ManagementForm instance for this FormSet."""
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
@@ -107,7 +101,7 @@ class BaseFormSet(object):
         return form
 
     def total_form_count(self):
-        """Returns the total number of forms in this FormSet."""
+        """Return the total number of forms in this FormSet."""
         if self.is_bound:
             # return absolute_max if it is lower than the actual total form
             # count in the data; this is DoS protection to prevent clients
@@ -126,7 +120,7 @@ class BaseFormSet(object):
         return total_forms
 
     def initial_form_count(self):
-        """Returns the number of forms that are required in this FormSet."""
+        """Return the number of forms that are required in this FormSet."""
         if self.is_bound:
             return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
         else:
@@ -136,9 +130,7 @@ class BaseFormSet(object):
 
     @cached_property
     def forms(self):
-        """
-        Instantiate forms at first property access.
-        """
+        """Instantiate forms at first property access."""
         # DoS protection is included in total_form_count()
         forms = [self._construct_form(i, **self.get_form_kwargs(i))
                  for i in range(self.total_form_count())]
@@ -154,9 +146,7 @@ class BaseFormSet(object):
         return self.form_kwargs.copy()
 
     def _construct_form(self, i, **kwargs):
-        """
-        Instantiates and returns the i-th form instance in a formset.
-        """
+        """Instantiate and return the i-th form instance in a formset."""
         defaults = {
             'auto_id': self.auto_id,
             'prefix': self.add_prefix(i),
@@ -208,7 +198,7 @@ class BaseFormSet(object):
     @property
     def cleaned_data(self):
         """
-        Returns a list of form.cleaned_data dicts for every form in self.forms.
+        Return a list of form.cleaned_data dicts for every form in self.forms.
         """
         if not self.is_valid():
             raise AttributeError("'%s' object has no attribute 'cleaned_data'" % self.__class__.__name__)
@@ -216,9 +206,7 @@ class BaseFormSet(object):
 
     @property
     def deleted_forms(self):
-        """
-        Returns a list of forms that have been marked for deletion.
-        """
+        """Return a list of forms that have been marked for deletion."""
         if not self.is_valid() or not self.can_delete:
             return []
         # construct _deleted_form_indexes which is just a list of form indexes
@@ -237,8 +225,8 @@ class BaseFormSet(object):
     @property
     def ordered_forms(self):
         """
-        Returns a list of form in the order specified by the incoming data.
-        Raises an AttributeError if ordering is not allowed.
+        Return a list of form in the order specified by the incoming data.
+        Raise an AttributeError if ordering is not allowed.
         """
         if not self.is_valid() or not self.can_order:
             raise AttributeError("'%s' object has no attribute 'ordered_forms'" % self.__class__.__name__)
@@ -278,8 +266,8 @@ class BaseFormSet(object):
 
     def non_form_errors(self):
         """
-        Returns an ErrorList of errors that aren't associated with a particular
-        form -- i.e., from formset.clean(). Returns an empty ErrorList if there
+        Return an ErrorList of errors that aren't associated with a particular
+        form -- i.e., from formset.clean(). Return an empty ErrorList if there
         are none.
         """
         if self._non_form_errors is None:
@@ -288,30 +276,22 @@ class BaseFormSet(object):
 
     @property
     def errors(self):
-        """
-        Returns a list of form.errors for every form in self.forms.
-        """
+        """Return a list of form.errors for every form in self.forms."""
         if self._errors is None:
             self.full_clean()
         return self._errors
 
     def total_error_count(self):
-        """
-        Returns the number of errors across all forms in the formset.
-        """
+        """Return the number of errors across all forms in the formset."""
         return len(self.non_form_errors()) +\
             sum(len(form_errors) for form_errors in self.errors)
 
     def _should_delete_form(self, form):
-        """
-        Returns whether or not the form was marked for deletion.
-        """
+        """Return whether or not the form was marked for deletion."""
         return form.cleaned_data.get(DELETION_FIELD_NAME, False)
 
     def is_valid(self):
-        """
-        Returns True if every form in self.forms is valid.
-        """
+        """Return True if every form in self.forms is valid."""
         if not self.is_bound:
             return False
         # We loop over every form.errors here rather than short circuiting on the
@@ -331,7 +311,7 @@ class BaseFormSet(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors and
+        Clean all of self.data and populate self._errors and
         self._non_form_errors.
         """
         self._errors = []
@@ -350,14 +330,14 @@ class BaseFormSet(object):
             if (self.validate_max and
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                     self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
-                raise ValidationError(ungettext(
+                raise ValidationError(ngettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
                     self.total_form_count() - len(self.deleted_forms) - empty_forms_count < self.min_num):
-                raise ValidationError(ungettext(
+                raise ValidationError(ngettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
                     code='too_few_forms')
@@ -376,9 +356,7 @@ class BaseFormSet(object):
         pass
 
     def has_changed(self):
-        """
-        Returns true if data in any form differs from initial.
-        """
+        """Return True if data in any form differs from initial."""
         return any(form.has_changed() for form in self)
 
     def add_fields(self, form, index):
@@ -397,8 +375,8 @@ class BaseFormSet(object):
 
     def is_multipart(self):
         """
-        Returns True if the formset needs to be multipart, i.e. it
-        has FileInput. Otherwise, False.
+        Return True if the formset needs to be multipart, i.e. it
+        has FileInput, or False otherwise.
         """
         if self.forms:
             return self.forms[0].is_multipart()
@@ -415,22 +393,22 @@ class BaseFormSet(object):
             return self.empty_form.media
 
     def as_table(self):
-        "Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."
+        "Return this formset rendered as HTML <tr>s -- excluding the <table></table>."
         # XXX: there is no semantic division between forms here, there
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join(form.as_table() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_p(self):
-        "Returns this formset rendered as HTML <p>s."
+        "Return this formset rendered as HTML <p>s."
         forms = ' '.join(form.as_p() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_ul(self):
-        "Returns this formset rendered as HTML <li>s."
+        "Return this formset rendered as HTML <li>s."
         forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
@@ -450,11 +428,11 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
              'min_num': min_num, 'max_num': max_num,
              'absolute_max': absolute_max, 'validate_min': validate_min,
              'validate_max': validate_max}
-    return type(form.__name__ + str('FormSet'), (formset,), attrs)
+    return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 
 def all_valid(formsets):
-    """Returns true if every formset in formsets is valid."""
+    """Return True if every formset in formsets is valid."""
     valid = True
     for formset in formsets:
         if not formset.is_valid():

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.aggregates import Sum
 from django.db.models.expressions import F
 from django.test import TestCase

@@ -40,9 +40,7 @@ from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
@@ -64,7 +62,7 @@ class DataSource(GDALBase):
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, six.string_types):
+        if isinstance(ds_input, str):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -93,7 +91,7 @@ class DataSource(GDALBase):
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, six.string_types):
+        if isinstance(index, str):
             layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
             if not layer:
                 raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
@@ -106,20 +104,20 @@ class DataSource(GDALBase):
         return Layer(layer, self)
 
     def __len__(self):
-        "Returns the number of layers within the data source."
+        "Return the number of layers within the data source."
         return self.layer_count
 
     def __str__(self):
-        "Returns OGR GetName and Driver for the Data Source."
-        return '%s (%s)' % (self.name, str(self.driver))
+        "Return OGR GetName and Driver for the Data Source."
+        return '%s (%s)' % (self.name, self.driver)
 
     @property
     def layer_count(self):
-        "Returns the number of layers in the data source."
+        "Return the number of layers in the data source."
         return capi.get_layer_count(self._ptr)
 
     @property
     def name(self):
-        "Returns the name of the data source."
+        "Return the name of the data source."
         name = capi.get_ds_name(self._ptr)
         return force_text(name, self.encoding, strings_only=True)

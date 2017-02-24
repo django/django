@@ -2,13 +2,12 @@ import os
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils._os import upath
 from django.utils.module_loading import module_has_submodule
 
 MODELS_MODULE_NAME = 'models'
 
 
-class AppConfig(object):
+class AppConfig:
     """
     Class representing a Django application and its configuration.
     """
@@ -18,7 +17,7 @@ class AppConfig(object):
         self.name = app_name
 
         # Root module for the application eg. <module 'django.contrib.admin'
-        # from 'django/contrib/admin/__init__.pyc'>.
+        # from 'django/contrib/admin/__init__.py'>.
         self.module = app_module
 
         # Reference to the Apps registry that holds this AppConfig. Set by the
@@ -38,13 +37,12 @@ class AppConfig(object):
             self.verbose_name = self.label.title()
 
         # Filesystem path to the application directory eg.
-        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. Unicode on
-        # Python 2 and a str on Python 3.
+        # '/path/to/django/contrib/admin'.
         if not hasattr(self, 'path'):
             self.path = self._path_from_module(app_module)
 
         # Module containing models eg. <module 'django.contrib.admin.models'
-        # from 'django/contrib/admin/models.pyc'>. Set by import_models().
+        # from 'django/contrib/admin/models.py'>. Set by import_models().
         # None if the application doesn't have a models module.
         self.models_module = None
 
@@ -59,8 +57,8 @@ class AppConfig(object):
         """Attempt to determine app's filesystem path from its module."""
         # See #21874 for extended discussion of the behavior of this method in
         # various cases.
-        # Convert paths to list because Python 3's _NamespacePath does not
-        # support indexing.
+        # Convert paths to list because Python's _NamespacePath doesn't support
+        # indexing.
         paths = list(getattr(module, '__path__', []))
         if len(paths) != 1:
             filename = getattr(module, '__file__', None)
@@ -80,7 +78,7 @@ class AppConfig(object):
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "
                 "with a 'path' class attribute." % (module,))
-        return upath(paths[0])
+        return paths[0]
 
     @classmethod
     def create(cls, entry):

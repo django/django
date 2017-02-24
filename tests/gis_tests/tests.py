@@ -1,9 +1,7 @@
-import sys
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import ProgrammingError
-from django.utils import six
 
 try:
     from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
@@ -19,11 +17,11 @@ except ImproperlyConfigured as e:
     if e.args and e.args[0].startswith('Could not import user-defined GEOMETRY_BACKEND'):
         HAS_POSTGRES = False
     else:
-        six.reraise(*sys.exc_info())
+        raise
 
 
 if HAS_POSTGRES:
-    class FakeConnection(object):
+    class FakeConnection:
         def __init__(self):
             self.settings_dict = {
                 'NAME': 'test',

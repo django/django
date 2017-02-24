@@ -28,8 +28,6 @@ allows the field to have two "empty values", but it's important for the
 
 .. class:: Cast(expression, output_field)
 
-.. versionadded:: 1.10
-
 Forces the result type of ``expression`` to be the one from ``output_field``.
 
 Usage example::
@@ -280,8 +278,6 @@ Date Functions
 ==============
 
 .. module:: django.db.models.functions.datetime
-
-.. versionadded:: 1.10
 
 We'll be using the following model in examples of each function::
 

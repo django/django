@@ -1,16 +1,16 @@
-from __future__ import unicode_literals
+from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text
+from django.utils.translation import gettext_lazy as _
 
 
 class ContentTypeManager(models.Manager):
     use_in_migrations = True
 
     def __init__(self, *args, **kwargs):
-        super(ContentTypeManager, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Cache shared by all the get_for_* methods to speed up
         # ContentType retrieval.
         self._cache = {}
@@ -34,7 +34,7 @@ class ContentTypeManager(models.Manager):
 
     def get_for_model(self, model, for_concrete_model=True):
         """
-        Returns the ContentType object for a given model, creating the
+        Return the ContentType object for a given model, creating the
         ContentType if necessary. Lookups are cached so that subsequent lookups
         for the same model don't hit the database.
         """
@@ -60,17 +60,16 @@ class ContentTypeManager(models.Manager):
         self._add_to_cache(self.db, ct)
         return ct
 
-    def get_for_models(self, *models, **kwargs):
+    def get_for_models(self, *models, for_concrete_models=True):
         """
-        Given *models, returns a dictionary mapping {model: content_type}.
+        Given *models, return a dictionary mapping {model: content_type}.
         """
-        for_concrete_models = kwargs.pop('for_concrete_models', True)
-        # Final results
         results = {}
-        # models that aren't already in the cache
+        # Models that aren't already in the cache.
         needed_app_labels = set()
         needed_models = set()
-        needed_opts = set()
+        # Mapping of opts to the list of models requiring it.
+        needed_opts = defaultdict(list)
         for model in models:
             opts = self._get_opts(model, for_concrete_models)
             try:
@@ -78,33 +77,35 @@ class ContentTypeManager(models.Manager):
             except KeyError:
                 needed_app_labels.add(opts.app_label)
                 needed_models.add(opts.model_name)
-                needed_opts.add(opts)
+                needed_opts[opts].append(model)
             else:
                 results[model] = ct
         if needed_opts:
+            # Lookup required content types from the DB.
             cts = self.filter(
                 app_label__in=needed_app_labels,
                 model__in=needed_models
             )
             for ct in cts:
                 model = ct.model_class()
-                if model._meta in needed_opts:
+                opts_models = needed_opts.pop(ct.model_class()._meta, [])
+                for model in opts_models:
                     results[model] = ct
-                    needed_opts.remove(model._meta)
                 self._add_to_cache(self.db, ct)
-        for opts in needed_opts:
-            # These weren't in the cache, or the DB, create them.
+        # Create content types that weren't in the cache or DB.
+        for opts, opts_models in needed_opts.items():
             ct = self.create(
                 app_label=opts.app_label,
                 model=opts.model_name,
             )
             self._add_to_cache(self.db, ct)
-            results[ct.model_class()] = ct
+            for model in opts_models:
+                results[model] = ct
         return results
 
     def get_for_id(self, id):
         """
-        Lookup a ContentType by ID. Uses the same shared cache as get_for_model
+        Lookup a ContentType by ID. Use the same shared cache as get_for_model
         (though ContentTypes are obviously not created on-the-fly by get_by_id).
         """
         try:
@@ -131,7 +132,6 @@ class ContentTypeManager(models.Manager):
         self._cache.setdefault(using, {})[ct.id] = ct
 
 
-@python_2_unicode_compatible
 class ContentType(models.Model):
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)
@@ -154,7 +154,7 @@ class ContentType(models.Model):
         return force_text(model._meta.verbose_name)
 
     def model_class(self):
-        "Returns the Python model class for this type of content."
+        """Return the model class for this type of content."""
         try:
             return apps.get_model(self.app_label, self.model)
         except LookupError:
@@ -162,7 +162,7 @@ class ContentType(models.Model):
 
     def get_object_for_this_type(self, **kwargs):
         """
-        Returns an object of this type for the keyword arguments given.
+        Return an object of this type for the keyword arguments given.
         Basically, this is a proxy around this object_type's get_object() model
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
@@ -171,7 +171,7 @@ class ContentType(models.Model):
 
     def get_all_objects_for_this_type(self, **kwargs):
         """
-        Returns all objects of this type for the keyword arguments given.
+        Return all objects of this type for the keyword arguments given.
         """
         return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
 

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import settings
@@ -228,7 +226,7 @@ class SitesFrameworkTests(TestCase):
             RequestSite(request).delete()
 
 
-class JustOtherRouter(object):
+class JustOtherRouter:
     def allow_migrate(self, db, app_label, **hints):
         return db == 'other'
 

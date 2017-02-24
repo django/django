@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import uuid
 from decimal import Decimal
@@ -237,6 +235,10 @@ class TestQuerying(PostgreSQLTestCase):
             JSONModel.objects.filter(id__in=JSONModel.objects.filter(field__c=1)),
             self.objs[7:9]
         )
+
+    def test_iexact(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__iexact='BaR').exists())
+        self.assertFalse(JSONModel.objects.filter(field__foo__iexact='"BaR"').exists())
 
     def test_icontains(self):
         self.assertFalse(JSONModel.objects.filter(field__foo__icontains='"bar"').exists())

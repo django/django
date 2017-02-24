@@ -1,17 +1,7 @@
-import sys
 import threading
-import warnings
 import weakref
 
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.inspect import func_accepts_kwargs
-from django.utils.six.moves import range
-
-if six.PY2:
-    from .weakref_backports import WeakMethod
-else:
-    from weakref import WeakMethod
 
 
 def _make_id(target):
@@ -26,7 +16,7 @@ NONE_ID = _make_id(None)
 NO_RECEIVERS = object()
 
 
-class Signal(object):
+class Signal:
     """
     Base class for all signals
 
@@ -109,13 +99,10 @@ class Signal(object):
             receiver_object = receiver
             # Check for bound methods
             if hasattr(receiver, '__self__') and hasattr(receiver, '__func__'):
-                ref = WeakMethod
+                ref = weakref.WeakMethod
                 receiver_object = receiver.__self__
-            if six.PY3:
-                receiver = ref(receiver)
-                weakref.finalize(receiver_object, self._remove_receiver)
-            else:
-                receiver = ref(receiver, self._remove_receiver)
+            receiver = ref(receiver)
+            weakref.finalize(receiver_object, self._remove_receiver)
 
         with self.lock:
             self._clear_dead_receivers()
@@ -126,12 +113,12 @@ class Signal(object):
                 self.receivers.append((lookup_key, receiver))
             self.sender_receivers_cache.clear()
 
-    def disconnect(self, receiver=None, sender=None, weak=None, dispatch_uid=None):
+    def disconnect(self, receiver=None, sender=None, dispatch_uid=None):
         """
         Disconnect receiver from sender for signal.
 
         If weak references are used, disconnect need not be called. The receiver
-        will be remove from dispatch automatically.
+        will be removed from dispatch automatically.
 
         Arguments:
 
@@ -145,8 +132,6 @@ class Signal(object):
             dispatch_uid
                 the unique identifier of the receiver to disconnect
         """
-        if weak is not None:
-            warnings.warn("Passing `weak` to disconnect has no effect.", RemovedInDjango20Warning, stacklevel=2)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:
@@ -183,7 +168,7 @@ class Signal(object):
             named
                 Named arguments which will be passed to receivers.
 
-        Returns a list of tuple pairs [(receiver, response), ... ].
+        Return a list of tuple pairs [(receiver, response), ... ].
         """
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
             return []
@@ -209,13 +194,10 @@ class Signal(object):
                 arguments must be a subset of the argument names defined in
                 providing_args.
 
-        Return a list of tuple pairs [(receiver, response), ... ]. May raise
-        DispatcherKeyError.
+        Return a list of tuple pairs [(receiver, response), ... ].
 
         If any receiver raises an error (specifically any subclass of
-        Exception), the error instance is returned as the result for that
-        receiver. The traceback is always attached to the error at
-        ``__traceback__``.
+        Exception), return the error instance as the result for that receiver.
         """
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
             return []
@@ -227,8 +209,6 @@ class Signal(object):
             try:
                 response = receiver(signal=self, sender=sender, **named)
             except Exception as err:
-                if not hasattr(err, '__traceback__'):
-                    err.__traceback__ = sys.exc_info()[2]
                 responses.append((receiver, err))
             else:
                 responses.append((receiver, response))

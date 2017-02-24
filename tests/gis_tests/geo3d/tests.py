@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 import re
 
@@ -8,16 +6,14 @@ from django.contrib.gis.db.models.functions import (
     AsGeoJSON, AsKML, Length, Perimeter, Scale, Translate,
 )
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point, Polygon
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
     City3D, Interstate2D, Interstate3D, InterstateProj2D, InterstateProj3D,
     MultiPoint3D, Point2D, Point3D, Polygon2D, Polygon3D,
 )
 
-data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+data_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
 city_file = os.path.join(data_path, 'cities', 'cities.shp')
 vrt_file = os.path.join(data_path, 'test_vrt', 'test_vrt.vrt')
 
@@ -69,7 +65,7 @@ bbox_data = (
 )
 
 
-class Geo3DLoadingHelper(object):
+class Geo3DLoadingHelper:
     def _load_interstate_data(self):
         # Interstate (2D / 3D and Geographic/Projected variants)
         for name, line, exp_z in interstate_data:
@@ -171,30 +167,6 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         lm.save()
         self.assertEqual(3, MultiPoint3D.objects.count())
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_kml(self):
-        """
-        Test GeoQuerySet.kml() with Z values.
-        """
-        self._load_city_data()
-        h = City3D.objects.kml(precision=6).get(name='Houston')
-        # KML should be 3D.
-        # `SELECT ST_AsKML(point, 6) FROM geo3d_city3d WHERE name = 'Houston';`
-        ref_kml_regex = re.compile(r'^<Point><coordinates>-95.363\d+,29.763\d+,18</coordinates></Point>$')
-        self.assertTrue(ref_kml_regex.match(h.kml))
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_geojson(self):
-        """
-        Test GeoQuerySet.geojson() with Z values.
-        """
-        self._load_city_data()
-        h = City3D.objects.geojson(precision=6).get(name='Houston')
-        # GeoJSON should be 3D
-        # `SELECT ST_AsGeoJSON(point, 6) FROM geo3d_city3d WHERE name='Houston';`
-        ref_json_regex = re.compile(r'^{"type":"Point","coordinates":\[-95.363151,29.763374,18(\.0+)?\]}$')
-        self.assertTrue(ref_json_regex.match(h.geojson))
-
     @skipUnlessDBFeature("supports_3d_functions")
     def test_union(self):
         """
@@ -230,84 +202,6 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
 
         check_extent3d(extent)
         self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @skipUnlessDBFeature("supports_3d_functions")
-    def test_perimeter(self):
-        """
-        Testing GeoQuerySet.perimeter() on 3D fields.
-        """
-        self._load_polygon_data()
-        # Reference query for values below:
-        #  `SELECT ST_Perimeter3D(poly), ST_Perimeter2D(poly) FROM geo3d_polygon3d;`
-        ref_perim_3d = 76859.2620451
-        ref_perim_2d = 76859.2577803
-        tol = 6
-        self.assertAlmostEqual(ref_perim_2d,
-                               Polygon2D.objects.perimeter().get(name='2D BBox').perimeter.m,
-                               tol)
-        self.assertAlmostEqual(ref_perim_3d,
-                               Polygon3D.objects.perimeter().get(name='3D BBox').perimeter.m,
-                               tol)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @skipUnlessDBFeature("supports_3d_functions")
-    def test_length(self):
-        """
-        Testing GeoQuerySet.length() on 3D fields.
-        """
-        # ST_Length_Spheroid Z-aware, and thus does not need to use
-        # a separate function internally.
-        # `SELECT ST_Length_Spheroid(line, 'SPHEROID["GRS 1980",6378137,298.257222101]')
-        #    FROM geo3d_interstate[2d|3d];`
-        self._load_interstate_data()
-        tol = 3
-        ref_length_2d = 4368.1721949481
-        ref_length_3d = 4368.62547052088
-        self.assertAlmostEqual(ref_length_2d,
-                               Interstate2D.objects.length().get(name='I-45').length.m,
-                               tol)
-        self.assertAlmostEqual(ref_length_3d,
-                               Interstate3D.objects.length().get(name='I-45').length.m,
-                               tol)
-
-        # Making sure `ST_Length3D` is used on for a projected
-        # and 3D model rather than `ST_Length`.
-        # `SELECT ST_Length(line) FROM geo3d_interstateproj2d;`
-        ref_length_2d = 4367.71564892392
-        # `SELECT ST_Length3D(line) FROM geo3d_interstateproj3d;`
-        ref_length_3d = 4368.16897234101
-        self.assertAlmostEqual(ref_length_2d,
-                               InterstateProj2D.objects.length().get(name='I-45').length.m,
-                               tol)
-        self.assertAlmostEqual(ref_length_3d,
-                               InterstateProj3D.objects.length().get(name='I-45').length.m,
-                               tol)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @skipUnlessDBFeature("supports_3d_functions")
-    def test_scale(self):
-        """
-        Testing GeoQuerySet.scale() on Z values.
-        """
-        self._load_city_data()
-        # Mapping of City name to reference Z values.
-        zscales = (-3, 4, 23)
-        for zscale in zscales:
-            for city in City3D.objects.scale(1.0, 1.0, zscale):
-                self.assertEqual(city_dict[city.name][2] * zscale, city.scale.z)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @skipUnlessDBFeature("supports_3d_functions")
-    def test_translate(self):
-        """
-        Testing GeoQuerySet.translate() on Z values.
-        """
-        self._load_city_data()
-        ztranslations = (5.23, 23, -17)
-        for ztrans in ztranslations:
-            for city in City3D.objects.translate(0, 0, ztrans):
-                self.assertEqual(city_dict[city.name][2] + ztrans, city.translate.z)
 
 
 @skipUnlessDBFeature("gis_enabled", "supports_3d_functions")

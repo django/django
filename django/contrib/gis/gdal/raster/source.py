@@ -10,10 +10,7 @@ from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.const import GDAL_RESAMPLE_ALGORITHMS
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry.regex import json_regex
-from django.utils import six
-from django.utils.encoding import (
-    force_bytes, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
 
@@ -52,10 +49,9 @@ class TransformPoint(list):
         self._raster.geotransform = gtf
 
 
-@python_2_unicode_compatible
 class GDALRaster(GDALBase):
     """
-    Wraps a raster GDAL Data Source object.
+    Wrap a raster GDAL Data Source object.
     """
     destructor = capi.close_ds
 
@@ -65,11 +61,11 @@ class GDALRaster(GDALBase):
 
         # Preprocess json inputs. This converts json strings to dictionaries,
         # which are parsed below the same way as direct dictionary inputs.
-        if isinstance(ds_input, six.string_types) and json_regex.match(ds_input):
+        if isinstance(ds_input, str) and json_regex.match(ds_input):
             ds_input = json.loads(ds_input)
 
         # If input is a valid file path, try setting file as source.
-        if isinstance(ds_input, six.string_types):
+        if isinstance(ds_input, str):
             if not os.path.exists(ds_input):
                 raise GDALException('Unable to read raster source input "{}"'.format(ds_input))
             try:
@@ -169,7 +165,7 @@ class GDALRaster(GDALBase):
     @property
     def name(self):
         """
-        Returns the name of this raster. Corresponds to filename
+        Return the name of this raster. Corresponds to filename
         for file-based rasters.
         """
         return force_text(capi.get_ds_description(self._ptr))
@@ -177,7 +173,7 @@ class GDALRaster(GDALBase):
     @cached_property
     def driver(self):
         """
-        Returns the GDAL Driver used for this raster.
+        Return the GDAL Driver used for this raster.
         """
         ds_driver = capi.get_ds_driver(self._ptr)
         return Driver(ds_driver)
@@ -199,7 +195,7 @@ class GDALRaster(GDALBase):
     @property
     def srs(self):
         """
-        Returns the SpatialReference used in this GDALRaster.
+        Return the SpatialReference used in this GDALRaster.
         """
         try:
             wkt = capi.get_ds_projection_ref(self._ptr)
@@ -212,13 +208,13 @@ class GDALRaster(GDALBase):
     @srs.setter
     def srs(self, value):
         """
-        Sets the spatial reference used in this GDALRaster. The input can be
+        Set the spatial reference used in this GDALRaster. The input can be
         a SpatialReference or any parameter accepted by the SpatialReference
         constructor.
         """
         if isinstance(value, SpatialReference):
             srs = value
-        elif isinstance(value, six.integer_types + six.string_types):
+        elif isinstance(value, (int, str)):
             srs = SpatialReference(value)
         else:
             raise ValueError('Could not create a SpatialReference from input.')
@@ -242,8 +238,8 @@ class GDALRaster(GDALBase):
     @property
     def geotransform(self):
         """
-        Returns the geotransform of the data source.
-        Returns the default geotransform if it does not exist or has not been
+        Return the geotransform of the data source.
+        Return the default geotransform if it does not exist or has not been
         set previously. The default is [0.0, 1.0, 0.0, 0.0, 0.0, -1.0].
         """
         # Create empty ctypes double array for data
@@ -253,7 +249,7 @@ class GDALRaster(GDALBase):
 
     @geotransform.setter
     def geotransform(self, values):
-        "Sets the geotransform for the data source."
+        "Set the geotransform for the data source."
         if sum([isinstance(x, (int, float)) for x in values]) != 6:
             raise ValueError('Geotransform must consist of 6 numeric values.')
         # Create ctypes double array with input and write data
@@ -285,7 +281,7 @@ class GDALRaster(GDALBase):
     @property
     def extent(self):
         """
-        Returns the extent as a 4-tuple (xmin, ymin, xmax, ymax).
+        Return the extent as a 4-tuple (xmin, ymin, xmax, ymax).
         """
         # Calculate boundary values based on scale and size
         xval = self.origin.x + self.scale.x * self.width
@@ -304,7 +300,7 @@ class GDALRaster(GDALBase):
 
     def warp(self, ds_input, resampling='NearestNeighbour', max_error=0.0):
         """
-        Returns a warped GDALRaster with the given input characteristics.
+        Return a warped GDALRaster with the given input characteristics.
 
         The input is expected to be a dictionary containing the parameters
         of the target raster. Allowed values are width, height, SRID, origin,
@@ -373,7 +369,7 @@ class GDALRaster(GDALBase):
     def transform(self, srid, driver=None, name=None, resampling='NearestNeighbour',
                   max_error=0.0):
         """
-        Returns a copy of this raster reprojected into the given SRID.
+        Return a copy of this raster reprojected into the given SRID.
         """
         # Convert the resampling algorithm name into an algorithm id
         algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]

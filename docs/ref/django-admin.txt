@@ -138,8 +138,6 @@ make it part of your integration test suite.
 
 .. django-admin-option:: --fail-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
 
-.. versionadded:: 1.10
-
 Specifies the message level that will cause the command to exit with a non-zero
 status. Default is ``ERROR``.
 
@@ -392,11 +390,6 @@ modification, and deletion. If you do want to allow Django to manage the
 table's lifecycle, you'll need to change the
 :attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
 it because ``True`` is its default value).
-
-.. versionadded:: 1.10
-
-    Support for the ``table`` argument(s) to choose what tables should be
-    inspected was added.
 
 .. django-admin-option:: --database DATABASE
 
@@ -704,18 +697,10 @@ Enables fixing of migration conflicts.
 
 Allows naming the generated migration(s) instead of using a generated name.
 
-.. django-admin-option:: --exit, -e
-
-.. deprecated:: 1.10
-
-   Use the ``--check`` option instead.
-
 Makes ``makemigrations`` exit with error code 1 when no migrations are created
 (or would have been created, if combined with ``--dry-run``).
 
 .. django-admin-option:: --check
-
-.. versionadded:: 1.10
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
@@ -841,11 +826,6 @@ history of migrations is created at first run of ``runserver``.
 Logging of each request and response of the server is sent to the
 :ref:`django-server-logger` logger.
 
-.. versionchanged:: 1.10
-
-    In older versions, log messages were written to ``sys.stderr`` instead of
-    being handled through Python logging.
-
 .. django-admin-option:: --noreload
 
 Disables the auto-reloader. This means any Python code changes you make while
@@ -957,11 +937,6 @@ Python interpreter, use ``python`` as the interface name, like so::
 
     django-admin shell -i python
 
-.. deprecated:: 1.10
-
-   In older versions, use the ``--plain`` option instead of ``-i python``. This
-   is deprecated and will be removed in Django 2.0.
-
 .. _IPython: https://ipython.org/
 .. _bpython: http://bpython-interpreter.org/
 
@@ -972,8 +947,6 @@ default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
 
 .. django-admin-option:: --command COMMAND, -c COMMAND
-
-.. versionadded:: 1.10
 
 Lets you pass a command as a string to execute it as Django, like so::
 
@@ -1015,10 +988,16 @@ This is the default output format.
 
 .. django-admin-option:: --plan, -p
 
-Shows the migration plan Django will follow to apply migrations. Any supplied
-app labels are ignored because the plan might go beyond those apps. Like
+Shows the migration plan Django will follow to apply migrations. Like
 ``--list``, applied migrations are marked by an ``[X]``. For a ``--verbosity``
 of 2 and above, all dependencies of a migration will also be shown.
+
+``app_label``\s arguments limit the output, however, dependencies of provided
+apps may also be included.
+
+.. versionchanged:: 1.11
+
+    In older versions, ``showmigrations --plan`` ignores app labels.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1339,14 +1318,10 @@ don't.
 
 .. option:: --tag TAGS
 
-.. versionadded:: 1.10
-
 Runs only tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 .. option:: --exclude-tag EXCLUDE_TAGS
-
-.. versionadded:: 1.10
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
@@ -1801,18 +1776,19 @@ Named arguments can be passed by using either one of the following syntaxes::
       # `use_natural_foreign_keys` is the option destination variable
       management.call_command('dumpdata', use_natural_foreign_keys=True)
 
+Some command options have different names when using ``call_command()`` instead
+of ``django-admin`` or ``manage.py``. For example, ``django-admin
+createsuperuser --no-input`` translates to ``call_command('createsuperuser',
+interactive=False)``. To find what keyword argument name to use for
+``call_command()``, check the command's source code for the ``dest`` argument
+passed to ``parser.add_argument()``.
+
 Command options which take multiple options are passed a list::
 
       management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
 
 The return value of the ``call_command()`` function is the same as the return
 value of the ``handle()`` method of the command.
-
-.. versionchanged:: 1.10
-
-    ``call_command()`` now returns the value received from the
-    ``command.handle()`` method. It now also accepts a command object as the
-    first argument.
 
 Output redirection
 ==================

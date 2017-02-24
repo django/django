@@ -3,8 +3,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models.deletion import Collector
-from django.utils import six
-from django.utils.six.moves import input
 
 from ...management import get_contenttypes_and_models
 
@@ -32,7 +30,7 @@ class Command(BaseCommand):
             if not app_models:
                 continue
             to_remove = [
-                ct for (model_name, ct) in six.iteritems(content_types)
+                ct for (model_name, ct) in content_types.items()
                 if model_name not in app_models
             ]
             # Confirm that the content type is stale before deletion.

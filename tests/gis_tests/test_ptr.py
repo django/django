@@ -1,7 +1,8 @@
 import ctypes
+from unittest import mock
 
 from django.contrib.gis.ptr import CPointerBase
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 
 
 class CPointerBaseTests(SimpleTestCase):

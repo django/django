@@ -41,17 +41,17 @@ Fields
             on Python 2, with the option to customize the behavior using
             :attr:`.User.username_validator`.
 
-        .. versionchanged:: 1.10
-
-            The ``max_length`` increased from 30 to 150 characters.
-
     .. attribute:: first_name
 
         Optional. 30 characters or fewer.
 
     .. attribute:: last_name
 
-        Optional. 30 characters or fewer.
+        Optional. 150 characters or fewer.
+
+        .. versionchanged:: 2.0
+
+            The ``max_length`` increased from 30 to 150 characters.
 
     .. attribute:: email
 
@@ -99,13 +99,6 @@ Fields
         authentication in the Django admin all return ``False`` for inactive
         users.
 
-        .. versionchanged:: 1.10
-
-            In older versions,
-            :class:`~django.contrib.auth.backends.ModelBackend` and
-            :class:`~django.contrib.auth.backends.RemoteUserBackend` allowed
-            inactive users to authenticate.
-
     .. attribute:: is_superuser
 
         Boolean. Designates that this user has all permissions without
@@ -137,11 +130,6 @@ Attributes
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~models.User` instance.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
@@ -150,22 +138,14 @@ Attributes
         :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: username_validator
 
-        .. versionadded:: 1.10
-
         Points to a validator instance used to validate usernames. Defaults to
-        :class:`validators.UnicodeUsernameValidator` on Python 3 and
-        :class:`validators.ASCIIUsernameValidator` on Python 2.
+        :class:`validators.UnicodeUsernameValidator`.
 
         To change the default username validator, you can subclass the ``User``
         model and set this attribute to a different validator instance. For
-        example, to use ASCII usernames on Python 3::
+        example, to use ASCII usernames::
 
             from django.contrib.auth.models import User
             from django.contrib.auth.validators import ASCIIUsernameValidator
@@ -412,19 +392,13 @@ Validators
 
 .. class:: validators.ASCIIUsernameValidator
 
-    .. versionadded:: 1.10
-
     A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 2.
+    ``+``, ``-``, and ``_``.
 
 .. class:: validators.UnicodeUsernameValidator
 
-    .. versionadded:: 1.10
-
     A field validator allowing Unicode letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 3.
+    ``+``, ``-``, and ``_``. The default validator for ``User.username``.
 
 .. _topics-auth-signals:
 
@@ -578,8 +552,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
     .. method:: ModelBackend.user_can_authenticate()
 
-        .. versionadded:: 1.10
-
         Returns whether the user is allowed to authenticate. To match the
         behavior of :class:`~django.contrib.auth.forms.AuthenticationForm`
         which :meth:`prohibits inactive users from logging in
@@ -590,8 +562,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         field are allowed.
 
 .. class:: AllowAllUsersModelBackend
-
-   .. versionadded:: 1.10
 
    Same as :class:`ModelBackend` except that it doesn't reject inactive users
    because :meth:`~ModelBackend.user_can_authenticate` always returns ``True``.
@@ -647,8 +617,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. method:: RemoteUserBackend.user_can_authenticate()
 
-    .. versionadded:: 1.10
-
     Returns whether the user is allowed to authenticate. This method returns
     ``False`` for users with :attr:`is_active=False
     <django.contrib.auth.models.User.is_active>`. Custom user models that don't
@@ -656,8 +624,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     allowed.
 
 .. class:: AllowAllUsersRemoteUserBackend
-
-   .. versionadded:: 1.10
 
    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
    users because :attr:`~RemoteUserBackend.user_can_authenticate` always

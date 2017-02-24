@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import re
 
 from django.core.exceptions import FieldDoesNotExist
@@ -7,7 +5,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.sql.query import Query
-from django.utils import six
 
 gis_lookups = {}
 
@@ -25,19 +22,19 @@ class GISLookup(Lookup):
     band_lhs = None
 
     def __init__(self, *args, **kwargs):
-        super(GISLookup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.template_params = {}
 
     @classmethod
     def _check_geo_field(cls, opts, lookup):
         """
-        Utility for checking the given lookup with the given model options.
+        Check the given lookup with the given model options.
         The lookup is a string either specifying the geographic field, e.g.
         'point, 'the_geom', or a related lookup on a geographic field like
         'address__point'.
 
-        If a BaseSpatialField exists according to the given lookup on the model
-        options, it will be returned. Otherwise return None.
+        Return a BaseSpatialField if one exists according to the given lookup
+        on the model options, otherwise return None.
         """
         from django.contrib.gis.db.models.fields import BaseSpatialField
         # This takes into account the situation where the lookup is a
@@ -103,7 +100,7 @@ class GISLookup(Lookup):
     def process_rhs(self, compiler, connection):
         if isinstance(self.rhs, Query):
             # If rhs is some Query, don't touch it.
-            return super(GISLookup, self).process_rhs(compiler, connection)
+            return super().process_rhs(compiler, connection)
 
         geom = self.rhs
         if isinstance(self.rhs, Col):
@@ -127,7 +124,7 @@ class GISLookup(Lookup):
         elif isinstance(self.lhs, RasterBandTransform):
             self.process_band_indices(only_lhs=True)
 
-        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
+        rhs, rhs_params = super().process_rhs(compiler, connection)
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
@@ -391,9 +388,9 @@ class RelateLookup(GISLookup):
             backend_op.check_relate_argument(value[1])
         else:
             pattern = value[1]
-            if not isinstance(pattern, six.string_types) or not self.pattern_regex.match(pattern):
+            if not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
                 raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
-        return super(RelateLookup, self).get_db_prep_lookup(value, connection)
+        return super().get_db_prep_lookup(value, connection)
 
 
 gis_lookups['relate'] = RelateLookup
@@ -439,7 +436,7 @@ class DistanceLookupBase(GISLookup):
         else:
             params += connection.ops.get_distance(
                 self.lhs.output_field, (dist_param,) + self.rhs[2:],
-                self.lookup_name, handle_spheroid=False
+                self.lookup_name,
             )
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, params[0], compiler)
         return (rhs, params)

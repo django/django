@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
-from __future__ import unicode_literals
-
 import datetime
 import re
 import threading
 import unittest
 import warnings
 from decimal import Decimal, Rounded
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
@@ -23,11 +21,9 @@ from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
     skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.utils import six
-from django.utils.six.moves import range
 
 from .models import (
     Article, Item, Object, ObjectReference, Person, Post, RawData, Reporter,
@@ -104,7 +100,7 @@ class OracleTests(unittest.TestCase):
         # than 4000 chars and read it properly
         with connection.cursor() as cursor:
             cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(six.text_type(x) for x in range(4000))
+            long_str = ''.join(str(x) for x in range(4000))
             cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
             cursor.execute('SELECT text FROM ltext')
             row = cursor.fetchone()
@@ -239,7 +235,7 @@ class PostgreSQLTests(TestCase):
         """Test PostgreSQL version detection"""
 
         # Helper mocks
-        class CursorMock(object):
+        class CursorMock:
             "Very simple mock of DB-API cursor"
             def execute(self, arg):
                 pass
@@ -253,7 +249,7 @@ class PostgreSQLTests(TestCase):
             def __exit__(self, type, value, traceback):
                 pass
 
-        class OlderConnectionMock(object):
+        class OlderConnectionMock:
             "Mock of psycopg2 (< 2.0.12) connection"
             def cursor(self):
                 return CursorMock()
@@ -415,14 +411,12 @@ class LastExecutedQueryTest(TestCase):
         self.assertIn(Reporter._meta.db_table, sql)
 
     def test_query_encoding(self):
-        """
-        last_executed_query() returns an Unicode string
-        """
+        """last_executed_query() returns a string."""
         data = RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = data.query.sql_with_params()
         cursor = data.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertIsInstance(last_sql, six.text_type)
+        self.assertIsInstance(last_sql, str)
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This test is specific to SQLite.")

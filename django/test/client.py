@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import mimetypes
 import os
@@ -8,10 +6,11 @@ import sys
 from copy import copy
 from importlib import import_module
 from io import BytesIO
+from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (
     got_request_exception, request_finished, request_started,
 )
@@ -21,12 +20,10 @@ from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
-from django.utils import six
-from django.utils.encoding import force_bytes, force_str, uri_to_iri
+from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
-from django.utils.six.moves.urllib.parse import urljoin, urlparse, urlsplit
 
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
@@ -43,12 +40,12 @@ class RedirectCycleError(Exception):
     The test client has been asked to follow a redirect loop.
     """
     def __init__(self, message, last_response):
-        super(RedirectCycleError, self).__init__(message)
+        super().__init__(message)
         self.last_response = last_response
         self.redirect_chain = last_response.redirect_chain
 
 
-class FakePayload(object):
+class FakePayload:
     """
     A wrapper around BytesIO that restricts what can be read since data from
     the network can't be seeked and cannot be read outside of its content
@@ -86,8 +83,7 @@ class FakePayload(object):
 
 def closing_iterator_wrapper(iterable, close):
     try:
-        for item in iterable:
-            yield item
+        yield from iterable
     finally:
         request_finished.disconnect(close_old_connections)
         close()                                 # will fire request_finished
@@ -122,7 +118,7 @@ class ClientHandler(BaseHandler):
     """
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
         self.enforce_csrf_checks = enforce_csrf_checks
-        super(ClientHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __call__(self, environ):
         # Set up middleware if needed. We couldn't do this earlier, because
@@ -199,7 +195,7 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, six.string_types) and is_iterable(value):
+        elif not isinstance(value, str) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -231,7 +227,7 @@ def encode_file(boundary, key, file):
 
     # file.name might not be a string. For example, it's an int for
     # tempfile.TemporaryFile().
-    file_has_string_name = hasattr(file, 'name') and isinstance(file.name, six.string_types)
+    file_has_string_name = hasattr(file, 'name') and isinstance(file.name, str)
     filename = os.path.basename(file.name) if file_has_string_name else ''
 
     if hasattr(file, 'content_type'):
@@ -255,7 +251,7 @@ def encode_file(boundary, key, file):
     ]
 
 
-class RequestFactory(object):
+class RequestFactory:
     """
     Class that lets you create mock Request objects for use in testing.
 
@@ -283,15 +279,15 @@ class RequestFactory(object):
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         environ = {
             'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
-            'PATH_INFO': str('/'),
-            'REMOTE_ADDR': str('127.0.0.1'),
-            'REQUEST_METHOD': str('GET'),
-            'SCRIPT_NAME': str(''),
-            'SERVER_NAME': str('testserver'),
-            'SERVER_PORT': str('80'),
-            'SERVER_PROTOCOL': str('HTTP/1.1'),
+            'PATH_INFO': '/',
+            'REMOTE_ADDR': '127.0.0.1',
+            'REQUEST_METHOD': 'GET',
+            'SCRIPT_NAME': '',
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '80',
+            'SERVER_PROTOCOL': 'HTTP/1.1',
             'wsgi.version': (1, 0),
-            'wsgi.url_scheme': str('http'),
+            'wsgi.url_scheme': 'http',
             'wsgi.input': FakePayload(b''),
             'wsgi.errors': self.errors,
             'wsgi.multiprocess': True,
@@ -319,15 +315,15 @@ class RequestFactory(object):
             return force_bytes(data, encoding=charset)
 
     def _get_path(self, parsed):
-        path = force_str(parsed[2])
+        path = parsed.path
         # If there are parameters, add them
-        if parsed[3]:
-            path += str(";") + force_str(parsed[3])
-        path = uri_to_iri(path).encode(UTF_8)
-        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
-        # decoded with ISO-8859-1. We replicate this behavior here.
+        if parsed.params:
+            path += ";" + parsed.params
+        path = unquote_to_bytes(path)
+        # Replace the behavior where non-ASCII values in the WSGI environ are
+        # arbitrarily decoded with ISO-8859-1.
         # Refs comment in `get_bytes_from_wsgi()`.
-        return path.decode(ISO_8859_1) if six.PY3 else path
+        return path.decode('iso-8859-1')
 
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
@@ -391,27 +387,25 @@ class RequestFactory(object):
                 content_type='application/octet-stream', secure=False,
                 **extra):
         """Constructs an arbitrary HTTP request."""
-        parsed = urlparse(force_str(path))
+        parsed = urlparse(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO': self._get_path(parsed),
-            'REQUEST_METHOD': str(method),
-            'SERVER_PORT': str('443') if secure else str('80'),
-            'wsgi.url_scheme': str('https') if secure else str('http'),
+            'REQUEST_METHOD': method,
+            'SERVER_PORT': '443' if secure else '80',
+            'wsgi.url_scheme': 'https' if secure else 'http',
         }
         if data:
             r.update({
                 'CONTENT_LENGTH': len(data),
-                'CONTENT_TYPE': str(content_type),
+                'CONTENT_TYPE': content_type,
                 'wsgi.input': FakePayload(data),
             })
         r.update(extra)
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get('QUERY_STRING'):
-            query_string = force_bytes(parsed[4])
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            if six.PY3:
-                query_string = query_string.decode('iso-8859-1')
+            query_string = force_bytes(parsed[4]).decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 
@@ -435,7 +429,7 @@ class Client(RequestFactory):
     HTML rendered to the end-user.
     """
     def __init__(self, enforce_csrf_checks=False, **defaults):
-        super(Client, self).__init__(**defaults)
+        super().__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
         self.exc_info = None
 
@@ -498,7 +492,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                six.reraise(*exc_info)
+                raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self
@@ -532,8 +526,7 @@ class Client(RequestFactory):
         """
         Requests a response from the server using GET.
         """
-        response = super(Client, self).get(path, data=data, secure=secure,
-                                           **extra)
+        response = super().get(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -543,9 +536,7 @@ class Client(RequestFactory):
         """
         Requests a response from the server using POST.
         """
-        response = super(Client, self).post(path, data=data,
-                                            content_type=content_type,
-                                            secure=secure, **extra)
+        response = super().post(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -554,8 +545,7 @@ class Client(RequestFactory):
         """
         Request a response from the server using HEAD.
         """
-        response = super(Client, self).head(path, data=data, secure=secure,
-                                            **extra)
+        response = super().head(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -565,9 +555,7 @@ class Client(RequestFactory):
         """
         Request a response from the server using OPTIONS.
         """
-        response = super(Client, self).options(path, data=data,
-                                               content_type=content_type,
-                                               secure=secure, **extra)
+        response = super().options(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -577,9 +565,7 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PUT.
         """
-        response = super(Client, self).put(path, data=data,
-                                           content_type=content_type,
-                                           secure=secure, **extra)
+        response = super().put(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -589,9 +575,7 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PATCH.
         """
-        response = super(Client, self).patch(path, data=data,
-                                             content_type=content_type,
-                                             secure=secure, **extra)
+        response = super().patch(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -601,9 +585,7 @@ class Client(RequestFactory):
         """
         Send a DELETE request to the server.
         """
-        response = super(Client, self).delete(path, data=data,
-                                              content_type=content_type,
-                                              secure=secure, **extra)
+        response = super().delete(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -612,7 +594,7 @@ class Client(RequestFactory):
         """
         Send a TRACE request to the server.
         """
-        response = super(Client, self).trace(path, data=data, secure=secure, **extra)
+        response = super().trace(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response

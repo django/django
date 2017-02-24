@@ -1,7 +1,7 @@
 import warnings
 
 from django.template import (
-    Context, Engine, TemplateDoesNotExist, TemplateSyntaxError,
+    Context, Engine, TemplateDoesNotExist, TemplateSyntaxError, loader,
 )
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango21Warning
@@ -248,9 +248,6 @@ class IncludeTests(SimpleTestCase):
         self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_cachedloader(self):
-        """
-        Test the cache loader separately since it overrides load_template.
-        """
         engine = Engine(debug=True, loaders=[
             ('django.template.loaders.cached.Loader', [
                 'django.template.loaders.app_directories.Loader',
@@ -279,6 +276,11 @@ class IncludeTests(SimpleTestCase):
         outer_tmpl = engine.from_string('{% include tmpl %}')
         output = outer_tmpl.render(ctx)
         self.assertEqual(output, 'This worked!')
+
+    def test_include_from_loader_get_template(self):
+        tmpl = loader.get_template('include_tpl.html')  # {% include tmpl %}
+        output = tmpl.render({'tmpl': loader.get_template('index.html')})
+        self.assertEqual(output, 'index\n\n')
 
     def test_include_immediate_missing(self):
         """

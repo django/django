@@ -197,14 +197,14 @@ given ``geo_input`` argument, and then assumes the proper geometry subclass
 The following input formats, along with their corresponding Python types,
 are accepted:
 
-=======================  ======================
+=======================  ==========
 Format                   Input Type
-=======================  ======================
-WKT / EWKT               ``str`` or ``unicode``
-HEX / HEXEWKB            ``str`` or ``unicode``
+=======================  ==========
+WKT / EWKT               ``str``
+HEX / HEXEWKB            ``str``
 WKB / EWKB               ``buffer``
-GeoJSON                  ``str`` or ``unicode``
-=======================  ======================
+GeoJSON                  ``str``
+=======================  ==========
 
 .. classmethod:: GEOSGeometry.from_gml(gml_string)
 
@@ -379,10 +379,6 @@ another object.
 
     Returns the Well-Known Text of the geometry (an OGC standard).
 
-    .. versionchanged:: 1.10
-
-        Non-significant zeros are stripped from the output.
-
 __ https://developers.google.com/kml/documentation/
 
 Spatial Predicate Methods
@@ -398,8 +394,6 @@ return a boolean.
     ``True``.
 
 .. method:: GEOSGeometry.covers(other)
-
-    .. versionadded:: 1.10
 
     Returns ``True`` if this geometry covers the specified geometry.
 
@@ -569,8 +563,6 @@ Topological Properties
 
 .. attribute:: GEOSGeometry.unary_union
 
-    .. versionadded:: 1.10
-
     Computes the union of all the elements of this geometry.
 
     The result obeys the following contract:
@@ -646,12 +638,6 @@ Other Properties & Methods
         doesn't impose any constraints on the geometry's SRID if called with a
         :class:`~django.contrib.gis.gdal.CoordTransform` object.
 
-        .. versionchanged:: 1.10
-
-            In previous versions, it required the geometry's SRID to be a
-            positive integer even if it was called with a
-            :class:`~django.contrib.gis.gdal.CoordTransform` object.
-
 .. method:: GEOSGeometry.normalize()
 
     Converts this geometry to canonical form::
@@ -681,10 +667,6 @@ Other Properties & Methods
         >>> pnt = Point()
         >>> pnt = Point([])
 
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``Point`` couldn't be instantiated.
-
 ``LineString``
 --------------
 
@@ -709,13 +691,7 @@ Other Properties & Methods
         >>> ls = LineString()
         >>> ls = LineString([])
 
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``LineString`` couldn't be instantiated.
-
     .. attribute:: closed
-
-        .. versionadded:: 1.10
 
         Returns whether or not this ``LineString`` is closed.
 
@@ -748,10 +724,6 @@ Other Properties & Methods
         >>> int_coords = ((0.4, 0.4), (0.4, 0.6), (0.6, 0.6), (0.6, 0.4), (0.4, 0.4))
         >>> poly = Polygon(ext_coords, int_coords)
         >>> poly = Polygon(LinearRing(ext_coords), LinearRing(int_coords))
-
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``Polygon`` couldn't be instantiated.
 
     .. classmethod:: from_bbox(bbox)
 
@@ -787,10 +759,6 @@ Geometry Collections
         >>> mp = MultiPoint(Point(0, 0), Point(1, 1))
         >>> mp = MultiPoint( (Point(0, 0), Point(1, 1)) )
 
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``MultiPoint`` couldn't be instantiated.
-
 ``MultiLineString``
 -------------------
 
@@ -805,19 +773,12 @@ Geometry Collections
         >>> mls = MultiLineString(ls1, ls2)
         >>> mls = MultiLineString([ls1, ls2])
 
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``MultiLineString`` couldn't be
-        instantiated.
-
     .. attribute:: merged
 
         Returns a :class:`LineString` representing the line merge of
         all the components in this ``MultiLineString``.
 
     .. attribute:: closed
-
-        .. versionadded:: 1.10
 
         Returns ``True`` if and only if all elements are closed. Requires GEOS 3.5.
 
@@ -834,22 +795,6 @@ Geometry Collections
         >>> mp = MultiPolygon(p1, p2)
         >>> mp = MultiPolygon([p1, p2])
 
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``MultiPolygon`` couldn't be
-        instantiated.
-
-    .. attribute:: cascaded_union
-
-        .. deprecated:: 1.10
-
-            Use the :attr:`GEOSGeometry.unary_union` property instead.
-
-        Returns a :class:`Polygon` that is the union of all of the component
-        polygons in this collection.  The algorithm employed is significantly
-        more efficient (faster) than trying to union the geometries together
-        individually. [#fncascadedunion]_
-
 ``GeometryCollection``
 ----------------------
 
@@ -862,11 +807,6 @@ Geometry Collections
         >>> poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
         >>> gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
         >>> gc = GeometryCollection((Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
-
-    .. versionchanged:: 1.10
-
-        In previous versions, an empty ``GeometryCollection`` couldn't be
-        instantiated.
 
 .. _prepared-geometries:
 
@@ -989,10 +929,6 @@ include the SRID value (in other words, EWKB).
     :attr:`WKBWriter.outdim` documentation for more details about the ``dim``
     argument.
 
-    .. versionchanged:: 1.10
-
-        The ability to pass the ``dim`` argument to the constructor was added.
-
     .. method:: WKBWriter.write(geom)
 
     Returns the WKB of the given geometry as a Python ``buffer`` object.
@@ -1082,11 +1018,6 @@ include the SRID value (in other words, EWKB).
     :attr:`WKBWriter.outdim`, :attr:`trim`, and :attr:`precision` attributes for
     details about the constructor arguments.
 
-    .. versionchanged:: 1.10
-
-        The ability to pass the ``dim``, ``trim``, and ``precision`` arguments
-        to the constructor was added.
-
     .. method:: WKTWriter.write(geom)
 
     Returns the WKT of the given geometry. Example::
@@ -1103,8 +1034,6 @@ include the SRID value (in other words, EWKB).
 
     .. attribute:: WKTWriter.trim
 
-    .. versionadded:: 1.10
-
     This property is used to enable or disable trimming of
     unnecessary decimals.
 
@@ -1120,8 +1049,6 @@ include the SRID value (in other words, EWKB).
         'POINT (1 1)'
 
     .. attribute:: WKTWriter.precision
-
-    .. versionadded:: 1.10
 
     This property controls the rounding precision of coordinates;
     if set to ``None`` rounding is disabled.
@@ -1142,7 +1069,6 @@ include the SRID value (in other words, EWKB).
 
 .. rubric:: Footnotes
 .. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
-.. [#fncascadedunion] For more information, read Paul Ramsey's blog post about `(Much) Faster Unions in PostGIS 1.4 <http://blog.cleverelephant.ca/2009/01/must-faster-unions-in-postgis-14.html>`_ and Martin Davis' blog post on `Fast polygon merging in JTS using Cascaded Union <http://lin-ear-th-inking.blogspot.com/2007/11/fast-polygon-merging-in-jts-using.html>`_.
 
 Settings
 ========

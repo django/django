@@ -929,7 +929,7 @@ comment model manager to exclude the user group, like this::
 
     class BanningCommentManager(CommentManager):
         def get_query_set(self):
-            qs = super(BanningCommentManager, self).get_query_set()
+            qs = super().get_query_set()
             if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
                 where = ['user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)']
                 params = [settings.COMMENTS_BANNED_USERS_GROUP]

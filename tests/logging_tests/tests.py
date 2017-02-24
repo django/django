@@ -1,8 +1,6 @@
-# -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 import logging
 from contextlib import contextmanager
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -13,7 +11,6 @@ from django.core.management import color
 from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
-from django.utils import six
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, ServerFormatter,
@@ -67,17 +64,17 @@ class LoggingFiltersTest(SimpleTestCase):
             self.assertIs(filter_.filter("record is not used"), False)
 
 
-class SetupDefaultLoggingMixin(object):
+class SetupDefaultLoggingMixin:
 
     @classmethod
     def setUpClass(cls):
-        super(SetupDefaultLoggingMixin, cls).setUpClass()
+        super().setUpClass()
         cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
 
     @classmethod
     def tearDownClass(cls):
-        super(SetupDefaultLoggingMixin, cls).tearDownClass()
+        super().tearDownClass()
         logging.config.dictConfig(cls._logging)
 
 
@@ -450,7 +447,7 @@ args=(sys.stdout,)
 format=%(message)s
 """
         self.temp_file = NamedTemporaryFile()
-        self.temp_file.write(logging_conf.encode('utf-8'))
+        self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
         sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
                  'LOGGING': 'r"%s"' % self.temp_file.name}
@@ -516,7 +513,7 @@ class LogFormattersTests(SimpleTestCase):
         @contextmanager
         def patch_django_server_logger():
             old_stream = logger.handlers[0].stream
-            new_stream = six.StringIO()
+            new_stream = StringIO()
             logger.handlers[0].stream = new_stream
             yield new_stream
             logger.handlers[0].stream = old_stream

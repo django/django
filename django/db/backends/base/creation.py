@@ -1,19 +1,17 @@
 import sys
-import time
+from io import StringIO
 
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.db import router
-from django.utils.six import StringIO
-from django.utils.six.moves import input
 
 # The prefix to put on the default database name when creating
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
 
 
-class BaseDatabaseCreation(object):
+class BaseDatabaseCreation:
     """
     This class encapsulates all backend-specific differences that pertain to
     creation and destruction of the test database.
@@ -115,8 +113,7 @@ class BaseDatabaseCreation(object):
                 if (model._meta.can_migrate(self.connection) and
                         router.allow_migrate_model(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
-                    for obj in queryset.iterator():
-                        yield obj
+                    yield from queryset.iterator()
         # Serialize to a string
         out = StringIO()
         serializers.serialize("json", get_objects(), indent=None, stream=out)
@@ -277,8 +274,6 @@ class BaseDatabaseCreation(object):
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
         with self.connection._nodb_connection.cursor() as cursor:
-            # Wait to avoid "database is being accessed by other users" errors.
-            time.sleep(1)
             cursor.execute("DROP DATABASE %s"
                            % self.connection.ops.quote_name(test_database_name))
 

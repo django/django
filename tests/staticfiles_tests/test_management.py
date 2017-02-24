@@ -1,11 +1,11 @@
-from __future__ import unicode_literals
-
 import codecs
 import datetime
 import os
 import shutil
 import tempfile
 import unittest
+from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -14,11 +14,10 @@ from django.contrib.staticfiles import storage
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.test import mock, override_settings
+from django.test import override_settings
 from django.test.utils import extend_sys_path
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils._os import symlinks_supported
-from django.utils.encoding import force_text
 from django.utils.functional import empty
 
 from .cases import CollectionTestCase, StaticFilesTestCase, TestDefaults
@@ -26,7 +25,7 @@ from .settings import TEST_ROOT, TEST_SETTINGS
 from .storage import DummyStorage
 
 
-class TestNoFilesCreated(object):
+class TestNoFilesCreated:
 
     def test_no_files_created(self):
         """
@@ -40,41 +39,41 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
     Test ``findstatic`` management command.
     """
     def _get_file(self, filepath):
-        path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=six.StringIO())
-        with codecs.open(force_text(path), "r", "utf-8") as f:
+        path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
+        with codecs.open(path, "r", "utf-8") as f:
             return f.read()
 
     def test_all_files(self):
         """
         findstatic returns all candidate files if run without --first and -v1.
         """
-        result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=six.StringIO())
+        result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
-        self.assertIn('project', force_text(lines[1]))
-        self.assertIn('apps', force_text(lines[2]))
+        self.assertIn('project', lines[1])
+        self.assertIn('apps', lines[2])
 
     def test_all_files_less_verbose(self):
         """
         findstatic returns all candidate files if run without --first and -v0.
         """
-        result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=six.StringIO())
+        result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 2)
-        self.assertIn('project', force_text(lines[0]))
-        self.assertIn('apps', force_text(lines[1]))
+        self.assertIn('project', lines[0])
+        self.assertIn('apps', lines[1])
 
     def test_all_files_more_verbose(self):
         """
         findstatic returns all candidate files if run without --first and -v2.
         Also, test that findstatic returns the searched locations with -v2.
         """
-        result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=six.StringIO())
+        result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
-        self.assertIn('project', force_text(lines[1]))
-        self.assertIn('apps', force_text(lines[2]))
-        self.assertIn("Looking in the following locations:", force_text(lines[3]))
-        searched_locations = ', '.join(force_text(x) for x in lines[4:])
+        self.assertIn('project', lines[1])
+        self.assertIn('apps', lines[2])
+        self.assertIn("Looking in the following locations:", lines[3])
+        searched_locations = ', '.join(lines[4:])
         # AppDirectoriesFinder searched locations
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'test', 'static'), searched_locations)
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'), searched_locations)
@@ -91,7 +90,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
 class TestConfiguration(StaticFilesTestCase):
     def test_location_empty(self):
         msg = 'without having set the STATIC_ROOT setting to a filesystem path'
-        err = six.StringIO()
+        err = StringIO()
         for root in ['', None]:
             with override_settings(STATIC_ROOT=root):
                 with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -162,14 +161,14 @@ class TestCollectionClear(CollectionTestCase):
         clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
         with open(clear_filepath, 'w') as f:
             f.write('should be cleared')
-        super(TestCollectionClear, self).run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True)
 
     def test_cleared_not_found(self):
         self.assertFileNotFound('cleared.txt')
 
     def test_dir_not_exists(self, **kwargs):
-        shutil.rmtree(six.text_type(settings.STATIC_ROOT))
-        super(TestCollectionClear, self).run_collectstatic(clear=True)
+        shutil.rmtree(settings.STATIC_ROOT)
+        super().run_collectstatic(clear=True)
 
     @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.PathNotImplementedStorage')
     def test_handle_path_notimplemented(self):
@@ -185,48 +184,44 @@ class TestInteractiveMessages(CollectionTestCase):
     @staticmethod
     def mock_input(stdout):
         def _input(msg):
-            # Python 2 reads bytes from the console output, use bytes for the StringIO
-            stdout.write(msg.encode('utf-8') if six.PY2 else msg)
+            stdout.write(msg)
             return 'yes'
         return _input
 
     def test_warning_when_clearing_staticdir(self):
-        stdout = six.StringIO()
+        stdout = StringIO()
         self.run_collectstatic()
-        with mock.patch('django.contrib.staticfiles.management.commands.collectstatic.input',
-                        side_effect=self.mock_input(stdout)):
+        with mock.patch('builtins.input', side_effect=self.mock_input(stdout)):
             call_command('collectstatic', interactive=True, clear=True, stdout=stdout)
 
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertIn(self.delete_warning_msg, output)
 
     def test_warning_when_overwriting_files_in_staticdir(self):
-        stdout = six.StringIO()
+        stdout = StringIO()
         self.run_collectstatic()
-        with mock.patch('django.contrib.staticfiles.management.commands.collectstatic.input',
-                        side_effect=self.mock_input(stdout)):
+        with mock.patch('builtins.input', side_effect=self.mock_input(stdout)):
             call_command('collectstatic', interactive=True, stdout=stdout)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
 
     def test_no_warning_when_staticdir_does_not_exist(self):
-        stdout = six.StringIO()
-        shutil.rmtree(six.text_type(settings.STATIC_ROOT))
+        stdout = StringIO()
+        shutil.rmtree(settings.STATIC_ROOT)
         call_command('collectstatic', interactive=True, stdout=stdout)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
         self.assertIn(self.files_copied_msg, output)
 
     def test_no_warning_for_empty_staticdir(self):
-        stdout = six.StringIO()
-        static_dir = tempfile.mkdtemp(prefix='collectstatic_empty_staticdir_test')
-        with override_settings(STATIC_ROOT=static_dir):
-            call_command('collectstatic', interactive=True, stdout=stdout)
-        shutil.rmtree(six.text_type(static_dir))
-        output = force_text(stdout.getvalue())
+        stdout = StringIO()
+        with tempfile.TemporaryDirectory(prefix='collectstatic_empty_staticdir_test') as static_dir:
+            with override_settings(STATIC_ROOT=static_dir):
+                call_command('collectstatic', interactive=True, stdout=stdout)
+        output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
         self.assertIn(self.files_copied_msg, output)
@@ -238,8 +233,7 @@ class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):
     ``collectstatic`` management command.
     """
     def run_collectstatic(self):
-        super(TestCollectionExcludeNoDefaultIgnore, self).run_collectstatic(
-            use_default_ignore_patterns=False)
+        super().run_collectstatic(use_default_ignore_patterns=False)
 
     def test_no_common_ignore_patterns(self):
         """
@@ -270,7 +264,7 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     Test ``--dry-run`` option for ``collectstatic`` management command.
     """
     def run_collectstatic(self):
-        super(TestCollectionDryRun, self).run_collectstatic(dry_run=True)
+        super().run_collectstatic(dry_run=True)
 
 
 class TestCollectionFilesOverride(CollectionTestCase):
@@ -312,10 +306,10 @@ class TestCollectionFilesOverride(CollectionTestCase):
         with extend_sys_path(self.temp_dir):
             self.settings_with_test_app.enable()
 
-        super(TestCollectionFilesOverride, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestCollectionFilesOverride, self).tearDown()
+        super().tearDown()
         self.settings_with_test_app.disable()
 
     def test_ordering_override(self):
@@ -350,9 +344,9 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         the command at highest verbosity, which is why we can't
         just call e.g. BaseCollectionTestCase.run_collectstatic()
         """
-        out = six.StringIO()
+        out = StringIO()
         call_command('collectstatic', interactive=False, verbosity=3, stdout=out, **kwargs)
-        return force_text(out.getvalue())
+        return out.getvalue()
 
     def test_no_warning(self):
         """
@@ -365,24 +359,22 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         """
         There is a warning when there are duplicate destinations.
         """
-        static_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, static_dir)
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate = os.path.join(static_dir, 'test', 'file.txt')
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, 'w+') as f:
+                f.write('duplicate of file.txt')
 
-        duplicate = os.path.join(static_dir, 'test', 'file.txt')
-        os.mkdir(os.path.dirname(duplicate))
-        with open(duplicate, 'w+') as f:
-            f.write('duplicate of file.txt')
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True)
+            self.assertIn(self.warning_string, output)
 
-        with self.settings(STATICFILES_DIRS=[static_dir]):
-            output = self._collectstatic_output(clear=True)
-        self.assertIn(self.warning_string, output)
+            os.remove(duplicate)
 
-        os.remove(duplicate)
-
-        # Make sure the warning went away again.
-        with self.settings(STATICFILES_DIRS=[static_dir]):
-            output = self._collectstatic_output(clear=True)
-        self.assertNotIn(self.warning_string, output)
+            # Make sure the warning went away again.
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True)
+            self.assertNotIn(self.warning_string, output)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
@@ -410,9 +402,9 @@ class TestCollectionNeverCopyStorage(CollectionTestCase):
         NeverCopyRemoteStorage.get_modified_time() returns a datetime in the
         future to simulate an unmodified file.
         """
-        stdout = six.StringIO()
+        stdout = StringIO()
         self.run_collectstatic(stdout=stdout, verbosity=2)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertIn("Skipping 'test.txt' (not modified)", output)
 
 
@@ -426,7 +418,7 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
     ``--link`` does not change the file-selection semantics.
     """
     def run_collectstatic(self, clear=False, link=True, **kwargs):
-        super(TestCollectionLinks, self).run_collectstatic(link=link, clear=clear, **kwargs)
+        super().run_collectstatic(link=link, clear=clear, **kwargs)
 
     def test_links_created(self):
         """

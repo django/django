@@ -8,7 +8,7 @@ Parser and utilities for the smart 'if' tag
 # 'bp' = binding power (left = lbp, right = rbp)
 
 
-class TokenBase(object):
+class TokenBase:
     """
     Base class for operators and literals, mainly for debugging and for throwing
     syntax errors.
@@ -31,7 +31,7 @@ class TokenBase(object):
 
     def display(self):
         """
-        Returns what to display in error messages for this node
+        Return what to display in error messages for this node
         """
         return self.id
 
@@ -42,8 +42,8 @@ class TokenBase(object):
 
 def infix(bp, func):
     """
-    Creates an infix operator, given a binding power and a function that
-    evaluates the node
+    Create an infix operator, given a binding power and a function that
+    evaluates the node.
     """
     class Operator(TokenBase):
         lbp = bp
@@ -67,7 +67,7 @@ def infix(bp, func):
 
 def prefix(bp, func):
     """
-    Creates a prefix operator, given a binding power and a function that
+    Create a prefix operator, given a binding power and a function that
     evaluates the node.
     """
     class Operator(TokenBase):
@@ -147,7 +147,7 @@ class EndToken(TokenBase):
 EndToken = EndToken()
 
 
-class IfParser(object):
+class IfParser:
     error_class = ValueError
 
     def __init__(self, tokens):

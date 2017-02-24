@@ -1,15 +1,10 @@
-# -*- coding: utf-8 -*-
-# This coding header is significant for tests, as the debug view is parsing
-# files to search for such a header to decode the source file content
-from __future__ import unicode_literals
-
 import importlib
 import inspect
 import os
 import re
 import sys
 import tempfile
-from unittest import skipIf
+from io import StringIO
 
 from django.conf.urls import url
 from django.core import mail
@@ -19,15 +14,13 @@ from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
-from django.utils import six
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
 )
 
-from .. import BrokenException, except_args
 from ..views import (
     custom_exception_reporter_filter_view, index_page,
     multivalue_dict_key_error, non_sensitive_view, paranoid_view,
@@ -35,13 +28,10 @@ from ..views import (
     sensitive_method_view, sensitive_view,
 )
 
-if six.PY3:
-    from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
-
 PY36 = sys.version_info >= (3, 6)
 
 
-class User(object):
+class User:
     def __str__(self):
         return 'jacob'
 
@@ -54,7 +44,7 @@ class CallableSettingWrapperTests(SimpleTestCase):
     """ Unittests for CallableSettingWrapper
     """
     def test_repr(self):
-        class WrappedCallable(object):
+        class WrappedCallable:
             def __repr__(self):
                 return "repr from the wrapped callable"
 
@@ -136,11 +126,6 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         self.assertContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "view_tests.views.Http404View", status_code=404)
 
-    def test_view_exceptions(self):
-        for n in range(len(except_args)):
-            with self.assertRaises(BrokenException):
-                self.client.get(reverse('view_exception', args=(n,)))
-
     def test_non_l10ned_numeric_ids(self):
         """
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
@@ -155,20 +140,19 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             id_repr = match.group('id')
             self.assertFalse(
                 re.search(b'[^c0-9]', id_repr),
-                "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr
+                "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr.decode()
             )
 
     def test_template_exceptions(self):
-        for n in range(len(except_args)):
-            try:
-                self.client.get(reverse('template_exception', args=(n,)))
-            except Exception:
-                raising_loc = inspect.trace()[-1][-2][0].strip()
-                self.assertNotEqual(
-                    raising_loc.find('raise BrokenException'), -1,
-                    "Failed to find 'raise BrokenException' in last frame of "
-                    "traceback, instead found: %s" % raising_loc
-                )
+        try:
+            self.client.get(reverse('template_exception'))
+        except Exception:
+            raising_loc = inspect.trace()[-1][-2][0].strip()
+            self.assertNotEqual(
+                raising_loc.find("raise Exception('boom')"), -1,
+                "Failed to find 'raise Exception' in last frame of "
+                "traceback, instead found: %s" % raising_loc
+            )
 
     def test_template_loader_postmortem(self):
         """Tests for not existing file"""
@@ -357,6 +341,34 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<h2>Request information</h2>', html)
         self.assertNotIn('<p>Request data not supplied</p>', html)
 
+    def test_reporting_of_nested_exceptions(self):
+        request = self.rf.get('/test_view/')
+        try:
+            try:
+                raise AttributeError('Top level')
+            except AttributeError as explicit:
+                try:
+                    raise ValueError('Second exception') from explicit
+                except ValueError:
+                    raise IndexError('Final exception')
+        except Exception:
+            # Custom exception handler, just pass it into ExceptionReporter
+            exc_type, exc_value, tb = sys.exc_info()
+
+        explicit_exc = 'The above exception ({0}) was the direct cause of the following exception:'
+        implicit_exc = 'During handling of the above exception ({0}), another exception occurred:'
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        # Both messages are twice on page -- one rendered as html,
+        # one as plain text (for pastebin)
+        self.assertEqual(2, html.count(explicit_exc.format("Top level")))
+        self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
+
+        text = reporter.get_traceback_text()
+        self.assertIn(explicit_exc.format("Top level"), text)
+        self.assertIn(implicit_exc.format("Second exception"), text)
+
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
         request = self.rf.get('/test_view/')
@@ -403,7 +415,7 @@ class ExceptionReporterTests(SimpleTestCase):
     def test_unprintable_values_handling(self):
         "Unprintable values should not make the output generation choke."
         try:
-            class OomOutput(object):
+            class OomOutput:
                 def __repr__(self):
                     raise MemoryError('OOM')
             oomvalue = OomOutput()  # NOQA
@@ -419,7 +431,7 @@ class ExceptionReporterTests(SimpleTestCase):
         large = 256 * 1024
         repr_of_str_adds = len(repr(''))
         try:
-            class LargeOutput(object):
+            class LargeOutput:
                 def __repr__(self):
                     return repr('A' * large)
             largevalue = LargeOutput()  # NOQA
@@ -431,11 +443,10 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
-    @skipIf(six.PY2, 'Bug manifests on PY3 only')
     def test_unfrozen_importlib(self):
         """
         importlib is not a frozen app, but its loader thinks it's frozen which
-        results in an ImportError on Python 3. Refs #21443.
+        results in an ImportError. Refs #21443.
         """
         try:
             request = self.rf.get('/test_view/')
@@ -483,10 +494,7 @@ class ExceptionReporterTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        if six.PY3:
-            value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
-        else:
-            value = '<td>items</td><td class="code"><pre>u&#39;Oops&#39;</pre></td>'
+        value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
@@ -498,7 +506,7 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertInHTML(value, html)
         # FILES
-        fp = six.StringIO('filecontent')
+        fp = StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
@@ -520,7 +528,7 @@ class ExceptionReporterTests(SimpleTestCase):
         The error page can be rendered if the current user can't be retrieved
         (such as when the database is unavailable).
         """
-        class ExceptionUser(object):
+        class ExceptionUser:
             def __str__(self):
                 raise Exception()
 
@@ -602,22 +610,18 @@ class PlainTextReportTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        if six.PY3:
-            value = "items = 'Oops'"
-        else:
-            value = "items = u'Oops'"
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
-        self.assertIn(value, text)
+        self.assertIn("items = 'Oops'", text)
         # POST
         request = self.rf.post('/test_view/', data={'items': 'Oops'})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
-        self.assertIn(value, text)
+        self.assertIn("items = 'Oops'", text)
         # FILES
-        fp = six.StringIO('filecontent')
+        fp = StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
@@ -643,7 +647,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertIn("http://evil.com/", text)
 
 
-class ExceptionReportTestMixin(object):
+class ExceptionReportTestMixin:
 
     # Mixin used in the ExceptionReporterFilterTests and
     # AjaxResponseExceptionReporterFilter tests below
@@ -729,14 +733,14 @@ class ExceptionReportTestMixin(object):
             email = mail.outbox[0]
 
             # Frames vars are never shown in plain text email reports.
-            body_plain = force_text(email.body)
+            body_plain = str(email.body)
             self.assertNotIn('cooked_eggs', body_plain)
             self.assertNotIn('scrambled', body_plain)
             self.assertNotIn('sauce', body_plain)
             self.assertNotIn('worcestershire', body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = force_text(email.alternatives[0][0])
+            body_html = str(email.alternatives[0][0])
             self.assertIn('cooked_eggs', body_html)
             self.assertIn('scrambled', body_html)
             self.assertIn('sauce', body_html)
@@ -762,14 +766,14 @@ class ExceptionReportTestMixin(object):
             email = mail.outbox[0]
 
             # Frames vars are never shown in plain text email reports.
-            body_plain = force_text(email.body)
+            body_plain = str(email.body)
             self.assertNotIn('cooked_eggs', body_plain)
             self.assertNotIn('scrambled', body_plain)
             self.assertNotIn('sauce', body_plain)
             self.assertNotIn('worcestershire', body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = force_text(email.alternatives[0][0])
+            body_html = str(email.alternatives[0][0])
             self.assertIn('cooked_eggs', body_html)
             self.assertIn('scrambled', body_html)
             self.assertIn('sauce', body_html)
@@ -801,7 +805,7 @@ class ExceptionReportTestMixin(object):
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
-            body = force_text(email.body)
+            body = str(email.body)
             self.assertNotIn('cooked_eggs', body)
             self.assertNotIn('scrambled', body)
             self.assertNotIn('sauce', body)
@@ -940,7 +944,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
         Callable settings which forbid to set attributes should not break
         the debug page (#23070).
         """
-        class CallableSettingWithSlots(object):
+        class CallableSettingWithSlots:
             __slots__ = []
 
             def __call__(self):

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
 from datetime import datetime
 
@@ -10,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.utils import six, translation
+from django.utils import translation
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
 
@@ -153,31 +150,31 @@ class LogEntryTests(TestCase):
     def test_logentry_get_admin_url(self):
         """
         LogEntry.get_admin_url returns a URL to edit the entry's object or
-        None for non-existent (possibly deleted) models.
+        None for nonexistent (possibly deleted) models.
         """
         logentry = LogEntry.objects.get(content_type__model__iexact='article')
         expected_url = reverse('admin:admin_utils_article_change', args=(quote(self.a1.pk),))
         self.assertEqual(logentry.get_admin_url(), expected_url)
         self.assertIn('article/%d/change/' % self.a1.pk, logentry.get_admin_url())
 
-        logentry.content_type.model = "non-existent"
+        logentry.content_type.model = "nonexistent"
         self.assertIsNone(logentry.get_admin_url())
 
     def test_logentry_unicode(self):
         log_entry = LogEntry()
 
         log_entry.action_flag = ADDITION
-        self.assertTrue(six.text_type(log_entry).startswith('Added '))
+        self.assertTrue(str(log_entry).startswith('Added '))
 
         log_entry.action_flag = CHANGE
-        self.assertTrue(six.text_type(log_entry).startswith('Changed '))
+        self.assertTrue(str(log_entry).startswith('Changed '))
 
         log_entry.action_flag = DELETION
-        self.assertTrue(six.text_type(log_entry).startswith('Deleted '))
+        self.assertTrue(str(log_entry).startswith('Deleted '))
 
         # Make sure custom action_flags works
         log_entry.action_flag = 4
-        self.assertEqual(six.text_type(log_entry), 'LogEntry Object')
+        self.assertEqual(str(log_entry), 'LogEntry Object')
 
     def test_log_action(self):
         content_type_pk = ContentType.objects.get_for_model(Article).pk

@@ -6,9 +6,7 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.test import TestCase, modify_settings, override_settings
-from django.test.utils import ignore_warnings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango20Warning
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -153,22 +151,6 @@ class RemoteUserTest(TestCase):
         self.assertTrue(response.context['user'].is_anonymous)
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
-@override_settings(MIDDLEWARE=None)
-class RemoteUserTestMiddlewareClasses(RemoteUserTest):
-
-    def setUp(self):
-        self.patched_settings = modify_settings(
-            AUTHENTICATION_BACKENDS={'append': self.backend},
-            MIDDLEWARE_CLASSES={'append': [
-                'django.contrib.sessions.middleware.SessionMiddleware',
-                'django.contrib.auth.middleware.AuthenticationMiddleware',
-                self.middleware,
-            ]},
-        )
-        self.patched_settings.enable()
-
-
 class RemoteUserNoCreateBackend(RemoteUserBackend):
     """Backend that doesn't create unknown users."""
     create_unknown_user = False
@@ -236,7 +218,7 @@ class RemoteUserCustomTest(RemoteUserTest):
         The strings passed in REMOTE_USER should be cleaned and the known users
         should not have been configured with an email address.
         """
-        super(RemoteUserCustomTest, self).test_known_user()
+        super().test_known_user()
         self.assertEqual(User.objects.get(username='knownuser').email, '')
         self.assertEqual(User.objects.get(username='knownuser2').email, '')
 
@@ -244,7 +226,7 @@ class RemoteUserCustomTest(RemoteUserTest):
         """
         The unknown user created should be configured with an email address.
         """
-        super(RemoteUserCustomTest, self).test_unknown_user()
+        super().test_unknown_user()
         newuser = User.objects.get(username='newuser')
         self.assertEqual(newuser.email, 'user@example.com')
 

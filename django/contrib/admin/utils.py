@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 from collections import defaultdict
@@ -12,13 +10,11 @@ from django.db.models.deletion import Collector
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
-from django.utils import formats, six, timezone
-from django.utils.encoding import force_str, force_text, smart_text
+from django.utils import formats, timezone
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
-from django.utils.translation import (
-    override as translation_override, ungettext,
-)
+from django.utils.translation import ngettext, override as translation_override
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -28,7 +24,7 @@ class FieldIsAForeignKeyColumnName(Exception):
 
 def lookup_needs_distinct(opts, lookup_path):
     """
-    Returns True if 'distinct()' should be used to query the given lookup path.
+    Return True if 'distinct()' should be used to query the given lookup path.
     """
     lookup_fields = lookup_path.split(LOOKUP_SEP)
     # Remove the last item of the lookup path if it is a query term
@@ -49,7 +45,7 @@ def lookup_needs_distinct(opts, lookup_path):
 
 def prepare_lookup_value(key, value):
     """
-    Returns a lookup value prepared to be used in queryset filtering.
+    Return a lookup value prepared to be used in queryset filtering.
     """
     # if key ends with __in, split parameter into separate values
     if key.endswith('__in'):
@@ -70,7 +66,7 @@ def quote(s):
     Similar to urllib.quote, except that the quoting is slightly different so
     that it doesn't get automatically unquoted by the Web browser.
     """
-    if not isinstance(s, six.string_types):
+    if not isinstance(s, str):
         return s
     res = list(s)
     for i in range(len(res)):
@@ -102,8 +98,9 @@ def unquote(s):
 
 
 def flatten(fields):
-    """Returns a list which is a single level of flattening of the
-    original list."""
+    """
+    Return a list which is a single level of flattening of the original list.
+    """
     flat = []
     for field in fields:
         if isinstance(field, (list, tuple)):
@@ -114,7 +111,7 @@ def flatten(fields):
 
 
 def flatten_fieldsets(fieldsets):
-    """Returns a list of field names from an admin fieldsets structure."""
+    """Return a list of field names from an admin fieldsets structure."""
     field_names = []
     for name, opts in fieldsets:
         field_names.extend(
@@ -128,7 +125,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
 
-    Returns a nested list of strings suitable for display in the
+    Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
     collector = NestedObjects(using=using)
@@ -177,7 +174,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
 class NestedObjects(Collector):
     def __init__(self, *args, **kwargs):
-        super(NestedObjects, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
         self.model_objs = defaultdict(set)
@@ -197,12 +194,12 @@ class NestedObjects(Collector):
                 self.add_edge(None, obj)
             self.model_objs[obj._meta.model].add(obj)
         try:
-            return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+            return super().collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
     def related_objects(self, related, objs):
-        qs = super(NestedObjects, self).related_objects(related, objs)
+        qs = super().related_objects(related, objs)
         return qs.select_related(related.field.name)
 
     def _nested(self, obj, seen, format_callback):
@@ -272,7 +269,7 @@ def model_ngettext(obj, n=None):
         obj = obj.model
     d = model_format_dict(obj)
     singular, plural = d["verbose_name"], d["verbose_name_plural"]
-    return ungettext(singular, plural, n or 0)
+    return ngettext(singular, plural, n or 0)
 
 
 def lookup_field(name, obj, model_admin=None):
@@ -285,10 +282,7 @@ def lookup_field(name, obj, model_admin=None):
         if callable(name):
             attr = name
             value = attr(obj)
-        elif (model_admin is not None and
-                hasattr(model_admin, name) and
-                not name == '__str__' and
-                not name == '__unicode__'):
+        elif model_admin is not None and hasattr(model_admin, name) and name != '__str__':
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:
@@ -327,11 +321,11 @@ def _get_non_gfk_field(opts, name):
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
-    Returns a sensible label for a field name. The name can be a callable,
-    property (but not created with @property decorator) or the name of an
-    object's attribute, as well as a genuine fields. If return_attr is
-    True, the resolved attribute (which could be a callable) is also returned.
-    This will be None if (and only if) the name refers to a field.
+    Return a sensible label for a field name. The name can be a callable,
+    property (but not created with @property decorator), or the name of an
+    object's attribute, as well as a model field. If return_attr is True, also
+    return the resolved attribute (which could be a callable). This will be
+    None if (and only if) the name refers to a field.
     """
     attr = None
     try:
@@ -342,12 +336,9 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             # field is likely a ForeignObjectRel
             label = field.related_model._meta.verbose_name
     except FieldDoesNotExist:
-        if name == "__unicode__":
+        if name == "__str__":
             label = force_text(model._meta.verbose_name)
-            attr = six.text_type
-        elif name == "__str__":
-            label = force_str(model._meta.verbose_name)
-            attr = bytes
+            attr = str
         else:
             if callable(name):
                 attr = name
@@ -432,7 +423,7 @@ def display_for_value(value, empty_value_display, boolean=False):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
+    elif isinstance(value, (int, decimal.Decimal, float)):
         return formats.number_format(value)
     elif isinstance(value, (list, tuple)):
         return ', '.join(force_text(v) for v in value)

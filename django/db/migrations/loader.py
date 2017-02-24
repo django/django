@@ -1,14 +1,11 @@
-from __future__ import unicode_literals
-
 import os
 import sys
-from importlib import import_module
+from importlib import import_module, reload
 
 from django.apps import apps
 from django.conf import settings
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.utils import six
 
 from .exceptions import (
     AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
@@ -18,7 +15,7 @@ from .exceptions import (
 MIGRATIONS_MODULE_NAME = 'migrations'
 
 
-class MigrationLoader(object):
+class MigrationLoader:
     """
     Loads migration files from disk, and their status from the database.
 
@@ -99,7 +96,7 @@ class MigrationLoader(object):
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
-                    six.moves.reload_module(module)
+                    reload(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py files
@@ -258,7 +255,7 @@ class MigrationLoader(object):
                 is_replaced = any(candidate in self.graph.nodes for candidate in candidates)
                 if not is_replaced:
                     tries = ', '.join('%s.%s' % c for c in candidates)
-                    exc_value = NodeNotFoundError(
+                    raise NodeNotFoundError(
                         "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
                         "Django tried to replace migration {1}.{2} with any of [{3}] "
                         "but wasn't able to because some of the replaced migrations "
@@ -266,11 +263,7 @@ class MigrationLoader(object):
                             exc.origin, exc.node[0], exc.node[1], tries
                         ),
                         exc.node
-                    )
-                    exc_value.__cause__ = exc
-                    if not hasattr(exc, '__traceback__'):
-                        exc.__traceback__ = sys.exc_info()[2]
-                    six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+                    ) from exc
             raise exc
 
     def check_consistent_history(self, connection):

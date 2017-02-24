@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -381,7 +381,19 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-#: core/validators.py:33
+#: core/paginator.py:43
+msgid "That page number is not an integer"
+msgstr ""
+
+#: core/paginator.py:45
+msgid "That page number is less than 1"
+msgstr ""
+
+#: core/paginator.py:50
+msgid "That page contains no results"
+msgstr ""
+
+#: core/validators.py:34
 msgid "Enter a valid value."
 msgstr ""
 
@@ -484,7 +496,14 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: db/models/base.py:1095 forms/models.py:727
+#: core/validators.py:464
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+#: db/models/base.py:1205 forms/models.py:732
 msgid "and"
 msgstr ""
 
@@ -890,16 +909,16 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: forms/widgets.py:353
+#: forms/widgets.py:378
+msgid "Clear"
+msgstr ""
+
+#: forms/widgets.py:379
 msgid "Currently"
 msgstr ""
 
-#: forms/widgets.py:354
+#: forms/widgets.py:380
 msgid "Change"
-msgstr ""
-
-#: forms/widgets.py:355
-msgid "Clear"
 msgstr ""
 
 #: forms/widgets.py:570
@@ -1365,8 +1384,8 @@ msgstr ""
 
 #: views/debug.py:511
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 #: views/debug.py:513

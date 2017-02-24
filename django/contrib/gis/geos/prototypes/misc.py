@@ -7,7 +7,6 @@ from ctypes import POINTER, c_double, c_int
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
 from django.contrib.gis.geos.prototypes.errcheck import check_dbl, check_string
 from django.contrib.gis.geos.prototypes.geom import geos_char_p
-from django.utils.six.moves import range
 
 __all__ = ['geos_area', 'geos_distance', 'geos_length', 'geos_isvalidreason']
 
@@ -24,7 +23,7 @@ class DblFromGeom(GEOSFuncFactory):
         argtypes = [GEOM_PTR for i in range(num_geom)]
         argtypes += [POINTER(c_double)]
         self.argtypes = argtypes
-        return super(DblFromGeom, self).get_func()
+        return super().get_func()
 
 
 # ### ctypes prototypes ###

@@ -1,7 +1,7 @@
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.db import connection
-from django.test import TestCase, mock
+from django.test import TestCase
 
 
 class TestDatabaseFeatures(TestCase):

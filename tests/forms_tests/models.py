@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import itertools
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 callable_default_counter = itertools.count()
 
@@ -58,7 +54,6 @@ class ChoiceModel(models.Model):
                                          null=True)
 
 
-@python_2_unicode_compatible
 class ChoiceOptionModel(models.Model):
     """Destination for ChoiceFieldModel's ForeignKey.
     Can't reuse ChoiceModel because error_message tests require that it have no instances."""
@@ -135,7 +130,6 @@ class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     name = models.CharField(max_length=10)
 

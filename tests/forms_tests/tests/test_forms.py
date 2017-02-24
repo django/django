@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import copy
 import datetime
 import json
@@ -22,11 +19,8 @@ from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import format_html
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import mark_safe
 
 
 class Person(Form):
@@ -1239,7 +1233,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             last_name = CharField()
 
             def __init__(self, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['birthday'] = DateField()
 
         p = Person(auto_id=False)
@@ -1310,7 +1304,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             last_name = CharField(required=False)
 
             def __init__(self, names_required=False, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
                 if names_required:
                     self.fields['first_name'].required = True
@@ -1337,7 +1331,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             last_name = CharField(max_length=30)
 
             def __init__(self, name_max_length=None, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
                 if name_max_length:
                     self.fields['first_name'].max_length = name_max_length
@@ -1358,7 +1352,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             gender = ChoiceField(choices=(('f', 'Female'), ('m', 'Male')))
 
             def __init__(self, allow_unspec_gender=False, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
                 if allow_unspec_gender:
                     self.fields['gender'].choices += (('u', 'Unspecified'),)
@@ -1548,7 +1542,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             field_order = None
 
             def __init__(self, **kwargs):
-                super(TestFormInit, self).__init__(**kwargs)
+                super().__init__(**kwargs)
                 self.order_fields(field_order=TestForm.field_order)
 
         p = TestFormParent()
@@ -2034,22 +2028,6 @@ Password: <input type="password" name="password" required /></li>
         form = PersonForm({})
         self.assertEqual(form['name'].value(), 'John Doe')
 
-    def test_boundfield_rendering(self):
-        """
-        Python 2 issue: Rendering a BoundField with bytestring content
-        doesn't lose it's safe string status (#22950).
-        """
-        class CustomWidget(TextInput):
-            def render(self, name, value, attrs=None, choices=None,
-                       renderer=None, extra_context=None):
-                return format_html(str('<input{} />'), ' id=custom')
-
-        class SampleForm(Form):
-            name = CharField(widget=CustomWidget)
-
-        f = SampleForm(data={'name': 'bar'})
-        self.assertIsInstance(force_text(f['name']), SafeData)
-
     def test_custom_boundfield(self):
         class CustomField(CharField):
             def get_bound_field(self, form, name):
@@ -2445,7 +2423,7 @@ Password: <input type="password" name="password" required />
         )
         self.assertTrue(f.is_valid())
 
-        file1 = SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))
+        file1 = SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode())
         f = FileForm(data={}, files={'file1': file1}, auto_id=False)
         self.assertHTMLEqual(
             f.as_table(),
@@ -2524,9 +2502,7 @@ Password: <input type="password" name="password" required />
         # Case 3: POST with valid data (the success message).)
         self.assertEqual(
             my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}),
-            str_prefix(
-                "VALID: [('password1', %(_)s'secret'), ('password2', %(_)s'secret'), ('username', %(_)s'adrian')]"
-            )
+            "VALID: [('password1', 'secret'), ('password2', 'secret'), ('username', 'adrian')]"
         )
 
     def test_templates_with_forms(self):
@@ -2844,7 +2820,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             def __init__(self, fields=(), *args, **kwargs):
                 fields = (CharField(label='First name', max_length=10),
                           CharField(label='Last name', max_length=10))
-                super(NameField, self).__init__(fields=fields, *args, **kwargs)
+                super().__init__(fields=fields, *args, **kwargs)
 
             def compress(self, data_list):
                 return ' '.join(data_list)
@@ -2875,7 +2851,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                     ChoiceField(label='Rank', choices=((1, 1), (2, 2))),
                     CharField(label='Name', max_length=10),
                 )
-                super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
+                super().__init__(fields=fields, *args, **kwargs)
 
         field = ChoicesField()
         field2 = copy.deepcopy(field)
@@ -2890,7 +2866,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         class DateAgeField(MultiValueField):
             def __init__(self, fields=(), *args, **kwargs):
                 fields = (DateField(label="Date"), IntegerField(label="Age"))
-                super(DateAgeField, self).__init__(fields=fields, *args, **kwargs)
+                super().__init__(fields=fields, *args, **kwargs)
 
         class DateAgeForm(Form):
             date_age = DateAgeField()
@@ -2909,7 +2885,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                     CharField(label='Extension', error_messages={'incomplete': 'Enter an extension.'}),
                     CharField(label='Label', required=False, help_text='E.g. home, work.'),
                 )
-                super(PhoneField, self).__init__(fields, *args, **kwargs)
+                super().__init__(fields, *args, **kwargs)
 
             def compress(self, data_list):
                 if data_list:
@@ -2959,10 +2935,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        self.assertRaisesRegex(
-            ValidationError,
-            r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
-        )
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
+            f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
@@ -2975,7 +2949,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        with self.assertRaisesRegex(ValidationError, r"'Enter a complete value\.', u?'Enter an extension\.'"):
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
             f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
@@ -2992,7 +2966,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                 # Fake json.loads
                 if value == '{}':
                     return {}
-                return super(CustomJSONField, self).to_python(value)
+                return super().to_python(value)
 
         class JSONForm(forms.Form):
             json = CustomJSONField()
@@ -3380,7 +3354,6 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         )
 
     def test_errorlist_override(self):
-        @python_2_unicode_compatible
         class DivErrorList(ErrorList):
             def __str__(self):
                 return self.as_divs()
@@ -3389,7 +3362,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                 if not self:
                     return ''
                 return '<div class="errorlist">%s</div>' % ''.join(
-                    '<div class="error">%s</div>' % force_text(e) for e in self)
+                    '<div class="error">%s</div>' % e for e in self)
 
         class CommentForm(Form):
             name = CharField(max_length=50, required=False)
@@ -3499,9 +3472,9 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 
         form = SimpleForm()
         self.assertTrue(hasattr(SimpleForm, '__html__'))
-        self.assertEqual(force_text(form), form.__html__())
+        self.assertEqual(str(form), form.__html__())
         self.assertTrue(hasattr(form['username'], '__html__'))
-        self.assertEqual(force_text(form['username']), form['username'].__html__())
+        self.assertEqual(str(form['username']), form['username'].__html__())
 
     def test_use_required_attribute_true(self):
         class MyForm(Form):

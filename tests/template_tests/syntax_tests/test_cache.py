@@ -128,7 +128,7 @@ class CacheTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(libraries={'cache': 'django.templatetags.cache'})
-        super(CacheTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_cache_regression_20130(self):
         t = self.engine.from_string('{% load cache %}{% cache 1 regression_20130 %}foo{% endcache %}')

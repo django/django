@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import re
 from decimal import Decimal
@@ -186,7 +184,7 @@ class AggregateTestCase(TestCase):
             page_sum=Sum("pages")).defer('name').filter(pk=self.b1.pk)
 
         rows = [
-            (1, "159059725", 447, "The Definitive Guide to Django: Web Development Done Right")
+            (self.b1.id, "159059725", 447, "The Definitive Guide to Django: Web Development Done Right")
         ]
         self.assertQuerysetEqual(
             qs.order_by('pk'), rows,
@@ -198,7 +196,7 @@ class AggregateTestCase(TestCase):
             page_sum=Sum("pages")).defer('name').filter(pk=self.b1.pk)
 
         rows = [
-            (1, "159059725", 447, "Adrian Holovaty",
+            (self.b1.id, "159059725", 447, "Adrian Holovaty",
              "The Definitive Guide to Django: Web Development Done Right")
         ]
         self.assertQuerysetEqual(
@@ -292,15 +290,15 @@ class AggregateTestCase(TestCase):
         self.assertEqual(
             books, [
                 {
-                    "contact_id": 1,
-                    "id": 1,
+                    "contact_id": self.a1.id,
+                    "id": self.b1.id,
                     "isbn": "159059725",
                     "mean_age": 34.5,
                     "name": "The Definitive Guide to Django: Web Development Done Right",
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
-                    "publisher_id": 1,
+                    "publisher_id": self.p1.id,
                     "rating": 4.5,
                 }
             ]
@@ -315,7 +313,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(
             list(books), [
                 {
-                    "pk": 1,
+                    "pk": self.b1.pk,
                     "isbn": "159059725",
                     "mean_age": 34.5,
                 }
@@ -335,15 +333,15 @@ class AggregateTestCase(TestCase):
         self.assertEqual(
             list(books), [
                 {
-                    "contact_id": 1,
-                    "id": 1,
+                    "contact_id": self.a1.id,
+                    "id": self.b1.id,
                     "isbn": "159059725",
                     "mean_age": 34.5,
                     "name": "The Definitive Guide to Django: Web Development Done Right",
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
-                    "publisher_id": 1,
+                    "publisher_id": self.p1.id,
                     "rating": 4.5,
                 }
             ]
@@ -517,7 +515,7 @@ class AggregateTestCase(TestCase):
         """
         Sum on a distinct() QuerySet should aggregate only the distinct items.
         """
-        authors = Author.objects.filter(book__in=[5, 6])
+        authors = Author.objects.filter(book__in=[self.b5, self.b6])
         self.assertEqual(authors.count(), 3)
 
         distinct_authors = authors.distinct()
@@ -536,7 +534,7 @@ class AggregateTestCase(TestCase):
             rating=3.5,
             price=Decimal("1000"),
             publisher=p,
-            contact_id=1,
+            contact_id=self.a1.id,
             pubdate=datetime.date(2008, 12, 1)
         )
         Book.objects.create(
@@ -546,7 +544,7 @@ class AggregateTestCase(TestCase):
             rating=4.0,
             price=Decimal("1000"),
             publisher=p,
-            contact_id=1,
+            contact_id=self.a1.id,
             pubdate=datetime.date(2008, 12, 2)
         )
         Book.objects.create(
@@ -556,7 +554,7 @@ class AggregateTestCase(TestCase):
             rating=4.5,
             price=Decimal("35"),
             publisher=p,
-            contact_id=1,
+            contact_id=self.a1.id,
             pubdate=datetime.date(2008, 12, 3)
         )
 
@@ -735,25 +733,25 @@ class AggregateTestCase(TestCase):
                 {
                     'earliest_book': datetime.date(1991, 10, 15),
                     'num_awards': 9,
-                    'id': 4,
+                    'id': self.p4.id,
                     'name': 'Morgan Kaufmann'
                 },
                 {
                     'earliest_book': datetime.date(1995, 1, 15),
                     'num_awards': 7,
-                    'id': 3,
+                    'id': self.p3.id,
                     'name': 'Prentice Hall'
                 },
                 {
                     'earliest_book': datetime.date(2007, 12, 6),
                     'num_awards': 3,
-                    'id': 1,
+                    'id': self.p1.id,
                     'name': 'Apress'
                 },
                 {
                     'earliest_book': datetime.date(2008, 3, 3),
                     'num_awards': 1,
-                    'id': 2,
+                    'id': self.p2.id,
                     'name': 'Sams'
                 }
             ]
@@ -777,7 +775,7 @@ class AggregateTestCase(TestCase):
         )
         self.assertEqual(
             list(books), [
-                (1, "159059725", 34.5),
+                (self.b1.id, "159059725", 34.5),
             ]
         )
 
@@ -1090,7 +1088,7 @@ class AggregateTestCase(TestCase):
         class MyMax(Max):
             def as_sql(self, compiler, connection):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
-                return super(MyMax, self).as_sql(compiler, connection)
+                return super().as_sql(compiler, connection)
 
         with self.assertRaisesMessage(FieldError, "Cannot compute Max('id__max'): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(my_max=MyMax('id__max', 'price'))
@@ -1099,7 +1097,7 @@ class AggregateTestCase(TestCase):
         class MyMax(Max):
             def as_sql(self, compiler, connection):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
-                return super(MyMax, self).as_sql(compiler, connection)
+                return super().as_sql(compiler, connection)
 
         with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Book.objects.aggregate(MyMax('pages', 'price'))
@@ -1174,7 +1172,7 @@ class AggregateTestCase(TestCase):
             function = 'GREATEST'
 
             def as_sqlite(self, compiler, connection):
-                return super(Greatest, self).as_sql(compiler, connection, function='MAX')
+                return super().as_sql(compiler, connection, function='MAX')
 
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))

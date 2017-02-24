@@ -113,17 +113,11 @@ are loaded from the database::
         if not self._state.adding and (
                 self.creator_id != self._loaded_values['creator_id']):
             raise ValueError("Updating the value of creator isn't allowed")
-        super(...).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would of course be possible to just use ``super()`` call
 in the ``from_db()`` method.
-
-.. versionchanged:: 1.10
-
-    In older versions, you could check if all fields were loaded by consulting
-    ``cls._deferred``. This attribute is removed and
-    ``django.db.models.DEFERRED`` is new.
 
 Refreshing objects from database
 ================================
@@ -134,11 +128,6 @@ value from the database::
     >>> obj = MyModel.objects.first()
     >>> del obj.field
     >>> obj.field  # Loads the field from the database
-
-.. versionchanged:: 1.10
-
-    In older versions, accessing a deleted field raised ``AttributeError``
-    instead of reloading it.
 
 .. method:: Model.refresh_from_db(using=None, fields=None)
 
@@ -195,7 +184,7 @@ all of the instance's fields when a deferred field is reloaded::
                 if fields.intersection(deferred_fields):
                     # then load all of them
                     fields = fields.union(deferred_fields)
-            super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
+            super().refresh_from_db(using, fields, **kwargs)
 
 .. method:: Model.get_deferred_fields()
 
@@ -272,7 +261,7 @@ access to more than a single field::
     import datetime
     from django.core.exceptions import ValidationError
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class Article(models.Model):
         ...
@@ -612,18 +601,13 @@ representation of the model from the ``__str__()`` method.
 For example::
 
     from django.db import models
-    from django.utils.encoding import python_2_unicode_compatible
 
-    @python_2_unicode_compatible  # only if you need to support Python 2
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
             return '%s %s' % (self.first_name, self.last_name)
-
-If you'd like compatibility with Python 2, you can decorate your model class
-with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 
 ``__eq__()``
 ------------
@@ -749,8 +733,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
     Code and templates calling ``get_absolute_url()`` should be able to use the
     result directly without any further processing. You may wish to use the
     ``django.utils.encoding.iri_to_uri()`` function to help with this if you
-    are using unicode strings containing characters outside the ASCII range at
-    all.
+    are using strings containing characters outside the ASCII range.
 
 Extra instance methods
 ======================

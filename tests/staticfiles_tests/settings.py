@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
 import os.path
 
-from django.utils._os import upath
-
-TEST_ROOT = os.path.dirname(upath(__file__))
+TEST_ROOT = os.path.dirname(__file__)
 
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
@@ -26,4 +22,7 @@ TEST_SETTINGS = {
         'staticfiles_tests.apps.test',
         'staticfiles_tests.apps.no_label',
     ],
+    # In particular, AuthenticationMiddleware can't be used because
+    # contrib.auth isn't in INSTALLED_APPS.
+    'MIDDLEWARE': [],
 }

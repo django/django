@@ -358,14 +358,6 @@ If you have an authenticated user you want to attach to the current session
                 # Return an 'invalid login' error message.
                 ...
 
-    .. versionchanged:: 1.10
-
-        In older versions, when you're manually logging a user in, you *must*
-        successfully authenticate the user with
-        :func:`~django.contrib.auth.authenticate()` before you call
-        :func:`~django.contrib.auth.login()`. Now you can set the backend using
-        the new ``backend`` argument.
-
 Selecting the authentication backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -824,15 +816,6 @@ user to the login page or issue an HTTP 403 Forbidden response.
 Session invalidation on password change
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionchanged:: 1.10
-
-    Session verification is enabled and mandatory in Django 1.10 (there's no
-    way to disable it) regardless of whether or not
-    ``SessionAuthenticationMiddleware`` is enabled. In older
-    versions, this protection only applies if
-    ``django.contrib.auth.middleware.SessionAuthenticationMiddleware``
-    is enabled in :setting:`MIDDLEWARE`.
-
 If your :setting:`AUTH_USER_MODEL` inherits from
 :class:`~django.contrib.auth.models.AbstractBaseUser` or implements its own
 :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
@@ -955,7 +938,7 @@ All authentication views
 This is a list with all the views ``django.contrib.auth`` provides. For
 implementation details see :ref:`using-the-views`.
 
-.. function:: login(request, template_name=`registration/login.html`, redirect_field_name='next', authentication_form=AuthenticationForm, current_app=None, extra_context=None, redirect_authenticated_user=False)
+.. function:: login(request, template_name=`registration/login.html`, redirect_field_name='next', authentication_form=AuthenticationForm, extra_context=None, redirect_authenticated_user=False)
 
     .. deprecated:: 1.11
 
@@ -963,20 +946,7 @@ implementation details see :ref:`using-the-views`.
         :class:`LoginView`.
 
     The optional arguments of this view are similar to the class-based
-    ``LoginView`` attributes. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the
-      current view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` attribute is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
-
-    .. versionadded:: 1.10
-
-        The ``redirect_authenticated_user`` parameter was added.
+    ``LoginView`` attributes.
 
 .. class:: LoginView
 
@@ -1116,7 +1086,7 @@ implementation details see :ref:`using-the-views`.
     ``get_user()`` method which returns the authenticated user object (this
     method is only ever called after successful form validation).
 
-.. function:: logout(request, next_page=None, template_name='registration/logged_out.html', redirect_field_name='next', current_app=None, extra_context=None)
+.. function:: logout(request, next_page=None, template_name='registration/logged_out.html', redirect_field_name='next', extra_context=None)
 
     .. deprecated:: 1.11
 
@@ -1124,16 +1094,7 @@ implementation details see :ref:`using-the-views`.
         class-based :class:`LogoutView`.
 
     The optional arguments of this view are similar to the class-based
-    ``LogoutView`` attributes. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the
-      current view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` attribute is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``LogoutView`` attributes.
 
 .. class:: LogoutView
 
@@ -1178,7 +1139,7 @@ implementation details see :ref:`using-the-views`.
       :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
-.. function:: logout_then_login(request, login_url=None, current_app=None, extra_context=None)
+.. function:: logout_then_login(request, login_url=None, extra_context=None)
 
     Logs a user out, then redirects to the login page.
 
@@ -1189,24 +1150,15 @@ implementation details see :ref:`using-the-views`.
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
 
     .. deprecated:: 1.11
 
         The unused ``extra_context`` parameter is deprecated and will be
         removed in Django 2.1.
 
-.. function:: password_change(request, template_name='registration/password_change_form.html', post_change_redirect=None, password_change_form=PasswordChangeForm, current_app=None, extra_context=None)
+.. function:: password_change(request, template_name='registration/password_change_form.html', post_change_redirect=None, password_change_form=PasswordChangeForm, extra_context=None)
 
     .. deprecated:: 1.11
 
@@ -1216,16 +1168,7 @@ implementation details see :ref:`using-the-views`.
     The optional arguments of this view are similar to the class-based
     ``PasswordChangeView`` attributes, except the ``post_change_redirect`` and
     ``password_change_form`` arguments which map to the ``success_url`` and
-    ``form_class`` attributes of the class-based view. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``form_class`` attributes of the class-based view.
 
 .. class:: PasswordChangeView
 
@@ -1256,7 +1199,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``form``: The password change form (see ``form_class`` above).
 
-.. function:: password_change_done(request, template_name='registration/password_change_done.html', current_app=None, extra_context=None)
+.. function:: password_change_done(request, template_name='registration/password_change_done.html', extra_context=None)
 
     .. deprecated:: 1.11
 
@@ -1264,16 +1207,7 @@ implementation details see :ref:`using-the-views`.
         the class-based :class:`PasswordChangeDoneView`.
 
     The optional arguments of this view are similar to the class-based
-    ``PasswordChangeDoneView`` attributes. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``PasswordChangeDoneView`` attributes.
 
 .. class:: PasswordChangeDoneView
 
@@ -1292,7 +1226,7 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
-.. function:: password_reset(request, template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', subject_template_name='registration/password_reset_subject.txt', password_reset_form=PasswordResetForm, token_generator=default_token_generator, post_reset_redirect=None, from_email=None, current_app=None, extra_context=None, html_email_template_name=None, extra_email_context=None)
+.. function:: password_reset(request, template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', subject_template_name='registration/password_reset_subject.txt', password_reset_form=PasswordResetForm, token_generator=default_token_generator, post_reset_redirect=None, from_email=None, extra_context=None, html_email_template_name=None, extra_email_context=None)
 
     .. deprecated:: 1.11
 
@@ -1302,16 +1236,7 @@ implementation details see :ref:`using-the-views`.
     The optional arguments of this view are similar to the class-based
     ``PasswordResetView`` attributes, except the ``post_reset_redirect`` and
     ``password_reset_form`` arguments which map to the ``success_url`` and
-    ``form_class`` attributes of the class-based view. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``form_class`` attributes of the class-based view.
 
 .. class:: PasswordResetView
 
@@ -1413,7 +1338,7 @@ implementation details see :ref:`using-the-views`.
     The same template context is used for subject template. Subject must be
     single line plain text string.
 
-.. function:: password_reset_done(request, template_name='registration/password_reset_done.html', current_app=None, extra_context=None)
+.. function:: password_reset_done(request, template_name='registration/password_reset_done.html', extra_context=None)
 
     .. deprecated:: 1.11
 
@@ -1421,16 +1346,7 @@ implementation details see :ref:`using-the-views`.
         the  class-based :class:`PasswordResetDoneView`.
 
     The optional arguments of this view are similar to the class-based
-    ``PasswordResetDoneView`` attributes. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``PasswordResetDoneView`` attributes.
 
 .. class:: PasswordResetDoneView
 
@@ -1457,7 +1373,7 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
-.. function:: password_reset_confirm(request, uidb64=None, token=None, template_name='registration/password_reset_confirm.html', token_generator=default_token_generator, set_password_form=SetPasswordForm, post_reset_redirect=None, current_app=None, extra_context=None)
+.. function:: password_reset_confirm(request, uidb64=None, token=None, template_name='registration/password_reset_confirm.html', token_generator=default_token_generator, set_password_form=SetPasswordForm, post_reset_redirect=None, extra_context=None)
 
     .. deprecated:: 1.11
 
@@ -1467,16 +1383,7 @@ implementation details see :ref:`using-the-views`.
     The optional arguments of this view are similar to the class-based
     ``PasswordResetConfirmView`` attributes, except the ``post_reset_redirect``
     and ``set_password_form`` arguments which map to the ``success_url`` and
-    ``form_class`` attributes of the class-based view. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``form_class`` attributes of the class-based view.
 
 .. class:: PasswordResetConfirmView
 
@@ -1523,7 +1430,7 @@ implementation details see :ref:`using-the-views`.
     * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
       ``token``) is valid or unused yet.
 
-.. function:: password_reset_complete(request, template_name='registration/password_reset_complete.html', current_app=None, extra_context=None)
+.. function:: password_reset_complete(request, template_name='registration/password_reset_complete.html', extra_context=None)
 
     .. deprecated:: 1.11
 
@@ -1531,16 +1438,7 @@ implementation details see :ref:`using-the-views`.
         by the class-based :class:`PasswordResetCompleteView`.
 
     The optional arguments of this view are similar to the class-based
-    ``PasswordResetCompleteView`` attributes. In addition, it has:
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    .. deprecated:: 1.9
-
-        The ``current_app`` parameter is deprecated and will be removed in
-        Django 2.0. Callers should set ``request.current_app`` instead.
+    ``PasswordResetCompleteView`` attributes.
 
 .. class:: PasswordResetCompleteView
 

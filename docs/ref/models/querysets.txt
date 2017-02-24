@@ -149,11 +149,10 @@ Here's the formal declaration of a ``QuerySet``:
     .. note::
 
         The ``query`` parameter to :class:`QuerySet` exists so that specialized
-        query subclasses such as
-        :class:`~django.contrib.gis.db.models.GeoQuerySet` can reconstruct
-        internal query state. The value of the parameter is an opaque
-        representation of that query state and is not part of a public API.
-        To put it simply: if you need to ask, you don't need to use it.
+        query subclasses can reconstruct internal query state. The value of the
+        parameter is an opaque representation of that query state and is not
+        part of a public API. To put it simply: if you need to ask, you don't
+        need to use it.
 
 .. currentmodule:: django.db.models.query.QuerySet
 
@@ -801,6 +800,61 @@ typically caches its results. If the data in the database might have changed
 since a ``QuerySet`` was evaluated, you can get updated results for the same
 query by calling ``all()`` on a previously evaluated ``QuerySet``.
 
+``union()``
+~~~~~~~~~~~
+
+.. method:: union(*other_qs, all=False)
+
+.. versionadded:: 1.11
+
+Uses SQL's ``UNION`` operator to combine the results of two or more
+``QuerySet``\s. For example:
+
+    >>> qs1.union(qs2, qs3)
+
+The ``UNION`` operator selects only distinct values by default. To allow
+duplicate values, use the ``all=True`` argument.
+
+``union()``, ``intersection()``, and ``difference()`` return model instances
+of the type of the first ``QuerySet`` even if the arguments are ``QuerySet``\s
+of other models. Passing different models works as long as the ``SELECT`` list
+is the same in all ``QuerySet``\s (at least the types, the names don't matter
+as long as the types in the same order).
+
+In addition, only ``LIMIT``, ``OFFSET``, and ``ORDER BY`` (i.e. slicing and
+:meth:`order_by`) are allowed on the resulting ``QuerySet``. Further, databases
+place restrictions on what operations are allowed in the combined queries. For
+example, most databases don't allow ``LIMIT`` or ``OFFSET`` in the combined
+queries.
+
+``intersection()``
+~~~~~~~~~~~~~~~~~~
+
+.. method:: intersection(*other_qs)
+
+.. versionadded:: 1.11
+
+Uses SQL's ``INTERSECT`` operator to return the shared elements of two or more
+``QuerySet``\s. For example:
+
+    >>> qs1.itersect(qs2, qs3)
+
+See :meth:`union` for some restrictions.
+
+``difference()``
+~~~~~~~~~~~~~~~~
+
+.. method:: difference(*other_qs)
+
+.. versionadded:: 1.11
+
+Uses SQL's ``EXCEPT`` operator to keep only elements present in the
+``QuerySet`` but not in some other ``QuerySet``\s. For example::
+
+    >>> qs1.difference(qs2, qs3)
+
+See :meth:`union` for some restrictions.
+
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -948,7 +1002,7 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s (%s)" % (
                 self.name,
                 ", ".join(topping.name for topping in self.toppings.all()),
@@ -1895,11 +1949,6 @@ This has a number of caveats though:
   unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
 
-.. versionchanged:: 1.10
-
-    Support for setting primary keys on objects created using ``bulk_create()``
-    when using PostgreSQL was added.
-
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
@@ -1924,11 +1973,6 @@ A ``count()`` call performs a ``SELECT COUNT(*)`` behind the scenes, so you
 should always use ``count()`` rather than loading all of the record into Python
 objects and calling ``len()`` on the result (unless you need to load the
 objects into memory anyway, in which case ``len()`` will be faster).
-
-Depending on which database you're using (e.g. PostgreSQL vs. MySQL),
-``count()`` may return a long integer instead of a normal Python integer. This
-is an underlying implementation quirk that shouldn't pose any real-world
-problems.
 
 Note that if you want the number of items in a ``QuerySet`` and are also
 retrieving model instances from it (for example, by iterating over it), it's
@@ -1957,10 +2001,6 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-.. versionchanged:: 1.10
-
-    In older versions, ``id_list`` was a required argument.
-
 ``iterator()``
 ~~~~~~~~~~~~~~
 
@@ -1981,15 +2021,15 @@ evaluated will force it to evaluate again, repeating the query.
 Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
 ignored since these two optimizations do not make sense together.
 
-.. warning::
+Some Python database drivers still load the entire result set into memory, but
+won't cache results after iterating over them. Oracle and :ref:`PostgreSQL
+<postgresql-server-side-cursors>` use server-side cursors to stream results
+from the database without loading the entire result set into memory.
 
-    Some Python database drivers like ``psycopg2`` perform caching if using
-    client side cursors (instantiated with ``connection.cursor()`` and what
-    Django's ORM uses). Using ``iterator()`` does not affect caching at the
-    database driver level. To disable this caching, look at `server side
-    cursors`_.
+.. versionchanged:: 1.11
 
-.. _server side cursors: http://initd.org/psycopg/docs/usage.html#server-side-cursors
+    PostgreSQL support for server-side cursors was added.
+
 
 ``latest()``
 ~~~~~~~~~~~~
@@ -2351,10 +2391,9 @@ Note the first query will match ``'Beatles Blog'``, ``'beatles blog'``,
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons. SQLite does not do case-insensitive matching for Unicode
-    strings.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
+    SQLite does not do case-insensitive matching for non-ASCII strings.
 
 .. fieldlookup:: contains
 
@@ -2398,9 +2437,8 @@ SQL equivalent::
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
 
 .. fieldlookup:: in
 
@@ -2532,9 +2570,8 @@ SQL equivalent::
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
 
 .. fieldlookup:: endswith
 
@@ -2574,9 +2611,8 @@ SQL equivalent::
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
 
 .. fieldlookup:: range
 
@@ -2863,33 +2899,6 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
-
-.. fieldlookup:: search
-
-``search``
-~~~~~~~~~~
-
-.. deprecated:: 1.10
-
-    See :ref:`the 1.10 release notes <search-lookup-replacement>` for how to
-    replace it.
-
-A boolean full-text search, taking advantage of full-text indexing. This is
-like :lookup:`contains` but is significantly faster due to full-text indexing.
-
-Example::
-
-    Entry.objects.filter(headline__search="+Django -jazz Python")
-
-SQL equivalent::
-
-    SELECT ... WHERE MATCH(tablename, headline) AGAINST (+Django -jazz Python IN BOOLEAN MODE);
-
-Note this is only available in MySQL and requires direct manipulation of the
-database to add the full-text index. By default Django uses BOOLEAN MODE for
-full text searches. See the `MySQL documentation`_ for additional details.
-
-.. _MySQL documentation: https://dev.mysql.com/doc/refman/en/fulltext-boolean.html
 
 .. fieldlookup:: regex
 
@@ -3178,8 +3187,6 @@ attribute:
 ------------------------------
 
 .. function:: prefetch_related_objects(model_instances, *related_lookups)
-
-.. versionadded:: 1.10
 
 Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;

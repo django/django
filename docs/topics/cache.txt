@@ -805,8 +805,7 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     >>> cache.get('my_key')
     'hello, world!'
 
-``key`` should be a ``str`` (or ``unicode`` on Python 2), and ``value`` can be
-any picklable Python object.
+``key`` should be a ``str``, and ``value`` can be any picklable Python object.
 
 The ``timeout`` argument is optional and defaults to the ``timeout`` argument
 of the appropriate backend in the :setting:`CACHES` setting (explained above).

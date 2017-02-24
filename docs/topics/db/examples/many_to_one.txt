@@ -11,7 +11,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
         last_name = models.CharField(max_length=30)
         email = models.EmailField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s %s" % (self.first_name, self.last_name)
 
     class Article(models.Model):
@@ -19,7 +19,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
         pub_date = models.DateField()
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
         class Meta:
@@ -63,13 +63,6 @@ raises ``ValueError``::
 Article objects have access to their related Reporter objects::
 
     >>> r = a.reporter
-
-On Python 2, these are strings of type ``str`` instead of unicode strings
-because that's what was used in the creation of this reporter (and we haven't
-refreshed the data from the database, which always returns unicode strings)::
-
-    >>> r.first_name, r.last_name
-    ('John', 'Smith')
 
 Create an Article via the Reporter object::
 

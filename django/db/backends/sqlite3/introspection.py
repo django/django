@@ -4,6 +4,7 @@ import warnings
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.db.models.indexes import Index
 from django.utils.deprecation import RemovedInDjango21Warning
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
@@ -18,7 +19,7 @@ def get_field_size(name):
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
-class FlexibleFieldLookupDict(object):
+class FlexibleFieldLookupDict:
     # Maps SQL types to Django Field types. Some of the SQL types have multiple
     # entries here because SQLite allows for anything and doesn't normalize the
     # field type; it uses whatever was given.
@@ -262,7 +263,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Add type and column orders for indexes
             if constraints[index]['index'] and not constraints[index]['unique']:
                 # SQLite doesn't support any index type other than b-tree
-                constraints[index]['type'] = 'btree'
+                constraints[index]['type'] = Index.suffix
                 cursor.execute(
                     "SELECT sql FROM sqlite_master "
                     "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)

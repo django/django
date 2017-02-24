@@ -13,4 +13,4 @@ class PostgreSQLTestCase(TestCase):
         from django.contrib.postgres.signals import register_hstore_handler
 
         connection_created.disconnect(register_hstore_handler)
-        super(PostgreSQLTestCase, cls).tearDownClass()
+        super().tearDownClass()

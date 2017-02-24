@@ -1,17 +1,8 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
-import warnings
-
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.db.models.fields.related import ForeignObject
-from django.test import ignore_warnings
 from django.test.testcases import SimpleTestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.version import get_docs_version
 
 
 @isolate_apps('invalid_models_tests')
@@ -28,88 +19,6 @@ class RelativeFieldTests(SimpleTestCase):
         field = Model._meta.get_field('field')
         errors = field.check()
         self.assertEqual(errors, [])
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_valid_foreign_key_without_on_delete(self):
-        class Target(models.Model):
-            model = models.IntegerField()
-
-        class Model(models.Model):
-            field = models.ForeignKey(Target, related_name='+')
-
-    def test_foreign_key_without_on_delete_warning(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-
-            class Target(models.Model):
-                model = models.IntegerField()
-
-            class Model(models.Model):
-                field = models.ForeignKey(Target, related_name='+')
-
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                'on_delete will be a required arg for ForeignKey in Django '
-                '2.0. Set it to models.CASCADE on models and in existing '
-                'migrations if you want to maintain the current default '
-                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
-                '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
-            )
-
-    def test_foreign_key_to_field_as_arg(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-
-            class Target(models.Model):
-                model = models.IntegerField()
-
-            class Model(models.Model):
-                field = models.ForeignKey(Target, 'id')
-
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                "The signature for ForeignKey will change in Django 2.0. "
-                "Pass to_field='id' as a kwarg instead of as an arg."
-            )
-
-    def test_one_to_one_field_without_on_delete_warning(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-
-            class Target(models.Model):
-                model = models.IntegerField()
-
-            class Model(models.Model):
-                field = models.OneToOneField(Target, related_name='+')
-
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                'on_delete will be a required arg for OneToOneField in Django '
-                '2.0. Set it to models.CASCADE on models and in existing '
-                'migrations if you want to maintain the current default '
-                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
-                '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
-            )
-
-    def test_one_to_one_field_to_field_as_arg(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-
-            class Target(models.Model):
-                model = models.IntegerField()
-
-            class Model(models.Model):
-                field = models.OneToOneField(Target, 'id')
-
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                "The signature for OneToOneField will change in Django 2.0. "
-                "Pass to_field='id' as a kwarg instead of as an arg."
-            )
 
     def test_foreign_key_to_missing_model(self):
         # Model names are resolved when a model is being created, so we cannot
@@ -745,16 +654,14 @@ class RelativeFieldTests(SimpleTestCase):
             'with',  # a Python keyword
             'related_name\n',
             '',
+            '，',  # non-ASCII
         ]
-        # Python 2 crashes on non-ASCII strings.
-        if six.PY3:
-            invalid_related_names.append('，')
 
         class Parent(models.Model):
             pass
 
         for invalid_related_name in invalid_related_names:
-            Child = type(str('Child%s') % str(invalid_related_name), (models.Model,), {
+            Child = type('Child%s' % invalid_related_name, (models.Model,), {
                 'parent': models.ForeignKey('Parent', models.CASCADE, related_name=invalid_related_name),
                 '__module__': Parent.__module__,
             })
@@ -785,16 +692,15 @@ class RelativeFieldTests(SimpleTestCase):
             'ends_with_plus+',
             '_+',
             '+',
+            '試',
+            '試驗+',
         ]
-        # Python 2 crashes on non-ASCII strings.
-        if six.PY3:
-            related_names.extend(['試', '試驗+'])
 
         class Parent(models.Model):
             pass
 
         for related_name in related_names:
-            Child = type(str('Child%s') % str(related_name), (models.Model,), {
+            Child = type('Child%s' % related_name, (models.Model,), {
                 'parent': models.ForeignKey('Parent', models.CASCADE, related_name=related_name),
                 '__module__': Parent.__module__,
             })

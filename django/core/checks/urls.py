@@ -1,9 +1,6 @@
-from __future__ import unicode_literals
-
 from collections import Counter
 
 from django.conf import settings
-from django.utils import six
 
 from . import Error, Tags, Warning, register
 
@@ -53,17 +50,18 @@ def check_url_namespaces_unique(app_configs, **kwargs):
     return errors
 
 
-def _load_all_namespaces(resolver):
+def _load_all_namespaces(resolver, parents=()):
     """
     Recursively load all namespaces from URL patterns.
     """
     url_patterns = getattr(resolver, 'url_patterns', [])
     namespaces = [
-        url.namespace for url in url_patterns
+        ':'.join(parents + (url.namespace,)) for url in url_patterns
         if getattr(url, 'namespace', None) is not None
     ]
     for pattern in url_patterns:
-        namespaces.extend(_load_all_namespaces(pattern))
+        current = parents + (getattr(pattern, 'namespace', ()),)
+        namespaces.extend(_load_all_namespaces(pattern, current))
     return namespaces
 
 
@@ -74,7 +72,7 @@ def get_warning_for_invalid_pattern(pattern):
     describe_pattern() cannot be used here, because we cannot rely on the
     urlpattern having regex or name attributes.
     """
-    if isinstance(pattern, six.string_types):
+    if isinstance(pattern, str):
         hint = (
             "Try removing the string '{}'. The list of urlpatterns should not "
             "have a prefix string as the first element.".format(pattern)

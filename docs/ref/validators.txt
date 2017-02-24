@@ -16,7 +16,7 @@ different types of fields.
 For example, here's a validator that only allows even numbers::
 
     from django.core.exceptions import ValidationError
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     def validate_even(value):
         if value % 2 != 0:
@@ -229,10 +229,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     Returns a :class:`RegexValidator` instance that ensures a string consists
     of integers separated by ``sep``. It allows negative integers when
     ``allow_negative`` is ``True``.
-
-    .. versionchanged:: 1.10
-
-        The ``allow_negative`` parameter was added.
 
 ``MaxValueValidator``
 ---------------------

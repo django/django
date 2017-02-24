@@ -5,7 +5,6 @@ import re
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
-from django.utils import six
 from django.utils.text import force_text
 
 
@@ -23,9 +22,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
-        elif isinstance(value, six.string_types):
-            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
-        elif isinstance(value, six.buffer_types):
+        elif isinstance(value, str):
+            return "'%s'" % value.replace("\'", "\'\'")
+        elif isinstance(value, (bytes, bytearray, memoryview)):
             return "'%s'" % force_text(binascii.hexlify(value))
         elif isinstance(value, bool):
             return "1" if value else "0"
@@ -34,7 +33,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model):
         # Run superclass action
-        super(DatabaseSchemaEditor, self).delete_model(model)
+        super().delete_model(model)
         # Clean up any autoincrement trigger
         self.execute("""
             DECLARE
@@ -50,7 +49,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def alter_field(self, model, old_field, new_field, strict=False):
         try:
-            super(DatabaseSchemaEditor, self).alter_field(model, old_field, new_field, strict)
+            super().alter_field(model, old_field, new_field, strict)
         except DatabaseError as e:
             description = str(e)
             # If we're changing type to an unsupported type we need a
@@ -101,7 +100,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Drop the old field
         self.remove_field(model, old_field)
         # Rename and possibly make the new field NOT NULL
-        super(DatabaseSchemaEditor, self).alter_field(model, new_temp_field, new_field)
+        super().alter_field(model, new_temp_field, new_field)
 
     def normalize_name(self, name):
         """

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 from collections import Counter
+from unittest import mock
 
 from django.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
@@ -10,8 +8,7 @@ from django.forms import (
 )
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.test import SimpleTestCase, mock
-from django.utils.encoding import force_text
+from django.test import SimpleTestCase
 
 
 class Choice(Form):
@@ -59,9 +56,9 @@ SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
 class CustomKwargForm(Form):
-    def __init__(self, *args, **kwargs):
-        self.custom_kwarg = kwargs.pop('custom_kwarg')
-        super(CustomKwargForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, custom_kwarg, **kwargs):
+        self.custom_kwarg = custom_kwarg
+        super().__init__(*args, **kwargs)
 
 
 class FormsFormsetTestCase(SimpleTestCase):
@@ -1059,7 +1056,7 @@ class FormsFormsetTestCase(SimpleTestCase):
                 return reversed(self.forms)
 
             def __getitem__(self, idx):
-                return super(BaseReverseFormSet, self).__getitem__(len(self) - idx - 1)
+                return super().__getitem__(len(self) - idx - 1)
 
         ReverseChoiceFormset = formset_factory(Choice, BaseReverseFormSet, extra=3)
         reverse_formset = ReverseChoiceFormset()
@@ -1109,7 +1106,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         class AnotherChoice(Choice):
             def is_valid(self):
                 self.is_valid_called = True
-                return super(AnotherChoice, self).is_valid()
+                return super().is_valid()
 
         AnotherChoiceFormSet = formset_factory(AnotherChoice)
         data = {
@@ -1253,7 +1250,7 @@ class FormsFormsetTestCase(SimpleTestCase):
     def test_html_safe(self):
         formset = self.make_choiceformset()
         self.assertTrue(hasattr(formset, '__html__'))
-        self.assertEqual(force_text(formset), formset.__html__())
+        self.assertEqual(str(formset), formset.__html__())
 
 
 data = {

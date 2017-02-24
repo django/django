@@ -10,7 +10,7 @@ import contextlib
 import threading
 
 
-class RWLock(object):
+class RWLock:
     """
     Classic implementation of reader-writer lock with preference to writers.
 

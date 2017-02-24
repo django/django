@@ -2,8 +2,6 @@
 Full text search
 ================
 
-.. versionadded:: 1.10
-
 The database functions in the ``django.contrib.postgres.search`` module ease
 the use of PostgreSQL's `full text search engine
 <https://www.postgresql.org/docs/current/static/textsearch.html>`_.
@@ -203,8 +201,6 @@ operation.
 
 .. class:: TrigramSimilarity(expression, string, **extra)
 
-.. versionadded:: 1.10
-
 Accepts a field name or expression, and a string or expression. Returns the
 trigram similarity between the two arguments.
 
@@ -223,8 +219,6 @@ Usage example::
 -------------------
 
 .. class:: TrigramDistance(expression, string, **extra)
-
-.. versionadded:: 1.10
 
 Accepts a field name or expression, and a string or expression. Returns the
 trigram distance between the two arguments.

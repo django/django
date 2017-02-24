@@ -203,15 +203,11 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Returns a text object representing ``s`` -- ``unicode`` on Python 2 and
-    ``str`` on Python 3. Treats bytestrings using the ``encoding`` codec.
+    Returns a ``str`` object representing ``s``. Treats bytestrings using the
+    ``encoding`` codec.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
-
-.. function:: smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    Historical name of :func:`smart_text`. Only available under Python 2.
 
 .. function:: is_protected_type(obj)
 
@@ -227,10 +223,6 @@ The functions defined in this module share the following properties:
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
-
-.. function:: force_unicode(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    Historical name of :func:`force_text`. Only available under Python 2.
 
 .. function:: smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')
 
@@ -250,28 +242,32 @@ The functions defined in this module share the following properties:
 
 .. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Alias of :func:`smart_bytes` on Python 2 and :func:`smart_text` on Python
-    3. This function returns a ``str`` or a lazy string.
+    Alias of :func:`smart_text`. This function returns a ``str`` or a lazy
+    string.
 
-    For instance, this is  suitable for writing to :data:`sys.stdout` on
-    Python 2 and 3.
+    For instance, this is suitable for writing to :data:`sys.stdout`.
+
+    Alias of :func:`smart_bytes` on Python 2 (in older versions of Django that
+    support it).
 
 .. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Alias of :func:`force_bytes` on Python 2 and :func:`force_text` on Python
-    3. This function always returns a ``str``.
+    Alias of :func:`force_text`. This function always returns a ``str``.
+
+    Alias of :func:`force_bytes` on Python 2 (in older versions of Django that
+    support it).
 
 .. function:: iri_to_uri(iri)
 
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`. However,
-    since we are assuming input is either UTF-8 or unicode already, we can
-    simplify things a little from the full method.
+    This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`, slightly
+    simplified since the input is assumed to be a string rather than an
+    arbitrary byte stream.
 
-    Takes an IRI in UTF-8 bytes and returns ASCII bytes containing the encoded
-    result.
+    Takes an IRI (string or UTF-8 bytes) and returns a string containing the
+    encoded result.
 
 .. function:: uri_to_iri(uri)
 
@@ -280,13 +276,13 @@ The functions defined in this module share the following properties:
 
     This is an algorithm from section 3.2 of :rfc:`3987#section-3.2`.
 
-    Takes a URI in ASCII bytes and returns a unicode string containing the
-    encoded result.
+    Takes a URI in ASCII bytes and returns a string containing the encoded
+    result.
 
 .. function:: filepath_to_uri(path)
 
     Convert a file system path to a URI portion that is suitable for inclusion
-    in a URL. The path is assumed to be either UTF-8 or unicode.
+    in a URL. The path is assumed to be either UTF-8 bytes or string.
 
     This method will encode certain characters that would normally be
     recognized as special characters for URIs.  Note that this method does not
@@ -350,21 +346,14 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
 
-        All parameters should be Unicode objects, except ``categories``, which
-        should be a sequence of Unicode objects.
+        All parameters should be strings, except ``categories``, which should
+        be a sequence of strings.
 
-    .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
+    .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
-        Adds an item to the feed. All args are expected to be Python ``unicode``
-        objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
-        objects, ``enclosure``, which is an ``Enclosure`` instance, and
-        ``enclosures``, which is a list of ``Enclosure`` instances.
-
-        .. deprecated:: 1.9
-
-            The ``enclosure`` keyword argument is deprecated in favor of the
-            new ``enclosures`` keyword argument which accepts a list of
-            ``Enclosure`` objects.
+        Adds an item to the feed. All args are expected to be strings except
+        ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
+        objects, and ``enclosures``, which is a list of ``Enclosure`` instances.
 
     .. method:: num_items()
 
@@ -525,16 +514,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         z = person.friends         # does not call
         x is z                     # is True
 
-.. function:: allow_lazy(func, *resultclasses)
-
-    .. deprecated:: 1.10
-
-    Works like :meth:`~django.utils.functional.keep_lazy` except that it can't
-    be used as a decorator.
-
 .. function:: keep_lazy(func, *resultclasses)
-
-    .. versionadded:: 1.10
 
     Django offers many utility functions (particularly in ``django.utils``)
     that take a string as their first argument and do something to that string.
@@ -554,23 +534,22 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     For example::
 
-        from django.utils import six
         from django.utils.functional import keep_lazy, keep_lazy_text
 
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
-        fancy_utility_function = keep_lazy(six.text_type)(fancy_utility_function)
+        fancy_utility_function = keep_lazy(str)(fancy_utility_function)
 
         # Or more succinctly:
-        @keep_lazy(six.text_type)
+        @keep_lazy(str)
         def fancy_utility_function(s, ...):
             ...
 
     The ``keep_lazy()`` decorator takes a number of extra arguments (``*args``)
     specifying the type(s) that the original function can return. A common
     use case is to have functions that return text. For these, you can just
-    pass the ``six.text_type`` type to ``keep_lazy`` (or even simpler, use the
+    pass the ``str`` type to ``keep_lazy`` (or even simpler, use the
     :func:`keep_lazy_text` decorator described in the next section).
 
     Using this decorator means you can write your function and assume that the
@@ -579,18 +558,15 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. function:: keep_lazy_text(func)
 
-    .. versionadded:: 1.10
-
-    A shortcut for ``keep_lazy(six.text_type)(func)``.
+    A shortcut for ``keep_lazy(str)(func)``.
 
     If you have a function that returns text and you want to be able to take
     lazy arguments while delaying their evaluation, simply use this decorator::
 
-        from django.utils import six
         from django.utils.functional import keep_lazy, keep_lazy_text
 
         # Our previous example was:
-        @keep_lazy(six.text_type)
+        @keep_lazy(str)
         def fancy_utility_function(s, ...):
             ...
 
@@ -698,11 +674,9 @@ escaping HTML.
     classes whose output doesn't require HTML escaping.
 
     This decorator defines the ``__html__()`` method on the decorated class
-    by wrapping the ``__unicode__()`` (Python 2) or ``__str__()`` (Python 3)
-    in :meth:`~django.utils.safestring.mark_safe`. Ensure the ``__unicode__()``
-    or ``__str__()`` method does indeed return text that doesn't require HTML
-    escaping.
-
+    by wrapping ``__str__()`` in :meth:`~django.utils.safestring.mark_safe`.
+    Ensure the ``__str__()`` method does indeed return text that doesn't
+    require HTML escaping.
 
 ``django.utils.http``
 =====================
@@ -710,27 +684,10 @@ escaping HTML.
 .. module:: django.utils.http
    :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
 
-.. function:: urlquote(url, safe='/')
-
-    A version of Python's ``urllib.quote()`` function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    ``iri_to_uri()`` call without double-quoting occurring. Employs lazy
-    execution.
-
-.. function:: urlquote_plus(url, safe='')
-
-    A version of Python's urllib.quote_plus() function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    ``iri_to_uri()`` call without double-quoting occurring. Employs lazy
-    execution.
-
 .. function:: urlencode(query, doseq=0)
 
-    A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first cast to UTF-8 encoded strings
-    and then encoded as per normal.
+    A version of Python's :func:`urllib.parse.urlencode` function that can
+    operate on ``MultiValueDict`` and non-string values.
 
 .. function:: cookie_date(epoch_seconds=None)
 
@@ -755,13 +712,11 @@ escaping HTML.
 
 .. function:: base36_to_int(s)
 
-    Converts a base 36 string to an integer. On Python 2 the output is
-    guaranteed to be an ``int`` and not a ``long``.
+    Converts a base 36 string to an integer.
 
 .. function:: int_to_base36(i)
 
-    Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
-    smaller than `sys.maxint`_.
+    Converts a positive integer to a base 36 string.
 
     .. _sys.maxint: https://docs.python.org/2/library/sys.html#sys.maxint
 
@@ -808,30 +763,21 @@ string" means that the producer of the string has already turned characters
 that should not be interpreted by the HTML engine (e.g. '<') into the
 appropriate entities.
 
-.. class:: SafeBytes
-
-    A ``bytes`` subclass that has been specifically marked as "safe"
-    (requires no further escaping) for HTML output purposes.
-
 .. class:: SafeString
 
     A ``str`` subclass that has been specifically marked as "safe"
-    (requires no further escaping) for HTML output purposes. This is
-    :class:`SafeBytes` on Python 2 and :class:`SafeText` on Python 3.
+    (requires no further escaping) for HTML output purposes. Alias of
+    :class:`SafeText`.
 
 .. class:: SafeText
 
-    A ``str`` (in Python 3) or ``unicode`` (in Python 2) subclass
-    that has been specifically marked as "safe" for HTML output purposes.
-
-.. class:: SafeUnicode
-
-    Historical name of :class:`SafeText`. Only available under Python 2.
+    A ``str`` subclass that has been specifically marked as "safe" for HTML
+    output purposes.
 
 .. function:: mark_safe(s)
 
     Explicitly mark a string as safe for (HTML) output purposes. The returned
-    object can be used everywhere a string or unicode object is appropriate.
+    object can be used everywhere a string is appropriate.
 
     Can be called multiple times on a single string.
 
@@ -845,7 +791,7 @@ appropriate entities.
         >>> mystr = '<b>Hello World</b>   '
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
-        <class 'django.utils.safestring.SafeBytes'>
+        <class 'django.utils.safestring.SafeText'>
 
         >>> mystr = mystr.strip()  # removing whitespace
         >>> type(mystr)
@@ -854,16 +800,6 @@ appropriate entities.
     .. versionchanged:: 1.11
 
         Added support for decorator usage.
-
-.. function:: mark_for_escaping(s)
-
-    .. deprecated:: 1.10
-
-    Explicitly mark a string as requiring HTML escaping upon output. Has no
-    effect on ``SafeData`` subclasses.
-
-    Can be called multiple times on a single string (the resulting escaping is
-    only applied once).
 
 ``django.utils.text``
 =====================
@@ -1048,7 +984,7 @@ appropriate entities.
     ``value`` aware during a DST transition such that the time never occurred
     (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
     avoid the exception by moving the hour backwards or forwards by 1
-    respectively. For example, ``is_dst=True`` would change a non-existent
+    respectively. For example, ``is_dst=True`` would change a nonexistent
     time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
 
 .. function:: make_naive(value, timezone=None)
@@ -1067,18 +1003,18 @@ appropriate entities.
 For a complete discussion on the usage of the following see the
 :doc:`translation documentation </topics/i18n/translation>`.
 
+The ``u`` prefix on the functions below comes from a difference in Python 2
+between unicode and bytestrings. If your code doesn't support Python 2, use the
+functions without the ``u``.
+
 .. function:: gettext(message)
-
-    Translates ``message`` and returns it in a UTF-8 bytestring
-
 .. function:: ugettext(message)
 
-    Translates ``message`` and returns it in a unicode string
+    Translates ``message`` and returns it as a string.
 
 .. function:: pgettext(context, message)
 
-    Translates ``message`` given the ``context`` and returns
-    it in a unicode string.
+    Translates ``message`` given the ``context`` and returns it as a string.
 
     For more information, see :ref:`contextual-markers`.
 
@@ -1099,19 +1035,15 @@ For a complete discussion on the usage of the following see the
     later.
 
 .. function:: ngettext(singular, plural, number)
-
-    Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` in a UTF-8 bytestring.
-
 .. function:: ungettext(singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` in a unicode string.
+    based on ``number``.
 
 .. function:: npgettext(context, singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` and the ``context`` in a unicode string.
+    based on ``number`` and the ``context``.
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)

@@ -1,15 +1,13 @@
-from __future__ import unicode_literals
-
 import os
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.urls import LocaleRegexProvider
 from django.urls.resolvers import LocaleRegexDescriptor
 from django.utils import translation
-from django.utils._os import upath
 
-here = os.path.dirname(upath(os.path.abspath(__file__)))
+here = os.path.dirname(os.path.abspath(__file__))
 
 
 @override_settings(LOCALE_PATHS=[os.path.join(here, 'translations', 'locale')])

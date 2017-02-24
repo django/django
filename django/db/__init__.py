@@ -23,7 +23,7 @@ router = ConnectionRouter()
 # that the database backends care about.
 # We load all these up for backwards compatibility, you should use
 # connections['default'] instead.
-class DefaultConnectionProxy(object):
+class DefaultConnectionProxy:
     """
     Proxy for accessing the default DatabaseWrapper object's attributes. If you
     need to access the DatabaseWrapper object itself, use
@@ -40,9 +40,6 @@ class DefaultConnectionProxy(object):
 
     def __eq__(self, other):
         return connections[DEFAULT_DB_ALIAS] == other
-
-    def __ne__(self, other):
-        return connections[DEFAULT_DB_ALIAS] != other
 
 
 connection = DefaultConnectionProxy()

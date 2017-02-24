@@ -1,11 +1,10 @@
 import sys
 import unittest
+from io import StringIO
 
 from django.db import connection
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
-from django.utils import six
-from django.utils.encoding import force_text
 
 from .models import Person
 
@@ -34,7 +33,7 @@ class TestDebugSQL(unittest.TestCase):
         suite.addTest(self.ErrorTest())
         suite.addTest(self.PassingTest())
         old_config = runner.setup_databases()
-        stream = six.StringIO()
+        stream = StringIO()
         resultclass = runner.get_resultclass()
         runner.test_runner(
             verbosity=verbosity,
@@ -43,8 +42,6 @@ class TestDebugSQL(unittest.TestCase):
         ).run(suite)
         runner.teardown_databases(old_config)
 
-        if six.PY2:
-            stream.buflist = [force_text(x) for x in stream.buflist]
         return stream.getvalue()
 
     def test_output_normal(self):

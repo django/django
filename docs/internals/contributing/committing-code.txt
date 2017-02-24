@@ -2,10 +2,9 @@
 Committing code
 ===============
 
-This section is addressed to the :ref:`committers` and to anyone interested in
-knowing how code gets committed into Django core. If you're a community member
-who wants to contribute code to Django, have a look at
-:doc:`writing-code/working-with-git` instead.
+This section is addressed to the committers and to anyone interested in knowing
+how code gets committed into Django. If you're a community member who wants to
+contribute code to Django, look at :doc:`writing-code/working-with-git` instead.
 
 .. _handling-pull-requests:
 

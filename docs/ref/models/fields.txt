@@ -401,8 +401,6 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 
 .. class:: BigAutoField(**options)
 
-.. versionadded:: 1.10
-
 A 64-bit integer, much like an :class:`AutoField` except that it is
 guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 
@@ -472,28 +470,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     database backends, you should be aware that there are restrictions on
     ``max_length`` for some backends. Refer to the :doc:`database backend
     notes </ref/databases>` for details.
-
-.. admonition:: MySQL users
-
-    If you are using this field with MySQLdb 1.2.2 and the ``utf8_bin``
-    collation (which is *not* the default), there are some issues to be aware
-    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
-    details.
-
-``CommaSeparatedIntegerField``
-------------------------------
-
-.. class:: CommaSeparatedIntegerField(max_length=None, **options)
-
-.. deprecated:: 1.9
-
-    This field is deprecated in favor of :class:`~django.db.models.CharField`
-    with ``validators=[``\ :func:`validate_comma_separated_integer_list
-    <django.core.validators.validate_comma_separated_integer_list>`\ ``]``.
-
-A field of integers separated by commas. As in :class:`CharField`, the
-:attr:`~CharField.max_length` argument is required and the note about database
-portability mentioned there should be heeded.
 
 ``DateField``
 -------------
@@ -1097,13 +1073,6 @@ If you specify a ``max_length`` attribute, it will be reflected in the
 However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
 
-.. admonition:: MySQL users
-
-    If you are using this field with MySQLdb 1.2.1p2 and the ``utf8_bin``
-    collation (which is *not* the default), there are some issues to be aware
-    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
-    details.
-
 ``TimeField``
 -------------
 
@@ -1276,11 +1245,6 @@ relation works.
             blank=True,
             null=True,
         )
-
-    .. deprecated:: 1.9
-
-        :attr:`~ForeignKey.on_delete` will become a required argument in Django
-        2.0. In older versions it defaults to ``CASCADE``.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
 :mod:`django.db.models`:
@@ -1796,8 +1760,6 @@ Field API reference
         See :ref:`custom-database-types` for usage in custom fields.
 
     .. method:: rel_db_type(connection)
-
-        .. versionadded:: 1.10
 
         Returns the database column data type for fields such as ``ForeignKey``
         and ``OneToOneField`` that point to the :class:`Field`, taking

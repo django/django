@@ -206,12 +206,12 @@ Read-only attributes
 .. attribute:: AppConfig.module
 
     Root module for the application, e.g. ``<module 'django.contrib.admin' from
-    'django/contrib/admin/__init__.pyc'>``.
+    'django/contrib/admin/__init__.py'>``.
 
 .. attribute:: AppConfig.models_module
 
     Module containing the models, e.g. ``<module 'django.contrib.admin.models'
-    from 'django/contrib/admin/models.pyc'>``.
+    from 'django/contrib/admin/models.py'>``.
 
     It may be ``None`` if the application doesn't contain a ``models`` module.
     Note that the database related signals such as
@@ -295,13 +295,12 @@ Methods
 
 .. _namespace package:
 
-Namespace packages as apps (Python 3.3+)
-----------------------------------------
+Namespace packages as apps
+--------------------------
 
-Python versions 3.3 and later support Python packages without an
-``__init__.py`` file. These packages are known as "namespace packages" and may
-be spread across multiple directories at different locations on ``sys.path``
-(see :pep:`420`).
+Python packages without an ``__init__.py`` file are known as "namespace
+packages" and may be spread across multiple directories at different locations
+on ``sys.path`` (see :pep:`420`).
 
 Django applications require a single base filesystem path where Django
 (depending on configuration) will search for templates, static assets,
@@ -401,10 +400,6 @@ application registry.
       :setting:`FORCE_SCRIPT_NAME` if defined, or ``/`` otherwise.
     * Initializing the application registry.
 
-    .. versionchanged:: 1.10
-
-        The ability to set the URL resolver script prefix is new.
-
     This function is called automatically:
 
     * When running an HTTP server via Django's WSGI support.
@@ -462,10 +457,10 @@ Here are some common problems that you may encounter during initialization:
   importing an application configuration or a models module triggers code that
   depends on the app registry.
 
-  For example, :func:`~django.utils.translation.ugettext()` uses the app
+  For example, :func:`~django.utils.translation.gettext()` uses the app
   registry to look up translation catalogs in applications. To translate at
-  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
-  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
+  import time, you need :func:`~django.utils.translation.gettext_lazy()`
+  instead. (Using :func:`~django.utils.translation.gettext()` would be a bug,
   because the translation would happen at import time, rather than at each
   request depending on the active language.)
 

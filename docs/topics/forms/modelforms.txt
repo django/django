@@ -70,8 +70,6 @@ Model field                         Form field
                                     :attr:`~django.forms.CharField.empty_value`
                                     set to ``None`` if ``null=True``.
 
-:class:`CommaSeparatedIntegerField` :class:`~django.forms.CharField`
-
 :class:`DateField`                  :class:`~django.forms.DateField`
 
 :class:`DateTimeField`              :class:`~django.forms.DateTimeField`
@@ -171,7 +169,7 @@ Consider this set of models::
         title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Book(models.Model):
@@ -343,16 +341,6 @@ there is one, for that field. This behavior doesn't apply to fields that use
 ``False``) since an unchecked checkbox doesn't appear in the data of an HTML
 form submission. Use a custom form field or widget if you're designing an API
 and want the default fallback for a :class:`~django.db.models.BooleanField`.
-
-.. versionchanged:: 1.10.1
-
-    Older versions don't have the exception for
-    :class:`~django.forms.CheckboxInput` which means that unchecked checkboxes
-    receive a value of ``True`` if that's the model field default.
-
-.. versionchanged:: 1.10.2
-
-    The :meth:`~django.forms.Widget.value_omitted_from_data` method was added.
 
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
 accepts either ``True`` or ``False``. If you call ``save()`` with
@@ -533,7 +521,7 @@ attributes of the inner ``Meta`` class if you want to further customize a field.
 For example if you wanted to customize the wording of all user facing strings for
 the ``name`` field::
 
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class AuthorForm(ModelForm):
         class Meta:
@@ -809,7 +797,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
-            super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             self.queryset = Author.objects.filter(name__startswith='O')
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function::
@@ -1014,7 +1002,7 @@ class's ``clean`` method::
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
+            super().clean()
             # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation
@@ -1030,7 +1018,7 @@ to modify a value in ``ModelFormSet.clean()`` you must modify
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
+            super().clean()
 
             for form in self.forms:
                 name = form.cleaned_data['name'].upper()
@@ -1176,7 +1164,7 @@ For example, if you want to override ``clean()``::
 
     class CustomInlineFormSet(BaseInlineFormSet):
         def clean(self):
-            super(CustomInlineFormSet, self).clean()
+            super().clean()
             # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation

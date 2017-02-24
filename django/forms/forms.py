@@ -2,8 +2,6 @@
 Form classes
 """
 
-from __future__ import unicode_literals
-
 import copy
 from collections import OrderedDict
 
@@ -14,12 +12,11 @@ from django.forms.fields import Field, FileField
 # pretty_name is imported for backwards compatibility in Django 1.9
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.forms.widgets import Media, MediaDefiningClass
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .renderers import get_default_renderer
 
@@ -27,9 +24,7 @@ __all__ = ('BaseForm', 'Form')
 
 
 class DeclarativeFieldsMetaclass(MediaDefiningClass):
-    """
-    Metaclass that collects Fields declared on the base classes.
-    """
+    """Collect Fields declared on the base classes."""
     def __new__(mcs, name, bases, attrs):
         # Collect fields from current class.
         current_fields = []
@@ -37,7 +32,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             if isinstance(value, Field):
                 current_fields.append((key, value))
                 attrs.pop(key)
-        current_fields.sort(key=lambda x: x[1].creation_counter)
         attrs['declared_fields'] = OrderedDict(current_fields)
 
         new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
@@ -59,14 +53,20 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
 
         return new_class
 
+    @classmethod
+    def __prepare__(metacls, name, bases, **kwds):
+        # Remember the order in which form fields are defined.
+        return OrderedDict()
+
 
 @html_safe
-@python_2_unicode_compatible
-class BaseForm(object):
-    # This is the main implementation of all the Form logic. Note that this
-    # class is different than Form. See the comments by the Form class for more
-    # information. Any improvements to the form API should be made to *this*
-    # class, not to the Form class.
+class BaseForm:
+    """
+    The main implementation of all the Form logic. Note that this class is
+    different than Form. See the comments by the Form class for more info. Any
+    improvements to the form API should be made to this class, not to the Form
+    class.
+    """
     default_renderer = None
     field_order = None
     prefix = None
@@ -113,14 +113,14 @@ class BaseForm(object):
 
     def order_fields(self, field_order):
         """
-        Rearranges the fields according to field_order.
+        Rearrange the fields according to field_order.
 
-        field_order is a list of field names specifying the order. Fields not
-        included in the list are appended in the default order for backward
-        compatibility with subclasses not overriding field_order. If field_order
-        is None, all fields are kept in the order defined in the class.
-        Unknown fields in field_order are ignored to allow disabling fields in
-        form subclasses without redefining ordering.
+        field_order is a list of field names specifying the order. Append fields
+        not included in the list in the default order for backward compatibility
+        with subclasses not overriding field_order. If field_order is None,
+        keep all fields in the order defined in the class. Ignore unknown
+        fields in field_order to allow disabling fields in form subclasses
+        without redefining ordering.
         """
         if field_order is None:
             return
@@ -153,7 +153,7 @@ class BaseForm(object):
             yield self[name]
 
     def __getitem__(self, name):
-        "Returns a BoundField with the given name."
+        """Return a BoundField with the given name."""
         try:
             field = self.fields[name]
         except KeyError:
@@ -170,21 +170,18 @@ class BaseForm(object):
 
     @property
     def errors(self):
-        "Returns an ErrorDict for the data provided for the form"
+        """Return an ErrorDict for the data provided for the form."""
         if self._errors is None:
             self.full_clean()
         return self._errors
 
     def is_valid(self):
-        """
-        Returns True if the form has no errors. Otherwise, False. If errors are
-        being ignored, returns False.
-        """
+        """Return True if the form has no errors, or False otherwise."""
         return self.is_bound and not self.errors
 
     def add_prefix(self, field_name):
         """
-        Returns the field name with a prefix appended, if this Form has a
+        Return the field name with a prefix appended, if this Form has a
         prefix set.
 
         Subclasses may wish to override.
@@ -192,13 +189,11 @@ class BaseForm(object):
         return '%s-%s' % (self.prefix, field_name) if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
-        """
-        Add a 'initial' prefix for checking dynamic initial values
-        """
+        """Add a 'initial' prefix for checking dynamic initial values."""
         return 'initial-%s' % self.add_prefix(field_name)
 
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
-        "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
+        "Output HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors()  # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
 
@@ -212,7 +207,7 @@ class BaseForm(object):
                     top_errors.extend(
                         [_('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': force_text(e)}
                          for e in bf_errors])
-                hidden_fields.append(six.text_type(bf))
+                hidden_fields.append(str(bf))
             else:
                 # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
@@ -237,7 +232,7 @@ class BaseForm(object):
                 output.append(normal_row % {
                     'errors': force_text(bf_errors),
                     'label': force_text(label),
-                    'field': six.text_type(bf),
+                    'field': str(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr,
                     'css_classes': css_classes,
@@ -276,7 +271,7 @@ class BaseForm(object):
         return mark_safe('\n'.join(output))
 
     def as_table(self):
-        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        "Return this form rendered as HTML <tr>s -- excluding the <table></table>."
         return self._html_output(
             normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
             error_row='<tr><td colspan="2">%s</td></tr>',
@@ -285,7 +280,7 @@ class BaseForm(object):
             errors_on_separate_row=False)
 
     def as_ul(self):
-        "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
+        "Return this form rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
             normal_row='<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
             error_row='<li>%s</li>',
@@ -294,7 +289,7 @@ class BaseForm(object):
             errors_on_separate_row=False)
 
     def as_p(self):
-        "Returns this form rendered as HTML <p>s."
+        "Return this form rendered as HTML <p>s."
         return self._html_output(
             normal_row='<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
             error_row='%s',
@@ -304,8 +299,8 @@ class BaseForm(object):
 
     def non_field_errors(self):
         """
-        Returns an ErrorList of errors that aren't associated with a particular
-        field -- i.e., from Form.clean(). Returns an empty ErrorList if there
+        Return an ErrorList of errors that aren't associated with a particular
+        field -- i.e., from Form.clean(). Return an empty ErrorList if there
         are none.
         """
         return self.errors.get(NON_FIELD_ERRORS, self.error_class(error_class='nonfield'))
@@ -315,15 +310,14 @@ class BaseForm(object):
         Update the content of `self._errors`.
 
         The `field` argument is the name of the field to which the errors
-        should be added. If its value is None the errors will be treated as
-        NON_FIELD_ERRORS.
+        should be added. If it's None, treat the errors as NON_FIELD_ERRORS.
 
         The `error` argument can be a single error, a list of errors, or a
-        dictionary that maps field names to lists of errors. What we define as
-        an "error" can be either a simple string or an instance of
-        ValidationError with its message attribute set and what we define as
-        list or dictionary can be an actual `list` or `dict` or an instance
-        of ValidationError with its `error_list` or `error_dict` attribute set.
+        dictionary that maps field names to lists of errors. An "error" can be
+        either a simple string or an instance of ValidationError with its
+        message attribute set and a "list or dictionary" can be an actual
+        `list` or `dict` or an instance of ValidationError with its
+        `error_list` or `error_dict` attribute set.
 
         If `error` is a dictionary, the `field` argument *must* be None and
         errors will be added to the fields that correspond to the keys of the
@@ -369,8 +363,7 @@ class BaseForm(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self._errors and
-        self.cleaned_data.
+        Clean all of self.data and populate self._errors and self.cleaned_data.
         """
         self._errors = ErrorDict()
         if not self.is_bound:  # Stop further processing.
@@ -433,9 +426,7 @@ class BaseForm(object):
         return self.cleaned_data
 
     def has_changed(self):
-        """
-        Returns True if data differs from initial.
-        """
+        """Return True if data differs from initial."""
         return bool(self.changed_data)
 
     @cached_property
@@ -464,9 +455,7 @@ class BaseForm(object):
 
     @property
     def media(self):
-        """
-        Provide a description of all media required to render the widgets on this form
-        """
+        """Return all media required to render the widgets on this form."""
         media = Media()
         for field in self.fields.values():
             media = media + field.widget.media
@@ -474,8 +463,8 @@ class BaseForm(object):
 
     def is_multipart(self):
         """
-        Returns True if the form needs to be multipart-encoded, i.e. it has
-        FileInput. Otherwise, False.
+        Return True if the form needs to be multipart-encoded, i.e. it has
+        FileInput, or False otherwise.
         """
         for field in self.fields.values():
             if field.widget.needs_multipart_form:
@@ -484,14 +473,14 @@ class BaseForm(object):
 
     def hidden_fields(self):
         """
-        Returns a list of all the BoundField objects that are hidden fields.
+        Return a list of all the BoundField objects that are hidden fields.
         Useful for manual form layout in templates.
         """
         return [field for field in self if field.is_hidden]
 
     def visible_fields(self):
         """
-        Returns a list of BoundField objects that aren't hidden fields.
+        Return a list of BoundField objects that aren't hidden fields.
         The opposite of the hidden_fields() method.
         """
         return [field for field in self if not field.is_hidden]
@@ -507,7 +496,7 @@ class BaseForm(object):
         return value
 
 
-class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the

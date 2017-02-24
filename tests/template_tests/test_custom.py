@@ -1,14 +1,10 @@
-from __future__ import unicode_literals
-
 import os
-from unittest import skipUnless
 
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
 from django.template.library import InvalidTemplateLibrary
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
-from django.utils import six
 
 from .templatetags import custom, inclusion
 from .utils import ROOT
@@ -35,7 +31,7 @@ class TagTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(app_dirs=True, libraries=LIBRARIES)
-        super(TagTestCase, cls).setUpClass()
+        super().setUpClass()
 
     def verify_tag(self, tag, name):
         self.assertEqual(tag.__name__, name)
@@ -306,59 +302,32 @@ class InclusionTagTests(TagTestCase):
         self.assertEqual(template.render(Context({})).strip(), 'one\ntwo')
 
 
-class AssignmentTagTests(TagTestCase):
-
-    def test_assignment_tags(self):
-        c = Context({'value': 42})
-
-        t = self.engine.from_string('{% load custom %}{% assignment_no_params as var %}The result is: {{ var }}')
-        self.assertEqual(t.render(c), 'The result is: assignment_no_params - Expected result')
-
-    def test_assignment_tag_registration(self):
-        # The decorators preserve the decorated function's docstring, name,
-        # and attributes.
-        self.verify_tag(custom.assignment_no_params, 'assignment_no_params')
-
-    def test_assignment_tag_missing_context(self):
-        # The 'context' parameter must be present when takes_context is True
-        msg = (
-            "'assignment_tag_without_context_parameter' is decorated with "
-            "takes_context=True so it must have a first argument of 'context'"
-        )
-        with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string('{% load custom %}{% assignment_tag_without_context_parameter 123 as var %}')
-
-
 class TemplateTagLoadingTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.egg_dir = os.path.join(ROOT, 'eggs')
-        super(TemplateTagLoadingTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_load_error(self):
         msg = (
             "Invalid template library specified. ImportError raised when "
             "trying to load 'template_tests.broken_tag': cannot import name "
-            "'?Xtemplate'?"
+            "'Xtemplate'"
         )
-        with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
-            Engine(libraries={
-                'broken_tag': 'template_tests.broken_tag',
-            })
+        with self.assertRaisesMessage(InvalidTemplateLibrary, msg):
+            Engine(libraries={'broken_tag': 'template_tests.broken_tag'})
 
     def test_load_error_egg(self):
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         msg = (
             "Invalid template library specified. ImportError raised when "
             "trying to load 'tagsegg.templatetags.broken_egg': cannot "
-            "import name '?Xtemplate'?"
+            "import name 'Xtemplate'"
         )
         with extend_sys_path(egg_name):
-            with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
-                Engine(libraries={
-                    'broken_egg': 'tagsegg.templatetags.broken_egg',
-                })
+            with self.assertRaisesMessage(InvalidTemplateLibrary, msg):
+                Engine(libraries={'broken_egg': 'tagsegg.templatetags.broken_egg'})
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
@@ -369,7 +338,6 @@ class TemplateTagLoadingTests(SimpleTestCase):
             })
             engine.from_string(ttext)
 
-    @skipUnless(six.PY3, "Python 3 only -- Python 2 doesn't have annotations.")
     def test_load_annotated_function(self):
         Engine(libraries={
             'annotated_tag_function': 'template_tests.annotated_tag_function',

@@ -7,6 +7,20 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-3.0:
+
+3.0
+---
+
+See the :ref:`Django 2.0 release notes<deprecated-features-2.0>` for more
+details on these changes.
+
+* The ``django.db.backends.postgresql_psycopg2`` module will be removed.
+
+* ``django.shortcuts.render_to_response()`` will be removed.
+
+* The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
@@ -38,8 +52,8 @@ details on these changes.
 
 * ``DatabaseIntrospection.get_indexes()`` will be removed.
 
-* The ``authenticate()`` method of authentication backends will require a
-  ``request`` argument.
+* The ``authenticate()`` method of authentication backends will require
+  ``request`` as the first positional argument.
 
 * The ``django.db.models.permalink()`` decorator will be removed.
 
@@ -571,7 +585,7 @@ details on these changes.
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
-  your :setting:`MIDDLEWARE_CLASSES` setting instead.
+  your ``MIDDLEWARE_CLASSES`` setting instead.
 
 * ``django.middleware.doc.XViewMiddleware`` will be removed. Use
   ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.

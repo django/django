@@ -2,6 +2,7 @@ import datetime
 import itertools
 import unittest
 from copy import copy
+from unittest import mock
 
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
@@ -19,7 +20,7 @@ from django.db.models.fields.related import (
 from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
-    TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
+    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
@@ -415,7 +416,7 @@ class SchemaTests(TransactionTestCase):
         field_type = columns['awesome'][0]
         self.assertEqual(
             field_type,
-            connection.features.introspected_boolean_field_type(new_field, created_separately=True)
+            connection.features.introspected_boolean_field_type(new_field)
         )
 
     def test_add_field_default_transform(self):
@@ -1818,9 +1819,9 @@ class SchemaTests(TransactionTestCase):
         """
         #23065 - Constraint names must be quoted if they contain capital letters.
         """
-        def get_field(*args, **kwargs):
+        def get_field(*args, field_class=IntegerField, **kwargs):
             kwargs['db_column'] = "CamelCase"
-            field = kwargs.pop('field_class', IntegerField)(*args, **kwargs)
+            field = field_class(*args, **kwargs)
             field.set_attributes_from_name("CamelCase")
             return field
 

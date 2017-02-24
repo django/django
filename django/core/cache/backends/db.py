@@ -1,20 +1,16 @@
 "Database cache backend."
 import base64
+import pickle
 from datetime import datetime
 
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
-
-class Options(object):
+class Options:
     """A class that will quack like a Django model _meta class.
 
     This allows cache operations to be controlled by the router
@@ -37,7 +33,7 @@ class BaseDatabaseCache(BaseCache):
         BaseCache.__init__(self, params)
         self._table = table
 
-        class CacheEntry(object):
+        class CacheEntry:
             _meta = Options(table)
         self.cache_model_class = CacheEntry
 
@@ -112,11 +108,9 @@ class DatabaseCache(BaseDatabaseCache):
             if num > self._max_entries:
                 self._cull(db, cursor, now)
             pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-            b64encoded = base64.b64encode(pickled)
             # The DB column is expecting a string, so make sure the value is a
             # string, not bytes. Refs #19274.
-            if six.PY3:
-                b64encoded = b64encoded.decode('latin1')
+            b64encoded = base64.b64encode(pickled).decode('latin1')
             try:
                 # Note: typecasting for datetimes is needed by some 3rd party
                 # database backends. All core backends work without typecasting,

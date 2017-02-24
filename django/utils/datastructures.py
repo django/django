@@ -1,10 +1,8 @@
 import copy
 from collections import OrderedDict
 
-from django.utils import six
 
-
-class OrderedSet(object):
+class OrderedSet:
     """
     A set which keeps the ordering of the inserted items.
     Currently backs onto OrderedDict.
@@ -33,9 +31,6 @@ class OrderedSet(object):
 
     def __bool__(self):
         return bool(self.dict)
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
     def __len__(self):
         return len(self.dict)
@@ -68,19 +63,18 @@ class MultiValueDict(dict):
     single name-value pairs.
     """
     def __init__(self, key_to_list_mapping=()):
-        super(MultiValueDict, self).__init__(key_to_list_mapping)
+        super().__init__(key_to_list_mapping)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__,
-                             super(MultiValueDict, self).__repr__())
+        return "<%s: %s>" % (self.__class__.__name__, super().__repr__())
 
     def __getitem__(self, key):
         """
-        Returns the last data value for this key, or [] if it's an empty list;
-        raises KeyError if not found.
+        Return the last data value for this key, or [] if it's an empty list;
+        raise KeyError if not found.
         """
         try:
-            list_ = super(MultiValueDict, self).__getitem__(key)
+            list_ = super().__getitem__(key)
         except KeyError:
             raise MultiValueDictKeyError(repr(key))
         try:
@@ -89,7 +83,7 @@ class MultiValueDict(dict):
             return []
 
     def __setitem__(self, key, value):
-        super(MultiValueDict, self).__setitem__(key, [value])
+        super().__setitem__(key, [value])
 
     def __copy__(self):
         return self.__class__([
@@ -120,8 +114,8 @@ class MultiValueDict(dict):
 
     def get(self, key, default=None):
         """
-        Returns the last data value for the passed key. If key doesn't exist
-        or value is an empty list, then default is returned.
+        Return the last data value for the passed key. If key doesn't exist
+        or value is an empty list, return `default`.
         """
         try:
             val = self[key]
@@ -139,7 +133,7 @@ class MultiValueDict(dict):
         return a new copy of values.
         """
         try:
-            values = super(MultiValueDict, self).__getitem__(key)
+            values = super().__getitem__(key)
         except KeyError:
             if default is None:
                 return []
@@ -157,7 +151,7 @@ class MultiValueDict(dict):
         return self._getlist(key, default, force_list=True)
 
     def setlist(self, key, list_):
-        super(MultiValueDict, self).__setitem__(key, list_)
+        super().__setitem__(key, list_)
 
     def setdefault(self, key, default=None):
         if key not in self:
@@ -176,53 +170,32 @@ class MultiValueDict(dict):
         return self._getlist(key)
 
     def appendlist(self, key, value):
-        """Appends an item to the internal list associated with key."""
+        """Append an item to the internal list associated with key."""
         self.setlistdefault(key).append(value)
 
-    def _iteritems(self):
+    def items(self):
         """
-        Yields (key, value) pairs, where value is the last item in the list
+        Yield (key, value) pairs, where value is the last item in the list
         associated with the key.
         """
         for key in self:
             yield key, self[key]
 
-    def _iterlists(self):
-        """Yields (key, list) pairs."""
-        return six.iteritems(super(MultiValueDict, self))
+    def lists(self):
+        """Yield (key, list) pairs."""
+        return iter(super().items())
 
-    def _itervalues(self):
+    def values(self):
         """Yield the last value on every key list."""
         for key in self:
             yield self[key]
 
-    if six.PY3:
-        items = _iteritems
-        lists = _iterlists
-        values = _itervalues
-    else:
-        iteritems = _iteritems
-        iterlists = _iterlists
-        itervalues = _itervalues
-
-        def items(self):
-            return list(self.iteritems())
-
-        def lists(self):
-            return list(self.iterlists())
-
-        def values(self):
-            return list(self.itervalues())
-
     def copy(self):
-        """Returns a shallow copy of this object."""
+        """Return a shallow copy of this object."""
         return copy.copy(self)
 
     def update(self, *args, **kwargs):
-        """
-        update() extends rather than replaces existing key lists.
-        Also accepts keyword args.
-        """
+        """Extend rather than replace existing key lists."""
         if len(args) > 1:
             raise TypeError("update expected at most 1 arguments, got %d" % len(args))
         if args:
@@ -236,13 +209,11 @@ class MultiValueDict(dict):
                         self.setlistdefault(key).append(value)
                 except TypeError:
                     raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 
     def dict(self):
-        """
-        Returns current object as a dict with singular values.
-        """
+        """Return current object as a dict with singular values."""
         return {key: self[key] for key in self}
 
 
@@ -259,12 +230,7 @@ class ImmutableList(tuple):
         AttributeError: You cannot mutate this.
     """
 
-    def __new__(cls, *args, **kwargs):
-        if 'warning' in kwargs:
-            warning = kwargs['warning']
-            del kwargs['warning']
-        else:
-            warning = 'ImmutableList object is immutable.'
+    def __new__(cls, *args, warning='ImmutableList object is immutable.', **kwargs):
         self = tuple.__new__(cls, *args, **kwargs)
         self.warning = warning
         return self
@@ -293,7 +259,7 @@ class ImmutableList(tuple):
 
 class DictWrapper(dict):
     """
-    Wraps accesses to a dictionary so that certain values (those starting with
+    Wrap accesses to a dictionary so that certain values (those starting with
     the specified prefix) are passed through a function before being returned.
     The prefix is removed before looking up the real value.
 
@@ -301,13 +267,13 @@ class DictWrapper(dict):
     quoted before being used.
     """
     def __init__(self, data, func, prefix):
-        super(DictWrapper, self).__init__(data)
+        super().__init__(data)
         self.func = func
         self.prefix = prefix
 
     def __getitem__(self, key):
         """
-        Retrieves the real value after stripping the prefix string (if
+        Retrieve the real value after stripping the prefix string (if
         present). If the prefix is present, pass the value through self.func
         before returning, otherwise return the raw value.
         """
@@ -316,7 +282,7 @@ class DictWrapper(dict):
             key = key[len(self.prefix):]
         else:
             use_func = False
-        value = super(DictWrapper, self).__getitem__(key)
+        value = super().__getitem__(key)
         if use_func:
             return self.func(value)
         return value

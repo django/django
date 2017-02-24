@@ -1,14 +1,16 @@
+from unittest import mock
+
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import connections
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import Book
 
 
-class Router(object):
+class Router:
     target_db = None
 
     def db_for_read(self, model, **hints):

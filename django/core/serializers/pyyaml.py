@@ -6,7 +6,6 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 
 import collections
 import decimal
-import sys
 from io import StringIO
 
 import yaml
@@ -16,7 +15,6 @@ from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
 from django.db import models
-from django.utils import six
 
 # Use the C (faster) implementation if possible
 try:
@@ -39,9 +37,7 @@ DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.repre
 
 
 class Serializer(PythonSerializer):
-    """
-    Convert a queryset to YAML.
-    """
+    """Convert a queryset to YAML."""
 
     internal_use_only = False
 
@@ -55,31 +51,27 @@ class Serializer(PythonSerializer):
         if isinstance(field, models.TimeField) and getattr(obj, field.name) is not None:
             self._current[field.name] = str(getattr(obj, field.name))
         else:
-            super(Serializer, self).handle_field(obj, field)
+            super().handle_field(obj, field)
 
     def end_serialization(self):
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
-        # Grand-parent super
+        # Grandparent super
         return super(PythonSerializer, self).getvalue()
 
 
 def Deserializer(stream_or_string, **options):
-    """
-    Deserialize a stream or string of YAML data.
-    """
+    """Deserialize a stream or string of YAML data."""
     if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode('utf-8')
-    if isinstance(stream_or_string, six.string_types):
+        stream_or_string = stream_or_string.decode()
+    if isinstance(stream_or_string, str):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
     try:
-        for obj in PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options):
-            yield obj
-    except GeneratorExit:
+        yield from PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options)
+    except (GeneratorExit, DeserializationError):
         raise
-    except Exception as e:
-        # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
+    except Exception as exc:
+        raise DeserializationError() from exc

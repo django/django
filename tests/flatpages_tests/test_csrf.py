@@ -2,8 +2,6 @@ from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site
 from django.test import Client, TestCase, modify_settings, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .settings import FLATPAGES_TEMPLATES
 
@@ -62,7 +60,10 @@ class FlatpageCSRFTests(TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view, even when the middleware is in use"
+        """
+        A nonexistent flatpage raises 404 when served through a view, even when
+        the middleware is in use.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -81,7 +82,10 @@ class FlatpageCSRFTests(TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middleware"
+        """
+        A nonexistent flatpage raises a 404 when served by the fallback
+        middleware.
+        """
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -99,19 +103,3 @@ class FlatpageCSRFTests(TestCase):
         "POSTing to an unknown page isn't caught as a 403 CSRF error"
         response = self.client.post('/no_such_page/')
         self.assertEqual(response.status_code, 404)
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-@override_settings(
-    MIDDLEWARE=None,
-    MIDDLEWARE_CLASSES=[
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ],
-)
-class FlatpageCSRFMiddlewareClassesTests(FlatpageCSRFTests):
-    pass

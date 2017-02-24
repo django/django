@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from unittest import mock
 
 from django.db import migrations
 
@@ -9,7 +8,6 @@ try:
         TrigramExtension, UnaccentExtension,
     )
 except ImportError:
-    from django.test import mock
     BtreeGinExtension = mock.Mock()
     CreateExtension = mock.Mock()
     HStoreExtension = mock.Mock()

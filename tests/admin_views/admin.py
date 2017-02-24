@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 import tempfile
+from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
@@ -20,7 +18,6 @@ from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.six import StringIO
 
 from .forms import MediaActionForm
 from .models import (
@@ -110,11 +107,7 @@ class ArticleAdmin(admin.ModelAdmin):
     )
 
     def changelist_view(self, request):
-        return super(ArticleAdmin, self).changelist_view(
-            request, extra_context={
-                'extra_var': 'Hello!'
-            }
-        )
+        return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})
 
     def modeladmin_year(self, obj):
         return obj.date.year
@@ -128,7 +121,7 @@ class ArticleAdmin(admin.ModelAdmin):
             'from@example.com',
             ['to@example.com']
         ).send()
-        return super(ArticleAdmin, self).delete_model(request, obj)
+        return super().delete_model(request, obj)
 
     def save_model(self, request, obj, form, change=True):
         EmailMessage(
@@ -137,7 +130,7 @@ class ArticleAdmin(admin.ModelAdmin):
             'from@example.com',
             ['to@example.com']
         ).send()
-        return super(ArticleAdmin, self).save_model(request, obj, form, change)
+        return super().save_model(request, obj, form, change)
 
 
 class ArticleAdmin2(admin.ModelAdmin):
@@ -165,11 +158,7 @@ class CustomArticleAdmin(admin.ModelAdmin):
     popup_response_template = 'custom_admin/popup_response.html'
 
     def changelist_view(self, request):
-        return super(CustomArticleAdmin, self).changelist_view(
-            request, extra_context={
-                'extra_var': 'Hello!'
-            }
-        )
+        return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})
 
 
 class ThingAdmin(admin.ModelAdmin):
@@ -210,12 +199,12 @@ class PersonAdmin(admin.ModelAdmin):
     save_as = True
 
     def get_changelist_formset(self, request, **kwargs):
-        return super(PersonAdmin, self).get_changelist_formset(request, formset=BasePersonModelFormSet, **kwargs)
+        return super().get_changelist_formset(request, formset=BasePersonModelFormSet, **kwargs)
 
     def get_queryset(self, request):
         # Order by a field that isn't in list display, to be able to test
         # whether ordering is preserved.
-        return super(PersonAdmin, self).get_queryset(request).order_by('age')
+        return super().get_queryset(request).order_by('age')
 
 
 class FooAccountAdmin(admin.StackedInline):
@@ -310,11 +299,12 @@ class ParentAdmin(admin.ModelAdmin):
     model = Parent
     inlines = [ChildInline]
     save_as = True
-
+    list_display = ('id', 'name',)
+    list_display_links = ('id',)
     list_editable = ('name',)
 
     def save_related(self, request, form, formsets, change):
-        super(ParentAdmin, self).save_related(request, form, formsets, change)
+        super().save_related(request, form, formsets, change)
         first_name, last_name = form.instance.name.split()
         for child in form.instance.child_set.all():
             if len(child.name.split()) < 2:
@@ -324,7 +314,7 @@ class ParentAdmin(admin.ModelAdmin):
 
 class EmptyModelAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
-        return super(EmptyModelAdmin, self).get_queryset(request).filter(pk__gt=1)
+        return super().get_queryset(request).filter(pk__gt=1)
 
 
 class OldSubscriberAdmin(admin.ModelAdmin):
@@ -446,7 +436,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
         'multiline', 'multiline_html', lambda obj: "foo",
-        'multiline_html_allow_tags', 'readonly_content',
+        'readonly_content',
     )
 
     inlines = [
@@ -468,10 +458,6 @@ class PostAdmin(admin.ModelAdmin):
 
     def multiline_html(self, instance):
         return mark_safe("Multiline<br>\nhtml<br>\ncontent")
-
-    def multiline_html_allow_tags(self, instance):
-        return "Multiline<br>html<br>content<br>with allow tags"
-    multiline_html_allow_tags.allow_tags = True
 
 
 class FieldOverridePostForm(forms.ModelForm):
@@ -527,7 +513,7 @@ class CoverLetterAdmin(admin.ModelAdmin):
     """
 
     def get_queryset(self, request):
-        return super(CoverLetterAdmin, self).get_queryset(request).defer('date_written')
+        return super().get_queryset(request).defer('date_written')
 
 
 class PaperAdmin(admin.ModelAdmin):
@@ -539,7 +525,7 @@ class PaperAdmin(admin.ModelAdmin):
     """
 
     def get_queryset(self, request):
-        return super(PaperAdmin, self).get_queryset(request).only('title')
+        return super().get_queryset(request).only('title')
 
 
 class ShortMessageAdmin(admin.ModelAdmin):
@@ -551,7 +537,7 @@ class ShortMessageAdmin(admin.ModelAdmin):
     """
 
     def get_queryset(self, request):
-        return super(ShortMessageAdmin, self).get_queryset(request).defer('timestamp')
+        return super().get_queryset(request).defer('timestamp')
 
 
 class TelegramAdmin(admin.ModelAdmin):
@@ -563,7 +549,7 @@ class TelegramAdmin(admin.ModelAdmin):
     """
 
     def get_queryset(self, request):
-        return super(TelegramAdmin, self).get_queryset(request).only('title')
+        return super().get_queryset(request).only('title')
 
 
 class StoryForm(forms.ModelForm):
@@ -576,14 +562,14 @@ class StoryAdmin(admin.ModelAdmin):
     list_display_links = ('title',)  # 'id' not in list_display_links
     list_editable = ('content', )
     form = StoryForm
-    ordering = ["-pk"]
+    ordering = ['-id']
 
 
 class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title', 'id')  # 'id' in list_display_links
     list_editable = ('content', )
-    ordering = ["-pk"]
+    ordering = ['-id']
 
 
 class ComplexSortedPersonAdmin(admin.ModelAdmin):
@@ -600,9 +586,7 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(
-            request, queryset, search_term
-        )
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
         try:
             search_term_as_int = int(search_term)
         except ValueError:
@@ -710,7 +694,8 @@ class MainPrepopulatedAdmin(admin.ModelAdmin):
 
 
 class UnorderedObjectAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['id', 'name']
+    list_display_links = ['id']
     list_editable = ['name']
     list_per_page = 2
 
@@ -718,13 +703,13 @@ class UnorderedObjectAdmin(admin.ModelAdmin):
 class UndeletableObjectAdmin(admin.ModelAdmin):
     def change_view(self, *args, **kwargs):
         kwargs['extra_context'] = {'show_delete': False}
-        return super(UndeletableObjectAdmin, self).change_view(*args, **kwargs)
+        return super().change_view(*args, **kwargs)
 
 
 class UnchangeableObjectAdmin(admin.ModelAdmin):
     def get_urls(self):
         # Disable change_view, but leave other urls untouched
-        urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
+        urlpatterns = super().get_urls()
         return [p for p in urlpatterns if p.name and not p.name.endswith("_change")]
 
 
@@ -780,7 +765,7 @@ class DependentChildAdminForm(forms.ModelForm):
         if parent.family_name and parent.family_name != self.cleaned_data.get('family_name'):
             raise ValidationError("Children must share a family name with their parents " +
                                   "in this contrived test case")
-        return super(DependentChildAdminForm, self).clean()
+        return super().clean()
 
 
 class DependentChildInline(admin.TabularInline):
@@ -888,18 +873,18 @@ class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
 
     def add_view(self, request, *args, **kwargs):
         request.is_add_view = True
-        return super(GetFormsetsArgumentCheckingAdmin, self).add_view(request, *args, **kwargs)
+        return super().add_view(request, *args, **kwargs)
 
     def change_view(self, request, *args, **kwargs):
         request.is_add_view = False
-        return super(GetFormsetsArgumentCheckingAdmin, self).change_view(request, *args, **kwargs)
+        return super().change_view(request, *args, **kwargs)
 
     def get_formsets_with_inlines(self, request, obj=None):
         if request.is_add_view and obj is not None:
             raise Exception("'obj' passed to get_formsets_with_inlines wasn't None during add_view")
         if not request.is_add_view and obj is None:
             raise Exception("'obj' passed to get_formsets_with_inlines was None during change_view")
-        return super(GetFormsetsArgumentCheckingAdmin, self).get_formsets_with_inlines(request, obj)
+        return super().get_formsets_with_inlines(request, obj)
 
 
 site = admin.AdminSite(name="admin")
@@ -976,8 +961,7 @@ site.register(RelatedWithUUIDPKModel)
 #     related ForeignKey object not registered in admin
 #     related OneToOne object registered in admin
 #     related OneToOne object not registered in admin
-# when deleting Book so as exercise all four troublesome (w.r.t escaping
-# and calling force_text to avoid problems on Python 2.3) paths through
+# when deleting Book so as exercise all four paths through
 # contrib.admin.utils's get_deleted_objects function.
 site.register(Book, inlines=[ChapterInline])
 site.register(Promo)

@@ -6,6 +6,7 @@ from MySQLdb.constants import FIELD_TYPE
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.db.models.indexes import Index
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
@@ -39,7 +40,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     }
 
     def get_field_type(self, data_type, description):
-        field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        field_type = super().get_field_type(data_type, description)
         if 'auto_increment' in description.extra:
             if field_type == 'IntegerField':
                 return 'AutoField'
@@ -217,7 +218,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     'foreign_key': None,
                 }
             constraints[index]['index'] = True
-            constraints[index]['type'] = type_.lower()
+            constraints[index]['type'] = Index.suffix if type_ == 'BTREE' else type_.lower()
             constraints[index]['columns'].add(column)
         # Convert the sorted sets to lists
         for constraint in constraints.values():

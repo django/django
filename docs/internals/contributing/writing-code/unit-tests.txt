@@ -31,7 +31,7 @@ Next, clone your fork, install some requirements, and run the tests::
    $ git clone git@github.com:YourGitHubName/django.git django-repo
    $ cd django-repo/tests
    $ pip install -e ..
-   $ pip install -r requirements/py3.txt  # Python 2: py2.txt
+   $ pip install -r requirements/py3.txt
    $ ./runtests.py
 
 Installing the requirements will likely require some operating system packages
@@ -39,8 +39,7 @@ that your computer doesn't have installed. You can usually figure out which
 package to install by doing a Web search for the last line or so of the error
 message. Try adding your operating system to the search query if needed.
 
-If you have trouble installing the requirements, you can skip that step, except
-on Python 2, where you must ``pip install mock``. See
+If you have trouble installing the requirements, you can skip that step. See
 :ref:`running-unit-tests-dependencies` for details on installing the optional
 test dependencies. If you don't have an optional dependency installed, the
 tests that require it will be skipped.
@@ -75,9 +74,8 @@ command from any place in the Django source tree::
 By default, ``tox`` runs the test suite with the bundled test settings file for
 SQLite, ``flake8``, ``isort``, and the documentation spelling checker. In
 addition to the system dependencies noted elsewhere in this documentation,
-the commands ``python2`` and ``python3`` must be on your path and linked to
-the appropriate versions of Python. A list of default environments can be seen
-as follows::
+the command ``python3`` must be on your path and linked to the appropriate
+version of Python. A list of default environments can be seen as follows::
 
     $ tox -l
     py3
@@ -225,7 +223,6 @@ dependencies:
 *  argon2-cffi_ 16.1.0+
 *  bcrypt_
 *  docutils_
-*  enum34_ (Python 2 only)
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
@@ -234,7 +231,6 @@ dependencies:
 *  pytz_ (required)
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
@@ -243,7 +239,7 @@ You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so::
 
-   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
+   $ pip install -r tests/requirements/py3.txt
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
@@ -265,7 +261,6 @@ associated tests will be skipped.
 .. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
-.. _enum34: https://pypi.python.org/pypi/enum34
 .. _geoip2: https://pypi.python.org/pypi/geoip2
 .. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
@@ -274,7 +269,6 @@ associated tests will be skipped.
 .. _pytz: https://pypi.python.org/pypi/pytz/
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
-.. _mock: https://pypi.python.org/pypi/mock
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
@@ -427,8 +421,6 @@ a temporary ``Apps`` instance::
             ...
 
 .. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
-
-.. versionadded:: 1.10
 
 Since this pattern involves a lot of boilerplate, Django provides the
 :func:`~django.test.utils.isolate_apps` decorator. It's used like this::

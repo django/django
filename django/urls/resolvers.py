@@ -5,22 +5,20 @@ RegexURLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
-from __future__ import unicode_literals
-
 import functools
 import re
 import threading
 from importlib import import_module
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core.checks import Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.http import RFC3986_SUBDELIMS, urlquote
+from django.utils.http import RFC3986_SUBDELIMS
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
 
@@ -28,7 +26,7 @@ from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
 
-class ResolverMatch(object):
+class ResolverMatch:
     def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
         self.func = func
         self.args = args
@@ -62,7 +60,7 @@ class ResolverMatch(object):
         )
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         from django.conf import settings
@@ -70,7 +68,7 @@ def get_resolver(urlconf=None):
     return RegexURLResolver(r'^/', urlconf)
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
@@ -79,7 +77,7 @@ def get_ns_resolver(ns_pattern, resolver):
     return RegexURLResolver(r'^/', [ns_resolver])
 
 
-class LocaleRegexDescriptor(object):
+class LocaleRegexDescriptor:
     def __get__(self, instance, cls=None):
         """
         Return a compiled regular expression based on the active language.
@@ -89,7 +87,7 @@ class LocaleRegexDescriptor(object):
         # As a performance optimization, if the given regex string is a regular
         # string (not a lazily-translated string proxy), compile it once and
         # avoid per-language compilation.
-        if isinstance(instance._regex, six.string_types):
+        if isinstance(instance._regex, str):
             instance.__dict__['regex'] = self._compile(instance._regex)
             return instance.__dict__['regex']
         language_code = get_language()
@@ -102,22 +100,21 @@ class LocaleRegexDescriptor(object):
         Compile and return the given regular expression.
         """
         try:
-            return re.compile(regex, re.UNICODE)
+            return re.compile(regex)
         except re.error as e:
             raise ImproperlyConfigured(
-                '"%s" is not a valid regular expression: %s' %
-                (regex, six.text_type(e))
+                '"%s" is not a valid regular expression: %s' % (regex, e)
             )
 
 
-class LocaleRegexProvider(object):
+class LocaleRegexProvider:
     """
     A mixin to provide a default regex property which can vary by active
     language.
     """
     def __init__(self, regex):
         # regex is either a string representing a regular expression, or a
-        # translatable string (using ugettext_lazy) representing a regular
+        # translatable string (using gettext_lazy) representing a regular
         # expression.
         self._regex = regex
         self._regex_dict = {}
@@ -164,7 +161,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return '<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern)
 
     def check(self):
         warnings = self._check_pattern_name()
@@ -211,11 +208,7 @@ class RegexURLPattern(LocaleRegexProvider):
             callback = callback.func
         if not hasattr(callback, '__name__'):
             return callback.__module__ + "." + callback.__class__.__name__
-        elif six.PY3:
-            return callback.__module__ + "." + callback.__qualname__
-        else:
-            # PY2 does not support __qualname__
-            return callback.__module__ + "." + callback.__name__
+        return callback.__module__ + "." + callback.__qualname__
 
 
 class RegexURLResolver(LocaleRegexProvider):
@@ -244,7 +237,7 @@ class RegexURLResolver(LocaleRegexProvider):
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return str('<%s %s (%s:%s) %s>') % (
+        return '<%s %s (%s:%s) %s>' % (
             self.__class__.__name__, urlconf_repr, self.app_name,
             self.namespace, self.regex.pattern,
         )
@@ -394,7 +387,7 @@ class RegexURLResolver(LocaleRegexProvider):
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, six.string_types):
+        if isinstance(self.urlconf_name, str):
             return import_module(self.urlconf_name)
         else:
             return self.urlconf_name
@@ -461,9 +454,9 @@ class RegexURLResolver(LocaleRegexProvider):
                 # Then, if we have a match, redo the substitution with quoted
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = _prefix.replace('%', '%%') + result
-                if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs, re.UNICODE):
+                if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs):
                     # safe characters from `pchar` definition of RFC 3986
-                    url = urlquote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + str('/~:@'))
+                    url = quote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + '/~:@')
                     # Don't allow construction of scheme relative urls.
                     if url.startswith('//'):
                         url = '/%%2F%s' % url[2:]
@@ -478,11 +471,23 @@ class RegexURLResolver(LocaleRegexProvider):
             lookup_view_s = lookup_view
 
         patterns = [pattern for (possibility, pattern, defaults) in possibilities]
-        raise NoReverseMatch(
-            "Reverse for '%s' with arguments '%s' and keyword "
-            "arguments '%s' not found. %d pattern(s) tried: %s" %
-            (lookup_view_s, args, kwargs, len(patterns), patterns)
-        )
+        if patterns:
+            if args:
+                arg_msg = "arguments '%s'" % (args,)
+            elif kwargs:
+                arg_msg = "keyword arguments '%s'" % (kwargs,)
+            else:
+                arg_msg = "no arguments"
+            msg = (
+                "Reverse for '%s' with %s not found. %d pattern(s) tried: %s" %
+                (lookup_view_s, arg_msg, len(patterns), patterns)
+            )
+        else:
+            msg = (
+                "Reverse for '%(view)s' not found. '%(view)s' is not "
+                "a valid view function or pattern name." % {'view': lookup_view_s}
+            )
+        raise NoReverseMatch(msg)
 
 
 class LocaleRegexURLResolver(RegexURLResolver):
@@ -496,9 +501,7 @@ class LocaleRegexURLResolver(RegexURLResolver):
         self, urlconf_name, default_kwargs=None, app_name=None, namespace=None,
         prefix_default_language=True,
     ):
-        super(LocaleRegexURLResolver, self).__init__(
-            None, urlconf_name, default_kwargs, app_name, namespace,
-        )
+        super().__init__(None, urlconf_name, default_kwargs, app_name, namespace)
         self.prefix_default_language = prefix_default_language
 
     @property
@@ -509,5 +512,5 @@ class LocaleRegexURLResolver(RegexURLResolver):
                 regex_string = ''
             else:
                 regex_string = '^%s/' % language_code
-            self._regex_dict[language_code] = re.compile(regex_string, re.UNICODE)
+            self._regex_dict[language_code] = re.compile(regex_string)
         return self._regex_dict[language_code]

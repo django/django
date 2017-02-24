@@ -1,4 +1,5 @@
 from django.template import TemplateSyntaxError
+from django.template.defaulttags import WithNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -50,3 +51,9 @@ class WithTagTests(SimpleTestCase):
     def test_with_error02(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('with-error02', {'dict': {'key': 50}})
+
+
+class WithNodeTests(SimpleTestCase):
+    def test_repr(self):
+        node = WithNode(nodelist=[], name='a', var='dict.key')
+        self.assertEqual(repr(node), '<WithNode>')

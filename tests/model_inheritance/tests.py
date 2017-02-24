@@ -1,12 +1,9 @@
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
-from django.utils import six
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
@@ -27,8 +24,8 @@ class ModelInheritanceTests(TestCase):
 
         s = Student.objects.create(name="Pebbles", age=5, school_class="1B")
 
-        self.assertEqual(six.text_type(w1), "Worker Fred")
-        self.assertEqual(six.text_type(s), "Student Pebbles")
+        self.assertEqual(str(w1), "Worker Fred")
+        self.assertEqual(str(s), "Student Pebbles")
 
         # The children inherit the Meta class of their parents (if they don't
         # specify their own).

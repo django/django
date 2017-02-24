@@ -1,9 +1,6 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.test import TestCase, skipIfDBFeature
-from django.utils import six
 from django.utils.timezone import utc
 
 from .models import Donut, RumBaba
@@ -72,12 +69,11 @@ class DataTypesTestCase(TestCase):
         self.assertEqual(0, Donut.objects.filter(consumed_at__year=2005).count())
         self.assertEqual(0, Donut.objects.filter(consumed_at__year=2008).count())
 
-    def test_textfields_unicode(self):
-        """Regression test for #10238: TextField values returned from the
-        database should be unicode."""
+    def test_textfields_str(self):
+        """TextField values returned from the database should be str."""
         d = Donut.objects.create(name='Jelly Donut', review='Outstanding')
         newd = Donut.objects.get(id=d.id)
-        self.assertIsInstance(newd.review, six.text_type)
+        self.assertIsInstance(newd.review, str)
 
     @skipIfDBFeature('supports_timezones')
     def test_error_on_timezone(self):

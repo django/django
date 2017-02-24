@@ -9,9 +9,9 @@ Settings
 .. warning::
 
     Be careful when you override settings, especially when the default value
-    is a non-empty list or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
-    and :setting:`STATICFILES_FINDERS`. Make sure you keep the components
-    required by the features of Django you wish to use.
+    is a non-empty list or dictionary, such as :setting:`STATICFILES_FINDERS`.
+    Make sure you keep the components required by the features of Django you
+    wish to use.
 
 Core Settings
 =============
@@ -422,11 +422,6 @@ an :class:`~django.http.HttpResponseForbidden`.
 ``django.views.csrf.csrf_failure()`` accepts an additional ``template_name``
 parameter that defaults to ``'403_csrf.html'``. If a template with that name
 exists, it will be used to render the page.
-
-.. versionchanged:: 1.10
-
-   The ``template_name`` parameter and the behavior of searching for a template
-   called ``403_csrf.html`` were added to ``csrf_failure()``.
 
 .. setting:: CSRF_HEADER_NAME
 
@@ -906,8 +901,6 @@ The maximum size that the DATAFILE_TMP is allowed to grow to.
 DATA_UPLOAD_MAX_MEMORY_SIZE
 ---------------------------
 
-.. versionadded:: 1.10
-
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size in bytes that a request body may be before a
@@ -929,8 +922,6 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS
 -----------------------------
-
-.. versionadded:: 1.10
 
 Default: ``1000``
 
@@ -1148,6 +1139,11 @@ Default: ``'text/html'``
 Default content type to use for all ``HttpResponse`` objects, if a MIME type
 isn't manually specified. Used with :setting:`DEFAULT_CHARSET` to construct
 the ``Content-Type`` header.
+
+.. deprecated:: 2.0
+
+    This setting is deprecated because it doesn't interact well with
+    third-party apps and is obsolete since HTML5 has mostly superseded XHTML.
 
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
@@ -1513,10 +1509,6 @@ of the preferred value or not supplied at all. It is also used by
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
-.. versionchanged:: 1.10
-
-    The setting's use in :func:`django.setup()` was added.
-
 .. setting:: FORM_RENDERER
 
 ``FORM_RENDERER``
@@ -1761,11 +1753,11 @@ to restrict language selection to a subset of the Django-provided languages.
 
 If you define a custom :setting:`LANGUAGES` setting, you can mark the
 language names as translation strings using the
-:func:`~django.utils.translation.ugettext_lazy` function.
+:func:`~django.utils.translation.gettext_lazy` function.
 
 Here's a sample settings file::
 
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     LANGUAGES = [
         ('de', _('German')),
@@ -1894,35 +1886,9 @@ Example: ``"http://media.example.com/"``
 ``MIDDLEWARE``
 --------------
 
-.. versionadded:: 1.10
-
 Default:: ``None``
 
 A list of middleware to use. See :doc:`/topics/http/middleware`.
-
-.. setting:: MIDDLEWARE_CLASSES
-
-``MIDDLEWARE_CLASSES``
-----------------------
-
-.. deprecated:: 1.10
-
-    Old-style middleware that uses  ``settings.MIDDLEWARE_CLASSES`` are
-    deprecated. :ref:`Adapt old, custom middleware <upgrading-middleware>` and
-    use the :setting:`MIDDLEWARE` setting.
-
-Default::
-
-    [
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-    ]
-
-A list of middleware classes to use. This was the default setting used in
-Django 1.9 and earlier. Django 1.10 introduced a new style of middleware. If
-you have an older project using this setting you should :ref:`update any
-middleware you've written yourself <upgrading-middleware>` to the new style
-and then use the :setting:`MIDDLEWARE` setting.
 
 .. setting:: MIGRATION_MODULES
 
@@ -2799,8 +2765,6 @@ the URL in two places (``settings`` and URLconf).
 ``LOGOUT_REDIRECT_URL``
 -----------------------
 
-.. versionadded:: 1.10
-
 Default: ``None``
 
 The URL where requests are redirected after a user logs out using
@@ -2840,22 +2804,6 @@ Default::
         'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
         'django.contrib.auth.hashers.BCryptPasswordHasher',
     ]
-
-.. versionchanged:: 1.10
-
-    The following hashers were removed from the defaults::
-
-        'django.contrib.auth.hashers.SHA1PasswordHasher'
-        'django.contrib.auth.hashers.MD5PasswordHasher'
-        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
-        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
-        'django.contrib.auth.hashers.CryptPasswordHasher'
-
-    Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>`
-    to strengthen the hashes in your database. If that's not feasible, add this
-    setting to your project and add back any hashers that you need.
-
-    Also, the ``Argon2PasswordHasher`` was added.
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
 
@@ -3411,7 +3359,6 @@ HTTP
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
 * :setting:`MIDDLEWARE`
-* :setting:`MIDDLEWARE_CLASSES`
 * Security
 
   * :setting:`SECURE_BROWSER_XSS_FILTER`

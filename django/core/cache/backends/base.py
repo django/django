@@ -1,6 +1,4 @@
 "Base Cache class."
-from __future__ import unicode_literals
-
 import time
 import warnings
 
@@ -28,7 +26,7 @@ def default_key_func(key, key_prefix, version):
     """
     Default function to generate keys.
 
-    Constructs the key used by all other methods. By default it prepends
+    Construct the key used by all other methods. By default, prepend
     the `key_prefix'. KEY_FUNCTION can be used to specify an alternate
     function with custom key making behavior.
     """
@@ -39,7 +37,7 @@ def get_key_func(key_func):
     """
     Function to decide which key function to use.
 
-    Defaults to ``default_key_func``.
+    Default to ``default_key_func``.
     """
     if key_func is not None:
         if callable(key_func):
@@ -49,7 +47,7 @@ def get_key_func(key_func):
     return default_key_func
 
 
-class BaseCache(object):
+class BaseCache:
     def __init__(self, params):
         timeout = params.get('timeout', params.get('TIMEOUT', 300))
         if timeout is not None:
@@ -78,7 +76,7 @@ class BaseCache(object):
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
-        Returns the timeout value usable by this backend based upon the provided
+        Return the timeout value usable by this backend based upon the provided
         timeout.
         """
         if timeout == DEFAULT_TIMEOUT:
@@ -89,12 +87,12 @@ class BaseCache(object):
         return None if timeout is None else time.time() + timeout
 
     def make_key(self, key, version=None):
-        """Constructs the key used by all other methods. By default it
-        uses the key_func to generate a key (which, by default,
-        prepends the `key_prefix' and 'version'). A different key
-        function can be provided at the time of cache construction;
-        alternatively, you can subclass the cache backend to provide
-        custom key making behavior.
+        """
+        Construct the key used by all other methods. By default, use the
+        key_func to generate a key (which, by default, prepends the
+        `key_prefix' and 'version'). A different key function can be provided
+        at the time of cache construction; alternatively, you can subclass the
+        cache backend to provide custom key making behavior.
         """
         if version is None:
             version = self.version
@@ -105,10 +103,10 @@ class BaseCache(object):
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Set a value in the cache if the key does not already exist. If
-        timeout is given, that timeout will be used for the key; otherwise
-        the default cache timeout will be used.
+        timeout is given, use that timeout for the key; otherwise use the
+        default cache timeout.
 
-        Returns True if the value was stored, False otherwise.
+        Return True if the value was stored, False otherwise.
         """
         raise NotImplementedError('subclasses of BaseCache must provide an add() method')
 
@@ -121,8 +119,8 @@ class BaseCache(object):
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
-        Set a value in the cache. If timeout is given, that timeout will be
-        used for the key; otherwise the default cache timeout will be used.
+        Set a value in the cache. If timeout is given, use that timeout for the
+        key; otherwise use the default cache timeout.
         """
         raise NotImplementedError('subclasses of BaseCache must provide a set() method')
 
@@ -137,7 +135,7 @@ class BaseCache(object):
         Fetch a bunch of keys from the cache. For certain backends (memcached,
         pgsql) this can be *much* faster when fetching multiple values.
 
-        Returns a dict mapping each key in keys to its value. If the given
+        Return a dict mapping each key in keys to its value. If the given
         key is missing, it will be missing from the response dict.
         """
         d = {}
@@ -150,9 +148,9 @@ class BaseCache(object):
     def get_or_set(self, key, default, timeout=DEFAULT_TIMEOUT, version=None):
         """
         Fetch a given key from the cache. If the key does not exist,
-        the key is added and set to the default value. The default value can
-        also be any callable. If timeout is given, that timeout will be used
-        for the key; otherwise the default cache timeout will be used.
+        add the key and set it to the default value. The default value can
+        also be any callable. If timeout is given, use that timeout for the
+        key; otherwise use the default cache timeout.
 
         Return the value of the key stored or retrieved.
         """
@@ -168,7 +166,7 @@ class BaseCache(object):
 
     def has_key(self, key, version=None):
         """
-        Returns True if the key is in the cache and has not expired.
+        Return True if the key is in the cache and has not expired.
         """
         return self.get(key, version=version) is not None
 
@@ -193,7 +191,7 @@ class BaseCache(object):
 
     def __contains__(self, key):
         """
-        Returns True if the key is in the cache and has not expired.
+        Return True if the key is in the cache and has not expired.
         """
         # This is a separate method, rather than just a copy of has_key(),
         # so that it always has the same functionality as has_key(), even
@@ -206,8 +204,8 @@ class BaseCache(object):
         pairs.  For certain backends (memcached), this is much more efficient
         than calling set() multiple times.
 
-        If timeout is given, that timeout will be used for the key; otherwise
-        the default cache timeout will be used.
+        If timeout is given, use that timeout for the key; otherwise use the
+        default cache timeout.
         """
         for key, value in data.items():
             self.set(key, value, timeout=timeout, version=version)
@@ -245,8 +243,9 @@ class BaseCache(object):
                 break
 
     def incr_version(self, key, delta=1, version=None):
-        """Adds delta to the cache version for the supplied key. Returns the
-        new version.
+        """
+        Add delta to the cache version for the supplied key. Return the new
+        version.
         """
         if version is None:
             version = self.version
@@ -260,8 +259,9 @@ class BaseCache(object):
         return version + delta
 
     def decr_version(self, key, delta=1, version=None):
-        """Subtracts delta from the cache version for the supplied key. Returns
-        the new version.
+        """
+        Subtract delta from the cache version for the supplied key. Return the
+        new version.
         """
         return self.incr_version(key, -delta, version)
 

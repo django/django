@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.db import models
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_lru_cache
-from django.utils import six
 
 
 class FieldDeconstructionTests(SimpleTestCase):
@@ -23,7 +20,6 @@ class FieldDeconstructionTests(SimpleTestCase):
         field.set_attributes_from_name("is_awesome_test")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(name, "is_awesome_test")
-        self.assertIsInstance(name, six.text_type)
         # Now try with a ForeignKey
         field = models.ForeignKey("some_fake.ModelName", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()

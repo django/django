@@ -13,7 +13,7 @@ class CurrentTranslation(models.ForeignObject):
         kwargs['related_name'] = '+'
         # Set unique to enable model cache.
         kwargs['unique'] = True
-        super(CurrentTranslation, self).__init__(to, on_delete, from_fields, to_fields, **kwargs)
+        super().__init__(to, on_delete, from_fields, to_fields, **kwargs)
 
 
 class ArticleTranslation(models.Model):

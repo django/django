@@ -384,7 +384,7 @@ Internationalization
 * The :func:`django.views.i18n.set_language` view now properly redirects to
   :ref:`translated URLs <url-internationalization>`, when available.
 
-* The :func:`django.views.i18n.javascript_catalog` view now works correctly
+* The ``django.views.i18n.javascript_catalog()`` view now works correctly
   if used multiple times with different configurations on the same page.
 
 * The :func:`django.utils.timezone.make_aware` function gained an ``is_dst``
@@ -394,7 +394,7 @@ Internationalization
   for languages which can be written in different scripts, for example Latin
   and Cyrillic (e.g. ``be@latin``).
 
-* Added the :func:`django.views.i18n.json_catalog` view to help build a custom
+* Added the ``django.views.i18n.json_catalog()`` view to help build a custom
   client-side i18n library upon Django translations. It returns a JSON object
   containing a translations catalog, formatting settings, and a plural rule.
 
@@ -938,9 +938,8 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 In general, template tags do not autoescape their contents, and this behavior is
 :ref:`documented <tags-auto-escaping>`. For tags like
 :class:`~django.template.Library.inclusion_tag`, this is not a problem because
-the included template will perform autoescaping. For
-:class:`~django.template.Library.assignment_tag`, the output will be escaped
-when it is used as a variable in the template.
+the included template will perform autoescaping. For ``assignment_tag()``,
+the output will be escaped when it is used as a variable in the template.
 
 For the intended use cases of :class:`~django.template.Library.simple_tag`,
 however, it is very easy to end up with incorrect HTML and possibly an XSS

@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
@@ -370,7 +366,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_lazystring(self):
-        prepend_www = lazy(lambda url: 'www.' + url, six.text_type)
+        prepend_www = lazy(lambda url: 'www.' + url, str)
         self.assertEqual(
             urlize(prepend_www('google.com')),
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',

@@ -17,8 +17,6 @@ from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
-from django.utils import six
-from django.utils.functional import cached_property
 
 DEFAULT_TOLERANCE = '0.05'
 
@@ -45,12 +43,12 @@ class SDORelate(SpatialOperator):
     def check_relate_argument(self, arg):
         masks = 'TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON'
         mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
-        if not isinstance(arg, six.string_types) or not mask_regex.match(arg):
+        if not isinstance(arg, str) or not mask_regex.match(arg):
             raise ValueError('Invalid SDO_RELATE mask: "%s"' % arg)
 
     def as_sql(self, connection, lookup, template_params, sql_params):
         template_params['mask'] = sql_params.pop()
-        return super(SDORelate, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class SDOIsValid(SpatialOperator):
@@ -133,21 +131,16 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     truncate_params = {'relate': None}
 
-    @cached_property
-    def unsupported_functions(self):
-        unsupported = {
-            'AsGeoJSON', 'AsKML', 'AsSVG', 'Envelope', 'ForceRHR', 'GeoHash',
-            'MakeValid', 'MemSize', 'Scale', 'SnapToGrid', 'Translate',
-        }
-        if self.connection.oracle_full_version < '12.1.0.2':
-            unsupported.add('BoundingCircle')
-        return unsupported
+    unsupported_functions = {
+        'AsGeoJSON', 'AsKML', 'AsSVG', 'Envelope', 'ForceRHR', 'GeoHash',
+        'MakeValid', 'MemSize', 'Scale', 'SnapToGrid', 'Translate',
+    }
 
     def geo_quote_name(self, name):
-        return super(OracleOperations, self).geo_quote_name(name).upper()
+        return super().geo_quote_name(name).upper()
 
     def get_db_converters(self, expression):
-        converters = super(OracleOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         geometry_fields = (
             'PointField', 'GeometryField', 'LineStringField',
@@ -192,15 +185,15 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         """
-        Returns the geometry database type for Oracle.  Unlike other spatial
+        Return the geometry database type for Oracle. Unlike other spatial
         backends, no stored procedure is necessary and it's the same for all
         geometry types.
         """
         return 'MDSYS.SDO_GEOMETRY'
 
-    def get_distance(self, f, value, lookup_type, **kwargs):
+    def get_distance(self, f, value, lookup_type):
         """
-        Returns the distance parameters given the value and the lookup type.
+        Return the distance parameters given the value and the lookup type.
         On Oracle, geometry columns with a geodetic coordinate system behave
         implicitly like a geography column, and thus meters will be used as
         the distance parameter on them.
@@ -225,7 +218,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geom_placeholder(self, f, value, compiler):
         """
-        Provides a proper substitution value for Geometries that are not in the
+        Provide a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
         SDO_CS.TRANSFORM() function call.
         """
@@ -252,7 +245,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def spatial_aggregate_name(self, agg_name):
         """
-        Returns the spatial aggregate SQL name.
+        Return the spatial aggregate SQL name.
         """
         agg_name = 'unionagg' if agg_name.lower() == 'union' else agg_name.lower()
         return getattr(self, agg_name)
@@ -272,4 +265,4 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         """
         if placeholder == 'NULL':
             return []
-        return super(OracleOperations, self).modify_insert_params(placeholder, params)
+        return super().modify_insert_params(placeholder, params)

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import asyncore
 import base64
 import mimetypes
@@ -11,8 +8,11 @@ import socket
 import sys
 import tempfile
 import threading
+from email import message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
+from email.utils import parseaddr
+from io import StringIO
 from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
@@ -25,23 +25,11 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six import PY3, StringIO, binary_type
-from django.utils.translation import ugettext_lazy
-
-if PY3:
-    from email.utils import parseaddr
-    from email import message_from_bytes, message_from_binary_file
-else:
-    from email.Utils import parseaddr
-    from email import (
-        message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file,
-    )
+from django.utils.translation import gettext_lazy
 
 
-class HeadersCheckMixin(object):
+class HeadersCheckMixin:
 
     def assertMessageHasHeaders(self, message, headers):
         """
@@ -51,7 +39,7 @@ class HeadersCheckMixin(object):
                  with the contents of an email message.
         headers: should be a set of (header-name, header-value) tuples.
         """
-        if isinstance(message, binary_type):
+        if isinstance(message, bytes):
             message = message_from_bytes(message)
         msg_headers = set(message.items())
         self.assertTrue(headers.issubset(msg_headers), msg='Message is missing '
@@ -189,7 +177,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         with self.assertRaises(BadHeaderError):
             email.message()
         email = EmailMessage(
-            ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
+            gettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
         )
         with self.assertRaises(BadHeaderError):
             email.message()
@@ -204,7 +192,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             'Content', 'from@example.com', ['to@example.com']
         )
         message = email.message()
-        # Note that in Python 3, maximum line length has increased from 76 to 78
         self.assertEqual(
             message['Subject'].encode(),
             b'Long subject lines that get wrapped should contain a space continuation\n'
@@ -422,7 +409,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 email = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
                 self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
                 self.assertEqual(email.attachments, [])
-                file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', basename)
+                file_path = os.path.join(os.path.dirname(__file__), 'attachments', basename)
                 email.attach_file(file_path, mimetype=mimetype)
                 self.assertEqual(len(email.attachments), 1)
                 self.assertIn(basename, email.attachments[0])
@@ -506,14 +493,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             mail.get_connection('django.core.mail.backends.console.EmailBackend'),
             console.EmailBackend
         )
-        tmp_dir = tempfile.mkdtemp()
-        try:
+        with tempfile.TemporaryDirectory() as tmp_dir:
             self.assertIsInstance(
                 mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
                 filebased.EmailBackend
             )
-        finally:
-            shutil.rmtree(tmp_dir)
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
@@ -588,7 +572,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         s = msg.message().as_bytes()
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
         s = msg.message().as_string()
-        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
+        self.assertIn('Content-Transfer-Encoding: 8bit', s)
 
         msg = EmailMessage(
             'Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com',
@@ -597,7 +581,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         s = msg.message().as_bytes()
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
         s = msg.message().as_string()
-        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
+        self.assertIn('Content-Transfer-Encoding: 8bit', s)
 
     def test_dont_base64_encode_message_rfc822(self):
         # Ticket #18967
@@ -620,7 +604,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_s = parent_msg.message().as_string()
 
         # The child message header is not base64 encoded
-        self.assertIn(str('Child Subject'), parent_s)
+        self.assertIn('Child Subject', parent_s)
 
         # Feature test: try attaching email.Message object directly to the mail.
         parent_msg = EmailMessage(
@@ -631,7 +615,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_s = parent_msg.message().as_string()
 
         # The child message header is not base64 encoded
-        self.assertIn(str('Child Subject'), parent_s)
+        self.assertIn('Child Subject', parent_s)
 
         # Feature test: try attaching Django's EmailMessage object directly to the mail.
         parent_msg = EmailMessage(
@@ -642,7 +626,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_s = parent_msg.message().as_string()
 
         # The child message header is not base64 encoded
-        self.assertIn(str('Child Subject'), parent_s)
+        self.assertIn('Child Subject', parent_s)
 
     def test_sanitize_address(self):
         """
@@ -659,16 +643,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             sanitize_address(('A name', 'to@example.com'), 'ascii'),
             'A name <to@example.com>'
         )
-        if PY3:
-            self.assertEqual(
-                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-                '=?utf-8?q?A_name?= <to@example.com>'
-            )
-        else:
-            self.assertEqual(
-                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-                'A name <to@example.com>'
-            )
+        self.assertEqual(
+            sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+            '=?utf-8?q?A_name?= <to@example.com>'
+        )
 
         # Unicode characters are are supported in RFC-6532.
         self.assertEqual(
@@ -718,14 +696,14 @@ class PythonGlobalState(SimpleTestCase):
 
     def test_8bit_latin(self):
         txt = MIMEText('Body with latin characters: àáä.', 'plain', 'utf-8')
-        self.assertIn(str('Content-Transfer-Encoding: base64'), txt.as_string())
+        self.assertIn('Content-Transfer-Encoding: base64', txt.as_string())
 
     def test_8bit_non_latin(self):
         txt = MIMEText('Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'plain', 'utf-8')
-        self.assertIn(str('Content-Transfer-Encoding: base64'), txt.as_string())
+        self.assertIn('Content-Transfer-Encoding: base64', txt.as_string())
 
 
-class BaseEmailBackendTests(HeadersCheckMixin, object):
+class BaseEmailBackendTests(HeadersCheckMixin):
     email_backend = None
 
     def setUp(self):
@@ -779,7 +757,8 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         Message body containing longer lines are converted to Quoted-Printable
         to avoid having to insert newlines, which could be hairy to do properly.
         """
-        email = EmailMessage('Subject', "Comment ça va? " * 100, 'from@example.com', ['to@example.com'])
+        # Unencoded body length is < 998 (840) but > 998 when utf-8 encoded.
+        email = EmailMessage('Subject', 'В южных морях ' * 60, 'from@example.com', ['to@example.com'])
         email.send()
         message = self.get_the_message()
         self.assertMessageHasHeaders(message, {
@@ -877,12 +856,12 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         String prefix + lazy translated subject = bad output
         Regression for #13494
         """
-        mail_managers(ugettext_lazy('Subject'), 'Content')
+        mail_managers(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
         self.flush_mailbox()
-        mail_admins(ugettext_lazy('Subject'), 'Content')
+        mail_admins(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
@@ -947,7 +926,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         """
         Email sending should support lazy email addresses (#24416).
         """
-        _ = ugettext_lazy
+        _ = gettext_lazy
         self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('django')]))
         message = self.get_the_message()
         self.assertEqual(message.get('from'), 'tester')
@@ -1007,7 +986,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         mail.outbox = []
 
     def tearDown(self):
-        super(LocmemBackendTests, self).tearDown()
+        super().tearDown()
         mail.outbox = []
 
     def test_locmem_shared_messages(self):
@@ -1034,7 +1013,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
-        super(FileBackendTests, self).setUp()
+        super().setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
         self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
@@ -1042,7 +1021,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def tearDown(self):
         self._settings_override.disable()
-        super(FileBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         for filename in os.listdir(self.tmp_dir):
@@ -1094,7 +1073,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.console.EmailBackend'
 
     def setUp(self):
-        super(ConsoleBackendTests, self).setUp()
+        super().setUp()
         self.__stdout = sys.stdout
         self.stream = sys.stdout = StringIO()
 
@@ -1102,13 +1081,13 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         del self.stream
         sys.stdout = self.__stdout
         del self.__stdout
-        super(ConsoleBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         self.stream = sys.stdout = StringIO()
 
     def get_mailbox_content(self):
-        messages = self.stream.getvalue().split(str('\n' + ('-' * 79) + '\n'))
+        messages = self.stream.getvalue().split('\n' + ('-' * 79) + '\n')
         return [message_from_bytes(force_bytes(m)) for m in messages if m]
 
     def test_console_stream_kwarg(self):
@@ -1144,9 +1123,9 @@ class FakeSMTPChannel(smtpd.SMTPChannel):
             # This is only the first part of the login process. But it's enough
             # for our tests.
             challenge = base64.b64encode(b'somerandomstring13579')
-            self.push(str('334 %s' % challenge.decode()))
+            self.push('334 %s' % challenge.decode())
         else:
-            self.push(str('502 Error: login "%s" not implemented' % arg))
+            self.push('502 Error: login "%s" not implemented' % arg)
 
 
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
@@ -1167,25 +1146,15 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active_lock = threading.Lock()
         self.sink_lock = threading.Lock()
 
-    if not PY3:
-        def handle_accept(self):
-            # copy of Python 2.7 smtpd.SMTPServer.handle_accept with hardcoded
-            # SMTPChannel replaced by self.channel_class
-            pair = self.accept()
-            if pair is not None:
-                conn, addr = pair
-                self.channel_class(self, conn, addr)
-
     def process_message(self, peer, mailfrom, rcpttos, data):
-        if PY3:
-            data = data.encode('utf-8')
+        data = data.encode()
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
 
         if mailfrom != maddr:
             # According to the spec, mailfrom does not necessarily match the
-            # From header - on Python 3 this is the case where the local part
-            # isn't encoded, so try to correct that.
+            # From header - this is the case where the local part isn't
+            # encoded, so try to correct that.
             lp, domain = mailfrom.split('@', 1)
             lp = Header(lp, 'utf-8').encode()
             mailfrom = '@'.join([lp, domain])
@@ -1241,7 +1210,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendTestsBase, cls).setUpClass()
+        super().setUpClass()
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
         cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
@@ -1253,19 +1222,19 @@ class SMTPBackendTestsBase(SimpleTestCase):
     def tearDownClass(cls):
         cls._settings_override.disable()
         cls.server.stop()
-        super(SMTPBackendTestsBase, cls).tearDownClass()
+        super().tearDownClass()
 
 
 class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     email_backend = 'django.core.mail.backends.smtp.EmailBackend'
 
     def setUp(self):
-        super(SMTPBackendTests, self).setUp()
+        super().setUp()
         self.server.flush_sink()
 
     def tearDown(self):
         self.server.flush_sink()
-        super(SMTPBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         self.server.flush_sink()
@@ -1413,7 +1382,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         class MyEmailBackend(smtp.EmailBackend):
             def __init__(self, *args, **kwargs):
                 kwargs.setdefault('timeout', 42)
-                super(MyEmailBackend, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
         myemailbackend = MyEmailBackend()
         myemailbackend.open()
@@ -1450,8 +1419,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             self.assertTrue(msg)
 
-            if PY3:
-                msg = msg.decode('utf-8')
+            msg = msg.decode()
             # The message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)
@@ -1482,7 +1450,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     """
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendStoppedServerTests, cls).setUpClass()
+        super().setUpClass()
         cls.backend = smtp.EmailBackend(username='', password='')
         cls.server.stop()
 

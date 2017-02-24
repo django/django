@@ -15,7 +15,7 @@ from django.views.decorators.cache import never_cache
 class CustomRequestAuthenticationForm(AuthenticationForm):
     def __init__(self, request, *args, **kwargs):
         assert isinstance(request, HttpRequest)
-        super(CustomRequestAuthenticationForm, self).__init__(request, *args, **kwargs)
+        super().__init__(request, *args, **kwargs)
 
 
 @never_cache

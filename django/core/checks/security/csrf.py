@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from .. import Tags, Warning, register
-from ..utils import patch_middleware_message
 
 W003 = Warning(
     "You don't appear to be using Django's built-in "
@@ -22,14 +21,13 @@ W016 = Warning(
 
 
 def _csrf_middleware():
-    return ("django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE_CLASSES or
-            settings.MIDDLEWARE and "django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE)
+    return 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE
 
 
 @register(Tags.security, deploy=True)
 def check_csrf_middleware(app_configs, **kwargs):
     passed_check = _csrf_middleware()
-    return [] if passed_check else [patch_middleware_message(W003)]
+    return [] if passed_check else [W003]
 
 
 @register(Tags.security, deploy=True)
@@ -39,4 +37,4 @@ def check_csrf_cookie_secure(app_configs, **kwargs):
         not _csrf_middleware() or
         settings.CSRF_COOKIE_SECURE
     )
-    return [] if passed_check else [patch_middleware_message(W016)]
+    return [] if passed_check else [W016]

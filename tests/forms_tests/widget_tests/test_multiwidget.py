@@ -24,7 +24,7 @@ class ComplexMultiWidget(MultiWidget):
             SelectMultiple(choices=WidgetTest.beatles),
             SplitDateTimeWidget(),
         )
-        super(ComplexMultiWidget, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:
@@ -45,9 +45,7 @@ class ComplexField(MultiValueField):
             MultipleChoiceField(choices=WidgetTest.beatles),
             SplitDateTimeField(),
         )
-        super(ComplexField, self).__init__(
-            fields, required, widget, label, initial,
-        )
+        super().__init__(fields, required, widget, label, initial)
 
     def compress(self, data_list):
         if data_list:
@@ -66,7 +64,7 @@ class DeepCopyWidget(MultiWidget):
             RadioSelect(choices=choices),
             TextInput,
         ]
-        super(DeepCopyWidget, self).__init__(widgets)
+        super().__init__(widgets)
 
     def _set_choices(self, choices):
         """
@@ -116,6 +114,19 @@ class MultiWidgetTest(WidgetTest):
         self.check_html(widget, 'name', ['john', 'lennon'], html=(
             '<input id="bar_0" type="text" class="big" value="john" name="name_0" />'
             '<input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
+        ))
+
+    def test_constructor_attrs_with_type(self):
+        attrs = {'type': 'number'}
+        widget = MyMultiWidget(widgets=(TextInput, TextInput()), attrs=attrs)
+        self.check_html(widget, 'code', ['1', '2'], html=(
+            '<input type="number" value="1" name="code_0" />'
+            '<input type="number" value="2" name="code_1" />'
+        ))
+        widget = MyMultiWidget(widgets=(TextInput(attrs), TextInput(attrs)), attrs={'class': 'bar'})
+        self.check_html(widget, 'code', ['1', '2'], html=(
+            '<input type="number" value="1" name="code_0" class="bar" />'
+            '<input type="number" value="2" name="code_1" class="bar" />'
         ))
 
     def test_value_omitted_from_data(self):

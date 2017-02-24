@@ -6,7 +6,7 @@ class Command(InspectDBCommand):
     db_module = 'django.contrib.gis.db'
 
     def get_field_type(self, connection, table_name, row):
-        field_type, field_params, field_notes = super(Command, self).get_field_type(connection, table_name, row)
+        field_type, field_params, field_notes = super().get_field_type(connection, table_name, row)
         if field_type == 'GeometryField':
             geo_col = row[0]
             # Getting a more specific field type and any additional parameters

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # This python file contains utility scripts to manage Django translations.
 # It has to be run inside the django git root directory.

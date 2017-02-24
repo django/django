@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.admin.templatetags.admin_modify import submit_row
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
