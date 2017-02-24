@@ -315,20 +315,18 @@ Jeremy Dunck
     .. _shoutcaster: http://twitch.tv/vlogalonstar/
 
 `Simon Charette`_
-    Simon is a mathematics student who discovered Django while searching for a
+    Simon used to study mathematics and discovered Django while searching for a
     replacement framework to an in-house PHP entity. Since that faithful day
     Django has been a big part of his life. So far, he's been involved in some
-    ORM and forms API fixes.
+    ORM, forms, and migrations fixes.
 
-    Apart from contributing to multiple open source projects he spends most of
-    his spare-time playing `Ultimate Frisbee`_ and working part-time
-    at this awesome place called `Reptiletech`_.
+    Apart from contributing to Django he spends most of his spare-time playing
+    ultimate frisbee and bouldering.
 
-    Simon lives in Montréal, Québec, Canada.
+    Simon currently lives in Montréal and works remotely for `Zapier`_.
 
     .. _Simon Charette: https://github.com/charettes
-    .. _Ultimate Frisbee: http://www.montrealultimate.ca
-    .. _Reptiletech: https://www.reptiletech.com
+    .. _Zapier: https://zapier.com
 
 Donald Stufft
     Donald found Python and Django in 2007 while trying to find a language,
