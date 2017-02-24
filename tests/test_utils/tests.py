@@ -5,6 +5,7 @@ import sys
 import unittest
 import warnings
 
+from django.conf import settings
 from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -14,7 +15,7 @@ from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, skipIfDBFeature,
+    SimpleTestCase, TestCase, ignore_warnings, mock, skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
@@ -884,6 +885,15 @@ class SetupTestEnvironmentTests(SimpleTestCase):
     def test_setup_test_environment_calling_more_than_once(self):
         with self.assertRaisesMessage(RuntimeError, "setup_test_environment() was already called"):
             setup_test_environment()
+
+    def test_allowed_hosts(self):
+        for type_ in (list, tuple):
+            allowed_hosts = type_('*')
+            with mock.patch('django.test.utils._TestState') as x:
+                del x.saved_data
+                with self.settings(ALLOWED_HOSTS=allowed_hosts):
+                    setup_test_environment()
+                    self.assertEqual(settings.ALLOWED_HOSTS, ['*', 'testserver'])
 
 
 class OverrideSettingsTests(SimpleTestCase):
