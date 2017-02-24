@@ -3,6 +3,7 @@ import sys
 import threading
 
 from daphne.server import Server, build_endpoint_description_strings
+from django.apps import apps
 from django.conf import settings
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.utils import six
@@ -139,7 +140,8 @@ class Command(RunserverCommand):
         if static files should be served. Otherwise just returns the default
         handler.
         """
-        use_static_handler = options.get('use_static_handler', True)
+        staticfiles_installed = apps.is_installed("django.contrib.staticfiles")
+        use_static_handler = options.get('use_static_handler', staticfiles_installed)
         insecure_serving = options.get('insecure_serving', False)
         if use_static_handler and (settings.DEBUG or insecure_serving):
             return StaticFilesConsumer()
