@@ -2561,11 +2561,11 @@ Case-sensitive starts-with.
 
 Example::
 
-    Entry.objects.filter(headline__startswith='Will')
+    Entry.objects.filter(headline__startswith='Lennon')
 
 SQL equivalent::
 
-    SELECT ... WHERE headline LIKE 'Will%';
+    SELECT ... WHERE headline LIKE 'Lennon%';
 
 SQLite doesn't support case-sensitive ``LIKE`` statements; ``startswith`` acts
 like ``istartswith`` for SQLite.
@@ -2579,11 +2579,11 @@ Case-insensitive starts-with.
 
 Example::
 
-    Entry.objects.filter(headline__istartswith='will')
+    Entry.objects.filter(headline__istartswith='Lennon')
 
 SQL equivalent::
 
-    SELECT ... WHERE headline ILIKE 'Will%';
+    SELECT ... WHERE headline ILIKE 'Lennon%';
 
 .. admonition:: SQLite users
 
@@ -2600,11 +2600,11 @@ Case-sensitive ends-with.
 
 Example::
 
-    Entry.objects.filter(headline__endswith='cats')
+    Entry.objects.filter(headline__endswith='Lennon')
 
 SQL equivalent::
 
-    SELECT ... WHERE headline LIKE '%cats';
+    SELECT ... WHERE headline LIKE '%Lennon';
 
 .. admonition:: SQLite users
 
@@ -2621,11 +2621,11 @@ Case-insensitive ends-with.
 
 Example::
 
-    Entry.objects.filter(headline__iendswith='will')
+    Entry.objects.filter(headline__iendswith='Lennon')
 
 SQL equivalent::
 
-    SELECT ... WHERE headline ILIKE '%will'
+    SELECT ... WHERE headline ILIKE '%Lennon'
 
 .. admonition:: SQLite users
 
