@@ -67,21 +67,35 @@ def authenticate(request=None, **credentials):
     """
     for backend, backend_path in _get_backends(return_tuples=True):
         args = (request,)
+        # Does the backend accept a request argument?
         try:
             inspect.getcallargs(backend.authenticate, request, **credentials)
         except TypeError:
+            args = ()
+            # Does the backend accept a request keyword argument?
             try:
-                inspect.getcallargs(backend.authenticate, **credentials)
+                inspect.getcallargs(backend.authenticate, request=request, **credentials)
             except TypeError:
-                # This backend doesn't accept these credentials as arguments. Try the next one.
-                continue
+                # Does the backend accept credentials without request?
+                try:
+                    inspect.getcallargs(backend.authenticate, **credentials)
+                except TypeError:
+                    # This backend doesn't accept these credentials as arguments. Try the next one.
+                    continue
+                else:
+                    warnings.warn(
+                        "Update %s.authenticate() to accept a positional "
+                        "`request` argument." % backend_path,
+                        RemovedInDjango21Warning
+                    )
             else:
-                args = ()
+                credentials['request'] = request
                 warnings.warn(
-                    "Update authentication backend %s to accept a "
-                    "positional `request` argument." % backend_path,
+                    "In %s.authenticate(), move the `request` keyword argument "
+                    "to the first positional argument." % backend_path,
                     RemovedInDjango21Warning
                 )
+
         try:
             user = backend.authenticate(*args, **credentials)
         except PermissionDenied:
