@@ -940,10 +940,15 @@ class Subquery(Expression):
 
         def resolve(child):
             if hasattr(child, 'resolve_expression'):
-                return child.resolve_expression(
+                resolved = child.resolve_expression(
                     query=query, allow_joins=allow_joins, reuse=reuse,
                     summarize=summarize, for_save=for_save,
                 )
+                # Add table alias to the parent query's aliases to prevent
+                # quoting.
+                if hasattr(resolved, 'alias'):
+                    clone.queryset.query.external_aliases.add(resolved.alias)
+                return resolved
             return child
 
         resolve_all(clone.queryset.query.where)
