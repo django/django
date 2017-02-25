@@ -44,7 +44,8 @@ class Apps:
         self.apps_ready = self.models_ready = self.ready = False
 
         # Lock for thread-safe population.
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
+        self.loading = False
 
         # Maps ("app_label", "modelname") tuples to lists of functions to be
         # called when the corresponding model is ready. Used by this class's
@@ -72,10 +73,13 @@ class Apps:
             if self.ready:
                 return
 
-            # app_config should be pristine, otherwise the code below won't
-            # guarantee that the order matches the order in INSTALLED_APPS.
-            if self.app_configs:
+            # An RLock prevents other threads from entering this section. The
+            # compare and set operation below is atomic.
+            if self.loading:
+                # Prevent reentrant calls to avoid running AppConfig.ready()
+                # methods twice.
                 raise RuntimeError("populate() isn't reentrant")
+            self.loading = True
 
             # Phase 1: initialize app configs and import app modules.
             for entry in installed_apps:
@@ -345,7 +349,7 @@ class Apps:
             raise AppRegistryNotReady("App registry isn't ready yet.")
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = OrderedDict()
-        self.apps_ready = self.models_ready = self.ready = False
+        self.apps_ready = self.models_ready = self.loading = self.ready = False
         self.clear_cache()
         self.populate(installed)
 
