@@ -1,9 +1,9 @@
-from django import http
 from django.contrib.messages import constants, get_level, set_level, utils
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import base, default_storage
 from django.contrib.messages.storage.base import Message
+from django.http import HttpRequest, HttpResponse
 from django.test import modify_settings, override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy
@@ -70,10 +70,10 @@ class BaseTests:
         self.settings_override.disable()
 
     def get_request(self):
-        return http.HttpRequest()
+        return HttpRequest()
 
     def get_response(self):
-        return http.HttpResponse()
+        return HttpResponse()
 
     def get_storage(self, data=None):
         """

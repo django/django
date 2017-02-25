@@ -3,10 +3,10 @@ import codecs
 import re
 from io import BytesIO
 
-from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
+from django.http import HttpRequest, QueryDict, parse_cookie
 from django.urls import set_script_prefix
 from django.utils.encoding import force_text, repercent_broken_unicode
 from django.utils.functional import cached_property
@@ -63,7 +63,7 @@ class LimitedStream:
         return line
 
 
-class WSGIRequest(http.HttpRequest):
+class WSGIRequest(HttpRequest):
     def __init__(self, environ):
         script_name = get_script_name(environ)
         path_info = get_path_info(environ)
@@ -108,7 +108,7 @@ class WSGIRequest(http.HttpRequest):
     def GET(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
         raw_query_string = get_bytes_from_wsgi(self.environ, 'QUERY_STRING', '')
-        return http.QueryDict(raw_query_string, encoding=self._encoding)
+        return QueryDict(raw_query_string, encoding=self._encoding)
 
     def _get_post(self):
         if not hasattr(self, '_post'):
@@ -121,7 +121,7 @@ class WSGIRequest(http.HttpRequest):
     @cached_property
     def COOKIES(self):
         raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
-        return http.parse_cookie(raw_cookie)
+        return parse_cookie(raw_cookie)
 
     @property
     def FILES(self):

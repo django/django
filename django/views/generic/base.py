@@ -1,8 +1,11 @@
 import logging
 from functools import update_wrapper
 
-from django import http
 from django.core.exceptions import ImproperlyConfigured
+from django.http import (
+    HttpResponse, HttpResponseGone, HttpResponseNotAllowed,
+    HttpResponsePermanentRedirect, HttpResponseRedirect,
+)
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
 from django.utils.decorators import classonlymethod
@@ -89,13 +92,13 @@ class View:
             'Method Not Allowed (%s): %s', request.method, request.path,
             extra={'status_code': 405, 'request': request}
         )
-        return http.HttpResponseNotAllowed(self._allowed_methods())
+        return HttpResponseNotAllowed(self._allowed_methods())
 
     def options(self, request, *args, **kwargs):
         """
         Handles responding to requests for the OPTIONS HTTP verb.
         """
-        response = http.HttpResponse()
+        response = HttpResponse()
         response['Allow'] = ', '.join(self._allowed_methods())
         response['Content-Length'] = '0'
         return response
@@ -187,15 +190,15 @@ class RedirectView(View):
         url = self.get_redirect_url(*args, **kwargs)
         if url:
             if self.permanent:
-                return http.HttpResponsePermanentRedirect(url)
+                return HttpResponsePermanentRedirect(url)
             else:
-                return http.HttpResponseRedirect(url)
+                return HttpResponseRedirect(url)
         else:
             logger.warning(
                 'Gone: %s', request.path,
                 extra={'status_code': 410, 'request': request}
             )
-            return http.HttpResponseGone()
+            return HttpResponseGone()
 
     def head(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

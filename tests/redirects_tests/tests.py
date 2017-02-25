@@ -1,9 +1,9 @@
-from django import http
 from django.conf import settings
 from django.contrib.redirects.middleware import RedirectFallbackMiddleware
 from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, modify_settings, override_settings
 
 
@@ -49,8 +49,8 @@ class RedirectTests(TestCase):
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
     # Use HTTP responses different from the defaults
-    response_gone_class = http.HttpResponseForbidden
-    response_redirect_class = http.HttpResponseRedirect
+    response_gone_class = HttpResponseForbidden
+    response_redirect_class = HttpResponseRedirect
 
 
 @modify_settings(MIDDLEWARE={'append': 'redirects_tests.tests.OverriddenRedirectFallbackMiddleware'})

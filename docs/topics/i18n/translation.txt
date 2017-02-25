@@ -1829,12 +1829,12 @@ preference persist in future requests.
 If you are not using sessions, the language will persist in a cookie, whose name
 is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
 
-    from django.utils import translation
-    from django import http
     from django.conf import settings
+    from django.http import HttpResponse
+    from django.utils import translation
     user_language = 'fr'
     translation.activate(user_language)
-    response = http.HttpResponse(...)
+    response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
 
 Using translations outside views and templates

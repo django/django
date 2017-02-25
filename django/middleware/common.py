@@ -2,10 +2,10 @@ import re
 import warnings
 from urllib.parse import urlparse
 
-from django import http
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
+from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
 from django.utils.cache import (
     cc_delim_re, get_conditional_response, set_response_etag,
@@ -38,7 +38,7 @@ class CommonMiddleware(MiddlewareMixin):
           ConditionalGetMiddleware.
     """
 
-    response_redirect_class = http.HttpResponsePermanentRedirect
+    response_redirect_class = HttpResponsePermanentRedirect
 
     def process_request(self, request):
         """
