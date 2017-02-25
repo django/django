@@ -1,3 +1,5 @@
+import sys
+
 from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
@@ -13,7 +15,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
-    autocommits_when_autocommit_is_off = True
+    autocommits_when_autocommit_is_off = sys.version_info < (3, 6)
     can_introspect_decimal_field = False
     can_introspect_duration_field = False
     can_introspect_positive_integer_field = True
