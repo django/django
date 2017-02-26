@@ -1655,10 +1655,13 @@ class SchemaTests(TransactionTestCase):
         """
         MySQL do not support indexing of blob/text/json fields
         """
+        # this test applies only to mysql connection
+        if connection.client.executable_name != 'mysql':
+            return
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(BookWithTextField)
-        # Ensure the table is there and has no index
+        # Ensure the table is there and has no index for TextField
         self.assertNotIn('description', self.get_indexes(BookWithTextField._meta.db_table))
 
     def test_indexes(self):
