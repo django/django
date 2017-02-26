@@ -324,6 +324,12 @@ and set up your channel layer like this::
         },
     }
 
+You'll also need to install the Redis server - there are downloads available
+for Mac OS and Windows, and it's in pretty much every linux distribution's
+package manager. For example, on Ubuntu, you can just::
+
+    sudo apt-get install redis-server
+
 Fire up ``runserver``, and it'll work as before - unexciting, like good
 infrastructure should be. You can also try out the cross-process nature; run
 these two commands in two terminals:
