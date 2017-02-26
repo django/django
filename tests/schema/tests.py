@@ -31,7 +31,7 @@ from .fields import (
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
     BookForeignObj, BookWeak, BookWithLongName, BookWithO2O, BookWithoutAuthor,
-    BookWithSlug, IntegerPK, Node, Note, NoteRename, Tag, TagIndexed,
+    BookWithSlug, BookWithTextField, IntegerPK, Node, Note, NoteRename, Tag, TagIndexed,
     TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
@@ -1650,6 +1650,16 @@ class SchemaTests(TransactionTestCase):
             if connection.features.uppercases_column_names:
                 index_name = index_name.upper()
             self.assertIndexOrder(Author._meta.db_table, index_name, ['ASC', 'DESC'])
+
+    def test_mysql_non_supported_db_index_fields(self):
+        """
+        MySQL do not support indexing of blob/text/json fields
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithTextField)
+        # Ensure the table is there and has no index
+        self.assertNotIn('description', self.get_indexes(BookWithTextField._meta.db_table))
 
     def test_indexes(self):
         """
