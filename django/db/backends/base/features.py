@@ -100,6 +100,9 @@ class BaseDatabaseFeatures:
     # deferred
     can_defer_constraint_checks = False
 
+    # Does the backend supports index on `text` field
+    supports_index_on_text_field = True
+
     # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
     supports_mixed_date_datetime_comparisons = True
 

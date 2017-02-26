@@ -1651,6 +1651,23 @@ class SchemaTests(TransactionTestCase):
                 index_name = index_name.upper()
             self.assertIndexOrder(Author._meta.db_table, index_name, ['ASC', 'DESC'])
 
+    @skipIfDBFeature('supports_index_on_text_field')
+    def test_mysql_non_supported_db_index_fields(self):
+        """
+        MySQL do not support indexing of blob/text/json fields
+        """
+        class NoteInfoIndexed(Model):
+            info = TextField(db_index=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(NoteInfoIndexed)
+        # Ensure the table is there and has no index for TextField
+        self.assertNotIn('info', self.get_indexes(NoteInfoIndexed._meta.db_table))
+
     def test_indexes(self):
         """
         Tests creation/altering of indexes
@@ -2298,3 +2315,16 @@ class SchemaTests(TransactionTestCase):
         doc = Document.objects.create(name='Test Name')
         student = Student.objects.create(name='Some man')
         doc.students.add(student)
+
+    @skipIfDBFeature('supports_index_on_text_field')
+    def test_db_feature_supports_index_on_text_field(self):
+        class NoteInfoTextFieldIndexed(Model):
+            info = TextField(db_index=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+        with connection.schema_editor() as editor:
+            editor.create_model(NoteInfoTextFieldIndexed)
+        # Ensure the table is there and has no index for TextField
+        self.assertNotIn('info', self.get_indexes(NoteInfoTextFieldIndexed._meta.db_table))
