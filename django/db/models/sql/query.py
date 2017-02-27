@@ -399,7 +399,7 @@ class Query:
         """
         if not self.annotation_select:
             return {}
-        has_limit = self.low_mark != 0 or self.high_mark is not None
+        has_limit = self.has_limit()
         has_existing_annotations = any(
             annotation for alias, annotation
             in self.annotations.items()
@@ -523,8 +523,6 @@ class Query:
         """
         assert self.model == rhs.model, \
             "Cannot combine queries on two different base models."
-        assert self.can_filter(), \
-            "Cannot combine queries once a slice has been taken."
         assert self.distinct == rhs.distinct, \
             "Cannot combine a unique query with a non-unique query."
         assert self.distinct_fields == rhs.distinct_fields, \
@@ -1583,13 +1581,8 @@ class Query:
         """
         self.low_mark, self.high_mark = 0, None
 
-    def can_filter(self):
-        """
-        Returns True if adding filters to this instance is still possible.
-
-        Typically, this means no limits or offsets have been put on the results.
-        """
-        return not self.low_mark and self.high_mark is None
+    def has_limit(self):
+        return self.low_mark != 0 or self.high_mark is not None
 
     def clear_select_clause(self):
         """
