@@ -183,7 +183,7 @@ def truncate_name(name, length=None, hash_len=4):
     If a quote stripped name contains a username, e.g. USERNAME"."TABLE,
     truncate the table portion only.
     """
-    match = re.match('([^"]+)"\."([^"]+)', name)
+    match = re.match(r'([^"]+)"\."([^"]+)', name)
     table_name = match.group(2) if match else name
 
     if length is None or len(table_name) <= length:
