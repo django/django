@@ -37,7 +37,7 @@ class BasicExpressionsTests(TestCase):
             ceo=Employee.objects.create(firstname="Joe", lastname="Smith", salary=10)
         )
         cls.foobar_ltd = Company.objects.create(
-            name="Foobar Ltd.", num_employees=3, num_chairs=4,
+            name="Foobar Ltd.", num_employees=3, num_chairs=4, based_in_eu=True,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
         cls.max = Employee.objects.create(firstname='Max', lastname='Mustermann', salary=30)
@@ -80,6 +80,14 @@ class BasicExpressionsTests(TestCase):
             Company.objects.annotate(
                 num_employees_check=ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
             ).filter(num_employees_check=True).count(),
+            2,
+        )
+
+    def test_filtering_on_q_that_is_boolean(self):
+        self.assertEqual(
+            Company.objects.filter(
+                ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
+            ).count(),
             2,
         )
 
@@ -641,6 +649,56 @@ class BasicExpressionsTests(TestCase):
     def test_incorrect_joined_field_in_F_expression(self):
         with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
             list(Company.objects.filter(ceo__pk=F('point_of_contact__nope')))
+
+    def test_exists_in_filter(self):
+        inner = Company.objects.filter(ceo=OuterRef('pk')).values('pk')
+        qs1 = Employee.objects.filter(Exists(inner))
+        qs2 = Employee.objects.annotate(found=Exists(inner)).filter(found=True)
+        self.assertCountEqual(qs1, qs2)
+        self.assertFalse(Employee.objects.exclude(Exists(inner)).exists())
+        self.assertCountEqual(qs2, Employee.objects.exclude(~Exists(inner)))
+
+    def test_subquery_in_filter(self):
+        inner = Company.objects.filter(ceo=OuterRef('pk')).values('based_in_eu')
+        self.assertSequenceEqual(
+            Employee.objects.filter(Subquery(inner)),
+            [self.foobar_ltd.ceo],
+        )
+
+    def test_case_in_filter_if_boolean_output_field(self):
+        is_ceo = Company.objects.filter(ceo=OuterRef('pk'))
+        is_poc = Company.objects.filter(point_of_contact=OuterRef('pk'))
+        qs = Employee.objects.filter(
+            Case(
+                When(Exists(is_ceo), then=True),
+                When(Exists(is_poc), then=True),
+                default=False,
+                output_field=models.BooleanField(),
+            ),
+        )
+        self.assertSequenceEqual(qs, [self.example_inc.ceo, self.foobar_ltd.ceo, self.max])
+
+    def test_boolean_expression_combined(self):
+        is_ceo = Company.objects.filter(ceo=OuterRef('pk'))
+        is_poc = Company.objects.filter(point_of_contact=OuterRef('pk'))
+        self.gmbh.point_of_contact = self.max
+        self.gmbh.save()
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_ceo) | Exists(is_poc)),
+            [self.example_inc.ceo, self.foobar_ltd.ceo, self.max],
+        )
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_ceo) & Exists(is_poc)),
+            [self.max],
+        )
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_ceo) & Q(salary__gte=30)),
+            [self.max],
+        )
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_poc) | Q(salary__lt=15)),
+            [self.example_inc.ceo, self.max],
+        )
 
 
 class IterableLookupInnerExpressionsTests(TestCase):

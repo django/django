@@ -1229,6 +1229,16 @@ class Query(BaseExpression):
         """
         if isinstance(filter_expr, dict):
             raise FieldError("Cannot parse keyword query as dict")
+        if hasattr(filter_expr, 'resolve_expression') and getattr(filter_expr, 'conditional', False):
+            if connections[DEFAULT_DB_ALIAS].ops.conditional_expression_supported_in_where_clause(filter_expr):
+                condition = filter_expr.resolve_expression(self)
+            else:
+                # Expression is not supported in the WHERE clause, add
+                # comparison with True.
+                condition = self.build_lookup(['exact'], filter_expr.resolve_expression(self), True)
+            clause = self.where_class()
+            clause.add(condition, AND)
+            return clause, []
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)

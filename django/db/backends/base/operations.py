@@ -581,6 +581,13 @@ class BaseDatabaseOperations:
         """
         pass
 
+    def conditional_expression_supported_in_where_clause(self, expression):
+        """
+        Return True, if the conditional expression is supported in the WHERE
+        clause.
+        """
+        return True
+
     def combine_expression(self, connector, sub_expressions):
         """
         Combine a list of subexpressions into a single expression, using

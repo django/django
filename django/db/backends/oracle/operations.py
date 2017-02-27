@@ -6,6 +6,8 @@ from functools import lru_cache
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
+from django.db.models.expressions import Exists, ExpressionWrapper
+from django.db.models.query_utils import Q
 from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
@@ -607,3 +609,14 @@ END;
         if fields:
             return self.connection.features.max_query_params // len(fields)
         return len(objs)
+
+    def conditional_expression_supported_in_where_clause(self, expression):
+        """
+        Oracle supports only EXISTS(...) or filters in the WHERE clause, others
+        must be compared with True.
+        """
+        if isinstance(expression, Exists):
+            return True
+        if isinstance(expression, ExpressionWrapper) and isinstance(expression.expression, Q):
+            return True
+        return False

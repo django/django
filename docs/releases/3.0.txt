@@ -74,6 +74,13 @@ enable adding exclusion constraints on PostgreSQL. Constraints are added to
 models using the
 :attr:`Meta.constraints <django.db.models.Options.constraints>` option.
 
+Filter expressions
+------------------
+
+Expressions that outputs :class:`~django.db.models.BooleanField` may now be
+used directly in ``QuerySet`` filters, without having to first annotate and
+then filter against the annotation.
+
 Minor features
 --------------
 

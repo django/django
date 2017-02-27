@@ -34,6 +34,7 @@ class Company(models.Model):
         related_name='company_point_of_contact_set',
         null=True,
     )
+    based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

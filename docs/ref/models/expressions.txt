@@ -5,10 +5,11 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-an update, create, filter, order by, annotation, or aggregate. There are a
-number of built-in expressions (documented below) that can be used to help you
-write queries. Expressions can be combined, or in some cases nested, to form
-more complex computations.
+an update, create, filter, order by, annotation, or aggregate. When an
+expression outputs a boolean value, it may be used directly in filters. There
+are a number of built-in expressions (documented below) that can be used to
+help you write queries. Expressions can be combined, or in some cases nested,
+to form more complex computations.
 
 Supported arithmetic
 ====================
@@ -68,6 +69,12 @@ Some examples
     from django.db.models.functions import Length
     CharField.register_lookup(Length)
     Company.objects.order_by('name__length')
+
+    # Boolean expression can be used directly in filters.
+    from django.db.models import Exists
+    Company.objects.filter(
+        Exists(Employee.objects.filter(company=OuterRef('pk'), salary__gt=10))
+    )
 
 Built-in Expressions
 ====================
@@ -626,22 +633,25 @@ degrade performance, it's automatically removed.
 
 You can query using ``NOT EXISTS`` with ``~Exists()``.
 
-Filtering on a ``Subquery`` expression
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Filtering on a ``Subquery()`` or ``Exists()`` expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's not possible to filter directly using ``Subquery`` and ``Exists``, e.g.::
+``Subquery()`` that returns a boolean value and ``Exists()`` may be used as a
+``condition`` in :class:`~django.db.models.expressions.When` expressions, or to
+directly filter a queryset::
 
+    >>> recent_comments = Comment.objects.filter(...)  # From above
     >>> Post.objects.filter(Exists(recent_comments))
-    ...
-    TypeError: 'Exists' object is not iterable
 
+This will ensure that the subquery will not be added to the ``SELECT`` columns,
+which may result in a better performance.
 
-You must filter on a subquery expression by first annotating the queryset
-and then filtering based on that annotation::
+.. versionchanged:: 3.0
 
-    >>> Post.objects.annotate(
-    ...     recent_comment=Exists(recent_comments),
-    ... ).filter(recent_comment=True)
+    In previous versions of Django, it was necessary to first annotate and then
+    filter against the annotation. This resulted in the annotated value always
+    being present in the query result, and often resulted in a query that took
+    more time to execute.
 
 Using aggregates within a ``Subquery`` expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

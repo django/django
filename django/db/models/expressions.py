@@ -90,6 +90,8 @@ class Combinable:
         return self._combine(other, self.POW, False)
 
     def __and__(self, other):
+        if getattr(self, 'conditional', False) and getattr(other, 'conditional', False):
+            return Q(self) & Q(other)
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
@@ -104,6 +106,8 @@ class Combinable:
         return self._combine(other, self.BITRIGHTSHIFT, False)
 
     def __or__(self, other):
+        if getattr(self, 'conditional', False) and getattr(other, 'conditional', False):
+            return Q(self) | Q(other)
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
@@ -244,6 +248,10 @@ class BaseExpression:
             for expr in c.get_source_expressions()
         ])
         return c
+
+    @property
+    def conditional(self):
+        return isinstance(self.output_field, fields.BooleanField)
 
     @property
     def field(self):
@@ -873,12 +881,17 @@ class ExpressionWrapper(Expression):
 
 class When(Expression):
     template = 'WHEN %(condition)s THEN %(result)s'
+    # This isn't a complete conditional expression, must be used in Case().
+    conditional = False
 
     def __init__(self, condition=None, then=None, **lookups):
         if lookups and condition is None:
             condition, lookups = Q(**lookups), None
         if condition is None or not getattr(condition, 'conditional', False) or lookups:
-            raise TypeError("__init__() takes either a Q object or lookups as keyword arguments")
+            raise TypeError(
+                'When() supports a Q object, a boolean expression, or lookups '
+                'as a condition.'
+            )
         if isinstance(condition, Q) and not condition:
             raise ValueError("An empty Q() can't be used as a When() condition.")
         super().__init__(output_field=None)
@@ -1090,6 +1103,7 @@ class Exists(Subquery):
 
 class OrderBy(BaseExpression):
     template = '%(expression)s %(ordering)s'
+    conditional = False
 
     def __init__(self, expression, descending=False, nulls_first=False, nulls_last=False):
         if nulls_first and nulls_last:
