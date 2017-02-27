@@ -1,4 +1,5 @@
 import builtins
+import getpass
 import sys
 from datetime import date
 from io import StringIO
@@ -110,6 +111,28 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         self.stdout.close()
         self.stderr.close()
 
+    @mock.patch.object(getpass, 'getpass', return_value='password')
+    def test_get_pass(self, mock_get_pass):
+        call_command('changepassword', username='joe', stdout=self.stdout)
+        self.assertIs(User.objects.get(username='joe').check_password('password'), True)
+
+    @mock.patch.object(getpass, 'getpass', return_value='')
+    def test_get_pass_no_input(self, mock_get_pass):
+        with self.assertRaisesMessage(CommandError, 'aborted'):
+            call_command('changepassword', username='joe', stdout=self.stdout)
+
+    @mock.patch.object(changepassword.Command, '_get_pass', return_value='new_password')
+    def test_system_username(self, mock_get_pass):
+        """The system username is used if --username isn't provided."""
+        username = getpass.getuser()
+        User.objects.create_user(username=username, password='qwerty')
+        call_command('changepassword', stdout=self.stdout)
+        self.assertIs(User.objects.get(username=username).check_password('new_password'), True)
+
+    def test_nonexistent_username(self):
+        with self.assertRaisesMessage(CommandError, "user 'test' does not exist"):
+            call_command('changepassword', username='test', stdout=self.stdout)
+
     @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
     def test_that_changepassword_command_changes_joes_password(self, mock_get_pass):
         "Executing the changepassword management command should change joe's password"
@@ -182,6 +205,11 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
     AUTH_PASSWORD_VALIDATORS=[{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
 )
 class CreatesuperuserManagementCommandTestCase(TestCase):
+
+    def test_no_email_argument(self):
+        new_io = StringIO()
+        with self.assertRaisesMessage(CommandError, 'You must use --email with --noinput.'):
+            call_command('createsuperuser', interactive=False, username='joe', stdout=new_io)
 
     def test_basic_usage(self):
         "Check the operation of the createsuperuser management command"
