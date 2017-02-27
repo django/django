@@ -107,20 +107,19 @@ class BaseDatabaseOperations:
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
-        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
-        'second', returns the SQL that extracts a value from the given
-        datetime field field_name, and a tuple of parameters.
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute', or
+        'second', return the SQL that extracts a value from the given
+        datetime field field_name.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_extract_sql() method')
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         """
-        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
-        'second', returns the SQL that truncates the given datetime field
-        field_name to a datetime object with only the given specificity, and
-        a tuple of parameters.
+        Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute', or
+        'second', return the SQL that truncates the given datetime field
+        field_name to a datetime object with only the given specificity.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunc_sql() method')
 
     def time_trunc_sql(self, lookup_type, field_name):
         """
