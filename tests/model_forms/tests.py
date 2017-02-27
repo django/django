@@ -1363,8 +1363,6 @@ class ModelFormBasicTests(TestCase):
             '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>''')
 
-        # You can create a form over a subset of the available fields
-        # by specifying a 'fields' argument to form_for_instance.
         class PartialArticleFormWithSlug(forms.ModelForm):
             class Meta:
                 model = Article
