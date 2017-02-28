@@ -827,6 +827,11 @@ class TransactionTestCase(SimpleTestCase):
                     enter=False,
                 )
             raise
+        # Clear the queries_log so that it's less likley to overflow (a single
+        # test probably won't execute 9K queries). If queries_log overflows,
+        # then assertNumQueries() doesn't work.
+        for db_name in self._databases_names(include_mirrors=False):
+            connections[db_name].queries_log.clear()
 
     @classmethod
     def _databases_names(cls, include_mirrors=True):

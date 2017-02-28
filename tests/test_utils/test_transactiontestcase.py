@@ -1,6 +1,7 @@
 from unittest import mock
 
-from django.test import TransactionTestCase
+from django.db import connections
+from django.test import TestCase, TransactionTestCase, override_settings
 
 
 class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
@@ -28,3 +29,18 @@ class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
             reset_sequences=False, inhibit_post_migrate=True,
             database='default', verbosity=0,
         )
+
+
+@override_settings(DEBUG=True)  # Enable query logging for test_queries_cleared
+class TransactionTestCaseMultiDbTests(TestCase):
+    available_apps = []
+    multi_db = True
+
+    def test_queries_cleared(self):
+        """
+        TransactionTestCase._pre_setup() clears the connections' queries_log
+        so that it's less likely to overflow. An overflow causes
+        assertNumQueries() to fail.
+        """
+        for alias in connections:
+            self.assertEqual(len(connections[alias].queries_log), 0, 'Failed for alias %s' % alias)
