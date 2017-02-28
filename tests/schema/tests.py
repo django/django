@@ -31,7 +31,7 @@ from .fields import (
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
     BookForeignObj, BookWeak, BookWithLongName, BookWithO2O, BookWithoutAuthor,
-    BookWithSlug, IntegerPK, Node, Note, NoteRename, NoteInfoIndexed, Tag, TagIndexed,
+    BookWithSlug, IntegerPK, Node, Note, NoteInfoIndexed, NoteRename, Tag, TagIndexed,
     TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
