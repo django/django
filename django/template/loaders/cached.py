@@ -82,7 +82,7 @@ class Loader(BaseLoader):
         return ("%s-%s-%s" % (template_name, skip_prefix, dirs_prefix)).strip('-')
 
     def generate_hash(self, values):
-        return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()
+        return hashlib.sha256(force_bytes('|'.join(values))).hexdigest()
 
     @property
     def supports_recursion(self):
