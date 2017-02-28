@@ -407,11 +407,6 @@ class RedirectViewTest(SimpleTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/detail/artist/1/')
 
-    def test_wrong_named_url_pattern(self):
-        "A wrong pattern name returns 410 GONE"
-        response = RedirectView.as_view(pattern_name='wrong.pattern_name')(self.rf.get('/foo/'))
-        self.assertEqual(response.status_code, 410)
-
     def test_redirect_POST(self):
         "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.post('/foo/'))

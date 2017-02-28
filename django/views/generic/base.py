@@ -7,7 +7,7 @@ from django.http import (
     HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, reverse
+from django.urls import reverse
 from django.utils.decorators import classonlymethod
 
 logger = logging.getLogger('django.request')
@@ -174,10 +174,7 @@ class RedirectView(View):
         if self.url:
             url = self.url % kwargs
         elif self.pattern_name:
-            try:
-                url = reverse(self.pattern_name, args=args, kwargs=kwargs)
-            except NoReverseMatch:
-                return None
+            url = reverse(self.pattern_name, args=args, kwargs=kwargs)
         else:
             return None
 

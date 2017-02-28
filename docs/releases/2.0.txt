@@ -283,6 +283,9 @@ Miscellaneous
   instead of dotted Python path strings. Django favors callable references
   since they provide better performance and debugging experience.
 
+* :class:`~django.views.generic.base.RedirectView` no longer silences
+  ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
