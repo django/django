@@ -100,13 +100,6 @@ class BookForeignObj(models.Model):
         apps = new_apps
 
 
-class BookWithTextField(models.Model):
-    description = models.TextField(db_index=True)
-
-    class Meta:
-        apps = new_apps
-
-
 class IntegerPK(models.Model):
     i = models.IntegerField(primary_key=True)
     j = models.IntegerField(unique=True)
@@ -129,6 +122,13 @@ class NoteRename(models.Model):
     class Meta:
         apps = new_apps
         db_table = "schema_note"
+
+
+class NoteInfoIndexed(models.Model):
+    info = models.TextField(db_index=True)
+
+    class Meta:
+        apps = new_apps
 
 
 class Tag(models.Model):

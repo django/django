@@ -58,7 +58,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)
-
         storage = self.connection.introspection.get_storage_engine(
             self.connection.cursor(), model._meta.db_table
         )
@@ -70,12 +69,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field.get_internal_type() == 'ForeignKey' and
                 field.db_constraint):
             return False
-
         # MySQL's blob/text/json fields do not support indexing of whole field
         # https://code.djangoproject.com/ticket/27859
-        if self.skip_default(field):
+        if field.get_internal_type() == 'TextField':
             return False
-
         return create_index
 
     def _delete_composed_index(self, model, fields, *args):
