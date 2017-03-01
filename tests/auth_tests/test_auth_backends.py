@@ -583,19 +583,32 @@ class TypeErrorBackend:
         raise TypeError
 
 
-class TypeErrorBackendTest(TestCase):
-    """
-    A TypeError within a backend is propagated properly (#18171).
-    """
-    backend = 'auth_tests.test_auth_backends.TypeErrorBackend'
+class SkippedBackend:
+    def authenticate(self):
+        # Doesn't accept any credentials so is skipped by authenticate().
+        pass
 
+
+class AuthenticateTests(TestCase):
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
 
-    @override_settings(AUTHENTICATION_BACKENDS=[backend])
+    @override_settings(AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.TypeErrorBackend'])
     def test_type_error_raised(self):
+        """A TypeError within a backend is propagated properly (#18171)."""
         with self.assertRaises(TypeError):
             authenticate(username='test', password='test')
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'auth_tests.test_auth_backends.SkippedBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    ))
+    def test_skips_backends_without_arguments(self):
+        """
+        A backend (SkippedBackend) is ignored if it doesn't accept the
+        credentials as arguments.
+        """
+        self.assertEqual(authenticate(username='test', password='test'), self.user1)
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):

@@ -147,6 +147,13 @@ class UserManagerTestCase(TestCase):
                 password='test', is_staff=False,
             )
 
+    def test_make_random_password(self):
+        allowed_chars = 'abcdefg'
+        password = UserManager().make_random_password(5, allowed_chars)
+        self.assertEqual(len(password), 5)
+        for char in password:
+            self.assertIn(char, allowed_chars)
+
 
 class AbstractBaseUserTests(TestCase):
 
