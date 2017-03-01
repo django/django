@@ -15,4 +15,6 @@ urlpatterns = [
     # 'nested' is included twice but namespaced by nested-1 and nested-2.
     url(r'^app-ns1-2/', include(nested_url_patterns, namespace='nested-1')),
     url(r'^app-ns1-3/', include(nested_url_patterns, namespace='nested-2')),
+    # namespaced URLs inside non-namespaced URLs.
+    url(r'^app-ns1-4/', include([url(r'^abc/', include(common_url_patterns))])),
 ]
