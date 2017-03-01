@@ -293,6 +293,7 @@ class PostgreSQLTests(TestCase):
         """
         Regression test for #18130 and #24318.
         """
+        import psycopg2
         from psycopg2.extensions import (
             ISOLATION_LEVEL_READ_COMMITTED as read_committed,
             ISOLATION_LEVEL_SERIALIZABLE as serializable,
@@ -303,7 +304,8 @@ class PostgreSQLTests(TestCase):
         # PostgreSQL is configured with the default isolation level.
 
         # Check the level on the psycopg2 connection, not the Django wrapper.
-        self.assertEqual(connection.connection.isolation_level, read_committed)
+        default_level = read_committed if psycopg2.__version__ < '2.7' else None
+        self.assertEqual(connection.connection.isolation_level, default_level)
 
         databases = copy.deepcopy(settings.DATABASES)
         databases[DEFAULT_DB_ALIAS]['OPTIONS']['isolation_level'] = serializable
