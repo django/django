@@ -19,7 +19,7 @@ Bugfixes
   or ``IntegerField`` from ``DateField`` (:ticket:`27828`).
 
 * Fixed query expression date subtraction accuracy on PostgreSQL for
-  differences large an a month (:ticket:`27856`).
+  differences larger than a month (:ticket:`27856`).
 
 * Fixed a ``GDALException`` raised by ``GDALClose`` on GDAL ≥ 2.0
   (:ticket:`27479`).
