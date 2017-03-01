@@ -17,6 +17,13 @@ class Author(models.Model):
         apps = new_apps
 
 
+class AuthorCharFieldWithIndex(models.Model):
+    char_field = models.CharField(max_length=31, db_index=True)
+
+    class Meta:
+        apps = new_apps
+
+
 class AuthorTextFieldWithIndex(models.Model):
     text_field = models.TextField(db_index=True)
 
