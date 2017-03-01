@@ -163,6 +163,15 @@ The JSON-enabled consumer looks slightly different::
             """
             pass
 
+        # Optionally provide your own custom json encoder and decoder
+        # @classmethod
+        # def decode_json(cls, text):
+        #     return my_custom_json_decoder(text)
+        #
+        # @classmethod
+        # def encode_json(cls, content):
+        #     return my_custom_json_encoder(content)
+
 For this subclass, ``receive`` only gets a ``content`` argument that is the
 already-decoded JSON as Python datastructures; similarly, ``send`` now only
 takes a single argument, which it JSON-encodes before sending down to the
@@ -221,8 +230,11 @@ Example using class-based consumer::
             "other": AnotherConsumer,
         }
 
+        # Optionally provide a custom multiplexer class
+        # multiplexer_class = MyCustomJsonEncodingMultiplexer
 
-The ``multiplexer`` allows the consumer class to be independant of the stream name.
+
+The ``multiplexer`` allows the consumer class to be independent of the stream name.
 It holds the stream name and the demultiplexer on the attributes ``stream`` and ``demultiplexer``.
 
 The :doc:`data binding <binding>` code will also send out messages to clients
