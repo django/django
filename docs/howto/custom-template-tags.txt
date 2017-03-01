@@ -490,7 +490,7 @@ you see fit:
 
 .. code-block:: html+django
 
-    {% get_current_time "%Y-%m-%d %I:%M %p" as the_time %}
+    {% current_time "%Y-%m-%d %I:%M %p" as the_time %}
     <p>The time is {{ the_time }}.</p>
 
 .. _howto-custom-template-tags-inclusion-tags:
