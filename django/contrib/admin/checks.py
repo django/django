@@ -465,7 +465,8 @@ class BaseModelAdminChecks:
         else:
             if field_name.startswith('-'):
                 field_name = field_name[1:]
-
+            if field_name == 'pk':
+                return []
             try:
                 model._meta.get_field(field_name)
             except FieldDoesNotExist:
