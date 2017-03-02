@@ -115,6 +115,8 @@ urlpatterns = [
         views.AuthorDelete.as_view()),
     url(r'^edit/author/(?P<pk>[0-9]+)/delete/special/$',
         views.SpecializedAuthorDelete.as_view()),
+    url(r'^edit/author/(?P<pk>\d+)/delete/form/$',
+        views.AuthorDeleteFormView.as_view()),
 
     # ArchiveIndexView
     url(r'^dates/books/$',
