@@ -10,10 +10,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import (
     FileSystemStorage, Storage, default_storage,
 )
+from django.core.management.base import BaseCommand
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject, empty
 from django.utils.module_loading import import_string
-from django.core.management.base import BaseCommand
 
 
 # To keep track on which directories the finder has searched the static files.
