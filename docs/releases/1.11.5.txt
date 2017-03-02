@@ -40,3 +40,6 @@ Bugfixes
   weren't logged in the admin change history (:ticket:`27998`) and prevented
   ``ManyToManyField`` initial data in model forms from being affected by
   subsequent model changes (:ticket:`28543`).
+
+* Fixed non-deterministic results or an ``AssertionError`` crash in some
+  queries with multiple joins (:ticket:`26522`).
