@@ -14,6 +14,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s"
     sql_create_varchar_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s varchar_pattern_ops)%(extra)s"
     sql_create_text_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s text_pattern_ops)%(extra)s"
+    sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
 
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
@@ -117,7 +118,4 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Removed an index? Drop any PostgreSQL-specific indexes.
         if old_field.unique and not (new_field.db_index or new_field.unique):
             index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
-            index_names = self._constraint_names(model, [old_field.column], index=True)
-            for index_name in index_names:
-                if index_name == index_to_remove:
-                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_to_remove))
