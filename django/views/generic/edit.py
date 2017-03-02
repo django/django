@@ -265,7 +265,7 @@ class DeletionMixin:
         redirects to the success URL.
         """
         self.object = self.get_object()
-        return self.delete_object
+        return self.delete_object()
 
     # Add support for browsers which only accept GET and POST for now.
     def post(self, request, *args, **kwargs):
@@ -293,7 +293,7 @@ class BaseDeleteView(DeletionMixin, FormMixin, SingleObjectMixin, ProcessFormVie
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(DeletionMixin, self).post(request, *args, **kwargs)
+        return super(BaseDeleteView, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         return self.delete_object()
