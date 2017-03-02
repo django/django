@@ -7,7 +7,8 @@ from django.template import engines
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
-from django.views.generic.edit import FormView
+from django.views.generic.edit import DeleteView, FormView
+from .messages_tests.test_models import SomeObjects
 
 
 TEMPLATE = """{% if messages %}
@@ -61,13 +62,20 @@ class ContactForm(forms.Form):
 
 class ContactFormViewWithMsg(SuccessMessageMixin, FormView):
     form_class = ContactForm
-    success_url = show
+    success_url = "/show/"
     success_message = "%(name)s was created successfully"
+
+
+class DeleteFormViewWithMsg(SuccessMessageMixin, DeleteView):
+    model = SomeObjects
+    success_url = "/show/"
+    success_message = "Object was deleted successfully"
 
 
 urlpatterns = [
     url('^add/(debug|info|success|warning|error)/$', add, name='add_message'),
     url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
+    url('^delete/msg/(?P<pk>\d+)$', DeleteFormViewWithMsg.as_view(), name='success_msg_on_delete'),
     url('^show/$', show, name='show_message'),
     url('^template_response/add/(debug|info|success|warning|error)/$',
         add_template_response, name='add_template_response'),
