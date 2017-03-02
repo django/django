@@ -126,7 +126,7 @@ class Query:
         # types they are. The key is the alias of the joined table (possibly
         # the table name) and the value is a Join-like object (see
         # sql.datastructures.Join for more information).
-        self.alias_map = {}
+        self.alias_map = OrderedDict()
         # Sometimes the query contains references to aliases in outer queries (as
         # a result of split_exclude). Correct alias quoting needs to know these
         # aliases too.

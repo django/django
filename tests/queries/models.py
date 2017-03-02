@@ -663,6 +663,11 @@ class Classroom(models.Model):
     students = models.ManyToManyField(Student, related_name='classroom')
 
 
+class Teacher(models.Model):
+    schools = models.ManyToManyField(School)
+    friends = models.ManyToManyField('self')
+
+
 class Ticket23605AParent(models.Model):
     pass
 
