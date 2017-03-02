@@ -13,6 +13,8 @@ from django.core.files.storage import (
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject, empty
 from django.utils.module_loading import import_string
+from django.core.management.base import BaseCommand
+
 
 # To keep track on which directories the finder has searched the static files.
 searched_locations = []
@@ -121,9 +123,26 @@ class FileSystemFinder(BaseFinder):
         List all files in all locations.
         """
         for prefix, root in self.locations:
-            storage = self.storages[root]
-            for path in utils.get_files(storage, ignore_patterns):
-                yield path, storage
+            if os.path.isdir(root):
+                storage = self.storages[root]
+                for path in utils.get_files(storage, ignore_patterns):
+                    yield path, storage
+            else:
+                printer = MessagePrinter()
+                message = "Path [%s] does not exists. Skipping..." % str(root)
+                printer.log(message)
+
+
+class MessagePrinter(BaseCommand):
+    """
+    A Message printer that will simply print a message
+    """
+
+    def log(self, msg):
+        """
+        Small log helper
+        """
+        self.stderr.write(msg)
 
 
 class AppDirectoriesFinder(BaseFinder):
