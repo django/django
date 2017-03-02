@@ -8,7 +8,8 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.generic.edit import DeleteView, FormView
-from .messages_tests.test_models import SomeObjects
+
+from .test_models import SomeObjects
 
 
 TEMPLATE = """{% if messages %}
