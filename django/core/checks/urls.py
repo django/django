@@ -60,7 +60,10 @@ def _load_all_namespaces(resolver, parents=()):
         if getattr(url, 'namespace', None) is not None
     ]
     for pattern in url_patterns:
-        current = parents + (getattr(pattern, 'namespace', ()),)
+        namespace = getattr(pattern, 'namespace', None)
+        current = parents
+        if namespace is not None:
+            current += (namespace,)
         namespaces.extend(_load_all_namespaces(pattern, current))
     return namespaces
 
