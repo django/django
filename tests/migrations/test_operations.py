@@ -116,7 +116,8 @@ class OperationTestBase(MigrationTestBase):
                 [
                     ("id", models.AutoField(primary_key=True)),
                     ("pony", models.ForeignKey("Pony", models.CASCADE)),
-                    ("friend", models.ForeignKey("self", models.CASCADE))
+                    ("friend", models.ForeignKey("self", models.CASCADE)),
+                    ("hidden_pony", models.ForeignKey("Pony", models.CASCADE, null=True, related_name='+'))
                 ],
             ))
         if mti_model:
@@ -557,11 +558,14 @@ class OperationTests(OperationTestBase):
         self.assertIn(("test_rnmo", "horse"), new_state.models)
         # RenameModel also repoints all incoming FKs and M2Ms
         self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
+        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[3][1].remote_field.model)
         self.assertTableNotExists("test_rnmo_pony")
         self.assertTableExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
             self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
             self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
+            self.assertFKNotExists("test_rnmo_rider", ["hidden_pony_id"], ("test_rnmo_pony", "id"))
+            self.assertFKExists("test_rnmo_rider", ["hidden_pony_id"], ("test_rnmo_horse", "id"))
         # Migrate backwards
         original_state = self.unapply_operations("test_rnmo", project_state, [operation])
         # Test original state and database
