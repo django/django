@@ -136,6 +136,10 @@ class FuncIndex(Index):
     def __init__(self, expression, name=None):
         self.expression, self.name = expression, name
 
+    @property
+    def fields(self):
+        return [repr(self.expression)]
+
     def create_sql(self, model, schema_editor):
         connection = schema_editor.connection
         compiler = connection.ops.compiler('SQLCompiler')(None, connection, 'default')
