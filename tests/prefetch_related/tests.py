@@ -1265,13 +1265,19 @@ class Ticket21760Tests(TestCase):
         self.assertNotIn(' JOIN ', str(queryset.query))
 
 
-class Ticket25546Tests(TestCase):
+class DirectPrefechedObjectCacheReuseTests(TestCase):
     """
-    Nested prefetch_related() shouldn't trigger duplicate queries for the same
-    lookup.
+    prefetch_related() reuses objects fetched in _prefetched_objects_cache.
 
-    Before, prefetch queries were for 'addresses', 'first_time_authors', and
-    'first_time_authors__addresses'. The last query is the duplicate.
+    When objects are prefetched and not stored as an instance attribute (often
+    intermediary relationships), they are saved to the
+    _prefetched_objects_cache attribute. prefetch_related() takes
+    _prefetched_objects_cache into account when determining whether an object
+    has been fetched[1] and retrieves results from it when it is populated [2].
+
+    [1]: #25546 (duplicate queries on nested Prefetch)
+    [2]: #27554 (queryset evaluation fails with a mix of nested and flattened
+        prefetches)
     """
 
     @classmethod
@@ -1291,7 +1297,11 @@ class Ticket25546Tests(TestCase):
             AuthorAddress.objects.create(author=cls.author21, address='Happy place'),
         ]
 
-    def test_prefetch(self):
+    def test_detect_is_fetched(self):
+        """
+        Nested prefetch_related() shouldn't trigger duplicate queries for the same
+        lookup.
+        """
         with self.assertNumQueries(3):
             books = Book.objects.filter(
                 title__in=['book1', 'book2'],
@@ -1335,7 +1345,7 @@ class Ticket25546Tests(TestCase):
             list(book2.first_time_authors.all()[0].addresses.all().all())
         )
 
-    def test_prefetch_with_to_attr(self):
+    def test_detect_is_fetched_with_to_attr(self):
         with self.assertNumQueries(3):
             books = Book.objects.filter(
                 title__in=['book1', 'book2'],
