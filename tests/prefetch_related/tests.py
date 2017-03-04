@@ -1361,3 +1361,37 @@ class Ticket25546Tests(TestCase):
             self.assertEqual(book1.first_authors[0].happy_place, [self.author1_address1])
             self.assertEqual(book1.first_authors[1].happy_place, [])
             self.assertEqual(book2.first_authors[0].happy_place, [self.author2_address1])
+
+
+class ReadPrefetchedObjectsCacheTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.book1 = Book.objects.create(title='Les confessions Volume I')
+        cls.book2 = Book.objects.create(title='Candide')
+        cls.author1 = AuthorWithAge.objects.create(name='Rousseau', first_book=cls.book1, age=70)
+        cls.author2 = AuthorWithAge.objects.create(name='Voltaire', first_book=cls.book2, age=65)
+        cls.book1.authors.add(cls.author1)
+        cls.book2.authors.add(cls.author2)
+        FavoriteAuthors.objects.create(author=cls.author1, likes_author=cls.author2)
+
+    def test_retrieves_results_from_prefetched_objects_cache(self):
+        """
+        When intermediary results are prefetched without a destination
+        attribute, they are saved in the RelatedManager's cache
+        (_prefetched_objects_cache). prefetch_related() uses this cache
+        (#27554).
+        """
+        authors = AuthorWithAge.objects.prefetch_related(
+            Prefetch(
+                'author',
+                queryset=Author.objects.prefetch_related(
+                    # Results are saved in the RelatedManager's cache
+                    # (_prefetched_objects_cache) and do not replace the
+                    # RelatedManager on Author instances (favorite_authors)
+                    Prefetch('favorite_authors__first_book'),
+                ),
+            ),
+        )
+        with self.assertNumQueries(4):
+            # AuthorWithAge -> Author -> FavoriteAuthors, Book
+            self.assertQuerysetEqual(authors, ['<AuthorWithAge: Rousseau>', '<AuthorWithAge: Voltaire>'])

@@ -1423,10 +1423,15 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 # that we can continue with nullable or reverse relations.
                 new_obj_list = []
                 for obj in obj_list:
-                    try:
-                        new_obj = getattr(obj, through_attr)
-                    except exceptions.ObjectDoesNotExist:
-                        continue
+                    if through_attr in getattr(obj, '_prefetched_objects_cache', ()):
+                        # If related objects have been prefetched, use the
+                        # cache rather than the object's through_attr.
+                        new_obj = list(obj._prefetched_objects_cache.get(through_attr))
+                    else:
+                        try:
+                            new_obj = getattr(obj, through_attr)
+                        except exceptions.ObjectDoesNotExist:
+                            continue
                     if new_obj is None:
                         continue
                     # We special-case `list` rather than something more generic
