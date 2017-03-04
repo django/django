@@ -91,3 +91,6 @@ Bugfixes
 
 * Corrected the return type of ``ArrayField(CITextField())`` values retrieved
   from the database (:ticket:`28161`).
+
+* Fixed ``QuerySet.prefetch_related()`` crash when fetching relations in nested
+  ``Prefetch`` objects (:ticket:`27554`).
