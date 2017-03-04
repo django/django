@@ -918,6 +918,20 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.context['site_url'], '/my-site-url/')
         self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
+    def test_sortable_by(self):
+        expected_sortable_field_names = ('date', 'callable_year')
+        expected_not_sortable_field_name = (
+            'content', 'model_year', 'modeladmin_year',
+            'model_year_reversed', 'section', 'lambda8'
+        )
+
+        response = self.client.get(reverse('admin:admin_views_article_changelist'))
+        for field_name in expected_sortable_field_names:
+            self.assertContains(response, '<th scope="col"  class="sortable column-%s">' % field_name)
+
+        for field_name in expected_not_sortable_field_name:
+            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
+
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',

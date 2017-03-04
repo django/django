@@ -105,6 +105,7 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ('date', 'section', 'sub_section')
         })
     )
+    sortable_by = ('date', callable_year)
 
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})

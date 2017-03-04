@@ -107,6 +107,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     formfield_overrides = {}
     readonly_fields = ()
     ordering = None
+    sortable_by = None
     view_on_site = True
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
@@ -482,6 +483,9 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         `ModelAdmin.has_(add|change|delete)_permission` for that.
         """
         return request.user.has_module_perms(self.opts.app_label)
+
+    def get_sortable_by(self, request):
+        return self.sortable_by or self.get_list_display(request)
 
 
 class ModelAdmin(BaseModelAdmin):
@@ -1525,6 +1529,7 @@ class ModelAdmin(BaseModelAdmin):
         list_filter = self.get_list_filter(request)
         search_fields = self.get_search_fields(request)
         list_select_related = self.get_list_select_related(request)
+        sortable_by = self.get_sortable_by(request)
 
         # Check actions to see if any are available on this changelist
         actions = self.get_actions(request)
@@ -1539,6 +1544,7 @@ class ModelAdmin(BaseModelAdmin):
                 list_display_links, list_filter, self.date_hierarchy,
                 search_fields, list_select_related, self.list_per_page,
                 self.list_max_show_all, self.list_editable, self,
+                sortable_by,
             )
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main

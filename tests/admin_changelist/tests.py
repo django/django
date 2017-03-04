@@ -43,6 +43,7 @@ def get_changelist_args(modeladmin, **kwargs):
         kwargs.pop('list_max_show_all', m.list_max_show_all),
         kwargs.pop('list_editable', m.list_editable),
         m,
+        kwargs.pop('sortable_by', m.sortable_by),
     )
     assert not kwargs, "Unexpected kwarg %s" % kwargs
     return args

@@ -297,6 +297,7 @@ class ListFiltersTests(TestCase):
             modeladmin.date_hierarchy, modeladmin.search_fields,
             modeladmin.list_select_related, modeladmin.list_per_page,
             modeladmin.list_max_show_all, modeladmin.list_editable, modeladmin,
+            modeladmin.sortable_by
         )
 
     def test_choicesfieldlistfilter_has_none_choice(self):
