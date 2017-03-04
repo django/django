@@ -108,13 +108,12 @@ class BoundField:
                 'It will be mandatory in Django 2.1.' % widget.__class__,
                 RemovedInDjango21Warning, stacklevel=2,
             )
-        html = widget.render(
+        return widget.render(
             name=name,
             value=self.value(),
             attrs=attrs,
             **kwargs
         )
-        return force_text(html)
 
     def as_text(self, attrs=None, **kwargs):
         """

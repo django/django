@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils._os import safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import filepath_to_uri, force_text
+from django.utils.encoding import filepath_to_uri
 from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import get_valid_filename
@@ -288,7 +288,7 @@ class FileSystemStorage(Storage):
             os.chmod(full_path, self.file_permissions_mode)
 
         # Store filenames with forward slashes, even on Windows.
-        return force_text(name.replace('\\', '/'))
+        return name.replace('\\', '/')
 
     def delete(self, name):
         assert name, "The name argument is not allowed to be empty."

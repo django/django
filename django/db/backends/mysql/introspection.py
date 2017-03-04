@@ -9,7 +9,6 @@ from django.db.backends.base.introspection import (
 from django.db.models.indexes import Index
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra',))
 InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default')
@@ -79,7 +78,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         fields = []
         for line in cursor.description:
-            col_name = force_text(line[0])
+            col_name = line[0]
             fields.append(
                 FieldInfo(*(
                     (col_name,) +

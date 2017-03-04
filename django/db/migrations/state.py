@@ -10,7 +10,6 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
@@ -363,7 +362,7 @@ class ModelState:
 
     def __init__(self, app_label, name, fields, options=None, bases=None, managers=None):
         self.app_label = app_label
-        self.name = force_text(name)
+        self.name = name
         self.fields = fields
         self.options = options or {}
         self.options.setdefault('indexes', [])
@@ -411,7 +410,7 @@ class ModelState:
                 continue
             if isinstance(field, OrderWrt):
                 continue
-            name = force_text(field.name, strings_only=True)
+            name = field.name
             try:
                 fields.append((name, field.clone()))
             except TypeError as e:
@@ -422,7 +421,7 @@ class ModelState:
                 ))
         if not exclude_rels:
             for field in model._meta.local_many_to_many:
-                name = force_text(field.name, strings_only=True)
+                name = field.name
                 try:
                     fields.append((name, field.clone()))
                 except TypeError as e:
@@ -489,8 +488,7 @@ class ModelState:
         manager_names = set()
         default_manager_shim = None
         for manager in model._meta.managers:
-            manager_name = force_text(manager.name)
-            if manager_name in manager_names:
+            if manager.name in manager_names:
                 # Skip overridden managers.
                 continue
             elif manager.use_in_migrations:
@@ -506,8 +504,8 @@ class ModelState:
                     default_manager_shim = new_manager
             else:
                 continue
-            manager_names.add(manager_name)
-            managers.append((manager_name, new_manager))
+            manager_names.add(manager.name)
+            managers.append((manager.name, new_manager))
 
         # Ignore a shimmed default manager called objects if it's the only one.
         if managers == [('objects', default_manager_shim)]:
@@ -528,7 +526,6 @@ class ModelState:
         # Sort all managers by their creation counter
         sorted_managers = sorted(self.managers, key=lambda v: v[1].creation_counter)
         for mgr_name, manager in sorted_managers:
-            mgr_name = force_text(mgr_name)
             as_manager, manager_path, qs_path, args, kwargs = manager.deconstruct()
             if as_manager:
                 qs_class = import_string(qs_path)

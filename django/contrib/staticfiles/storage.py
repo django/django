@@ -14,7 +14,7 @@ from django.core.cache import (
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 from django.utils.functional import LazyObject
 
 
@@ -308,7 +308,7 @@ class HashedFilesMixin:
                         self.delete(hashed_name)
 
                     saved_name = self._save(hashed_name, content_file)
-                    hashed_name = force_text(self.clean_name(saved_name))
+                    hashed_name = self.clean_name(saved_name)
                     # If the file hash stayed the same, this file didn't change
                     if old_hashed_name == hashed_name:
                         substitutions = False
@@ -320,7 +320,7 @@ class HashedFilesMixin:
                     if not hashed_file_exists:
                         processed = True
                         saved_name = self._save(hashed_name, original_file)
-                        hashed_name = force_text(self.clean_name(saved_name))
+                        hashed_name = self.clean_name(saved_name)
 
                 # and then set the cache accordingly
                 hashed_files[hash_key] = hashed_name

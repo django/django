@@ -5,7 +5,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
 from django.utils import timezone
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.views.generic.base import View
@@ -326,7 +325,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
             is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
-                    'verbose_name_plural': force_text(qs.model._meta.verbose_name_plural)
+                    'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 })
 
         return qs
@@ -353,9 +352,11 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         else:
             date_list = queryset.dates(date_field, date_type, ordering)
         if date_list is not None and not date_list and not allow_empty:
-            name = force_text(queryset.model._meta.verbose_name_plural)
-            raise Http404(_("No %(verbose_name_plural)s available") %
-                          {'verbose_name_plural': name})
+            raise Http404(
+                _("No %(verbose_name_plural)s available") % {
+                    'verbose_name_plural': queryset.model._meta.verbose_name_plural,
+                }
+            )
 
         return date_list
 

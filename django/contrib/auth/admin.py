@@ -14,7 +14,6 @@ from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
 from django.utils.html import escape
 from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
@@ -135,7 +134,7 @@ class UserAdmin(admin.ModelAdmin):
         user = self.get_object(request, unquote(id))
         if user is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                'name': force_text(self.model._meta.verbose_name),
+                'name': self.model._meta.verbose_name,
                 'key': escape(id),
             })
         if request.method == 'POST':

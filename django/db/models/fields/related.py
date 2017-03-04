@@ -12,7 +12,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import gettext_lazy as _
 
@@ -300,7 +299,7 @@ class RelatedField(Field):
             else:
                 related_name = self.opts.default_related_name
             if related_name:
-                related_name = force_text(related_name) % {
+                related_name = related_name % {
                     'class': cls.__name__.lower(),
                     'model_name': cls._meta.model_name.lower(),
                     'app_label': cls._meta.app_label.lower()
@@ -308,7 +307,7 @@ class RelatedField(Field):
                 self.remote_field.related_name = related_name
 
             if self.remote_field.related_query_name:
-                related_query_name = force_text(self.remote_field.related_query_name) % {
+                related_query_name = self.remote_field.related_query_name % {
                     'class': cls.__name__.lower(),
                     'app_label': cls._meta.app_label.lower(),
                 }

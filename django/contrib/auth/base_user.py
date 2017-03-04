@@ -10,7 +10,6 @@ from django.contrib.auth.hashers import (
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
-from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
 
 
@@ -142,4 +141,4 @@ class AbstractBaseUser(models.Model):
 
     @classmethod
     def normalize_username(cls, username):
-        return unicodedata.normalize('NFKC', force_text(username))
+        return unicodedata.normalize('NFKC', username) if username else username

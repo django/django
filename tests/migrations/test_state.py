@@ -359,7 +359,7 @@ class StateTests(SimpleTestCase):
                 # The ordering we really want is objects, mgr1, mgr2
                 ('default', base_mgr),
                 ('food_mgr2', mgr2),
-                (b'food_mgr1', mgr1),
+                ('food_mgr1', mgr1),
             ]
         ))
 

@@ -157,11 +157,6 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.normalize_newlines(""), "")
         self.assertEqual(text.normalize_newlines(lazystr("abc\ndef\rghi\r\n")), "abc\ndef\nghi\n")
 
-    def test_normalize_newlines_bytes(self):
-        """normalize_newlines should be able to handle bytes too"""
-        normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
-        self.assertEqual(normalized, "abc\ndef\nghi\n")
-
     def test_phone2numeric(self):
         numeric = text.phone2numeric('0800 flowers')
         self.assertEqual(numeric, '0800 3569377')

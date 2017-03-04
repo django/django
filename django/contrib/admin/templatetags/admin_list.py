@@ -281,7 +281,7 @@ def items_for_result(cl, result, form):
                 result_repr = mark_safe(force_text(bf.errors) + force_text(bf))
             yield format_html('<td{}>{}</td>', row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
-        yield format_html('<td>{}</td>', force_text(form[cl.model._meta.pk.name]))
+        yield format_html('<td>{}</td>', form[cl.model._meta.pk.name])
 
 
 class ResultList(list):
@@ -308,7 +308,7 @@ def result_hidden_fields(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
             if form[cl.model._meta.pk.name].is_hidden:
-                yield mark_safe(force_text(form[cl.model._meta.pk.name]))
+                yield mark_safe(form[cl.model._meta.pk.name])
 
 
 @register.inclusion_tag("admin/change_list_results.html")

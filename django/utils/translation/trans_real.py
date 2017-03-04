@@ -14,7 +14,6 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
@@ -327,8 +326,7 @@ def pgettext(context, message):
     result = gettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        # force str, because the lazy version expects str.
-        result = force_text(message)
+        result = message
     return result
 
 

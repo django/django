@@ -5,7 +5,6 @@ from django.db.backends.base.introspection import (
 )
 from django.db.models.indexes import Index
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -79,11 +78,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
-            FieldInfo(*(
-                (force_text(line[0]),) +
-                line[1:6] +
-                (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])
-            )) for line in cursor.description
+            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1])))
+            for line in cursor.description
         ]
 
     def get_relations(self, cursor, table_name):

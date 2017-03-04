@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
-from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy as _
@@ -135,7 +134,7 @@ class AdminField:
 
     def label_tag(self):
         classes = []
-        contents = conditional_escape(force_text(self.field.label))
+        contents = conditional_escape(self.field.label)
         if self.is_checkbox:
             classes.append('vCheckboxLabel')
 
@@ -193,9 +192,7 @@ class AdminReadonlyField:
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        return format_html('<label{}>{}:</label>',
-                           flatatt(attrs),
-                           capfirst(force_text(label)))
+        return format_html('<label{}>{}:</label>', flatatt(attrs), capfirst(label))
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -213,7 +210,7 @@ class AdminReadonlyField:
                     if hasattr(value, "__html__"):
                         result_repr = value
                     else:
-                        result_repr = linebreaksbr(force_text(value))
+                        result_repr = linebreaksbr(value)
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(str, value.all()))

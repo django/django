@@ -42,8 +42,8 @@ class SimpleTests(HStoreTestCase):
         self.assertEqual(reloaded.field, value)
 
     def test_key_val_cast_to_string(self):
-        value = {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê', b'x': b'test'}
-        expected_value = {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê', 'x': 'test'}
+        value = {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê'}
+        expected_value = {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê'}
 
         instance = HStoreModel.objects.create(field=value)
         instance = HStoreModel.objects.get()

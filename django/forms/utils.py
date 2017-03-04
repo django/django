@@ -4,7 +4,6 @@ from collections import UserList
 from django.conf import settings
 from django.core.exceptions import ValidationError  # backwards compatibility
 from django.utils import timezone
-from django.utils.encoding import force_text
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -60,7 +59,7 @@ class ErrorDict(dict):
             return ''
         return format_html(
             '<ul class="errorlist">{}</ul>',
-            format_html_join('', '<li>{}{}</li>', ((k, force_text(v)) for k, v in self.items()))
+            format_html_join('', '<li>{}{}</li>', self.items())
         )
 
     def as_text(self):
@@ -110,7 +109,7 @@ class ErrorList(UserList, list):
         return format_html(
             '<ul class="{}">{}</ul>',
             self.error_class,
-            format_html_join('', '<li>{}</li>', ((force_text(e),) for e in self))
+            format_html_join('', '<li>{}</li>', ((e,) for e in self))
         )
 
     def as_text(self):
@@ -132,7 +131,7 @@ class ErrorList(UserList, list):
         error = self.data[i]
         if isinstance(error, ValidationError):
             return list(error)[0]
-        return force_text(error)
+        return error
 
     def __reduce_ex__(self, *args, **kwargs):
         # The `list` reduce function returns an iterator as the fourth element

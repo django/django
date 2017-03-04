@@ -885,7 +885,7 @@ class Model(metaclass=ModelBase):
             raise ValueError("get_next/get_previous cannot be used on unsaved objects.")
         op = 'gt' if is_next else 'lt'
         order = '' if is_next else '-'
-        param = force_text(getattr(self, field.attname))
+        param = getattr(self, field.attname)
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
         qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by(

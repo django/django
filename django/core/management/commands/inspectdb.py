@@ -5,7 +5,6 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.constants import LOOKUP_SEP
-from django.utils.encoding import force_text
 
 
 class Command(BaseCommand):
@@ -79,7 +78,7 @@ class Command(BaseCommand):
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
-                    yield "# The error was: %s" % force_text(e)
+                    yield "# The error was: %s" % e
                     continue
 
                 yield ''
