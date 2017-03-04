@@ -24,11 +24,11 @@ class Author(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
     author = models.ForeignKey(Author, models.SET_NULL, blank=True, null=True)
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
+        ordering = ('-publication_date', 'headline')
 
     def __str__(self):
         return self.headline

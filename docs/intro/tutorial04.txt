@@ -276,7 +276,7 @@ views and use Django's generic views instead. To do so, open the
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by('-publication_date')[:5]
 
 
     class DetailView(generic.DetailView):

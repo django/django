@@ -31,14 +31,14 @@ class ValidationTestModel(models.Model):
     users = models.ManyToManyField(User)
     state = models.CharField(max_length=2, choices=(("CO", "Colorado"), ("WA", "Washington")))
     is_active = models.BooleanField(default=False)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
     band = models.ForeignKey(Band, models.CASCADE)
     best_friend = models.OneToOneField(User, models.CASCADE, related_name='best_friend')
     # This field is intentionally 2 characters long (#16080).
     no = models.IntegerField(verbose_name="Number", blank=True, null=True)
 
     def decade_published_in(self):
-        return self.pub_date.strftime('%Y')[:3] + "0's"
+        return self.publication_date.strftime('%Y')[:3] + "0's"
 
 
 class ValidationTestInlineModel(models.Model):

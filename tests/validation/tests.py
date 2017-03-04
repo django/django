@@ -91,7 +91,7 @@ class ModelFormsTests(TestCase):
         # works with model validation.
         data = {
             'title': 'The state of model validation',
-            'pub_date': '2010-1-10 14:49:00'
+            'publication_date': '2010-1-10 14:49:00'
         }
         form = ArticleForm(data)
         self.assertEqual(list(form.errors), [])
@@ -100,10 +100,10 @@ class ModelFormsTests(TestCase):
         article.save()
 
     def test_validation_with_empty_blank_field(self):
-        # Since a value for pub_date wasn't provided and the field is
+        # Since a value for publication_date wasn't provided and the field is
         # blank=True, model-validation should pass.
-        # Also, Article.clean() should be run, so pub_date will be filled after
-        # validation, so the form should save cleanly even though pub_date is
+        # Also, Article.clean() should be run, so publication_date will be filled after
+        # validation, so the form should save cleanly even though publication_date is
         # not allowed to be null.
         data = {
             'title': 'The state of model validation',
@@ -111,19 +111,19 @@ class ModelFormsTests(TestCase):
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
         self.assertEqual(list(form.errors), [])
-        self.assertIsNotNone(form.instance.pub_date)
+        self.assertIsNotNone(form.instance.publication_date)
         article = form.save()
 
     def test_validation_with_invalid_blank_field(self):
-        # Even though pub_date is set to blank=True, an invalid value was
+        # Even though publication_date is set to blank=True, an invalid value was
         # provided, so it should fail validation.
         data = {
             'title': 'The state of model validation',
-            'pub_date': 'never'
+            'publication_date': 'never'
         }
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
-        self.assertEqual(list(form.errors), ['pub_date'])
+        self.assertEqual(list(form.errors), ['publication_date'])
 
 
 class GenericIPAddressFieldTests(ValidationTestCase):

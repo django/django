@@ -1304,7 +1304,7 @@ class FormsetAsFooTests(SimpleTestCase):
 # Regression test for #11418 #################################################
 class ArticleForm(Form):
     title = CharField()
-    pub_date = DateField()
+    publication_date = DateField()
 
 
 ArticleFormSet = formset_factory(ArticleForm)
@@ -1334,20 +1334,20 @@ class TestIsBoundBehavior(SimpleTestCase):
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '0',
             'form-0-title': 'Test',
-            'form-0-pub_date': '1904-06-16',
+            'form-0-publication_date': '1904-06-16',
             'form-1-title': 'Test',
-            'form-1-pub_date': '',  # <-- this date is missing but required
+            'form-1-publication_date': '',  # <-- this date is missing but required
         }
         formset = ArticleFormSet(data)
         self.assertFalse(formset.is_valid())
-        self.assertEqual([{}, {'pub_date': ['This field is required.']}], formset.errors)
+        self.assertEqual([{}, {'publication_date': ['This field is required.']}], formset.errors)
 
     def test_empty_forms_are_unbound(self):
         data = {
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '0',
             'form-0-title': 'Test',
-            'form-0-pub_date': '1904-06-16',
+            'form-0-publication_date': '1904-06-16',
         }
         unbound_formset = ArticleFormSet()
         bound_formset = ArticleFormSet(data)

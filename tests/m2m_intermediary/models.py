@@ -22,7 +22,7 @@ class Reporter(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
+    publication_date = models.DateField()
 
     def __str__(self):
         return self.headline

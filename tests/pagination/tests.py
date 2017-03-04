@@ -249,7 +249,7 @@ class ModelPaginationTests(TestCase):
     def setUp(self):
         # Prepare a list of objects for pagination.
         for x in range(1, 10):
-            a = Article(headline='Article %s' % x, pub_date=datetime(2005, 7, 29))
+            a = Article(headline='Article %s' % x, publication_date=datetime(2005, 7, 29))
             a.save()
 
     def test_first_page(self):

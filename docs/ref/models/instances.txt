@@ -266,12 +266,12 @@ access to more than a single field::
     class Article(models.Model):
         ...
         def clean(self):
-            # Don't allow draft entries to have a pub_date.
-            if self.status == 'draft' and self.pub_date is not None:
+            # Don't allow draft entries to have a publication_date.
+            if self.status == 'draft' and self.publication_date is not None:
                 raise ValidationError(_('Draft entries may not have a publication date.'))
-            # Set the pub_date for published items if it hasn't been set already.
-            if self.status == 'published' and self.pub_date is None:
-                self.pub_date = datetime.date.today()
+            # Set the publication_date for published items if it hasn't been set already.
+            if self.status == 'published' and self.publication_date is None:
+                self.publication_date = datetime.date.today()
 
 Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
 method is not invoked when you call your model's :meth:`~Model.save()` method.
@@ -291,14 +291,14 @@ that are tied to the entire model instead of to a specific field::
 To assign exceptions to a specific field, instantiate the
 :exc:`~django.core.exceptions.ValidationError` with a dictionary, where the
 keys are the field names. We could update the previous example to assign the
-error to the ``pub_date`` field::
+error to the ``publication_date`` field::
 
     class Article(models.Model):
         ...
         def clean(self):
-            # Don't allow draft entries to have a pub_date.
-            if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
+            # Don't allow draft entries to have a publication_date.
+            if self.status == 'draft' and self.publication_date is not None:
+                raise ValidationError({'publication_date': _('Draft entries may not have a publication date.')})
             ...
 
 If you detect errors in multiple fields during ``Model.clean()``, you can also
@@ -306,7 +306,7 @@ pass a dictionary mapping field names to errors::
 
     raise ValidationError({
         'title': ValidationError(_('Missing title.'), code='required'),
-        'pub_date': ValidationError(_('Invalid date.'), code='invalid'),
+        'publication_date': ValidationError(_('Invalid date.'), code='invalid'),
     })
 
 Finally, ``full_clean()`` will check any unique constraints on your model.

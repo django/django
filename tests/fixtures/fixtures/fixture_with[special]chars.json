@@ -4,7 +4,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "How To Deal With Special Characters",
-            "pub_date": "2006-06-16 12:00:00"
+            "publication_date": "2006-06-16 12:00:00"
         }
     }
 ]

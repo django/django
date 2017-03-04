@@ -69,7 +69,7 @@ many projects they are typically the most commonly used views.
         <h1>{{ object.headline }}</h1>
         <p>{{ object.content }}</p>
         <p>Reporter: {{ object.reporter }}</p>
-        <p>Published: {{ object.pub_date|date }}</p>
+        <p>Published: {{ object.publication_date|date }}</p>
         <p>Date: {{ now|date }}</p>
 
 ``ListView``
@@ -138,7 +138,7 @@ many projects they are typically the most commonly used views.
         <h1>Articles</h1>
         <ul>
         {% for article in object_list %}
-            <li>{{ article.pub_date|date }} - {{ article.headline }}</li>
+            <li>{{ article.publication_date|date }} - {{ article.headline }}</li>
         {% empty %}
             <li>No articles yet.</li>
         {% endfor %}

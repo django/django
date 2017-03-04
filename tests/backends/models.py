@@ -64,7 +64,7 @@ class ReporterProxy(Reporter):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
+    publication_date = models.DateField()
     reporter = models.ForeignKey(Reporter, models.CASCADE)
     reporter_proxy = models.ForeignKey(
         ReporterProxy,

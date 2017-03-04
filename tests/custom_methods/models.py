@@ -11,16 +11,16 @@ from django.db import models
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
+    publication_date = models.DateField()
 
     def __str__(self):
         return self.headline
 
     def was_published_today(self):
-        return self.pub_date == datetime.date.today()
+        return self.publication_date == datetime.date.today()
 
     def articles_from_same_day_1(self):
-        return Article.objects.filter(pub_date=self.pub_date).exclude(id=self.id)
+        return Article.objects.filter(publication_date=self.publication_date).exclude(id=self.id)
 
     def articles_from_same_day_2(self):
         """
@@ -30,9 +30,9 @@ class Article(models.Model):
         from django.db import connection
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT id, headline, pub_date
+                SELECT id, headline, publication_date
                 FROM custom_methods_article
-                WHERE pub_date = %s
-                    AND id != %s""", [connection.ops.adapt_datefield_value(self.pub_date),
+                WHERE publication_date = %s
+                    AND id != %s""", [connection.ops.adapt_datefield_value(self.publication_date),
                                       self.id])
             return [self.__class__(*row) for row in cursor.fetchall()]

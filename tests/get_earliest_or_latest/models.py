@@ -3,11 +3,11 @@ from django.db import models
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
+    publication_date = models.DateField()
     expire_date = models.DateField()
 
     class Meta:
-        get_latest_by = 'pub_date'
+        get_latest_by = 'publication_date'
 
 
 class Person(models.Model):

@@ -511,7 +511,7 @@ Models
 
 * :lookup:`Date and time <year>` lookups can be chained with other lookups
   (such as :lookup:`exact`, :lookup:`gt`, :lookup:`lt`, etc.). For example:
-  ``Entry.objects.filter(pub_date__month__gt=6)``.
+  ``Entry.objects.filter(publication_date__month__gt=6)``.
 
 * Time lookups (hour, minute, second) are now supported by
   :class:`~django.db.models.TimeField` for all database backends. Support for

@@ -36,7 +36,7 @@ class AuthorWithEvenLongerName(models.Model):
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100, db_index=True)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
     # tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
@@ -46,7 +46,7 @@ class Book(models.Model):
 class BookWeak(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, db_constraint=False)
     title = models.CharField(max_length=100, db_index=True)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     class Meta:
         apps = new_apps
@@ -65,7 +65,7 @@ class BookWithLongName(models.Model):
 class BookWithO2O(models.Model):
     author = models.OneToOneField(Author, models.CASCADE)
     title = models.CharField(max_length=100, db_index=True)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     class Meta:
         apps = new_apps
@@ -75,7 +75,7 @@ class BookWithO2O(models.Model):
 class BookWithSlug(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100, db_index=True)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
     slug = models.CharField(max_length=20, unique=True)
 
     class Meta:
@@ -85,7 +85,7 @@ class BookWithSlug(models.Model):
 
 class BookWithoutAuthor(models.Model):
     title = models.CharField(max_length=100, db_index=True)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     class Meta:
         apps = new_apps

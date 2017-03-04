@@ -12,57 +12,57 @@ class DatesTests(TestCase):
     def test_related_model_traverse(self):
         a1 = Article.objects.create(
             title="First one",
-            pub_date=datetime.date(2005, 7, 28),
+            publication_date=datetime.date(2005, 7, 28),
         )
         a2 = Article.objects.create(
             title="Another one",
-            pub_date=datetime.date(2010, 7, 28),
+            publication_date=datetime.date(2010, 7, 28),
         )
         a3 = Article.objects.create(
             title="Third one, in the first day",
-            pub_date=datetime.date(2005, 7, 28),
+            publication_date=datetime.date(2005, 7, 28),
         )
 
         a1.comments.create(
             text="Im the HULK!",
-            pub_date=datetime.date(2005, 7, 28),
+            publication_date=datetime.date(2005, 7, 28),
         )
         a1.comments.create(
             text="HULK SMASH!",
-            pub_date=datetime.date(2005, 7, 29),
+            publication_date=datetime.date(2005, 7, 29),
         )
         a2.comments.create(
             text="LMAO",
-            pub_date=datetime.date(2010, 7, 28),
+            publication_date=datetime.date(2010, 7, 28),
         )
         a3.comments.create(
             text="+1",
-            pub_date=datetime.date(2005, 8, 29),
+            publication_date=datetime.date(2005, 8, 29),
         )
 
         c = Category.objects.create(name="serious-news")
         c.articles.add(a1, a3)
 
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "year"), [
+            Comment.objects.dates("article__publication_date", "year"), [
                 datetime.date(2005, 1, 1),
                 datetime.date(2010, 1, 1),
             ],
         )
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "month"), [
+            Comment.objects.dates("article__publication_date", "month"), [
                 datetime.date(2005, 7, 1),
                 datetime.date(2010, 7, 1),
             ],
         )
         self.assertSequenceEqual(
-            Comment.objects.dates("article__pub_date", "day"), [
+            Comment.objects.dates("article__publication_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2010, 7, 28),
             ],
         )
         self.assertSequenceEqual(
-            Article.objects.dates("comments__pub_date", "day"), [
+            Article.objects.dates("comments__publication_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2005, 7, 29),
                 datetime.date(2005, 8, 29),
@@ -73,7 +73,7 @@ class DatesTests(TestCase):
             Article.objects.dates("comments__approval_date", "day"), []
         )
         self.assertSequenceEqual(
-            Category.objects.dates("articles__pub_date", "day"), [
+            Category.objects.dates("articles__publication_date", "day"), [
                 datetime.date(2005, 7, 28),
             ],
         )
@@ -86,7 +86,7 @@ class DatesTests(TestCase):
         self.assertRaisesMessage(
             FieldError,
             "Cannot resolve keyword 'invalid_field' into field. Choices are: "
-            "categories, comments, id, pub_date, pub_datetime, title",
+            "categories, comments, id, publication_date, publication_datetime, title",
             Article.objects.dates,
             "invalid_field",
             "year",
@@ -94,17 +94,17 @@ class DatesTests(TestCase):
 
     def test_dates_fails_when_given_invalid_kind_argument(self):
         with self.assertRaisesMessage(AssertionError, "'kind' must be one of 'year', 'month' or 'day'."):
-            Article.objects.dates("pub_date", "bad_kind")
+            Article.objects.dates("publication_date", "bad_kind")
 
     def test_dates_fails_when_given_invalid_order_argument(self):
         with self.assertRaisesMessage(AssertionError, "'order' must be either 'ASC' or 'DESC'."):
-            Article.objects.dates("pub_date", "year", order="bad order")
+            Article.objects.dates("publication_date", "year", order="bad order")
 
     @override_settings(USE_TZ=False)
     def test_dates_trunc_datetime_fields(self):
         Article.objects.bulk_create(
-            Article(pub_date=pub_datetime.date(), pub_datetime=pub_datetime)
-            for pub_datetime in [
+            Article(publication_date=publication_datetime.date(), publication_datetime=publication_datetime)
+            for publication_datetime in [
                 datetime.datetime(2015, 10, 21, 18, 1),
                 datetime.datetime(2015, 10, 21, 18, 2),
                 datetime.datetime(2015, 10, 22, 18, 1),
@@ -112,7 +112,7 @@ class DatesTests(TestCase):
             ]
         )
         self.assertSequenceEqual(
-            Article.objects.dates('pub_datetime', 'day', order='ASC'), [
+            Article.objects.dates('publication_datetime', 'day', order='ASC'), [
                 datetime.date(2015, 10, 21),
                 datetime.date(2015, 10, 22),
             ]
@@ -120,9 +120,9 @@ class DatesTests(TestCase):
 
     @skipUnless(connection.vendor == 'mysql', "Test checks MySQL query syntax")
     def test_dates_avoid_datetime_cast(self):
-        Article.objects.create(pub_date=datetime.date(2015, 10, 21))
+        Article.objects.create(publication_date=datetime.date(2015, 10, 21))
         for kind in ['day', 'month', 'year']:
-            qs = Article.objects.dates('pub_date', kind)
+            qs = Article.objects.dates('publication_date', kind)
             if kind == 'day':
                 self.assertIn('DATE(', str(qs.query))
             else:

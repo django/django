@@ -482,7 +482,7 @@ For example with a ``FormSet``::
 
     >>> class ArticleForm(Form):
     ...     title = CharField()
-    ...     pub_date = DateField()
+    ...     publication_date = DateField()
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
 the following code will raise a ``ValidationError``::

@@ -725,7 +725,7 @@ class DateHierarchyCheckTests(CheckTestCase):
 
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
-            date_hierarchy = 'pub_date'
+            date_hierarchy = 'publication_date'
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
@@ -1072,7 +1072,7 @@ class ListDisplayEditableTests(CheckTestCase):
         when list_display_links is None
         """
         class ProductAdmin(ModelAdmin):
-            list_display = ['name', 'slug', 'pub_date']
+            list_display = ['name', 'slug', 'publication_date']
             list_editable = list_display
             list_display_links = None
         self.assertIsValid(ProductAdmin, ValidationTestModel)
@@ -1083,9 +1083,9 @@ class ListDisplayEditableTests(CheckTestCase):
         list_editable.
         """
         class ProductAdmin(ModelAdmin):
-            list_display = ['name', 'slug', 'pub_date']
+            list_display = ['name', 'slug', 'publication_date']
             list_editable = ['name', 'slug']
-            list_display_links = ['pub_date']
+            list_display_links = ['publication_date']
         self.assertIsValid(ProductAdmin, ValidationTestModel)
 
     def test_list_display_first_item_in_list_editable(self):
@@ -1094,9 +1094,9 @@ class ListDisplayEditableTests(CheckTestCase):
         list_display_links is defined.
         """
         class ProductAdmin(ModelAdmin):
-            list_display = ['name', 'slug', 'pub_date']
+            list_display = ['name', 'slug', 'publication_date']
             list_editable = ['slug', 'name']
-            list_display_links = ['pub_date']
+            list_display_links = ['publication_date']
         self.assertIsValid(ProductAdmin, ValidationTestModel)
 
     def test_list_display_first_item_same_as_list_editable_no_list_display_links(self):
@@ -1121,7 +1121,7 @@ class ListDisplayEditableTests(CheckTestCase):
         list_display_links isn't defined.
         """
         class ProductAdmin(ModelAdmin):
-            list_display = ['name', 'slug', 'pub_date']
+            list_display = ['name', 'slug', 'publication_date']
             list_editable = ['slug', 'name']
         self.assertIsInvalid(
             ProductAdmin, ValidationTestModel,

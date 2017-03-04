@@ -34,7 +34,7 @@ class Reporter(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
+    publication_date = models.DateField()
     body = models.TextField(default='')
     reporter = models.ForeignKey(Reporter, models.CASCADE)
     response_to = models.ForeignKey('self', models.SET_NULL, null=True)
@@ -46,7 +46,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('headline',)
         index_together = [
-            ["headline", "pub_date"],
+            ["headline", "publication_date"],
         ]
 
 

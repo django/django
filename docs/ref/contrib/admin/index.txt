@@ -181,7 +181,7 @@ subclass::
     from django.contrib import admin
 
     class AuthorAdmin(admin.ModelAdmin):
-        date_hierarchy = 'pub_date'
+        date_hierarchy = 'publication_date'
 
 .. attribute:: ModelAdmin.actions
 
@@ -209,12 +209,12 @@ subclass::
 
     Example::
 
-        date_hierarchy = 'pub_date'
+        date_hierarchy = 'publication_date'
 
     You can also specify a field on a related model using the ``__`` lookup,
     for example::
 
-        date_hierarchy = 'author__pub_date'
+        date_hierarchy = 'author__publication_date'
 
     This will intelligently populate itself based on available data,
     e.g. if all the dates are in one month, it'll show the day-level

@@ -13,7 +13,7 @@ from django.db import models
 
 class InternationalArticle(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     def __str__(self):
         return self.headline

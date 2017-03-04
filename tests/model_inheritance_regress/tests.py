@@ -219,27 +219,27 @@ class ModelInheritanceTest(TestCase):
         c1 = ArticleWithAuthor(
             headline='ArticleWithAuthor 1',
             author="Person 1",
-            pub_date=datetime.datetime(2005, 8, 1, 3, 0))
+            publication_date=datetime.datetime(2005, 8, 1, 3, 0))
         c1.save()
         c2 = ArticleWithAuthor(
             headline='ArticleWithAuthor 2',
             author="Person 2",
-            pub_date=datetime.datetime(2005, 8, 1, 10, 0))
+            publication_date=datetime.datetime(2005, 8, 1, 10, 0))
         c2.save()
         c3 = ArticleWithAuthor(
             headline='ArticleWithAuthor 3',
             author="Person 3",
-            pub_date=datetime.datetime(2005, 8, 2))
+            publication_date=datetime.datetime(2005, 8, 2))
         c3.save()
 
-        self.assertEqual(c1.get_next_by_pub_date(), c2)
-        self.assertEqual(c2.get_next_by_pub_date(), c3)
+        self.assertEqual(c1.get_next_by_publication_date(), c2)
+        self.assertEqual(c2.get_next_by_publication_date(), c3)
         with self.assertRaises(ArticleWithAuthor.DoesNotExist):
-            c3.get_next_by_pub_date()
-        self.assertEqual(c3.get_previous_by_pub_date(), c2)
-        self.assertEqual(c2.get_previous_by_pub_date(), c1)
+            c3.get_next_by_publication_date()
+        self.assertEqual(c3.get_previous_by_publication_date(), c2)
+        self.assertEqual(c2.get_previous_by_publication_date(), c1)
         with self.assertRaises(ArticleWithAuthor.DoesNotExist):
-            c1.get_previous_by_pub_date()
+            c1.get_previous_by_publication_date()
 
     def test_inherited_fields(self):
         """
@@ -255,11 +255,11 @@ class ModelInheritanceTest(TestCase):
         # check it here). Regression test for #9390. This necessarily pokes at
         # the SQL string for the query, since the duplicate problems are only
         # apparent at that late stage.
-        qs = ArticleWithAuthor.objects.order_by('pub_date', 'pk')
+        qs = ArticleWithAuthor.objects.order_by('publication_date', 'pk')
         sql = qs.query.get_compiler(qs.db).as_sql()[0]
         fragment = sql[sql.find('ORDER BY'):]
-        pos = fragment.find('pub_date')
-        self.assertEqual(fragment.find('pub_date', pos + 1), -1)
+        pos = fragment.find('publication_date')
+        self.assertEqual(fragment.find('publication_date', pos + 1), -1)
 
     def test_queryset_update_on_parent_model(self):
         """
@@ -270,7 +270,7 @@ class ModelInheritanceTest(TestCase):
         article = ArticleWithAuthor.objects.create(
             author="fred",
             headline="Hey there!",
-            pub_date=datetime.datetime(2009, 3, 1, 8, 0, 0))
+            publication_date=datetime.datetime(2009, 3, 1, 8, 0, 0))
         update = ArticleWithAuthor.objects.filter(
             author="fred").update(headline="Oh, no!")
         self.assertEqual(update, 1)
@@ -318,7 +318,7 @@ class ModelInheritanceTest(TestCase):
         # should work without error.
         QualityControl.objects.create(
             headline="Problems in Django",
-            pub_date=datetime.datetime.now(),
+            publication_date=datetime.datetime.now(),
             quality=10,
             assignee="adrian")
 

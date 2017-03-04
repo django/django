@@ -55,12 +55,12 @@ class Author(models.Model):
 class Article(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     headline = models.CharField(max_length=50)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
     categories = models.ManyToManyField(Category)
     meta_data = models.ManyToManyField(CategoryMetaData)
 
     class Meta:
-        ordering = ('pub_date',)
+        ordering = ('publication_date',)
 
     def __str__(self):
         return self.headline

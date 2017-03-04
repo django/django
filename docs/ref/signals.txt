@@ -67,7 +67,7 @@ Arguments sent with this signal:
 
 For example, the :doc:`tutorial </intro/tutorial01>` has this line::
 
-    p = Poll(question="What's up?", pub_date=datetime.now())
+    p = Poll(question="What's up?", publication_date=datetime.now())
 
 The arguments sent to a :data:`pre_init` handler would be:
 
@@ -79,7 +79,7 @@ Argument    Value
 ``args``    ``[]`` (an empty list because there were no positional
             arguments passed to ``__init__()``.)
 
-``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+``kwargs``  ``{'question': "What's up?", 'publication_date': datetime.now()}``
 ==========  ===============================================================
 
 ``post_init``

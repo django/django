@@ -822,7 +822,7 @@ class FkConstraintsTests(TransactionTestCase):
         Try to create a model instance that violates a FK constraint. If it
         fails it should fail with IntegrityError.
         """
-        a1 = Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
+        a1 = Article(headline="This is a test", publication_date=datetime.datetime(2005, 7, 27), reporter_id=30)
         try:
             a1.save()
         except IntegrityError:
@@ -833,7 +833,7 @@ class FkConstraintsTests(TransactionTestCase):
         # constraints are also enforced for proxy  Refs #17519
         a2 = Article(
             headline='This is another test', reporter=self.r,
-            pub_date=datetime.datetime(2012, 8, 3),
+            publication_date=datetime.datetime(2012, 8, 3),
             reporter_proxy_id=30,
         )
         with self.assertRaises(IntegrityError):
@@ -845,7 +845,7 @@ class FkConstraintsTests(TransactionTestCase):
         If it fails it should fail with IntegrityError.
         """
         # Create an Article.
-        Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+        Article.objects.create(headline="Test article", publication_date=datetime.datetime(2010, 9, 4), reporter=self.r)
         # Retrieve it from the DB
         a1 = Article.objects.get(headline="Test article")
         a1.reporter_id = 30
@@ -861,7 +861,7 @@ class FkConstraintsTests(TransactionTestCase):
         r_proxy = ReporterProxy.objects.get(pk=self.r.pk)
         Article.objects.create(
             headline='Another article',
-            pub_date=datetime.datetime(1988, 5, 15),
+            publication_date=datetime.datetime(1988, 5, 15),
             reporter=self.r, reporter_proxy=r_proxy,
         )
         # Retrieve the second article from the DB
@@ -879,7 +879,7 @@ class FkConstraintsTests(TransactionTestCase):
             # Create an Article.
             Article.objects.create(
                 headline="Test article",
-                pub_date=datetime.datetime(2010, 9, 4),
+                publication_date=datetime.datetime(2010, 9, 4),
                 reporter=self.r,
             )
             # Retrieve it from the DB
@@ -902,7 +902,7 @@ class FkConstraintsTests(TransactionTestCase):
             # Create an Article.
             Article.objects.create(
                 headline="Test article",
-                pub_date=datetime.datetime(2010, 9, 4),
+                publication_date=datetime.datetime(2010, 9, 4),
                 reporter=self.r,
             )
             # Retrieve it from the DB
@@ -923,7 +923,7 @@ class FkConstraintsTests(TransactionTestCase):
             # Create an Article.
             Article.objects.create(
                 headline="Test article",
-                pub_date=datetime.datetime(2010, 9, 4),
+                publication_date=datetime.datetime(2010, 9, 4),
                 reporter=self.r,
             )
             # Retrieve it from the DB

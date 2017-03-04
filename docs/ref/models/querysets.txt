@@ -190,25 +190,25 @@ The lookup parameters (``**kwargs``) should be in the format described in
 `Field lookups`_ below. Multiple parameters are joined via ``AND`` in the
 underlying SQL statement, and the whole thing is enclosed in a ``NOT()``.
 
-This example excludes all entries whose ``pub_date`` is later than 2005-1-3
+This example excludes all entries whose ``publication_date`` is later than 2005-1-3
 AND whose ``headline`` is "Hello"::
 
-    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline='Hello')
+    Entry.objects.exclude(publication_date__gt=datetime.date(2005, 1, 3), headline='Hello')
 
 In SQL terms, that evaluates to::
 
     SELECT ...
-    WHERE NOT (pub_date > '2005-1-3' AND headline = 'Hello')
+    WHERE NOT (publication_date > '2005-1-3' AND headline = 'Hello')
 
-This example excludes all entries whose ``pub_date`` is later than 2005-1-3
+This example excludes all entries whose ``publication_date`` is later than 2005-1-3
 OR whose headline is "Hello"::
 
-    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
+    Entry.objects.exclude(publication_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
 
 In SQL terms, that evaluates to::
 
     SELECT ...
-    WHERE NOT pub_date > '2005-1-3'
+    WHERE NOT publication_date > '2005-1-3'
     AND NOT headline = 'Hello'
 
 Note the second example is more restrictive.
@@ -275,10 +275,10 @@ override this on a per-``QuerySet`` basis by using the ``order_by`` method.
 
 Example::
 
-    Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
+    Entry.objects.filter(publication_date__year=2005).order_by('-publication_date', 'headline')
 
-The result above will be ordered by ``pub_date`` descending, then by
-``headline`` ascending. The negative sign in front of ``"-pub_date"`` indicates
+The result above will be ordered by ``publication_date`` descending, then by
+``headline`` ascending. The negative sign in front of ``"-publication_date"`` indicates
 *descending* order. Ascending order is implied. To order randomly, use ``"?"``,
 like so::
 
@@ -376,9 +376,9 @@ You can tell if a query is ordered or not by checking the
 ``QuerySet`` has been ordered in any way.
 
 Each ``order_by()`` call will clear any previous ordering. For example, this
-query will be ordered by ``pub_date`` and not ``headline``::
+query will be ordered by ``publication_date`` and not ``headline``::
 
-    Entry.objects.order_by('headline').order_by('pub_date')
+    Entry.objects.order_by('headline').order_by('publication_date')
 
 .. warning::
 
@@ -472,19 +472,19 @@ Examples (those after the first will only work on PostgreSQL)::
     >>> Author.objects.distinct()
     [...]
 
-    >>> Entry.objects.order_by('pub_date').distinct('pub_date')
+    >>> Entry.objects.order_by('publication_date').distinct('publication_date')
     [...]
 
     >>> Entry.objects.order_by('blog').distinct('blog')
     [...]
 
-    >>> Entry.objects.order_by('author', 'pub_date').distinct('author', 'pub_date')
+    >>> Entry.objects.order_by('author', 'publication_date').distinct('author', 'publication_date')
     [...]
 
     >>> Entry.objects.order_by('blog__name', 'mod_date').distinct('blog__name', 'mod_date')
     [...]
 
-    >>> Entry.objects.order_by('author', 'pub_date').distinct('author')
+    >>> Entry.objects.order_by('author', 'publication_date').distinct('author')
     [...]
 
 .. note::
@@ -713,15 +713,15 @@ contents of the ``QuerySet``.
 
 Examples::
 
-    >>> Entry.objects.dates('pub_date', 'year')
+    >>> Entry.objects.dates('publication_date', 'year')
     [datetime.date(2005, 1, 1)]
-    >>> Entry.objects.dates('pub_date', 'month')
+    >>> Entry.objects.dates('publication_date', 'month')
     [datetime.date(2005, 2, 1), datetime.date(2005, 3, 1)]
-    >>> Entry.objects.dates('pub_date', 'day')
+    >>> Entry.objects.dates('publication_date', 'day')
     [datetime.date(2005, 2, 20), datetime.date(2005, 3, 20)]
-    >>> Entry.objects.dates('pub_date', 'day', order='DESC')
+    >>> Entry.objects.dates('publication_date', 'day', order='DESC')
     [datetime.date(2005, 3, 20), datetime.date(2005, 2, 20)]
-    >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
+    >>> Entry.objects.filter(headline__contains='Lennon').dates('publication_date', 'day')
     [datetime.date(2005, 3, 20)]
 
 ``datetimes()``
@@ -890,7 +890,7 @@ You can use ``select_related()`` with any queryset of objects::
     # Find all the blogs with entries scheduled to be published in the future.
     blogs = set()
 
-    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog'):
+    for e in Entry.objects.filter(publication_date__gt=timezone.now()).select_related('blog'):
         # Without select_related(), this would make a database query for each
         # loop iteration in order to fetch the related blog for each entry.
         blogs.add(e.blog)
@@ -898,8 +898,8 @@ You can use ``select_related()`` with any queryset of objects::
 The order of ``filter()`` and ``select_related()`` chaining isn't important.
 These querysets are equivalent::
 
-    Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog')
-    Entry.objects.select_related('blog').filter(pub_date__gt=timezone.now())
+    Entry.objects.filter(publication_date__gt=timezone.now()).select_related('blog')
+    Entry.objects.select_related('blog').filter(publication_date__gt=timezone.now())
 
 You can follow foreign keys in a similar way to querying them. If you have the
 following models::
@@ -1294,17 +1294,17 @@ of the arguments is required, but you should use at least one of them.
 
   Example::
 
-      Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+      Entry.objects.extra(select={'is_recent': "publication_date > '2006-01-01'"})
 
   As a result, each ``Entry`` object will have an extra attribute,
-  ``is_recent``, a boolean representing whether the entry's ``pub_date``
+  ``is_recent``, a boolean representing whether the entry's ``publication_date``
   is greater than Jan. 1, 2006.
 
   Django inserts the given SQL snippet directly into the ``SELECT``
   statement, so the resulting SQL of the above example would be something
   like::
 
-      SELECT blog_entry.*, (pub_date > '2006-01-01') AS is_recent
+      SELECT blog_entry.*, (publication_date > '2006-01-01') AS is_recent
       FROM blog_entry;
 
 
@@ -1398,7 +1398,7 @@ of the arguments is required, but you should use at least one of them.
 
   For example::
 
-      q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+      q = Entry.objects.extra(select={'is_recent': "publication_date > '2006-01-01'"})
       q = q.extra(order_by = ['-is_recent'])
 
   This would sort all the items for which ``is_recent`` is true to the
@@ -2040,9 +2040,9 @@ Returns the latest object in the table, by date, using the ``field_name``
 provided as the date field.
 
 This example returns the latest ``Entry`` in the table, according to the
-``pub_date`` field::
+``publication_date`` field::
 
-    Entry.objects.latest('pub_date')
+    Entry.objects.latest('publication_date')
 
 If your model's :ref:`Meta <meta-options>` specifies
 :attr:`~django.db.models.Options.get_latest_by`, you can leave off the
@@ -2065,7 +2065,7 @@ readability.
 
     You may want to filter out null values::
 
-        Entry.objects.filter(pub_date__isnull=False).latest('pub_date')
+        Entry.objects.filter(publication_date__isnull=False).latest('publication_date')
 
 ``earliest()``
 ~~~~~~~~~~~~~~
@@ -2086,13 +2086,13 @@ queryset is automatically ordered by the primary key.
 
 Example::
 
-    p = Article.objects.order_by('title', 'pub_date').first()
+    p = Article.objects.order_by('title', 'publication_date').first()
 
 Note that ``first()`` is a convenience method, the following code sample is
 equivalent to the above example::
 
     try:
-        p = Article.objects.order_by('title', 'pub_date')[0]
+        p = Article.objects.order_by('title', 'publication_date')[0]
     except IndexError:
         p = None
 
@@ -2197,14 +2197,14 @@ updated if some rows already have the new value).
 For example, to turn comments off for all blog entries published in 2010,
 you could do this::
 
-    >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False)
+    >>> Entry.objects.filter(publication_date__year=2010).update(comments_on=False)
 
-(This assumes your ``Entry`` model has fields ``pub_date`` and ``comments_on``.)
+(This assumes your ``Entry`` model has fields ``publication_date`` and ``comments_on``.)
 
 You can update multiple fields — there's no limit on how many. For example,
 here we update the ``comments_on`` and ``headline`` fields::
 
-    >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False, headline='This is old')
+    >>> Entry.objects.filter(publication_date__year=2010).update(comments_on=False, headline='This is old')
 
 The ``update()`` method is applied instantly, and the only restriction on the
 :class:`.QuerySet` that is updated is that it can only update columns in the
@@ -2227,7 +2227,7 @@ The ``update()`` method returns the number of affected rows::
     >>> Entry.objects.filter(slug='nonexistent-slug').update(comments_on=True)
     0
 
-    >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False)
+    >>> Entry.objects.filter(publication_date__year=2010).update(comments_on=False)
     132
 
 If you're just updating a record and don't need to do anything with the model
@@ -2255,7 +2255,7 @@ update a bunch of records for a model that has a custom
 :meth:`~django.db.models.Model.save()` method, loop over them and call
 :meth:`~django.db.models.Model.save()`, like this::
 
-    for e in Entry.objects.filter(pub_date__year=2010):
+    for e in Entry.objects.filter(publication_date__year=2010):
         e.comments_on = False
         e.save()
 
@@ -2626,11 +2626,11 @@ Example::
     import datetime
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
-    Entry.objects.filter(pub_date__range=(start_date, end_date))
+    Entry.objects.filter(publication_date__range=(start_date, end_date))
 
 SQL equivalent::
 
-    SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
+    SELECT ... WHERE publication_date BETWEEN '2005-01-01' and '2005-03-31';
 
 You can use ``range`` anywhere you can use ``BETWEEN`` in SQL — for dates,
 numbers and even characters.
@@ -2639,10 +2639,10 @@ numbers and even characters.
 
     Filtering a ``DateTimeField`` with dates won't include items on the last
     day, because the bounds are interpreted as "0am on the given date". If
-    ``pub_date`` was a ``DateTimeField``, the above expression would be turned
+    ``publication_date`` was a ``DateTimeField``, the above expression would be turned
     into this SQL::
 
-        SELECT ... WHERE pub_date BETWEEN '2005-01-01 00:00:00' and '2005-03-31 00:00:00';
+        SELECT ... WHERE publication_date BETWEEN '2005-01-01 00:00:00' and '2005-03-31 00:00:00';
 
     Generally speaking, you can't mix dates and datetimes.
 
@@ -2656,8 +2656,8 @@ lookups. Takes a date value.
 
 Example::
 
-    Entry.objects.filter(pub_date__date=datetime.date(2005, 1, 1))
-    Entry.objects.filter(pub_date__date__gt=datetime.date(2005, 1, 1))
+    Entry.objects.filter(publication_date__date=datetime.date(2005, 1, 1))
+    Entry.objects.filter(publication_date__date__gt=datetime.date(2005, 1, 1))
 
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
@@ -2675,13 +2675,13 @@ field lookups. Takes an integer year.
 
 Example::
 
-    Entry.objects.filter(pub_date__year=2005)
-    Entry.objects.filter(pub_date__year__gte=2005)
+    Entry.objects.filter(publication_date__year=2005)
+    Entry.objects.filter(publication_date__year__gte=2005)
 
 SQL equivalent::
 
-    SELECT ... WHERE pub_date BETWEEN '2005-01-01' AND '2005-12-31';
-    SELECT ... WHERE pub_date >= '2005-01-01';
+    SELECT ... WHERE publication_date BETWEEN '2005-01-01' AND '2005-12-31';
+    SELECT ... WHERE publication_date >= '2005-01-01';
 
 (The exact SQL syntax varies for each database engine.)
 
@@ -2698,13 +2698,13 @@ field lookups. Takes an integer 1 (January) through 12 (December).
 
 Example::
 
-    Entry.objects.filter(pub_date__month=12)
-    Entry.objects.filter(pub_date__month__gte=6)
+    Entry.objects.filter(publication_date__month=12)
+    Entry.objects.filter(publication_date__month__gte=6)
 
 SQL equivalent::
 
-    SELECT ... WHERE EXTRACT('month' FROM pub_date) = '12';
-    SELECT ... WHERE EXTRACT('month' FROM pub_date) >= '6';
+    SELECT ... WHERE EXTRACT('month' FROM publication_date) = '12';
+    SELECT ... WHERE EXTRACT('month' FROM publication_date) >= '6';
 
 (The exact SQL syntax varies for each database engine.)
 
@@ -2722,17 +2722,17 @@ field lookups. Takes an integer day.
 
 Example::
 
-    Entry.objects.filter(pub_date__day=3)
-    Entry.objects.filter(pub_date__day__gte=3)
+    Entry.objects.filter(publication_date__day=3)
+    Entry.objects.filter(publication_date__day__gte=3)
 
 SQL equivalent::
 
-    SELECT ... WHERE EXTRACT('day' FROM pub_date) = '3';
-    SELECT ... WHERE EXTRACT('day' FROM pub_date) >= '3';
+    SELECT ... WHERE EXTRACT('day' FROM publication_date) = '3';
+    SELECT ... WHERE EXTRACT('day' FROM publication_date) >= '3';
 
 (The exact SQL syntax varies for each database engine.)
 
-Note this will match any record with a pub_date on the third day of the month,
+Note this will match any record with a publication_date on the third day of the month,
 such as January 3, July 3, etc.
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
@@ -2752,8 +2752,8 @@ on a Monday and the first week starts on or before Thursday.
 
 Example::
 
-    Entry.objects.filter(pub_date__week=52)
-    Entry.objects.filter(pub_date__week__gte=32, pub_date__week__lte=38)
+    Entry.objects.filter(publication_date__week=52)
+    Entry.objects.filter(publication_date__week__gte=32, publication_date__week__lte=38)
 
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
@@ -2774,13 +2774,13 @@ Takes an integer value representing the day of week from 1 (Sunday) to 7
 
 Example::
 
-    Entry.objects.filter(pub_date__week_day=2)
-    Entry.objects.filter(pub_date__week_day__gte=2)
+    Entry.objects.filter(publication_date__week_day=2)
+    Entry.objects.filter(publication_date__week_day__gte=2)
 
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
 
-Note this will match any record with a ``pub_date`` that falls on a Monday (day
+Note this will match any record with a ``publication_date`` that falls on a Monday (day
 2 of the week), regardless of the month or year in which it occurs. Week days
 are indexed with day 1 being Sunday and day 7 being Saturday.
 
@@ -2800,8 +2800,8 @@ lookups. Takes a :class:`datetime.time` value.
 
 Example::
 
-    Entry.objects.filter(pub_date__time=datetime.time(14, 30))
-    Entry.objects.filter(pub_date__time__between=(datetime.time(8), datetime.time(17)))
+    Entry.objects.filter(publication_date__time=datetime.time(14, 30))
+    Entry.objects.filter(publication_date__time__between=(datetime.time(8), datetime.time(17)))
 
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
@@ -2894,11 +2894,11 @@ Takes either ``True`` or ``False``, which correspond to SQL queries of
 
 Example::
 
-    Entry.objects.filter(pub_date__isnull=True)
+    Entry.objects.filter(publication_date__isnull=True)
 
 SQL equivalent::
 
-    SELECT ... WHERE pub_date IS NULL;
+    SELECT ... WHERE publication_date IS NULL;
 
 .. fieldlookup:: regex
 

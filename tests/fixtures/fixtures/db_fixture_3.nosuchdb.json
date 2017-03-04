@@ -4,7 +4,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "There is no spoon.",
-            "pub_date": "2006-06-16 14:00:00"
+            "publication_date": "2006-06-16 14:00:00"
         }
     }
 ]

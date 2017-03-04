@@ -108,7 +108,7 @@ class Field(RegisterLookupMixin):
         'unique': _('%(model_name)s with this %(field_label)s '
                     'already exists.'),
         # Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-        # Eg: "Title must be unique for pub_date year"
+        # Eg: "Title must be unique for publication_date year"
         'unique_for_date': _("%(field_label)s must be unique for "
                              "%(date_field_label)s %(lookup_type)s."),
     }

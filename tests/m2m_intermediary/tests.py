@@ -11,7 +11,7 @@ class M2MIntermediaryTests(TestCase):
         r2 = Reporter.objects.create(first_name="Jane", last_name="Doe")
 
         a = Article.objects.create(
-            headline="This is a test", pub_date=datetime(2005, 7, 27)
+            headline="This is a test", publication_date=datetime(2005, 7, 27)
         )
 
         w1 = Writer.objects.create(reporter=r1, article=a, position="Main writer")
