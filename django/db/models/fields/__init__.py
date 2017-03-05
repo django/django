@@ -204,6 +204,7 @@ class Field(RegisterLookupMixin):
         errors.extend(self._check_db_index())
         errors.extend(self._check_null_allowed_for_primary_keys())
         errors.extend(self._check_backend_specific_checks(**kwargs))
+        errors.extend(self._check_validators())
         errors.extend(self._check_deprecation_details())
         return errors
 
@@ -301,6 +302,25 @@ class Field(RegisterLookupMixin):
             if router.allow_migrate(db, app_label, model_name=self.model._meta.model_name):
                 return connections[db].validation.check_field(self, **kwargs)
         return []
+
+    def _check_validators(self):
+        errors = []
+        for i, validator in enumerate(self.validators):
+            if not callable(validator):
+                errors.append(
+                    checks.Error(
+                        "All 'validators' must be callable.",
+                        hint=(
+                            "validators[{i}] ({repr}) isn't a function or "
+                            "instance of a validator class.".format(
+                                i=i, repr=repr(validator),
+                            )
+                        ),
+                        obj=self,
+                        id='fields.E008',
+                    )
+                )
+        return errors
 
     def _check_deprecation_details(self):
         if self.system_check_removed_details is not None:

@@ -102,7 +102,7 @@ class RelativeFieldTests(SimpleTestCase):
             m2m = models.ManyToManyField(
                 Model,
                 null=True,
-                validators=[''],
+                validators=[lambda x: x],
                 limit_choices_to={'name': 'test_name'},
                 through='ThroughModel',
                 through_fields=('modelm2m', 'model'),

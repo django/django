@@ -154,6 +154,7 @@ Model fields
   human readable name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
+* **fields.E008**: All ``validators`` must be callable.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values.
 * **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
