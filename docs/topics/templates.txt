@@ -415,6 +415,32 @@ adds defaults that differ from Jinja2's for a few options:
 
   It defaults to an empty list.
 
+  .. admonition:: Using context processors with Jinja2 templates is discouraged.
+
+    Context processors are useful with Django templates because Django templates
+    don't support calling functions with arguments. Since Jinja2 doesn't have
+    that limitation, it's recommended to put the function that you would use as a
+    context processor in the global variables available to the template using
+    ``jinja2.Environment`` as described below. You can then call that function in
+    the template:
+
+    .. code-block:: jinja
+
+      {{ function(request) }}
+
+    Some Django templates context processors return a fixed value. For Jinja2
+    templates, this layer of indirection isn't necessary since you can add
+    constants directly in ``jinja2.Environment``.
+
+    The original use case for adding context processors for Jinja2 involved:
+
+    * Making an expensive computation that depends on the request.
+    * Needing the result in every template.
+    * Using the result multiple times in each template.
+
+    Unless all of these conditions are met, passing a function to the template is
+    simpler and more in line with the design of Jinja2.
+
 .. versionadded:: 1.11
 
     The ``'context_processors'`` option was added.
