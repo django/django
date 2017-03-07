@@ -1677,12 +1677,10 @@ class Query:
         will be made automatically.
         """
         group_by = list(self.select)
-
         if self.annotation_select:
             for alias, annotation in self.annotation_select.items():
                 for col in annotation.get_group_by_cols():
                     group_by.append(col)
-
         self.group_by = tuple(group_by)
 
     def add_select_related(self, fields):
