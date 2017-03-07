@@ -45,9 +45,10 @@ class ContentTypesViewsTests(TestCase):
     def test_shortcut_with_absolute_url(self):
         "Can view a shortcut for an Author object that has a get_absolute_url method"
         for obj in Author.objects.all():
-            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
-            response = self.client.get(short_url)
-            self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(), target_status_code=404)
+            with self.subTest(obj=obj):
+                short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
+                response = self.client.get(short_url)
+                self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(), target_status_code=404)
 
     def test_shortcut_with_absolute_url_including_scheme(self):
         """
@@ -55,9 +56,10 @@ class ContentTypesViewsTests(TestCase):
         the tested URLs are: "http://...", "https://..." and "//..."
         """
         for obj in SchemeIncludedURL.objects.all():
-            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(SchemeIncludedURL).id, obj.pk)
-            response = self.client.get(short_url)
-            self.assertRedirects(response, obj.get_absolute_url(), fetch_redirect_response=False)
+            with self.subTest(obj=obj):
+                short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(SchemeIncludedURL).id, obj.pk)
+                response = self.client.get(short_url)
+                self.assertRedirects(response, obj.get_absolute_url(), fetch_redirect_response=False)
 
     def test_shortcut_no_absolute_url(self):
         """
@@ -65,9 +67,10 @@ class ContentTypesViewsTests(TestCase):
         404.
         """
         for obj in Article.objects.all():
-            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Article).id, obj.pk)
-            response = self.client.get(short_url)
-            self.assertEqual(response.status_code, 404)
+            with self.subTest(obj=obj):
+                short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Article).id, obj.pk)
+                response = self.client.get(short_url)
+                self.assertEqual(response.status_code, 404)
 
     def test_wrong_type_pk(self):
         short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, 'nobody/expects')

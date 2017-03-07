@@ -127,8 +127,9 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             'http://العربية.idn.icann.org/',
         )
         for url in urls:
-            # Valid IDN
-            self.assertEqual(url, f.clean(url))
+            with self.subTest(url=url):
+                # Valid IDN
+                self.assertEqual(url, f.clean(url))
 
     def test_urlfield_10(self):
         """URLField correctly validates IPv6 (#18779)."""
@@ -138,7 +139,8 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             'http://[a34:9238::]:8080/',
         )
         for url in urls:
-            self.assertEqual(url, f.clean(url))
+            with self.subTest(url=url):
+                self.assertEqual(url, f.clean(url))
 
     def test_urlfield_not_string(self):
         f = URLField(required=False)

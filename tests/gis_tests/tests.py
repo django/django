@@ -76,17 +76,19 @@ class TestPostGISVersionCheck(unittest.TestCase):
         ]
 
         for version in versions:
-            ops = FakePostGISOperations(version[0])
-            actual = ops.spatial_version
-            self.assertEqual(version[1:], actual)
+            with self.subTest(version=version):
+                ops = FakePostGISOperations(version[0])
+                actual = ops.spatial_version
+                self.assertEqual(version[1:], actual)
 
     def test_invalid_version_numbers(self):
         versions = ['nope', '123']
 
         for version in versions:
-            ops = FakePostGISOperations(version)
-            with self.assertRaises(Exception):
-                ops.spatial_version
+            with self.subTest(version=version):
+                ops = FakePostGISOperations(version)
+                with self.assertRaises(Exception):
+                    ops.spatial_version
 
     def test_no_version_number(self):
         ops = FakePostGISOperations()

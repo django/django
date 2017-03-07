@@ -47,32 +47,35 @@ class MultiDatabaseTests(TestCase):
     @mock.patch('django.contrib.admin.options.transaction')
     def test_add_view(self, mock):
         for db in connections:
-            Router.target_db = db
-            self.client.force_login(self.superusers[db])
-            self.client.post(
-                reverse('test_adminsite:admin_views_book_add'),
-                {'name': 'Foobar: 5th edition'},
-            )
-            mock.atomic.assert_called_with(using=db)
+            with self.subTest(db=db):
+                Router.target_db = db
+                self.client.force_login(self.superusers[db])
+                self.client.post(
+                    reverse('test_adminsite:admin_views_book_add'),
+                    {'name': 'Foobar: 5th edition'},
+                )
+                mock.atomic.assert_called_with(using=db)
 
     @mock.patch('django.contrib.admin.options.transaction')
     def test_change_view(self, mock):
         for db in connections:
-            Router.target_db = db
-            self.client.force_login(self.superusers[db])
-            self.client.post(
-                reverse('test_adminsite:admin_views_book_change', args=[self.test_book_ids[db]]),
-                {'name': 'Test Book 2: Test more'},
-            )
-            mock.atomic.assert_called_with(using=db)
+            with self.subTest(db=db):
+                Router.target_db = db
+                self.client.force_login(self.superusers[db])
+                self.client.post(
+                    reverse('test_adminsite:admin_views_book_change', args=[self.test_book_ids[db]]),
+                    {'name': 'Test Book 2: Test more'},
+                )
+                mock.atomic.assert_called_with(using=db)
 
     @mock.patch('django.contrib.admin.options.transaction')
     def test_delete_view(self, mock):
         for db in connections:
-            Router.target_db = db
-            self.client.force_login(self.superusers[db])
-            self.client.post(
-                reverse('test_adminsite:admin_views_book_delete', args=[self.test_book_ids[db]]),
-                {'post': 'yes'},
-            )
-            mock.atomic.assert_called_with(using=db)
+            with self.subTest(db=db):
+                Router.target_db = db
+                self.client.force_login(self.superusers[db])
+                self.client.post(
+                    reverse('test_adminsite:admin_views_book_delete', args=[self.test_book_ids[db]]),
+                    {'post': 'yes'},
+                )
+                mock.atomic.assert_called_with(using=db)

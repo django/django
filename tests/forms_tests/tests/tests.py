@@ -335,12 +335,12 @@ class EmptyLabelTestCase(TestCase):
         ]
 
         for form, key, expected in tests:
-            f = form({'name': 'some-key', key: ''})
-            self.assertTrue(f.is_valid())
-            m = f.save()
-            self.assertEqual(expected, getattr(m, key))
-            self.assertEqual('No Preference',
-                             getattr(m, 'get_{}_display'.format(key))())
+            with self.subTest(form=form):
+                f = form({'name': 'some-key', key: ''})
+                self.assertTrue(f.is_valid())
+                m = f.save()
+                self.assertEqual(expected, getattr(m, key))
+                self.assertEqual('No Preference', getattr(m, 'get_{}_display'.format(key))())
 
     def test_empty_field_integer(self):
         f = EmptyIntegerLabelChoiceForm()

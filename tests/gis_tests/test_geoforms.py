@@ -15,8 +15,9 @@ class GeometryFieldTest(SimpleTestCase):
         "Testing GeometryField initialization with defaults."
         fld = forms.GeometryField()
         for bad_default in ('blah', 3, 'FoO', None, 0):
-            with self.assertRaises(ValidationError):
-                fld.clean(bad_default)
+            with self.subTest(bad_default=bad_default):
+                with self.assertRaises(ValidationError):
+                    fld.clean(bad_default)
 
     def test_srid(self):
         "Testing GeometryField with a SRID set."
@@ -50,9 +51,10 @@ class GeometryFieldTest(SimpleTestCase):
         # By default, all geometry types are allowed.
         fld = forms.GeometryField()
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            # `to_python` uses the SRID of OpenLayersWidget if the converted
-            # value doesn't have an SRID itself.
-            self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.clean(wkt))
+            with self.subTest(wkt=wkt):
+                # to_python() uses the SRID of OpenLayersWidget if the
+                # converted value doesn't have an SRID.
+                self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.clean(wkt))
 
         pnt_fld = forms.GeometryField(geom_type='POINT')
         self.assertEqual(GEOSGeometry('POINT(5 23)', srid=pnt_fld.widget.map_srid), pnt_fld.clean('POINT(5 23)'))
@@ -73,11 +75,13 @@ class GeometryFieldTest(SimpleTestCase):
         fld = forms.GeometryField()
         # to_python returns the same GEOSGeometry for a WKT
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.to_python(wkt))
+            with self.subTest(wkt=wkt):
+                self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.to_python(wkt))
         # but raises a ValidationError for any other string
         for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
-            with self.assertRaises(forms.ValidationError):
-                fld.to_python(wkt)
+            with self.subTest(wkt=wkt):
+                with self.assertRaises(forms.ValidationError):
+                    fld.to_python(wkt)
 
     def test_field_with_text_widget(self):
         class PointForm(forms.Form):

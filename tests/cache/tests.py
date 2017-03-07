@@ -169,8 +169,9 @@ class DummyCacheTests(SimpleTestCase):
             'ascii2': {'x': 1}
         }
         for (key, value) in stuff.items():
-            cache.set(key, value)
-            self.assertIsNone(cache.get(key))
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertIsNone(cache.get(key))
 
     def test_set_many(self):
         "set_many does nothing for the dummy cache backend"
@@ -420,21 +421,24 @@ class BaseCacheTests:
         }
         # Test `set`
         for (key, value) in stuff.items():
-            cache.set(key, value)
-            self.assertEqual(cache.get(key), value)
+            with self.subTest(key=key):
+                cache.set(key, value)
+                self.assertEqual(cache.get(key), value)
 
         # Test `add`
         for (key, value) in stuff.items():
-            cache.delete(key)
-            cache.add(key, value)
-            self.assertEqual(cache.get(key), value)
+            with self.subTest(key=key):
+                cache.delete(key)
+                cache.add(key, value)
+                self.assertEqual(cache.get(key), value)
 
         # Test `set_many`
         for (key, value) in stuff.items():
             cache.delete(key)
         cache.set_many(stuff)
         for (key, value) in stuff.items():
-            self.assertEqual(cache.get(key), value)
+            with self.subTest(key=key):
+                self.assertEqual(cache.get(key), value)
 
     def test_binary_string(self):
         # Binary strings should be cacheable
@@ -1151,9 +1155,10 @@ class BaseMemcachedTests(BaseCacheTests):
             'server1.tld,server2:11211',
         ]
         for location in locations:
-            params = {'BACKEND': self.base_params['BACKEND'], 'LOCATION': location}
-            with self.settings(CACHES={'default': params}):
-                self.assertEqual(cache._servers, ['server1.tld', 'server2:11211'])
+            with self.subTest(location=location):
+                params = {'BACKEND': self.base_params['BACKEND'], 'LOCATION': location}
+                with self.settings(CACHES={'default': params}):
+                    self.assertEqual(cache._servers, ['server1.tld', 'server2:11211'])
 
     def test_invalid_key_characters(self):
         """
@@ -1250,7 +1255,8 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
         for cache_key in settings.CACHES:
-            self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
+            with self.subTest(cache_key=cache_key):
+                self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
 
     @override_settings(CACHES=caches_setting_for_tests(
         base=MemcachedCache_params,
@@ -1521,11 +1527,12 @@ class CacheUtils(SimpleTestCase):
             ('Cookie    ,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
         )
         for initial_vary, newheaders, resulting_vary in headers:
-            response = HttpResponse()
-            if initial_vary is not None:
-                response['Vary'] = initial_vary
-            patch_vary_headers(response, newheaders)
-            self.assertEqual(response['Vary'], resulting_vary)
+            with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
+                response = HttpResponse()
+                if initial_vary is not None:
+                    response['Vary'] = initial_vary
+                patch_vary_headers(response, newheaders)
+                self.assertEqual(response['Vary'], resulting_vary)
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
@@ -1605,12 +1612,13 @@ class CacheUtils(SimpleTestCase):
         cc_delim_re = re.compile(r'\s*,\s*')
 
         for initial_cc, newheaders, expected_cc in tests:
-            response = HttpResponse()
-            if initial_cc is not None:
-                response['Cache-Control'] = initial_cc
-            patch_cache_control(response, **newheaders)
-            parts = set(cc_delim_re.split(response['Cache-Control']))
-            self.assertEqual(parts, expected_cc)
+            with self.subTest(initial_cc=initial_cc, newheaders=newheaders):
+                response = HttpResponse()
+                if initial_cc is not None:
+                    response['Cache-Control'] = initial_cc
+                patch_cache_control(response, **newheaders)
+                parts = set(cc_delim_re.split(response['Cache-Control']))
+                self.assertEqual(parts, expected_cc)
 
 
 @override_settings(
@@ -2179,12 +2187,13 @@ class TestWithTemplateResponse(SimpleTestCase):
             ('Cookie    ,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
         )
         for initial_vary, newheaders, resulting_vary in headers:
-            template = engines['django'].from_string("This is a test")
-            response = TemplateResponse(HttpRequest(), template)
-            if initial_vary is not None:
-                response['Vary'] = initial_vary
-            patch_vary_headers(response, newheaders)
-            self.assertEqual(response['Vary'], resulting_vary)
+            with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
+                template = engines['django'].from_string("This is a test")
+                response = TemplateResponse(HttpRequest(), template)
+                if initial_vary is not None:
+                    response['Vary'] = initial_vary
+                patch_vary_headers(response, newheaders)
+                self.assertEqual(response['Vary'], resulting_vary)
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)

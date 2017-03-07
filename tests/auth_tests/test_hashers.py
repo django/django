@@ -300,13 +300,14 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_upgrade(self):
         self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
         for algo in ('sha1', 'md5'):
-            encoded = make_password('lètmein', hasher=algo)
-            state = {'upgraded': False}
+            with self.subTest(algo=algo):
+                encoded = make_password('lètmein', hasher=algo)
+                state = {'upgraded': False}
 
-            def setter(password):
-                state['upgraded'] = True
-            self.assertTrue(check_password('lètmein', encoded, setter))
-            self.assertTrue(state['upgraded'])
+                def setter(password):
+                    state['upgraded'] = True
+                self.assertTrue(check_password('lètmein', encoded, setter))
+                self.assertTrue(state['upgraded'])
 
     def test_no_upgrade(self):
         encoded = make_password('lètmein')
@@ -327,13 +328,14 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_no_upgrade_on_incorrect_pass(self):
         self.assertEqual('pbkdf2_sha256', get_hasher('default').algorithm)
         for algo in ('sha1', 'md5'):
-            encoded = make_password('lètmein', hasher=algo)
-            state = {'upgraded': False}
+            with self.subTest(algo=algo):
+                encoded = make_password('lètmein', hasher=algo)
+                state = {'upgraded': False}
 
-            def setter():
-                state['upgraded'] = True
-            self.assertFalse(check_password('WRONG', encoded, setter))
-            self.assertFalse(state['upgraded'])
+                def setter():
+                    state['upgraded'] = True
+                self.assertFalse(check_password('WRONG', encoded, setter))
+                self.assertFalse(state['upgraded'])
 
     def test_pbkdf2_upgrade(self):
         hasher = get_hasher('default')
