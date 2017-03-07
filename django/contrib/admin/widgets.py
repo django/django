@@ -303,6 +303,9 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def value_from_datadict(self, data, files, name):
         return self.widget.value_from_datadict(data, files, name)
 
+    def value_omitted_from_data(self, data, files, name):
+        return self.widget.value_omitted_from_data(data, files, name)
+
     def id_for_label(self, id_):
         return self.widget.id_for_label(id_)
 
