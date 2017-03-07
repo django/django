@@ -2,8 +2,8 @@ import datetime
 import decimal
 import hashlib
 import logging
-import traceback
 import re
+import traceback
 from time import time
 
 from django.conf import settings
