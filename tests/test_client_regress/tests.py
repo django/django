@@ -2,6 +2,7 @@
 Regression tests for the Test Client, especially the customized assertions.
 """
 import itertools
+import json
 import os
 
 from django.contrib.auth.models import User
@@ -1276,6 +1277,7 @@ class UnicodePayloadTests(SimpleTestCase):
         json_str = '{"english": "mountain pass"}'
         response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json")
         self.assertEqual(response.content, json_str.encode())
+        self.assertEqual(response.json(), json.loads(json_str))
 
     def test_unicode_payload_utf8(self):
         "A non-ASCII unicode data encoded as UTF-8 can be POSTed"
@@ -1283,6 +1285,7 @@ class UnicodePayloadTests(SimpleTestCase):
         json_str = '{"dog": "собака"}'
         response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=utf-8")
         self.assertEqual(response.content, json_str.encode())
+        self.assertEqual(response.json(), json.loads(json_str))
 
     def test_unicode_payload_utf16(self):
         "A non-ASCII unicode data encoded as UTF-16 can be POSTed"
@@ -1290,6 +1293,7 @@ class UnicodePayloadTests(SimpleTestCase):
         json_str = '{"dog": "собака"}'
         response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=utf-16")
         self.assertEqual(response.content, json_str.encode('utf-16'))
+        self.assertEqual(response.json(), json.loads(json_str))
 
     def test_unicode_payload_non_utf(self):
         "A non-ASCII unicode data as a non-UTF based encoding can be POSTed"
@@ -1297,6 +1301,7 @@ class UnicodePayloadTests(SimpleTestCase):
         json_str = '{"dog": "собака"}'
         response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=koi8-r")
         self.assertEqual(response.content, json_str.encode('koi8-r'))
+        self.assertEqual(response.json(), json.loads(json_str))
 
 
 class DummyFile:
