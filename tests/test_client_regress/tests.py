@@ -1286,30 +1286,30 @@ class UnicodePayloadTests(SimpleTestCase):
     def test_simple_unicode_payload(self):
         "A simple ASCII-only unicode JSON document can be POSTed"
         # Regression test for #10571
-        json = '{"english": "mountain pass"}'
-        response = self.client.post("/parse_unicode_json/", json, content_type="application/json")
-        self.assertEqual(response.content, json.encode())
+        json_str = '{"english": "mountain pass"}'
+        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json")
+        self.assertEqual(response.content, json_str.encode())
 
     def test_unicode_payload_utf8(self):
         "A non-ASCII unicode data encoded as UTF-8 can be POSTed"
         # Regression test for #10571
-        json = '{"dog": "собака"}'
-        response = self.client.post("/parse_unicode_json/", json, content_type="application/json; charset=utf-8")
-        self.assertEqual(response.content, json.encode('utf-8'))
+        json_str = '{"dog": "собака"}'
+        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=utf-8")
+        self.assertEqual(response.content, json_str.encode('utf-8'))
 
     def test_unicode_payload_utf16(self):
         "A non-ASCII unicode data encoded as UTF-16 can be POSTed"
         # Regression test for #10571
-        json = '{"dog": "собака"}'
-        response = self.client.post("/parse_unicode_json/", json, content_type="application/json; charset=utf-16")
-        self.assertEqual(response.content, json.encode('utf-16'))
+        json_str = '{"dog": "собака"}'
+        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=utf-16")
+        self.assertEqual(response.content, json_str.encode('utf-16'))
 
     def test_unicode_payload_non_utf(self):
         "A non-ASCII unicode data as a non-UTF based encoding can be POSTed"
         # Regression test for #10571
-        json = '{"dog": "собака"}'
-        response = self.client.post("/parse_unicode_json/", json, content_type="application/json; charset=koi8-r")
-        self.assertEqual(response.content, json.encode('koi8-r'))
+        json_str = '{"dog": "собака"}'
+        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=koi8-r")
+        self.assertEqual(response.content, json_str.encode('koi8-r'))
 
 
 class DummyFile(object):
