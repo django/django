@@ -9,7 +9,7 @@ Abstract
 ========
 
 This document proposes a standard interface between network protocol
-servers (particularly webservers) and Python applications, intended
+servers (particularly web servers) and Python applications, intended
 to allow handling of multiple common protocol styles (including HTTP, HTTP2,
 and WebSocket).
 
@@ -22,7 +22,7 @@ Rationale
 =========
 
 The WSGI specification has worked well since it was introduced, and
-allowed for great flexibility in Python framework and webserver choice.
+allowed for great flexibility in Python framework and web server choice.
 However, its design is irrevocably tied to the HTTP-style
 request/response cycle, and more and more protocols are becoming a
 standard part of web programming that do not follow this pattern
@@ -478,8 +478,9 @@ Message Formats
 
 These describe the standardized message formats for the protocols this
 specification supports. All messages are ``dicts`` at the top level,
-and all keys are required unless otherwise specified (with a default to
-use if the key is missing). Keys are unicode strings.
+and all keys are required unless explicitly marked as optional. If a key is
+marked optional, a default value is specified, which is to be assumed if
+the key is missing. Keys are unicode strings.
 
 The one common key across all protocols is ``reply_channel``, a way to indicate
 the client-specific channel to send responses to. Protocols are generally
@@ -557,10 +558,11 @@ Keys:
   is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional, defaults
   to ``""``.
 
-* ``headers``: A list of ``[name, value]`` pairs, where ``name`` is the
+* ``headers``: A list of ``[name, value]`` lists, where ``name`` is the
   byte string header name, and ``value`` is the byte string
-  header value. Order should be preserved from the original HTTP request;
-  duplicates are possible and must be preserved in the message as received.
+  header value. Order of header values must be preserved from the original HTTP
+  request; order of header names is not important. Duplicates are possible and
+  must be preserved in the message as received.
   Header names must be lowercased.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
@@ -622,9 +624,9 @@ Keys:
 
 * ``status``: Integer HTTP status code.
 
-* ``headers``: A list of ``[name, value]`` pairs, where ``name`` is the
+* ``headers``: A list of ``[name, value]`` lists, where ``name`` is the
   byte string header name, and ``value`` is the byte string
-  header value. Order should be preserved in the HTTP response. Header names
+  header value. Order must be preserved in the HTTP response. Header names
   must be lowercased.
 
 * ``content``: Byte string of HTTP body content.
