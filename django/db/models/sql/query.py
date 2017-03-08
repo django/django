@@ -6,7 +6,6 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
-import copy
 from collections import Counter, Iterator, Mapping, OrderedDict
 from itertools import chain, count, product
 from string import ascii_uppercase
@@ -145,21 +144,21 @@ class Query:
         # The select is used for cases where we want to set up the select
         # clause to contain other than default fields (values(), subqueries...)
         # Note that annotations go to annotations dictionary.
-        self.select = []
-        self.tables = []    # Aliases in the order they are created.
+        self.select = ()
+        self.tables = ()  # Aliases in the order they are created.
         self.where = where()
         self.where_class = where
         # The group_by attribute can have one of the following forms:
         #  - None: no group by at all in the query
-        #  - A list of expressions: group by (at least) those expressions.
+        #  - A tuple of expressions: group by (at least) those expressions.
         #    String refs are also allowed for now.
         #  - True: group by all select fields of the model
         # See compiler.get_group_by() for details.
         self.group_by = None
-        self.order_by = []
+        self.order_by = ()
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
-        self.distinct_fields = []
+        self.distinct_fields = ()
         self.select_for_update = False
         self.select_for_update_nowait = False
         self.select_for_update_skip_locked = False
@@ -170,7 +169,7 @@ class Query:
 
         # Holds the selects defined by a call to values() or values_list()
         # excluding annotation_select and extra_select.
-        self.values_select = []
+        self.values_select = ()
 
         # SQL annotation-related attributes
         # The _annotations will be an OrderedDict when used. Due to the cost
@@ -199,7 +198,7 @@ class Query:
         # A tuple that is a set of model field names and either True, if these
         # are the fields to defer, or False if these are the only fields to
         # load.
-        self.deferred_loading = (set(), True)
+        self.deferred_loading = (frozenset(), True)
 
         self.context = {}
 
@@ -271,25 +270,20 @@ class Query:
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
-        obj.select = self.select[:]
-        obj.tables = self.tables[:]
+        obj.select = self.select
+        obj.tables = self.tables
         obj.where = self.where.clone()
         obj.where_class = self.where_class
-        if self.group_by is None:
-            obj.group_by = None
-        elif self.group_by is True:
-            obj.group_by = True
-        else:
-            obj.group_by = self.group_by[:]
-        obj.order_by = self.order_by[:]
+        obj.group_by = self.group_by
+        obj.order_by = self.order_by
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
-        obj.distinct_fields = self.distinct_fields[:]
+        obj.distinct_fields = self.distinct_fields
         obj.select_for_update = self.select_for_update
         obj.select_for_update_nowait = self.select_for_update_nowait
         obj.select_for_update_skip_locked = self.select_for_update_skip_locked
         obj.select_related = self.select_related
-        obj.values_select = self.values_select[:]
+        obj.values_select = self.values_select
         obj._annotations = self._annotations.copy() if self._annotations is not None else None
         if self.annotation_select_mask is None:
             obj.annotation_select_mask = None
@@ -316,7 +310,7 @@ class Query:
             obj._extra_select_cache = self._extra_select_cache.copy()
         obj.extra_tables = self.extra_tables
         obj.extra_order_by = self.extra_order_by
-        obj.deferred_loading = copy.copy(self.deferred_loading[0]), self.deferred_loading[1]
+        obj.deferred_loading = self.deferred_loading
         if self.filter_is_sticky and self.used_aliases:
             obj.used_aliases = self.used_aliases.copy()
         else:
@@ -412,7 +406,7 @@ class Query:
         # done in a subquery so that we are aggregating on the limit and/or
         # distinct results instead of applying the distinct and limit after the
         # aggregation.
-        if (isinstance(self.group_by, list) or has_limit or has_existing_annotations or
+        if (isinstance(self.group_by, tuple) or has_limit or has_existing_annotations or
                 self.distinct):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
@@ -431,7 +425,7 @@ class Query:
                 # clearing the select clause can alter results if distinct is
                 # used.
                 if inner_query.default_cols and has_existing_annotations:
-                    inner_query.group_by = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
+                    inner_query.group_by = (self.model._meta.pk.get_col(inner_query.get_initial_alias()),)
                 inner_query.default_cols = False
 
             relabels = {t: 'subquery' for t in inner_query.tables}
@@ -446,11 +440,11 @@ class Query:
                     del inner_query.annotations[alias]
                 # Make sure the annotation_select wont use cached results.
                 inner_query.set_annotation_mask(inner_query.annotation_select_mask)
-            if inner_query.select == [] and not inner_query.default_cols and not inner_query.annotation_select_mask:
+            if inner_query.select == () and not inner_query.default_cols and not inner_query.annotation_select_mask:
                 # In case of Model.objects[0:3].count(), there would be no
                 # field selected in the inner query, yet we must use a subquery.
                 # So, make sure at least one field is selected.
-                inner_query.select = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
+                inner_query.select = (self.model._meta.pk.get_col(inner_query.get_initial_alias()),)
             try:
                 outer_query.add_subquery(inner_query, using)
             except EmptyResultSet:
@@ -460,7 +454,7 @@ class Query:
                 }
         else:
             outer_query = self
-            self.select = []
+            self.select = ()
             self.default_cols = False
             self._extra = {}
 
@@ -582,9 +576,10 @@ class Query:
         self.where.add(w, connector)
 
         # Selection columns and extra extensions are those provided by 'rhs'.
-        self.select = []
-        for col in rhs.select:
-            self.add_select(col.relabeled_clone(change_map))
+        if rhs.select:
+            self.set_select([col.relabeled_clone(change_map) for col in rhs.select])
+        else:
+            self.select = ()
 
         if connector == OR:
             # It would be nice to be able to handle this, but the queries don't
@@ -604,7 +599,7 @@ class Query:
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
-        self.order_by = rhs.order_by[:] if rhs.order_by else self.order_by
+        self.order_by = rhs.order_by if rhs.order_by else self.order_by
         self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
     def deferred_to_data(self, target, callback):
@@ -716,7 +711,7 @@ class Query:
             alias = table_name
             self.table_map[alias] = [alias]
         self.alias_refcount[alias] = 1
-        self.tables.append(alias)
+        self.tables += (alias,)
         return alias, True
 
     def ref_alias(self, alias):
@@ -800,9 +795,9 @@ class Query:
         # 1. Update references in "select" (normal columns plus aliases),
         # "group by" and "where".
         self.where.relabel_aliases(change_map)
-        if isinstance(self.group_by, list):
-            self.group_by = [col.relabeled_clone(change_map) for col in self.group_by]
-        self.select = [col.relabeled_clone(change_map) for col in self.select]
+        if isinstance(self.group_by, tuple):
+            self.group_by = tuple([col.relabeled_clone(change_map) for col in self.group_by])
+        self.select = tuple([col.relabeled_clone(change_map) for col in self.select])
         if self._annotations:
             self._annotations = OrderedDict(
                 (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
@@ -866,10 +861,12 @@ class Query:
         self.subq_aliases = self.subq_aliases.union([self.alias_prefix])
         outer_query.subq_aliases = outer_query.subq_aliases.union(self.subq_aliases)
         change_map = OrderedDict()
-        for pos, alias in enumerate(self.tables):
+        tables = list(self.tables)
+        for pos, alias in enumerate(tables):
             new_alias = '%s%d' % (self.alias_prefix, pos)
             change_map[alias] = new_alias
-            self.tables[pos] = new_alias
+            tables[pos] = new_alias
+        self.tables = tuple(tables)
         self.change_aliases(change_map)
 
     def get_initial_alias(self):
@@ -1577,7 +1574,7 @@ class Query:
 
     def clear_select_clause(self):
         """Remove all fields from SELECT clause."""
-        self.select = []
+        self.select = ()
         self.default_cols = False
         self.select_related = False
         self.set_extra_mask(())
@@ -1589,16 +1586,12 @@ class Query:
         Some queryset types completely replace any existing list of select
         columns.
         """
-        self.select = []
-        self.values_select = []
-
-    def add_select(self, col):
-        self.default_cols = False
-        self.select.append(col)
+        self.select = ()
+        self.values_select = ()
 
     def set_select(self, cols):
         self.default_cols = False
-        self.select = cols
+        self.select = tuple(cols)
 
     def add_distinct_fields(self, *field_names):
         """
@@ -1616,6 +1609,7 @@ class Query:
         opts = self.get_meta()
 
         try:
+            cols = []
             for name in field_names:
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
@@ -1623,7 +1617,9 @@ class Query:
                     name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
-                    self.add_select(target.get_col(final_alias))
+                    cols.append(target.get_col(final_alias))
+            if cols:
+                self.set_select(cols)
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
@@ -1657,7 +1653,7 @@ class Query:
         if errors:
             raise FieldError('Invalid order_by arguments: %s' % errors)
         if ordering:
-            self.order_by.extend(ordering)
+            self.order_by += ordering
         else:
             self.default_ordering = False
 
@@ -1666,7 +1662,7 @@ class Query:
         Remove any ordering settings. If 'force_empty' is True, there will be
         no ordering in the resulting query (not even the model's default).
         """
-        self.order_by = []
+        self.order_by = ()
         self.extra_order_by = ()
         if force_empty:
             self.default_ordering = False
@@ -1680,15 +1676,12 @@ class Query:
         primary key, and the query would be equivalent, the optimization
         will be made automatically.
         """
-        self.group_by = []
-
-        for col in self.select:
-            self.group_by.append(col)
-
+        group_by = list(self.select)
         if self.annotation_select:
             for alias, annotation in self.annotation_select.items():
                 for col in annotation.get_group_by_cols():
-                    self.group_by.append(col)
+                    group_by.append(col)
+        self.group_by = tuple(group_by)
 
     def add_select_related(self, fields):
         """
@@ -1741,7 +1734,7 @@ class Query:
 
     def clear_deferred_loading(self):
         """Remove any fields from the deferred loading set."""
-        self.deferred_loading = (set(), True)
+        self.deferred_loading = (frozenset(), True)
 
     def add_deferred_loading(self, field_names):
         """
@@ -1785,7 +1778,7 @@ class Query:
             self.deferred_loading = field_names.difference(existing), False
         else:
             # Replace any existing "immediate load" field names.
-            self.deferred_loading = field_names, False
+            self.deferred_loading = frozenset(field_names), False
 
     def get_loaded_field_names(self):
         """
@@ -1865,7 +1858,7 @@ class Query:
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
 
-        self.values_select = field_names
+        self.values_select = tuple(field_names)
         self.add_fields(field_names, True)
 
     @property

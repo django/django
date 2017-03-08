@@ -19,7 +19,7 @@ class DeleteQuery(Query):
     compiler = 'SQLDeleteCompiler'
 
     def do_query(self, table, where, using):
-        self.tables = [table]
+        self.tables = (table,)
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
@@ -52,8 +52,7 @@ class DeleteQuery(Query):
         innerq.get_initial_alias()
         # The same for our new query.
         self.get_initial_alias()
-        innerq_used_tables = [t for t in innerq.tables
-                              if innerq.alias_refcount[t]]
+        innerq_used_tables = tuple([t for t in innerq.tables if innerq.alias_refcount[t]])
         if not innerq_used_tables or innerq_used_tables == self.tables:
             # There is only the base table in use in the query.
             self.where = innerq.where
