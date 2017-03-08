@@ -406,6 +406,14 @@ model, but you'll be able to customize it in the future if the need arises::
 Don't forget to point :setting:`AUTH_USER_MODEL` to it. Do this before creating
 any migrations or running ``manage.py migrate`` for the first time.
 
+Also, register the model in the app's ``admin.py``::
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from .models import User
+
+    admin.site.register(User, UserAdmin)
+
 Changing to a custom user model mid-project
 -------------------------------------------
 
