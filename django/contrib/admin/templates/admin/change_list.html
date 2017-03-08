@@ -60,6 +60,12 @@
         {{ cl.formset.non_form_errors }}
     {% endif %}
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+      {% if cl.has_filters or cl.search_fields %}
+      <div class="clear-search-and-filter">
+        <a href="?{% if cl.is_popup %}_popup=1{% endif %}" class="button">{% trans 'Clear' %}</a>
+      </div>
+      {% endif %}
+      
       {% block search %}{% search_form cl %}{% endblock %}
       {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 

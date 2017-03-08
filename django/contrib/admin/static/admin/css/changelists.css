@@ -44,6 +44,17 @@
     overflow: hidden;
 }
 
+#changelist .clear-search-and-filter{
+    overflow: hidden;
+    margin-bottom: -34px;
+}
+
+#changelist .clear-search-and-filter a{
+    float: right;
+    margin-right: 290px;
+}
+
+
 /* CHANGELIST TABLES */
 
 #changelist table thead th {
