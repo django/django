@@ -409,6 +409,7 @@ class PasswordResetDoneView(PasswordContextMixin, TemplateView):
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
+    post_reset_login_backend = None
     success_url = reverse_lazy('password_reset_complete')
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
@@ -461,7 +462,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         user = form.save()
         del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
         if self.post_reset_login:
-            auth_login(self.request, user)
+            auth_login(self.request, user, self.post_reset_login_backend)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):

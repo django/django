@@ -8,7 +8,9 @@ from urllib.parse import ParseResult, quote, urlparse
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
-from django.contrib.auth import REDIRECT_FIELD_NAME, SESSION_KEY
+from django.contrib.auth import (
+    BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
+)
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
@@ -326,6 +328,22 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
         self.assertRedirects(response, '/reset/done/', fetch_redirect_response=False)
         self.assertIn(SESSION_KEY, self.client.session)
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            'django.contrib.auth.backends.ModelBackend',
+            'django.contrib.auth.backends.AllowAllUsersModelBackend',
+        ]
+    )
+    def test_confirm_login_post_reset_custom_backend(self):
+        # This backend is specified in the url().
+        backend = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
+        url, path = self._test_confirm_start()
+        path = path.replace('/reset/', '/reset/post_reset_login_custom_backend/')
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
+        self.assertRedirects(response, '/reset/done/', fetch_redirect_response=False)
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(self.client.session[BACKEND_SESSION_KEY], backend)
 
     def test_confirm_login_post_reset_already_logged_in(self):
         url, path = self._test_confirm_start()

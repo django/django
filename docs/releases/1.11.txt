@@ -118,6 +118,8 @@ Minor features
 * The new ``post_reset_login`` attribute for
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
   automatically logging in a user after a successful password reset.
+  If you have multiple ``AUTHENTICATION_BACKENDS`` configured, use the
+  ``post_reset_login_backend`` attribute to choose which one to use.
 
 * To avoid the possibility of leaking a password reset token via the HTTP
   Referer header (for example, if the reset page includes a reference to CSS or
