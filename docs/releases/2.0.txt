@@ -187,6 +187,9 @@ Management Commands
 
 * :djadmin:`loaddata` can now :ref:`read from stdin <loading-fixtures-stdin>`.
 
+* The new :option:`diffsettings --output` option allows formatting the output
+  in a unified diff format.
+
 Migrations
 ~~~~~~~~~~
 

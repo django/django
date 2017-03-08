@@ -2120,6 +2120,32 @@ class DiffSettings(AdminScriptTestCase):
         self.assertNotInOutput(out, "FOO")
         self.assertOutput(out, "BAR = 'bar2'")
 
+    def test_unified(self):
+        """--output=unified emits settings diff in unified mode."""
+        self.write_settings('settings_to_diff.py', sdict={'FOO': '"bar"'})
+        self.addCleanup(self.remove_settings, 'settings_to_diff.py')
+        args = ['diffsettings', '--settings=settings_to_diff', '--output=unified']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "+ FOO = 'bar'")
+        self.assertOutput(out, "- SECRET_KEY = ''")
+        self.assertOutput(out, "+ SECRET_KEY = 'django_tests_secret_key'")
+        self.assertNotInOutput(out, "  APPEND_SLASH = True")
+
+    def test_unified_all(self):
+        """
+        --output=unified --all emits settings diff in unified mode and includes
+        settings with the default value.
+        """
+        self.write_settings('settings_to_diff.py', sdict={'FOO': '"bar"'})
+        self.addCleanup(self.remove_settings, 'settings_to_diff.py')
+        args = ['diffsettings', '--settings=settings_to_diff', '--output=unified', '--all']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "  APPEND_SLASH = True")
+        self.assertOutput(out, "+ FOO = 'bar'")
+        self.assertOutput(out, "- SECRET_KEY = ''")
+
 
 class Dumpdata(AdminScriptTestCase):
     """Tests for dumpdata management command."""

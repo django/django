@@ -240,6 +240,16 @@ are prefixed by ``"###"``.
 The settings module to compare the current settings against. Leave empty to
 compare against Django's default settings.
 
+.. django-admin-option:: --output {hash,unified}
+
+.. versionadded:: 2.0
+
+Specifies the output format. Available values are ``hash`` and ``unified``.
+``hash`` is the default mode that displays the output that's described above.
+``unified`` displays the output similar to ``diff -u``. Default settings are
+prefixed with a minus sign, followed by the changed setting prefixed with a
+plus sign.
+
 ``dumpdata``
 ------------
 
