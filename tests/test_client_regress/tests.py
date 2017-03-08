@@ -1268,35 +1268,32 @@ class QueryStringTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
-class UnicodePayloadTests(SimpleTestCase):
+class PayloadEncodingTests(SimpleTestCase):
+    """Regression tests for #10571."""
 
-    def test_simple_unicode_payload(self):
-        "A simple ASCII-only JSON document can be POSTed"
-        # Regression test for #10571
-        json_str = '{"english": "mountain pass"}'
-        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json")
-        self.assertEqual(response.content, json_str.encode())
+    def test_simple_payload(self):
+        """A simple ASCII-only text can be POSTed."""
+        text = 'English: mountain pass'
+        response = self.client.post('/parse_encoded_text/', text, content_type='text/plain')
+        self.assertEqual(response.content, text.encode())
 
-    def test_unicode_payload_utf8(self):
-        "A non-ASCII unicode data encoded as UTF-8 can be POSTed"
-        # Regression test for #10571
-        json_str = '{"dog": "собака"}'
-        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=utf-8")
-        self.assertEqual(response.content, json_str.encode())
+    def test_utf8_payload(self):
+        """Non-ASCII data encoded as UTF-8 can be POSTed."""
+        text = 'dog: собака'
+        response = self.client.post('/parse_encoded_text/', text, content_type='text/plain; charset=utf-8')
+        self.assertEqual(response.content, text.encode())
 
-    def test_unicode_payload_utf16(self):
-        "A non-ASCII unicode data encoded as UTF-16 can be POSTed"
-        # Regression test for #10571
-        json_str = '{"dog": "собака"}'
-        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=utf-16")
-        self.assertEqual(response.content, json_str.encode('utf-16'))
+    def test_utf16_payload(self):
+        """Non-ASCII data encoded as UTF-16 can be POSTed."""
+        text = 'dog: собака'
+        response = self.client.post('/parse_encoded_text/', text, content_type='text/plain; charset=utf-16')
+        self.assertEqual(response.content, text.encode('utf-16'))
 
-    def test_unicode_payload_non_utf(self):
-        "A non-ASCII unicode data as a non-UTF based encoding can be POSTed"
-        # Regression test for #10571
-        json_str = '{"dog": "собака"}'
-        response = self.client.post("/parse_unicode_json/", json_str, content_type="application/json; charset=koi8-r")
-        self.assertEqual(response.content, json_str.encode('koi8-r'))
+    def test_non_utf_payload(self):
+        """Non-ASCII data as a non-UTF based encoding can be POSTed."""
+        text = 'dog: собака'
+        response = self.client.post('/parse_encoded_text/', text, content_type='text/plain; charset=koi8-r')
+        self.assertEqual(response.content, text.encode('koi8-r'))
 
 
 class DummyFile:
