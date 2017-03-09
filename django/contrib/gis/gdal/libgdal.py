@@ -23,7 +23,7 @@ if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT shared libraries
-    lib_names = ['gdal111', 'gdal110', 'gdal19', 'gdal18', 'gdal17']
+    lib_names = [str('gdal111'), str('gdal110'), str('gdal19'), str('gdal18'), str('gdal17')]
 elif os.name == 'posix':
     # *NIX library names.
     lib_names = ['gdal', 'GDAL', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0', 'gdal1.8.0', 'gdal1.7.0']
