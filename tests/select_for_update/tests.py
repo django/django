@@ -5,7 +5,8 @@ from unittest import mock
 from multiple_database.routers import TestRouter
 
 from django.db import (
-    DatabaseError, connection, connections, router, transaction,
+    DatabaseError, NotSupportedError, connection, connections, router,
+    transaction,
 )
 from django.test import (
     TransactionTestCase, override_settings, skipIfDBFeature,
@@ -178,6 +179,20 @@ class SelectForUpdateTests(TransactionTestCase):
         people = Person.objects.all().select_for_update()
         with self.assertRaises(transaction.TransactionManagementError):
             list(people)
+
+    @skipUnlessDBFeature('supports_select_for_update_with_limit')
+    def test_select_for_update_with_limit(self):
+        other = Person.objects.create(name='Grappeli')
+        with transaction.atomic():
+            qs = list(Person.objects.all().order_by('pk').select_for_update()[1:2])
+            self.assertEqual(qs[0], other)
+
+    @skipIfDBFeature('supports_select_for_update_with_limit')
+    def test_unsupported_select_for_update_with_limit(self):
+        msg = 'LIMIT/OFFSET not supported with select_for_update on this database backend.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic():
+                list(Person.objects.all().order_by('pk').select_for_update()[1:2])
 
     def run_select_for_update(self, status, **kwargs):
         """

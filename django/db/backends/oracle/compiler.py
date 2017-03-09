@@ -1,3 +1,4 @@
+from django.db import NotSupportedError
 from django.db.models.sql import compiler
 
 
@@ -17,6 +18,11 @@ class SQLCompiler(compiler.SQLCompiler):
         do_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
         if not do_offset:
             sql, params = super().as_sql(with_limits=False, with_col_aliases=with_col_aliases)
+        elif not self.connection.features.supports_select_for_update_with_limit and self.query.select_for_update:
+            raise NotSupportedError(
+                'LIMIT/OFFSET not supported with select_for_update on this '
+                'database backend.'
+            )
         else:
             sql, params = super().as_sql(with_limits=False, with_col_aliases=True)
             # Wrap the base query in an outer SELECT * with boundaries on
