@@ -3216,13 +3216,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         for error in control:
             self.assertInHTML(error, errors)
 
-        errors = json.loads(form.errors.as_json())
+        errors = form.errors.get_json_data()
         control = {
             'foo': [{'code': 'required', 'message': 'This field is required.'}],
             'bar': [{'code': 'required', 'message': 'This field is required.'}],
             '__all__': [{'code': 'secret', 'message': 'Non-field error.'}]
         }
         self.assertEqual(errors, control)
+        self.assertEqual(json.dumps(errors), form.errors.as_json())
 
     def test_error_dict_as_json_escape_html(self):
         """#21962 - adding html escape flag to ErrorDict"""
@@ -3247,8 +3248,13 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         errors = json.loads(form.errors.as_json())
         self.assertEqual(errors, control)
 
+        escaped_error = '&lt;p&gt;Non-field error.&lt;/p&gt;'
+        self.assertEqual(
+            form.errors.get_json_data(escape_html=True)['__all__'][0]['message'],
+            escaped_error
+        )
         errors = json.loads(form.errors.as_json(escape_html=True))
-        control['__all__'][0]['message'] = '&lt;p&gt;Non-field error.&lt;/p&gt;'
+        control['__all__'][0]['message'] = escaped_error
         self.assertEqual(errors, control)
 
     def test_error_list(self):
@@ -3270,10 +3276,12 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<ul class="errorlist"><li>Foo</li><li>Foobar</li></ul>'
         )
 
+        errors = e.get_json_data()
         self.assertEqual(
-            json.loads(e.as_json()),
+            errors,
             [{"message": "Foo", "code": ""}, {"message": "Foobar", "code": "foobar"}]
         )
+        self.assertEqual(json.dumps(errors), e.as_json())
 
     def test_error_list_class_not_specified(self):
         e = ErrorList()

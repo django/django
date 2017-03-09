@@ -166,6 +166,10 @@ Forms
   HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
   subwidgets.
 
+* The new :meth:`Form.errors.get_json_data()
+  <django.forms.Form.errors.get_json_data>` method returns form errors as
+  a dictionary suitable for including in a JSON response.
+
 Generic Views
 ~~~~~~~~~~~~~
 

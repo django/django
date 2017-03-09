@@ -165,6 +165,17 @@ If for some reason you don't want to use client-side escaping, you can also
 set ``escape_html=True`` and error messages will be escaped so you can use them
 directly in HTML.
 
+.. method:: Form.errors.get_json_data(escape_html=False)
+
+.. versionadded:: 2.0
+
+Returns the errors as a dictionary suitable for serializing to JSON.
+:meth:`Form.errors.as_json()` returns serialized JSON, while this returns the
+error data before it's serialized.
+
+The ``escape_html`` parameter behaves as described in
+:meth:`Form.errors.as_json()`.
+
 .. method:: Form.add_error(field, error)
 
 This method allows adding errors to specific fields from within the
