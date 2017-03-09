@@ -5,6 +5,7 @@ be executed through ``django-admin`` or ``manage.py``).
 import os
 import sys
 from argparse import ArgumentParser
+from contextlib import suppress
 from io import TextIOBase
 
 import django
@@ -297,12 +298,10 @@ class BaseCommand:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
-            try:
+            # Ignore if connections aren't setup at this point (e.g. no
+            # configured settings).
+            with suppress(ImproperlyConfigured):
                 connections.close_all()
-            except ImproperlyConfigured:
-                # Ignore if connections aren't setup at this point (e.g. no
-                # configured settings).
-                pass
 
     def execute(self, *args, **options):
         """

@@ -1,8 +1,7 @@
 "Thread-safe in-memory cache backend."
-
 import pickle
 import time
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.synch import RWLock
@@ -51,11 +50,9 @@ class LocMemCache(BaseCache):
                 return default
 
         with (self._lock.writer() if acquire_lock else dummy()):
-            try:
+            with suppress(KeyError):
                 del self._cache[key]
                 del self._expire_info[key]
-            except KeyError:
-                pass
             return default
 
     def _set(self, key, value, timeout=DEFAULT_TIMEOUT):
@@ -90,11 +87,9 @@ class LocMemCache(BaseCache):
                 return True
 
         with self._lock.writer():
-            try:
+            with suppress(KeyError):
                 del self._cache[key]
                 del self._expire_info[key]
-            except KeyError:
-                pass
             return False
 
     def _has_expired(self, key):
@@ -112,14 +107,11 @@ class LocMemCache(BaseCache):
                 self._delete(k)
 
     def _delete(self, key):
-        try:
+        with suppress(KeyError):
             del self._cache[key]
-        except KeyError:
-            pass
-        try:
+
+        with suppress(KeyError):
             del self._expire_info[key]
-        except KeyError:
-            pass
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)

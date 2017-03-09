@@ -8,6 +8,7 @@ import socket
 import sys
 import tempfile
 import threading
+from contextlib import suppress
 from email import message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
@@ -1123,12 +1124,10 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 class FakeSMTPChannel(smtpd.SMTPChannel):
 
     def collect_incoming_data(self, data):
-        try:
+        # Ignore decode error in SSL/TLS connection tests as the test only
+        # cares whether the connection attempt was made.
+        with suppress(UnicodeDecodeError):
             smtpd.SMTPChannel.collect_incoming_data(self, data)
-        except UnicodeDecodeError:
-            # ignore decode error in SSL/TLS connection tests as we only care
-            # whether the connection attempt was made
-            pass
 
     def smtp_AUTH(self, arg):
         if arg == 'CRAM-MD5':

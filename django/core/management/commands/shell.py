@@ -1,6 +1,7 @@
 import os
 import select
 import sys
+from contextlib import suppress
 
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
@@ -68,11 +69,9 @@ class Command(BaseCommand):
                     continue
                 if not os.path.isfile(pythonrc):
                     continue
-                try:
+                with suppress(NameError):
                     with open(pythonrc) as handle:
                         exec(compile(handle.read(), pythonrc, 'exec'), imported_objects)
-                except NameError:
-                    pass
         code.interact(local=imported_objects)
 
     def handle(self, **options):
@@ -90,8 +89,6 @@ class Command(BaseCommand):
         available_shells = [options['interface']] if options['interface'] else self.shells
 
         for shell in available_shells:
-            try:
+            with suppress(ImportError):
                 return getattr(self, shell)(options)
-            except ImportError:
-                pass
         raise CommandError("Couldn't import {} interface.".format(shell))

@@ -1,3 +1,4 @@
+from contextlib import suppress
 from functools import update_wrapper
 from weakref import WeakSet
 
@@ -427,15 +428,11 @@ class AdminSite:
                 'perms': perms,
             }
             if perms.get('change'):
-                try:
+                with suppress(NoReverseMatch):
                     model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
-                except NoReverseMatch:
-                    pass
             if perms.get('add'):
-                try:
+                with suppress(NoReverseMatch):
                     model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
-                except NoReverseMatch:
-                    pass
 
             if app_label in app_dict:
                 app_dict[app_label]['models'].append(model_dict)

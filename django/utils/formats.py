@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import unicodedata
+from contextlib import suppress
 from importlib import import_module
 
 from django.conf import settings
@@ -79,10 +80,8 @@ def iter_format_modules(lang, format_module_path=None):
         locales.append(locale.split('_')[0])
     for location in format_locations:
         for loc in locales:
-            try:
+            with suppress(ImportError):
                 yield import_module('%s.formats' % (location % loc))
-            except ImportError:
-                pass
 
 
 def get_format_modules(lang=None, reverse=False):
@@ -110,10 +109,8 @@ def get_format(format_type, lang=None, use_l10n=None):
     if use_l10n and lang is None:
         lang = get_language()
     cache_key = (format_type, lang)
-    try:
+    with suppress(KeyError):
         return _format_cache[cache_key]
-    except KeyError:
-        pass
 
     # The requested format_type has not been cached yet. Try to find it in any
     # of the format_modules for the given lang if l10n is enabled. If it's not
@@ -121,12 +118,9 @@ def get_format(format_type, lang=None, use_l10n=None):
     val = None
     if use_l10n:
         for module in get_format_modules(lang):
-            try:
-                val = getattr(module, format_type)
-                if val is not None:
-                    break
-            except AttributeError:
-                pass
+            val = getattr(module, format_type, None)
+            if val is not None:
+                break
     if val is None:
         if format_type not in FORMAT_SETTINGS:
             return format_type

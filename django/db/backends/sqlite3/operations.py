@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from contextlib import suppress
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -33,7 +34,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
         if isinstance(expression, bad_aggregates):
             for expr in expression.get_source_expressions():
-                try:
+                # Not every subexpression has an output_field which is fine
+                # to ignore.
+                with suppress(FieldError):
                     output_field = expr.output_field
                     if isinstance(output_field, bad_fields):
                         raise NotImplementedError(
@@ -41,10 +44,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
-                except FieldError:
-                    # Not every subexpression has an output_field which is fine
-                    # to ignore.
-                    pass
 
     def date_extract_sql(self, lookup_type, field_name):
         """

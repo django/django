@@ -1,4 +1,5 @@
 from collections import defaultdict
+from contextlib import suppress
 
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
@@ -237,10 +238,8 @@ class GenericForeignKey:
 
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
-            try:
+            with suppress(ObjectDoesNotExist):
                 rel_obj = ct.get_object_for_this_type(pk=pk_val)
-            except ObjectDoesNotExist:
-                pass
         setattr(instance, self.cache_attr, rel_obj)
         return rel_obj
 

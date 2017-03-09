@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from contextlib import suppress
 from decimal import Decimal
 
 from django.core import exceptions, serializers
@@ -11,11 +12,9 @@ from django.utils.html import escape
 from . import PostgreSQLTestCase
 from .models import JSONModel
 
-try:
+with suppress(ImportError):
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import JSONField
-except ImportError:
-    pass
 
 
 @skipUnlessDBFeature('has_jsonb_datatype')

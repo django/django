@@ -7,6 +7,7 @@ import random
 import tempfile
 import time
 import zlib
+from contextlib import suppress
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files.move import file_move_safe
@@ -29,12 +30,10 @@ class FileBasedCache(BaseCache):
 
     def get(self, key, default=None, version=None):
         fname = self._key_to_file(key, version)
-        try:
+        with suppress(FileNotFoundError):
             with open(fname, 'rb') as f:
                 if not self._is_expired(f):
                     return pickle.loads(zlib.decompress(f.read()))
-        except FileNotFoundError:
-            pass
         return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
@@ -60,11 +59,9 @@ class FileBasedCache(BaseCache):
     def _delete(self, fname):
         if not fname.startswith(self._dir) or not os.path.exists(fname):
             return
-        try:
-            os.remove(fname)
-        except FileNotFoundError:
+        with suppress(FileNotFoundError):
             # The file may have been removed by another process.
-            pass
+            os.remove(fname)
 
     def has_key(self, key, version=None):
         fname = self._key_to_file(key, version)
@@ -93,10 +90,8 @@ class FileBasedCache(BaseCache):
 
     def _createdir(self):
         if not os.path.exists(self._dir):
-            try:
+            with suppress(FileExistsError):
                 os.makedirs(self._dir, 0o700)
-            except FileExistsError:
-                pass
 
     def _key_to_file(self, key, version=None):
         """

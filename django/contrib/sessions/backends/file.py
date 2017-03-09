@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import tempfile
+from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
@@ -155,7 +156,7 @@ class SessionStore(SessionBase):
         # See ticket #8616.
         dir, prefix = os.path.split(session_file_name)
 
-        try:
+        with suppress(OSError, IOError, EOFError):
             output_file_fd, output_file_name = tempfile.mkstemp(dir=dir, prefix=prefix + '_out_')
             renamed = False
             try:
@@ -173,9 +174,6 @@ class SessionStore(SessionBase):
                 if not renamed:
                     os.unlink(output_file_name)
 
-        except (OSError, IOError, EOFError):
-            pass
-
     def exists(self, session_key):
         return os.path.exists(self._key_to_file(session_key))
 
@@ -184,10 +182,8 @@ class SessionStore(SessionBase):
             if self.session_key is None:
                 return
             session_key = self.session_key
-        try:
+        with suppress(OSError):
             os.unlink(self._key_to_file(session_key))
-        except OSError:
-            pass
 
     def clean(self):
         pass

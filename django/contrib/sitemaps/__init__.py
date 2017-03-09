@@ -1,3 +1,4 @@
+from contextlib import suppress
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
@@ -36,11 +37,9 @@ def _get_sitemap_full_url(sitemap_url):
             # First, try to get the "index" sitemap URL.
             sitemap_url = reverse('django.contrib.sitemaps.views.index')
         except NoReverseMatch:
-            try:
+            with suppress(NoReverseMatch):
                 # Next, try for the "global" sitemap URL.
                 sitemap_url = reverse('django.contrib.sitemaps.views.sitemap')
-            except NoReverseMatch:
-                pass
 
     if sitemap_url is None:
         raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
@@ -89,10 +88,8 @@ class Sitemap:
         if site is None:
             if django_apps.is_installed('django.contrib.sites'):
                 Site = django_apps.get_model('sites.Site')
-                try:
+                with suppress(Site.DoesNotExist):
                     site = Site.objects.get_current()
-                except Site.DoesNotExist:
-                    pass
             if site is None:
                 raise ImproperlyConfigured(
                     "To use sitemaps, either enable the sites framework or pass "

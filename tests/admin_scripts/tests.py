@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import suppress
 from io import StringIO
 from unittest import mock
 
@@ -95,12 +96,10 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Also try to remove the compiled file; if it exists, it could
         # mess up later tests that depend upon the .py file not existing
-        try:
+        with suppress(OSError):
             if sys.platform.startswith('java'):
                 # Jython produces module$py.class files
                 os.remove(re.sub(r'\.py$', '$py.class', full_name))
-        except OSError:
-            pass
         # Also remove a __pycache__ directory, if it exists
         cache_name = os.path.join(self.test_dir, '__pycache__')
         if os.path.isdir(cache_name):
@@ -166,10 +165,8 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def run_manage(self, args, settings_file=None):
         def safe_remove(path):
-            try:
+            with suppress(OSError):
                 os.remove(path)
-            except OSError:
-                pass
 
         conf_dir = os.path.dirname(conf.__file__)
         template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')

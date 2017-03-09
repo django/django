@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
@@ -160,10 +162,8 @@ class BaseFormSet:
             defaults['data'] = self.data
             defaults['files'] = self.files
         if self.initial and 'initial' not in kwargs:
-            try:
+            with suppress(IndexError):
                 defaults['initial'] = self.initial[i]
-            except IndexError:
-                pass
         # Allow extra forms to be empty, unless they're part of
         # the minimum forms.
         if i >= self.initial_form_count() and i >= self.min_num:

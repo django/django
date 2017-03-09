@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.core.exceptions import (
     ImproperlyConfigured, SuspiciousFileOperation,
 )
@@ -73,9 +75,8 @@ class BaseEngine:
         directory traversal attacks.
         """
         for template_dir in self.template_dirs:
-            try:
+            # SuspiciousFileOperation occurs if the jointed path is located
+            # outside of this template_dir (it might be inside another one,
+            # so this isn't fatal).
+            with suppress(SuspiciousFileOperation):
                 yield safe_join(template_dir, template_name)
-            except SuspiciousFileOperation:
-                # The joined path was located outside of this template_dir
-                # (it might be inside another one, so this isn't fatal).
-                pass

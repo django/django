@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.utils import DatabaseError
 
@@ -89,15 +91,13 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 self.remove_geometry_metadata(model, field)
         # Make sure all geom stuff is gone
         for geom_table in self.geometry_tables:
-            try:
+            with suppress(DatabaseError):
                 self.execute(
                     self.sql_discard_geometry_columns % {
                         "geom_table": geom_table,
                         "table": self.quote_name(model._meta.db_table),
                     }
                 )
-            except DatabaseError:
-                pass
         super().delete_model(model, **kwargs)
 
     def add_field(self, model, field):
@@ -138,7 +138,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         super().alter_db_table(model, old_db_table, new_db_table)
         # Repoint any straggler names
         for geom_table in self.geometry_tables:
-            try:
+            with suppress(DatabaseError):
                 self.execute(
                     self.sql_update_geometry_columns % {
                         "geom_table": geom_table,
@@ -146,8 +146,6 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                         "new_table": self.quote_name(new_db_table),
                     }
                 )
-            except DatabaseError:
-                pass
         # Re-add geometry-ness and rename spatial index tables
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):

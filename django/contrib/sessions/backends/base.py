@@ -1,6 +1,7 @@
 import base64
 import logging
 import string
+from contextlib import suppress
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -262,10 +263,8 @@ class SessionBase:
         """
         if value is None:
             # Remove any custom expiration for this session.
-            try:
+            with suppress(KeyError):
                 del self['_session_expiry']
-            except KeyError:
-                pass
             return
         if isinstance(value, timedelta):
             value = timezone.now() + value

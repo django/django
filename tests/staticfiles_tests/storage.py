@@ -1,4 +1,5 @@
 import os
+from contextlib import suppress
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -48,10 +49,8 @@ class PathNotImplementedStorage(storage.Storage):
 
     def delete(self, name):
         name = self._path(name)
-        try:
+        with suppress(FileNotFoundError):
             os.remove(name)
-        except FileNotFoundError:
-            pass
 
     def path(self, name):
         raise NotImplementedError

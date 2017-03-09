@@ -4,6 +4,7 @@ A series of tests to establish that the command-line bash completion works.
 import os
 import sys
 import unittest
+from contextlib import suppress
 
 from django.apps import apps
 from django.core.management import ManagementUtility
@@ -50,10 +51,8 @@ class BashCompletionTests(unittest.TestCase):
     def _run_autocomplete(self):
         util = ManagementUtility(argv=sys.argv)
         with captured_stdout() as stdout:
-            try:
+            with suppress(SystemExit):
                 util.autocomplete()
-            except SystemExit:
-                pass
         return stdout.getvalue().strip().split('\n')
 
     def test_django_admin_py(self):

@@ -1,4 +1,5 @@
 import json
+from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
@@ -153,12 +154,10 @@ class CookieStorage(BaseStorage):
         if len(bits) == 2:
             hash, value = bits
             if constant_time_compare(hash, self._hash(value)):
-                try:
+                with suppress(ValueError):
                     # If we get here (and the JSON decode works), everything is
                     # good. In any other case, drop back and return None.
                     return json.loads(value, cls=MessageDecoder)
-                except ValueError:
-                    pass
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.
         self.used = True

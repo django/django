@@ -97,10 +97,11 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         while True:
             try:
                 value = int(result)
-                if 0 < value <= len(choices):
-                    return value
             except ValueError:
                 pass
+            else:
+                if 0 < value <= len(choices):
+                    return value
             result = input("Please select a valid option: ")
 
     def _ask_default(self, default=''):

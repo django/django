@@ -1,3 +1,4 @@
+from contextlib import suppress
 from threading import local
 from urllib.parse import urlsplit, urlunsplit
 
@@ -53,7 +54,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
             ns = path.pop()
             current_ns = current_path.pop() if current_path else None
             # Lookup the name to see if it could be an app identifier.
-            try:
+            with suppress(KeyError):
                 app_list = resolver.app_dict[ns]
                 # Yes! Path part matches an app in the current Resolver.
                 if current_ns and current_ns in app_list:
@@ -64,8 +65,6 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                     # The name isn't shared by one of the instances (i.e.,
                     # the default) so pick the first instance as the default.
                     ns = app_list[0]
-            except KeyError:
-                pass
 
             if ns != current_ns:
                 current_path = None
@@ -119,10 +118,8 @@ def clear_script_prefix():
     """
     Unset the script prefix for the current thread.
     """
-    try:
+    with suppress(AttributeError):
         del _prefixes.value
-    except AttributeError:
-        pass
 
 
 def set_urlconf(urlconf_name):

@@ -1,5 +1,6 @@
 import os
 import re
+from contextlib import suppress
 from importlib import import_module
 
 from django import get_version
@@ -222,10 +223,8 @@ class MigrationWriter:
         except ImportError:
             pass
         else:
-            try:
+            with suppress(ValueError):
                 return module_dir(migrations_module)
-            except ValueError:
-                pass
 
         # Alright, see if it's a direct submodule of the app
         app_config = apps.get_app_config(self.migration.app_label)

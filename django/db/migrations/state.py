@@ -1,6 +1,6 @@
 import copy
 from collections import OrderedDict
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
@@ -342,11 +342,9 @@ class StateApps(Apps):
         self.clear_cache()
 
     def unregister_model(self, app_label, model_name):
-        try:
+        with suppress(KeyError):
             del self.all_models[app_label][model_name]
             del self.app_configs[app_label].models[model_name]
-        except KeyError:
-            pass
 
 
 class ModelState:

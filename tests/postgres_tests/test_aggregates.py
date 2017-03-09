@@ -1,4 +1,5 @@
 import json
+from contextlib import suppress
 
 from django.db.models.expressions import F, Value
 from django.test.testcases import skipUnlessDBFeature
@@ -7,14 +8,12 @@ from django.test.utils import Approximate
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, StatTestModel
 
-try:
+with suppress(ImportError):  # psycopg2 is not installed
     from django.contrib.postgres.aggregates import (
         ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JSONBAgg,
         RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
         RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
     )
-except ImportError:
-    pass  # psycopg2 is not installed
 
 
 class TestGeneralAggregate(PostgreSQLTestCase):

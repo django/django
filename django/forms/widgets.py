@@ -5,6 +5,7 @@ HTML Widget classes
 import copy
 import datetime
 import re
+from contextlib import suppress
 from itertools import chain
 
 from django.conf import settings
@@ -618,10 +619,8 @@ class ChoiceWidget(Widget):
     def value_from_datadict(self, data, files, name):
         getter = data.get
         if self.allow_multiple_selected:
-            try:
+            with suppress(AttributeError):
                 getter = data.getlist
-            except AttributeError:
-                pass
         return getter(name)
 
     def format_value(self, value):
@@ -977,12 +976,13 @@ class SelectDateWidget(Widget):
             year, month, day = value.year, value.month, value.day
         elif isinstance(value, str):
             if settings.USE_L10N:
+                input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
-                    input_format = get_format('DATE_INPUT_FORMATS')[0]
                     d = datetime.datetime.strptime(value, input_format)
-                    year, month, day = d.year, d.month, d.day
                 except ValueError:
                     pass
+                else:
+                    year, month, day = d.year, d.month, d.day
             match = self.date_re.match(value)
             if match:
                 year, month, day = [int(val) for val in match.groups()]

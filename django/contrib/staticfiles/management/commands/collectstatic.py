@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from contextlib import suppress
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -312,10 +313,8 @@ class Command(BaseCommand):
         else:
             self.log("Linking '%s'" % source_path, level=1)
             full_path = self.storage.path(prefixed_path)
-            try:
+            with suppress(OSError):
                 os.makedirs(os.path.dirname(full_path))
-            except OSError:
-                pass
             try:
                 if os.path.lexists(full_path):
                     os.unlink(full_path)

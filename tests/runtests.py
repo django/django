@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import warnings
+from contextlib import suppress
 
 import django
 from django.apps import apps
@@ -315,10 +316,8 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
     # Make sure the bisection point isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [bisection_label, 'model_inheritance_same_model_name']:
-        try:
+        with suppress(ValueError):
             test_labels.remove(label)
-        except ValueError:
-            pass
 
     subprocess_args = get_subprocess_args(options)
 
@@ -366,10 +365,8 @@ def paired_tests(paired_test, options, test_labels, parallel):
     # Make sure the constant member of the pair isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [paired_test, 'model_inheritance_same_model_name']:
-        try:
+        with suppress(ValueError):
             test_labels.remove(label)
-        except ValueError:
-            pass
 
     subprocess_args = get_subprocess_args(options)
 

@@ -6,6 +6,7 @@ import re
 import sys
 import warnings
 from collections import OrderedDict
+from contextlib import suppress
 from threading import local
 
 from django.apps import apps
@@ -256,10 +257,8 @@ def get_language():
     """Return the currently selected language."""
     t = getattr(_active, "value", None)
     if t is not None:
-        try:
+        with suppress(AttributeError):
             return t.to_language()
-        except AttributeError:
-            pass
     # If we don't have a real translation object, assume it's the default language.
     return settings.LANGUAGE_CODE
 
@@ -425,10 +424,8 @@ def get_supported_language_variant(lang_code, strict=False):
     if lang_code:
         # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
         possible_lang_codes = [lang_code]
-        try:
+        with suppress(KeyError):
             possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
-        except KeyError:
-            pass
         generic_lang_code = lang_code.split('-')[0]
         possible_lang_codes.append(generic_lang_code)
         supported_lang_codes = get_languages()
@@ -486,10 +483,8 @@ def get_language_from_request(request, check_path=False):
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
-    try:
+    with suppress(LookupError):
         return get_supported_language_variant(lang_code)
-    except LookupError:
-        pass
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
     for accept_lang, unused in parse_accept_lang_header(accept):

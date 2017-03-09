@@ -3,6 +3,7 @@ import inspect
 import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
+from contextlib import suppress
 from itertools import chain
 
 from django.apps import apps
@@ -269,10 +270,8 @@ class Options:
         # is a cached property, and all the models haven't been loaded yet, so
         # we need to make sure we don't cache a string reference.
         if field.is_relation and hasattr(field.remote_field, 'model') and field.remote_field.model:
-            try:
+            with suppress(AttributeError):
                 field.remote_field.model._meta._expire_cache(forward=False)
-            except AttributeError:
-                pass
             self._expire_cache()
         else:
             self._expire_cache(reverse=False)
@@ -520,10 +519,8 @@ class Options:
             # Due to the way Django's internals work, get_field() should also
             # be able to fetch a field by attname. In the case of a concrete
             # field with relation, includes the *_id name too
-            try:
+            with suppress(AttributeError):
                 res[field.attname] = field
-            except AttributeError:
-                pass
         return res
 
     @cached_property
@@ -535,10 +532,8 @@ class Options:
             # Due to the way Django's internals work, get_field() should also
             # be able to fetch a field by attname. In the case of a concrete
             # field with relation, includes the *_id name too
-            try:
+            with suppress(AttributeError):
                 res[field.attname] = field
-            except AttributeError:
-                pass
         return res
 
     def get_field(self, field_name):
@@ -755,12 +750,10 @@ class Options:
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, topmost_call)
 
-        try:
+        with suppress(KeyError):
             # In order to avoid list manipulation. Always return a shallow copy
             # of the results.
             return self._get_fields_cache[cache_key]
-        except KeyError:
-            pass
 
         fields = []
         # Recursively call _get_fields() on each parent, with the same
