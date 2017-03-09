@@ -350,12 +350,8 @@ class AdminURLFieldWidget(forms.URLInput):
         context = super(AdminURLFieldWidget, self).get_context(name, value, attrs)
         context['current_label'] = _('Currently:')
         context['change_label'] = _('Change:')
-        context['widget']['href'] = smart_urlquote(context['widget']['value'])
+        context['widget']['href'] = smart_urlquote(context['widget']['value']) if value else ''
         return context
-
-    def format_value(self, value):
-        value = super(AdminURLFieldWidget, self).format_value(value)
-        return force_text(value)
 
 
 class AdminIntegerFieldWidget(forms.NumberInput):

@@ -7,8 +7,10 @@ class RadioSelectTest(WidgetTest):
     widget = RadioSelect
 
     def test_render(self):
-        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', html=(
+        choices = (('', '------'),) + self.beatles
+        self.check_html(self.widget(choices=choices), 'beatle', 'J', html=(
             """<ul>
+            <li><label><input type="radio" name="beatle" value="" /> ------</label></li>
             <li><label><input checked type="radio" name="beatle" value="J" /> John</label></li>
             <li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
             <li><label><input type="radio" name="beatle" value="G" /> George</label></li>
