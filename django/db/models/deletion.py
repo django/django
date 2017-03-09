@@ -206,6 +206,7 @@ class Collector:
                                  reverse_dependency=True)
         if collect_related:
             parents = model._meta.parents
+            protected_objects = []
             for related in get_candidate_relations_to_delete(model._meta):
                 # Preserve parent reverse relationships if keep_parents=True.
                 if keep_parents and related.model in parents:
@@ -219,7 +220,21 @@ class Collector:
                     if self.can_fast_delete(sub_objs, from_field=field):
                         self.fast_deletes.append(sub_objs)
                     elif sub_objs:
-                        field.remote_field.on_delete(self, field, sub_objs, self.using)
+                        try:
+                            field.remote_field.on_delete(self, field, sub_objs, self.using)
+                        except ProtectedError as e:
+                            protected_objects.append({'field': field, 'sub_objs': sub_objs})
+
+            if protected_objects:
+                keys = ', '.join(["'%s.%s'" % (obj['sub_objs'][0].__class__.__name__, obj['field'].name)
+                              for obj in protected_objects])
+                model_name = protected_objects[0]['field'].remote_field.model.__name__
+                msg_line1 = "Cannot delete some instances of model '%s' " % model_name
+                msg_line2 = "because they are referenced through protected foreign keys: %s" % keys
+                objs = [obj['sub_objs'] for obj in protected_objects]
+                msg = msg_line1 + msg_line2
+                raise ProtectedError(msg, objs)
+
             for field in model._meta.private_fields:
                 if hasattr(field, 'bulk_related_objects'):
                     # It's something like generic foreign key.

@@ -5,7 +5,7 @@ from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
-    MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
+    MR, A, Avatar, B, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
     M2MTo, MRNull, Parent, R, RChild, S, T, User, create_a, get_default_r,
 )
 
@@ -62,10 +62,21 @@ class OnDeleteTests(TestCase):
         a = create_a('protect')
         msg = (
             "Cannot delete some instances of model 'R' because they are "
-            "referenced through a protected foreign key: 'A.protect'"
+            "referenced through protected foreign keys: 'A.protect'"
         )
         with self.assertRaisesMessage(IntegrityError, msg):
             a.protect.delete()
+
+    def test_protect_multiple(self):
+        a = create_a('a')
+        protect = a.protect
+        b = B.objects.create(protect=protect)
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through protected foreign keys: 'A.protect', 'B.protect'"
+        )
+        with self.assertRaises(IntegrityError) as cm:
+            protect.delete()
 
     def test_do_nothing(self):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
