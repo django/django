@@ -71,3 +71,12 @@ class GetModelsTest(SimpleTestCase):
         self.assertNotIn(
             "NotInstalledModel",
             [m.__name__ for m in apps.get_models()])
+
+
+class NonexistentAppTest(SimpleTestCase):
+
+    def test_nonexistent_app(self):
+        """Nonexistent app raises ImportError"""
+        with self.assertRaises(ImportError):
+            with self.settings(INSTALLED_APPS=['123']):
+                pass
