@@ -76,6 +76,9 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
   concatenated values will be distinct.
 
+* Added support for querying against querysets in
+  :lookup:`arrayfield.overlap`.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
