@@ -78,7 +78,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             name = force_text(desc[0])  # cx_Oracle always returns a 'str'
             internal_size, default = field_map[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
-            description.append(FieldInfo(*(name.lower(),) + desc[1:3] + (internal_size,) + desc[4:] + (default,)))
+            description.append(FieldInfo(*(
+                (name.lower(),) +
+                desc[1:3] +
+                (internal_size, desc[4] or 0, desc[5] or 0) +
+                desc[6:] +
+                (default,)
+            )))
         return description
 
     def table_name_converter(self, name):
