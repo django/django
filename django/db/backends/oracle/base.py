@@ -530,7 +530,8 @@ def _rowfactory(row, cursor):
     casted = []
     for value, desc in zip(row, cursor.description):
         if value is not None and desc[1] is Database.NUMBER:
-            precision, scale = desc[4:6]
+            precision = desc[4] or 0
+            scale = desc[5] or 0
             if scale == -127:
                 if precision == 0:
                     # NUMBER column: decimal-precision floating point

@@ -263,6 +263,8 @@ Database backends
   <mysql-isolation-level>`. To avoid possible data loss, it's recommended to
   switch from MySQL's default level, repeatable read, to read committed.
 
+* Added support for ``cx_Oracle`` 5.3.
+
 Email
 ~~~~~
 
