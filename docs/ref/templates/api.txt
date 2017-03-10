@@ -146,13 +146,19 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
 .. staticmethod:: Engine.get_default()
 
-    When a Django project configures one and only one
-    :class:`~django.template.backends.django.DjangoTemplates` engine, this
-    method returns the underlying :class:`Engine`. In other circumstances it
-    will raise :exc:`~django.core.exceptions.ImproperlyConfigured`.
+    Returns the underlying :class:`Engine` from the first configured
+    :class:`~django.template.backends.django.DjangoTemplates` engine. Raises
+    :exc:`~django.core.exceptions.ImproperlyConfigured` if no engines are
+    configured.
 
     It's required for preserving APIs that rely on a globally available,
     implicitly configured engine. Any other use is strongly discouraged.
+
+    .. versionchanged:: 2.0
+
+        In older versions, raises
+        :exc:`~django.core.exceptions.ImproperlyConfigured` if multiple
+        engines are configured rather than returning the first engine.
 
 .. method:: Engine.from_string(template_code)
 
@@ -175,9 +181,11 @@ The recommended way to create a :class:`Template` is by calling the factory
 methods of the :class:`Engine`: :meth:`~Engine.get_template`,
 :meth:`~Engine.select_template` and :meth:`~Engine.from_string`.
 
-In a Django project where the :setting:`TEMPLATES` setting defines exactly one
+In a Django project where the :setting:`TEMPLATES` setting defines a
 :class:`~django.template.backends.django.DjangoTemplates` engine, it's
-possible to instantiate a :class:`Template` directly.
+possible to instantiate a :class:`Template` directly. If more than one
+:class:`~django.template.backends.django.DjangoTemplates` engine is defined,
+the first one will be used.
 
 .. class:: Template
 

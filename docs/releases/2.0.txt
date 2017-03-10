@@ -191,7 +191,9 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* To increase the usefulness of :meth:`.Engine.get_default` in third-party
+  apps, it now returns the first engine if multiple ``DjangoTemplates`` engines
+  are configured in ``TEMPLATES`` rather than raising ``ImproperlyConfigured``.
 
 Tests
 ~~~~~

@@ -41,14 +41,14 @@ class GetDefaultTests(SimpleTestCase):
     @override_settings(TEMPLATES=[{
         'NAME': 'default',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {'file_charset': 'abc'},
     }, {
         'NAME': 'other',
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {'file_charset': 'def'},
     }])
     def test_multiple_engines_configured(self):
-        msg = 'Several DjangoTemplates backends are configured. You must select one explicitly.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            Engine.get_default()
+        self.assertEqual(Engine.get_default().file_charset, 'abc')
 
 
 class LoaderTests(SimpleTestCase):
