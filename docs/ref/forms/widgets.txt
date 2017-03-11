@@ -612,6 +612,14 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 Selector and checkbox widgets
 -----------------------------
 
+These widgets make use of the HTML elements ``<select>``,
+``<input type='checkbox'>``, and ``<input type='radio'>``.
+
+Widgets that render multiple choices have an ``option_template_name`` attribute
+that specifies the template used to render each choice. For example, for the
+:class:`Select` widget, ``select_option.html`` renders the ``<option>`` for a
+``<select>``.
+
 ``CheckboxInput``
 ~~~~~~~~~~~~~~~~~
 
@@ -634,6 +642,7 @@ Selector and checkbox widgets
 .. class:: Select
 
     * ``template_name``: ``'django/forms/widgets/select.html'``
+    * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
     * Renders as: ``<select><option ...>...</select>``
 
     .. attribute:: Select.choices
@@ -648,6 +657,7 @@ Selector and checkbox widgets
 .. class:: NullBooleanSelect
 
     * ``template_name``: ``'django/forms/widgets/select.html'``
+    * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
 
     Select widget with options 'Unknown', 'Yes' and 'No'
 
@@ -657,6 +667,7 @@ Selector and checkbox widgets
 .. class:: SelectMultiple
 
     * ``template_name``: ``'django/forms/widgets/select.html'``
+    * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
 
     Similar to :class:`Select`, but allows multiple selection:
     ``<select multiple='multiple'>...</select>``
@@ -667,6 +678,7 @@ Selector and checkbox widgets
 .. class:: RadioSelect
 
     * ``template_name``: ``'django/forms/widgets/radio.html'``
+    * ``option_template_name``: ``'django/forms/widgets/radio_option.html'``
 
     Similar to :class:`Select`, but rendered as a list of radio buttons within
     ``<li>`` tags:
@@ -761,6 +773,7 @@ Selector and checkbox widgets
 .. class:: CheckboxSelectMultiple
 
     * ``template_name``: ``'django/forms/widgets/checkbox_select.html'``
+    * ``option_template_name``: ``'django/forms/widgets/checkbox_option.html'``
 
     Similar to :class:`SelectMultiple`, but rendered as a list of check
     buttons:
