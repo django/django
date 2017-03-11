@@ -1,1 +1,1 @@
-cx_oracle
+cx_oracle < 5.3
