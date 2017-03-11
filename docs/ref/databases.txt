@@ -701,9 +701,9 @@ you add quotes where necessary before copying a query into an SQLite shell.
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 11.1 and higher. Version
-4.3.1 or higher of the `cx_Oracle`_ Python driver is required, although we
-recommend version 5.1.3 or later as these versions support Python 3.
+Django supports `Oracle Database Server`_ versions 11.1 and higher. Versions
+4.3.1 through 5.2.1 of the `cx_Oracle`_ Python driver are supported, although
+5.1.3 or later is recommended as these versions support Python 3.
 
 Note that due to a Unicode-corruption bug in ``cx_Oracle`` 5.0, that
 version of the driver should **not** be used with Django;
