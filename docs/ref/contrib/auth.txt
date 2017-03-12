@@ -43,11 +43,13 @@ Fields
 
     .. attribute:: first_name
 
-        Optional. 30 characters or fewer.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 30
+        characters or fewer.
 
     .. attribute:: last_name
 
-        Optional. 150 characters or fewer.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
+        characters or fewer.
 
         .. versionchanged:: 2.0
 
@@ -55,7 +57,8 @@ Fields
 
     .. attribute:: email
 
-        Optional. Email address.
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). Email
+        address.
 
     .. attribute:: password
 
