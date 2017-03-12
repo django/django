@@ -90,20 +90,23 @@ class Apps:
                 if app_config.label in self.app_configs:
                     raise ImproperlyConfigured(
                         "Application labels aren't unique, "
-                        "duplicates: %s" % app_config.label)
+                        "duplicates: %s" % app_config.label
+                    )
 
                 self.app_configs[app_config.label] = app_config
                 app_config.apps = self
 
             # Check for duplicate app names.
             counts = Counter(
-                app_config.name for app_config in self.app_configs.values())
+                app_config.name for app_config in self.app_configs.values()
+            )
             duplicates = [
                 name for name, count in counts.most_common() if count > 1]
             if duplicates:
                 raise ImproperlyConfigured(
                     "Application names aren't unique, "
-                    "duplicates: %s" % ", ".join(duplicates))
+                    "duplicates: %s" % ", ".join(duplicates)
+                )
 
             self.apps_ready = True
 
@@ -214,11 +217,13 @@ class Apps:
                     "Model '%s.%s' was already registered. "
                     "Reloading models is not advised as it can lead to inconsistencies, "
                     "most notably with related models." % (app_label, model_name),
-                    RuntimeWarning, stacklevel=2)
+                    RuntimeWarning, stacklevel=2
+                )
             else:
                 raise RuntimeError(
                     "Conflicting '%s' models in application '%s': %s and %s." %
-                    (model_name, app_label, app_models[model_name], model))
+                    (model_name, app_label, app_models[model_name], model)
+                )
         app_models[model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()
@@ -262,7 +267,8 @@ class Apps:
         model = self.all_models[app_label].get(model_name.lower())
         if model is None:
             raise LookupError(
-                "Model '%s.%s' not registered." % (app_label, model_name))
+                "Model '%s.%s' not registered." % (app_label, model_name)
+            )
         return model
 
     @functools.lru_cache(maxsize=None)
