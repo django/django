@@ -403,7 +403,9 @@ ratings exceeding 3.0.
 
 It's difficult to intuit how the ORM will translate complex querysets into SQL
 queries so when in doubt, inspect the SQL with ``str(queryset.query)`` and
-write plenty of tests.
+write plenty of tests.  The query returned by ``str(queryset.query)`` may be
+wrong, e.g., parameters may not be quoted correctly or may not be escaped
+correctly.
 
 ``order_by()``
 --------------
