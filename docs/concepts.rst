@@ -235,6 +235,8 @@ abstraction as a core concept called Groups::
     def ws_connect(message):
         # Add to reader group
         Group("liveblog").add(message.reply_channel)
+        # Accept the connection request
+        message.reply_channel.send({"accept": True})
 
     # Connected to websocket.disconnect
     def ws_disconnect(message):

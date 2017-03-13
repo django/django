@@ -165,12 +165,19 @@ disconnect, like this::
 
     # Connected to websocket.connect
     def ws_add(message):
+        # Accept the incoming connection
         message.reply_channel.send({"accept": True})
+        # Add them to the chat group
         Group("chat").add(message.reply_channel)
 
     # Connected to websocket.disconnect
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
+
+.. note::
+    You need to explicitly accept WebSocket connections if you override connect
+    by sending ``accept: True`` - you can also reject them at connection time,
+    before they open, by sending ``close: True``.
 
 Of course, if you've read through :doc:`concepts`, you'll know that channels
 added to groups expire out if their messages expire (every channel layer has
@@ -204,7 +211,9 @@ get the message. Here's all the code::
 
     # Connected to websocket.connect
     def ws_add(message):
+        # Accept the connection
         message.reply_channel.send({"accept": True})
+        # Add to the chat group
         Group("chat").add(message.reply_channel)
 
     # Connected to websocket.receive
@@ -559,6 +568,8 @@ consumer above to use a room based on URL rather than username::
     def ws_add(message, room):
         # Add them to the right group
         Group("chat-%s" % room).add(message.reply_channel)
+        # Accept the connection request
+        message.reply_channel.send({"accept": True})
 
 In the next section, we'll change to sending the ``room`` as a part of the
 WebSocket message - which you might do if you had a multiplexing client -
