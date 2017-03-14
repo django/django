@@ -34,10 +34,60 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(unquote(path))
-    path = path.lstrip('/')
+    normpath, newpath = _normalize_path(path)
+    if newpath and normpath != newpath:
+        return HttpResponseRedirect(newpath)
+    fullpath = os.path.join(document_root, newpath)
+    is_dir = _check_path(fullpath, show_indexes)
+    if is_dir and show_indexes:
+        return directory_index(newpath, fullpath)
+    else:
+        return _make_response(request, fullpath, FileResponse, open(fullpath, 'rb'))
+
+
+def nginx_serve(request, path, location=None, alias=None, show_indexes=False):
+    """
+    Serve files with nginx "X-Accel-Redirect" header (you might know it as "X-Sendfile").
+
+    It works similarly as django.views.static.serve view.
+    You have to specify 'location' and 'alias' keyword arguments
+    in the urlconf (which are corresponging to the appropriate nginx configuration directives)::
+
+        from django.views.static import nginx_serve
+
+        url(r'^(?P<path>.*)$', nginx_serve, {'location': '/protected/', alias': '/path/to/my/files/'})
+
+    For this urlconf, nginx configuration would be something like::
+
+        location /protected/ {
+            internal;
+            alias   /path/to/my/files/;  # note the trailing slash
+        }
+
+    You may also set ``show_indexes`` to ``True``. It works the same way as with serve.
+    For more details, see the xsendfile feature in nginx documentation:
+    https://www.nginx.com/resources/wiki/start/topics/examples/xsendfile/
+    """
+    normpath, newpath = _normalize_path(path)
+    if newpath and normpath != newpath:
+        return HttpResponseRedirect(newpath)
+    fullpath = os.path.join(alias, newpath)
+    is_dir = _check_path(fullpath, show_indexes)
+    if is_dir and show_indexes:
+        return directory_index(newpath, fullpath)
+    else:
+        response = _make_response(request, fullpath, HttpResponse, b'')
+        response['X-Accel-Redirect'] = os.path.join(location, alias)
+        return response
+
+
+def _normalize_path(path):
+    """Clean the path from unnecessary constructs like '.', '..', '//'."""
+    normpath = posixpath.normpath(unquote(path))
+    normpath = normpath.lstrip('/')
     newpath = ''
-    for part in path.split('/'):
+
+    for part in normpath.split('/'):
         if not part:
             # Strip empty path components.
             continue
@@ -47,23 +97,31 @@ def serve(request, path, document_root=None, show_indexes=False):
             # Strip '.' and '..' in path.
             continue
         newpath = os.path.join(newpath, part).replace('\\', '/')
-    if newpath and path != newpath:
-        return HttpResponseRedirect(newpath)
-    fullpath = os.path.join(document_root, newpath)
-    if os.path.isdir(fullpath):
-        if show_indexes:
-            return directory_index(newpath, fullpath)
+
+    return normpath, newpath
+
+
+def _check_path(fullpath, show_indexes):
+    is_dir = os.path.isdir(fullpath)
+
+    if is_dir and not show_indexes:
         raise Http404(_("Directory indexes are not allowed here."))
+
     if not os.path.exists(fullpath):
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
-    # Respect the If-Modified-Since header.
+
+    return is_dir
+
+
+def _make_response(request, fullpath, response_class, content):
     statobj = os.stat(fullpath)
+    # Respect the If-Modified-Since header.
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(fullpath)
     content_type = content_type or 'application/octet-stream'
-    response = FileResponse(open(fullpath, 'rb'), content_type=content_type)
+    response = response_class(content, content_type=content_type)
     response["Last-Modified"] = http_date(statobj.st_mtime)
     if stat.S_ISREG(statobj.st_mode):
         response["Content-Length"] = statobj.st_size
