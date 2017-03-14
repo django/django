@@ -110,7 +110,7 @@ class StaticTests(SimpleTestCase):
 
     def test_index(self):
         response = self.client.get('/%s/' % self.prefix)
-        self.assertContains(response, 'Index of /')
+        self.assertContains(response, 'Index of ./')
 
 
 class StaticHelperTest(StaticTests):
