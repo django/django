@@ -106,7 +106,7 @@ class Index:
             column_names[0][:7],
             '%s_%s' % (self._hash_generator(*hash_data), self.suffix),
         )
-        assert len(self.name) <= 30, (
+        assert len(self.name) <= MAX_NAME_LENGTH, (
             'Index too long for multiple database support. Is self.suffix '
             'longer than 3 characters?'
         )
