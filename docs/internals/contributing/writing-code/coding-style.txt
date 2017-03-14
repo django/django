@@ -39,6 +39,10 @@ Python style
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
+* Use single quotes for strings, or a double quote if the the string
+  contains a single quote. Don't bother refactoring existing code to confirm
+  to this style.
+
 * In docstrings, follow :pep:`257`. For example::
 
       def foo():
