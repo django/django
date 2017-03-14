@@ -384,7 +384,7 @@ in the first linestring in the geometry field; otherwise returns ``None``.
 
 .. class:: Perimeter(expression, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: PostGIS, Oracle, SpatiaLite (≥ 4.0)
 
 Accepts a single geographic field or expression and returns the perimeter of the
 geometry field as a :class:`~django.contrib.gis.measure.Distance` object. On
@@ -427,7 +427,7 @@ scaled coordinates by multiplying them with the ``x``, ``y``, and optionally
 
 .. class:: SnapToGrid(expression, *args, **extra)
 
-*Availability*: PostGIS, SpatiaLite
+*Availability*: PostGIS, SpatiaLite (≥ 3.1)
 
 Accepts a single geographic field or expression and returns a geometry with all
 points snapped to the given grid.  How the geometry is snapped to the grid
