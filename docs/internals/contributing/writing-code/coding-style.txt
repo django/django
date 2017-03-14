@@ -42,8 +42,10 @@ Python style
 * In docstrings, follow :pep:`257`. For example::
 
       def foo():
-          """
-          Calculate something and return the result.
+          """Calculate something and return the result.
+
+          Execute a complex calculation using something as input and returning
+          something else as result.
           """
           ...
 
