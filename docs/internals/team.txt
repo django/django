@@ -570,6 +570,28 @@ Daniele Procida
     .. _Coding is for Girls: https://www.youtube.com/channel/UC0hNd2uW8jTR5K3KBzRuG2A
     .. _Potato: https://p.ota.to
 
+`Tobias McNulty`_
+    Tobias' history with Django began in 2007 when he co-founded North
+    Carolina-based web development firm `Caktus Group`_. He quickly fell in
+    love with the framework and has been a persistent advocate for it over the
+    years, both within Caktus and more broadly.
+
+    Since discovering Django, Tobias has helped organize several Django
+    sprints in his former home state of North Carolina, is a regular mentor
+    at `Django Girls`_ events in Washington, DC, and can still be found
+    attending the sprints following Django-related conferences. He's
+    contributed a number of smaller tickets and is the co-author and chief
+    advocate for the :doc:`messages framework </ref/contrib/messages>` that
+    arrived in Django 1.2.
+
+    Tobias is a prolific `blogger`_ and occasional speaker on Django-related
+    topics. His interests include deployment and (particularly database)
+    performance.
+
+    .. _Tobias McNulty: https://twitter.com/tobiasmcnulty
+    .. _Caktus Group: https://www.caktusgroup.com/
+    .. _blogger: https://www.caktusgroup.com/blog/author/tobias-mcnulty/
+
 `Adam Johnson`_
     Adam started working with Django in 2012 on his first non-PHP website and
     has never looked back. He has since been pushing for it to be more friendly
