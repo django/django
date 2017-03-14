@@ -5,3 +5,14 @@ Django 1.8.18 release notes
 *April 4, 2017*
 
 Django 1.8.18 fixes two security issues in 1.8.17.
+
+CVE-2017-7234: Open redirect vulnerability in ``django.views.static.serve()``
+=============================================================================
+
+A maliciously crafted URL to a Django site using the
+:func:`~django.views.static.serve` view could redirect to any other domain. The
+view no longer does any redirects as they don't provide any known, useful
+functionality.
+
+Note, however, that this view has always carried a warning that it is not
+hardened for production use and should be used only as a development aid.
