@@ -7,6 +7,17 @@ Django 1.9.13 release notes
 Django 1.9.13 fixes two security issues and a bug in 1.9.12. This is the final
 release of the 1.9.x series.
 
+CVE-2017-7234: Open redirect vulnerability in ``django.views.static.serve()``
+=============================================================================
+
+A maliciously crafted URL to a Django site using the
+:func:`~django.views.static.serve` view could redirect to any other domain. The
+view no longer does any redirects as they don't provide any known, useful
+functionality.
+
+Note, however, that this view has always carried a warning that it is not
+hardened for production use and should be used only as a development aid.
+
 Bugfixes
 ========
 

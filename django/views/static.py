@@ -10,9 +10,9 @@ import stat
 
 from django.http import (
     FileResponse, Http404, HttpResponse, HttpResponseNotModified,
-    HttpResponseRedirect,
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
+from django.utils._os import safe_join
 from django.utils.http import http_date, parse_http_date
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -33,25 +33,11 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(path)
-    path = path.lstrip('/')
-    newpath = ''
-    for part in path.split('/'):
-        if not part:
-            # Strip empty path components.
-            continue
-        drive, part = os.path.splitdrive(part)
-        head, part = os.path.split(part)
-        if part in (os.curdir, os.pardir):
-            # Strip '.' and '..' in path.
-            continue
-        newpath = os.path.join(newpath, part).replace('\\', '/')
-    if newpath and path != newpath:
-        return HttpResponseRedirect(newpath)
-    fullpath = os.path.join(document_root, newpath)
+    path = posixpath.normpath(path).lstrip('/')
+    fullpath = safe_join(document_root, path)
     if os.path.isdir(fullpath):
         if show_indexes:
-            return directory_index(newpath, fullpath)
+            return directory_index(path, fullpath)
         raise Http404(_("Directory indexes are not allowed here."))
     if not os.path.exists(fullpath):
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
