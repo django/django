@@ -8,6 +8,7 @@ from django.contrib.sessions.backends.base import CreateError
 
 from .exceptions import ConsumeLater
 from .handler import AsgiRequest
+from .message import Message
 
 
 def session_for_reply_channel(reply_channel):
@@ -39,11 +40,18 @@ def channel_session(func):
     Use this to persist data across the lifetime of a connection.
     """
     @functools.wraps(func)
-    def inner(message, *args, **kwargs):
+    def inner(*args, **kwargs):
+        message = None
+        for arg in args[:2]:
+            if isinstance(arg, Message):
+                message = arg
+                break
+        if message is None:
+            raise ValueError('channel_session called without Message instance')
         # Make sure there's NOT a channel_session already
         if hasattr(message, "channel_session"):
             try:
-                return func(message, *args, **kwargs)
+                return func(*args, **kwargs)
             finally:
                 # Persist session if needed
                 if message.channel_session.modified:
@@ -67,7 +75,7 @@ def channel_session(func):
         message.channel_session = session
         # Run the consumer
         try:
-            return func(message, *args, **kwargs)
+            return func(*args, **kwargs)
         finally:
             # Persist session if needed
             if session.modified and not session.is_empty():
