@@ -74,9 +74,8 @@ need them through the same process.
 Membership
 ----------
 
-The core team finds its origins with the :ref:`four people
-<original-team-list>` who created Django. It has grown to :ref:`a few dozen
-people <core-team-list>` by co-opting volunteers who demonstrate:
+`Django team members <https://www.djangoproject.com/foundation/teams/>`_
+demonstrate:
 
 - a good grasp of the philosophy of the Django Project
 - a solid track record of being constructive and helpful
