@@ -49,6 +49,7 @@ Topics
    generics
    routing
    binding
+   javascript
    backends
    delay
    testing

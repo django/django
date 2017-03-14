@@ -1,0 +1,72 @@
+{
+  "name": "django-channels",
+  "version": "0.0.2",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/django/channels.git"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "transpile": "rm -rf lib && babel src --out-dir lib",
+    "docs": "rm -rf docs && esdoc -c esdoc.json",
+    "test": "jest",
+    "browserify": "browserify src/index.js -p browserify-banner -s channels -o ../channels/static/channels/js/websocketbridge.js",
+    "prepublish": "npm run transpile",
+    "compile": "npm run transpile && npm run browserify"
+  },
+  "files": [
+    "lib/index.js"
+  ],
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "reconnecting-websocket": "^3.0.3"
+  },
+  "jest": {
+    "roots": [
+      "tests"
+    ]
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify"
+      ]
+    ]
+  },
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.16.0",
+    "babel-core": "^6.16.0",
+    "babel-plugin-transform-inline-environment-variables": "^6.8.0",
+    "babel-plugin-transform-object-assign": "^6.8.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "babel-register": "^6.9.0",
+    "babel-runtime": "^6.11.6",
+    "babelify": "^7.3.0",
+    "browserify": "^14.1.0",
+    "browserify-banner": "^1.0.3",
+    "esdoc": "^0.5.2",
+    "esdoc-es7-plugin": "0.0.3",
+    "esdoc-importpath-plugin": "^0.1.1",
+    "eslint": "^2.13.1",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.9.2",
+    "eslint-plugin-jsx-a11y": "^1.5.3",
+    "eslint-plugin-react": "^5.2.2",
+    "jest": "^19.0.1",
+    "mock-socket": "^6.0.4",
+    "react": "^15.4.0",
+    "react-cookie": "^0.4.8",
+    "react-dom": "^15.4.0",
+    "react-redux": "^4.4.6",
+    "redux": "^3.6.0",
+    "redux-actions": "^1.0.0",
+    "redux-logger": "^2.7.4",
+    "redux-thunk": "^2.1.0"
+  }
+}

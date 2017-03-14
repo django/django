@@ -9,6 +9,7 @@ __pycache__/
 *.pyc
 .coverage.*
 TODO
+node_modules
 
 # IDE and Tooling files
 .idea/*

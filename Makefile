@@ -2,6 +2,9 @@
 
 all:
 
+build_assets:
+	cd js_client && npm run browserify && cd ..
+
 release:
 ifndef version
 	$(error Please supply a version)
@@ -14,3 +17,4 @@ endif
 	git push
 	git push --tags
 	python setup.py sdist bdist_wheel upload
+	cd js_client && npm publish && cd ..

@@ -136,9 +136,9 @@ Tie that into your routing, and you're ready to go::
 Frontend Considerations
 -----------------------
 
-You can use the standard Channels WebSocket wrapper **(not yet available)**
-to automatically run demultiplexing, and then tie the events you receive into
-your frontend framework of choice based on ``action``, ``pk`` and ``data``.
+You can use the standard :doc:`Channels WebSocket wrapper <javascript>` to
+automatically run demultiplexing, and then tie the events you receive into your
+frontend framework of choice based on ``action``, ``pk`` and ``data``.
 
 .. note::
 

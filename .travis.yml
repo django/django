@@ -17,11 +17,13 @@ cache:
   - $HOME/.cache/pip/wheels
 
 install:
+  - nvm install 7
   - pip install -U pip wheel setuptools
   - pip install $DJANGO -e .[tests]
   - pip freeze
 
 script:
   - python runtests.py
+  - cd js_client && npm install --progress=false && npm test && cd ..
   - flake8
   - isort --check-only --recursive channels

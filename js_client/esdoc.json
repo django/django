@@ -1,0 +1,21 @@
+{
+    "source": "./src",
+    "destination": "./docs",
+    "undocumentIdentifier": false,
+    "title": "django-channels",
+    "experimentalProposal": {
+        "classProperties": true,
+        "objectRestSpread": true
+    },
+    "plugins": [
+        {
+            "name": "esdoc-importpath-plugin",
+            "option": {
+                "replaces": [
+                  {"from": "^src/", "to": "lib/"},
+                  {"from": ".js$", "to": ""}
+                ]
+            }
+        }
+    ]
+}
