@@ -482,7 +482,7 @@ include the aggregate column.
 .. _aggregation-ordering-interaction:
 
 Interaction with default ordering or ``order_by()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Fields that are mentioned in the ``order_by()`` part of a queryset (or which
 are used in the default ordering on a model) are used when selecting the
