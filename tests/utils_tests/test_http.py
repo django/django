@@ -97,6 +97,8 @@ class TestUtilsHttp(unittest.TestCase):
             r'http://testserver\me:pass@example.com',
             r'http://testserver\@example.com',
             r'http:\\testserver\confirm\me@example.com',
+            'http:999999999',
+            'ftp:9999999999',
             '\n',
         )
         for bad_url in bad_urls:
@@ -117,6 +119,7 @@ class TestUtilsHttp(unittest.TestCase):
             '//testserver/',
             'http://testserver/confirm?email=me@example.com',
             '/url%20with%20spaces/',
+            'path/http:2222222222',
         )
         for good_url in good_urls:
             with ignore_warnings(category=RemovedInDjango21Warning):
