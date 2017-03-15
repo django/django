@@ -659,8 +659,9 @@ the ``cache`` template tag. To give your template access to this tag, put
 
 The ``{% cache %}`` template tag caches the contents of the block for a given
 amount of time. It takes at least two arguments: the cache timeout, in seconds,
-and the name to give the cache fragment. The name will be taken as is, do not
-use a variable. For example:
+and the name to give the cache fragment. The fragment is cached forever if
+timeout is ``None``. The name will be taken as is, do not use a variable. For
+example:
 
 .. code-block:: html+django
 
@@ -668,6 +669,10 @@ use a variable. For example:
     {% cache 500 sidebar %}
         .. sidebar ..
     {% endcache %}
+
+.. versionchanged:: 2.0
+
+    Older versions don't allow a ``None`` timeout.
 
 Sometimes you might want to cache multiple copies of a fragment depending on
 some dynamic data that appears inside the fragment. For example, you might want a

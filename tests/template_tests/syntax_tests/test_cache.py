@@ -122,6 +122,17 @@ class CacheTagTests(SimpleTestCase):
         output = self.engine.render_to_string('cache18')
         self.assertEqual(output, 'cache18')
 
+    @setup({
+        'first': '{% load cache %}{% cache None fragment19 %}content{% endcache %}',
+        'second': '{% load cache %}{% cache None fragment19 %}not rendered{% endcache %}'
+    })
+    def test_none_timeout(self):
+        """A timeout of None means "cache forever"."""
+        output = self.engine.render_to_string('first')
+        self.assertEqual(output, 'content')
+        output = self.engine.render_to_string('second')
+        self.assertEqual(output, 'content')
+
 
 class CacheTests(SimpleTestCase):
 
