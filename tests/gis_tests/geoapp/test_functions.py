@@ -2,7 +2,9 @@ import re
 from decimal import Decimal
 
 from django.contrib.gis.db.models import functions
-from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
+from django.contrib.gis.geos import (
+    GEOSGeometry, LineString, Point, Polygon, fromstr,
+)
 from django.contrib.gis.measure import Area
 from django.db import connection
 from django.db.models import Sum
@@ -494,7 +496,48 @@ class GISFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_Union_function")
     def test_union(self):
+        """Union with all combinations of geometries/geometry fields."""
         geom = Point(-95.363151, 29.763374, srid=4326)
-        ptown = City.objects.annotate(union=functions.Union('point', geom)).get(name='Dallas')
+
+        union = City.objects.annotate(union=functions.Union('point', geom)).get(name='Dallas').union
         expected = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
-        self.assertTrue(expected.equals(ptown.union))
+        self.assertTrue(expected.equals(union))
+
+        union = City.objects.annotate(union=functions.Union(geom, 'point')).get(name='Dallas').union
+        self.assertTrue(expected.equals(union))
+
+        union = City.objects.annotate(union=functions.Union('point', 'point')).get(name='Dallas').union
+        expected = GEOSGeometry('POINT(-96.801611 32.782057)', srid=4326)
+        self.assertTrue(expected.equals(union))
+
+        union = City.objects.annotate(union=functions.Union(geom, geom)).get(name='Dallas').union
+        self.assertTrue(geom.equals(union))
+
+    @skipUnlessDBFeature("has_Union_function", "has_Transform_function")
+    def test_union_mixed_srid(self):
+        """The result SRID depends on the order of parameters."""
+        geom = Point(61.42915, 55.15402, srid=4326)
+        geom_3857 = geom.transform(3857, clone=True)
+        tol = 0.001
+
+        for city in City.objects.annotate(union=functions.Union('point', geom_3857)):
+            expected = city.point | geom
+            self.assertTrue(city.union.equals_exact(expected, tol))
+            self.assertEqual(city.union.srid, 4326)
+
+        for city in City.objects.annotate(union=functions.Union(geom_3857, 'point')):
+            expected = geom_3857 | city.point.transform(3857, clone=True)
+            self.assertTrue(expected.equals_exact(city.union, tol))
+            self.assertEqual(city.union.srid, 3857)
+
+    def test_argument_validation(self):
+        with self.assertRaisesMessage(ValueError, 'SRID is required for all geometries.'):
+            City.objects.annotate(geo=functions.GeoFunc(Point(1, 1)))
+
+        msg = 'GeoFunc function requires a GeometryField in position 1, got CharField.'
+        with self.assertRaisesMessage(TypeError, msg):
+            City.objects.annotate(geo=functions.GeoFunc('name'))
+
+        msg = 'GeoFunc function requires a geometric argument in position 1.'
+        with self.assertRaisesMessage(TypeError, msg):
+            City.objects.annotate(union=functions.GeoFunc(1, 'point')).get(name='Dallas')
