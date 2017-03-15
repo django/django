@@ -10,6 +10,8 @@ Django 1.9.13 fixes a bug in 1.9.12.
 
 PostgreSQL Schema Objects
 =========================
+PosgreSQL Schema Objects
+========================
 
 Logic has been added to allow for PostgreSQL schema objects to be specified
 as part of the table name specification.  By prepending the schema name
