@@ -171,3 +171,9 @@ class StatTestModel(models.Model):
 
 class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
+
+class SchemaModel(models.Model):
+    int1 = models.IntegerField()
+
+    class Meta:
+        db_table = 'my_schema.test_table'

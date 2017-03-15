@@ -408,6 +408,15 @@ class BaseDatabaseOperations:
         """
         return ''
 
+    def schema_sql(self, schema):
+        """
+        Return any SQL needed to support creating tables within a schema.
+        This SQL is executed every time a table is created.
+
+        Return '' if the backend doesn't support schemas.
+        """
+        return ''
+
     def prep_for_like_query(self, x):
         """Prepare a value for use in a LIKE query."""
         return force_text(x).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
