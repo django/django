@@ -4,8 +4,8 @@ from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    BigIntegerModel, IntegerModel, PositiveIntegerModel,
-    PositiveSmallIntegerModel, SmallIntegerModel,
+    BigIntegerModel, IntegerModel, PositiveBigIntegerModel,
+    PositiveIntegerModel, PositiveSmallIntegerModel, SmallIntegerModel,
 )
 
 
@@ -150,6 +150,11 @@ class PositiveSmallIntegerFieldTests(IntegerFieldTests):
 class PositiveIntegerFieldTests(IntegerFieldTests):
     model = PositiveIntegerModel
     documented_range = (0, 2147483647)
+
+
+class PositiveBigIntegerFieldTests(IntegerFieldTests):
+    model = PositiveBigIntegerModel
+    documented_range = (0, 9223372036854775807)
 
 
 class ValidationTests(SimpleTestCase):

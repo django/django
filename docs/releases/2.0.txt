@@ -207,6 +207,7 @@ Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
 * :djadmin:`inspectdb` now translates MySQL's unsigned integer columns to
+  ``PositiveAutoField``, ``PositiveBigAutoField``, ``PositiveIntegerField``,
   ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
 * The new :option:`makemessages --add-location` option controls the comment
@@ -276,6 +277,10 @@ Models
 * The new ``filter`` argument for built-in aggregates allows :ref:`adding
   different conditionals <conditional-aggregation>` to multiple aggregations
   over the same fields or relations.
+* Added :class:`~django.db.models.PositiveAutoField`,
+  :class:`~django.db.models.PositiveBigAutoField` and
+  :class:`~django.db.models.PositiveBigIntegerField` which are unsigned on
+  MySQL.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
