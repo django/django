@@ -22,8 +22,8 @@ Some examples
 
 .. code-block:: python
 
-    from django.db.models import F, Count
-    from django.db.models.functions import Length, Upper, Value
+    from django.db.models import F, Count, Value
+    from django.db.models.functions import Length, Upper
 
     # Find companies that have more employees than chairs.
     Company.objects.filter(num_employees__gt=F('num_chairs'))
