@@ -487,23 +487,37 @@ class SelectDateWidgetTest(WidgetTest):
         self.assertIs(self.widget.value_omitted_from_data(data, {}, 'field'), False)
 
     def test_regexp_date_re(self):
-        # valid formats
-        self.assertIsNotNone(self.widget.date_re.match('2000-1-1'))  # 1 digit for (day & month)
-        self.assertIsNotNone(self.widget.date_re.match('2000-10-15'))  # 2 digit for (day & month)
-        self.assertIsNotNone(self.widget.date_re.match('2000-01-01'))  # 2 digit for (day & month) starting on 0
-        # valid formats with empty values
-        self.assertIsNotNone(self.widget.date_re.match('2000-01-0'))  # day not provided
-        self.assertIsNotNone(self.widget.date_re.match('2000-0-01'))  # month not provided
-        self.assertIsNotNone(self.widget.date_re.match('0-01-01'))  # year not provided
-        self.assertIsNotNone(self.widget.date_re.match('2000-0-0'))  # day & month not provided
-        self.assertIsNotNone(self.widget.date_re.match('0-01-0'))  # day & year not provided
-        self.assertIsNotNone(self.widget.date_re.match('0-0-01'))  # month & year not provided
-        self.assertIsNotNone(self.widget.date_re.match('0-0-0'))  # day, month & year not provided
-        # invalid formats
-        self.assertIsNone(self.widget.date_re.match('2000-01-001'))  # invalid day
-        self.assertIsNone(self.widget.date_re.match('2000-001-01'))  # invalid month
+        # check valid formats
+        # 1 digit for (day & month)
+        self.assertDictEqual(self.widget.format_value('2000-1-1'), {'day': 1, 'month': 1, 'year': 2000})
+        # 2 digit for (day & month)
+        self.assertDictEqual(self.widget.format_value('2000-10-15'), {'day': 15, 'month': 10, 'year': 2000})
+        # 2 digit for (day & month) starting on 0
+        self.assertDictEqual(self.widget.format_value('2000-01-01'), {'day': 1, 'month': 1, 'year': 2000})
+
+        # check valid formats with empty values
+        # day not provided
+        self.assertDictEqual(self.widget.format_value('2000-01-0'), {'day': 0, 'month': 1, 'year': 2000})
+        # month not provided
+        self.assertDictEqual(self.widget.format_value('2000-0-01'), {'day': 1, 'month': 0, 'year': 2000})
+        # year not provided
+        self.assertDictEqual(self.widget.format_value('0-01-01'), {'day': 1, 'month': 1, 'year': 0})
+        # day & month not provided
+        self.assertDictEqual(self.widget.format_value('2000-0-0'), {'day': 0, 'month': 0, 'year': 2000})
+        # day & year not provided
+        self.assertDictEqual(self.widget.format_value('0-01-0'), {'day': 0, 'month': 1, 'year': 0})
+        # month & year not provided
+        self.assertDictEqual(self.widget.format_value('0-0-01'), {'day': 1, 'month': 0, 'year': 0})
+        # day, month & year not provided
+        self.assertDictEqual(self.widget.format_value('0-0-0'), {'day': 0, 'month': 0, 'year': 0})
+
+        # check invalid formats
+        # invalid day
+        self.assertDictEqual(self.widget.format_value('2000-01-001'), {'day': None, 'month': None, 'year': None})
+        # invalid month
+        self.assertDictEqual(self.widget.format_value('2000-001-01'), {'day': None, 'month': None, 'year': None})
         # invalid year formats (year accept only 4 digits or 0)
-        self.assertIsNone(self.widget.date_re.match('2-01-01'))
-        self.assertIsNone(self.widget.date_re.match('20-01-01'))
-        self.assertIsNone(self.widget.date_re.match('200-01-01'))
-        self.assertIsNone(self.widget.date_re.match('20000-01-01'))
+        self.assertDictEqual(self.widget.format_value('2-01-01'), {'day': None, 'month': None, 'year': None})
+        self.assertDictEqual(self.widget.format_value('20-01-01'), {'day': None, 'month': None, 'year': None})
+        self.assertDictEqual(self.widget.format_value('200-01-01'), {'day': None, 'month': None, 'year': None})
+        self.assertDictEqual(self.widget.format_value('20000-01-01'), {'day': None, 'month': None, 'year': None})
