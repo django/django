@@ -32,6 +32,8 @@ def lookup_needs_distinct(opts, lookup_path):
         lookup_fields = lookup_fields[:-1]
     # Now go through the fields (following all relations) and look for an m2m
     for field_name in lookup_fields:
+        if field_name == 'pk':
+            field_name = opts.pk.name
         field = opts.get_field(field_name)
         if hasattr(field, 'get_path_info'):
             # This field is a relation, update opts to follow the relation
