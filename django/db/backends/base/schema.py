@@ -278,8 +278,14 @@ class BaseDatabaseSchemaEditor:
             columns = [model._meta.get_field(field).column for field in fields]
             self.deferred_sql.append(self._create_unique_sql(model, columns))
         # Make the table
-        sql = self.sql_create_table % {
-            "table": self.quote_name(model._meta.db_table),
+        sql = ""
+        quoted_name = self.quote_name(model._meta.db_table)
+        if self.connection.features.supports_schemas:
+            quoted_parts = quoted_name.split('.')
+            if len(quoted_parts) > 1:
+                sql += self.connection.ops.schema_sql(quoted_parts[-2])
+        sql += self.sql_create_table % {
+            "table": quoted_name,
             "definition": ", ".join(column_sqls)
         }
         if model._meta.db_tablespace:

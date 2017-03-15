@@ -71,10 +71,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
+        # Allow schemas (#22673)
+        table_schema = 'public'
+        parts = table_name.split('.')
+        if len(parts) > 1:
+            table_schema = parts[-2]
         cursor.execute("""
             SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
-            WHERE table_name = %s""", [table_name])
+            WHERE table_schema = %s AND table_name = %s""",
+                [table_schema, parts[-1]])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [

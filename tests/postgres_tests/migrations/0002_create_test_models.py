@@ -192,6 +192,17 @@ class Migration(migrations.Migration):
             ]
         ),
         migrations.CreateModel(
+            name='SchemaModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('int1', models.IntegerField(null=True, default=None)),
+            ],
+            options={
+                'db_table': 'schema_test.schema_test_table',
+            },
+            bases=(models.Model,)
+        ),
+        migrations.CreateModel(
             name='RangesModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
