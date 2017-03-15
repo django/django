@@ -30,6 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_select_intersection = False
     supports_select_difference = False
     supports_slicing_ordering_in_compound = True
+    supports_index_on_textfield = False
 
     @cached_property
     def _mysql_storage_engine(self):
