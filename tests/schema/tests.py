@@ -1660,7 +1660,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(NoteInfoIndexed)
         # Ensure the table is there and has no index for TextField
-        self.assertNotIn('description', self.get_indexes(NoteInfoIndexed._meta.db_table))
+        self.assertNotIn('info', self.get_indexes(NoteInfoIndexed._meta.db_table))
 
     def test_indexes(self):
         """
@@ -2309,3 +2309,11 @@ class SchemaTests(TransactionTestCase):
         doc = Document.objects.create(name='Test Name')
         student = Student.objects.create(name='Some man')
         doc.students.add(student)
+
+    @skipIfDBFeature('supports_index_on_textfield')
+    def test_db_feature_supports_index_on_textfield(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(NoteInfoIndexed)
+        # Ensure the table is there and has no index for TextField
+        self.assertNotIn('info', self.get_indexes(NoteInfoIndexed._meta.db_table))
+
