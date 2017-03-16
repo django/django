@@ -27,8 +27,8 @@ you should familiarize yourself with before using this feature.
 .. warning::
     Schema object are currently implemented only for Postgresql.
     By using table names that include schema names (as explained
-    before) tables wil be created and manipulated within the specified
-    schema.  Since the seperating period cannot be expressed in the
+    before) tables will be created and manipulated within the specified
+    schema.  Since the separating period cannot be expressed in the
     class name, you have to use the Meta class with a db_table
     attribute that specifies the fully qualified table name (that
     includes the schema name).

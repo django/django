@@ -79,8 +79,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("""
             SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
-            WHERE table_schema = %s AND table_name = %s""",
-                [table_schema, parts[-1]])
+            WHERE table_schema = %s AND table_name = %s""", [table_schema, parts[-1]])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
