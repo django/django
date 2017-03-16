@@ -364,7 +364,7 @@ features:
 For more details, see the GeoDjango documentation.
 
 .. _geodjango: http://geodjango.org/
-.. _spatialite: http://www.gaia-gis.it/gaia-sins/
+.. _spatialite: https://www.gaia-gis.it/gaia-sins/
 
 Other improvements
 ------------------

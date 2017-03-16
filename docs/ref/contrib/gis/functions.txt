@@ -169,7 +169,7 @@ __ http://www.w3.org/Graphics/SVG/
 
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
-*Availability*: `PostGIS <http://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
+*Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
 `Oracle (≥ 12.1.0.2) <https://docs.oracle.com/database/121/SPATL/GUID-82A61626-BB64-4793-B53D-A0DBEC91831A.htm#SPATL1554>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
@@ -269,7 +269,7 @@ representing the bounding box of the geometry.
 
 .. class:: ForceRHR(expression, **extra)
 
-*Availability*: `PostGIS <http://postgis.net/docs/ST_ForceRHR.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ForceRHR.html>`__
 
 Accepts a single geographic field or expression and returns a modified version
 of the polygon/multipolygon in which all of the vertices follow the

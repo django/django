@@ -49,8 +49,8 @@ totally fine with GeoDjango. Your mileage may vary.
     required -- just import them as normal from :mod:`django.contrib.gis`.
 
 .. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
-__ http://postgis.net/
-__ http://www.gaia-gis.it/gaia-sins/
+__ https://postgis.net/
+__ https://www.gaia-gis.it/gaia-sins/
 
 
 On Debian/Ubuntu, you are advised to install the following packages which will
