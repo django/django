@@ -195,7 +195,7 @@ class Migration(migrations.Migration):
             name='SchemaModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('int1', models.IntegerField(null=True, default=None)),
+                ('int1', models.IntegerField()),
             ],
             options={
                 'db_table': 'schema_test.schema_test_table',
