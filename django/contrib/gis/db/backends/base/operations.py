@@ -16,30 +16,6 @@ class BaseSpatialOperations:
     geography = False
     geometry = False
 
-    area = False
-    bounding_circle = False
-    centroid = False
-    difference = False
-    distance = False
-    distance_sphere = False
-    distance_spheroid = False
-    envelope = False
-    force_rhr = False
-    mem_size = False
-    num_geom = False
-    num_points = False
-    perimeter = False
-    perimeter3d = False
-    point_on_surface = False
-    polygonize = False
-    reverse = False
-    scale = False
-    snap_to_grid = False
-    sym_difference = False
-    transform = False
-    translate = False
-    union = False
-
     # Aggregates
     disallowed_aggregates = ()
 
@@ -58,13 +34,6 @@ class BaseSpatialOperations:
         'Reverse', 'Scale', 'SnapToGrid', 'SymDifference', 'Transform',
         'Translate', 'Union',
     }
-
-    # Serialization
-    geohash = False
-    geojson = False
-    gml = False
-    kml = False
-    svg = False
 
     # Constructors
     from_text = False
