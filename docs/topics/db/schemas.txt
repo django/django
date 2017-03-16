@@ -25,7 +25,7 @@ you should familiarize yourself with before using this feature.
 .. _`oracle schema`: http://docs.oracle.com/database/122/CNCPT/tables-and-table-clusters.htm#CNCPT88800
 
 .. warning::
-    Schema object are currently implemented only for Postgresql.
+    Schema object are currently implemented only for PostgreSQL.
     By using table names that include schema names (as explained
     before) tables will be created and manipulated within the specified
     schema.  Since the separating period cannot be expressed in the
@@ -64,7 +64,7 @@ qualified as ``my_schema.my_table``.
 Database support
 ================
 
-Currently Django only supports PostGreSQL schema objects.
+Currently Django only supports PostgreSQL schema objects.
 
 When you use a backend that lacks support for schemas, Django ignores all
 schema-related options.
