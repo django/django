@@ -20,5 +20,6 @@ model maps to a single database table.
    transactions
    multi-db
    tablespaces
+   schemas
    optimization
    examples/index
