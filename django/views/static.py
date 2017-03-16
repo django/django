@@ -7,7 +7,6 @@ import os
 import posixpath
 import re
 import stat
-from urllib.parse import unquote
 
 from django.http import (
     FileResponse, Http404, HttpResponse, HttpResponseNotModified,
@@ -34,7 +33,7 @@ def serve(request, path, document_root=None, show_indexes=False):
     but if you'd like to override it, you can create a template called
     ``static/directory_index.html``.
     """
-    path = posixpath.normpath(unquote(path))
+    path = posixpath.normpath(path)
     path = path.lstrip('/')
     newpath = ''
     for part in path.split('/'):

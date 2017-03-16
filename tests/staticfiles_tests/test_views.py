@@ -1,4 +1,5 @@
 import posixpath
+from urllib.parse import quote
 
 from django.conf import settings
 from django.test import override_settings
@@ -12,8 +13,7 @@ class TestServeStatic(StaticFilesTestCase):
     Test static asset serving view.
     """
     def _response(self, filepath):
-        return self.client.get(
-            posixpath.join(settings.STATIC_URL, filepath))
+        return self.client.get(quote(posixpath.join(settings.STATIC_URL, filepath)))
 
     def assertFileContains(self, filepath, text):
         self.assertContains(self._response(filepath), text)

@@ -1,6 +1,7 @@
 import mimetypes
 import unittest
 from os import path
+from urllib.parse import quote
 
 from django.conf.urls.static import static
 from django.core.exceptions import ImproperlyConfigured
@@ -21,9 +22,9 @@ class StaticTests(SimpleTestCase):
 
     def test_serve(self):
         "The static view can serve static media"
-        media_files = ['file.txt', 'file.txt.gz']
+        media_files = ['file.txt', 'file.txt.gz', '%2F.txt']
         for filename in media_files:
-            response = self.client.get('/%s/%s' % (self.prefix, filename))
+            response = self.client.get('/%s/%s' % (self.prefix, quote(filename)))
             response_content = b''.join(response)
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
