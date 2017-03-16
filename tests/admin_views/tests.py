@@ -3491,7 +3491,7 @@ action)</option>
             reverse('admin:admin_views_actor_add') + '?%s=1' % IS_POPUP_VAR,
             {'name': 'Troy McClure', 'age': '55', IS_POPUP_VAR: '1'})
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response.template_name, [
+        self.assertEqual(response.template_name, [
             'admin/admin_views/actor/popup_response.html',
             'admin/admin_views/popup_response.html',
             'admin/popup_response.html',
@@ -3505,7 +3505,7 @@ action)</option>
             {'name': 'David Tennant', 'age': '46', IS_POPUP_VAR: '1'}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response.template_name, [
+        self.assertEqual(response.template_name, [
             'admin/admin_views/actor/popup_response.html',
             'admin/admin_views/popup_response.html',
             'admin/popup_response.html',
@@ -3519,7 +3519,7 @@ action)</option>
             {IS_POPUP_VAR: '1'}
         )
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response.template_name, [
+        self.assertEqual(response.template_name, [
             'admin/admin_views/actor/popup_response.html',
             'admin/admin_views/popup_response.html',
             'admin/popup_response.html',

@@ -99,9 +99,9 @@ class RelatedGeoModelTest(TestCase):
 
         # Ordering of points in the result of the union is not defined and
         # implementation-dependent (DB backend, GEOS version)
-        self.assertSetEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u1})
-        self.assertSetEqual({p.ewkt for p in ref_u2}, {p.ewkt for p in u2})
-        self.assertSetEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
+        self.assertEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u1})
+        self.assertEqual({p.ewkt for p in ref_u2}, {p.ewkt for p in u2})
+        self.assertEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
 
     def test05_select_related_fk_to_subclass(self):
         "Testing that calling select_related on a query over a model with an FK to a model subclass works"

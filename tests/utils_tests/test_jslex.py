@@ -118,7 +118,7 @@ def make_function(input, toks):
     def test_func(self):
         lexer = JsLexer()
         result = ["%s %s" % (name, tok) for name, tok in lexer.lex(input) if name != 'ws']
-        self.assertListEqual(result, toks)
+        self.assertEqual(result, toks)
     return test_func
 
 
@@ -220,7 +220,7 @@ class JsToCForGettextTest(SimpleTestCase):
 
 def make_function(js, c):
     def test_func(self):
-        self.assertMultiLineEqual(prepare_js_for_gettext(js), c)
+        self.assertEqual(prepare_js_for_gettext(js), c)
     return test_func
 
 

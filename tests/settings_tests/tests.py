@@ -24,8 +24,8 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
     available_apps = []
 
     def test_override(self):
-        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
-        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
+        self.assertEqual(settings.ITEMS, ['b', 'c', 'd'])
+        self.assertEqual(settings.ITEMS_OUTER, [1, 2, 3])
         self.assertEqual(settings.TEST, 'override')
         self.assertEqual(settings.TEST_OUTER, 'outer')
 
@@ -35,8 +35,8 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
         'remove': ['d', 'c'],
     })
     def test_method_list_override(self):
-        self.assertListEqual(settings.ITEMS, ['a', 'b', 'e', 'f'])
-        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
+        self.assertEqual(settings.ITEMS, ['a', 'b', 'e', 'f'])
+        self.assertEqual(settings.ITEMS_OUTER, [1, 2, 3])
 
     @modify_settings(ITEMS={
         'append': ['b'],
@@ -44,7 +44,7 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
         'remove': ['a', 'c', 'e'],
     })
     def test_method_list_override_no_ops(self):
-        self.assertListEqual(settings.ITEMS, ['b', 'd'])
+        self.assertEqual(settings.ITEMS, ['b', 'd'])
 
     @modify_settings(ITEMS={
         'append': 'e',
@@ -52,12 +52,12 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
         'remove': 'c',
     })
     def test_method_list_override_strings(self):
-        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
+        self.assertEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
 
     @modify_settings(ITEMS={'remove': ['b', 'd']})
     @modify_settings(ITEMS={'append': ['b'], 'prepend': ['d']})
     def test_method_list_override_nested_order(self):
-        self.assertListEqual(settings.ITEMS, ['d', 'c', 'b'])
+        self.assertEqual(settings.ITEMS, ['d', 'c', 'b'])
 
     @override_settings(TEST='override2')
     def test_method_override(self):
@@ -80,7 +80,7 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
 class FullyDecoratedTestCase(TestCase):
 
     def test_override(self):
-        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
+        self.assertEqual(settings.ITEMS, ['b', 'c', 'd'])
         self.assertEqual(settings.TEST, 'override')
 
     @modify_settings(ITEMS={
@@ -90,7 +90,7 @@ class FullyDecoratedTestCase(TestCase):
     })
     @override_settings(TEST='override2')
     def test_method_override(self):
-        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
+        self.assertEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
         self.assertEqual(settings.TEST, 'override2')
 
 

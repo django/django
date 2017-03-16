@@ -812,11 +812,7 @@ class ChangeListTests(TestCase):
             cl.page_num = page_num
             cl.get_results(request)
             real_page_range = pagination(cl)['page_range']
-
-            self.assertListEqual(
-                expected_page_range,
-                list(real_page_range),
-            )
+            self.assertEqual(expected_page_range, list(real_page_range))
 
     def test_object_tools_displayed_no_add_permission(self):
         """

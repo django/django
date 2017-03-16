@@ -97,9 +97,7 @@ class AppsTests(SimpleTestCase):
         Tests apps.get_app_configs().
         """
         app_configs = apps.get_app_configs()
-        self.assertListEqual(
-            [app_config.name for app_config in app_configs],
-            SOME_INSTALLED_APPS_NAMES)
+        self.assertEqual([app_config.name for app_config in app_configs], SOME_INSTALLED_APPS_NAMES)
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_config(self):
@@ -201,7 +199,7 @@ class AppsTests(SimpleTestCase):
         body['__module__'] = TotallyNormal.__module__
         temp_model = type("SouthPonies", (models.Model,), body)
         # Make sure it appeared in the right place!
-        self.assertListEqual(list(apps.get_app_config("apps").get_models()), old_models)
+        self.assertEqual(list(apps.get_app_config("apps").get_models()), old_models)
         with self.assertRaises(LookupError):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
@@ -275,7 +273,7 @@ class AppsTests(SimpleTestCase):
 
         # LazyModelA shouldn't be waited on since it's already registered,
         # and LazyModelC shouldn't be waited on until LazyModelB exists.
-        self.assertSetEqual(set(apps._pending_operations) - initial_pending, {('apps', 'lazyb')})
+        self.assertEqual(set(apps._pending_operations) - initial_pending, {('apps', 'lazyb')})
 
         # Multiple operations can wait on the same model
         apps.lazy_model_operation(test_func, ('apps', 'lazyb'))
@@ -283,16 +281,16 @@ class AppsTests(SimpleTestCase):
         class LazyB(models.Model):
             pass
 
-        self.assertListEqual(model_classes, [LazyB])
+        self.assertEqual(model_classes, [LazyB])
 
         # Now we are just waiting on LazyModelC.
-        self.assertSetEqual(set(apps._pending_operations) - initial_pending, {('apps', 'lazyc')})
+        self.assertEqual(set(apps._pending_operations) - initial_pending, {('apps', 'lazyc')})
 
         class LazyC(models.Model):
             pass
 
         # Everything should be loaded - make sure the callback was executed properly.
-        self.assertListEqual(model_classes, [LazyA, LazyB, LazyB, LazyC, LazyA])
+        self.assertEqual(model_classes, [LazyA, LazyB, LazyB, LazyC, LazyA])
 
 
 class Stub:

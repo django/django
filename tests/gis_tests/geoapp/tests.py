@@ -196,7 +196,7 @@ class GeoModelTest(TestCase):
             tmp.write(result)
             tmp.seek(0)
             call_command('loaddata', tmp.name, verbosity=0)
-        self.assertListEqual(original_data, list(City.objects.all().order_by('name')))
+        self.assertEqual(original_data, list(City.objects.all().order_by('name')))
 
     @skipUnlessDBFeature("supports_empty_geometries")
     def test_empty_geometries(self):

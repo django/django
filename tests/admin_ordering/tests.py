@@ -49,7 +49,7 @@ class TestAdminOrdering(TestCase):
         """
         ma = ModelAdmin(Band, site)
         names = [b.name for b in ma.get_queryset(request)]
-        self.assertListEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
+        self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
     def test_specified_ordering(self):
         """
@@ -60,7 +60,7 @@ class TestAdminOrdering(TestCase):
             ordering = ('rank',)  # default ordering is ('name',)
         ma = BandAdmin(Band, site)
         names = [b.name for b in ma.get_queryset(request)]
-        self.assertListEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
+        self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
 
     def test_dynamic_ordering(self):
         """
@@ -72,10 +72,10 @@ class TestAdminOrdering(TestCase):
         request.user = super_user
         ma = DynOrderingBandAdmin(Band, site)
         names = [b.name for b in ma.get_queryset(request)]
-        self.assertListEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
+        self.assertEqual(['Radiohead', 'Van Halen', 'Aerosmith'], names)
         request.user = other_user
         names = [b.name for b in ma.get_queryset(request)]
-        self.assertListEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
+        self.assertEqual(['Aerosmith', 'Radiohead', 'Van Halen'], names)
 
 
 class TestInlineModelAdminOrdering(TestCase):
@@ -99,7 +99,7 @@ class TestInlineModelAdminOrdering(TestCase):
         """
         inline = SongInlineDefaultOrdering(self.band, site)
         names = [s.name for s in inline.get_queryset(request)]
-        self.assertListEqual(['Dude (Looks Like a Lady)', 'Jaded', 'Pink'], names)
+        self.assertEqual(['Dude (Looks Like a Lady)', 'Jaded', 'Pink'], names)
 
     def test_specified_ordering(self):
         """
@@ -107,7 +107,7 @@ class TestInlineModelAdminOrdering(TestCase):
         """
         inline = SongInlineNewOrdering(self.band, site)
         names = [s.name for s in inline.get_queryset(request)]
-        self.assertListEqual(['Jaded', 'Pink', 'Dude (Looks Like a Lady)'], names)
+        self.assertEqual(['Jaded', 'Pink', 'Dude (Looks Like a Lady)'], names)
 
 
 class TestRelatedFieldsAdminOrdering(TestCase):
@@ -130,9 +130,8 @@ class TestRelatedFieldsAdminOrdering(TestCase):
     def check_ordering_of_field_choices(self, correct_ordering):
         fk_field = site._registry[Song].formfield_for_foreignkey(Song.band.field, request=None)
         m2m_field = site._registry[Song].formfield_for_manytomany(Song.other_interpreters.field, request=None)
-
-        self.assertListEqual(list(fk_field.queryset), correct_ordering)
-        self.assertListEqual(list(m2m_field.queryset), correct_ordering)
+        self.assertEqual(list(fk_field.queryset), correct_ordering)
+        self.assertEqual(list(m2m_field.queryset), correct_ordering)
 
     def test_no_admin_fallback_to_model_ordering(self):
         # should be ordered by name (as defined by the model)

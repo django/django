@@ -255,7 +255,7 @@ class FormsTestCase(SimpleTestCase):
         self.assertEqual(p.errors['first_name'], ['This field is required.'])
         self.assertEqual(p.errors['birthday'], ['This field is required.'])
         self.assertFalse(p.is_valid())
-        self.assertDictEqual(
+        self.assertEqual(
             p.errors,
             {'birthday': ['This field is required.'], 'first_name': ['This field is required.']}
         )
