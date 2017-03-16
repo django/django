@@ -2312,7 +2312,13 @@ class SchemaTests(TransactionTestCase):
 
     @skipIfDBFeature('supports_index_on_textfield')
     def test_db_feature_supports_index_on_textfield(self):
+        class NoteInfoTextFieldIndexed(Model):
+            info = TextField(db_index=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
         with connection.schema_editor() as editor:
-            editor.create_model(NoteInfoIndexed)
+            editor.create_model(NoteInfoTextFieldIndexed)
         # Ensure the table is there and has no index for TextField
-        self.assertNotIn('info', self.get_indexes(NoteInfoIndexed._meta.db_table))
+        self.assertNotIn('info', self.get_indexes(NoteInfoTextFieldIndexed._meta.db_table))
