@@ -2316,4 +2316,3 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(NoteInfoIndexed)
         # Ensure the table is there and has no index for TextField
         self.assertNotIn('info', self.get_indexes(NoteInfoIndexed._meta.db_table))
-
