@@ -10,6 +10,8 @@ Django 1.9.13 fixes a bug in 1.9.12.
 
 PostgreSQL Schema Objects
 =========================
++PosgreSQL Schema Objects
+
 PosgreSQL Schema Objects
 ========================
 
