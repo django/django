@@ -233,7 +233,7 @@ class Field(RegisterLookupMixin):
             return [
                 checks.Error(
                     "'pk' is a reserved word that cannot be used as a field name.",
-                    obj=self,
+                    obj=self.model,
                     id='fields.E003',
                 )
             ]

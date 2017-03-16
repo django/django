@@ -413,7 +413,7 @@ class FieldNamesTests(SimpleTestCase):
         expected = [
             Error(
                 "'pk' is a reserved word that cannot be used as a field name.",
-                obj=Model._meta.get_field('pk'),
+                obj=Model,
                 id='fields.E003',
             )
         ]
