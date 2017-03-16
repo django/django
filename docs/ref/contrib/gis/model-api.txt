@@ -242,7 +242,7 @@ geography column to a geometry type in the query::
 
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
-<http://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
+<https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
@@ -250,4 +250,4 @@ determining `when to use geography data type over geometry data type
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
 .. [#fndist] This limitation does not apply to PostGIS.
-.. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.
+.. [#fngeography] Please refer to the `PostGIS Geography Type <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.

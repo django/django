@@ -24,7 +24,7 @@ All examples in the reference below are given for geometry fields and inputs,
 but the lookups can be used the same way with rasters on both sides. Whenever
 a lookup doesn't support raster input, the input is automatically
 converted to a geometry where necessary using the `ST_Polygon
-<http://postgis.net/docs/RT_ST_Polygon.html>`_ function. See also the
+<https://postgis.net/docs/RT_ST_Polygon.html>`_ function. See also the
 :ref:`introduction to raster lookups <spatial-lookup-raster>`.
 
 The database operators used by the lookups can be divided into three categories:
@@ -819,4 +819,4 @@ Example::
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/database/121/SPATL/GUID-97C17C18-F05E-49B4-BE11-E89B972E2A02.htm#SPATL1039>`_, from the Oracle Spatial and Graph Developer's Guide.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
-.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.net/docs/ST_ContainsProperly.html>`_ for more details.
+.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <https://postgis.net/docs/ST_ContainsProperly.html>`_ for more details.

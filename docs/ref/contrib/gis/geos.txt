@@ -1068,7 +1068,7 @@ include the SRID value (in other words, EWKB).
         'POINT (1.4 1.7)'
 
 .. rubric:: Footnotes
-.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <https://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 
 Settings
 ========

@@ -101,7 +101,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
     available within GeoDjango.  For more information, see the PostGIS docs
     on the routines that support 3D:
 
-    http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
+    https://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     """
 
     def test_3d_hasz(self):

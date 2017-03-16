@@ -1,7 +1,7 @@
 """
 SQL functions reference lists:
-https://web.archive.org/web/20130407175746/http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.0.0.html
-http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
+https://web.archive.org/web/20130407175746/https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.0.0.html
+https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
 import re
 

@@ -19,7 +19,7 @@ In any case, you should always be able to :ref:`install from source
 <spatialite_source>`.
 
 __ https://www.gaia-gis.it/fossil/libspatialite
-__ http://www.gaia-gis.it/gaia-sins/
+__ https://www.gaia-gis.it/gaia-sins/
 
 .. _spatialite_source:
 
@@ -72,7 +72,7 @@ SpatiaLite library (``libspatialite``)
 Get the latest SpatiaLite library source bundle from the
 `download page`__::
 
-    $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-4.1.0.tar.gz
+    $ wget https://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-4.1.0.tar.gz
     $ tar xaf libspatialite-4.1.0.tar.gz
     $ cd libspatialite-4.1.0
     $ ./configure
@@ -86,7 +86,7 @@ Get the latest SpatiaLite library source bundle from the
 
         $ ./configure --target=macosx
 
-__ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
+__ https://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
 .. _spatialite_macosx:
 
@@ -106,7 +106,7 @@ However, instead of attempting to compile the SpatiaLite tools from source,
 download the `SpatiaLite Binaries`__ for OS X, and install ``spatialite`` in a
 location available in your ``PATH``.  For example::
 
-    $ curl -O http://www.gaia-gis.it/spatialite/spatialite-tools-osx-x86-2.3.1.tar.gz
+    $ curl -O https://www.gaia-gis.it/spatialite/spatialite-tools-osx-x86-2.3.1.tar.gz
     $ tar xzf spatialite-tools-osx-x86-2.3.1.tar.gz
     $ cd spatialite-tools-osx-x86-2.3.1/bin
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
@@ -116,7 +116,7 @@ add the following to your ``settings.py``::
 
     SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
 
-__ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
+__ https://www.gaia-gis.it/spatialite-2.3.1/binaries.html
 
 Homebrew
 --------

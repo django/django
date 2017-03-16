@@ -16,10 +16,10 @@ python-psycopg2 (x.x matching the PostgreSQL version you want to install).
 Alternately, you can `build from source`_. Consult the platform-specific
 instructions if you are on :ref:`macosx` or :ref:`windows`.
 
-.. _PostGIS: http://postgis.net/
+.. _PostGIS: https://postgis.net/
 .. _psycopg2: http://initd.org/psycopg/
-.. _PostGIS requirements: http://postgis.net/docs/postgis_installation.html#install_requirements
-.. _build from source: http://postgis.net/docs/postgis_installation.html#install_short_version
+.. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
+.. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
 
 Post-installation
 =================
@@ -55,7 +55,7 @@ If you plan to use those features at some point, you can also install the
 ``postgis_topology`` extension by issuing ``CREATE EXTENSION
 postgis_topology;``.
 
-__ http://postgis.net/docs/Topology.html
+__ https://postgis.net/docs/Topology.html
 
 Managing the database
 ---------------------
