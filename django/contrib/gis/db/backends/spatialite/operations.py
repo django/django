@@ -38,29 +38,9 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     Adapter = SpatiaLiteAdapter
 
-    area = 'Area'
-    centroid = 'Centroid'
     collect = 'Collect'
-    contained = 'MbrWithin'
-    difference = 'Difference'
-    distance = 'Distance'
-    envelope = 'Envelope'
     extent = 'Extent'
-    geojson = 'AsGeoJSON'
-    gml = 'AsGML'
-    intersection = 'Intersection'
-    kml = 'AsKML'
-    length = 'GLength'  # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
     makeline = 'MakeLine'
-    num_geom = 'NumGeometries'
-    num_points = 'NumPoints'
-    point_on_surface = 'PointOnSurface'
-    scale = 'ScaleCoords'
-    svg = 'AsSVG'
-    sym_difference = 'SymDifference'
-    transform = 'Transform'
-    translate = 'ShiftCoords'
-    union = 'GUnion'  # OpenGis defines Union, but this conflicts with an SQLite reserved keyword
     unionagg = 'GUnion'
 
     from_text = 'GeomFromText'
@@ -178,11 +158,13 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         SRID of the field.  Specifically, this routine will substitute in the
         Transform() and GeomFromText() function call(s).
         """
+        tranform_func = self.spatial_function_name('Transform')
+
         def transform_value(value, srid):
             return not (value is None or value.srid == srid)
         if hasattr(value, 'as_sql'):
             if transform_value(value, f.srid):
-                placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
+                placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitute in
@@ -192,7 +174,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         else:
             if transform_value(value, f.srid):
                 # Adding Transform() to the SQL placeholder.
-                return '%s(%s(%%s,%s), %s)' % (self.transform, self.from_text, value.srid, f.srid)
+                return '%s(%s(%%s,%s), %s)' % (tranform_func, self.from_text, value.srid, f.srid)
             else:
                 return '%s(%%s,%s)' % (self.from_text, f.srid)
 

@@ -63,21 +63,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     Adapter = OracleSpatialAdapter
 
-    area = 'SDO_GEOM.SDO_AREA'
-    gml = 'SDO_UTIL.TO_GMLGEOMETRY'
-    centroid = 'SDO_GEOM.SDO_CENTROID'
-    difference = 'SDO_GEOM.SDO_DIFFERENCE'
-    distance = 'SDO_GEOM.SDO_DISTANCE'
     extent = 'SDO_AGGR_MBR'
-    intersection = 'SDO_GEOM.SDO_INTERSECTION'
-    length = 'SDO_GEOM.SDO_LENGTH'
-    num_points = 'SDO_UTIL.GETNUMVERTICES'
-    perimeter = length
-    point_on_surface = 'SDO_GEOM.SDO_POINTONSURFACE'
-    reverse = 'SDO_UTIL.REVERSE_LINESTRING'
-    sym_difference = 'SDO_GEOM.SDO_XOR'
-    transform = 'SDO_CS.TRANSFORM'
-    union = 'SDO_GEOM.SDO_UNION'
     unionagg = 'SDO_AGGR_UNION'
 
     from_text = 'SDO_GEOMETRY'
@@ -222,6 +208,8 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         SRID of the field.  Specifically, this routine will substitute in the
         SDO_CS.TRANSFORM() function call.
         """
+        tranform_func = self.spatial_function_name('Transform')
+
         if value is None:
             return 'NULL'
 
@@ -230,7 +218,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
         if hasattr(value, 'as_sql'):
             if transform_value(value, f.srid):
-                placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
+                placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
             else:
                 placeholder = '%s'
             # No geometry value used for F expression, substitute in
@@ -239,7 +227,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
             return placeholder % sql
         else:
             if transform_value(value, f.srid):
-                return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (self.transform, value.srid, f.srid)
+                return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (tranform_func, value.srid, f.srid)
             else:
                 return 'SDO_GEOMETRY(%%s, %s)' % f.srid
 
