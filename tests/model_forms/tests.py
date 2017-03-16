@@ -1867,7 +1867,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         )
         article.categories.add(self.c2, self.c3)
         form = ArticleCategoriesForm(instance=article)
-        self.assertEqual(form['categories'].value(), [self.c2.slug, self.c3.slug])
+        six.assertCountEqual(self, form['categories'].value(), [self.c2.slug, self.c3.slug])
 
 
 class ModelOneToOneFieldTests(TestCase):
