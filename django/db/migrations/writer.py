@@ -7,7 +7,6 @@ from django.apps import apps
 from django.db import migrations
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.serializer import serializer_factory
-from django.utils.encoding import force_text
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now
@@ -129,7 +128,7 @@ class OperationWriter:
 
 class MigrationWriter:
     """
-    Takes a Migration instance and is able to produce the contents
+    Take a Migration instance and is able to produce the contents
     of the migration file from it.
     """
 
@@ -138,9 +137,7 @@ class MigrationWriter:
         self.needs_manual_porting = False
 
     def as_string(self):
-        """
-        Returns a string of the file contents.
-        """
+        """Return a string of the file contents."""
         items = {
             "replaces_str": "",
             "initial_str": "",
@@ -163,8 +160,6 @@ class MigrationWriter:
                 dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
                 imports.add("from django.conf import settings")
             else:
-                # No need to output bytestrings for dependencies
-                dependency = tuple(force_text(s) for s in dependency)
                 dependencies.append("        %s," % self.serialize(dependency)[0])
         items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
 

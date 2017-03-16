@@ -14,15 +14,12 @@ __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
 
 class DeleteQuery(Query):
-    """
-    Delete queries are done through this class, since they are more constrained
-    than general queries.
-    """
+    """A DELETE SQL query."""
 
     compiler = 'SQLDeleteCompiler'
 
     def do_query(self, table, where, using):
-        self.tables = [table]
+        self.tables = (table,)
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
@@ -55,8 +52,7 @@ class DeleteQuery(Query):
         innerq.get_initial_alias()
         # The same for our new query.
         self.get_initial_alias()
-        innerq_used_tables = [t for t in innerq.tables
-                              if innerq.alias_refcount[t]]
+        innerq_used_tables = tuple([t for t in innerq.tables if innerq.alias_refcount[t]])
         if not innerq_used_tables or innerq_used_tables == self.tables:
             # There is only the base table in use in the query.
             self.where = innerq.where
@@ -81,9 +77,7 @@ class DeleteQuery(Query):
 
 
 class UpdateQuery(Query):
-    """
-    Represents an "update" SQL query.
-    """
+    """An UPDATE SQL query."""
 
     compiler = 'SQLUpdateCompiler'
 
@@ -93,7 +87,7 @@ class UpdateQuery(Query):
 
     def _setup_query(self):
         """
-        Runs on initialization and after cloning. Any attributes that would
+        Run on initialization and after cloning. Any attributes that would
         normally be set in __init__ should go in here, instead, so that they
         are also set up after a clone() call.
         """
@@ -148,15 +142,15 @@ class UpdateQuery(Query):
 
     def add_related_update(self, model, field, value):
         """
-        Adds (name, value) to an update query for an ancestor model.
+        Add (name, value) to an update query for an ancestor model.
 
-        Updates are coalesced so that we only run one update query per ancestor.
+        Update are coalesced so that only one update query per ancestor is run.
         """
         self.related_updates.setdefault(model, []).append((field, None, value))
 
     def get_related_updates(self):
         """
-        Returns a list of query objects: one for each update required to an
+        Return a list of query objects: one for each update required to an
         ancestor model. Each query will have the same filtering conditions as
         the current query but will only update a single table.
         """
@@ -181,15 +175,6 @@ class InsertQuery(Query):
         self.objs = []
 
     def insert_values(self, fields, objs, raw=False):
-        """
-        Set up the insert query from the 'insert_values' dictionary. The
-        dictionary gives the model field names and their target values.
-
-        If 'raw_values' is True, the values in the 'insert_values' dictionary
-        are inserted directly into the query, rather than passed as SQL
-        parameters. This provides a way to insert NULL and DEFAULT keywords
-        into the query, for example.
-        """
         self.fields = fields
         self.objs = objs
         self.raw = raw
@@ -197,8 +182,8 @@ class InsertQuery(Query):
 
 class AggregateQuery(Query):
     """
-    An AggregateQuery takes another query as a parameter to the FROM
-    clause and only selects the elements in the provided list.
+    Take another query as a parameter to the FROM clause and only select the
+    elements in the provided list.
     """
 
     compiler = 'SQLAggregateCompiler'

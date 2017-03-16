@@ -6,6 +6,13 @@ from .base import WidgetTest
 
 class WidgetTests(WidgetTest):
 
+    def test_format_value(self):
+        widget = Widget()
+        self.assertIsNone(widget.format_value(None))
+        self.assertIsNone(widget.format_value(''))
+        self.assertEqual(widget.format_value('español'), 'español')
+        self.assertEqual(widget.format_value(42.5), '42.5')
+
     def test_value_omitted_from_data(self):
         widget = Widget()
         self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)

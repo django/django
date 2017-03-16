@@ -11,7 +11,6 @@ from django.core.servers.basehttp import (
     WSGIServer, get_internal_wsgi_application, run,
 )
 from django.utils import autoreload
-from django.utils.encoding import force_text
 
 
 naiveip_re = re.compile(r"""^(?:
@@ -151,7 +150,7 @@ class Command(BaseCommand):
             try:
                 error_text = ERRORS[e.errno]
             except KeyError:
-                error_text = force_text(e)
+                error_text = e
             self.stderr.write("Error: %s" % error_text)
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)

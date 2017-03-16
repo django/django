@@ -53,12 +53,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_stddev(self):
-        """Confirm support for STDDEV and related stats functions
+        """
+        Confirm support for STDDEV and related stats functions.
 
         SQLite supports STDDEV as an extension package; so
         connection.ops.check_expression_support() can't unilaterally
-        rule out support for STDDEV. We need to manually check
-        whether the call works.
+        rule out support for STDDEV. Manually check whether the call works.
         """
         with self.connection.cursor() as cursor:
             cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')

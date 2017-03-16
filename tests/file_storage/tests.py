@@ -495,6 +495,11 @@ class FileStorageTests(SimpleTestCase):
         with self.assertRaises(AssertionError):
             self.storage.delete('')
 
+    def test_delete_deletes_directories(self):
+        tmp_dir = tempfile.mkdtemp(dir=self.storage.location)
+        self.storage.delete(tmp_dir)
+        self.assertFalse(os.path.exists(tmp_dir))
+
     @override_settings(
         MEDIA_ROOT='media_root',
         MEDIA_URL='media_url/',

@@ -42,7 +42,6 @@ from .introspection import DatabaseIntrospection            # NOQA isort:skip
 from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
-from .version import get_version                            # NOQA isort:skip
 
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
@@ -230,8 +229,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def check_constraints(self, table_names=None):
         """
-        To check constraints, we set constraints to immediate. Then, when, we're done we must ensure they
-        are returned to deferred.
+        Check constraints by setting them to immediate. Return them to deferred
+        afterward.
         """
         self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
         self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
@@ -274,4 +273,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def pg_version(self):
         with self.temporary_connection():
-            return get_version(self.connection)
+            return self.connection.server_version

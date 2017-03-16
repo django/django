@@ -73,7 +73,7 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
 
     @contextmanager
     def disable_implicit_wait(self):
-        """Context manager that disables the default implicit wait."""
+        """Disable the default implicit wait."""
         self.selenium.implicitly_wait(0)
         try:
             yield

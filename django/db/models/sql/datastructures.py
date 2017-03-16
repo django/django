@@ -59,7 +59,7 @@ class Join:
 
     def as_sql(self, compiler, connection):
         """
-        Generates the full
+        Generate the full
            LEFT OUTER JOIN sometable ON sometable.somecol = othertable.othercol, params
         clause for this join.
         """

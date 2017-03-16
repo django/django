@@ -142,11 +142,12 @@ class GenericSitemap(Sitemap):
     priority = None
     changefreq = None
 
-    def __init__(self, info_dict, priority=None, changefreq=None):
+    def __init__(self, info_dict, priority=None, changefreq=None, protocol=None):
         self.queryset = info_dict['queryset']
         self.date_field = info_dict.get('date_field')
         self.priority = priority
         self.changefreq = changefreq
+        self.protocol = protocol
 
     def items(self):
         # Make sure to return a clone; we don't want premature evaluation.

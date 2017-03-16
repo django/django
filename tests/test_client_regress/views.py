@@ -1,9 +1,7 @@
-import json
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -111,20 +109,15 @@ def return_json_response(request):
     return JsonResponse({'key': 'value'}, **kwargs)
 
 
-def return_json_file(request):
-    "A view that parses and returns a JSON string as a file."
+def return_text_file(request):
+    "A view that parses and returns text as a file."
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
     if match:
         charset = match.group(1)
     else:
         charset = settings.DEFAULT_CHARSET
 
-    # This just checks that the uploaded data is JSON
-    obj_dict = json.loads(request.body.decode(charset))
-    obj_json = json.dumps(obj_dict, cls=DjangoJSONEncoder, ensure_ascii=False)
-    response = HttpResponse(obj_json.encode(charset), status=200,
-                            content_type='application/json; charset=%s' % charset)
-    response['Content-Disposition'] = 'attachment; filename=testfile.json'
+    response = HttpResponse(request.body, status=200, content_type='text/plain; charset=%s' % charset)
     return response
 
 

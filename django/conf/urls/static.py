@@ -8,7 +8,7 @@ from django.views.static import serve
 
 def static(prefix, view=serve, **kwargs):
     """
-    Helper function to return a URL pattern for serving files in debug mode.
+    Return a URL pattern for serving files in debug mode.
 
     from django.conf import settings
     from django.conf.urls.static import static

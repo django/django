@@ -24,10 +24,11 @@ CLEANSED_SUBSTITUTE = '********************'
 
 
 class CallableSettingWrapper:
-    """ Object to wrap callable appearing in settings
-
+    """
+    Object to wrap callable appearing in settings.
     * Not to call in the debug page (#21345).
-    * Not to break the debug page if the callable forbidding to set attributes (#23070).
+    * Not to break the debug page if the callable forbidding to set attributes
+      (#23070).
     """
     def __init__(self, callable_setting):
         self._wrapped = callable_setting
@@ -37,10 +38,9 @@ class CallableSettingWrapper:
 
 
 def cleanse_setting(key, value):
-    """Cleanse an individual setting key/value of sensitive content.
-
-    If the value is a dictionary, recursively cleanse the keys in
-    that dictionary.
+    """
+    Cleanse an individual setting key/value of sensitive content. If the value
+    is a dictionary, recursively cleanse the keys in that dictionary.
     """
     try:
         if HIDDEN_SETTINGS.search(key):
@@ -62,7 +62,10 @@ def cleanse_setting(key, value):
 
 
 def get_safe_settings():
-    "Returns a dictionary of the settings module, with sensitive settings blurred out."
+    """
+    Return a dictionary of the settings module with values of sensitive
+    settings replaced with stars (*********).
+    """
     settings_dict = {}
     for k in dir(settings):
         if k.isupper():
@@ -128,7 +131,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
 
     def get_cleansed_multivaluedict(self, request, multivaluedict):
         """
-        Replaces the keys in a MultiValueDict marked as sensitive with stars.
+        Replace the keys in a MultiValueDict marked as sensitive with stars.
         This mitigates leaking sensitive POST parameters if something like
         request.POST['nonexistent_key'] throws an exception (#21098).
         """
@@ -142,7 +145,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
 
     def get_post_parameters(self, request):
         """
-        Replaces the values of POST parameters marked as sensitive with
+        Replace the values of POST parameters marked as sensitive with
         stars (*********).
         """
         if request is None:
@@ -181,7 +184,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
 
     def get_traceback_frame_variables(self, request, tb_frame):
         """
-        Replaces the values of variables marked as sensitive with
+        Replace the values of variables marked as sensitive with
         stars (*********).
         """
         # Loop through the frame's callers to see if the sensitive_variables
@@ -231,9 +234,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
 
 
 class ExceptionReporter:
-    """
-    A class to organize and coordinate reporting on exceptions.
-    """
+    """Organize and coordinate reporting on exceptions."""
     def __init__(self, request, exc_type, exc_value, tb, is_email=False):
         self.request = request
         self.filter = get_exception_reporter_filter(self.request)
@@ -318,21 +319,21 @@ class ExceptionReporter:
         return c
 
     def get_traceback_html(self):
-        "Return HTML version of debug 500 HTTP error page."
+        """Return HTML version of debug 500 HTTP error page."""
         t = DEBUG_ENGINE.from_string(TECHNICAL_500_TEMPLATE)
         c = Context(self.get_traceback_data(), use_l10n=False)
         return t.render(c)
 
     def get_traceback_text(self):
-        "Return plain text version of debug 500 HTTP error page."
+        """Return plain text version of debug 500 HTTP error page."""
         t = DEBUG_ENGINE.from_string(TECHNICAL_500_TEXT_TEMPLATE)
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
 
     def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
         """
-        Returns context_lines before and after lineno from file.
-        Returns (pre_context_lineno, pre_context, context_line, post_context).
+        Return context_lines before and after lineno from file.
+        Return (pre_context_lineno, pre_context, context_line, post_context).
         """
         source = None
         if loader is not None and hasattr(loader, "get_source"):
@@ -439,7 +440,7 @@ class ExceptionReporter:
 
 
 def technical_404_response(request, exception):
-    "Create a technical 404 error response. The exception should be the Http404."
+    """Create a technical 404 error response. `exception` is the Http404."""
     try:
         error_url = exception.args[0]['path']
     except (IndexError, TypeError, KeyError):
@@ -494,7 +495,7 @@ def technical_404_response(request, exception):
 
 
 def default_urlconf(request):
-    "Create an empty URLconf 404 error response."
+    """Create an empty URLconf 404 error response."""
     t = DEBUG_ENGINE.from_string(DEFAULT_URLCONF_TEMPLATE)
     c = Context({
         "title": _("Welcome to Django"),

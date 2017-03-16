@@ -166,8 +166,7 @@ def lazystr(text):
     """
     Shortcut for the common case of a lazy callable that returns str.
     """
-    from django.utils.encoding import force_text  # Avoid circular import
-    return lazy(force_text, str)(text)
+    return lazy(str, str)(text)
 
 
 def keep_lazy(*resultclasses):

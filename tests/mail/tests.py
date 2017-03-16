@@ -635,8 +635,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # Simple ASCII address - string form
         self.assertEqual(sanitize_address('to@example.com', 'ascii'), 'to@example.com')
         self.assertEqual(sanitize_address('to@example.com', 'utf-8'), 'to@example.com')
-        # Bytestrings are transformed to normal strings.
-        self.assertEqual(sanitize_address(b'to@example.com', 'utf-8'), 'to@example.com')
 
         # Simple ASCII address - tuple form
         self.assertEqual(

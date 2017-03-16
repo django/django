@@ -17,7 +17,7 @@ from django.utils.functional import Promise
 
 def render_to_response(template_name, context=None, content_type=None, status=None, using=None):
     """
-    Returns a HttpResponse whose content is filled with the result of calling
+    Return a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
     warnings.warn(
@@ -31,7 +31,7 @@ def render_to_response(template_name, context=None, content_type=None, status=No
 
 def render(request, template_name, context=None, content_type=None, status=None, using=None):
     """
-    Returns a HttpResponse whose content is filled with the result of calling
+    Return a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
     content = loader.render_to_string(template_name, context, request, using=using)
@@ -40,7 +40,7 @@ def render(request, template_name, context=None, content_type=None, status=None,
 
 def redirect(to, *args, permanent=False, **kwargs):
     """
-    Returns an HttpResponseRedirect to the appropriate URL for the arguments
+    Return an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
 
     The arguments could be:
@@ -74,7 +74,7 @@ def _get_queryset(klass):
 
 def get_object_or_404(klass, *args, **kwargs):
     """
-    Uses get() to return an object, or raises a Http404 exception if the object
+    Use get() to return an object, or raise a Http404 exception if the object
     does not exist.
 
     klass may be a Model, Manager, or QuerySet object. All other passed
@@ -98,7 +98,7 @@ def get_object_or_404(klass, *args, **kwargs):
 
 def get_list_or_404(klass, *args, **kwargs):
     """
-    Uses filter() to return a list of objects, or raise a Http404 exception if
+    Use filter() to return a list of objects, or raise a Http404 exception if
     the list is empty.
 
     klass may be a Model, Manager, or QuerySet object. All other passed

@@ -1097,10 +1097,15 @@ requests being returned as "Bad Request (400)".
 
 Default: ``False``
 
-If set to True, Django's normal exception handling of view functions
-will be suppressed, and exceptions will propagate upwards.  This can
-be useful for some test setups, and should never be used on a live
-site.
+If set to ``True``, Django's exception handling of view functions
+(:data:`~django.conf.urls.handler500`, or the debug view if :setting:`DEBUG`
+is ``True``) and logging of 500 responses (:ref:`django-request-logger`) is
+skipped and exceptions propagate upwards.
+
+This can be useful for some test setups. It shouldn't be used on a live site
+unless you want your web server (instead of Django) to generate "Internal
+Server Error" responses. In that case, make sure your server doesn't show the
+stack trace or other sensitive information in the response.
 
 .. setting:: DECIMAL_SEPARATOR
 

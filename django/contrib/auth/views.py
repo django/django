@@ -19,7 +19,6 @@ from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
@@ -303,7 +302,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
         # urlsafe_base64_decode() decodes to bytestring
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = urlsafe_base64_decode(uidb64).decode()
         user = UserModel._default_manager.get(pk=uid)
     except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
@@ -410,6 +409,7 @@ class PasswordResetDoneView(PasswordContextMixin, TemplateView):
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
+    post_reset_login_backend = None
     success_url = reverse_lazy('password_reset_complete')
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
@@ -447,7 +447,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     def get_user(self, uidb64):
         try:
             # urlsafe_base64_decode() decodes to bytestring
-            uid = force_text(urlsafe_base64_decode(uidb64))
+            uid = urlsafe_base64_decode(uidb64).decode()
             user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
             user = None
@@ -462,7 +462,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         user = form.save()
         del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
         if self.post_reset_login:
-            auth_login(self.request, user)
+            auth_login(self.request, user, self.post_reset_login_backend)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):

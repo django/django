@@ -5,7 +5,6 @@ from django.db.backends.base.introspection import (
 )
 from django.db.models.indexes import Index
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -53,9 +52,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return field_type
 
     def get_table_list(self, cursor):
-        """
-        Returns a list of table and view names in the current database.
-        """
+        """Return a list of table and view names in the current database."""
         cursor.execute("""
             SELECT c.relname, c.relkind
             FROM pg_catalog.pg_class c
@@ -68,7 +65,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
+        """
+        Return a description of the table with the DB-API cursor.description
+        interface.
+        """
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         cursor.execute("""
@@ -78,16 +78,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
-            FieldInfo(*(
-                (force_text(line[0]),) +
-                line[1:6] +
-                (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])
-            )) for line in cursor.description
+            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1])))
+            for line in cursor.description
         ]
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all relationships to the given table.
         """
         cursor.execute("""

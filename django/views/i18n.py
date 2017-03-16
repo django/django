@@ -3,9 +3,9 @@ import json
 import os
 from urllib.parse import unquote
 
-from django import http
 from django.apps import apps
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.encoding import force_text
@@ -22,9 +22,9 @@ LANGUAGE_QUERY_PARAMETER = 'language'
 
 def set_language(request):
     """
-    Redirect to a given url while setting the chosen language in the
-    session or cookie. The url and the language code need to be
-    specified in the request parameters.
+    Redirect to a given URL while setting the chosen language in the session or
+    cookie. The URL and the language code need to be specified in the request
+    parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
@@ -39,14 +39,14 @@ def set_language(request):
             next = unquote(next)  # HTTP_REFERER may be encoded.
         if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             next = '/'
-    response = http.HttpResponseRedirect(next) if next else http.HttpResponse(status=204)
+    response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
             if next:
                 next_trans = translate_url(next, lang_code)
                 if next_trans != next:
-                    response = http.HttpResponseRedirect(next_trans)
+                    response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
@@ -60,9 +60,7 @@ def set_language(request):
 
 
 def get_formats():
-    """
-    Returns all formats strings required for i18n to work
-    """
+    """Return all formats strings required for i18n to work."""
     FORMAT_SETTINGS = (
         'DATE_FORMAT', 'DATETIME_FORMAT', 'TIME_FORMAT',
         'YEAR_MONTH_FORMAT', 'MONTH_DAY_FORMAT', 'SHORT_DATE_FORMAT',
@@ -202,12 +200,12 @@ def render_javascript_catalog(catalog=None, plural=None):
         'plural': plural,
     })
 
-    return http.HttpResponse(template.render(context), 'text/javascript')
+    return HttpResponse(template.render(context), 'text/javascript')
 
 
 def null_javascript_catalog(request, domain=None, packages=None):
     """
-    Returns "identity" versions of the JavaScript i18n functions -- i.e.,
+    Return "identity" versions of the JavaScript i18n functions -- i.e.,
     versions that don't actually do anything.
     """
     return render_javascript_catalog()
@@ -217,7 +215,7 @@ class JavaScriptCatalog(View):
     """
     Return the selected language catalog as a JavaScript library.
 
-    Receives the list of packages to check for translations in the `packages`
+    Receive the list of packages to check for translations in the `packages`
     kwarg either from the extra dictionary passed to the url() function or as a
     plus-sign delimited string from the request. Default is 'django.conf'.
 
@@ -298,14 +296,14 @@ class JavaScriptCatalog(View):
         ) if context['catalog'] else None
         context['formats_str'] = indent(json.dumps(context['formats'], sort_keys=True, indent=2))
 
-        return http.HttpResponse(template.render(Context(context)), 'text/javascript')
+        return HttpResponse(template.render(Context(context)), 'text/javascript')
 
 
 class JSONCatalog(JavaScriptCatalog):
     """
     Return the selected language catalog as a JSON object.
 
-    Receives the same parameters as JavaScriptCatalog and returns a response
+    Receive the same parameters as JavaScriptCatalog and return a response
     with a JSON object of the following format:
 
         {
@@ -319,4 +317,4 @@ class JSONCatalog(JavaScriptCatalog):
         }
     """
     def render_to_response(self, context, **response_kwargs):
-        return http.JsonResponse(context)
+        return JsonResponse(context)

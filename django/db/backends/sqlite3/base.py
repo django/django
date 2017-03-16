@@ -27,9 +27,8 @@ from .schema import DatabaseSchemaEditor                    # isort:skip
 
 
 def decoder(conv_func):
-    """ The Python sqlite3 interface returns always byte strings.
-        This function converts the received value to a regular string before
-        passing it to the receiver function.
+    """
+    Convert bytestrings from Python's sqlite3 interface to a regular string.
     """
     return lambda s: conv_func(s.decode())
 
@@ -215,14 +214,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def check_constraints(self, table_names=None):
         """
-        Checks each table name in `table_names` for rows with invalid foreign
+        Check each table name in `table_names` for rows with invalid foreign
         key references. This method is intended to be used in conjunction with
         `disable_constraint_checking()` and `enable_constraint_checking()`, to
         determine if rows with invalid references were entered while constraint
         checks were off.
 
-        Raises an IntegrityError on the first invalid foreign key reference
-        encountered (if any) and provides detailed information about the
+        Raise an IntegrityError on the first invalid foreign key reference
+        encountered (if any) and provide detailed information about the
         invalid reference in the error message.
 
         Backends can override this method if they can more directly apply
@@ -409,9 +408,9 @@ def _sqlite_time_extract(lookup_type, dt):
 def _sqlite_format_dtdelta(conn, lhs, rhs):
     """
     LHS and RHS can be either:
-        - An integer number of microseconds
-        - A string representing a timedelta object
-        - A string representing a datetime
+    - An integer number of microseconds
+    - A string representing a timedelta object
+    - A string representing a datetime
     """
     try:
         if isinstance(lhs, int):

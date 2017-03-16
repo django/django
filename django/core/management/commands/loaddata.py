@@ -17,7 +17,6 @@ from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
 )
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 try:
@@ -177,7 +176,7 @@ class Command(BaseCommand):
                                 'app_label': obj.object._meta.app_label,
                                 'object_name': obj.object._meta.object_name,
                                 'pk': obj.object.pk,
-                                'error_msg': force_text(e)
+                                'error_msg': e,
                             },)
                             raise
                 if objects and show_progress:

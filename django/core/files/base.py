@@ -2,7 +2,6 @@ import os
 from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
-from django.utils.encoding import force_text
 
 
 class File(FileProxyMixin):
@@ -17,7 +16,7 @@ class File(FileProxyMixin):
             self.mode = file.mode
 
     def __str__(self):
-        return force_text(self.name or '')
+        return self.name or ''
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self or "None")

@@ -19,7 +19,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Some SQLite schema alterations need foreign key constraints to be
             # disabled. This is the default in SQLite but can be changed with a
             # build flag and might change in future, so can't be relied upon.
-            # We enforce it here for the duration of the transaction.
+            # Enforce it here for the duration of the transaction.
             c.execute('PRAGMA foreign_keys')
             self._initial_pragma_fk = c.fetchone()[0]
             c.execute('PRAGMA foreign_keys = 0')
@@ -225,9 +225,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def add_field(self, model, field):
         """
-        Creates a field on a model.
-        Usually involves adding a column, but may involve adding a
-        table instead (for M2M fields)
+        Create a field on a model. Usually involves adding a column, but may
+        involve adding a table instead (for M2M fields).
         """
         # Special-case implicit M2M tables
         if field.many_to_many and field.remote_field.through._meta.auto_created:
@@ -236,7 +235,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def remove_field(self, model, field):
         """
-        Removes a field from a model. Usually involves deleting a column,
+        Remove a field from a model. Usually involves deleting a column,
         but for M2Ms may involve deleting a table.
         """
         # M2M fields are a special case
@@ -254,14 +253,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
-        """Actually perform a "physical" (non-ManyToMany) field update."""
+        """Perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
         self._remake_table(model, alter_field=(old_field, new_field))
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
-        """
-        Alters M2Ms to repoint their to= endpoints.
-        """
+        """Alter M2Ms to repoint their to= endpoints."""
         if old_field.remote_field.through._meta.db_table == new_field.remote_field.through._meta.db_table:
             # The field name didn't change, but some options did; we have to propagate this altering.
             self._remake_table(

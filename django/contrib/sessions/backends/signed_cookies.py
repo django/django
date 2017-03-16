@@ -7,9 +7,9 @@ class SessionStore(SessionBase):
 
     def load(self):
         """
-        We load the data from the key itself instead of fetching from
-        some external data store. Opposite of _get_session_key(),
-        raises BadSignature if signature fails.
+        Load the data from the key itself instead of fetching from some
+        external data store. Opposite of _get_session_key(), raise BadSignature
+        if signature fails.
         """
         try:
             return signing.loads(

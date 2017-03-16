@@ -1058,7 +1058,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj_repr = force_text(obj)
         msg_dict = {
-            'name': force_text(opts.verbose_name),
+            'name': opts.verbose_name,
             'obj': obj_repr,
         }
         # Here, we distinguish between different save types by checking for
@@ -1150,7 +1150,7 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
 
         msg_dict = {
-            'name': force_text(opts.verbose_name),
+            'name': opts.verbose_name,
             'obj': format_html('<a href="{}">{}</a>', urlquote(request.path), obj),
         }
         if "_continue" in request.POST:
@@ -1320,8 +1320,8 @@ class ModelAdmin(BaseModelAdmin):
         self.message_user(
             request,
             _('The %(name)s "%(obj)s" was deleted successfully.') % {
-                'name': force_text(opts.verbose_name),
-                'obj': force_text(obj_display),
+                'name': opts.verbose_name,
+                'obj': obj_display,
             },
             messages.SUCCESS,
         )
@@ -1394,7 +1394,7 @@ class ModelAdmin(BaseModelAdmin):
         and return a redirect to the admin index page.
         """
         msg = _("""%(name)s with ID "%(key)s" doesn't exist. Perhaps it was deleted?""") % {
-            'name': force_text(opts.verbose_name),
+            'name': opts.verbose_name,
             'key': unquote(object_id),
         }
         self.message_user(request, msg, messages.WARNING)
@@ -1478,7 +1478,7 @@ class ModelAdmin(BaseModelAdmin):
 
         context = dict(
             self.admin_site.each_context(request),
-            title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
+            title=(_('Add %s') if add else _('Change %s')) % opts.verbose_name,
             adminform=adminForm,
             object_id=object_id,
             original=obj,
@@ -1620,7 +1620,6 @@ class ModelAdmin(BaseModelAdmin):
                     ) % {
                         'count': changecount,
                         'name': model_ngettext(opts, changecount),
-                        'obj': force_text(obj),
                     }
                     self.message_user(request, msg, messages.SUCCESS)
 
@@ -1768,7 +1767,7 @@ class ModelAdmin(BaseModelAdmin):
 
         context = dict(
             self.admin_site.each_context(request),
-            title=_('Change history: %s') % force_text(obj),
+            title=_('Change history: %s') % obj,
             action_list=action_list,
             module_name=capfirst(force_text(opts.verbose_name_plural)),
             object=obj,

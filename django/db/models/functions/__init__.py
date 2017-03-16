@@ -1,6 +1,6 @@
 from .base import (
     Cast, Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now,
-    Substr, Upper,
+    StrIndex, Substr, Upper,
 )
 from .datetime import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
@@ -12,7 +12,7 @@ from .datetime import (
 __all__ = [
     # base
     'Cast', 'Coalesce', 'Concat', 'ConcatPair', 'Greatest', 'Least', 'Length',
-    'Lower', 'Now', 'Substr', 'Upper',
+    'Lower', 'Now', 'StrIndex', 'Substr', 'Upper',
     # datetime
     'Extract', 'ExtractDay', 'ExtractHour', 'ExtractMinute', 'ExtractMonth',
     'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay', 'ExtractYear',

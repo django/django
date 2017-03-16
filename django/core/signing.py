@@ -92,7 +92,7 @@ class JSONSerializer:
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
-    Return URL-safe, sha1 signed base64 compressed JSON string. If key is
+    Return URL-safe, hmac/SHA1 signed base64 compressed JSON string. If key is
     None, use settings.SECRET_KEY instead.
 
     If compress is True (not the default), check if compressing using zlib can

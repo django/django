@@ -4,14 +4,13 @@ import sys
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
-from django.utils.encoding import force_text
 
 
 class DatabaseCreation(BaseDatabaseCreation):
 
     @staticmethod
     def is_in_memory_db(database_name):
-        return database_name == ':memory:' or 'mode=memory' in force_text(database_name)
+        return database_name == ':memory:' or 'mode=memory' in database_name
 
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict['TEST']['NAME']
@@ -99,7 +98,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def test_db_signature(self):
         """
-        Returns a tuple that uniquely identifies a test database.
+        Return a tuple that uniquely identifies a test database.
 
         This takes into account the special cases of ":memory:" and "" for
         SQLite since the databases will be distinct despite having the same

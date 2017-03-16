@@ -11,7 +11,6 @@ you'd like to help improve Django or learn about how Django is managed.
    contributing/index
    mailing-lists
    organization
-   team
    security
    release-process
    deprecation

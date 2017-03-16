@@ -1,11 +1,3 @@
-"""
-XX. Generating HTML forms from models
-
-This is mostly just a reworking of the ``form_for_model``/``form_for_instance``
-tests to use ``ModelForm``. As such, the text may not make sense in all cases,
-and the examples are probably a poor fit for the ``ModelForm`` syntax. In other
-words, most of these tests should be rewritten.
-"""
 import datetime
 import os
 import tempfile

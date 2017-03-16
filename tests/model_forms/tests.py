@@ -1363,8 +1363,6 @@ class ModelFormBasicTests(TestCase):
             '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>''')
 
-        # You can create a form over a subset of the available fields
-        # by specifying a 'fields' argument to form_for_instance.
         class PartialArticleFormWithSlug(forms.ModelForm):
             class Meta:
                 model = Article
@@ -1632,6 +1630,15 @@ class ModelChoiceFieldTests(TestCase):
         # without affecting other forms, the following must hold:
         self.assertIsNot(field1, ModelChoiceForm.base_fields['category'])
         self.assertIs(field1.widget.choices.field, field1)
+
+    def test_modelchoicefield_result_cache_not_shared(self):
+        class ModelChoiceForm(forms.Form):
+            category = forms.ModelChoiceField(Category.objects.all())
+
+        form1 = ModelChoiceForm()
+        self.assertCountEqual(form1.fields['category'].queryset, [self.c1, self.c2, self.c3])
+        form2 = ModelChoiceForm()
+        self.assertIsNone(form2.fields['category'].queryset._result_cache)
 
     def test_modelchoicefield_22745(self):
         """

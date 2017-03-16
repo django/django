@@ -14,7 +14,6 @@ from django.db import (
     reset_queries, transaction,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.postgresql import version as pg_version
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper, format_number
 from django.db.models import Avg, StdDev, Sum, Variance
@@ -190,22 +189,6 @@ class SQLiteTests(TestCase):
 @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
 class PostgreSQLTests(TestCase):
 
-    def assert_parses(self, version_string, version):
-        self.assertEqual(pg_version._parse_version(version_string), version)
-
-    def test_parsing(self):
-        """Test PostgreSQL version parsing from `SELECT version()` output"""
-        self.assert_parses("PostgreSQL 9.3 beta4", 90300)
-        self.assert_parses("PostgreSQL 9.3", 90300)
-        self.assert_parses("EnterpriseDB 9.3", 90300)
-        self.assert_parses("PostgreSQL 9.3.6", 90306)
-        self.assert_parses("PostgreSQL 9.4beta1", 90400)
-        self.assert_parses(
-            "PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC "
-            "i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)",
-            90301
-        )
-
     def test_nodb_connection(self):
         """
         The _nodb_connection property fallbacks to the default connection
@@ -230,33 +213,6 @@ class PostgreSQLTests(TestCase):
         # Check a RuntimeWarning has been emitted
         self.assertEqual(len(w), 1)
         self.assertEqual(w[0].message.__class__, RuntimeWarning)
-
-    def test_version_detection(self):
-        """Test PostgreSQL version detection"""
-
-        # Helper mocks
-        class CursorMock:
-            "Very simple mock of DB-API cursor"
-            def execute(self, arg):
-                pass
-
-            def fetchone(self):
-                return ["PostgreSQL 9.3"]
-
-            def __enter__(self):
-                return self
-
-            def __exit__(self, type, value, traceback):
-                pass
-
-        class OlderConnectionMock:
-            "Mock of psycopg2 (< 2.0.12) connection"
-            def cursor(self):
-                return CursorMock()
-
-        # psycopg2 < 2.0.12 code path
-        conn = OlderConnectionMock()
-        self.assertEqual(pg_version.get_version(conn), 90300)
 
     def test_connect_and_rollback(self):
         """
@@ -314,6 +270,7 @@ class PostgreSQLTests(TestCase):
         """
         Regression test for #18130 and #24318.
         """
+        import psycopg2
         from psycopg2.extensions import (
             ISOLATION_LEVEL_READ_COMMITTED as read_committed,
             ISOLATION_LEVEL_SERIALIZABLE as serializable,
@@ -324,7 +281,8 @@ class PostgreSQLTests(TestCase):
         # PostgreSQL is configured with the default isolation level.
 
         # Check the level on the psycopg2 connection, not the Django wrapper.
-        self.assertEqual(connection.connection.isolation_level, read_committed)
+        default_level = read_committed if psycopg2.__version__ < '2.7' else None
+        self.assertEqual(connection.connection.isolation_level, default_level)
 
         new_connection = connection.copy()
         new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable

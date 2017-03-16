@@ -140,6 +140,7 @@ class TestUtilsHtml(SimpleTestCase):
                 'paragraph separator:\u2029and line separator:\u2028',
                 'paragraph separator:\\u2029and line separator:\\u2028'
             ),
+            ('`', '\\u0060'),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):

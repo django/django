@@ -79,11 +79,11 @@ class Collector:
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
-        Adds 'objs' to the collection of objects to be deleted.  If the call is
+        Add 'objs' to the collection of objects to be deleted.  If the call is
         the result of a cascade, 'source' should be the model that caused it,
         and 'nullable' should be set to True if the relation can be null.
 
-        Returns a list of all objects that were not already collected.
+        Return a list of all objects that were not already collected.
         """
         if not objs:
             return []
@@ -106,7 +106,7 @@ class Collector:
 
     def add_field_update(self, field, value, objs):
         """
-        Schedules a field update. 'objs' must be a homogeneous iterable
+        Schedule a field update. 'objs' must be a homogeneous iterable
         collection of model instances (e.g. a QuerySet).
         """
         if not objs:
@@ -118,12 +118,12 @@ class Collector:
 
     def can_fast_delete(self, objs, from_field=None):
         """
-        Determines if the objects in the given queryset-like can be
+        Determine if the objects in the given queryset-like can be
         fast-deleted. This can be done if there are no cascades, no
         parents and no signal listeners for the object class.
 
         The 'from_field' tells where we are coming from - we need this to
-        determine if the objects are in fact to be deleted. Allows also
+        determine if the objects are in fact to be deleted. Allow also
         skipping parent -> child -> parent chain preventing fast delete of
         the child.
         """
@@ -154,7 +154,7 @@ class Collector:
 
     def get_del_batches(self, objs, field):
         """
-        Returns the objs in suitably sized batches for the used connection.
+        Return the objs in suitably sized batches for the used connection.
         """
         conn_batch_size = max(
             connections[self.using].ops.bulk_batch_size([field.name], objs), 1)
@@ -167,7 +167,7 @@ class Collector:
     def collect(self, objs, source=None, nullable=False, collect_related=True,
                 source_attr=None, reverse_dependency=False, keep_parents=False):
         """
-        Adds 'objs' to the collection of objects to be deleted as well as all
+        Add 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogeneous iterable collection of
         model instances (e.g. a QuerySet).  If 'collect_related' is True,
         related objects will be handled by their respective on_delete handler.
@@ -228,7 +228,7 @@ class Collector:
 
     def related_objects(self, related, objs):
         """
-        Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
+        Get a QuerySet of objects related to `objs` via the relation `related`.
         """
         return related.related_model._base_manager.using(self.using).filter(
             **{"%s__in" % related.field.name: objs}

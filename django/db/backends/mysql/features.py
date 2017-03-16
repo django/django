@@ -17,6 +17,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_autofield = True
     can_introspect_binary_field = False
     can_introspect_small_integer_field = True
+    can_introspect_positive_integer_field = True
     supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True

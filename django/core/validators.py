@@ -108,7 +108,6 @@ class URLValidator(RegexValidator):
             self.schemes = schemes
 
     def __call__(self, value):
-        value = force_text(value)
         # Check first if the scheme is valid
         scheme = value.split('://')[0].lower()
         if scheme not in self.schemes:
@@ -188,8 +187,6 @@ class EmailValidator:
             self.domain_whitelist = whitelist
 
     def __call__(self, value):
-        value = force_text(value)
-
         if not value or '@' not in value:
             raise ValidationError(self.message, code=self.code)
 

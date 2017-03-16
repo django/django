@@ -105,7 +105,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def normalize_name(self, name):
         """
         Get the properly shortened and uppercased identifier as returned by
-        quote_name(), but without the actual quotes.
+        quote_name() but without the quotes.
         """
         nn = self.quote_name(name)
         if nn[0] == '"' and nn[-1] == '"':
@@ -113,9 +113,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return nn
 
     def _generate_temp_name(self, for_name):
-        """
-        Generates temporary names for workarounds that need temp columns
-        """
+        """Generate temporary names for workarounds that need temp columns."""
         suffix = hex(hash(for_name)).upper()[1:]
         return self.normalize_name(for_name + "_" + suffix)
 

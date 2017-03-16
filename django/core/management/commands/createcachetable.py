@@ -6,7 +6,6 @@ from django.db import (
     DEFAULT_DB_ALIAS, connections, models, router, transaction,
 )
 from django.db.utils import DatabaseError
-from django.utils.encoding import force_text
 
 
 class Command(BaseCommand):
@@ -101,7 +100,7 @@ class Command(BaseCommand):
                 except DatabaseError as e:
                     raise CommandError(
                         "Cache table '%s' could not be created.\nThe error was: %s." %
-                        (tablename, force_text(e)))
+                        (tablename, e))
                 for statement in index_output:
                     curs.execute(statement)
 

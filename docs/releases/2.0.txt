@@ -89,7 +89,8 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the ``protocol`` keyword argument to the
+  :class:`~django.contrib.sitemaps.GenericSitemap` constructor.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -158,7 +159,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`inspectdb` now translates MySQL's unsigned integer columns to
+  ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
 Migrations
 ~~~~~~~~~~
@@ -168,7 +170,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :class:`~django.db.models.functions.StrIndex` database function
+  finds the starting index of a string inside another string.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -281,6 +284,9 @@ Miscellaneous
 * The default HTTP error handlers (``handler404``, etc.) are now callables
   instead of dotted Python path strings. Django favors callable references
   since they provide better performance and debugging experience.
+
+* :class:`~django.views.generic.base.RedirectView` no longer silences
+  ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
 
 .. _deprecated-features-2.0:
 

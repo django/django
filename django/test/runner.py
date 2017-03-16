@@ -253,9 +253,7 @@ class RemoteTestRunner:
 
 
 def default_test_processes():
-    """
-    Default number of test processes when using the --parallel option.
-    """
+    """Default number of test processes when using the --parallel option."""
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
     if multiprocessing.get_start_method() != 'fork':
@@ -389,9 +387,7 @@ class ParallelTestSuite(unittest.TestSuite):
 
 
 class DiscoverRunner:
-    """
-    A Django test runner that uses unittest2 test discovery.
-    """
+    """A Django test runner that uses unittest2 test discovery."""
 
     test_suite = unittest.TestSuite
     parallel_test_suite = ParallelTestSuite
@@ -566,9 +562,7 @@ class DiscoverRunner:
         return runner.run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
-        """
-        Destroys all the non-mirror databases.
-        """
+        """Destroy all the non-mirror databases."""
         _teardown_databases(
             old_config,
             verbosity=self.verbosity,
@@ -593,7 +587,7 @@ class DiscoverRunner:
         A list of 'extra' tests may also be provided; these tests
         will be added to the test suite.
 
-        Returns the number of tests that failed.
+        Return the number of tests that failed.
         """
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
@@ -623,15 +617,15 @@ def is_discoverable(label):
 
 def reorder_suite(suite, classes, reverse=False):
     """
-    Reorders a test suite by test type.
+    Reorder a test suite by test type.
 
     `classes` is a sequence of types
 
     All tests of type classes[0] are placed first, then tests of type
     classes[1], etc. Tests with no match in classes are placed last.
 
-    If `reverse` is True, tests within classes are sorted in opposite order,
-    but test classes are not reversed.
+    If `reverse` is True, sort tests within classes in opposite order but
+    don't reverse test classes.
     """
     class_count = len(classes)
     suite_class = type(suite)
@@ -645,7 +639,7 @@ def reorder_suite(suite, classes, reverse=False):
 
 def partition_suite_by_type(suite, classes, bins, reverse=False):
     """
-    Partitions a test suite by test type. Also prevents duplicated tests.
+    Partition a test suite by test type. Also prevent duplicated tests.
 
     classes is a sequence of types
     bins is a sequence of TestSuites, one more than classes
@@ -670,9 +664,7 @@ def partition_suite_by_type(suite, classes, bins, reverse=False):
 
 
 def partition_suite_by_case(suite):
-    """
-    Partitions a test suite by test case, preserving the order of tests.
-    """
+    """Partition a test suite by test case, preserving the order of tests."""
     groups = []
     suite_class = type(suite)
     for test_type, test_group in itertools.groupby(suite, type):

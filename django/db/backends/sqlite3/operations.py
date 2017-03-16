@@ -43,31 +43,24 @@ class DatabaseOperations(BaseDatabaseOperations):
                     pass
 
     def date_extract_sql(self, lookup_type, field_name):
-        # sqlite doesn't support extract, so we fake it with the user-defined
-        # function django_date_extract that's registered in connect(). Note that
-        # single quotes are used because this is a string (and could otherwise
-        # cause a collision with a field name).
+        """
+        Support EXTRACT with a user-defined function django_date_extract()
+        that's registered in connect(). Use single quotes because this is a
+        string and could otherwise cause a collision with a field name.
+        """
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
     def date_interval_sql(self, timedelta):
         return "'%s'" % duration_string(timedelta), []
 
     def format_for_duration_arithmetic(self, sql):
-        """Do nothing here, we will handle it in the custom function."""
+        """Do nothing since formatting is handled in the custom function."""
         return sql
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # sqlite doesn't support DATE_TRUNC, so we fake it with a user-defined
-        # function django_date_trunc that's registered in connect(). Note that
-        # single quotes are used because this is a string (and could otherwise
-        # cause a collision with a field name).
         return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
     def time_trunc_sql(self, lookup_type, field_name):
-        # sqlite doesn't support DATE_TRUNC, so we fake it with a user-defined
-        # function django_date_trunc that's registered in connect(). Note that
-        # single quotes are used because this is a string (and could otherwise
-        # cause a collision with a field name).
         return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
     def _convert_tzname_to_sql(self, tzname):
@@ -84,22 +77,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        # Same comment as in date_extract_sql.
         return "django_datetime_extract('%s', %s, %s)" % (
             lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
         )
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        # Same comment as in date_trunc_sql.
         return "django_datetime_trunc('%s', %s, %s)" % (
             lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
         )
 
     def time_extract_sql(self, lookup_type, field_name):
-        # sqlite doesn't support extract, so we fake it with the user-defined
-        # function django_time_extract that's registered in connect(). Note that
-        # single quotes are used because this is a string (and could otherwise
-        # cause a collision with a field name).
         return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
     def pk_default_value(self):

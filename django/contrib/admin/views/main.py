@@ -16,7 +16,6 @@ from django.core.exceptions import (
 from django.core.paginator import InvalidPage
 from django.db import models
 from django.urls import reverse
-from django.utils.encoding import force_text
 from django.utils.http import urlencode
 from django.utils.translation import gettext
 
@@ -79,7 +78,7 @@ class ChangeList:
             title = gettext('Select %s')
         else:
             title = gettext('Select %s to change')
-        self.title = title % force_text(self.opts.verbose_name)
+        self.title = title % self.opts.verbose_name
         self.pk_attname = self.lookup_opts.pk.attname
 
     def get_filters_params(self, params=None):

@@ -33,9 +33,7 @@ CSRF_SESSION_KEY = '_csrftoken'
 
 
 def _get_failure_view():
-    """
-    Returns the view to be used for CSRF rejections
-    """
+    """Return the view to be used for CSRF rejections."""
     return get_callable(settings.CSRF_FAILURE_VIEW)
 
 
@@ -75,7 +73,7 @@ def _get_new_csrf_token():
 
 def get_token(request):
     """
-    Returns the CSRF token required for a POST form. The token is an
+    Return the CSRF token required for a POST form. The token is an
     alphanumeric value. A new token is created if one is not already set.
 
     A side effect of calling this function is to make the csrf_protect
@@ -94,7 +92,7 @@ def get_token(request):
 
 def rotate_token(request):
     """
-    Changes the CSRF token in use for a request - should be done on login
+    Change the CSRF token in use for a request - should be done on login
     for security purposes.
     """
     request.META.update({
@@ -132,12 +130,11 @@ def _compare_salted_tokens(request_csrf_token, csrf_token):
 
 class CsrfViewMiddleware(MiddlewareMixin):
     """
-    Middleware that requires a present and correct csrfmiddlewaretoken
-    for POST requests that have a CSRF cookie, and sets an outgoing
-    CSRF cookie.
+    Require a present and correct csrfmiddlewaretoken for POST requests that
+    have a CSRF cookie, and set an outgoing CSRF cookie.
 
-    This middleware should be used in conjunction with the csrf_token template
-    tag.
+    This middleware should be used in conjunction with the {% csrf_token %}
+    template tag.
     """
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.

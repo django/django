@@ -1,4 +1,7 @@
-from django import http
+from django.http import (
+    HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound,
+    HttpResponseServerError,
+)
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.encoding import force_text
 from django.views.decorators.csrf import requires_csrf_token
@@ -52,7 +55,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
             '<p>The requested URL {{ request_path }} was not found on this server.</p>')
         body = template.render(Context(context))
         content_type = 'text/html'
-    return http.HttpResponseNotFound(body, content_type=content_type)
+    return HttpResponseNotFound(body, content_type=content_type)
 
 
 @requires_csrf_token
@@ -69,8 +72,8 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
         if template_name != ERROR_500_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.
             raise
-        return http.HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
-    return http.HttpResponseServerError(template.render())
+        return HttpResponseServerError('<h1>Server Error (500)</h1>', content_type='text/html')
+    return HttpResponseServerError(template.render())
 
 
 @requires_csrf_token
@@ -87,9 +90,9 @@ def bad_request(request, exception, template_name=ERROR_400_TEMPLATE_NAME):
         if template_name != ERROR_400_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.
             raise
-        return http.HttpResponseBadRequest('<h1>Bad Request (400)</h1>', content_type='text/html')
+        return HttpResponseBadRequest('<h1>Bad Request (400)</h1>', content_type='text/html')
     # No exception content is passed to the template, to not disclose any sensitive information.
-    return http.HttpResponseBadRequest(template.render())
+    return HttpResponseBadRequest(template.render())
 
 
 # This can be called when CsrfViewMiddleware.process_view has not run,
@@ -112,7 +115,7 @@ def permission_denied(request, exception, template_name=ERROR_403_TEMPLATE_NAME)
         if template_name != ERROR_403_TEMPLATE_NAME:
             # Reraise if it's a missing custom template.
             raise
-        return http.HttpResponseForbidden('<h1>403 Forbidden</h1>', content_type='text/html')
-    return http.HttpResponseForbidden(
+        return HttpResponseForbidden('<h1>403 Forbidden</h1>', content_type='text/html')
+    return HttpResponseForbidden(
         template.render(request=request, context={'exception': force_text(exception)})
     )

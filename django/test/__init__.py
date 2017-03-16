@@ -1,6 +1,4 @@
-"""
-Django Unit Test and Doctest framework.
-"""
+"""Django Unit Test framework."""
 
 from django.test.client import Client, RequestFactory
 from django.test.testcases import (

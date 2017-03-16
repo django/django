@@ -14,12 +14,11 @@ def setup(set_prefix=True):
     from django.apps import apps
     from django.conf import settings
     from django.urls import set_script_prefix
-    from django.utils.encoding import force_text
     from django.utils.log import configure_logging
 
     configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
     if set_prefix:
         set_script_prefix(
-            '/' if settings.FORCE_SCRIPT_NAME is None else force_text(settings.FORCE_SCRIPT_NAME)
+            '/' if settings.FORCE_SCRIPT_NAME is None else settings.FORCE_SCRIPT_NAME
         )
     apps.populate(settings.INSTALLED_APPS)

@@ -36,8 +36,8 @@ class OracleIntrospection(DatabaseIntrospection):
             dim, srid = row
             if srid != 4326:
                 field_params['srid'] = srid
-            # Length of object array ( SDO_DIM_ARRAY ) is number of dimensions.
-            dim = len(dim)
+            # Size of object array (SDO_DIM_ARRAY) is number of dimensions.
+            dim = dim.size()
             if dim != 2:
                 field_params['dim'] = dim
         finally:

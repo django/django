@@ -30,7 +30,7 @@ def get_foo():
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)
-    a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name=b'bars')
+    a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name='bars')
 
 
 class Whiz(models.Model):

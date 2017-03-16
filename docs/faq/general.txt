@@ -69,7 +69,7 @@ Who's behind this?
 
 Django was originally developed at World Online, the Web department of a
 newspaper in Lawrence, Kansas, USA. Django's now run by an international
-:doc:`team of volunteers </internals/team>`.
+`team of volunteers <https://www.djangoproject.com/foundation/teams/>`_.
 
 Which sites use Django?
 =======================

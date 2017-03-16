@@ -13,7 +13,7 @@ OR = 'OR'
 
 class WhereNode(tree.Node):
     """
-    Used to represent the SQL where-clause.
+    An SQL WHERE clause.
 
     The class is tied to the Query class that created it (in order to create
     the correct SQL).
@@ -29,7 +29,7 @@ class WhereNode(tree.Node):
 
     def split_having(self, negated=False):
         """
-        Returns two possibly None nodes: one for those parts of self that
+        Return two possibly None nodes: one for those parts of self that
         should be included in the WHERE clause and one for those parts of
         self that must be included in the HAVING clause.
         """
@@ -62,9 +62,9 @@ class WhereNode(tree.Node):
 
     def as_sql(self, compiler, connection):
         """
-        Returns the SQL version of the where clause and the value to be
-        substituted in. Returns '', [] if this node matches everything,
-        None, [] if this node is empty, and raises EmptyResultSet if this
+        Return the SQL version of the where clause and the value to be
+        substituted in. Return '', [] if this node matches everything,
+        None, [] if this node is empty, and raise EmptyResultSet if this
         node can't match anything.
         """
         result = []
@@ -127,7 +127,7 @@ class WhereNode(tree.Node):
 
     def relabel_aliases(self, change_map):
         """
-        Relabels the alias values of any children. 'change_map' is a dictionary
+        Relabel the alias values of any children. 'change_map' is a dictionary
         mapping old (current) alias values to the new values.
         """
         for pos, child in enumerate(self.children):
@@ -139,7 +139,7 @@ class WhereNode(tree.Node):
 
     def clone(self):
         """
-        Creates a clone of the tree. Must only be called on root nodes (nodes
+        Create a clone of the tree. Must only be called on root nodes (nodes
         with empty subtree_parents). Childs must be either (Contraint, lookup,
         value) tuples, or objects supporting .clone().
         """
@@ -173,9 +173,7 @@ class WhereNode(tree.Node):
 
 
 class NothingNode:
-    """
-    A node that matches nothing.
-    """
+    """A node that matches nothing."""
     contains_aggregate = False
 
     def as_sql(self, compiler=None, connection=None):

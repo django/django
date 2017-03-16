@@ -1,0 +1,13 @@
+===========================
+Django 1.10.7 release notes
+===========================
+
+*Under development*
+
+Django 1.10.7 fixes several bugs in 1.10.6.
+
+Bugfixes
+========
+
+* Made admin's ``RelatedFieldWidgetWrapper`` use the wrapped widget's
+  ``value_omitted_from_data()`` method (:ticket:`27905`).

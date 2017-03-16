@@ -11,7 +11,7 @@ from .loader import MigrationLoader
 
 class MigrationQuestioner:
     """
-    Gives the autodetector responses to questions it might have.
+    Give the autodetector responses to questions it might have.
     This base class has a built-in noninteractive mode, but the
     interactive subclass is what the command-line arguments will use.
     """
@@ -22,7 +22,7 @@ class MigrationQuestioner:
         self.dry_run = dry_run
 
     def ask_initial(self, app_label):
-        "Should we create an initial migration for the app?"
+        """Should we create an initial migration for the app?"""
         # If it was specified on the command line, definitely true
         if app_label in self.specified_apps:
             return True
@@ -52,29 +52,29 @@ class MigrationQuestioner:
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
     def ask_not_null_addition(self, field_name, model_name):
-        "Adding a NOT NULL field to a model"
+        """Adding a NOT NULL field to a model."""
         # None means quit
         return None
 
     def ask_not_null_alteration(self, field_name, model_name):
-        "Changing a NULL field to NOT NULL"
+        """Changing a NULL field to NOT NULL."""
         # None means quit
         return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
-        "Was this field really renamed?"
+        """Was this field really renamed?"""
         return self.defaults.get("ask_rename", False)
 
     def ask_rename_model(self, old_model_state, new_model_state):
-        "Was this model really renamed?"
+        """Was this model really renamed?"""
         return self.defaults.get("ask_rename_model", False)
 
     def ask_merge(self, app_label):
-        "Do you really want to merge these migrations?"
+        """Do you really want to merge these migrations?"""
         return self.defaults.get("ask_merge", False)
 
     def ask_auto_now_add_addition(self, field_name, model_name):
-        "Adding an auto_now_add field to a model"
+        """Adding an auto_now_add field to a model."""
         # None means quit
         return None
 
@@ -138,7 +138,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                     print("Invalid input: %s" % e)
 
     def ask_not_null_addition(self, field_name, model_name):
-        "Adding a NOT NULL field to a model"
+        """Adding a NOT NULL field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to add a non-nullable field '%s' to %s without a default; "
@@ -157,7 +157,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return None
 
     def ask_not_null_alteration(self, field_name, model_name):
-        "Changing a NULL field to NOT NULL"
+        """Changing a NULL field to NOT NULL."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to change the nullable field '%s' on %s to non-nullable "
@@ -182,13 +182,13 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
-        "Was this field really renamed?"
+        """Was this field really renamed?"""
         msg = "Did you rename %s.%s to %s.%s (a %s)? [y/N]"
         return self._boolean_input(msg % (model_name, old_name, model_name, new_name,
                                           field_instance.__class__.__name__), False)
 
     def ask_rename_model(self, old_model_state, new_model_state):
-        "Was this model really renamed?"
+        """Was this model really renamed?"""
         msg = "Did you rename the %s.%s model to %s? [y/N]"
         return self._boolean_input(msg % (old_model_state.app_label, old_model_state.name,
                                           new_model_state.name), False)
@@ -202,7 +202,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         )
 
     def ask_auto_now_add_addition(self, field_name, model_name):
-        "Adding an auto_now_add field to a model"
+        """Adding an auto_now_add field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
                 "You are trying to add the field '{}' with 'auto_now_add=True' "

@@ -23,7 +23,7 @@ publicly reported in this fashion.
 
 Instead, if you believe you've found something in Django which has security
 implications, please send a description of the issue via email to
-``security@djangoproject.com``. Mail sent to that address reaches the `securty
+``security@djangoproject.com``. Mail sent to that address reaches the `security
 team <https://www.djangoproject.com/foundation/teams/#security-team>`_.
 
 Once you've submitted an issue via email, you should receive an acknowledgment

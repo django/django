@@ -97,7 +97,7 @@ class DummyNode(Node):
 
 class MigrationGraph:
     """
-    Represents the digraph of all migrations in a project.
+    Represent the digraph of all migrations in a project.
 
     Each migration is a node, and each dependency is an edge. There are
     no implicit dependencies between numbered migrations - the numbering is
@@ -142,8 +142,9 @@ class MigrationGraph:
 
     def add_dependency(self, migration, child, parent, skip_validation=False):
         """
-        This may create dummy nodes if they don't yet exist.
-        If `skip_validation` is set, validate_consistency should be called afterwards.
+        This may create dummy nodes if they don't yet exist. If
+        `skip_validation=True`, validate_consistency() should be called
+        afterwards.
         """
         if child not in self.nodes:
             error_message = (
@@ -165,7 +166,7 @@ class MigrationGraph:
 
     def remove_replaced_nodes(self, replacement, replaced):
         """
-        Removes each of the `replaced` nodes (when they exist). Any
+        Remove each of the `replaced` nodes (when they exist). Any
         dependencies that were referencing them are changed to reference the
         `replacement` node instead.
         """
@@ -201,10 +202,10 @@ class MigrationGraph:
 
     def remove_replacement_node(self, replacement, replaced):
         """
-        The inverse operation to `remove_replaced_nodes`. Almost. Removes the
-        replacement node `replacement` and remaps its child nodes to
-        `replaced` - the list of nodes it would have replaced. Its parent
-        nodes are not remapped as they are expected to be correct already.
+        The inverse operation to `remove_replaced_nodes`. Almost. Remove the
+        replacement node `replacement` and remap its child nodes to `replaced`
+        - the list of nodes it would have replaced. Don't remap its parent
+        nodes as they are expected to be correct already.
         """
         self.nodes.pop(replacement, None)
         try:
@@ -237,9 +238,7 @@ class MigrationGraph:
         self.clear_cache()
 
     def validate_consistency(self):
-        """
-        Ensure there are no dummy nodes remaining in the graph.
-        """
+        """Ensure there are no dummy nodes remaining in the graph."""
         [n.raise_error() for n in self.node_map.values() if isinstance(n, DummyNode)]
 
     def clear_cache(self):
@@ -251,10 +250,9 @@ class MigrationGraph:
 
     def forwards_plan(self, target):
         """
-        Given a node, returns a list of which previous nodes (dependencies)
-        must be applied, ending with the node itself.
-        This is the list you would follow if applying the migrations to
-        a database.
+        Given a node, return a list of which previous nodes (dependencies) must
+        be applied, ending with the node itself. This is the list you would
+        follow if applying the migrations to a database.
         """
         if target not in self.nodes:
             raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
@@ -271,10 +269,9 @@ class MigrationGraph:
 
     def backwards_plan(self, target):
         """
-        Given a node, returns a list of which dependent nodes (dependencies)
-        must be unapplied, ending with the node itself.
-        This is the list you would follow if removing the migrations from
-        a database.
+        Given a node, return a list of which dependent nodes (dependencies)
+        must be unapplied, ending with the node itself. This is the list you
+        would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
             raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
@@ -290,9 +287,7 @@ class MigrationGraph:
             return self.iterative_dfs(node, forwards=False)
 
     def iterative_dfs(self, start, forwards=True):
-        """
-        Iterative depth first search, for finding dependencies.
-        """
+        """Iterative depth-first search for finding dependencies."""
         visited = deque()
         visited.append(start)
         if forwards:
@@ -314,7 +309,7 @@ class MigrationGraph:
 
     def root_nodes(self, app=None):
         """
-        Returns all root nodes - that is, nodes with no dependencies inside
+        Return all root nodes - that is, nodes with no dependencies inside
         their app. These are the starting point for an app.
         """
         roots = set()
@@ -325,7 +320,7 @@ class MigrationGraph:
 
     def leaf_nodes(self, app=None):
         """
-        Returns all leaf nodes - that is, nodes with no dependents in their app.
+        Return all leaf nodes - that is, nodes with no dependents in their app.
         These are the "most current" version of an app's schema.
         Having more than one per app is technically an error, but one that
         gets handled further up, in the interactive command - it's usually the
@@ -369,9 +364,9 @@ class MigrationGraph:
 
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
-        Given a migration node or nodes, returns a complete ProjectState for it.
-        If at_end is False, returns the state before the migration has run.
-        If nodes is not provided, returns the overall most current project state.
+        Given a migration node or nodes, return a complete ProjectState for it.
+        If at_end is False, return the state before the migration has run.
+        If nodes is not provided, return the overall most current project state.
         """
         if nodes is None:
             nodes = list(self.leaf_nodes())

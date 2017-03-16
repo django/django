@@ -5,7 +5,7 @@ from .base import Operation
 
 class SeparateDatabaseAndState(Operation):
     """
-    Takes two lists of operations - ones that will be used for the database,
+    Take two lists of operations - ones that will be used for the database,
     and ones that will be used for the state change. This allows operations
     that don't support state change to have it applied, or have operations
     that affect the state or not the database, or so on.
@@ -62,9 +62,9 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     """
-    Runs some raw SQL. A reverse SQL statement may be provided.
+    Run some raw SQL. A reverse SQL statement may be provided.
 
-    Also accepts a list of operations that represent the state change effected
+    Also accept a list of operations that represent the state change effected
     by this SQL change, in case it's custom column/table creation/deletion.
     """
     noop = ''
@@ -132,7 +132,7 @@ class RunSQL(Operation):
 
 class RunPython(Operation):
     """
-    Runs Python code in a context suitable for doing versioned ORM operations.
+    Run Python code in a context suitable for doing versioned ORM operations.
     """
 
     reduces_to_sql = False

@@ -103,11 +103,12 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _switch_to_test_user(self, parameters):
         """
-        Oracle doesn't have the concept of separate databases under the same user.
-        Thus, we use a separate user (see _create_test_db). This method is used
-        to switch to that user. We will need the main user again for clean-up when
-        we end testing, so we keep its credentials in SAVED_USER/SAVED_PASSWORD
-        entries in the settings dict.
+        Switch to the user that's used for creating the test database.
+
+        Oracle doesn't have the concept of separate databases under the same
+        user, so a separate user is used; see _create_test_db(). The main user
+        is also needed for cleanup when testing is completed, so save its
+        credentials in the SAVED_USER/SAVED_PASSWORD key in the settings dict.
         """
         real_settings = settings.DATABASES[self.connection.alias]
         real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = \
@@ -122,8 +123,8 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def set_as_test_mirror(self, primary_settings_dict):
         """
-        Set this database up to be used in testing as a mirror of a primary database
-        whose settings are given
+        Set this database up to be used in testing as a mirror of a primary
+        database whose settings are given.
         """
         self.connection.settings_dict['USER'] = primary_settings_dict['USER']
         self.connection.settings_dict['PASSWORD'] = primary_settings_dict['PASSWORD']
@@ -166,7 +167,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _destroy_test_db(self, test_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
-        database already exists. Returns the name of the test database created.
+        database already exists. Return the name of the test database created.
         """
         self.connection.settings_dict['USER'] = self.connection.settings_dict['SAVED_USER']
         self.connection.settings_dict['PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD']
@@ -292,9 +293,8 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _test_settings_get(self, key, default=None, prefixed=None):
         """
-        Return a value from the test settings dict,
-        or a given default,
-        or a prefixed entry from the main settings dict
+        Return a value from the test settings dict, or a given default, or a
+        prefixed entry from the main settings dict.
         """
         settings_dict = self.connection.settings_dict
         val = settings_dict['TEST'].get(key, default)
@@ -345,9 +345,9 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _get_test_db_name(self):
         """
-        We need to return the 'production' DB name to get the test DB creation
-        machinery to work. This isn't a great deal in this case because DB
-        names as handled by Django haven't real counterparts in Oracle.
+        Return the 'production' DB name to get the test DB creation machinery
+        to work. This isn't a great deal in this case because DB names as
+        handled by Django don't have real counterparts in Oracle.
         """
         return self.connection.settings_dict['NAME']
 

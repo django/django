@@ -11,7 +11,7 @@ from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import ngettext, override as translation_override
@@ -32,6 +32,8 @@ def lookup_needs_distinct(opts, lookup_path):
         lookup_fields = lookup_fields[:-1]
     # Now go through the fields (following all relations) and look for an m2m
     for field_name in lookup_fields:
+        if field_name == 'pk':
+            field_name = opts.pk.name
         field = opts.get_field(field_name)
         if hasattr(field, 'get_path_info'):
             # This field is a relation, update opts to follow the relation
@@ -136,8 +138,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
         has_admin = obj.__class__ in admin_site._registry
         opts = obj._meta
 
-        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name),
-                                   force_text(obj))
+        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name), obj)
 
         if has_admin:
             try:
@@ -249,8 +250,8 @@ def model_format_dict(obj):
     else:
         opts = obj
     return {
-        'verbose_name': force_text(opts.verbose_name),
-        'verbose_name_plural': force_text(opts.verbose_name_plural)
+        'verbose_name': opts.verbose_name,
+        'verbose_name_plural': opts.verbose_name_plural,
     }
 
 
@@ -384,7 +385,7 @@ def help_text_for_field(name, model):
     else:
         if hasattr(field, 'help_text'):
             help_text = field.help_text
-    return smart_text(help_text)
+    return help_text
 
 
 def display_for_field(value, field, empty_value_display):

@@ -794,7 +794,7 @@ class OrderingCheckTests(CheckTestCase):
 
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
-            ordering = ('name',)
+            ordering = ('name', 'pk')
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 

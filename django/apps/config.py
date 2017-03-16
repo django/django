@@ -8,15 +8,13 @@ MODELS_MODULE_NAME = 'models'
 
 
 class AppConfig:
-    """
-    Class representing a Django application and its configuration.
-    """
+    """Class representing a Django application and its configuration."""
 
     def __init__(self, app_name, app_module):
-        # Full Python path to the application eg. 'django.contrib.admin'.
+        # Full Python path to the application e.g. 'django.contrib.admin'.
         self.name = app_name
 
-        # Root module for the application eg. <module 'django.contrib.admin'
+        # Root module for the application e.g. <module 'django.contrib.admin'
         # from 'django/contrib/admin/__init__.py'>.
         self.module = app_module
 
@@ -27,21 +25,21 @@ class AppConfig:
         # The following attributes could be defined at the class level in a
         # subclass, hence the test-and-set pattern.
 
-        # Last component of the Python path to the application eg. 'admin'.
+        # Last component of the Python path to the application e.g. 'admin'.
         # This value must be unique across a Django project.
         if not hasattr(self, 'label'):
             self.label = app_name.rpartition(".")[2]
 
-        # Human-readable name for the application eg. "Admin".
+        # Human-readable name for the application e.g. "Admin".
         if not hasattr(self, 'verbose_name'):
             self.verbose_name = self.label.title()
 
-        # Filesystem path to the application directory eg.
+        # Filesystem path to the application directory e.g.
         # '/path/to/django/contrib/admin'.
         if not hasattr(self, 'path'):
             self.path = self._path_from_module(app_module)
 
-        # Module containing models eg. <module 'django.contrib.admin.models'
+        # Module containing models e.g. <module 'django.contrib.admin.models'
         # from 'django/contrib/admin/models.py'>. Set by import_models().
         # None if the application doesn't have a models module.
         self.models_module = None
@@ -155,9 +153,9 @@ class AppConfig:
 
     def get_model(self, model_name, require_ready=True):
         """
-        Returns the model with the given case-insensitive model_name.
+        Return the model with the given case-insensitive model_name.
 
-        Raises LookupError if no model exists with this name.
+        Raise LookupError if no model exists with this name.
         """
         if require_ready:
             self.apps.check_models_ready()
@@ -171,7 +169,7 @@ class AppConfig:
 
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
-        Returns an iterable of models.
+        Return an iterable of models.
 
         By default, the following models aren't included:
 

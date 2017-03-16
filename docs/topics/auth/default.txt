@@ -1413,6 +1413,11 @@ implementation details see :ref:`using-the-views`.
       automatically authenticated after a successful password reset. Defaults
       to ``False``.
 
+    * ``post_reset_login_backend``: A dotted path to the authentication
+      backend to use when authenticating a user if ``post_reset_login`` is
+      ``True``. Required only if you have multiple
+      :setting:`AUTHENTICATION_BACKENDS` configured. Defaults to ``None``.
+
     * ``form_class``: Form that will be used to set the password. Defaults to
       :class:`~django.contrib.auth.forms.SetPasswordForm`.
 
