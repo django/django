@@ -258,7 +258,7 @@ foundation for custom widgets.
         ``Widget`` subclasses can provide custom context values by overriding
         this method.
 
-    .. method:: id_for_label(self, id_)
+    .. method:: id_for_label(id_)
 
         Returns the HTML ID attribute of this widget for use by a ``<label>``,
         given the ID of the field. Returns ``None`` if an ID isn't available.
