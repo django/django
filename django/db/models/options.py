@@ -545,6 +545,8 @@ class Options:
         """
         Return a field instance given the name of a forward or reverse field.
         """
+        if field_name == 'pk':
+            return self.pk
         try:
             # In order to avoid premature loading of the relation tree
             # (expensive) we prefer checking if the field is a forward field.

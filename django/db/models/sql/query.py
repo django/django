@@ -1295,8 +1295,6 @@ class Query:
         path, names_with_path = [], []
         for pos, name in enumerate(names):
             cur_names_with_path = (name, [])
-            if name == 'pk':
-                name = opts.pk.name
 
             field = None
             try:
