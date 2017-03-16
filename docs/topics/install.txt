@@ -220,7 +220,7 @@ latest bug fixes and improvements, follow these instructions:
 
    .. code-block:: console
 
-        $ git clone git://github.com/django/django.git
+        $ git clone https://github.com/django/django.git
 
    This will create a directory ``django`` in your current directory.
 
