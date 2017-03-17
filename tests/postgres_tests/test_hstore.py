@@ -47,13 +47,13 @@ class SimpleTests(HStoreTestCase):
 
         instance = HStoreModel.objects.create(field=value)
         instance = HStoreModel.objects.get()
-        self.assertDictEqual(instance.field, expected_value)
+        self.assertEqual(instance.field, expected_value)
 
         instance = HStoreModel.objects.get(field__a=1)
-        self.assertDictEqual(instance.field, expected_value)
+        self.assertEqual(instance.field, expected_value)
 
         instance = HStoreModel.objects.get(field__has_keys=[2, 'a', 'ï'])
-        self.assertDictEqual(instance.field, expected_value)
+        self.assertEqual(instance.field, expected_value)
 
 
 class TestQuerying(HStoreTestCase):

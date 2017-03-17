@@ -1306,12 +1306,12 @@ class Ticket25546Tests(TestCase):
             book1, book2 = list(books)
 
         with self.assertNumQueries(0):
-            self.assertListEqual(list(book1.first_time_authors.all()), [self.author11, self.author12])
-            self.assertListEqual(list(book2.first_time_authors.all()), [self.author21])
+            self.assertSequenceEqual(book1.first_time_authors.all(), [self.author11, self.author12])
+            self.assertSequenceEqual(book2.first_time_authors.all(), [self.author21])
 
-            self.assertListEqual(list(book1.first_time_authors.all()[0].addresses.all()), [self.author1_address1])
-            self.assertListEqual(list(book1.first_time_authors.all()[1].addresses.all()), [])
-            self.assertListEqual(list(book2.first_time_authors.all()[0].addresses.all()), [self.author2_address1])
+            self.assertSequenceEqual(book1.first_time_authors.all()[0].addresses.all(), [self.author1_address1])
+            self.assertSequenceEqual(book1.first_time_authors.all()[1].addresses.all(), [])
+            self.assertSequenceEqual(book2.first_time_authors.all()[0].addresses.all(), [self.author2_address1])
 
         self.assertEqual(
             list(book1.first_time_authors.all()), list(book1.first_time_authors.all().all())
@@ -1352,9 +1352,9 @@ class Ticket25546Tests(TestCase):
             book1, book2 = list(books)
 
         with self.assertNumQueries(0):
-            self.assertListEqual(book1.first_authors, [self.author11, self.author12])
-            self.assertListEqual(book2.first_authors, [self.author21])
+            self.assertEqual(book1.first_authors, [self.author11, self.author12])
+            self.assertEqual(book2.first_authors, [self.author21])
 
-            self.assertListEqual(book1.first_authors[0].happy_place, [self.author1_address1])
-            self.assertListEqual(book1.first_authors[1].happy_place, [])
-            self.assertListEqual(book2.first_authors[0].happy_place, [self.author2_address1])
+            self.assertEqual(book1.first_authors[0].happy_place, [self.author1_address1])
+            self.assertEqual(book1.first_authors[1].happy_place, [])
+            self.assertEqual(book2.first_authors[0].happy_place, [self.author2_address1])

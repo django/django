@@ -184,7 +184,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         union = City3D.objects.aggregate(Union('point'))['point__union']
         self.assertTrue(union.hasz)
         # Ordering of points in the resulting geometry may vary between implementations
-        self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
+        self.assertEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
     @skipUnlessDBFeature("supports_3d_functions")
     def test_extent(self):

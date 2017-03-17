@@ -143,10 +143,10 @@ class QueryDictTests(SimpleTestCase):
         self.assertEqual(q['foo'], 'another')
         self.assertIn('foo', q)
 
-        self.assertListEqual(sorted(q.items()), [('foo', 'another'), ('name', 'john')])
-        self.assertListEqual(sorted(q.lists()), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertListEqual(sorted(q.keys()), ['foo', 'name'])
-        self.assertListEqual(sorted(q.values()), ['another', 'john'])
+        self.assertCountEqual(q.items(), [('foo', 'another'), ('name', 'john')])
+        self.assertCountEqual(q.lists(), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertCountEqual(q.keys(), ['foo', 'name'])
+        self.assertCountEqual(q.values(), ['another', 'john'])
 
         q.update({'foo': 'hello'})
         self.assertEqual(q['foo'], 'hello')

@@ -960,9 +960,9 @@ class OverrideSettingsTests(SimpleTestCase):
         """
         Overriding DATABASE_ROUTERS should update the master router.
         """
-        test_routers = (object(),)
+        test_routers = [object()]
         with self.settings(DATABASE_ROUTERS=test_routers):
-            self.assertSequenceEqual(router.routers, test_routers)
+            self.assertEqual(router.routers, test_routers)
 
     def test_override_static_url(self):
         """

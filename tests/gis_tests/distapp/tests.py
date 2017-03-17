@@ -94,7 +94,7 @@ class DistanceTest(TestCase):
                 with self.assertRaises(ValueError):
                     AustraliaCity.objects.filter(point__dwithin=(self.au_pnt, dist)).count()
             else:
-                self.assertListEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
+                self.assertEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
     @skipUnlessDBFeature("supports_distances_lookups")
     def test_distance_lookups(self):
