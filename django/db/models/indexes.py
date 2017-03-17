@@ -75,6 +75,11 @@ class Index:
         path = path.replace('django.db.models.indexes', 'django.db.models')
         return (path, (), {'fields': self.fields, 'name': self.name})
 
+    def clone(self):
+        """Create a copy of this Index."""
+        path, args, kwargs = self.deconstruct()
+        return self.__class__(*args, **kwargs)
+
     @staticmethod
     def _hash_generator(*args):
         """
