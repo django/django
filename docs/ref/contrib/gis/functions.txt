@@ -392,7 +392,13 @@ or ``MULTI*`` field); otherwise returns ``None``.
 Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of points
-in the first linestring in the geometry field; otherwise returns ``None``.
+in a geometry.
+
+On MySQL, returns ``None`` for any non-``LINESTRING`` geometry.
+
+.. versionchanged:: 1.11
+
+    SpatiaLite support for non-``LINESTRING`` geometries was added.
 
 ``Perimeter``
 =============
