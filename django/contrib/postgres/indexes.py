@@ -1,4 +1,6 @@
+from django.db import connection
 from django.db.models import Index
+from django.utils.functional import cached_property
 
 __all__ = ['BrinIndex', 'GinIndex']
 
@@ -33,6 +35,14 @@ class BrinIndex(Index):
             parameters['extra'] = ' WITH (pages_per_range={})'.format(
                 schema_editor.quote_value(self.pages_per_range)) + parameters['extra']
         return parameters
+
+    @cached_property
+    def max_name_length(self):
+        # Allow an index name longer than 30 characters since the suffix
+        # is 4 characters (usual limit is 3). Since this index can only be
+        # used on PostgreSQL, the 30 character limit for cross-database
+        # compatibility isn't applicable.
+        return connection.ops.max_name_length()
 
 
 class GinIndex(Index):

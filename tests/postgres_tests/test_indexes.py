@@ -3,7 +3,7 @@ from django.db import connection
 from django.test import skipUnlessDBFeature
 
 from . import PostgreSQLTestCase
-from .models import CharFieldModel, IntegerArrayModel
+from .models import CharFieldModel, DateTimeArrayModel, IntegerArrayModel
 
 
 @skipUnlessDBFeature('has_brin_index_support')
@@ -22,6 +22,17 @@ class BrinIndexTests(PostgreSQLTestCase):
         index = BrinIndex(fields=['title'])
         index_with_page_range = BrinIndex(fields=['title'], pages_per_range=16)
         self.assertNotEqual(index, index_with_page_range)
+
+    def test_name_auto_generation(self):
+        """
+        A name longer than 30 characters (since len(BrinIndex.suffix) is 4
+        rather than usual limit of 3) is okay for PostgreSQL. For this test,
+        the name of the field ('datetimes') must be at least 7 characters to
+        generate a name longer than 30 characters.
+        """
+        index = BrinIndex(fields=['datetimes'])
+        index.set_name_with_model(DateTimeArrayModel)
+        self.assertEqual(index.name, 'postgres_te_datetim_abf104_brin')
 
     def test_deconstruction(self):
         index = BrinIndex(fields=['title'], name='test_title_brin')

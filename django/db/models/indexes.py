@@ -4,12 +4,12 @@ from django.utils.encoding import force_bytes
 
 __all__ = ['Index']
 
-# The max length of the names of the indexes (restricted to 30 due to Oracle)
-MAX_NAME_LENGTH = 30
-
 
 class Index:
     suffix = 'idx'
+    # The max length of the name of the index (restricted to 30 for
+    # cross-database compatibility with Oracle)
+    max_name_length = 30
 
     def __init__(self, fields=[], name=None):
         if not isinstance(fields, list):
@@ -25,8 +25,8 @@ class Index:
         self.name = name or ''
         if self.name:
             errors = self.check_name()
-            if len(self.name) > MAX_NAME_LENGTH:
-                errors.append('Index names cannot be longer than %s characters.' % MAX_NAME_LENGTH)
+            if len(self.name) > self.max_name_length:
+                errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
             if errors:
                 raise ValueError(errors)
 
@@ -100,13 +100,15 @@ class Index:
             (('-%s' if order else '%s') % column_name)
             for column_name, (field_name, order) in zip(column_names, self.fields_orders)
         ]
+        # The length of the parts of the name is based on the default max
+        # length of 30 characters.
         hash_data = [table_name] + column_names_with_order + [self.suffix]
         self.name = '%s_%s_%s' % (
             table_name[:11],
             column_names[0][:7],
             '%s_%s' % (self._hash_generator(*hash_data), self.suffix),
         )
-        assert len(self.name) <= MAX_NAME_LENGTH, (
+        assert len(self.name) <= self.max_name_length, (
             'Index too long for multiple database support. Is self.suffix '
             'longer than 3 characters?'
         )
