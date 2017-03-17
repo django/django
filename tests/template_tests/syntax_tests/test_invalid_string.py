@@ -9,10 +9,7 @@ class InvalidStringTests(SimpleTestCase):
     @setup({'invalidstr01': '{{ var|default:"Foo" }}'})
     def test_invalidstr01(self):
         output = self.engine.render_to_string('invalidstr01')
-        if self.engine.string_if_invalid:
-            self.assertEqual(output, 'INVALID')
-        else:
-            self.assertEqual(output, 'Foo')
+        self.assertEqual(output, 'Foo')
 
     @setup({'invalidstr02': '{{ var|default_if_none:"Foo" }}'})
     def test_invalidstr02(self):
