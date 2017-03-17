@@ -545,7 +545,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         permission string ``perm``. Returns ``False`` if the user is not
         :attr:`~django.contrib.auth.models.CustomUser.is_active`.
 
-    .. method:: has_module_perms(self, user_obj, app_label)
+    .. method:: has_module_perms(user_obj, app_label)
 
         Returns whether the ``user_obj`` has any permissions on the app
         ``app_label``.

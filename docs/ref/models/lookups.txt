@@ -79,7 +79,7 @@ field references, aggregates, and ``Transform`` are examples that follow this
 API. A class is said to follow the query expression API when it implements the
 following methods:
 
-.. method:: as_sql(self, compiler, connection)
+.. method:: as_sql(compiler, connection)
 
     Responsible for producing the query string and parameters for the expression.
     The ``compiler`` is an ``SQLCompiler`` object, which has a ``compile()``
@@ -95,7 +95,7 @@ following methods:
     override the generation of the SQL string. See :meth:`Func.as_sql` for
     example usage.
 
-.. method:: as_vendorname(self, compiler, connection)
+.. method:: as_vendorname(compiler, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
     ``compiler.compile()``, Django will first try to call ``as_vendorname()``,

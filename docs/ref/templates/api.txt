@@ -163,7 +163,7 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     Loads a template with the given name, compiles it and returns a
     :class:`Template` object.
 
-.. method:: Engine.select_template(self, template_name_list)
+.. method:: Engine.select_template(template_name_list)
 
     Like :meth:`~Engine.get_template`, except it takes a list of names
     and returns the first template that was found.
