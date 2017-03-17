@@ -373,9 +373,7 @@ in the first linestring in the geometry field; otherwise returns ``None``.
 *Availability*: PostGIS, Oracle, SpatiaLite (≥ 4.0)
 
 Accepts a single geographic field or expression and returns the perimeter of the
-geometry field as a :class:`~django.contrib.gis.measure.Distance` object. On
-MySQL, a raw float value is returned, as it's not possible to automatically
-determine the unit of the field.
+geometry field as a :class:`~django.contrib.gis.measure.Distance` object.
 
 ``PointOnSurface``
 ==================
