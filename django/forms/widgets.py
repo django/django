@@ -894,7 +894,7 @@ class SelectDateWidget(Widget):
     template_name = 'django/forms/widgets/select_date.html'
     input_type = 'select'
     select_widget = Select
-    date_re = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
+    date_re = re.compile(r'(\d{4}|0)-(\d\d?)-(\d\d?)$')
 
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}

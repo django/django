@@ -482,6 +482,7 @@ class SelectDateWidgetTest(WidgetTest):
         valid_formats = [
             '2000-1-1', '2000-10-15', '2000-01-01',
             '2000-01-0', '2000-0-01', '2000-0-0',
+            '0-01-01', '0-01-0', '0-0-01', '0-0-0',
         ]
         for value in valid_formats:
             year, month, day = (int(x) for x in value.split('-'))
