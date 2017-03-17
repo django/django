@@ -13,14 +13,9 @@ import django
 from django.apps import apps
 from django.conf import settings
 from django.db import connection, connections
-from django.test import TestCase, TransactionTestCase
-from django.test.runner import default_test_processes
-from django.test.selenium import SeleniumTestCaseBase
-from django.test.utils import get_runner
 from django.utils.deprecation import (
     RemovedInDjango21Warning, RemovedInDjango30Warning,
 )
-from django.utils.log import DEFAULT_LOGGING
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango30Warning)
@@ -40,7 +35,10 @@ TMPDIR = tempfile.mkdtemp(prefix='django_')
 # so that children processes inherit it.
 tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
 
-# Removing the temporary TMPDIR.
+# Removing the temporary TMPDIR. Some inner imports of django modules are used
+# in this script to prevent a FileNotFound teardown error at the end of running
+# the tests on Python 3.6+ due to the order in which atexit handlers are
+# registered (#27890).
 atexit.register(shutil.rmtree, TMPDIR)
 
 
@@ -102,6 +100,9 @@ def get_installed():
 
 
 def setup(verbosity, test_labels, parallel):
+    from django.test import TestCase, TransactionTestCase
+    from django.test.runner import default_test_processes
+    from django.utils.log import DEFAULT_LOGGING
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
         max_parallel = default_test_processes() if parallel == 0 else parallel
@@ -235,6 +236,7 @@ class ActionSelenium(argparse.Action):
     Validate the comma-separated list of requested browsers.
     """
     def __call__(self, parser, namespace, values, option_string=None):
+        from django.test.selenium import SeleniumTestCaseBase
         browsers = values.split(',')
         for browser in browsers:
             try:
@@ -246,6 +248,7 @@ class ActionSelenium(argparse.Action):
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags):
+    from django.test.utils import get_runner
     state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
@@ -371,6 +374,8 @@ def paired_tests(paired_test, options, test_labels, parallel):
 
 
 if __name__ == "__main__":
+    from django.test.runner import default_test_processes
+    from django.test.selenium import SeleniumTestCaseBase
     parser = argparse.ArgumentParser(description="Run the Django test suite.")
     parser.add_argument(
         'modules', nargs='*', metavar='module',
