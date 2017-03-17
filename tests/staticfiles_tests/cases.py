@@ -128,3 +128,6 @@ class TestDefaults:
         Can find a file with capital letters.
         """
         self.assertFileContains('test/camelCase.txt', 'camelCase')
+
+    def test_filename_with_percent_sign(self):
+        self.assertFileContains('test/%2F.txt', '%2F content')

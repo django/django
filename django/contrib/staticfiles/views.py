@@ -5,7 +5,6 @@ development, and SHOULD NOT be used in a production setting.
 """
 import os
 import posixpath
-from urllib.parse import unquote
 
 from django.conf import settings
 from django.contrib.staticfiles import finders
@@ -30,7 +29,7 @@ def serve(request, path, insecure=False, **kwargs):
     """
     if not settings.DEBUG and not insecure:
         raise Http404
-    normalized_path = posixpath.normpath(unquote(path)).lstrip('/')
+    normalized_path = posixpath.normpath(path).lstrip('/')
     absolute_path = finders.find(normalized_path)
     if not absolute_path:
         if path.endswith('/') or path == '':
