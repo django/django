@@ -460,6 +460,11 @@ class ModelState(object):
                 elif name == "index_together":
                     it = model._meta.original_attrs["index_together"]
                     options[name] = set(normalize_together(it))
+                elif name == "indexes":
+                    indexes = [idx.clone() for idx in model._meta.indexes]
+                    for index in indexes:
+                        index.set_name_with_model(model)
+                    options['indexes'] = indexes
                 else:
                     options[name] = model._meta.original_attrs[name]
         # Force-convert all options to text_type (#23226)

@@ -1,7 +1,7 @@
 from django.db import models
 from django.test import SimpleTestCase
 
-from .models import Book
+from .models import Book, ChildModel1, ChildModel2
 
 
 class IndexesTests(SimpleTestCase):
@@ -76,3 +76,15 @@ class IndexesTests(SimpleTestCase):
         self.assertEqual(path, 'django.db.models.Index')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'model_index_title_196f42_idx'})
+
+    def test_clone(self):
+        index = models.Index(fields=['title'])
+        new_index = index.clone()
+        self.assertIsNot(index, new_index)
+        self.assertEqual(index.fields, new_index.fields)
+
+    def test_abstract_children(self):
+        index_names = [index.name for index in ChildModel1._meta.indexes]
+        self.assertEqual(index_names, ['model_index_name_440998_idx'])
+        index_names = [index.name for index in ChildModel2._meta.indexes]
+        self.assertEqual(index_names, ['model_index_name_b6c374_idx'])
