@@ -381,7 +381,9 @@ Accepts a single geographic field or expression and returns the memory size
 
 Accepts a single geographic field or expression and returns the number of
 geometries if the geometry field is a collection (e.g., a ``GEOMETRYCOLLECTION``
-or ``MULTI*`` field); otherwise returns ``None``.
+or ``MULTI*`` field). Returns 1 for single geometries.
+
+On MySQL, returns ``None`` for single geometries.
 
 ``NumPoints``
 =============
