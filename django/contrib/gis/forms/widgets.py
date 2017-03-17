@@ -78,6 +78,7 @@ class BaseGeometryWidget(Widget):
 
 class OpenLayersWidget(BaseGeometryWidget):
     template_name = 'gis/openlayers.html'
+    map_srid = 3857
 
     class Media:
         css = {
@@ -102,7 +103,6 @@ class OSMWidget(OpenLayersWidget):
     template_name = 'gis/openlayers-osm.html'
     default_lon = 5
     default_lat = 47
-    map_srid = 3857
 
     def __init__(self, attrs=None):
         super(OSMWidget, self).__init__()
