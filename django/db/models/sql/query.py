@@ -1095,13 +1095,13 @@ class Query:
                     # We didn't find a lookup. We are going to interpret
                     # the name as transform, and do an Exact lookup against
                     # it.
-                    lhs = self.try_transform(lhs, name, lookups)
+                    lhs = self.try_transform(lhs, name)
                     final_lookup = lhs.get_lookup('exact')
                 return final_lookup(lhs, rhs)
-            lhs = self.try_transform(lhs, name, lookups)
+            lhs = self.try_transform(lhs, name)
             lookups = lookups[1:]
 
-    def try_transform(self, lhs, name, rest_of_lookups):
+    def try_transform(self, lhs, name):
         """
         Helper method for build_lookup(). Try to fetch and initialize
         a transform for name parameter from lhs.
