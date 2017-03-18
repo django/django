@@ -1,6 +1,21 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+1.1.0 (2017-03-18)
+------------------
+
+* Channels now includes a JavaScript wrapper that wraps reconnection and
+  multiplexing for you on the client side.
+
+* Test classes have been moved from ``channels.tests`` to ``channels.test``.
+
+* Bindings now support non-integer fields for primary keys on models.
+
+* The ``enforce_ordering`` decorator no longer suffers a race condition where
+  it would drop messages under high load.
+
+* ``runserver`` no longer errors if the ``staticfiles`` app is not enabled in Django.
+
 
 1.0.3 (2017-02-01)
 ------------------
