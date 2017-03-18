@@ -43,7 +43,7 @@ class Extent(GeoAggregate):
         super().__init__(expression, output_field=ExtentField(), **extra)
 
     def convert_value(self, value, expression, connection, context):
-        return connection.ops.convert_extent(value, context.get('transformed_srid'))
+        return connection.ops.convert_extent(value)
 
 
 class Extent3D(GeoAggregate):
@@ -54,7 +54,7 @@ class Extent3D(GeoAggregate):
         super().__init__(expression, output_field=ExtentField(), **extra)
 
     def convert_value(self, value, expression, connection, context):
-        return connection.ops.convert_extent3d(value, context.get('transformed_srid'))
+        return connection.ops.convert_extent3d(value)
 
 
 class MakeLine(GeoAggregate):

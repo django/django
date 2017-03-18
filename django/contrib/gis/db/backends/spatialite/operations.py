@@ -113,13 +113,13 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 4.0.0 and above.')
         return version
 
-    def convert_extent(self, box, srid):
+    def convert_extent(self, box):
         """
         Convert the polygon data received from SpatiaLite to min/max values.
         """
         if box is None:
             return None
-        shell = Geometry(box, srid).shell
+        shell = Geometry(box).shell
         xmin, ymin = shell[0][:2]
         xmax, ymax = shell[2][:2]
         return (xmin, ymin, xmax, ymax)
@@ -242,16 +242,3 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
         return SpatialiteSpatialRefSys
-
-    def get_db_converters(self, expression):
-        converters = super().get_db_converters(expression)
-        if hasattr(expression.output_field, 'geom_type'):
-            converters.append(self.convert_geometry)
-        return converters
-
-    def convert_geometry(self, value, expression, connection, context):
-        if value:
-            value = Geometry(value)
-            if 'transformed_srid' in context:
-                value.srid = context['transformed_srid']
-        return value
