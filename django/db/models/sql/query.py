@@ -1116,7 +1116,7 @@ class Query:
                 (name, lhs.output_field.__class__.__name__))
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
-                     can_reuse=None, connector=AND, allow_joins=True, split_subq=True):
+                     can_reuse=None, allow_joins=True, split_subq=True):
         """
         Build a WhereNode for a single filter clause but don't add it
         to this Query. Query.add_q() will then add this filter to the where
@@ -1268,8 +1268,8 @@ class Query:
             else:
                 child_clause, needed_inner = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated, connector=connector,
-                    allow_joins=allow_joins, split_subq=split_subq,
+                    current_negated=current_negated, allow_joins=allow_joins,
+                    split_subq=split_subq,
                 )
                 joinpromoter.add_votes(needed_inner)
             if child_clause:
