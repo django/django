@@ -36,16 +36,16 @@ an abstraction that allows for data to be sent and received at any time,
 and from different application threads or processes.
 
 It also take the principle of turning protocols into Python-compatible,
-asynchronous-friendly sets of messages and generalises it into two sections;
+asynchronous-friendly sets of messages and generalises it into two parts;
 a standardised interface for communication and to build servers around (this
-document), and a set of standard message formats for each protocol (the
-sub-specifications, linked above).
+document), and a set of standard :ref:`message formats for each protocol <asgi_sub_specifications>`.
 
-Its primary design is for HTTP, however, and part of this design is
-ensuring there is an easy path to use both
-existing WSGI servers and applications, as a large majority of Python
-web usage relies on WSGI and providing an easy path forwards is critical
-to adoption.
+Its primary goal is to provide a way to write HTTP/2 and WebSocket code,
+alongside normal HTTP handling code, however, and part of this design is
+ensuring there is an easy path to use both existing WSGI servers and
+applications, as a large majority of Python web usage relies on WSGI and
+providing an easy path forwards is critical to adoption. Details on that
+interoperability are covered in :doc:`/asgi/www`.
 
 The end result of this process has been a specification for generalised
 inter-process communication between Python processes, with a certain set of
@@ -54,6 +54,7 @@ processing and response. It is not intended to replace things like traditional
 task queues, but it is intended that it could be used for things like
 distributed systems communication, or as the backbone of a service-oriented
 architecure for inter-service communication.
+
 
 Overview
 ========
@@ -104,7 +105,8 @@ contain only the following types to ensure serializability:
 
 * Byte strings
 * Unicode strings
-* Integers (no longs)
+* Integers (within the signed 64 bit range)
+* Floating point numbers (within the IEEE 754 double precision range)
 * Lists (tuples should be treated as lists)
 * Dicts (keys must be unicode strings)
 * Booleans
