@@ -2,8 +2,8 @@
 ASGI (Asynchronous Server Gateway Interface) Draft Spec
 =======================================================
 
-**NOTE: This is still in-progress, and may change substantially as development
-progresses.**
+.. note::
+  This is still in-progress, but is now mostly complete.
 
 Abstract
 ========
@@ -13,9 +13,12 @@ servers (particularly web servers) and Python applications, intended
 to allow handling of multiple common protocol styles (including HTTP, HTTP2,
 and WebSocket).
 
-It is intended to supplement and expand on WSGI, though the design
-deliberately includes provisions to allow WSGI-to-ASGI and ASGI-to-WGSI
-adapters to be easily written for the HTTP protocol.
+This base specification is intended to fix in place the set of APIs by which
+these servers interact and the guarantees and style of message delivery;
+each supported protocol (such as HTTP) has a sub-specification that outlines
+how to encode and decode that protocol into messages.
+
+The set of sub-specifications is available :ref:`in the Message Formats section <asgi_sub_specifications>`.
 
 
 Rationale
@@ -32,16 +35,25 @@ ASGI attempts to preserve a simple application interface, but provide
 an abstraction that allows for data to be sent and received at any time,
 and from different application threads or processes.
 
-It also lays out new, serialization-compatible formats for things like
-HTTP requests and responses and WebSocket data frames, to allow these to
-be transported over a network or local memory, and allow separation
-of protocol handling and application logic into different processes.
+It also take the principle of turning protocols into Python-compatible,
+asynchronous-friendly sets of messages and generalises it into two sections;
+a standardised interface for communication and to build servers around (this
+document), and a set of standard message formats for each protocol (the
+sub-specifications, linked above).
 
-Part of this design is ensuring there is an easy path to use both
+Its primary design is for HTTP, however, and part of this design is
+ensuring there is an easy path to use both
 existing WSGI servers and applications, as a large majority of Python
 web usage relies on WSGI and providing an easy path forwards is critical
 to adoption.
 
+The end result of this process has been a specification for generalised
+inter-process communication between Python processes, with a certain set of
+guarantees and delivery styles that make it suited to low-latency protocol
+processing and response. It is not intended to replace things like traditional
+task queues, but it is intended that it could be used for things like
+distributed systems communication, or as the backbone of a service-oriented
+architecure for inter-service communication.
 
 Overview
 ========
@@ -62,12 +74,12 @@ to a channel layer instance. It is intended that applications and protocol
 servers always run in separate processes or threads, and always communicate
 via the channel layer.
 
-Despite the name of the proposal, ASGI does not specify or design to any
-specific in-process async solution, such as ``asyncio``, ``twisted``, or
-``gevent``. Instead, the ``receive`` function can be switched between
-nonblocking or synchronous. This approach allows applications to choose what's
-best for their current runtime environment; further improvements may provide
-extensions where cooperative versions of receive are provided.
+ASGI tries to be as compatible as possible by default, and so the only
+implementation of ``receive`` that must be provided is a fully-synchronous,
+nonblocking one. Implementations can then choose to implement a blocking mode
+in this method, and if they wish to go further, versions compatible with
+the asyncio or Twisted frameworks (or other frameworks that may become
+popular, thanks to the extension declaration mechanism).
 
 The distinction between protocol servers and applications in this document
 is mostly to distinguish their roles and to make illustrating concepts easier.
@@ -76,11 +88,11 @@ to have a process that does both, or middleware-like code that transforms
 messages between two different channel layers or channel names. It is
 expected, however, that most deployments will fall into this pattern.
 
-There is even room for a WSGI-like application abstraction with a callable
-which takes ``(channel, message, send_func)``, but this would be slightly
-too restrictive for many use cases and does not cover how to specify
-channel names to listen on; it is expected that frameworks will cover this
-use case.
+There is even room for a WSGI-like application abstraction on the application
+server side, with a callable which takes ``(channel, message, send_func)``,
+but this would be slightly too restrictive for many use cases and does not
+cover how to specify channel names to listen on. It is expected that
+frameworks will cover this use case.
 
 
 Channels and Messages
@@ -164,12 +176,11 @@ ASGI messages represent two main things - internal application events
 (for example, a channel might be used to queue thumbnails of previously
 uploaded videos), and protocol events to/from connected clients.
 
-As such, this specification outlines encodings to and from ASGI messages
-for HTTP and WebSocket; this allows any ASGI
-web server to talk to any ASGI web application, as well as servers and
-applications for any other protocol with a common specification. It is
-recommended that if other protocols become commonplace they should gain
-standardized formats in a supplementary specification of their own.
+As such, there are :ref:`sub-specifications <asgi_sub_specifications>` that
+outline encodings to and from ASGI messages for common protocols like HTTP and
+WebSocket; in particular, the HTTP one covers the WSGI/ASGI interoperability.
+It is recommended that if a protocol becomes commonplace, it should gain
+standardized formats in a sub-specification of its own.
 
 The message formats are a key part of the specification; without them,
 the protocol server and web application might be able to talk to each other,
@@ -275,7 +286,7 @@ Solving this issue is left to frameworks and application code; there are
 already solutions such as database transactions that help solve this,
 and the vast majority of application code will not need to deal with this
 problem. If ordering of incoming packets matters for a protocol, they should
-be annotated with a packet number (as WebSocket is in this specification).
+be annotated with a packet number (as WebSocket is in its specification).
 
 Single-reader and process-specific channels, such as those used for response
 channels back to clients, are not subject to this problem; a single reader
@@ -394,14 +405,21 @@ A channel layer implementing the ``twisted`` extension must also provide:
 * ``receive_twisted(channels)``, a function that behaves
   like ``receive`` but that returns a Twisted Deferred that eventually
   returns either ``(channel, message)`` or ``(None, None)``. It is not possible
-  to run it in nonblocking mode; use the normal ``receive`` for that.
+  to run it in nonblocking mode; use the normal ``receive`` for that. The
+  channel layer must be able to deal with this function being called from
+  many different places in a codebase simultaneously - likely once from each
+  Twisted Protocol instance - and so it is recommended that implementations
+  use internal connection pooling and call merging or similar.
 
 A channel layer implementing the ``asyncio`` extension must also provide:
 
 * ``receive_asyncio(channels)``, a function that behaves
   like ``receive`` but that fulfills the asyncio coroutine contract to
   block until either a result is available or an internal timeout is reached
-  and ``(None, None)`` is returned.
+  and ``(None, None)`` is returned. The channel layer must be able to deal
+  with this function being called from many different places in a codebase
+  simultaneously, and so it is recommended that implementations
+  use internal connection pooling and call merging or similar.
 
 Channel Semantics
 -----------------
@@ -473,6 +491,8 @@ restart, you will likely need to move and reprovision protocol servers, and
 making sure your code can cope with this is important.
 
 
+.. _asgi_sub_specifications:
+
 Message Formats
 ---------------
 
@@ -501,380 +521,14 @@ in the channel name they are received on. Two types that are sent on the same
 channel, such as HTTP responses and response chunks, are distinguished apart
 by their required fields.
 
+Message formats can be found in the sub-specifications:
 
-HTTP
-----
+.. toctree::
+   :maxdepth: 1
 
-The HTTP format covers HTTP/1.0, HTTP/1.1 and HTTP/2, as the changes in
-HTTP/2 are largely on the transport level. A protocol server should give
-different requests on the same connection different reply channels, and
-correctly multiplex the responses back into the same stream as they come in.
-The HTTP version is available as a string in the request message.
-
-HTTP/2 Server Push responses are included, but must be sent prior to the
-main response, and applications must check for ``http_version = 2`` before
-sending them; if a protocol server or connection incapable of Server Push
-receives these, it must drop them.
-
-Multiple header fields with the same name are complex in HTTP. RFC 7230
-states that for any header field that can appear multiple times, it is exactly
-equivalent to sending that header field only once with all the values joined by
-commas.
-
-However, RFC 7230 and RFC 6265 make it clear that this rule does not apply to
-the various headers used by HTTP cookies (``Cookie`` and ``Set-Cookie``). The
-``Cookie`` header must only be sent once by a user-agent, but the
-``Set-Cookie`` header may appear repeatedly and cannot be joined by commas.
-For this reason, we can safely make the request ``headers`` a ``dict``, but
-the response ``headers`` must be sent as a list of tuples, which matches WSGI.
-
-Request
-'''''''
-
-Sent once for each request that comes into the protocol server. If sending
-this raises ``ChannelFull``, the interface server must respond with a
-500-range error, preferably ``503 Service Unavailable``, and close the connection.
-
-Channel: ``http.request``
-
-Keys:
-
-* ``reply_channel``: Channel name for responses and server pushes, starting with
-  ``http.response!``
-
-* ``http_version``: Unicode string, one of ``1.0``, ``1.1`` or ``2``.
-
-* ``method``: Unicode string HTTP method name, uppercased.
-
-* ``scheme``: Unicode string URL scheme portion (likely ``http`` or ``https``).
-  Optional (but must not be empty), default is ``"http"``.
-
-* ``path``: Unicode string HTTP path from URL, with percent escapes decoded
-  and UTF8 byte sequences decoded into characters.
-
-* ``query_string``: Byte string URL portion after the ``?``, not url-decoded.
-
-* ``root_path``: Unicode string that indicates the root path this application
-  is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional, defaults
-  to ``""``.
-
-* ``headers``: A list of ``[name, value]`` lists, where ``name`` is the
-  byte string header name, and ``value`` is the byte string
-  header value. Order of header values must be preserved from the original HTTP
-  request; order of header names is not important. Duplicates are possible and
-  must be preserved in the message as received.
-  Header names must be lowercased.
-
-* ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
-  If ``body_channel`` is set, treat as start of body and concatenate
-  on further chunks.
-
-* ``body_channel``: Name of a single-reader channel (containing ``?``) that contains
-  Request Body Chunk messages representing a large request body.
-  Optional, defaults to ``None``. Chunks append to ``body`` if set. Presence of
-  a channel indicates at least one Request Body Chunk message needs to be read,
-  and then further consumption keyed off of the ``more_content`` key in those
-  messages.
-
-* ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
-  remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
-  integer. Optional, defaults to ``None``.
-
-* ``server``: List of ``[host, port]`` where ``host`` is the listening address
-  for this server as a unicode string, and ``port`` is the integer listening port.
-  Optional, defaults to ``None``.
-
-
-Request Body Chunk
-''''''''''''''''''
-
-Must be sent after an initial Response. If trying to send this raises
-``ChannelFull``, the interface server should wait and try again until it is
-accepted (the consumer at the other end of the channel may not be as fast
-consuming the data as the client is at sending it).
-
-Channel: ``http.request.body?``
-
-Keys:
-
-* ``content``: Byte string of HTTP body content, will be concatenated onto
-  previously received ``content`` values and ``body`` key in Request.
-  Not required if ``closed`` is True, required otherwise.
-
-* ``closed``: True if the client closed the connection prematurely and the
-  rest of the body. If you receive this, abandon processing of the HTTP request.
-  Optional, defaults to ``False``.
-
-* ``more_content``: Boolean value signifying if there is additional content
-  to come (as part of a Request Body Chunk message). If ``False``, request will
-  be taken as complete, and any further messages on the channel
-  will be ignored. Optional, defaults to ``False``.
-
-
-Response
-''''''''
-
-Send after any server pushes, and before any response chunks. If ``ChannelFull``
-is encountered, wait and try again later, optionally giving up after a
-predetermined timeout.
-
-Channel: ``http.response!``
-
-Keys:
-
-* ``status``: Integer HTTP status code.
-
-* ``headers``: A list of ``[name, value]`` lists, where ``name`` is the
-  byte string header name, and ``value`` is the byte string
-  header value. Order must be preserved in the HTTP response. Header names
-  must be lowercased.
-
-* ``content``: Byte string of HTTP body content.
-  Optional, defaults to empty string.
-
-* ``more_content``: Boolean value signifying if there is additional content
-  to come (as part of a Response Chunk message). If ``False``, response will
-  be taken as complete and closed off, and any further messages on the channel
-  will be ignored. Optional, defaults to ``False``.
-
-
-Response Chunk
-''''''''''''''
-
-Must be sent after an initial Response. If ``ChannelFull``
-is encountered, wait and try again later.
-
-Channel: ``http.response!``
-
-Keys:
-
-* ``content``: Byte string of HTTP body content, will be concatenated onto
-  previously received ``content`` values.
-
-* ``more_content``: Boolean value signifying if there is additional content
-  to come (as part of a Response Chunk message). If ``False``, response will
-  be taken as complete and closed off, and any further messages on the channel
-  will be ignored. Optional, defaults to ``False``.
-
-
-Server Push
-'''''''''''
-
-Must be sent before any Response or Response Chunk messages. If ``ChannelFull``
-is encountered, wait and try again later, optionally giving up after a
-predetermined timeout, and give up on the entire response this push is
-connected to.
-
-When a server receives this message, it must treat the Request message in the
-``request`` field of the Server Push as though it were a new HTTP request being
-received from the network. A server may, if it chooses, apply all of its
-internal logic to handling this request (e.g. the server may want to try to
-satisfy the request from a cache). Regardless, if the server is unable to
-satisfy the request itself it must create a new ``http.response!`` channel for
-the application to send the Response message on, fill that channel in on the
-``reply_channel`` field of the message, and then send the Request back to the
-application on the ``http.request`` channel.
-
-This approach limits the amount of knowledge the application has to have about
-pushed responses: they essentially appear to the application like a normal HTTP
-request, with the difference being that the application itself triggered the
-request.
-
-If the remote peer does not support server push, either because it's not a
-HTTP/2 peer or because SETTINGS_ENABLE_PUSH is set to 0, the server must do
-nothing in response to this message.
-
-Channel: ``http.response!``
-
-Keys:
-
-* ``request``: A Request message. The ``body``, ``body_channel``, and
-  ``reply_channel`` fields MUST be absent: bodies are not allowed on
-  server-pushed requests, and applications should not create reply channels.
-
-
-Disconnect
-''''''''''
-
-Sent when a HTTP connection is closed. This is mainly useful for long-polling,
-where you may have added the response channel to a Group or other set of
-channels you want to trigger a reply to when data arrives.
-
-If ``ChannelFull`` is raised, then give up attempting to send the message;
-consumption is not required.
-
-Channel: ``http.disconnect``
-
-Keys:
-
-* ``reply_channel``: Channel name responses would have been sent on. No longer
-  valid after this message is sent; all messages to it will be dropped.
-
-* ``path``: Unicode string HTTP path from URL, with percent escapes decoded
-  and UTF8 byte sequences decoded into characters.
-
-
-WebSocket
----------
-
-WebSockets share some HTTP details - they have a path and headers - but also
-have more state. Path and header details are only sent in the connection
-message; applications that need to refer to these during later messages
-should store them in a cache or database.
-
-WebSocket protocol servers should handle PING/PONG requests themselves, and
-send PING frames as necessary to ensure the connection is alive.
-
-Note that you **must** ensure that websocket.connect is consumed; if an
-interface server gets ``ChannelFull`` on this channel it will drop the
-connection. Django Channels ships with a no-op consumer attached by default;
-we recommend other implementations do the same.
-
-
-Connection
-''''''''''
-
-Sent when the client initially opens a connection and completes the
-WebSocket handshake. If sending this raises ``ChannelFull``, the interface
-server must close the connection with either HTTP status code ``503`` or
-WebSocket close code ``1013``.
-
-This message must be responded to on the ``reply_channel`` with a
-*Send/Close/Accept* message before the socket will pass messages on the
-``receive`` channel. The protocol server should ideally send this message
-during the handshake phase of the WebSocket and not complete the handshake
-until it gets a reply, returning HTTP status code ``403`` if the connection is
-denied. If this is not possible, it must buffer WebSocket frames and not
-send them onto ``websocket.receive`` until a reply is received, and if the
-connection is rejected, return WebSocket close code ``4403``.
-
-Channel: ``websocket.connect``
-
-Keys:
-
-* ``reply_channel``: Channel name for sending data, start with ``websocket.send!``
-
-* ``scheme``: Unicode string URL scheme portion (likely ``ws`` or ``wss``).
-  Optional (but must not be empty), default is ``ws``.
-
-* ``path``: Unicode HTTP path from URL, already urldecoded.
-
-* ``query_string``: Byte string URL portion after the ``?``. Optional, default
-  is empty string.
-
-* ``root_path``: Byte string that indicates the root path this application
-  is mounted at; same as ``SCRIPT_NAME`` in WSGI. Optional, defaults
-  to empty string.
-
-* ``headers``: List of ``[name, value]``, where ``name`` is the
-  header name as byte string and ``value`` is the header value as a byte
-  string. Order should be preserved from the original HTTP request;
-  duplicates are possible and must be preserved in the message as received.
-  Header names must be lowercased.
-
-* ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
-  remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
-  integer. Optional, defaults to ``None``.
-
-* ``server``: List of ``[host, port]`` where ``host`` is the listening address
-  for this server as a unicode string, and ``port`` is the integer listening port.
-  Optional, defaults to ``None``.
-
-* ``order``: The integer value ``0``.
-
-
-Receive
-'''''''
-
-Sent when a data frame is received from the client. If ``ChannelFull`` is
-raised, you may retry sending it but if it does not send the socket must
-be closed with websocket error code 1013.
-
-Channel: ``websocket.receive``
-
-Keys:
-
-* ``reply_channel``: Channel name for sending data, starting with ``websocket.send!``
-
-* ``path``: Path sent during ``connect``, sent to make routing easier for apps.
-
-* ``bytes``: Byte string of frame content, if it was bytes mode, or ``None``.
-
-* ``text``: Unicode string of frame content, if it was text mode, or ``None``.
-
-* ``order``: Order of this frame in the WebSocket stream, starting
-  at 1 (``connect`` is 0).
-
-One of ``bytes`` or ``text`` must be non-``None``.
-
-
-Disconnection
-'''''''''''''
-
-Sent when either connection to the client is lost, either from the client
-closing the connection, the server closing the connection, or loss of the
-socket.
-
-If ``ChannelFull`` is raised, then give up attempting to send the message;
-consumption is not required.
-
-Channel: ``websocket.disconnect``
-
-Keys:
-
-* ``reply_channel``: Channel name that was used for sending data, starting
-  with ``websocket.send!``. Cannot be used to send at this point; provided
-  as a way to identify the connection only.
-
-* ``code``: The WebSocket close code (integer), as per the WebSocket spec.
-
-* ``path``: Path sent during ``connect``, sent to make routing easier for apps.
-
-* ``order``: Order of the disconnection relative to the incoming frames'
-  ``order`` values in ``websocket.receive``.
-
-
-Send/Close/Accept
-'''''''''''''''''
-
-Sends a data frame to the client and/or closes the connection from the
-server end and/or accepts a connection. If ``ChannelFull`` is raised, wait
-and try again.
-
-If received while the connection is waiting for acceptance after a ``connect``
-message:
-
-* If ``bytes`` or ``text`` is present, accept the connection and send the data.
-* If ``accept`` is ``True``, accept the connection and do nothing else.
-* If ``close`` is ``True`` or a positive integer, reject the connection. If
-  ``bytes`` or ``text`` is also set, it should accept the connection, send the
-  frame, then immediately close the connection.
-
-If received while the connection is established:
-
-* If ``bytes`` or ``text`` is present, send the data.
-* If ``close`` is ``True`` or a positive integer, close the connection after
-  any send.
-* ``accept`` is ignored.
-
-Channel: ``websocket.send!``
-
-Keys:
-
-* ``bytes``: Byte string of frame content, if in bytes mode, or ``None``.
-
-* ``text``: Unicode string of frame content, if in text mode, or ``None``.
-
-* ``close``: Boolean indicating if the connection should be closed after
-  data is sent, if any. Alternatively, a positive integer specifying the
-  response code. The response code will be 1000 if you pass ``True``.
-  Optional, default ``False``.
-
-* ``accept``: Boolean saying if the connection should be accepted without
-  sending a frame if it is in the handshake phase.
-
-A maximum of one of ``bytes`` or ``text`` may be provided. If both are
-provided, the protocol server should ignore the message entirely.
+   /asgi/www
+   /asgi/delay
+   /asgi/udp
 
 
 Protocol Format Guidelines
@@ -932,14 +586,14 @@ a message doesn't get received purely because another channel is busy.
 Strings and Unicode
 -------------------
 
-In this document, *byte string* refers to ``str`` on Python 2 and ``bytes``
-on Python 3. If this type still supports Unicode codepoints due to the
-underlying implementation, then any values should be kept within the lower
-8-byte range.
+In this document, and all sub-specifications, *byte string* refers to
+``str`` on Python 2 and ``bytes`` on Python 3. If this type still supports
+Unicode codepoints due to the underlying implementation, then any values
+should be kept within the 0 - 255 range.
 
 *Unicode string* refers to ``unicode`` on Python 2 and ``str`` on Python 3.
 This document will never specify just *string* - all strings are one of the
-two types.
+two exact types.
 
 Some serializers, such as ``json``, cannot differentiate between byte
 strings and unicode strings; these should include logic to box one type as
@@ -960,58 +614,6 @@ limitation that they only use the following characters:
   and only one per name)
 
 
-WSGI Compatibility
-------------------
-
-Part of the design of the HTTP portion of this spec is to make sure it
-aligns well with the WSGI specification, to ensure easy adaptability
-between both specifications and the ability to keep using WSGI servers or
-applications with ASGI.
-
-The adaptability works in two ways:
-
-* WSGI Server to ASGI: A WSGI application can be written that transforms
-  ``environ`` into a Request message, sends it off on the ``http.request``
-  channel, and then waits on a generated response channel for a Response
-  message. This has the disadvantage of tying up an entire WSGI thread
-  to poll one channel, but should not be a massive performance drop if
-  there is no backlog on the request channel, and would work fine for an
-  in-process adapter to run a pure-ASGI web application.
-
-* ASGI to WSGI application: A small wrapper process is needed that listens
-  on the ``http.request`` channel, and decodes incoming Request messages
-  into an ``environ`` dict that matches the WSGI specs, while passing in
-  a ``start_response`` that stores the values for sending with the first
-  content chunk. Then, the application iterates over the WSGI app,
-  packaging each returned content chunk into a Response or Response Chunk
-  message (if more than one is yielded).
-
-There is an almost direct mapping for the various special keys in
-WSGI's ``environ`` variable to the Request message:
-
-* ``REQUEST_METHOD`` is the ``method`` key
-* ``SCRIPT_NAME`` is ``root_path``
-* ``PATH_INFO`` can be derived from ``path`` and ``root_path``
-* ``QUERY_STRING`` is ``query_string``
-* ``CONTENT_TYPE`` can be extracted from ``headers``
-* ``CONTENT_LENGTH`` can be extracted from ``headers``
-* ``SERVER_NAME`` and ``SERVER_PORT`` are in ``server``
-* ``REMOTE_HOST``/``REMOTE_ADDR`` and ``REMOTE_PORT`` are in ``client``
-* ``SERVER_PROTOCOL`` is encoded in ``http_version``
-* ``wsgi.url_scheme`` is ``scheme``
-* ``wsgi.input`` is a StringIO around ``body``
-* ``wsgi.errors`` is directed by the wrapper as needed
-
-The ``start_response`` callable maps similarly to Response:
-
-* The ``status`` argument becomes ``status``, with the reason phrase dropped.
-* ``response_headers`` maps to ``headers``
-
-It may even be possible to map Request Body Chunks in a way that allows
-streaming of body data, though it would likely be easier and sufficient for
-many applications to simply buffer the whole body into memory before calling
-the WSGI application.
-
 
 Common Questions
 ================
@@ -1024,35 +626,7 @@ Common Questions
    custom classes (e.g. ``http.request`` messages become ``Request`` objects)
 
 
-TODOs
-=====
-
-* Maybe remove ``http_version`` and replace with ``supports_server_push``?
-
-* ``receive`` can't easily be implemented with async/cooperative code
-  behind it as it's nonblocking - possible alternative call type?
-  Asyncio extension that provides ``receive_yield``?
-
-* Possible extension to allow detection of channel layer flush/restart and
-  prompt protocol servers to restart?
-
-* Maybe WSGI-app like spec for simple "applications" that allows standardized
-  application-running servers?
-
-
 Copyright
 =========
 
 This document has been placed in the public domain.
-
-
-Protocol Definitions
-====================
-
-
-.. toctree::
-   :maxdepth: 1
-
-   /asgi/email
-   /asgi/udp
-   /asgi/delay

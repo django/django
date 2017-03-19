@@ -1,6 +1,6 @@
-====================================
-UDP ASGI Message Format (Draft Spec)
-====================================
+=============================
+UDP ASGI Message Format (1.0)
+=============================
 
 Raw UDP is specified here as it is a datagram-based, unordered and unreliable
 protocol, which neatly maps to the underlying message abstraction. It is not

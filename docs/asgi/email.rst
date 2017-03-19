@@ -2,6 +2,9 @@
 Email ASGI Message Format (Draft Spec)
 ======================================
 
+.. warning::
+  This is an incomplete draft.
+
 Represents emails sent or received, likely over the SMTP protocol though that
 is not directly specified here (a protocol server could in theory deliver
 or receive email over HTTP to some external service, for example). Generally
