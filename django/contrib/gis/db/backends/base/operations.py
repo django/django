@@ -1,6 +1,4 @@
 class BaseSpatialOperations:
-    truncate_params = {}
-
     # Quick booleans for the type of this spatial backend, and
     # an attribute for the spatial database version tuple (if applicable)
     postgis = False

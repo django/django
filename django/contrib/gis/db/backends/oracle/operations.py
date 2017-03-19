@@ -115,8 +115,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'dwithin': SDODWithin(),
     }
 
-    truncate_params = {'relate': None}
-
     unsupported_functions = {
         'AsGeoJSON', 'AsKML', 'AsSVG', 'Envelope', 'ForceRHR', 'GeoHash',
         'MakeValid', 'MemSize', 'Scale', 'SnapToGrid', 'Translate',
