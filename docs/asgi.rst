@@ -205,6 +205,8 @@ network based on attributes in the message (in this case, a telephone
 number).
 
 
+.. _asgi_extensions:
+
 Extensions
 ----------
 
@@ -338,7 +340,7 @@ A *channel layer* must provide an object with these attributes
   and returns a new valid channel name that does not already exist, by
   adding a unicode string after the ``!`` or ``?`` character in ``pattern``,
   and checking for existence of that name in the channel layer. The ``pattern``
-  MUST end with ``!`` or ``?`` or this function must error. If the character
+  must end with ``!`` or ``?`` or this function must error. If the character
   is ``!``, making it a process-specific channel, ``new_channel`` must be
   called on the same channel layer that intends to read the channel with
   ``receive``; any other channel layer instance may not receive
@@ -351,9 +353,8 @@ A *channel layer* must provide an object with these attributes
   because the destination channel is over capacity.
 
 * ``extensions``, a list of unicode string names indicating which
-  extensions this layer provides, or empty if it supports none.
-  The names defined in this document are ``groups``, ``flush`` and
-  ``statistics``.
+  extensions this layer provides, or an empty list if it supports none.
+  The possible extensions can be seen in :ref:`asgi_extensions`.
 
 A channel layer implementing the ``groups`` extension must also provide:
 
