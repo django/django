@@ -1,1 +1,2 @@
 recursive-exclude tests *
+include channels/static/channels/js/*

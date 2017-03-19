@@ -1,6 +1,12 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+1.1.1 (2017-03-19)
+------------------
+
+* Fixed JS packaging issue
+
+
 1.1.0 (2017-03-18)
 ------------------
 

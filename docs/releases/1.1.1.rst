@@ -1,0 +1,22 @@
+1.1.1 Release Notes
+===================
+
+Channels 1.1.1 is a bugfix release that fixes a packaging issue with the JavaScript files.
+
+
+Major Changes
+-------------
+
+None.
+
+Minor Changes & Bugfixes
+------------------------
+
+* The JavaScript binding introduced in 1.1.0 is now correctly packaged and
+  included in builds.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

@@ -13,7 +13,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'Django>=1.8',
-        'asgiref>=1.0.0',
+        'asgiref>=1.0.1',
         'daphne>=1.0.0',
     ],
     extras_require={

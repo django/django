@@ -1,6 +1,6 @@
 {
   "name": "django-channels",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "repository": {
     "type": "git",
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "babel": "^6.5.2",
-    "babel-cli": "^6.16.0",
+    "babel-cli": "^6.24.0",
     "babel-core": "^6.16.0",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
     "babel-plugin-transform-object-assign": "^6.8.0",
