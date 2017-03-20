@@ -42,7 +42,7 @@ class BaseGeometryWidget(Widget):
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
         if value and isinstance(value, six.string_types):

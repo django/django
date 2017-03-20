@@ -241,7 +241,7 @@ foundation for custom widgets.
             In older versions, this method is a private API named
             ``_format_value()``. The old name will work until Django 2.0.
 
-    .. method:: get_context(name, value, attrs=None)
+    .. method:: get_context(name, value, attrs)
 
         .. versionadded:: 1.11
 
@@ -386,7 +386,7 @@ foundation for custom widgets.
 
     It provides some custom context:
 
-    .. method:: get_context(name, value, attrs=None)
+    .. method:: get_context(name, value, attrs)
 
         In addition to the ``'widget'`` key described in
         :meth:`Widget.get_context`, ``MultiValueWidget`` adds a

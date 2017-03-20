@@ -34,7 +34,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         self.is_stacked = is_stacked
         super(FilteredSelectMultiple, self).__init__(attrs, choices)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super(FilteredSelectMultiple, self).get_context(name, value, attrs)
         context['widget']['attrs']['class'] = 'selectfilter'
         if self.is_stacked:
@@ -132,7 +132,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         self.db = using
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super(ForeignKeyRawIdWidget, self).get_context(name, value, attrs)
         rel_to = self.rel.model
         if rel_to in self.admin_site._registry:
@@ -199,7 +199,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """
     template_name = 'admin/widgets/many_to_many_raw_id.html'
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super(ManyToManyRawIdWidget, self).get_context(name, value, attrs)
         if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
@@ -268,7 +268,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return reverse("admin:%s_%s_%s" % (info + (action,)),
                        current_app=self.admin_site.name, args=args)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
