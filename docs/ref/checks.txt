@@ -15,7 +15,7 @@ API reference
 =============
 
 ``CheckMessage``
------------------
+----------------
 
 .. class:: CheckMessage(level, msg, hint=None, obj=None, id=None)
 

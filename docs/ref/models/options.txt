@@ -302,7 +302,7 @@ Django quotes column and table names behind the scenes.
     human_readable_permission_name)``.
 
 ``default_permissions``
-------------------------------
+-----------------------
 
 .. attribute:: Options.default_permissions
 

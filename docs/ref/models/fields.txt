@@ -356,7 +356,7 @@ respect to the month.
 Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
 
 ``verbose_name``
--------------------
+----------------
 
 .. attribute:: Field.verbose_name
 
@@ -365,7 +365,7 @@ will automatically create it using the field's attribute name, converting
 underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
 ``validators``
--------------------
+--------------
 
 .. attribute:: Field.validators
 
@@ -415,7 +415,7 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 :class:`~django.forms.TextInput`.
 
 ``BinaryField``
--------------------
+---------------
 
 .. class:: BinaryField(**options)
 

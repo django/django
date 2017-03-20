@@ -549,7 +549,7 @@ solution is to use ``db_manager()``, like this::
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
 Using ``get_queryset()`` with multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're overriding ``get_queryset()`` on your manager, be sure to
 either call the method on the parent (using ``super()``) or do the

@@ -425,7 +425,7 @@ rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
 
 Context variables
-------------------
+-----------------
 
 When customizing the templates for the
 :func:`~django.contrib.sitemaps.views.index` and

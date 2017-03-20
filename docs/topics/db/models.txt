@@ -1349,7 +1349,7 @@ Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
         pass
 
 Field name "hiding" is not permitted
--------------------------------------
+------------------------------------
 
 In normal Python class inheritance, it is permissible for a child class to
 override any attribute from the parent class. In Django, this isn't usually
