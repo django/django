@@ -276,8 +276,8 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         self.assertHTMLEqual(
             t.render(Context({'form': f})),
             '<ul class="errorlist"><li>field<ul class="errorlist">'
-            '<li>&quot;&lt;script&gt;&quot; is not a valid value for a '
-            'primary key.</li></ul></li></ul>'
+            '<li>&quot;&lt;script&gt;&quot; is not a valid value.</li>'
+            '</ul></li></ul>'
         )
 
 

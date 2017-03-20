@@ -1059,7 +1059,7 @@ class InlineForeignKeyField(Field):
     """
     widget = HiddenInput
     default_error_messages = {
-        'invalid_choice': _('The inline foreign key did not match the parent instance primary key.'),
+        'invalid_choice': _('The inline value did not match the parent instance.'),
     }
 
     def __init__(self, parent_instance, *args, pk_field=False, to_field=None, **kwargs):
@@ -1229,7 +1229,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         'list': _('Enter a list of values.'),
         'invalid_choice': _('Select a valid choice. %(value)s is not one of the'
                             ' available choices.'),
-        'invalid_pk_value': _('"%(pk)s" is not a valid value for a primary key.')
+        'invalid_pk_value': _('"%(pk)s" is not a valid value.')
     }
 
     def __init__(self, queryset, required=True, widget=None, label=None,
