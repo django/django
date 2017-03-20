@@ -735,7 +735,14 @@ By default, Django configures the following logging:
 When :setting:`DEBUG` is ``True``:
 
 * The ``django`` catch-all logger sends all messages at the ``INFO`` level or
-  higher to the console.
+  higher to the console. It processes only messages in the ``django`` namespace:
+
+  .. code-block:: python
+
+      import logging
+
+      logger = logging.getLogger('django')
+      logger.info(...)
 
 When :setting:`DEBUG` is ``False``:
 
