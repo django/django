@@ -186,7 +186,7 @@ class Widget(metaclass=MediaDefiningClass):
             return formats.localize_input(value)
         return force_text(value)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = {}
         context['widget'] = {
             'name': name,
@@ -254,7 +254,7 @@ class Input(Widget):
             self.input_type = attrs.pop('type', self.input_type)
         super().__init__(attrs)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['type'] = self.input_type
         return context
@@ -306,7 +306,7 @@ class MultipleHiddenInput(HiddenInput):
     """
     template_name = 'django/forms/widgets/multiple_hidden.html'
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         final_attrs = context['widget']['attrs']
         id_ = context['widget']['attrs'].get('id')
@@ -388,7 +388,7 @@ class ClearableFileInput(FileInput):
         if self.is_initial(value):
             return value
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         checkbox_name = self.clear_checkbox_name(name)
         checkbox_id = self.clear_checkbox_id(checkbox_name)
@@ -485,7 +485,7 @@ class CheckboxInput(Input):
             return
         return force_text(value)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         if self.check_test(value):
             if attrs is None:
                 attrs = {}
@@ -603,7 +603,7 @@ class ChoiceWidget(Widget):
             'template_name': self.option_template_name,
         }
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
         context['wrap_label'] = True
@@ -648,7 +648,7 @@ class Select(ChoiceWidget):
     checked_attribute = {'selected': True}
     option_inherits_attrs = False
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         if self.allow_multiple_selected:
             context['widget']['attrs']['multiple'] = 'multiple'
@@ -767,7 +767,7 @@ class MultiWidget(Widget):
     def is_hidden(self):
         return all(w.is_hidden for w in self.widgets)
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         if self.is_localized:
             for widget in self.widgets:
@@ -928,7 +928,7 @@ class SelectDateWidget(Widget):
             self.month_none_value = self.none_value
             self.day_none_value = self.none_value
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         date_context = {}
         year_choices = [(i, i) for i in self.years]

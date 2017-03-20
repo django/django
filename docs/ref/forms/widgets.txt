@@ -236,7 +236,7 @@ foundation for custom widgets.
         isn't guaranteed to be valid input, therefore subclass implementations
         should program defensively.
 
-    .. method:: get_context(name, value, attrs=None)
+    .. method:: get_context(name, value, attrs)
 
         .. versionadded:: 1.11
 
@@ -377,7 +377,7 @@ foundation for custom widgets.
 
     It provides some custom context:
 
-    .. method:: get_context(name, value, attrs=None)
+    .. method:: get_context(name, value, attrs)
 
         In addition to the ``'widget'`` key described in
         :meth:`Widget.get_context`, ``MultiValueWidget`` adds a
