@@ -1488,7 +1488,7 @@ Monday and so on.
 .. setting:: FIXTURE_DIRS
 
 ``FIXTURE_DIRS``
------------------
+----------------
 
 Default: ``[]`` (Empty list)
 
@@ -1949,7 +1949,7 @@ See :tfilter:`allowed date format strings <date>`. See also
 .. setting:: NUMBER_GROUPING
 
 ``NUMBER_GROUPING``
---------------------
+-------------------
 
 Default: ``0``
 

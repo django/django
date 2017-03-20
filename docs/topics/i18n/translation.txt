@@ -1638,7 +1638,7 @@ That's it. Your translations are ready for use.
    files by default then you will need to reconfigure it.
 
 Troubleshooting: ``gettext()`` incorrectly detects ``python-format`` in strings with percent signs
----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 
 In some cases, such as strings with a percent sign followed by a space and a
 :ref:`string conversion type <old-string-formatting>` (e.g.

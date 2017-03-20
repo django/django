@@ -11,7 +11,7 @@ Problems running ``django-admin``
 =================================
 
 "command not found: `django-admin`"
-------------------------------------
+-----------------------------------
 
 :doc:`django-admin </ref/django-admin>` should be on your system path if you
 installed Django via ``python setup.py``. If it's not on your path, you can

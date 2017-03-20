@@ -604,7 +604,7 @@ specific to SQLite that you should be aware of.
 .. _sqlite-string-matching:
 
 Substring matching and case sensitivity
------------------------------------------
+---------------------------------------
 
 For all SQLite versions, there is some slightly counter-intuitive behavior when
 attempting to match some types of strings.  These are triggered when using the
