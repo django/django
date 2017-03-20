@@ -595,8 +595,8 @@ class ChoiceWidget(Widget):
                 if selected is True and has_selected is False:
                     has_selected = True
                 subgroup.append(self.create_option(
-                    name, subvalue, sublabel, selected, index, subindex,
-                    attrs=attrs,
+                    name, subvalue, sublabel, selected, index,
+                    subindex=subindex, attrs=attrs,
                 ))
                 if subindex is not None:
                     subindex += 1
