@@ -264,6 +264,19 @@ class GISFunctionsTests(TestCase):
                 result = result.sq_m
             self.assertAlmostEqual((result - c.mpoly.area) / c.mpoly.area, 0)
 
+    @skipUnlessDBFeature("has_Area_function")
+    def test_area_lookups(self):
+        # Create projected countries so the test works on all backends.
+        CountryWebMercator.objects.bulk_create(
+            CountryWebMercator(name=c.name, mpoly=c.mpoly.transform(3857, clone=True))
+            for c in Country.objects.all()
+        )
+        qs = CountryWebMercator.objects.annotate(area=functions.Area('mpoly'))
+        self.assertEqual(qs.get(area__lt=Area(sq_km=500000)), CountryWebMercator.objects.get(name='New Zealand'))
+
+        with self.assertRaisesMessage(ValueError, 'AreaField only accepts Area measurement objects.'):
+            qs.get(area__lt=500000)
+
     @skipUnlessDBFeature("has_MakeValid_function")
     def test_make_valid(self):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')

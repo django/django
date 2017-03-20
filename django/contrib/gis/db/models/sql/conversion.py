@@ -7,6 +7,7 @@ from decimal import Decimal
 from django.contrib.gis.db.models.fields import GeoSelectFormatMixin
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
+from django.db import models
 
 
 class BaseField:
@@ -19,10 +20,20 @@ class BaseField:
         return sql, params
 
 
-class AreaField(BaseField):
+class AreaField(models.FloatField):
     "Wrapper for Area values."
     def __init__(self, area_att=None):
         self.area_att = area_att
+
+    def get_prep_value(self, value):
+        if not isinstance(value, Area):
+            raise ValueError('AreaField only accepts Area measurement objects.')
+        return value
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if value is None or not self.area_att:
+            return value
+        return getattr(value, self.area_att)
 
     def from_db_value(self, value, expression, connection, context):
         if connection.features.interprets_empty_strings_as_nulls and value == '':
