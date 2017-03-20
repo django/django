@@ -28,7 +28,7 @@ options`_.
     Creates an index (B-Tree) in the database.
 
 ``fields``
------------
+----------
 
 .. attribute:: Index.fields
 

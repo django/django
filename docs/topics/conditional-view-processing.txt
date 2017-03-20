@@ -147,7 +147,7 @@ using one of these decorators::
     front_page = last_modified(latest_entry)(front_page)
 
 Use ``condition`` when testing both conditions
-------------------------------------------------
+----------------------------------------------
 
 It might look nicer to some people to try and chain the ``etag`` and
 ``last_modified`` decorators if you want to test both preconditions. However,

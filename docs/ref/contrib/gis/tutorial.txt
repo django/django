@@ -53,7 +53,7 @@ would for any other project. We provide some tips for selected databases:
 * :doc:`install/spatialite`
 
 Create a New Project
-------------------------
+--------------------
 
 Use the standard ``django-admin`` script to create a project called
 ``geodjango``:
