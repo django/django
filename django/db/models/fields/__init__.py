@@ -850,7 +850,7 @@ class Field(RegisterLookupMixin):
             for k in list(kwargs):
                 if k not in ('coerce', 'empty_value', 'choices', 'required',
                              'widget', 'label', 'initial', 'help_text',
-                             'error_messages', 'show_hidden_initial'):
+                             'error_messages', 'show_hidden_initial', 'disabled'):
                     del kwargs[k]
         defaults.update(kwargs)
         if form_class is None:
