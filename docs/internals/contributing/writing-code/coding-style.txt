@@ -39,13 +39,7 @@ Python style
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
-* In docstrings, follow :pep:`257`. For example::
-
-      def foo():
-          """
-          Calculate something and return the result.
-          """
-          ...
+* In docstrings, follow the style of existing docstrings and :pep:`257`.
 
 * In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
   of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
