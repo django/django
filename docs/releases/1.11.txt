@@ -521,6 +521,9 @@ Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
 Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
 to support it.
 
+Also, the minimum supported version of psycopg2 is increased from 2.4.5 to
+2.5.4.
+
 ``LiveServerTestCase`` binds to port zero
 -----------------------------------------
 

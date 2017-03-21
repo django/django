@@ -9,9 +9,6 @@ PostgreSQL has a number of features which are not shared by the other databases
 Django supports. This optional module contains model fields and form fields for
 a number of PostgreSQL specific data types.
 
-Psycopg2 2.5 or higher is required, though we highly recommend using the latest
-release. Some fields require higher versions.
-
 .. note::
     Django is, and will continue to be, a database-agnostic web framework. We
     would encourage those writing reusable applications for the Django
