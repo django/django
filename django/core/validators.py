@@ -52,7 +52,7 @@ class RegexValidator:
 
     def __call__(self, value):
         """
-        Validate that the input matches the regular expression
+        Validate that the input contains a match for the regular expression
         if inverse_match is False, otherwise raise ValidationError.
         """
         if not (self.inverse_match is not bool(self.regex.search(
