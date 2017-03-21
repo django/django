@@ -134,23 +134,14 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         )
         if internal_type in geometry_fields:
             converters.append(self.convert_textfield_value)
-        if hasattr(expression.output_field, 'geom_type'):
-            converters.append(self.convert_geometry)
         return converters
 
-    def convert_geometry(self, value, expression, connection, context):
-        if value:
-            value = Geometry(value)
-            if 'transformed_srid' in context:
-                value.srid = context['transformed_srid']
-        return value
-
-    def convert_extent(self, clob, srid):
+    def convert_extent(self, clob):
         if clob:
             # Generally, Oracle returns a polygon for the extent -- however,
             # it can return a single point if there's only one Point in the
             # table.
-            ext_geom = Geometry(clob.read(), srid)
+            ext_geom = Geometry(clob.read())
             gtype = str(ext_geom.geom_type)
             if gtype == 'Polygon':
                 # Construct the 4-tuple from the coordinates in the polygon.

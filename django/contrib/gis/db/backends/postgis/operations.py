@@ -206,7 +206,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             version = vtup[1:]
         return version
 
-    def convert_extent(self, box, srid):
+    def convert_extent(self, box):
         """
         Return a 4-tuple extent for the `Extent` aggregate by converting
         the bounding box text returned by PostGIS (`box` argument), for
@@ -219,7 +219,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         xmax, ymax = map(float, ur.split())
         return (xmin, ymin, xmax, ymax)
 
-    def convert_extent3d(self, box3d, srid):
+    def convert_extent3d(self, box3d):
         """
         Return a 6-tuple extent for the `Extent3D` aggregate by converting
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for

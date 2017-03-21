@@ -57,18 +57,12 @@ class GeoSelectFormatMixin:
         other fields, return a simple '%s' format string.
         """
         connection = compiler.connection
-        srid = compiler.query.get_context('transformed_srid')
-        if srid:
-            sel_fmt = '%s(%%s, %s)' % (connection.ops.transform, srid)
-        else:
-            sel_fmt = '%s'
         if connection.ops.select:
             # This allows operations to be done on fields in the SELECT,
             # overriding their values -- used by the Oracle and MySQL
-            # spatial backends to get database values as WKT, and by the
-            # `transform` method.
-            sel_fmt = connection.ops.select % sel_fmt
-        return sel_fmt % sql, params
+            # spatial backends to get database values as WKT.
+            sql = connection.ops.select % sql
+        return sql, params
 
 
 class BaseSpatialField(Field):
