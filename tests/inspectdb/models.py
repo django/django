@@ -37,7 +37,7 @@ class SpecialName(models.Model):
     non_ascii = models.IntegerField(db_column='tamaño')
 
     class Meta:
-        db_table = "inspectdb_special.table name"
+        db_table = "\"inspectdb_special.table name\""
 
 
 class ColumnTypes(models.Model):

@@ -51,6 +51,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'BigAutoField'
         return field_type
 
+    def table_name_converter(self, name):
+        """Table name comparison is without quotes."""
+        return name.strip('"')
+
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
         cursor.execute("""
@@ -72,14 +76,25 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         # Allow schemas (#22673)
-        table_schema = 'public'
-        parts = table_name.split('.')
-        if len(parts) > 1:
-            table_schema = parts[-2]
-        cursor.execute("""
-            SELECT column_name, is_nullable, column_default
-            FROM information_schema.columns
-            WHERE table_schema = %s AND table_name = %s""", [table_schema, parts[-1]])
+        schema_name = ""
+        if table_name.startswith('"') and table_name.endswith('"'):
+            # No quotes for this query
+            base_name = table_name[1:-1]
+        else:
+            parts = table_name.split('.')
+            base_name = parts[-1]
+            if len(parts) > 1:
+                schema_name = parts[-2]
+        if schema_name:
+            cursor.execute("""
+                SELECT column_name, is_nullable, column_default
+                FROM information_schema.columns
+                WHERE table_schema = %s AND table_name = %s""", [schema_name, base_name])
+        else:
+            cursor.execute("""
+                SELECT column_name, is_nullable, column_default
+                FROM information_schema.columns
+                WHERE table_name = %s""", [base_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [

@@ -280,7 +280,7 @@ class BaseDatabaseSchemaEditor:
         # Make the table
         sql = ""
         quoted_name = self.quote_name(model._meta.db_table)
-        if self.connection.features.supports_schemas:
+        if self.connection.features.supports_schemas and quoted_name != model._meta.db_table:
             quoted_parts = quoted_name.split('.')
             if len(quoted_parts) > 1:
                 sql += self.connection.ops.schema_sql(quoted_parts[-2])
