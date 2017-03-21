@@ -517,7 +517,7 @@ using in conjunction with lookups on
     of the JSON which allows indexing. The trade-off is a small additional cost
     on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
 
-    **As a result, this field requires PostgreSQL ≥ 9.4 and Psycopg2 ≥ 2.5.4**.
+    **As a result, this field requires PostgreSQL ≥ 9.4**.
 
 Querying ``JSONField``
 ----------------------
