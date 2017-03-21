@@ -207,9 +207,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if name:
             # In autocommit mode, the cursor will be used outside of a
             # transaction, hence use a holdable cursor.
-            cursor = self.cursor(name, scrollable=False, withhold=self.connection.autocommit)
+            cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
         else:
-            cursor = self.cursor()
+            cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
@@ -238,7 +238,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def is_usable(self):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
-            self.cursor().execute("SELECT 1")
+            self.connection.cursor().execute("SELECT 1")
         except Database.Error:
             return False
         else:
