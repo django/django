@@ -1,13 +1,7 @@
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
-from django.contrib.contenttypes.views import shortcut
-from django.contrib.sites.shortcuts import get_current_site
-from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
 
-from .models import (
-    Author, ConcreteModel, FooWithBrokenAbsoluteUrl, FooWithoutUrl, FooWithUrl,
-    ProxyModel,
-)
+from .models import Author, ConcreteModel, FooWithUrl, ProxyModel
 
 
 class ContentTypesTests(TestCase):
@@ -171,64 +165,6 @@ class ContentTypesTests(TestCase):
             other_manager.get_for_model(ContentType)
         with self.assertNumQueries(0):
             other_manager.get_for_model(ContentType)
-
-    @override_settings(ALLOWED_HOSTS=['example.com'])
-    def test_shortcut_view(self):
-        """
-        The shortcut view (used for the admin "view on site" functionality)
-        returns a complete URL regardless of whether the sites framework is
-        installed.
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithUrl)
-        obj = FooWithUrl.objects.create(name="john")
-
-        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual(
-                "http://%s/users/john/" % get_current_site(request).domain,
-                response._headers.get("location")[1]
-            )
-
-        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://Example.com/users/john/", response._headers.get("location")[1])
-
-    def test_shortcut_view_without_get_absolute_url(self):
-        """
-        The shortcut view (used for the admin "view on site" functionality)
-        returns 404 when get_absolute_url is not defined.
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithoutUrl)
-        obj = FooWithoutUrl.objects.create(name="john")
-
-        with self.assertRaises(Http404):
-            shortcut(request, user_ct.id, obj.id)
-
-    def test_shortcut_view_with_broken_get_absolute_url(self):
-        """
-        The shortcut view does not catch an AttributeError raised by
-        the model's get_absolute_url() method (#8997).
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithBrokenAbsoluteUrl)
-        obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
-
-        with self.assertRaises(AttributeError):
-            shortcut(request, user_ct.id, obj.id)
 
     def test_missing_model(self):
         """
