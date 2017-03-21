@@ -1,16 +1,14 @@
-from __future__ import unicode_literals
-
 import datetime
 
-from django.conf import settings
-from django.db import transaction, DEFAULT_DB_ALIAS, models
-from django.db.utils import ConnectionHandler
+from django.db import connection, models, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
-    PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
-    Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy, Login,
-    OrgUnit, OrderedPerson, House)
+from .models import (
+    Award, AwardNote, Book, Child, Eaten, Email, File, Food, FooFile,
+    FooFileProxy, FooImage, FooPhoto, House, Image, Item, Location, Login,
+    OrderedPerson, OrgUnit, Person, Photo, PlayedWith, PlayedWithNote, Policy,
+    Researcher, Toy, Version,
+)
 
 
 # Can't run this test under SQLite, because you can't
@@ -22,8 +20,7 @@ class DeleteLockingTest(TransactionTestCase):
 
     def setUp(self):
         # Create a second connection to the default database
-        new_connections = ConnectionHandler(settings.DATABASES)
-        self.conn2 = new_connections[DEFAULT_DB_ALIAS]
+        self.conn2 = connection.copy()
         self.conn2.set_autocommit(False)
 
     def tearDown(self):
@@ -61,7 +58,6 @@ class DeleteCascadeTests(TestCase):
         """
         Django cascades deletes through generic-related objects to their
         reverse relations.
-
         """
         person = Person.objects.create(name='Nelson Mandela')
         award = Award.objects.create(name='Nobel', content_object=person)
@@ -79,7 +75,6 @@ class DeleteCascadeTests(TestCase):
         some other model has an FK to that through model, deletion is cascaded
         from one of the participants in the M2M, to the through model, to its
         related model.
-
         """
         juan = Child.objects.create(name='Juan')
         paints = Toy.objects.create(name='Paints')
@@ -124,7 +119,6 @@ class DeleteCascadeTransactionTests(TransactionTestCase):
     def test_to_field(self):
         """
         Cascade deletion works with ForeignKey.to_field set to non-PK.
-
         """
         apple = Food.objects.create(name="apple")
         Eaten.objects.create(food=apple, meal="lunch")
@@ -154,7 +148,6 @@ class ProxyDeleteTest(TestCase):
     Tests on_delete behavior for proxy models.
 
     See #16128.
-
     """
     def create_image(self):
         """Return an Image referenced by both a FooImage and a FooFile."""
@@ -175,7 +168,6 @@ class ProxyDeleteTest(TestCase):
         """
         Deleting the *proxy* instance bubbles through to its non-proxy and
         *all* referring objects are deleted.
-
         """
         self.create_image()
 
@@ -193,7 +185,6 @@ class ProxyDeleteTest(TestCase):
         """
         Deleting a proxy-of-proxy instance should bubble through to its proxy
         and non-proxy parents, deleting *all* referring objects.
-
         """
         test_image = self.create_image()
 
@@ -219,7 +210,6 @@ class ProxyDeleteTest(TestCase):
         """
         Deleting an instance of a concrete model should also delete objects
         referencing its proxy subclass.
-
         """
         self.create_image()
 
@@ -242,7 +232,6 @@ class ProxyDeleteTest(TestCase):
         IntegrityError on databases unable to defer integrity checks).
 
         Refs #17918.
-
         """
         # Create an Image (proxy of File) and FooFileProxy (proxy of FooFile,
         # which has an FK to File)

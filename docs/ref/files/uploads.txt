@@ -57,15 +57,13 @@ Here are some useful attributes of ``UploadedFile``:
 
 .. attribute:: UploadedFile.content_type_extra
 
-    .. versionadded:: 1.7
-
     A dictionary containing extra parameters passed to the ``content-type``
     header. This is typically provided by services, such as Google App Engine,
     that intercept and handle file uploads on your behalf. As a result your
     handler may not receive the uploaded file content, but instead a URL or
     other pointer to the file. (see `RFC 2388`_ section 5.3).
 
-    .. _RFC 2388: http://www.ietf.org/rfc/rfc2388.txt
+    .. _RFC 2388: https://www.ietf.org/rfc/rfc2388.txt
 
 .. attribute:: UploadedFile.charset
 
@@ -88,10 +86,6 @@ Here are some useful attributes of ``UploadedFile``:
 
     .. _universal newlines: https://www.python.org/dev/peps/pep-0278
 
-    .. versionchanged:: 1.8
-
-        Previously lines were only split on the Unix end-of-line ``'\n'``.
-
 Subclasses of ``UploadedFile`` include:
 
 .. class:: TemporaryUploadedFile
@@ -111,8 +105,8 @@ Subclasses of ``UploadedFile`` include:
     A file uploaded into memory (i.e. stream-to-memory). This class is used
     by the :class:`~django.core.files.uploadhandler.MemoryFileUploadHandler`.
 
-Built-in upload handers
-=======================
+Built-in upload handlers
+========================
 
 .. module:: django.core.files.uploadhandler
    :synopsis: Django's handlers for file uploads.
@@ -143,7 +137,7 @@ All file upload handlers should be subclasses of
 handlers wherever you wish.
 
 Required methods
-~~~~~~~~~~~~~~~~
+----------------
 
 Custom file upload handlers **must** define the following methods:
 
@@ -177,7 +171,7 @@ Custom file upload handlers **must** define the following methods:
     the ``UploadedFile`` object should come from subsequent upload handlers.
 
 Optional methods
-~~~~~~~~~~~~~~~~
+----------------
 
 Custom upload handlers may also define any of the following optional methods or
 attributes:
@@ -202,7 +196,7 @@ attributes:
 
     ``field_name`` is a string name of the file ``<input>`` field.
 
-    ``file_name`` is the unicode filename that was provided by the browser.
+    ``file_name`` is the filename provided by the browser.
 
     ``content_type`` is the MIME type provided by the browser -- E.g.
     ``'image/jpeg'``.
@@ -219,10 +213,6 @@ attributes:
 
     This method may raise a ``StopFutureHandlers`` exception to prevent
     future handlers from handling this file.
-
-    .. versionadded:: 1.7
-
-        The ``content_type_extra`` parameter was added.
 
 .. method:: FileUploadHandler.upload_complete()
 

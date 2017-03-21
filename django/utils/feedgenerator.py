@@ -21,16 +21,14 @@ Sample usage:
 For definitions of the different versions of RSS, see:
 http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
-from __future__ import unicode_literals
-
 import datetime
-from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import force_text, iri_to_uri
+from io import StringIO
+from urllib.parse import urlparse
+
 from django.utils import datetime_safe
-from django.utils import six
-from django.utils.six import StringIO
-from django.utils.six.moves.urllib.parse import urlparse
-from django.utils.timezone import is_aware
+from django.utils.encoding import force_text, iri_to_uri
+from django.utils.timezone import utc
+from django.utils.xmlutils import SimplerXMLGenerator
 
 
 def rfc2822_date(date):
@@ -44,35 +42,33 @@ def rfc2822_date(date):
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    if six.PY2:             # strftime returns a byte string in Python 2
-        time_str = time_str.decode('utf-8')
-    if is_aware(date):
-        offset = date.tzinfo.utcoffset(date)
+    offset = date.utcoffset()
+    # Historically, this function assumes that naive datetimes are in UTC.
+    if offset is None:
+        return time_str + '-0000'
+    else:
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
         return time_str + '%+03d%02d' % (hour, minute)
-    else:
-        return time_str + '-0000'
 
 
 def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
     time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
-    if six.PY2:             # strftime returns a byte string in Python 2
-        time_str = time_str.decode('utf-8')
-    if is_aware(date):
-        offset = date.tzinfo.utcoffset(date)
+    offset = date.utcoffset()
+    # Historically, this function assumes that naive datetimes are in UTC.
+    if offset is None:
+        return time_str + 'Z'
+    else:
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
         return time_str + '%+03d:%02d' % (hour, minute)
-    else:
-        return time_str + 'Z'
 
 
 def get_tag_uri(url, date):
     """
-    Creates a TagURI.
+    Create a TagURI.
 
     See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
@@ -83,29 +79,30 @@ def get_tag_uri(url, date):
     return 'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
 
 
-class SyndicationFeed(object):
+class SyndicationFeed:
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
-            author_name=None, author_link=None, subtitle=None, categories=None,
-            feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
-        to_unicode = lambda s: force_text(s, strings_only=True)
+                 author_name=None, author_link=None, subtitle=None, categories=None,
+                 feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
+        def to_str(s):
+            return force_text(s, strings_only=True)
         if categories:
             categories = [force_text(c) for c in categories]
         if ttl is not None:
-            # Force ints to unicode
+            # Force ints to str
             ttl = force_text(ttl)
         self.feed = {
-            'title': to_unicode(title),
+            'title': to_str(title),
             'link': iri_to_uri(link),
-            'description': to_unicode(description),
-            'language': to_unicode(language),
-            'author_email': to_unicode(author_email),
-            'author_name': to_unicode(author_name),
+            'description': to_str(description),
+            'language': to_str(language),
+            'author_email': to_str(author_email),
+            'author_name': to_str(author_name),
             'author_link': iri_to_uri(author_link),
-            'subtitle': to_unicode(subtitle),
+            'subtitle': to_str(subtitle),
             'categories': categories or (),
             'feed_url': iri_to_uri(feed_url),
-            'feed_copyright': to_unicode(feed_copyright),
+            'feed_copyright': to_str(feed_copyright),
             'id': feed_guid or link,
             'ttl': ttl,
         }
@@ -113,35 +110,36 @@ class SyndicationFeed(object):
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
-            author_name=None, author_link=None, pubdate=None, comments=None,
-            unique_id=None, unique_id_is_permalink=None, enclosure=None,
-            categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs):
+                 author_name=None, author_link=None, pubdate=None, comments=None,
+                 unique_id=None, unique_id_is_permalink=None, categories=(),
+                 item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs):
         """
-        Adds an item to the feed. All args are expected to be Python Unicode
-        objects except pubdate and updateddate, which are datetime.datetime
-        objects, and enclosure, which is an instance of the Enclosure class.
+        Add an item to the feed. All args are expected to be strings except
+        pubdate and updateddate, which are datetime.datetime objects, and
+        enclosures, which is an iterable of instances of the Enclosure class.
         """
-        to_unicode = lambda s: force_text(s, strings_only=True)
+        def to_str(s):
+            return force_text(s, strings_only=True)
         if categories:
-            categories = [to_unicode(c) for c in categories]
+            categories = [to_str(c) for c in categories]
         if ttl is not None:
-            # Force ints to unicode
+            # Force ints to str
             ttl = force_text(ttl)
         item = {
-            'title': to_unicode(title),
+            'title': to_str(title),
             'link': iri_to_uri(link),
-            'description': to_unicode(description),
-            'author_email': to_unicode(author_email),
-            'author_name': to_unicode(author_name),
+            'description': to_str(description),
+            'author_email': to_str(author_email),
+            'author_name': to_str(author_name),
             'author_link': iri_to_uri(author_link),
             'pubdate': pubdate,
             'updateddate': updateddate,
-            'comments': to_unicode(comments),
-            'unique_id': to_unicode(unique_id),
+            'comments': to_str(comments),
+            'unique_id': to_str(unique_id),
             'unique_id_is_permalink': unique_id_is_permalink,
-            'enclosure': enclosure,
+            'enclosures': enclosures or (),
             'categories': categories or (),
-            'item_copyright': to_unicode(item_copyright),
+            'item_copyright': to_str(item_copyright),
             'ttl': ttl,
         }
         item.update(kwargs)
@@ -178,14 +176,14 @@ class SyndicationFeed(object):
 
     def write(self, outfile, encoding):
         """
-        Outputs the feed in the given encoding to outfile, which is a file-like
+        Output the feed in the given encoding to outfile, which is a file-like
         object. Subclasses should override this.
         """
         raise NotImplementedError('subclasses of SyndicationFeed must provide a write() method')
 
     def writeString(self, encoding):
         """
-        Returns the feed in the given encoding as a string.
+        Return the feed in the given encoding as a string.
         """
         s = StringIO()
         self.write(s, encoding)
@@ -193,8 +191,8 @@ class SyndicationFeed(object):
 
     def latest_post_date(self):
         """
-        Returns the latest item's pubdate or updateddate. If no items
-        have either of these attributes this returns the current date/time.
+        Return the latest item's pubdate or updateddate. If no items
+        have either of these attributes this return the current UTC date/time.
         """
         latest_date = None
         date_keys = ('updateddate', 'pubdate')
@@ -206,19 +204,20 @@ class SyndicationFeed(object):
                     if latest_date is None or item_date > latest_date:
                         latest_date = item_date
 
-        return latest_date or datetime.datetime.now()
+        # datetime.now(tz=utc) is slower, as documented in django.utils.timezone.now
+        return latest_date or datetime.datetime.utcnow().replace(tzinfo=utc)
 
 
-class Enclosure(object):
-    "Represents an RSS enclosure"
+class Enclosure:
+    """An RSS enclosure"""
     def __init__(self, url, length, mime_type):
-        "All args are expected to be Python Unicode objects"
+        "All args are expected to be strings"
         self.length, self.mime_type = length, mime_type
         self.url = iri_to_uri(url)
 
 
 class RssFeed(SyndicationFeed):
-    mime_type = 'application/rss+xml; charset=utf-8'
+    content_type = 'application/rss+xml; charset=utf-8'
 
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
@@ -245,8 +244,7 @@ class RssFeed(SyndicationFeed):
         handler.addQuickElement("link", self.feed['link'])
         handler.addQuickElement("description", self.feed['description'])
         if self.feed['feed_url'] is not None:
-            handler.addQuickElement("atom:link", None,
-                    {"rel": "self", "href": self.feed['feed_url']})
+            handler.addQuickElement("atom:link", None, {"rel": "self", "href": self.feed['feed_url']})
         if self.feed['language'] is not None:
             handler.addQuickElement("language", self.feed['language'])
         for cat in self.feed['categories']:
@@ -283,13 +281,13 @@ class Rss201rev2Feed(RssFeed):
 
         # Author information.
         if item["author_name"] and item["author_email"]:
-            handler.addQuickElement("author", "%s (%s)" %
-                (item['author_email'], item['author_name']))
+            handler.addQuickElement("author", "%s (%s)" % (item['author_email'], item['author_name']))
         elif item["author_email"]:
             handler.addQuickElement("author", item["author_email"])
         elif item["author_name"]:
-            handler.addQuickElement("dc:creator", item["author_name"],
-                {"xmlns:dc": "http://purl.org/dc/elements/1.1/"})
+            handler.addQuickElement(
+                "dc:creator", item["author_name"], {"xmlns:dc": "http://purl.org/dc/elements/1.1/"}
+            )
 
         if item['pubdate'] is not None:
             handler.addQuickElement("pubDate", rfc2822_date(item['pubdate']))
@@ -298,17 +296,25 @@ class Rss201rev2Feed(RssFeed):
         if item['unique_id'] is not None:
             guid_attrs = {}
             if isinstance(item.get('unique_id_is_permalink'), bool):
-                guid_attrs['isPermaLink'] = str(
-                    item['unique_id_is_permalink']).lower()
+                guid_attrs['isPermaLink'] = str(item['unique_id_is_permalink']).lower()
             handler.addQuickElement("guid", item['unique_id'], guid_attrs)
         if item['ttl'] is not None:
             handler.addQuickElement("ttl", item['ttl'])
 
         # Enclosure.
-        if item['enclosure'] is not None:
-            handler.addQuickElement("enclosure", '',
-                {"url": item['enclosure'].url, "length": item['enclosure'].length,
-                    "type": item['enclosure'].mime_type})
+        if item['enclosures']:
+            enclosures = list(item['enclosures'])
+            if len(enclosures) > 1:
+                raise ValueError(
+                    "RSS feed items may only have one enclosure, see "
+                    "http://www.rssboard.org/rss-profile#element-channel-item-enclosure"
+                )
+            enclosure = enclosures[0]
+            handler.addQuickElement('enclosure', '', {
+                'url': enclosure.url,
+                'length': enclosure.length,
+                'type': enclosure.mime_type,
+            })
 
         # Categories.
         for cat in item['categories']:
@@ -316,8 +322,8 @@ class Rss201rev2Feed(RssFeed):
 
 
 class Atom1Feed(SyndicationFeed):
-    # Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
-    mime_type = 'application/atom+xml; charset=utf-8'
+    # Spec: https://tools.ietf.org/html/rfc4287
+    content_type = 'application/atom+xml; charset=utf-8'
     ns = "http://www.w3.org/2005/Atom"
 
     def write(self, outfile, encoding):
@@ -393,13 +399,14 @@ class Atom1Feed(SyndicationFeed):
         if item['description'] is not None:
             handler.addQuickElement("summary", item['description'], {"type": "html"})
 
-        # Enclosure.
-        if item['enclosure'] is not None:
-            handler.addQuickElement("link", '',
-                {"rel": "enclosure",
-                 "href": item['enclosure'].url,
-                 "length": item['enclosure'].length,
-                 "type": item['enclosure'].mime_type})
+        # Enclosures.
+        for enclosure in item['enclosures']:
+            handler.addQuickElement('link', '', {
+                'rel': 'enclosure',
+                'href': enclosure.url,
+                'length': enclosure.length,
+                'type': enclosure.mime_type,
+            })
 
         # Categories.
         for cat in item['categories']:
@@ -408,6 +415,7 @@ class Atom1Feed(SyndicationFeed):
         # Rights.
         if item['item_copyright'] is not None:
             handler.addQuickElement("rights", item['item_copyright'])
+
 
 # This isolates the decision of what the system default is, so calling code can
 # do "feedgenerator.DefaultFeed" instead of "feedgenerator.Rss201rev2Feed".

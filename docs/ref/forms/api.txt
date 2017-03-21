@@ -13,7 +13,7 @@ The Forms API
 .. _ref-forms-api-bound-unbound:
 
 Bound and unbound forms
------------------------
+=======================
 
 A :class:`Form` instance is either **bound** to a set of data, or **unbound**.
 
@@ -69,7 +69,7 @@ another :class:`Form` instance. There is no way to change data in a
 should consider its data immutable, whether it has data or not.
 
 Using forms to validate data
-----------------------------
+============================
 
 .. method:: Form.clean()
 
@@ -112,7 +112,7 @@ messages::
     {'sender': ['Enter a valid email address.'], 'subject': ['This field is required.']}
 
 In this dictionary, the keys are the field names, and the values are lists of
-Unicode strings representing the error messages. The error messages are stored
+strings representing the error messages. The error messages are stored
 in lists because a field can have multiple error messages.
 
 You can access :attr:`~Form.errors` without having to call
@@ -124,8 +124,6 @@ you access :attr:`~Form.errors` or call :meth:`~Form.is_valid`. This means that
 if validation has side effects, those side effects will only be triggered once.
 
 .. method:: Form.errors.as_data()
-
-.. versionadded:: 1.7
 
 Returns a ``dict`` that maps fields to their original ``ValidationError``
 instances.
@@ -150,8 +148,6 @@ messages in ``Form.errors``.
 
 .. method:: Form.errors.as_json(escape_html=False)
 
-.. versionadded:: 1.7
-
 Returns the errors serialized as JSON.
 
     >>> f.errors.as_json()
@@ -171,8 +167,6 @@ directly in HTML.
 
 .. method:: Form.add_error(field, error)
 
-.. versionadded:: 1.7
-
 This method allows adding errors to specific fields from within the
 ``Form.clean()`` method, or from outside the form altogether; for instance
 from a view.
@@ -191,8 +185,6 @@ Note that ``Form.add_error()`` automatically removes the relevant field from
 
 .. method:: Form.has_error(field, code=None)
 
-.. versionadded:: 1.8
-
 This method returns a boolean designating whether a field has an error with
 a specific error ``code``. If ``code`` is ``None``, it will return ``True``
 if the field contains any errors at all.
@@ -209,7 +201,7 @@ This includes ``ValidationError``\s that are raised in :meth:`Form.clean()
 "...") <django.forms.Form.add_error>`.
 
 Behavior of unbound forms
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 It's meaningless to validate a form with no data, but, for the record, here's
 what happens with unbound forms::
@@ -221,7 +213,7 @@ what happens with unbound forms::
     {}
 
 Dynamic initial values
-----------------------
+======================
 
 .. attribute:: Form.initial
 
@@ -239,8 +231,8 @@ it's not necessary to include every field in your form. For example::
 These values are only displayed for unbound forms, and they're not used as
 fallback values if a particular value isn't provided.
 
-Note that if a :class:`~django.forms.Field` defines :attr:`~Form.initial` *and*
-you include ``initial`` when instantiating the ``Form``, then the latter
+If a :class:`~django.forms.Field` defines :attr:`~Field.initial` *and* you
+include :attr:`~Form.initial` when instantiating the ``Form``, then the latter
 ``initial`` will have precedence. In this example, ``initial`` is provided both
 at the field level and at the form instance level, and the latter gets
 precedence::
@@ -252,12 +244,20 @@ precedence::
     ...     comment = forms.CharField()
     >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
     >>> print(f)
-    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url" /></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+    <tr><th>Name:</th><td><input type="text" name="name" value="instance" required /></td></tr>
+    <tr><th>Url:</th><td><input type="url" name="url" required /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" required /></td></tr>
 
-Checking if form data has changed
----------------------------------
+.. method:: Form.get_initial_for_field(field, field_name)
+
+.. versionadded:: 1.11
+
+Use :meth:`~Form.get_initial_for_field()` to retrieve initial data for a form
+field. It retrieves data from :attr:`Form.initial` and :attr:`Field.initial`,
+in that order, and evaluates any callable initial values.
+
+Checking which form data has changed
+====================================
 
 .. method:: Form.has_changed()
 
@@ -283,8 +283,18 @@ from what was provided in :attr:`~Form.initial` or ``False`` otherwise. The
 result is computed by calling :meth:`Field.has_changed` for each field in the
 form.
 
+.. attribute:: Form.changed_data
+
+The ``changed_data`` attribute returns a list of the names of the fields whose
+values in the form's bound data (usually ``request.POST``) differ from what was
+provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
+
+    >>> f = ContactForm(request.POST, initial=data)
+    >>> if f.has_changed():
+    ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
+
 Accessing the fields from the form
-----------------------------------
+==================================
 
 .. attribute:: Form.fields
 
@@ -303,10 +313,10 @@ You can alter the field of :class:`Form` instance to change the way it is
 presented in the form::
 
     >>> f.as_table().split('\n')[0]
-    '<tr><th>Name:</th><td><input name="name" type="text" value="instance" /></td></tr>'
+    '<tr><th>Name:</th><td><input name="name" type="text" value="instance" required /></td></tr>'
     >>> f.fields['name'].label = "Username"
     >>> f.as_table().split('\n')[0]
-    '<tr><th>Username:</th><td><input name="name" type="text" value="instance" /></td></tr>'
+    '<tr><th>Username:</th><td><input name="name" type="text" value="instance" required /></td></tr>'
 
 Beware not to alter the ``base_fields`` attribute because this modification
 will influence all subsequent ``ContactForm`` instances within the same Python
@@ -315,10 +325,10 @@ process::
     >>> f.base_fields['name'].label = "Username"
     >>> another_f = CommentForm(auto_id=False)
     >>> another_f.as_table().split('\n')[0]
-    '<tr><th>Username:</th><td><input name="name" type="text" value="class" /></td></tr>'
+    '<tr><th>Username:</th><td><input name="name" type="text" value="class" required /></td></tr>'
 
 Accessing "clean" data
-----------------------
+======================
 
 .. attribute:: Form.cleaned_data
 
@@ -347,8 +357,8 @@ it, you can access the clean data via its ``cleaned_data`` attribute::
     {'cc_myself': True, 'message': 'Hi there', 'sender': 'foo@example.com', 'subject': 'hello'}
 
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
-always cleans the input into a Unicode string. We'll cover the encoding
-implications later in this document.
+always cleans the input into a string. We'll cover the encoding implications
+later in this document.
 
 If your data does *not* validate, the ``cleaned_data`` dictionary contains
 only the valid fields::
@@ -386,11 +396,11 @@ When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
 fields. In this example, the data dictionary doesn't include a value for the
 ``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
 
-    >>> from django.forms import Form
-    >>> class OptionalPersonForm(Form):
-    ...     first_name = CharField()
-    ...     last_name = CharField()
-    ...     nick_name = CharField(required=False)
+    >>> from django import forms
+    >>> class OptionalPersonForm(forms.Form):
+    ...     first_name = forms.CharField()
+    ...     last_name = forms.CharField()
+    ...     nick_name = forms.CharField(required=False)
     >>> data = {'first_name': 'John', 'last_name': 'Lennon'}
     >>> f = OptionalPersonForm(data)
     >>> f.is_valid()
@@ -412,23 +422,23 @@ fields). More information about this is in :doc:`/ref/forms/validation`.
 .. _ref-forms-api-outputting-html:
 
 Outputting forms as HTML
-------------------------
+========================
 
 The second task of a ``Form`` object is to render itself as HTML. To do so,
 simply ``print`` it::
 
     >>> f = ContactForm()
     >>> print(f)
-    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
-    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 If the form is bound to data, the HTML output will include that data
 appropriately. For example, if a field is represented by an
 ``<input type="text">``, the data will be in the ``value`` attribute. If a
 field is represented by an ``<input type="checkbox">``, then that HTML will
-include ``checked="checked"`` if appropriate::
+include ``checked`` if appropriate::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -436,10 +446,15 @@ include ``checked="checked"`` if appropriate::
     ...         'cc_myself': True}
     >>> f = ContactForm(data)
     >>> print(f)
-    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" value="hello" /></td></tr>
-    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" value="Hi there" /></td></tr>
-    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" value="foo@example.com" /></td></tr>
-    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked="checked" /></td></tr>
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" value="hello" required /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" value="Hi there" required /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" value="foo@example.com" required /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked /></td></tr>
+
+.. versionchanged:: 1.11
+
+    The ``checked`` attribute was changed to use HTML5 boolean syntax rather
+    than ``checked="checked"``.
 
 This default output is a two-column HTML table, with a ``<tr>`` for each field.
 Notice the following:
@@ -469,12 +484,16 @@ Notice the following:
   attributes and ``<label>`` tags are included in the output by default, to
   follow best practices, but you can change that behavior.
 
+* The output uses HTML5 syntax, targeting ``<!DOCTYPE html>``. For example,
+  it uses boolean attributes such as ``checked`` rather than the XHTML style
+  of ``checked='checked'``.
+
 Although ``<table>`` output is the default output style when you ``print`` a
 form, other output styles are available. Each style is available as a method on
-a form object, and each rendering method returns a Unicode object.
+a form object, and each rendering method returns a string.
 
 ``as_p()``
-~~~~~~~~~~
+----------
 
 .. method:: Form.as_p()
 
@@ -483,15 +502,15 @@ containing one field::
 
     >>> f = ContactForm()
     >>> f.as_p()
-    '<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
+    '<p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required /></p>\n<p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required /></p>\n<p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" required /></p>\n<p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>'
     >>> print(f.as_p())
-    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
-    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></p>
-    <p><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" /></p>
+    <p><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required /></p>
+    <p><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required /></p>
+    <p><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required /></p>
     <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
 ``as_ul()``
-~~~~~~~~~~~
+-----------
 
 .. method:: Form.as_ul()
 
@@ -502,15 +521,15 @@ flexibility::
 
     >>> f = ContactForm()
     >>> f.as_ul()
-    '<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>\n<li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
+    '<li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required /></li>\n<li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required /></li>\n<li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required /></li>\n<li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>'
     >>> print(f.as_ul())
-    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" /></li>
-    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" /></li>
-    <li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" /></li>
+    <li><label for="id_subject">Subject:</label> <input id="id_subject" type="text" name="subject" maxlength="100" required /></li>
+    <li><label for="id_message">Message:</label> <input type="text" name="message" id="id_message" required /></li>
+    <li><label for="id_sender">Sender:</label> <input type="email" name="sender" id="id_sender" required /></li>
     <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
 
 ``as_table()``
-~~~~~~~~~~~~~~
+--------------
 
 .. method:: Form.as_table()
 
@@ -520,17 +539,17 @@ it calls its ``as_table()`` method behind the scenes::
 
     >>> f = ContactForm()
     >>> f.as_table()
-    '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
-    >>> print(f.as_table())
-    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
-    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>
+    '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
+    >>> print(f)
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 .. _ref-forms-api-styling-form-rows:
 
 Styling required or erroneous form rows
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 .. attribute:: Form.error_css_class
 .. attribute:: Form.required_css_class
@@ -544,9 +563,9 @@ attributes to required rows or to rows with errors: simply set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
 attributes::
 
-    from django.forms import Form
+    from django import forms
 
-    class ContactForm(Form):
+    class ContactForm(forms.Form):
         error_css_class = 'error'
         required_css_class = 'required'
 
@@ -566,15 +585,10 @@ classes, as needed. The HTML will look something like::
     >>> f['subject'].label_tag(attrs={'class': 'foo'})
     <label for="id_subject" class="foo required">Subject:</label>
 
-.. versionchanged:: 1.8
-
-    The ``required_css_class`` will also be added to the ``<label>`` tag as
-    seen above.
-
 .. _ref-forms-api-configuring-label:
 
 Configuring form elements' HTML ``id`` attributes and ``<label>`` tags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------------------------
 
 .. attribute:: Form.auto_id
 
@@ -600,19 +614,19 @@ tags nor ``id`` attributes::
 
     >>> f = ContactForm(auto_id=False)
     >>> print(f.as_table())
-    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
-    <tr><th>Sender:</th><td><input type="email" name="sender" /></td></tr>
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" required /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" required /></td></tr>
+    <tr><th>Sender:</th><td><input type="email" name="sender" required /></td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print(f.as_ul())
-    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
-    <li>Message: <input type="text" name="message" /></li>
-    <li>Sender: <input type="email" name="sender" /></li>
+    <li>Subject: <input type="text" name="subject" maxlength="100" required /></li>
+    <li>Message: <input type="text" name="message" required /></li>
+    <li>Sender: <input type="email" name="sender" required /></li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     >>> print(f.as_p())
-    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
-    <p>Message: <input type="text" name="message" /></p>
-    <p>Sender: <input type="email" name="sender" /></p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" required /></p>
+    <p>Message: <input type="text" name="message" required /></p>
+    <p>Sender: <input type="email" name="sender" required /></p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
 If ``auto_id`` is set to ``True``, then the form output *will* include
@@ -621,19 +635,19 @@ field::
 
     >>> f = ContactForm(auto_id=True)
     >>> print(f.as_table())
-    <tr><th><label for="subject">Subject:</label></th><td><input id="subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th><label for="message">Message:</label></th><td><input type="text" name="message" id="message" /></td></tr>
-    <tr><th><label for="sender">Sender:</label></th><td><input type="email" name="sender" id="sender" /></td></tr>
+    <tr><th><label for="subject">Subject:</label></th><td><input id="subject" type="text" name="subject" maxlength="100" required /></td></tr>
+    <tr><th><label for="message">Message:</label></th><td><input type="text" name="message" id="message" required /></td></tr>
+    <tr><th><label for="sender">Sender:</label></th><td><input type="email" name="sender" id="sender" required /></td></tr>
     <tr><th><label for="cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="cc_myself" /></td></tr>
     >>> print(f.as_ul())
-    <li><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></li>
-    <li><label for="message">Message:</label> <input type="text" name="message" id="message" /></li>
-    <li><label for="sender">Sender:</label> <input type="email" name="sender" id="sender" /></li>
+    <li><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" required /></li>
+    <li><label for="message">Message:</label> <input type="text" name="message" id="message" required /></li>
+    <li><label for="sender">Sender:</label> <input type="email" name="sender" id="sender" required /></li>
     <li><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></li>
     >>> print(f.as_p())
-    <p><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></p>
-    <p><label for="message">Message:</label> <input type="text" name="message" id="message" /></p>
-    <p><label for="sender">Sender:</label> <input type="email" name="sender" id="sender" /></p>
+    <p><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" required /></p>
+    <p><label for="message">Message:</label> <input type="text" name="message" id="message" required /></p>
+    <p><label for="sender">Sender:</label> <input type="email" name="sender" id="sender" required /></p>
     <p><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself" /></p>
 
 If ``auto_id`` is set to a string containing the format character ``'%s'``,
@@ -644,19 +658,19 @@ attributes based on the format string. For example, for a format string
 
     >>> f = ContactForm(auto_id='id_for_%s')
     >>> print(f.as_table())
-    <tr><th><label for="id_for_subject">Subject:</label></th><td><input id="id_for_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th><label for="id_for_message">Message:</label></th><td><input type="text" name="message" id="id_for_message" /></td></tr>
-    <tr><th><label for="id_for_sender">Sender:</label></th><td><input type="email" name="sender" id="id_for_sender" /></td></tr>
+    <tr><th><label for="id_for_subject">Subject:</label></th><td><input id="id_for_subject" type="text" name="subject" maxlength="100" required /></td></tr>
+    <tr><th><label for="id_for_message">Message:</label></th><td><input type="text" name="message" id="id_for_message" required /></td></tr>
+    <tr><th><label for="id_for_sender">Sender:</label></th><td><input type="email" name="sender" id="id_for_sender" required /></td></tr>
     <tr><th><label for="id_for_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></td></tr>
     >>> print(f.as_ul())
-    <li><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
-    <li><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></li>
-    <li><label for="id_for_sender">Sender:</label> <input type="email" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required /></li>
+    <li><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" required /></li>
+    <li><label for="id_for_sender">Sender:</label> <input type="email" name="sender" id="id_for_sender" required /></li>
     <li><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
     >>> print(f.as_p())
-    <p><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></p>
-    <p><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></p>
-    <p><label for="id_for_sender">Sender:</label> <input type="email" name="sender" id="id_for_sender" /></p>
+    <p><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required /></p>
+    <p><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" required /></p>
+    <p><label for="id_for_sender">Sender:</label> <input type="email" name="sender" id="id_for_sender" required /></p>
     <p><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></p>
 
 If ``auto_id`` is set to any other true value -- such as a string that doesn't
@@ -674,22 +688,20 @@ It's possible to customize that character, or omit it entirely, using the
 
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
     >>> print(f.as_ul())
-    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
-    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" /></li>
-    <li><label for="id_for_sender">Sender</label> <input type="email" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required /></li>
+    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" required /></li>
+    <li><label for="id_for_sender">Sender</label> <input type="email" name="sender" id="id_for_sender" required /></li>
     <li><label for="id_for_cc_myself">Cc myself</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
     >>> print(f.as_ul())
-    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
-    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" /></li>
-    <li><label for="id_for_sender">Sender -></label> <input type="email" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required /></li>
+    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" required /></li>
+    <li><label for="id_for_sender">Sender -></label> <input type="email" name="sender" id="id_for_sender" required /></li>
     <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
 
 Note that the label suffix is added only if the last character of the
 label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
 or ``:``).
-
-.. versionadded:: 1.8
 
 Fields can also define their own :attr:`~django.forms.Field.label_suffix`.
 This will take precedence over :attr:`Form.label_suffix
@@ -697,8 +709,40 @@ This will take precedence over :attr:`Form.label_suffix
 using the ``label_suffix`` parameter to
 :meth:`~django.forms.BoundField.label_tag`.
 
+.. attribute:: Form.use_required_attribute
+
+When set to ``True`` (the default), required form fields will have the
+``required`` HTML attribute.
+
+:doc:`Formsets </topics/forms/formsets>` instantiate forms with
+``use_required_attribute=False`` to avoid incorrect browser validation when
+adding and deleting forms from a formset.
+
+Configuring the rendering of a form's widgets
+---------------------------------------------
+
+.. attribute:: Form.default_renderer
+
+.. versionadded:: 1.11
+
+Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
+``None`` which means to use the default renderer specified by the
+:setting:`FORM_RENDERER` setting.
+
+You can set this as a class attribute when declaring your form or use the
+``renderer`` argument to ``Form.__init__()``. For example::
+
+    from django import forms
+
+    class MyForm(forms.Form):
+        default_renderer = MyRenderer()
+
+or::
+
+    form = MyForm(renderer=MyRenderer())
+
 Notes on field ordering
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 In the ``as_p()``, ``as_ul()`` and ``as_table()`` shortcuts, the fields are
 displayed in the order in which you define them in your form class. For
@@ -706,8 +750,29 @@ example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
 output, just change the order in which those fields are listed in the class.
 
+There are several other ways to customize the order:
+
+.. attribute:: Form.field_order
+
+By default ``Form.field_order=None``, which retains the order in which you
+define the fields in your form class. If ``field_order`` is a list of field
+names, the fields are ordered as specified by the list and remaining fields are
+appended according to the default order. Unknown field names in the list are
+ignored. This makes it possible to disable a field in a subclass by setting it
+to ``None`` without having to redefine ordering.
+
+You can also use the ``Form.field_order`` argument to a :class:`Form` to
+override the field order. If a :class:`~django.forms.Form` defines
+:attr:`~Form.field_order` *and* you include ``field_order`` when instantiating
+the ``Form``, then the latter ``field_order`` will have precedence.
+
+.. method:: Form.order_fields(field_order)
+
+You may rearrange the fields any time using ``order_fields()`` with a list of
+field names as in :attr:`~django.forms.Form.field_order`.
+
 How errors are displayed
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 If you render a bound ``Form`` object, the act of rendering will automatically
 run the form's validation if it hasn't already happened, and the HTML output
@@ -721,34 +786,35 @@ method you're using::
     ...         'cc_myself': True}
     >>> f = ContactForm(data, auto_id=False)
     >>> print(f.as_table())
-    <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" /></td></tr>
-    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid email address.</li></ul><input type="email" name="sender" value="invalid email address" /></td></tr>
-    <tr><th>Cc myself:</th><td><input checked="checked" type="checkbox" name="cc_myself" /></td></tr>
+    <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" required /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" required /></td></tr>
+    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid email address.</li></ul><input type="email" name="sender" value="invalid email address" required /></td></tr>
+    <tr><th>Cc myself:</th><td><input checked type="checkbox" name="cc_myself" /></td></tr>
     >>> print(f.as_ul())
-    <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" /></li>
-    <li>Message: <input type="text" name="message" value="Hi there" /></li>
-    <li><ul class="errorlist"><li>Enter a valid email address.</li></ul>Sender: <input type="email" name="sender" value="invalid email address" /></li>
-    <li>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></li>
+    <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" required /></li>
+    <li>Message: <input type="text" name="message" value="Hi there" required /></li>
+    <li><ul class="errorlist"><li>Enter a valid email address.</li></ul>Sender: <input type="email" name="sender" value="invalid email address" required /></li>
+    <li>Cc myself: <input checked type="checkbox" name="cc_myself" /></li>
     >>> print(f.as_p())
     <p><ul class="errorlist"><li>This field is required.</li></ul></p>
-    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
-    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" required /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" required /></p>
     <p><ul class="errorlist"><li>Enter a valid email address.</li></ul></p>
-    <p>Sender: <input type="email" name="sender" value="invalid email address" /></p>
-    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+    <p>Sender: <input type="email" name="sender" value="invalid email address" required /></p>
+    <p>Cc myself: <input checked type="checkbox" name="cc_myself" /></p>
+
+.. _ref-forms-error-list-format:
 
 Customizing the error list format
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 By default, forms use ``django.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
-pass that in at construction time (replace ``__str__`` by ``__unicode__`` on
-Python 2)::
+pass that in at construction time::
 
     >>> from django.forms.utils import ErrorList
     >>> class DivErrorList(ErrorList):
-    ...     def __str__(self):              # __unicode__ on Python 2
+    ...     def __str__(self):
     ...         return self.as_divs()
     ...     def as_divs(self):
     ...         if not self: return ''
@@ -756,161 +822,270 @@ Python 2)::
     >>> f = ContactForm(data, auto_id=False, error_class=DivErrorList)
     >>> f.as_p()
     <div class="errorlist"><div class="error">This field is required.</div></div>
-    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
-    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" required /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" required /></p>
     <div class="errorlist"><div class="error">Enter a valid email address.</div></div>
-    <p>Sender: <input type="email" name="sender" value="invalid email address" /></p>
-    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
-
-.. versionchanged:: 1.7
-
-    ``django.forms.util`` was renamed to ``django.forms.utils``.
+    <p>Sender: <input type="email" name="sender" value="invalid email address" required /></p>
+    <p>Cc myself: <input checked type="checkbox" name="cc_myself" /></p>
 
 More granular output
-~~~~~~~~~~~~~~~~~~~~
+====================
 
-The ``as_p()``, ``as_ul()`` and ``as_table()`` methods are simply shortcuts for
-lazy developers -- they're not the only way a form object can be displayed.
+The ``as_p()``, ``as_ul()``, and ``as_table()`` methods are simply shortcuts --
+they're not the only way a form object can be displayed.
 
 .. class:: BoundField
 
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
 
-   The ``__str__()`` (``__unicode__`` on Python 2) method of this
-   object displays the HTML for this field.
+   The ``__str__()`` method of this object displays the HTML for this field.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key::
 
     >>> form = ContactForm()
     >>> print(form['subject'])
-    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    <input id="id_subject" type="text" name="subject" maxlength="100" required />
 
 To retrieve all ``BoundField`` objects, iterate the form::
 
     >>> form = ContactForm()
     >>> for boundfield in form: print(boundfield)
-    <input id="id_subject" type="text" name="subject" maxlength="100" />
-    <input type="text" name="message" id="id_message" />
-    <input type="email" name="sender" id="id_sender" />
+    <input id="id_subject" type="text" name="subject" maxlength="100" required />
+    <input type="text" name="message" id="id_message" required />
+    <input type="email" name="sender" id="id_sender" required />
     <input type="checkbox" name="cc_myself" id="id_cc_myself" />
 
 The field-specific output honors the form object's ``auto_id`` setting::
 
     >>> f = ContactForm(auto_id=False)
     >>> print(f['message'])
-    <input type="text" name="message" />
+    <input type="text" name="message" required />
     >>> f = ContactForm(auto_id='id_%s')
     >>> print(f['message'])
-    <input type="text" name="message" id="id_message" />
+    <input type="text" name="message" id="id_message" required />
 
-For a field's list of errors, access the field's ``errors`` attribute.
+Attributes of ``BoundField``
+----------------------------
+
+.. attribute:: BoundField.auto_id
+
+    The HTML ID attribute for this ``BoundField``. Returns an empty string
+    if :attr:`Form.auto_id` is ``False``.
+
+.. attribute:: BoundField.data
+
+    This property returns the data for this :class:`~django.forms.BoundField`
+    extracted by the widget's :meth:`~django.forms.Widget.value_from_datadict`
+    method, or ``None`` if it wasn't given::
+
+        >>> unbound_form = ContactForm()
+        >>> print(unbound_form['subject'].data)
+        None
+        >>> bound_form = ContactForm(data={'subject': 'My Subject'})
+        >>> print(bound_form['subject'].data)
+        My Subject
 
 .. attribute:: BoundField.errors
 
-A list-like object that is displayed as an HTML ``<ul class="errorlist">``
-when printed::
+    A :ref:`list-like object <ref-forms-error-list-format>` that is displayed
+    as an HTML ``<ul class="errorlist">`` when printed::
 
-    >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
-    >>> f = ContactForm(data, auto_id=False)
-    >>> print(f['message'])
-    <input type="text" name="message" />
-    >>> f['message'].errors
-    ['This field is required.']
-    >>> print(f['message'].errors)
-    <ul class="errorlist"><li>This field is required.</li></ul>
-    >>> f['subject'].errors
-    []
-    >>> print(f['subject'].errors)
+        >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+        >>> f = ContactForm(data, auto_id=False)
+        >>> print(f['message'])
+        <input type="text" name="message" required />
+        >>> f['message'].errors
+        ['This field is required.']
+        >>> print(f['message'].errors)
+        <ul class="errorlist"><li>This field is required.</li></ul>
+        >>> f['subject'].errors
+        []
+        >>> print(f['subject'].errors)
 
-    >>> str(f['subject'].errors)
-    ''
+        >>> str(f['subject'].errors)
+        ''
 
-.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None)
+.. attribute:: BoundField.field
 
-To separately render the label tag of a form field, you can call its
-``label_tag`` method::
+    The form :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps.
 
-    >>> f = ContactForm(data)
-    >>> print(f['message'].label_tag())
-    <label for="id_message">Message:</label>
+.. attribute:: BoundField.form
 
-Optionally, you can provide the ``contents`` parameter which will replace the
-auto-generated label tag. An optional ``attrs`` dictionary may contain
-additional attributes for the ``<label>`` tag.
+    The :class:`~django.forms.Form` instance this :class:`~django.forms.BoundField`
+    is bound to.
 
-The HTML that's generated includes the form's
-:attr:`~django.forms.Form.label_suffix` (a colon, by default) or, if set, the
-current field's :attr:`~django.forms.Field.label_suffix`. The optional
-``label_suffix`` parameter allows you to override any previously set
-suffix. For example, you can use an empty string to hide the label on selected
-fields. If you need to do this in a template, you could write a custom
-filter to allow passing parameters to ``label_tag``.
+.. attribute:: BoundField.help_text
 
-.. versionchanged:: 1.8
+    The :attr:`~django.forms.Field.help_text` of the field.
 
-    The label includes :attr:`~Form.required_css_class` if applicable.
+.. attribute:: BoundField.html_name
 
-.. method:: BoundField.css_classes()
-
-When you use Django's rendering shortcuts, CSS classes are used to
-indicate required form fields or fields that contain errors. If you're
-manually rendering a form, you can access these CSS classes using the
-``css_classes`` method::
-
-    >>> f = ContactForm(data)
-    >>> f['message'].css_classes()
-    'required'
-
-If you want to provide some additional classes in addition to the
-error and required classes that may be required, you can provide
-those classes as an argument::
-
-    >>> f = ContactForm(data)
-    >>> f['message'].css_classes('foo bar')
-    'foo bar required'
-
-.. method:: BoundField.value()
-
-Use this method to render the raw value of this field as it would be rendered
-by a ``Widget``::
-
-    >>> initial = {'subject': 'welcome'}
-    >>> unbound_form = ContactForm(initial=initial)
-    >>> bound_form = ContactForm(data, initial=initial)
-    >>> print(unbound_form['subject'].value())
-    welcome
-    >>> print(bound_form['subject'].value())
-    hi
+    The name that will be used in the widget's HTML ``name`` attribute. It takes
+    the form :attr:`~django.forms.Form.prefix` into account.
 
 .. attribute:: BoundField.id_for_label
 
-Use this property to render the ID of this field. For example, if you are
-manually constructing a ``<label>`` in your template (despite the fact that
-:meth:`~BoundField.label_tag` will do this for you):
+    Use this property to render the ID of this field. For example, if you are
+    manually constructing a ``<label>`` in your template (despite the fact that
+    :meth:`~BoundField.label_tag` will do this for you):
 
-.. code-block:: html+django
+    .. code-block:: html+django
 
-    <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
+        <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
 
-By default, this will be the field's name prefixed by ``id_``
-("``id_my_field``" for the example above). You may modify the ID by setting
-:attr:`~django.forms.Widget.attrs` on the field's widget. For example,
-declaring a field like this::
+    By default, this will be the field's name prefixed by ``id_``
+    ("``id_my_field``" for the example above). You may modify the ID by setting
+    :attr:`~django.forms.Widget.attrs` on the field's widget. For example,
+    declaring a field like this::
 
-    my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
+        my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
 
-and using the template above, would render something like:
+    and using the template above, would render something like:
 
-.. code-block:: html
+    .. code-block:: html
 
-    <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
+        <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" required />
+
+.. attribute:: BoundField.is_hidden
+
+    Returns ``True`` if this :class:`~django.forms.BoundField`'s widget is
+    hidden.
+
+.. attribute:: BoundField.label
+
+    The :attr:`~django.forms.Field.label` of the field. This is used in
+    :meth:`~BoundField.label_tag`.
+
+.. attribute:: BoundField.name
+
+    The name of this field in the form::
+
+        >>> f = ContactForm()
+        >>> print(f['subject'].name)
+        subject
+        >>> print(f['message'].name)
+        message
+
+Methods of ``BoundField``
+-------------------------
+
+.. method:: BoundField.as_hidden(attrs=None, **kwargs)
+
+    Returns a string of HTML for representing this as an ``<input type="hidden">``.
+
+    ``**kwargs`` are passed to :meth:`~django.forms.BoundField.as_widget`.
+
+    This method is primarily used internally. You should use a widget instead.
+
+.. method:: BoundField.as_widget(widget=None, attrs=None, only_initial=False)
+
+    Renders the field by rendering the passed widget, adding any HTML
+    attributes passed as ``attrs``.  If no widget is specified, then the
+    field's default widget will be used.
+
+    ``only_initial`` is used by Django internals and should not be set
+    explicitly.
+
+.. method:: BoundField.css_classes()
+
+    When you use Django's rendering shortcuts, CSS classes are used to
+    indicate required form fields or fields that contain errors. If you're
+    manually rendering a form, you can access these CSS classes using the
+    ``css_classes`` method::
+
+        >>> f = ContactForm(data={'message': ''})
+        >>> f['message'].css_classes()
+        'required'
+
+    If you want to provide some additional classes in addition to the
+    error and required classes that may be required, you can provide
+    those classes as an argument::
+
+        >>> f = ContactForm(data={'message': ''})
+        >>> f['message'].css_classes('foo bar')
+        'foo bar required'
+
+.. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None)
+
+    To separately render the label tag of a form field, you can call its
+    ``label_tag()`` method::
+
+        >>> f = ContactForm(data={'message': ''})
+        >>> print(f['message'].label_tag())
+        <label for="id_message">Message:</label>
+
+    You can provide the ``contents`` parameter which will replace the
+    auto-generated label tag. An ``attrs`` dictionary may contain additional
+    attributes for the ``<label>`` tag.
+
+    The HTML that's generated includes the form's
+    :attr:`~django.forms.Form.label_suffix` (a colon, by default) or, if set, the
+    current field's :attr:`~django.forms.Field.label_suffix`. The optional
+    ``label_suffix`` parameter allows you to override any previously set
+    suffix. For example, you can use an empty string to hide the label on selected
+    fields. If you need to do this in a template, you could write a custom
+    filter to allow passing parameters to ``label_tag``.
+
+.. method:: BoundField.value()
+
+    Use this method to render the raw value of this field as it would be rendered
+    by a ``Widget``::
+
+        >>> initial = {'subject': 'welcome'}
+        >>> unbound_form = ContactForm(initial=initial)
+        >>> bound_form = ContactForm(data={'subject': 'hi'}, initial=initial)
+        >>> print(unbound_form['subject'].value())
+        welcome
+        >>> print(bound_form['subject'].value())
+        hi
+
+Customizing ``BoundField``
+==========================
+
+If you need to access some additional information about a form field in a
+template and using a subclass of :class:`~django.forms.Field` isn't
+sufficient, consider also customizing :class:`~django.forms.BoundField`.
+
+A custom form field can override ``get_bound_field()``:
+
+.. method:: Field.get_bound_field(form, field_name)
+
+    Takes an instance of :class:`~django.forms.Form` and the name of the field.
+    The return value will be used when accessing the field in a template. Most
+    likely it will be an instance of a subclass of
+    :class:`~django.forms.BoundField`.
+
+If you have a ``GPSCoordinatesField``, for example, and want to be able to
+access additional information about the coordinates in a template, this could
+be implemented as follows::
+
+    class GPSCoordinatesBoundField(BoundField):
+        @property
+        def country(self):
+            """
+            Return the country the coordinates lie in or None if it can't be
+            determined.
+            """
+            value = self.value()
+            if value:
+                return get_country_from_coordinates(value)
+            else:
+                return None
+
+    class GPSCoordinatesField(Field):
+        def get_bound_field(self, form, field_name):
+            return GPSCoordinatesBoundField(form, self, field_name)
+
+Now you can access the country in a template with
+``{{ form.coordinates.country }}``.
 
 .. _binding-uploaded-files:
 
 Binding uploaded files to a form
---------------------------------
+================================
 
 Dealing with forms that have ``FileField`` and ``ImageField`` fields
 is a little more complicated than a normal form.
@@ -951,7 +1126,7 @@ form data *and* file data::
     >>> f = ContactFormWithMugshot()
 
 Testing for multipart forms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. method:: Form.is_multipart()
 
@@ -974,7 +1149,7 @@ Here's an example of how you might use this in a template::
     </form>
 
 Subclassing forms
------------------
+=================
 
 If you have multiple ``Form`` classes that share fields, you can use
 subclassing to remove redundancy.
@@ -991,36 +1166,34 @@ fields are ordered first::
     ...     priority = forms.CharField()
     >>> f = ContactFormWithPriority(auto_id=False)
     >>> print(f.as_ul())
-    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
-    <li>Message: <input type="text" name="message" /></li>
-    <li>Sender: <input type="email" name="sender" /></li>
+    <li>Subject: <input type="text" name="subject" maxlength="100" required /></li>
+    <li>Message: <input type="text" name="message" required /></li>
+    <li>Sender: <input type="email" name="sender" required /></li>
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
-    <li>Priority: <input type="text" name="priority" /></li>
+    <li>Priority: <input type="text" name="priority" required /></li>
 
-It's possible to subclass multiple forms, treating forms as "mix-ins." In this
+It's possible to subclass multiple forms, treating forms as mixins. In this
 example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
 (in that order), and its field list includes the fields from the parent
 classes::
 
-    >>> from django.forms import Form
-    >>> class PersonForm(Form):
-    ...     first_name = CharField()
-    ...     last_name = CharField()
-    >>> class InstrumentForm(Form):
-    ...     instrument = CharField()
-    >>> class BeatleForm(PersonForm, InstrumentForm):
-    ...     haircut_type = CharField()
+    >>> from django import forms
+    >>> class PersonForm(forms.Form):
+    ...     first_name = forms.CharField()
+    ...     last_name = forms.CharField()
+    >>> class InstrumentForm(forms.Form):
+    ...     instrument = forms.CharField()
+    >>> class BeatleForm(InstrumentForm, PersonForm):
+    ...     haircut_type = forms.CharField()
     >>> b = BeatleForm(auto_id=False)
     >>> print(b.as_ul())
-    <li>First name: <input type="text" name="first_name" /></li>
-    <li>Last name: <input type="text" name="last_name" /></li>
-    <li>Instrument: <input type="text" name="instrument" /></li>
-    <li>Haircut type: <input type="text" name="haircut_type" /></li>
+    <li>First name: <input type="text" name="first_name" required /></li>
+    <li>Last name: <input type="text" name="last_name" required /></li>
+    <li>Instrument: <input type="text" name="instrument" required /></li>
+    <li>Haircut type: <input type="text" name="haircut_type" required /></li>
 
-.. versionadded:: 1.7
-
-* It's possible to declaratively remove a ``Field`` inherited from a parent
-  class by setting the name to be ``None`` on the subclass. For example::
+It's possible to declaratively remove a ``Field`` inherited from a parent class
+by setting the name of the field to ``None`` on the subclass. For example::
 
     >>> from django import forms
 
@@ -1037,7 +1210,7 @@ classes::
 .. _form-prefix:
 
 Prefixes for forms
-------------------
+==================
 
 .. attribute:: Form.prefix
 
@@ -1047,8 +1220,14 @@ You can put several Django forms inside one ``<form>`` tag. To give each
     >>> mother = PersonForm(prefix="mother")
     >>> father = PersonForm(prefix="father")
     >>> print(mother.as_ul())
-    <li><label for="id_mother-first_name">First name:</label> <input type="text" name="mother-first_name" id="id_mother-first_name" /></li>
-    <li><label for="id_mother-last_name">Last name:</label> <input type="text" name="mother-last_name" id="id_mother-last_name" /></li>
+    <li><label for="id_mother-first_name">First name:</label> <input type="text" name="mother-first_name" id="id_mother-first_name" required /></li>
+    <li><label for="id_mother-last_name">Last name:</label> <input type="text" name="mother-last_name" id="id_mother-last_name" required /></li>
     >>> print(father.as_ul())
-    <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" /></li>
-    <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" /></li>
+    <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" required /></li>
+    <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" required /></li>
+
+The prefix can also be specified on the form class::
+
+    >>> class PersonForm(forms.Form):
+    ...     ...
+    ...     prefix = 'person'

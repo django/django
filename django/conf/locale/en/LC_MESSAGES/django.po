@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -25,399 +25,433 @@ msgstr ""
 msgid "Asturian"
 msgstr ""
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Azerbaijani"
 msgstr ""
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Bulgarian"
 msgstr ""
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Belarusian"
 msgstr ""
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Bengali"
 msgstr ""
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Breton"
 msgstr ""
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Bosnian"
 msgstr ""
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Catalan"
 msgstr ""
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Czech"
 msgstr ""
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Welsh"
 msgstr ""
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Danish"
 msgstr ""
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "German"
 msgstr ""
 
-#: conf/global_settings.py:64
-msgid "Greek"
-msgstr ""
-
-#: conf/global_settings.py:65
-msgid "English"
-msgstr ""
-
-#: conf/global_settings.py:66
-msgid "Australian English"
-msgstr ""
-
-#: conf/global_settings.py:67
-msgid "British English"
-msgstr ""
-
-#: conf/global_settings.py:68
-msgid "Esperanto"
-msgstr ""
-
-#: conf/global_settings.py:69
-msgid "Spanish"
-msgstr ""
-
 #: conf/global_settings.py:70
-msgid "Argentinian Spanish"
+msgid "Lower Sorbian"
 msgstr ""
 
 #: conf/global_settings.py:71
-msgid "Mexican Spanish"
+msgid "Greek"
+msgstr ""
+
+#: conf/global_settings.py:66
+msgid "English"
+msgstr ""
+
+#: conf/global_settings.py:67
+msgid "Australian English"
+msgstr ""
+
+#: conf/global_settings.py:68
+msgid "British English"
+msgstr ""
+
+#: conf/global_settings.py:69
+msgid "Esperanto"
+msgstr ""
+
+#: conf/global_settings.py:70
+msgid "Spanish"
+msgstr ""
+
+#: conf/global_settings.py:71
+msgid "Argentinian Spanish"
 msgstr ""
 
 #: conf/global_settings.py:72
-msgid "Nicaraguan Spanish"
+msgid "Colombian Spanish"
+msgstr ""
+
+#: conf/global_settings.py:72
+msgid "Mexican Spanish"
 msgstr ""
 
 #: conf/global_settings.py:73
-msgid "Venezuelan Spanish"
+msgid "Nicaraguan Spanish"
 msgstr ""
 
 #: conf/global_settings.py:74
-msgid "Estonian"
+msgid "Venezuelan Spanish"
 msgstr ""
 
 #: conf/global_settings.py:75
-msgid "Basque"
+msgid "Estonian"
 msgstr ""
 
 #: conf/global_settings.py:76
-msgid "Persian"
+msgid "Basque"
 msgstr ""
 
 #: conf/global_settings.py:77
-msgid "Finnish"
+msgid "Persian"
 msgstr ""
 
 #: conf/global_settings.py:78
-msgid "French"
+msgid "Finnish"
 msgstr ""
 
 #: conf/global_settings.py:79
-msgid "Frisian"
+msgid "French"
 msgstr ""
 
 #: conf/global_settings.py:80
-msgid "Irish"
+msgid "Frisian"
 msgstr ""
 
 #: conf/global_settings.py:81
-msgid "Galician"
-msgstr ""
-
-#: conf/global_settings.py:82
-msgid "Hebrew"
+msgid "Irish"
 msgstr ""
 
 #: conf/global_settings.py:83
-msgid "Hindi"
+msgid "Scottish Gaelic"
+msgstr ""
+
+#: conf/global_settings.py:82
+msgid "Galician"
+msgstr ""
+
+#: conf/global_settings.py:83
+msgid "Hebrew"
 msgstr ""
 
 #: conf/global_settings.py:84
-msgid "Croatian"
+msgid "Hindi"
 msgstr ""
 
 #: conf/global_settings.py:85
-msgid "Hungarian"
-msgstr ""
-
-#: conf/global_settings.py:86
-msgid "Interlingua"
-msgstr ""
-
-#: conf/global_settings.py:87
-msgid "Indonesian"
-msgstr ""
-
-#: conf/global_settings.py:88
-msgid "Ido"
-msgstr ""
-
-#: conf/global_settings.py:88
-msgid "Icelandic"
-msgstr ""
-
-#: conf/global_settings.py:89
-msgid "Italian"
-msgstr ""
-
-#: conf/global_settings.py:90
-msgid "Japanese"
-msgstr ""
-
-#: conf/global_settings.py:91
-msgid "Georgian"
-msgstr ""
-
-#: conf/global_settings.py:92
-msgid "Kazakh"
-msgstr ""
-
-#: conf/global_settings.py:93
-msgid "Khmer"
+msgid "Croatian"
 msgstr ""
 
 #: conf/global_settings.py:94
-msgid "Kannada"
+msgid "Upper Sorbian"
 msgstr ""
 
 #: conf/global_settings.py:95
-msgid "Korean"
+msgid "Hungarian"
+msgstr ""
+
+#: conf/global_settings.py:87
+msgid "Interlingua"
+msgstr ""
+
+#: conf/global_settings.py:88
+msgid "Indonesian"
+msgstr ""
+
+#: conf/global_settings.py:89
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:90
+msgid "Icelandic"
+msgstr ""
+
+#: conf/global_settings.py:91
+msgid "Italian"
+msgstr ""
+
+#: conf/global_settings.py:92
+msgid "Japanese"
+msgstr ""
+
+#: conf/global_settings.py:93
+msgid "Georgian"
+msgstr ""
+
+#: conf/global_settings.py:94
+msgid "Kazakh"
+msgstr ""
+
+#: conf/global_settings.py:95
+msgid "Khmer"
 msgstr ""
 
 #: conf/global_settings.py:96
-msgid "Luxembourgish"
+msgid "Kannada"
 msgstr ""
 
 #: conf/global_settings.py:97
-msgid "Lithuanian"
+msgid "Korean"
 msgstr ""
 
 #: conf/global_settings.py:98
-msgid "Latvian"
+msgid "Luxembourgish"
 msgstr ""
 
 #: conf/global_settings.py:99
-msgid "Macedonian"
+msgid "Lithuanian"
 msgstr ""
 
 #: conf/global_settings.py:100
-msgid "Malayalam"
+msgid "Latvian"
 msgstr ""
 
 #: conf/global_settings.py:101
-msgid "Mongolian"
+msgid "Macedonian"
 msgstr ""
 
 #: conf/global_settings.py:102
-msgid "Marathi"
-msgstr ""
-
-#: conf/global_settings.py:102
-msgid "Burmese"
+msgid "Malayalam"
 msgstr ""
 
 #: conf/global_settings.py:103
-msgid "Norwegian Bokmal"
+msgid "Mongolian"
 msgstr ""
 
 #: conf/global_settings.py:104
-msgid "Nepali"
+msgid "Marathi"
 msgstr ""
 
 #: conf/global_settings.py:105
-msgid "Dutch"
-msgstr ""
-
-#: conf/global_settings.py:106
-msgid "Norwegian Nynorsk"
-msgstr ""
-
-#: conf/global_settings.py:107
-msgid "Ossetic"
-msgstr ""
-
-#: conf/global_settings.py:108
-msgid "Punjabi"
-msgstr ""
-
-#: conf/global_settings.py:109
-msgid "Polish"
-msgstr ""
-
-#: conf/global_settings.py:110
-msgid "Portuguese"
-msgstr ""
-
-#: conf/global_settings.py:111
-msgid "Brazilian Portuguese"
-msgstr ""
-
-#: conf/global_settings.py:112
-msgid "Romanian"
+msgid "Burmese"
 msgstr ""
 
 #: conf/global_settings.py:113
-msgid "Russian"
+msgid "Norwegian Bokmål"
+msgstr ""
+
+#: conf/global_settings.py:107
+msgid "Nepali"
+msgstr ""
+
+#: conf/global_settings.py:108
+msgid "Dutch"
+msgstr ""
+
+#: conf/global_settings.py:109
+msgid "Norwegian Nynorsk"
+msgstr ""
+
+#: conf/global_settings.py:110
+msgid "Ossetic"
+msgstr ""
+
+#: conf/global_settings.py:111
+msgid "Punjabi"
+msgstr ""
+
+#: conf/global_settings.py:112
+msgid "Polish"
+msgstr ""
+
+#: conf/global_settings.py:113
+msgid "Portuguese"
 msgstr ""
 
 #: conf/global_settings.py:114
-msgid "Slovak"
+msgid "Brazilian Portuguese"
 msgstr ""
 
 #: conf/global_settings.py:115
-msgid "Slovenian"
+msgid "Romanian"
 msgstr ""
 
 #: conf/global_settings.py:116
-msgid "Albanian"
+msgid "Russian"
 msgstr ""
 
 #: conf/global_settings.py:117
-msgid "Serbian"
+msgid "Slovak"
 msgstr ""
 
 #: conf/global_settings.py:118
-msgid "Serbian Latin"
+msgid "Slovenian"
 msgstr ""
 
 #: conf/global_settings.py:119
-msgid "Swedish"
+msgid "Albanian"
 msgstr ""
 
 #: conf/global_settings.py:120
-msgid "Swahili"
+msgid "Serbian"
 msgstr ""
 
 #: conf/global_settings.py:121
-msgid "Tamil"
+msgid "Serbian Latin"
 msgstr ""
 
 #: conf/global_settings.py:122
-msgid "Telugu"
+msgid "Swedish"
 msgstr ""
 
 #: conf/global_settings.py:123
-msgid "Thai"
+msgid "Swahili"
 msgstr ""
 
 #: conf/global_settings.py:124
-msgid "Turkish"
+msgid "Tamil"
 msgstr ""
 
 #: conf/global_settings.py:125
-msgid "Tatar"
+msgid "Telugu"
 msgstr ""
 
 #: conf/global_settings.py:126
-msgid "Udmurt"
+msgid "Thai"
 msgstr ""
 
 #: conf/global_settings.py:127
-msgid "Ukrainian"
+msgid "Turkish"
 msgstr ""
 
 #: conf/global_settings.py:128
-msgid "Urdu"
+msgid "Tatar"
 msgstr ""
 
 #: conf/global_settings.py:129
+msgid "Udmurt"
+msgstr ""
+
+#: conf/global_settings.py:130
+msgid "Ukrainian"
+msgstr ""
+
+#: conf/global_settings.py:131
+msgid "Urdu"
+msgstr ""
+
+#: conf/global_settings.py:132
 msgid "Vietnamese"
 msgstr ""
 
-#: conf/global_settings.py:130 conf/global_settings.py:131
+#: conf/global_settings.py:133
 msgid "Simplified Chinese"
 msgstr ""
 
-#: conf/global_settings.py:132 conf/global_settings.py:133
+#: conf/global_settings.py:134
 msgid "Traditional Chinese"
 msgstr ""
 
-#: contrib/sitemaps/apps.py:8
+#: contrib/messages/apps.py:7
+msgid "Messages"
+msgstr ""
+
+#: contrib/sitemaps/apps.py:7
 msgid "Site Maps"
 msgstr ""
 
-#: contrib/staticfiles/apps.py:8
+#: contrib/staticfiles/apps.py:7
 msgid "Static Files"
 msgstr ""
 
-#: contrib/syndication/apps.py:8
+#: contrib/syndication/apps.py:7
 msgid "Syndication"
 msgstr ""
 
-#: contrib/webdesign/apps.py:8
-msgid "Web Design"
+#: core/paginator.py:43
+msgid "That page number is not an integer"
 msgstr ""
 
-#: core/validators.py:21
+#: core/paginator.py:45
+msgid "That page number is less than 1"
+msgstr ""
+
+#: core/paginator.py:50
+msgid "That page contains no results"
+msgstr ""
+
+#: core/validators.py:34
 msgid "Enter a valid value."
 msgstr ""
 
-#: core/validators.py:77 forms/fields.py:678
+#: core/validators.py:98 forms/fields.py:677
 msgid "Enter a valid URL."
 msgstr ""
 
-#: core/validators.py:115
+#: core/validators.py:141
 msgid "Enter a valid integer."
 msgstr ""
 
-#: core/validators.py:120
+#: core/validators.py:152
 msgid "Enter a valid email address."
 msgstr ""
 
-#: core/validators.py:185
+#: core/validators.py:225
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 
-#: core/validators.py:188 core/validators.py:207
+#: core/validators.py:232
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
+#: core/validators.py:237 core/validators.py:256
 msgid "Enter a valid IPv4 address."
 msgstr ""
 
-#: core/validators.py:193 core/validators.py:208
+#: core/validators.py:242 core/validators.py:257
 msgid "Enter a valid IPv6 address."
 msgstr ""
 
-#: core/validators.py:203 core/validators.py:206
+#: core/validators.py:252 core/validators.py:255
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr ""
 
-#: core/validators.py:229 db/models/fields/__init__.py:1070
+#: core/validators.py:284 db/models/fields/__init__.py:1147
 msgid "Enter only digits separated by commas."
 msgstr ""
 
-#: core/validators.py:236
+#: core/validators.py:292
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 
-#: core/validators.py:255
+#: core/validators.py:318
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: core/validators.py:262
+#: core/validators.py:325
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
 
-#: core/validators.py:271
+#: core/validators.py:334
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
@@ -428,7 +462,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/validators.py:282
+#: core/validators.py:345
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
@@ -439,255 +473,21 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: db/models/base.py:978 forms/models.py:713
-msgid "and"
-msgstr ""
-
-#: db/models/base.py:980
-#, python-format
-msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
-
-#: db/models/fields/__init__.py:104
-#, python-format
-msgid "Value %(value)r is not a valid choice."
-msgstr ""
-
-#: db/models/fields/__init__.py:105
-msgid "This field cannot be null."
-msgstr ""
-
-#: db/models/fields/__init__.py:106
-msgid "This field cannot be blank."
-msgstr ""
-
-#: db/models/fields/__init__.py:107
-#, python-format
-msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr ""
-
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
-#: db/models/fields/__init__.py:111
-#, python-format
-msgid ""
-"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
-msgstr ""
-
-#: db/models/fields/__init__.py:116
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr ""
-
-#: db/models/fields/__init__.py:847 db/models/fields/__init__.py:1696
-msgid "Integer"
-msgstr ""
-
-#: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1694
-#, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr ""
-
-#: db/models/fields/__init__.py:926
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr ""
-
-#: db/models/fields/__init__.py:928
-msgid "Boolean (Either True or False)"
-msgstr ""
-
-#: db/models/fields/__init__.py:1004
-#, python-format
-msgid "String (up to %(max_length)s)"
-msgstr ""
-
-#: db/models/fields/__init__.py:1065
-msgid "Comma-separated integers"
-msgstr ""
-
-#: db/models/fields/__init__.py:1114
-#, python-format
-msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
-"format."
-msgstr ""
-
-#: db/models/fields/__init__.py:1116 db/models/fields/__init__.py:1266
-#, python-format
-msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
-"date."
-msgstr ""
-
-#: db/models/fields/__init__.py:1119
-msgid "Date (without time)"
-msgstr ""
-
-#: db/models/fields/__init__.py:1264
-#, python-format
-msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
-msgstr ""
-
-#: db/models/fields/__init__.py:1268
-#, python-format
-msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]) but it is an invalid date/time."
-msgstr ""
-
-#: db/models/fields/__init__.py:1272
-msgid "Date (with time)"
-msgstr ""
-
-#: db/models/fields/__init__.py:1420
-#, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr ""
-
-#: db/models/fields/__init__.py:1422
-msgid "Decimal number"
-msgstr ""
-
-#: db/models/fields/__init__.py:1567
-msgid "Email address"
-msgstr ""
-
-#: db/models/fields/__init__.py:1593
-msgid "File path"
-msgstr ""
-
-#: db/models/fields/__init__.py:1660
-#, python-format
-msgid "'%(value)s' value must be a float."
-msgstr ""
-
-#: db/models/fields/__init__.py:1662
-msgid "Floating point number"
-msgstr ""
-
-#: db/models/fields/__init__.py:1746
-msgid "Big (8 byte) integer"
-msgstr ""
-
-#: db/models/fields/__init__.py:1761
-msgid "IPv4 address"
-msgstr ""
-
-#: db/models/fields/__init__.py:1791
-msgid "IP address"
-msgstr ""
-
-#: db/models/fields/__init__.py:1870
-#, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
-
-#: db/models/fields/__init__.py:1872
-msgid "Boolean (Either True, False or None)"
-msgstr ""
-
-#: db/models/fields/__init__.py:1932
-msgid "Positive integer"
-msgstr ""
-
-#: db/models/fields/__init__.py:1944
-msgid "Positive small integer"
-msgstr ""
-
-#: db/models/fields/__init__.py:1957
-#, python-format
-msgid "Slug (up to %(max_length)s)"
-msgstr ""
-
-#: db/models/fields/__init__.py:1986
-msgid "Small integer"
-msgstr ""
-
-#: db/models/fields/__init__.py:1993
-msgid "Text"
-msgstr ""
-
-#: db/models/fields/__init__.py:2016
-#, python-format
-msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
-"format."
-msgstr ""
-
-#: db/models/fields/__init__.py:2018
-#, python-format
-msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
-"invalid time."
-msgstr ""
-
-#: db/models/fields/__init__.py:2021
-msgid "Time"
-msgstr ""
-
-#: db/models/fields/__init__.py:2146
-msgid "URL"
-msgstr ""
-
-#: db/models/fields/__init__.py:2169
-msgid "Raw binary data"
-msgstr ""
-
-#: db/models/fields/files.py:224
-msgid "File"
-msgstr ""
-
-#: db/models/fields/files.py:374
-msgid "Image"
-msgstr ""
-
-#: db/models/fields/related.py:1594
-#, python-format
-msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr ""
-
-#: db/models/fields/related.py:1596
-msgid "Foreign Key (type determined by related field)"
-msgstr ""
-
-#: db/models/fields/related.py:1787
-msgid "One-to-one relationship"
-msgstr ""
-
-#: db/models/fields/related.py:1857
-msgid "Many-to-many relationship"
-msgstr ""
-
-#: forms/fields.py:55
-msgid "This field is required."
-msgstr ""
-
-#: forms/fields.py:239
-msgid "Enter a whole number."
-msgstr ""
-
-#: forms/fields.py:282 forms/fields.py:319
-msgid "Enter a number."
-msgstr ""
-
-#: forms/fields.py:321
+#: core/validators.py:359
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/fields.py:325
+#: core/validators.py:364
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/fields.py:329
+#: core/validators.py:369
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
@@ -696,31 +496,308 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/fields.py:440 forms/fields.py:1139
+#: core/validators.py:464
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+#: db/models/base.py:1205 forms/models.py:732
+msgid "and"
+msgstr ""
+
+#: db/models/base.py:1097
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+
+#: db/models/fields/__init__.py:110
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
+
+#: db/models/fields/__init__.py:111
+msgid "This field cannot be null."
+msgstr ""
+
+#: db/models/fields/__init__.py:112
+msgid "This field cannot be blank."
+msgstr ""
+
+#: db/models/fields/__init__.py:113
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr ""
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#: db/models/fields/__init__.py:117
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+
+#: db/models/fields/__init__.py:134
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+#: db/models/fields/__init__.py:930 db/models/fields/__init__.py:1834
+msgid "Integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:934 db/models/fields/__init__.py:1832
+#, python-format
+msgid "'%(value)s' value must be an integer."
+msgstr ""
+
+#: db/models/fields/__init__.py:960 db/models/fields/__init__.py:1849
+msgid "Big (8 byte) integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:972
+#, python-format
+msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+#: db/models/fields/__init__.py:1011
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1086
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1142
+msgid "Comma-separated integers"
+msgstr ""
+
+#: db/models/fields/__init__.py:1191
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1193 db/models/fields/__init__.py:1336
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+#: db/models/fields/__init__.py:1196
+msgid "Date (without time)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1334
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1338
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+#: db/models/fields/__init__.py:1342
+msgid "Date (with time)"
+msgstr ""
+
+#: db/models/fields/__init__.py:1494
+#, python-format
+msgid "'%(value)s' value must be a decimal number."
+msgstr ""
+
+#: db/models/fields/__init__.py:1496
+msgid "Decimal number"
+msgstr ""
+
+#: db/models/fields/__init__.py:1653
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"uuuuuu] format."
+msgstr ""
+
+#: db/models/fields/__init__.py:1656
+msgid "Duration"
+msgstr ""
+
+#: db/models/fields/__init__.py:1707
+msgid "Email address"
+msgstr ""
+
+#: db/models/fields/__init__.py:1731
+msgid "File path"
+msgstr ""
+
+#: db/models/fields/__init__.py:1798
+#, python-format
+msgid "'%(value)s' value must be a float."
+msgstr ""
+
+#: db/models/fields/__init__.py:1800
+msgid "Floating point number"
+msgstr ""
+
+#: db/models/fields/__init__.py:1864
+msgid "IPv4 address"
+msgstr ""
+
+#: db/models/fields/__init__.py:1947
+msgid "IP address"
+msgstr ""
+
+#: db/models/fields/__init__.py:2031
+#, python-format
+msgid "'%(value)s' value must be either None, True or False."
+msgstr ""
+
+#: db/models/fields/__init__.py:2033
+msgid "Boolean (Either True, False or None)"
+msgstr ""
+
+#: db/models/fields/__init__.py:2093
+msgid "Positive integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:2105
+msgid "Positive small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:2118
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr ""
+
+#: db/models/fields/__init__.py:2152
+msgid "Small integer"
+msgstr ""
+
+#: db/models/fields/__init__.py:2159
+msgid "Text"
+msgstr ""
+
+#: db/models/fields/__init__.py:2185
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#: db/models/fields/__init__.py:2187
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+#: db/models/fields/__init__.py:2190
+msgid "Time"
+msgstr ""
+
+#: db/models/fields/__init__.py:2318
+msgid "URL"
+msgstr ""
+
+#: db/models/fields/__init__.py:2341
+msgid "Raw binary data"
+msgstr ""
+
+#: db/models/fields/__init__.py:2385
+#, python-format
+msgid "'%(value)s' is not a valid UUID."
+msgstr ""
+
+#: db/models/fields/files.py:237
+msgid "File"
+msgstr ""
+
+#: db/models/fields/files.py:392
+msgid "Image"
+msgstr ""
+
+#: db/models/fields/related.py:723
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+#: db/models/fields/related.py:725
+msgid "Foreign Key (type determined by related field)"
+msgstr ""
+
+#: db/models/fields/related.py:983
+msgid "One-to-one relationship"
+msgstr ""
+
+#: db/models/fields/related.py:1049
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#: db/models/fields/related.py:1050
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
+#: db/models/fields/related.py:1092
+msgid "Many-to-many relationship"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the label
+#: forms/boundfield.py:167
+msgid ":?.!"
+msgstr ""
+
+#: forms/fields.py:65
+msgid "This field is required."
+msgstr ""
+
+#: forms/fields.py:254
+msgid "Enter a whole number."
+msgstr ""
+
+#: forms/fields.py:299 forms/fields.py:336
+msgid "Enter a number."
+msgstr ""
+
+#: forms/fields.py:414 forms/fields.py:1158
 msgid "Enter a valid date."
 msgstr ""
 
-#: forms/fields.py:464 forms/fields.py:1140
+#: forms/fields.py:438 forms/fields.py:1159
 msgid "Enter a valid time."
 msgstr ""
 
-#: forms/fields.py:486
+#: forms/fields.py:460
 msgid "Enter a valid date/time."
 msgstr ""
 
-#: forms/fields.py:567
+#: forms/fields.py:489
+msgid "Enter a valid duration."
+msgstr ""
+
+#: forms/fields.py:556
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 
-#: forms/fields.py:568
+#: forms/fields.py:557
 msgid "No file was submitted."
 msgstr ""
 
-#: forms/fields.py:569
+#: forms/fields.py:558
 msgid "The submitted file is empty."
 msgstr ""
 
-#: forms/fields.py:571
+#: forms/fields.py:560
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
@@ -728,193 +805,191 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/fields.py:574
+#: forms/fields.py:563
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 
-#: forms/fields.py:635
+#: forms/fields.py:625
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
 
-#: forms/fields.py:782 forms/fields.py:871 forms/models.py:1182
+#: forms/fields.py:792 forms/fields.py:886 forms/models.py:1230
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: forms/fields.py:872 forms/fields.py:987 forms/models.py:1181
+#: forms/fields.py:887 forms/fields.py:1002 forms/models.py:1229
 msgid "Enter a list of values."
 msgstr ""
 
-#: forms/fields.py:988
+#: forms/fields.py:1003
 msgid "Enter a complete value."
 msgstr ""
 
+#: forms/fields.py:1217
+msgid "Enter a valid UUID."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
-#: forms/forms.py:122
+#: forms/forms.py:84
 msgid ":"
 msgstr ""
 
-#: forms/forms.py:192
+#: forms/forms.py:191
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the label
-#: forms/forms.py:625
-msgid ":?.!"
-msgstr ""
-
-#: forms/formsets.py:95
+#: forms/formsets.py:97
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
 
-#: forms/formsets.py:332
+#: forms/formsets.py:345
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/formsets.py:339
+#: forms/formsets.py:352
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms/formsets.py:367 forms/formsets.py:369
+#: forms/formsets.py:380 forms/formsets.py:382
 msgid "Order"
 msgstr ""
 
-#: forms/formsets.py:371
+#: forms/formsets.py:384
 msgid "Delete"
 msgstr ""
 
-#: forms/models.py:707
+#: forms/models.py:721
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr ""
 
-#: forms/models.py:711
+#: forms/models.py:725
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 
-#: forms/models.py:717
+#: forms/models.py:731
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
 
-#: forms/models.py:725
+#: forms/models.py:739
 msgid "Please correct the duplicate values below."
 msgstr ""
 
-#: forms/models.py:1018
+#: forms/models.py:1063
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr ""
 
-#: forms/models.py:1084
+#: forms/models.py:1123
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: forms/models.py:1184
+#: forms/models.py:1232
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
 msgstr ""
 
-#: forms/utils.py:145
+#: forms/utils.py:172
 #, python-format
 msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: forms/widgets.py:340
-msgid "Currently"
-msgstr ""
-
-#: forms/widgets.py:341
-msgid "Change"
-msgstr ""
-
-#: forms/widgets.py:342
+#: forms/widgets.py:378
 msgid "Clear"
 msgstr ""
 
-#: forms/widgets.py:536
+#: forms/widgets.py:379
+msgid "Currently"
+msgstr ""
+
+#: forms/widgets.py:380
+msgid "Change"
+msgstr ""
+
+#: forms/widgets.py:570
 msgid "Unknown"
 msgstr ""
 
-#: forms/widgets.py:537
+#: forms/widgets.py:571
 msgid "Yes"
 msgstr ""
 
-#: forms/widgets.py:538
+#: forms/widgets.py:572
 msgid "No"
 msgstr ""
 
-#: template/defaultfilters.py:849
+#: template/defaultfilters.py:867
 msgid "yes,no,maybe"
 msgstr ""
 
-#: template/defaultfilters.py:878 template/defaultfilters.py:890
+#: template/defaultfilters.py:896 template/defaultfilters.py:908
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: template/defaultfilters.py:892
+#: template/defaultfilters.py:910
 #, python-format
 msgid "%s KB"
 msgstr ""
 
-#: template/defaultfilters.py:894
+#: template/defaultfilters.py:912
 #, python-format
 msgid "%s MB"
 msgstr ""
 
-#: template/defaultfilters.py:896
+#: template/defaultfilters.py:914
 #, python-format
 msgid "%s GB"
 msgstr ""
 
-#: template/defaultfilters.py:898
+#: template/defaultfilters.py:916
 #, python-format
 msgid "%s TB"
 msgstr ""
 
-#: template/defaultfilters.py:900
+#: template/defaultfilters.py:918
 #, python-format
 msgid "%s PB"
 msgstr ""
 
-#: utils/dateformat.py:59
+#: utils/dateformat.py:61
 msgid "p.m."
 msgstr ""
 
-#: utils/dateformat.py:60
+#: utils/dateformat.py:62
 msgid "a.m."
 msgstr ""
 
-#: utils/dateformat.py:65
+#: utils/dateformat.py:67
 msgid "PM"
 msgstr ""
 
-#: utils/dateformat.py:66
+#: utils/dateformat.py:68
 msgid "AM"
 msgstr ""
 
-#: utils/dateformat.py:149
+#: utils/dateformat.py:151
 msgid "midnight"
 msgstr ""
 
-#: utils/dateformat.py:151
+#: utils/dateformat.py:153
 msgid "noon"
 msgstr ""
 
@@ -1194,76 +1269,76 @@ msgstr ""
 msgid "This is not a valid IPv6 address."
 msgstr ""
 
-#: utils/text.py:79
+#: utils/text.py:77
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
 msgstr ""
 
-#: utils/text.py:248
+#: utils/text.py:246
 msgid "or"
 msgstr ""
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:267 utils/timesince.py:57
+#: utils/text.py:265 utils/timesince.py:63
 msgid ", "
 msgstr ""
 
-#: utils/timesince.py:25
+#: utils/timesince.py:11
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/timesince.py:26
+#: utils/timesince.py:12
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/timesince.py:27
+#: utils/timesince.py:13
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/timesince.py:28
+#: utils/timesince.py:14
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/timesince.py:29
+#: utils/timesince.py:15
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/timesince.py:30
+#: utils/timesince.py:16
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/timesince.py:46
+#: utils/timesince.py:52
 msgid "0 minutes"
 msgstr ""
 
-#: views/csrf.py:105
+#: views/csrf.py:107
 msgid "Forbidden"
 msgstr ""
 
-#: views/csrf.py:106
+#: views/csrf.py:108
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
 
-#: views/csrf.py:110
+#: views/csrf.py:112
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
 "header' to be sent by your Web browser, but none was sent. This header is "
@@ -1271,116 +1346,116 @@ msgid ""
 "hijacked by third parties."
 msgstr ""
 
-#: views/csrf.py:115
+#: views/csrf.py:117
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
 
-#: views/csrf.py:120
+#: views/csrf.py:122
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
 
-#: views/csrf.py:125
+#: views/csrf.py:127
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
 
-#: views/csrf.py:129
+#: views/csrf.py:132
 msgid "More information is available with DEBUG=True."
 msgstr ""
 
-#: views/debug.py:517
+#: views/debug.py:508
 msgid "Welcome to Django"
 msgstr ""
 
-#: views/debug.py:518
+#: views/debug.py:509
 msgid "It worked!"
 msgstr ""
 
-#: views/debug.py:519
+#: views/debug.py:510
 msgid "Congratulations on your first Django-powered page."
 msgstr ""
 
-#: views/debug.py:520
+#: views/debug.py:511
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
-#: views/debug.py:522
+#: views/debug.py:513
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
 
-#: views/generic/dates.py:43
+#: views/generic/dates.py:48
 msgid "No year specified"
 msgstr ""
 
-#: views/generic/dates.py:99
+#: views/generic/dates.py:104
 msgid "No month specified"
 msgstr ""
 
-#: views/generic/dates.py:158
+#: views/generic/dates.py:163
 msgid "No day specified"
 msgstr ""
 
-#: views/generic/dates.py:214
+#: views/generic/dates.py:219
 msgid "No week specified"
 msgstr ""
 
-#: views/generic/dates.py:369 views/generic/dates.py:397
+#: views/generic/dates.py:378 views/generic/dates.py:406
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr ""
 
-#: views/generic/dates.py:650
+#: views/generic/dates.py:660
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
 
-#: views/generic/dates.py:682
+#: views/generic/dates.py:694
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr ""
 
-#: views/generic/detail.py:54
+#: views/generic/detail.py:55
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr ""
 
-#: views/generic/list.py:62
+#: views/generic/list.py:76
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr ""
 
-#: views/generic/list.py:67
+#: views/generic/list.py:81
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr ""
 
-#: views/generic/list.py:158
+#: views/generic/list.py:172
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr ""
 
-#: views/static.py:54
+#: views/static.py:58
 msgid "Directory indexes are not allowed here."
 msgstr ""
 
-#: views/static.py:56
+#: views/static.py:60
 #, python-format
 msgid "\"%(path)s\" does not exist"
 msgstr ""
 
-#: views/static.py:97
+#: views/static.py:100
 #, python-format
 msgid "Index of %(directory)s"
 msgstr ""

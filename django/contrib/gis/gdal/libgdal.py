@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
 import logging
 import os
 import re
-from ctypes import c_char_p, c_int, CDLL, CFUNCTYPE
+from ctypes import CDLL, CFUNCTYPE, c_char_p, c_int
 from ctypes.util import find_library
 
 from django.contrib.gis.gdal.error import GDALException
@@ -26,8 +24,7 @@ elif os.name == 'nt':
     lib_names = ['gdal111', 'gdal110', 'gdal19', 'gdal18', 'gdal17']
 elif os.name == 'posix':
     # *NIX library names.
-    lib_names = ['gdal', 'GDAL', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0',
-        'gdal1.8.0', 'gdal1.7.0']
+    lib_names = ['gdal', 'GDAL', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0', 'gdal1.8.0', 'gdal1.7.0']
 else:
     raise GDALException('Unsupported OS "%s"' % os.name)
 
@@ -40,9 +37,10 @@ if lib_names:
             break
 
 if lib_path is None:
-    raise GDALException('Could not find the GDAL library (tried "%s"). '
-                       'Try setting GDAL_LIBRARY_PATH in your settings.' %
-                       '", "'.join(lib_names))
+    raise GDALException(
+        'Could not find the GDAL library (tried "%s"). Try setting '
+        'GDAL_LIBRARY_PATH in your settings.' % '", "'.join(lib_names)
+    )
 
 # This loads the GDAL/OGR C library
 lgdal = CDLL(lib_path)
@@ -58,7 +56,7 @@ if os.name == 'nt':
 
 def std_call(func):
     """
-    Returns the correct STDCALL function for certain OSR routines on Win32
+    Return the correct STDCALL function for certain OSR routines on Win32
     platforms.
     """
     if os.name == 'nt':
@@ -66,22 +64,24 @@ def std_call(func):
     else:
         return lgdal[func]
 
-#### Version-information functions. ####
 
-# Returns GDAL library version information with the given key.
+# #### Version-information functions. ####
+
+# Return GDAL library version information with the given key.
 _version_info = std_call('GDALVersionInfo')
 _version_info.argtypes = [c_char_p]
 _version_info.restype = c_char_p
 
 
 def gdal_version():
-    "Returns only the GDAL version number information."
+    "Return only the GDAL version number information."
     return _version_info(b'RELEASE_NAME')
 
 
 def gdal_full_version():
-    "Returns the full GDAL version information."
+    "Return the full GDAL version information."
     return _version_info('')
+
 
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 
@@ -92,6 +92,7 @@ def gdal_version_info():
     if not m:
         raise GDALException('Could not parse GDAL version string "%s"' % ver)
     return {key: m.group(key) for key in ('major', 'minor', 'subminor')}
+
 
 _verinfo = gdal_version_info()
 GDAL_MAJOR_VERSION = int(_verinfo['major'])
@@ -105,7 +106,9 @@ CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
 
 
 def err_handler(error_class, error_number, message):
-    logger.error('GDAL_ERROR %d: %s' % (error_number, message))
+    logger.error('GDAL_ERROR %d: %s', error_number, message)
+
+
 err_handler = CPLErrorHandler(err_handler)
 
 
@@ -114,6 +117,7 @@ def function(name, args, restype):
     func.argtypes = args
     func.restype = restype
     return func
+
 
 set_error_handler = function('CPLSetErrorHandler', [CPLErrorHandler], CPLErrorHandler)
 set_error_handler(err_handler)

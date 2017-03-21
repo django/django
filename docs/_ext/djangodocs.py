@@ -7,13 +7,13 @@ import re
 
 from docutils import nodes
 from docutils.parsers.rst import directives
-
-from sphinx import addnodes, __version__ as sphinx_ver
+from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinx.writers.html import SmartyPantsHTMLTranslator
-from sphinx.util.console import bold
+from sphinx.domains.std import Cmdoption
 from sphinx.util.compat import Directive
+from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
+from sphinx.writers.html import SmartyPantsHTMLTranslator
 
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
@@ -47,12 +47,7 @@ def setup(app):
         indextemplate="pair: %s; django-admin command",
         parse_node=parse_django_admin_node,
     )
-    app.add_description_unit(
-        directivename="django-admin-option",
-        rolename="djadminopt",
-        indextemplate="pair: %s; django-admin command-line option",
-        parse_node=parse_django_adminopt_node,
-    )
+    app.add_directive('django-admin-option', Cmdoption)
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
     app.add_directive('versionchanged', VersionDirective)
@@ -68,6 +63,9 @@ def setup(app):
                  man=(visit_snippet_literal, depart_snippet_literal),
                  text=(visit_snippet_literal, depart_snippet_literal),
                  texinfo=(visit_snippet_literal, depart_snippet_literal))
+    app.set_translator('djangohtml', DjangoHTMLTranslator)
+    app.set_translator('json', DjangoHTMLTranslator)
+    return {'parallel_read_safe': True}
 
 
 class snippet_with_filename(nodes.literal_block):
@@ -114,7 +112,7 @@ def visit_snippet(self, node):
                                                    linenos=linenos,
                                                    **highlight_args)
     starttag = self.starttag(node, 'div', suffix='',
-                             CLASS='highlight-%s' % lang)
+                             CLASS='highlight-%s snippet' % lang)
     self.body.append(starttag)
     self.body.append('<div class="snippet-filename">%s</div>\n''' % (fname,))
     self.body.append(highlighted)
@@ -126,14 +124,8 @@ def visit_snippet_latex(self, node):
     """
     Latex document generator visit handler
     """
-    self.verbatim = ''
+    code = node.rawsource.rstrip('\n')
 
-
-def depart_snippet_latex(self, node):
-    """
-    Latex document generator depart handler.
-    """
-    code = self.verbatim.rstrip('\n')
     lang = self.hlsettingstack[-1][0]
     linenos = code.count('\n') >= self.hlsettingstack[-1][1] - 1
     fname = node['filename']
@@ -152,9 +144,14 @@ def depart_snippet_latex(self, node):
                                               linenos=linenos,
                                               **highlight_args)
 
-    self.body.append('\n{\\colorbox[rgb]{0.9,0.9,0.9}'
-                     '{\\makebox[\\textwidth][l]'
-                     '{\\small\\texttt{%s}}}}\n' % (fname,))
+    self.body.append(
+        '\n{\\colorbox[rgb]{0.9,0.9,0.9}'
+        '{\\makebox[\\textwidth][l]'
+        '{\\small\\texttt{%s}}}}\n' % (
+            # Some filenames have '_', which is special in latex.
+            fname.replace('_', r'\_'),
+        )
+    )
 
     if self.table:
         hlcode = hlcode.replace('\\begin{Verbatim}',
@@ -166,7 +163,16 @@ def depart_snippet_latex(self, node):
     hlcode = hlcode.rstrip() + '\n'
     self.body.append('\n' + hlcode + '\\end{%sVerbatim}\n' %
                      (self.table and 'Original' or ''))
-    self.verbatim = None
+
+    # Prevent rawsource from appearing in output a second time.
+    raise nodes.SkipNode
+
+
+def depart_snippet_latex(self, node):
+    """
+    Latex document generator depart handler.
+    """
+    pass
 
 
 class SnippetWithFilename(Directive):
@@ -247,18 +253,6 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
 
-    if sphinx_ver < '1.0.8':
-        #
-        # Don't apply smartypants to literal blocks
-        #
-        def visit_literal_block(self, node):
-            self.no_smarty += 1
-            SmartyPantsHTMLTranslator.visit_literal_block(self, node)
-
-        def depart_literal_block(self, node):
-            SmartyPantsHTMLTranslator.depart_literal_block(self, node)
-            self.no_smarty -= 1
-
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a
     # better callout -- the Sphinx default is just a little span,
@@ -299,39 +293,10 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
-    env._django_curr_admin_command = command
+    env.ref_context['std:program'] = command
     title = "django-admin %s" % sig
     signode += addnodes.desc_name(title, title)
-    return sig
-
-
-def parse_django_adminopt_node(env, sig, signode):
-    """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
-    from sphinx.domains.std import option_desc_re
-    count = 0
-    firstname = ''
-    for m in option_desc_re.finditer(sig):
-        optname, args = m.groups()
-        if count:
-            signode += addnodes.desc_addname(', ', ', ')
-        signode += addnodes.desc_name(optname, optname)
-        signode += addnodes.desc_addname(args, args)
-        if not count:
-            firstname = optname
-        count += 1
-    if not count:
-        for m in simple_option_desc_re.finditer(sig):
-            optname, args = m.groups()
-            if count:
-                signode += addnodes.desc_addname(', ', ', ')
-            signode += addnodes.desc_name(optname, optname)
-            signode += addnodes.desc_addname(args, args)
-            if not count:
-                firstname = optname
-            count += 1
-    if not firstname:
-        raise ValueError
-    return firstname
+    return command
 
 
 class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
@@ -342,14 +307,18 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
     name = 'djangohtml'
 
     def finish(self):
-        super(DjangoStandaloneHTMLBuilder, self).finish()
+        super().finish()
         self.info(bold("writing templatebuiltins.js..."))
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {
-            "ttags": [n for ((t, n), (l, a)) in xrefs.items()
-                      if t == "templatetag" and l == "ref/templates/builtins"],
-            "tfilters": [n for ((t, n), (l, a)) in xrefs.items()
-                         if t == "templatefilter" and l == "ref/templates/builtins"],
+            "ttags": [
+                n for ((t, n), (k, a)) in xrefs.items()
+                if t == "templatetag" and k == "ref/templates/builtins"
+            ],
+            "tfilters": [
+                n for ((t, n), (k, a)) in xrefs.items()
+                if t == "templatefilter" and k == "ref/templates/builtins"
+            ],
         }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         with open(outfilename, 'w') as fp:

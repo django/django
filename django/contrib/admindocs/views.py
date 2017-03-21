@@ -1,23 +1,26 @@
-from importlib import import_module
 import inspect
 import os
-import re
+from importlib import import_module
 
-from django import template
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db import models
-from django.core.exceptions import ViewDoesNotExist
-from django.http import Http404
-from django.core import urlresolvers
 from django.contrib.admindocs import utils
+from django.contrib.admindocs.utils import (
+    replace_named_groups, replace_unnamed_groups,
+)
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.db import models
+from django.http import Http404
 from django.template.engine import Engine
+from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils.decorators import method_decorator
-from django.utils._os import upath
-from django.utils import six
-from django.utils.translation import ugettext as _
+from django.utils.inspect import (
+    func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
+    get_func_full_args,
+)
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 # Exclude methods starting with these strings from documentation
@@ -29,24 +32,24 @@ class BaseAdminDocsView(TemplateView):
     Base view for admindocs views.
     """
     @method_decorator(staff_member_required)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if not utils.docutils_is_available:
             # Display an error message for people without docutils
             self.template_name = 'admin_doc/missing_docutils.html'
-            return self.render_to_response(admin.site.each_context())
-        return super(BaseAdminDocsView, self).dispatch(*args, **kwargs)
+            return self.render_to_response(admin.site.each_context(request))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs.update({'root_path': urlresolvers.reverse('admin:index')})
-        kwargs.update(admin.site.each_context())
-        return super(BaseAdminDocsView, self).get_context_data(**kwargs)
+        kwargs.update({'root_path': reverse('admin:index')})
+        kwargs.update(admin.site.each_context(self.request))
+        return super().get_context_data(**kwargs)
 
 
 class BookmarkletsView(BaseAdminDocsView):
     template_name = 'admin_doc/bookmarklets.html'
 
     def get_context_data(self, **kwargs):
-        context = super(BookmarkletsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({
             'admin_url': "%s://%s%s" % (
                 self.request.scheme, self.request.get_host(), context['root_path'])
@@ -58,70 +61,77 @@ class TemplateTagIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/template_tag_index.html'
 
     def get_context_data(self, **kwargs):
-        load_all_installed_template_libraries()
-
         tags = []
-        app_libs = list(six.iteritems(template.libraries))
-        builtin_libs = [(None, lib) for lib in template.builtins]
-        for module_name, library in builtin_libs + app_libs:
-            for tag_name, tag_func in library.tags.items():
-                title, body, metadata = utils.parse_docstring(tag_func.__doc__)
-                if title:
-                    title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
-                if body:
-                    body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
-                for key in metadata:
-                    metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
-                if library in template.builtins:
-                    tag_library = ''
-                else:
+        try:
+            engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            app_libs = sorted(engine.template_libraries.items())
+            builtin_libs = [('', lib) for lib in engine.template_builtins]
+            for module_name, library in builtin_libs + app_libs:
+                for tag_name, tag_func in library.tags.items():
+                    title, body, metadata = utils.parse_docstring(tag_func.__doc__)
+                    if title:
+                        title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
+                    if body:
+                        body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
+                    for key in metadata:
+                        metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
                     tag_library = module_name.split('.')[-1]
-                tags.append({
-                    'name': tag_name,
-                    'title': title,
-                    'body': body,
-                    'meta': metadata,
-                    'library': tag_library,
-                })
+                    tags.append({
+                        'name': tag_name,
+                        'title': title,
+                        'body': body,
+                        'meta': metadata,
+                        'library': tag_library,
+                    })
         kwargs.update({'tags': tags})
-        return super(TemplateTagIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TemplateFilterIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/template_filter_index.html'
 
     def get_context_data(self, **kwargs):
-        load_all_installed_template_libraries()
-
         filters = []
-        app_libs = list(six.iteritems(template.libraries))
-        builtin_libs = [(None, lib) for lib in template.builtins]
-        for module_name, library in builtin_libs + app_libs:
-            for filter_name, filter_func in library.filters.items():
-                title, body, metadata = utils.parse_docstring(filter_func.__doc__)
-                if title:
-                    title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
-                if body:
-                    body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
-                for key in metadata:
-                    metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
-                if library in template.builtins:
-                    tag_library = ''
-                else:
+        try:
+            engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            app_libs = sorted(engine.template_libraries.items())
+            builtin_libs = [('', lib) for lib in engine.template_builtins]
+            for module_name, library in builtin_libs + app_libs:
+                for filter_name, filter_func in library.filters.items():
+                    title, body, metadata = utils.parse_docstring(filter_func.__doc__)
+                    if title:
+                        title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
+                    if body:
+                        body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
+                    for key in metadata:
+                        metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
                     tag_library = module_name.split('.')[-1]
-                filters.append({
-                    'name': filter_name,
-                    'title': title,
-                    'body': body,
-                    'meta': metadata,
-                    'library': tag_library,
-                })
+                    filters.append({
+                        'name': filter_name,
+                        'title': title,
+                        'body': body,
+                        'meta': metadata,
+                        'library': tag_library,
+                    })
         kwargs.update({'filters': filters})
-        return super(TemplateFilterIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ViewIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/view_index.html'
+
+    @staticmethod
+    def _get_full_name(func):
+        mod_name = func.__module__
+        return '%s.%s' % (mod_name, func.__qualname__)
 
     def get_context_data(self, **kwargs):
         views = []
@@ -129,26 +139,47 @@ class ViewIndexView(BaseAdminDocsView):
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex, namespace, name) in view_functions:
             views.append({
-                'full_name': '%s.%s' % (func.__module__, getattr(func, '__name__', func.__class__.__name__)),
+                'full_name': self._get_full_name(func),
                 'url': simplify_regex(regex),
                 'url_name': ':'.join((namespace or []) + (name and [name] or [])),
                 'namespace': ':'.join((namespace or [])),
                 'name': name,
             })
         kwargs.update({'views': views})
-        return super(ViewIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ViewDetailView(BaseAdminDocsView):
     template_name = 'admin_doc/view_detail.html'
 
+    @staticmethod
+    def _get_view_func(view):
+        urlconf = get_urlconf()
+        if get_resolver(urlconf)._is_callback(view):
+            mod, func = get_mod_func(view)
+            try:
+                # Separate the module and function, e.g.
+                # 'mymodule.views.myview' -> 'mymodule.views', 'myview').
+                return getattr(import_module(mod), func)
+            except ImportError:
+                # Import may fail because view contains a class name, e.g.
+                # 'mymodule.views.ViewContainer.my_view', so mod takes the form
+                # 'mymodule.views.ViewContainer'. Parse it again to separate
+                # the module and class.
+                mod, klass = get_mod_func(mod)
+                return getattr(getattr(import_module(mod), klass), func)
+            except AttributeError:
+                # PY2 generates incorrect paths for views that are methods,
+                # e.g. 'mymodule.views.ViewContainer.my_view' will be
+                # listed as 'mymodule.views.my_view' because the class name
+                # can't be detected. This causes an AttributeError when
+                # trying to resolve the view.
+                return None
+
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        urlconf = urlresolvers.get_urlconf()
-        if urlresolvers.get_resolver(urlconf)._is_callback(view):
-            mod, func = urlresolvers.get_mod_func(view)
-            view_func = getattr(import_module(mod), func)
-        else:
+        view_func = self._get_view_func(view)
+        if view_func is None:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
         if title:
@@ -163,7 +194,7 @@ class ViewDetailView(BaseAdminDocsView):
             'body': body,
             'meta': metadata,
         })
-        return super(ViewDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelIndexView(BaseAdminDocsView):
@@ -172,7 +203,7 @@ class ModelIndexView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         m_list = [m._meta for m in apps.get_models()]
         kwargs.update({'models': m_list})
-        return super(ModelIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelDetailView(BaseAdminDocsView):
@@ -204,8 +235,8 @@ class ModelDetailView(BaseAdminDocsView):
             # ForeignKey is a special case since the field will actually be a
             # descriptor that returns the other object
             if isinstance(field, models.ForeignKey):
-                data_type = field.rel.to.__name__
-                app_label = field.rel.to._meta.app_label
+                data_type = field.remote_field.model.__name__
+                app_label = field.remote_field.model._meta.app_label
                 verbose = utils.parse_rst(
                     (_("the related `%(app_label)s.%(data_type)s` object") % {
                         'app_label': app_label, 'data_type': data_type,
@@ -219,14 +250,14 @@ class ModelDetailView(BaseAdminDocsView):
             fields.append({
                 'name': field.name,
                 'data_type': data_type,
-                'verbose': verbose,
+                'verbose': verbose or '',
                 'help_text': field.help_text,
             })
 
         # Gather many-to-many fields.
         for field in opts.many_to_many:
-            data_type = field.rel.to.__name__
-            app_label = field.rel.to._meta.app_label
+            data_type = field.remote_field.model.__name__
+            app_label = field.remote_field.model._meta.app_label
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
                 'app_label': app_label,
                 'object_name': data_type,
@@ -242,9 +273,10 @@ class ModelDetailView(BaseAdminDocsView):
                 'verbose': utils.parse_rst(_("number of %s") % verbose, 'model', _('model:') + opts.model_name),
             })
 
+        methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if (inspect.isfunction(func) and len(inspect.getargspec(func)[0]) == 1):
+            if inspect.isfunction(func):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
@@ -254,17 +286,34 @@ class ModelDetailView(BaseAdminDocsView):
                 verbose = func.__doc__
                 if verbose:
                     verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
-                fields.append({
-                    'name': func_name,
-                    'data_type': get_return_data_type(func_name),
-                    'verbose': verbose,
-                })
+                # If a method has no arguments, show it as a 'field', otherwise
+                # as a 'method with arguments'.
+                if func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
+                    fields.append({
+                        'name': func_name,
+                        'data_type': get_return_data_type(func_name),
+                        'verbose': verbose or '',
+                    })
+                else:
+                    arguments = get_func_full_args(func)
+                    # Join arguments with ', ' and in case of default value,
+                    # join it with '='. Use repr() so that strings will be
+                    # correctly displayed.
+                    print_arguments = ', '.join([
+                        '='.join(list(arg_el[:1]) + [repr(el) for el in arg_el[1:]])
+                        for arg_el in arguments
+                    ])
+                    methods.append({
+                        'name': func_name,
+                        'arguments': print_arguments,
+                        'verbose': verbose or '',
+                    })
 
         # Gather related objects
-        for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
+        for rel in opts.related_objects:
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {
-                'app_label': rel.opts.app_label,
-                'object_name': rel.opts.object_name,
+                'app_label': rel.related_model._meta.app_label,
+                'object_name': rel.related_model._meta.object_name,
             }
             accessor = rel.get_accessor_name()
             fields.append({
@@ -282,8 +331,9 @@ class ModelDetailView(BaseAdminDocsView):
             'summary': title,
             'description': body,
             'fields': fields,
+            'methods': methods,
         })
-        return super(ModelDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TemplateDetailView(BaseAdminDocsView):
@@ -292,47 +342,36 @@ class TemplateDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         template = self.kwargs['template']
         templates = []
-        for dir in Engine.get_default().dirs:
-            template_file = os.path.join(dir, template)
-            templates.append({
-                'file': template_file,
-                'exists': os.path.exists(template_file),
-                'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
-                'order': list(Engine.get_default().dirs).index(dir),
-            })
+        try:
+            default_engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            # This doesn't account for template loaders (#24128).
+            for index, directory in enumerate(default_engine.dirs):
+                template_file = os.path.join(directory, template)
+                if os.path.exists(template_file):
+                    with open(template_file) as f:
+                        template_contents = f.read()
+                else:
+                    template_contents = ''
+                templates.append({
+                    'file': template_file,
+                    'exists': os.path.exists(template_file),
+                    'contents': template_contents,
+                    'order': index,
+                })
         kwargs.update({
             'name': template,
             'templates': templates,
         })
-        return super(TemplateDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 ####################
 # Helper functions #
 ####################
-
-def load_all_installed_template_libraries():
-    # Load/register all template tag libraries from installed apps.
-    for module_name in template.get_templatetags_modules():
-        mod = import_module(module_name)
-        if not hasattr(mod, '__file__'):
-            # e.g. packages installed as eggs
-            continue
-
-        try:
-            libraries = [
-                os.path.splitext(p)[0]
-                for p in os.listdir(os.path.dirname(upath(mod.__file__)))
-                if p.endswith('.py') and p[0].isalpha()
-            ]
-        except OSError:
-            continue
-        else:
-            for library_name in libraries:
-                try:
-                    template.get_library(library_name)
-                except template.InvalidTemplateLibrary:
-                    pass
 
 
 def get_return_data_type(func_name):
@@ -346,10 +385,11 @@ def get_return_data_type(func_name):
 
 
 def get_readable_field_data_type(field):
-    """Returns the description for a given field type, if it exists,
-    Fields' descriptions can contain format strings, which will be interpolated
-    against the values of field.__dict__ before being output."""
-
+    """
+    Return the description for a given field type, if it exists. Fields'
+    descriptions can contain format strings, which will be interpolated with
+    the values of field.__dict__ before being output.
+    """
     return field.description % field.__dict__
 
 
@@ -381,24 +421,17 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
             raise TypeError(_("%s does not appear to be a urlpattern object") % p)
     return views
 
-named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
-non_named_group_matcher = re.compile(r'\(.*?\)')
-
 
 def simplify_regex(pattern):
+    r"""
+    Clean up urlpattern regexes into something more readable by humans. For
+    example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
+    into "/<sport_slug>/athletes/<athlete_slug>/".
     """
-    Clean up urlpattern regexes into something somewhat readable by Mere Humans:
-    turns something like "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
-    into "<sport_slug>/athletes/<athlete_slug>/"
-    """
-    # handle named groups first
-    pattern = named_group_matcher.sub(lambda m: m.group(1), pattern)
-
-    # handle non-named groups
-    pattern = non_named_group_matcher.sub("<var>", pattern)
-
+    pattern = replace_named_groups(pattern)
+    pattern = replace_unnamed_groups(pattern)
     # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/').replace('\\', '')
+    pattern = pattern.replace('^', '').replace('$', '').replace('?', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern

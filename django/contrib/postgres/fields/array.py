@@ -1,19 +1,17 @@
 import json
 
+from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
-from django.db.models import Field, Lookup, Transform, IntegerField
-from django.utils import six
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.db.models import Field, IntegerField, Transform
+from django.db.models.lookups import Exact, In
+from django.utils.translation import gettext_lazy as _
 
+from ..utils import prefix_validation_error
+from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
-
-
-class AttributeSetter(object):
-    def __init__(self, name, value):
-        setattr(self, name, value)
 
 
 class ArrayField(Field):
@@ -29,15 +27,30 @@ class ArrayField(Field):
         if self.size:
             self.default_validators = self.default_validators[:]
             self.default_validators.append(ArrayMaxLengthValidator(self.size))
-        super(ArrayField, self).__init__(**kwargs)
+        # For performance, only add a from_db_value() method if the base field
+        # implements it.
+        if hasattr(self.base_field, 'from_db_value'):
+            self.from_db_value = self._from_db_value
+        super().__init__(**kwargs)
+
+    @property
+    def model(self):
+        try:
+            return self.__dict__['model']
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+
+    @model.setter
+    def model(self, model):
+        self.__dict__['model'] = model
+        self.base_field.model = model
 
     def check(self, **kwargs):
-        errors = super(ArrayField, self).check(**kwargs)
-        if self.base_field.rel:
+        errors = super().check(**kwargs)
+        if self.base_field.remote_field:
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
-                    hint=None,
                     obj=self,
                     id='postgres.E002'
                 )
@@ -50,7 +63,6 @@ class ArrayField(Field):
                 errors.append(
                     checks.Error(
                         'Base field for array has errors:\n    %s' % messages,
-                        hint=None,
                         obj=self,
                         id='postgres.E001'
                     )
@@ -58,7 +70,7 @@ class ArrayField(Field):
         return errors
 
     def set_attributes_from_name(self, name):
-        super(ArrayField, self).set_attributes_from_name(name)
+        super().set_attributes_from_name(name)
         self.base_field.set_attributes_from_name(name)
 
     @property
@@ -69,55 +81,61 @@ class ArrayField(Field):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
-    def get_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, list) or isinstance(value, tuple):
-            return [self.base_field.get_prep_value(i) for i in value]
+            return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
         return value
 
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        if lookup_type == 'contains':
-            return [self.get_prep_value(value)]
-        return super(ArrayField, self).get_db_prep_lookup(lookup_type, value,
-                connection, prepared=False)
-
     def deconstruct(self):
-        name, path, args, kwargs = super(ArrayField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if path == 'django.contrib.postgres.fields.array.ArrayField':
             path = 'django.contrib.postgres.fields.ArrayField'
         kwargs.update({
-            'base_field': self.base_field,
+            'base_field': self.base_field.clone(),
             'size': self.size,
         })
         return name, path, args, kwargs
 
     def to_python(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             # Assume we're deserializing
             vals = json.loads(value)
             value = [self.base_field.to_python(val) for val in vals]
         return value
 
+    def _from_db_value(self, value, expression, connection, context):
+        if value is None:
+            return value
+        return [
+            self.base_field.from_db_value(item, expression, connection, context)
+            for item in value
+        ]
+
     def value_to_string(self, obj):
         values = []
-        vals = self._get_val_from_obj(obj)
+        vals = self.value_from_object(obj)
         base_field = self.base_field
 
         for val in vals:
-            obj = AttributeSetter(base_field.attname, val)
-            values.append(base_field.value_to_string(obj))
+            if val is None:
+                values.append(None)
+            else:
+                obj = AttributeSetter(base_field.attname, val)
+                values.append(base_field.value_to_string(obj))
         return json.dumps(values)
 
     def get_transform(self, name):
-        transform = super(ArrayField, self).get_transform(name)
+        transform = super().get_transform(name)
         if transform:
             return transform
-        try:
-            index = int(name)
-        except ValueError:
-            pass
-        else:
-            index += 1  # postgres uses 1-indexing
-            return IndexTransformFactory(index, self.base_field)
+        if '_' not in name:
+            try:
+                index = int(name)
+            except ValueError:
+                pass
+            else:
+                index += 1  # postgres uses 1-indexing
+                return IndexTransformFactory(index, self.base_field)
         try:
             start, end = name.split('_')
             start = int(start) + 1
@@ -128,21 +146,35 @@ class ArrayField(Field):
             return SliceTransformFactory(start, end)
 
     def validate(self, value, model_instance):
-        super(ArrayField, self).validate(value, model_instance)
-        for i, part in enumerate(value):
+        super().validate(value, model_instance)
+        for index, part in enumerate(value):
             try:
                 self.base_field.validate(part, model_instance)
-            except exceptions.ValidationError as e:
-                raise exceptions.ValidationError(
-                    string_concat(self.error_messages['item_invalid'], e.message),
+            except exceptions.ValidationError as error:
+                raise prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
-                    params={'nth': i},
+                    params={'nth': index},
                 )
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
                 raise exceptions.ValidationError(
                     self.error_messages['nested_array_mismatch'],
                     code='nested_array_mismatch',
+                )
+
+    def run_validators(self, value):
+        super().run_validators(value)
+        for index, part in enumerate(value):
+            try:
+                self.base_field.run_validators(part)
+            except exceptions.ValidationError as error:
+                raise prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': index},
                 )
 
     def formfield(self, **kwargs):
@@ -152,60 +184,74 @@ class ArrayField(Field):
             'max_length': self.size,
         }
         defaults.update(kwargs)
-        return super(ArrayField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 @ArrayField.register_lookup
-class ArrayContainsLookup(Lookup):
-    lookup_name = 'contains'
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        type_cast = self.lhs.output_field.db_type(connection)
-        return '%s @> %s::%s' % (lhs, rhs, type_cast), params
+class ArrayContains(lookups.DataContains):
+    def as_sql(self, qn, connection):
+        sql, params = super().as_sql(qn, connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
+        return sql, params
 
 
 @ArrayField.register_lookup
-class ArrayContainedByLookup(Lookup):
-    lookup_name = 'contained_by'
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        return '%s <@ %s' % (lhs, rhs), params
+class ArrayContainedBy(lookups.ContainedBy):
+    def as_sql(self, qn, connection):
+        sql, params = super().as_sql(qn, connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
+        return sql, params
 
 
 @ArrayField.register_lookup
-class ArrayOverlapLookup(Lookup):
-    lookup_name = 'overlap'
+class ArrayExact(Exact):
+    def as_sql(self, qn, connection):
+        sql, params = super().as_sql(qn, connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
+        return sql, params
 
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
-        return '%s && %s' % (lhs, rhs), params
+
+@ArrayField.register_lookup
+class ArrayOverlap(lookups.Overlap):
+    def as_sql(self, qn, connection):
+        sql, params = super().as_sql(qn, connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
+        return sql, params
 
 
 @ArrayField.register_lookup
 class ArrayLenTransform(Transform):
     lookup_name = 'len'
-
-    @property
-    def output_field(self):
-        return IntegerField()
+    output_field = IntegerField()
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return 'array_length(%s, 1)' % lhs, params
+        # Distinguish NULL and empty arrays
+        return (
+            'CASE WHEN %(lhs)s IS NULL THEN NULL ELSE '
+            'coalesce(array_length(%(lhs)s, 1), 0) END'
+        ) % {'lhs': lhs}, params
+
+
+@ArrayField.register_lookup
+class ArrayInLookup(In):
+    def get_prep_lookup(self):
+        values = super().get_prep_lookup()
+        # In.process_rhs() expects values to be hashable, so convert lists
+        # to tuples.
+        prepared_values = []
+        for value in values:
+            if hasattr(value, 'resolve_expression'):
+                prepared_values.append(value)
+            else:
+                prepared_values.append(tuple(value))
+        return prepared_values
 
 
 class IndexTransform(Transform):
 
     def __init__(self, index, base_field, *args, **kwargs):
-        super(IndexTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.index = index
         self.base_field = base_field
 
@@ -218,7 +264,7 @@ class IndexTransform(Transform):
         return self.base_field
 
 
-class IndexTransformFactory(object):
+class IndexTransformFactory:
 
     def __init__(self, index, base_field):
         self.index = index
@@ -231,7 +277,7 @@ class IndexTransformFactory(object):
 class SliceTransform(Transform):
 
     def __init__(self, start, end, *args, **kwargs):
-        super(SliceTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.start = start
         self.end = end
 
@@ -240,7 +286,7 @@ class SliceTransform(Transform):
         return '%s[%s:%s]' % (lhs, self.start, self.end), params
 
 
-class SliceTransformFactory(object):
+class SliceTransformFactory:
 
     def __init__(self, start, end):
         self.start = start

@@ -2,13 +2,583 @@
 Writing your first Django app, part 2
 =====================================
 
-This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off. We're
-continuing the Web-poll application and will focus on Django's
-automatically-generated admin site.
+This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off.
+We'll setup the database, create your first model, and get a quick introduction
+to Django's automatically-generated admin site.
+
+Database setup
+==============
+
+Now, open up :file:`mysite/settings.py`. It's a normal Python module with
+module-level variables representing Django settings.
+
+By default, the configuration uses SQLite. If you're new to databases, or
+you're just interested in trying Django, this is the easiest choice. SQLite is
+included in Python, so you won't need to install anything else to support your
+database. When starting your first real project, however, you may want to use a
+more scalable database like PostgreSQL, to avoid database-switching headaches
+down the road.
+
+If you wish to use another database, install the appropriate :ref:`database
+bindings <database-installation>` and change the following keys in the
+:setting:`DATABASES` ``'default'`` item to match your database connection
+settings:
+
+* :setting:`ENGINE <DATABASE-ENGINE>` -- Either
+  ``'django.db.backends.sqlite3'``,
+  ``'django.db.backends.postgresql'``,
+  ``'django.db.backends.mysql'``, or
+  ``'django.db.backends.oracle'``. Other backends are :ref:`also available
+  <third-party-notes>`.
+
+* :setting:`NAME` -- The name of your database. If you're using SQLite, the
+  database will be a file on your computer; in that case, :setting:`NAME`
+  should be the full absolute path, including filename, of that file. The
+  default value, ``os.path.join(BASE_DIR, 'db.sqlite3')``, will store the file
+  in your project directory.
+
+If you are not using SQLite as your database, additional settings such as
+:setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.
+For more details, see the reference documentation for :setting:`DATABASES`.
+
+.. admonition:: For databases other than SQLite
+
+    If you're using a database besides SQLite, make sure you've created a
+    database by this point. Do that with "``CREATE DATABASE database_name;``"
+    within your database's interactive prompt.
+
+    Also make sure that the database user provided in :file:`mysite/settings.py`
+    has "create database" privileges. This allows automatic creation of a
+    :ref:`test database <the-test-database>` which will be needed in a later
+    tutorial.
+
+    If you're using SQLite, you don't need to create anything beforehand - the
+    database file will be created automatically when it is needed.
+
+While you're editing :file:`mysite/settings.py`, set :setting:`TIME_ZONE` to
+your time zone.
+
+Also, note the :setting:`INSTALLED_APPS` setting at the top of the file. That
+holds the names of all Django applications that are activated in this Django
+instance. Apps can be used in multiple projects, and you can package and
+distribute them for use by others in their projects.
+
+By default, :setting:`INSTALLED_APPS` contains the following apps, all of which
+come with Django:
+
+* :mod:`django.contrib.admin` -- The admin site. You'll use it shortly.
+
+* :mod:`django.contrib.auth` -- An authentication system.
+
+* :mod:`django.contrib.contenttypes` -- A framework for content types.
+
+* :mod:`django.contrib.sessions` -- A session framework.
+
+* :mod:`django.contrib.messages` -- A messaging framework.
+
+* :mod:`django.contrib.staticfiles` -- A framework for managing
+  static files.
+
+These applications are included by default as a convenience for the common case.
+
+Some of these applications make use of at least one database table, though,
+so we need to create the tables in the database before we can use them. To do
+that, run the following command:
+
+.. code-block:: console
+
+    $ python manage.py migrate
+
+The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
+and creates any necessary database tables according to the database settings
+in your :file:`mysite/settings.py` file and the database migrations shipped
+with the app (we'll cover those later). You'll see a message for each
+migration it applies. If you're interested, run the command-line client for your
+database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), ``.schema``
+(SQLite), or ``SELECT TABLE_NAME FROM USER_TABLES;`` (Oracle) to display the
+tables Django created.
+
+.. admonition:: For the minimalists
+
+    Like we said above, the default applications are included for the common
+    case, but not everybody needs them. If you don't need any or all of them,
+    feel free to comment-out or delete the appropriate line(s) from
+    :setting:`INSTALLED_APPS` before running :djadmin:`migrate`. The
+    :djadmin:`migrate` command will only run migrations for apps in
+    :setting:`INSTALLED_APPS`.
+
+.. _creating-models:
+
+Creating models
+===============
+
+Now we'll define your models -- essentially, your database layout, with
+additional metadata.
 
 .. admonition:: Philosophy
 
-    Generating admin sites for your staff or clients to add, change and delete
+   A model is the single, definitive source of truth about your data. It contains
+   the essential fields and behaviors of the data you're storing. Django follows
+   the :ref:`DRY Principle <dry>`. The goal is to define your data model in one
+   place and automatically derive things from it.
+
+   This includes the migrations - unlike in Ruby On Rails, for example, migrations
+   are entirely derived from your models file, and are essentially just a
+   history that Django can roll through to update your database schema to
+   match your current models.
+
+In our simple poll app, we'll create two models: ``Question`` and ``Choice``.
+A ``Question`` has a question and a publication date. A ``Choice`` has two
+fields: the text of the choice and a vote tally. Each ``Choice`` is associated
+with a ``Question``.
+
+These concepts are represented by simple Python classes. Edit the
+:file:`polls/models.py` file so it looks like this:
+
+.. snippet::
+    :filename: polls/models.py
+
+    from django.db import models
+
+
+    class Question(models.Model):
+        question_text = models.CharField(max_length=200)
+        pub_date = models.DateTimeField('date published')
+
+
+    class Choice(models.Model):
+        question = models.ForeignKey(Question, on_delete=models.CASCADE)
+        choice_text = models.CharField(max_length=200)
+        votes = models.IntegerField(default=0)
+
+The code is straightforward. Each model is represented by a class that
+subclasses :class:`django.db.models.Model`. Each model has a number of class
+variables, each of which represents a database field in the model.
+
+Each field is represented by an instance of a :class:`~django.db.models.Field`
+class -- e.g., :class:`~django.db.models.CharField` for character fields and
+:class:`~django.db.models.DateTimeField` for datetimes. This tells Django what
+type of data each field holds.
+
+The name of each :class:`~django.db.models.Field` instance (e.g.
+``question_text`` or ``pub_date``) is the field's name, in machine-friendly
+format. You'll use this value in your Python code, and your database will use
+it as the column name.
+
+You can use an optional first positional argument to a
+:class:`~django.db.models.Field` to designate a human-readable name. That's used
+in a couple of introspective parts of Django, and it doubles as documentation.
+If this field isn't provided, Django will use the machine-readable name. In this
+example, we've only defined a human-readable name for ``Question.pub_date``.
+For all other fields in this model, the field's machine-readable name will
+suffice as its human-readable name.
+
+Some :class:`~django.db.models.Field` classes have required arguments.
+:class:`~django.db.models.CharField`, for example, requires that you give it a
+:attr:`~django.db.models.CharField.max_length`. That's used not only in the
+database schema, but in validation, as we'll soon see.
+
+A :class:`~django.db.models.Field` can also have various optional arguments; in
+this case, we've set the :attr:`~django.db.models.Field.default` value of
+``votes`` to 0.
+
+Finally, note a relationship is defined, using
+:class:`~django.db.models.ForeignKey`. That tells Django each ``Choice`` is
+related to a single ``Question``. Django supports all the common database
+relationships: many-to-one, many-to-many, and one-to-one.
+
+Activating models
+=================
+
+That small bit of model code gives Django a lot of information. With it, Django
+is able to:
+
+* Create a database schema (``CREATE TABLE`` statements) for this app.
+* Create a Python database-access API for accessing ``Question`` and ``Choice`` objects.
+
+But first we need to tell our project that the ``polls`` app is installed.
+
+.. admonition:: Philosophy
+
+    Django apps are "pluggable": You can use an app in multiple projects, and
+    you can distribute apps, because they don't have to be tied to a given
+    Django installation.
+
+To include the app in our project, we need to add a reference to its
+configuration class in the :setting:`INSTALLED_APPS` setting. The
+``PollsConfig`` class is in the :file:`polls/apps.py` file, so its dotted path
+is ``'polls.apps.PollsConfig'``. Edit the :file:`mysite/settings.py` file and
+add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
+this:
+
+.. snippet::
+    :filename: mysite/settings.py
+
+    INSTALLED_APPS = [
+        'polls.apps.PollsConfig',
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+    ]
+
+Now Django knows to include the ``polls`` app. Let's run another command:
+
+.. code-block:: console
+
+    $ python manage.py makemigrations polls
+
+You should see something similar to the following:
+
+.. code-block:: text
+
+    Migrations for 'polls':
+      polls/migrations/0001_initial.py:
+        - Create model Choice
+        - Create model Question
+        - Add field question to choice
+
+By running ``makemigrations``, you're telling Django that you've made
+some changes to your models (in this case, you've made new ones) and that
+you'd like the changes to be stored as a *migration*.
+
+Migrations are how Django stores changes to your models (and thus your
+database schema) - they're just files on disk. You can read the migration
+for your new model if you like; it's the file
+``polls/migrations/0001_initial.py``. Don't worry, you're not expected to read
+them every time Django makes one, but they're designed to be human-editable
+in case you want to manually tweak how Django changes things.
+
+There's a command that will run the migrations for you and manage your database
+schema automatically - that's called :djadmin:`migrate`, and we'll come to it in a
+moment - but first, let's see what SQL that migration would run. The
+:djadmin:`sqlmigrate` command takes migration names and returns their SQL:
+
+.. code-block:: console
+
+    $ python manage.py sqlmigrate polls 0001
+
+You should see something similar to the following (we've reformatted it for
+readability):
+
+.. code-block:: sql
+
+    BEGIN;
+    --
+    -- Create model Choice
+    --
+    CREATE TABLE "polls_choice" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "choice_text" varchar(200) NOT NULL,
+        "votes" integer NOT NULL
+    );
+    --
+    -- Create model Question
+    --
+    CREATE TABLE "polls_question" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "question_text" varchar(200) NOT NULL,
+        "pub_date" timestamp with time zone NOT NULL
+    );
+    --
+    -- Add field question to choice
+    --
+    ALTER TABLE "polls_choice" ADD COLUMN "question_id" integer NOT NULL;
+    ALTER TABLE "polls_choice" ALTER COLUMN "question_id" DROP DEFAULT;
+    CREATE INDEX "polls_choice_7aa0f6ee" ON "polls_choice" ("question_id");
+    ALTER TABLE "polls_choice"
+      ADD CONSTRAINT "polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id"
+        FOREIGN KEY ("question_id")
+        REFERENCES "polls_question" ("id")
+        DEFERRABLE INITIALLY DEFERRED;
+
+    COMMIT;
+
+Note the following:
+
+* The exact output will vary depending on the database you are using. The
+  example above is generated for PostgreSQL.
+
+* Table names are automatically generated by combining the name of the app
+  (``polls``) and the lowercase name of the model -- ``question`` and
+  ``choice``. (You can override this behavior.)
+
+* Primary keys (IDs) are added automatically. (You can override this, too.)
+
+* By convention, Django appends ``"_id"`` to the foreign key field name.
+  (Yes, you can override this, as well.)
+
+* The foreign key relationship is made explicit by a ``FOREIGN KEY``
+  constraint. Don't worry about the ``DEFERRABLE`` parts; that's just telling
+  PostgreSQL to not enforce the foreign key until the end of the transaction.
+
+* It's tailored to the database you're using, so database-specific field types
+  such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
+  primary key autoincrement`` (SQLite) are handled for you automatically. Same
+  goes for the quoting of field names -- e.g., using double quotes or
+  single quotes.
+
+* The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
+  database - it just prints it to the screen so that you can see what SQL
+  Django thinks is required. It's useful for checking what Django is going to
+  do or if you have database administrators who require SQL scripts for
+  changes.
+
+If you're interested, you can also run
+:djadmin:`python manage.py check <check>`; this checks for any problems in
+your project without making migrations or touching the database.
+
+Now, run :djadmin:`migrate` again to create those model tables in your database:
+
+.. code-block:: console
+
+    $ python manage.py migrate
+    Operations to perform:
+      Apply all migrations: admin, auth, contenttypes, polls, sessions
+    Running migrations:
+      Rendering model states... DONE
+      Applying polls.0001_initial... OK
+
+The :djadmin:`migrate` command takes all the migrations that haven't been
+applied (Django tracks which ones are applied using a special table in your
+database called ``django_migrations``) and runs them against your database -
+essentially, synchronizing the changes you made to your models with the schema
+in the database.
+
+Migrations are very powerful and let you change your models over time, as you
+develop your project, without the need to delete your database or tables and
+make new ones - it specializes in upgrading your database live, without
+losing data. We'll cover them in more depth in a later part of the tutorial,
+but for now, remember the three-step guide to making model changes:
+
+* Change your models (in ``models.py``).
+* Run :djadmin:`python manage.py makemigrations <makemigrations>` to create
+  migrations for those changes
+* Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
+  the database.
+
+The reason that there are separate commands to make and apply migrations is
+because you'll commit migrations to your version control system and ship them
+with your app; they not only make your development easier, they're also
+useable by other developers and in production.
+
+Read the :doc:`django-admin documentation </ref/django-admin>` for full
+information on what the ``manage.py`` utility can do.
+
+Playing with the API
+====================
+
+Now, let's hop into the interactive Python shell and play around with the free
+API Django gives you. To invoke the Python shell, use this command:
+
+.. code-block:: console
+
+    $ python manage.py shell
+
+We're using this instead of simply typing "python", because :file:`manage.py`
+sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
+the Python import path to your :file:`mysite/settings.py` file.
+
+.. admonition:: Bypassing manage.py
+
+    If you'd rather not use :file:`manage.py`, no problem. Just set the
+    :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
+    ``mysite.settings``, start a plain Python shell, and set up Django:
+
+    .. code-block:: pycon
+
+        >>> import django
+        >>> django.setup()
+
+    If this raises an :exc:`AttributeError`, you're probably using
+    a version of Django that doesn't match this tutorial version. You'll want
+    to either switch to the older tutorial or the newer Django version.
+
+    You must run ``python`` from the same directory :file:`manage.py` is in,
+    or ensure that directory is on the Python path, so that ``import mysite``
+    works.
+
+    For more information on all of this, see the :doc:`django-admin
+    documentation </ref/django-admin>`.
+
+Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
+
+    >>> from polls.models import Question, Choice   # Import the model classes we just wrote.
+
+    # No questions are in the system yet.
+    >>> Question.objects.all()
+    <QuerySet []>
+
+    # Create a new Question.
+    # Support for time zones is enabled in the default settings file, so
+    # Django expects a datetime with tzinfo for pub_date. Use timezone.now()
+    # instead of datetime.datetime.now() and it will do the right thing.
+    >>> from django.utils import timezone
+    >>> q = Question(question_text="What's new?", pub_date=timezone.now())
+
+    # Save the object into the database. You have to call save() explicitly.
+    >>> q.save()
+
+    # Now it has an ID.
+    >>> q.id
+    1
+
+    # Access model field values via Python attributes.
+    >>> q.question_text
+    "What's new?"
+    >>> q.pub_date
+    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
+
+    # Change values by changing the attributes, then calling save().
+    >>> q.question_text = "What's up?"
+    >>> q.save()
+
+    # objects.all() displays all the questions in the database.
+    >>> Question.objects.all()
+    <QuerySet [<Question: Question object>]>
+
+Wait a minute. ``<Question: Question object>`` is, utterly, an unhelpful representation
+of this object. Let's fix that by editing the ``Question`` model (in the
+``polls/models.py`` file) and adding a
+:meth:`~django.db.models.Model.__str__` method to both ``Question`` and
+``Choice``:
+
+.. snippet::
+    :filename: polls/models.py
+
+    from django.db import models
+
+    class Question(models.Model):
+        # ...
+        def __str__(self):
+            return self.question_text
+
+    class Choice(models.Model):
+        # ...
+        def __str__(self):
+            return self.choice_text
+
+It's important to add :meth:`~django.db.models.Model.__str__` methods to your
+models, not only for your own convenience when dealing with the interactive
+prompt, but also because objects' representations are used throughout Django's
+automatically-generated admin.
+
+Note these are normal Python methods. Let's add a custom method, just for
+demonstration:
+
+.. snippet::
+    :filename: polls/models.py
+
+    import datetime
+
+    from django.db import models
+    from django.utils import timezone
+
+
+    class Question(models.Model):
+        # ...
+        def was_published_recently(self):
+            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+
+Note the addition of ``import datetime`` and ``from django.utils import
+timezone``, to reference Python's standard :mod:`datetime` module and Django's
+time-zone-related utilities in :mod:`django.utils.timezone`, respectively. If
+you aren't familiar with time zone handling in Python, you can learn more in
+the :doc:`time zone support docs </topics/i18n/timezones>`.
+
+Save these changes and start a new Python interactive shell by running
+``python manage.py shell`` again::
+
+    >>> from polls.models import Question, Choice
+
+    # Make sure our __str__() addition worked.
+    >>> Question.objects.all()
+    <QuerySet [<Question: What's up?>]>
+
+    # Django provides a rich database lookup API that's entirely driven by
+    # keyword arguments.
+    >>> Question.objects.filter(id=1)
+    <QuerySet [<Question: What's up?>]>
+    >>> Question.objects.filter(question_text__startswith='What')
+    <QuerySet [<Question: What's up?>]>
+
+    # Get the question that was published this year.
+    >>> from django.utils import timezone
+    >>> current_year = timezone.now().year
+    >>> Question.objects.get(pub_date__year=current_year)
+    <Question: What's up?>
+
+    # Request an ID that doesn't exist, this will raise an exception.
+    >>> Question.objects.get(id=2)
+    Traceback (most recent call last):
+        ...
+    DoesNotExist: Question matching query does not exist.
+
+    # Lookup by a primary key is the most common case, so Django provides a
+    # shortcut for primary-key exact lookups.
+    # The following is identical to Question.objects.get(id=1).
+    >>> Question.objects.get(pk=1)
+    <Question: What's up?>
+
+    # Make sure our custom method worked.
+    >>> q = Question.objects.get(pk=1)
+    >>> q.was_published_recently()
+    True
+
+    # Give the Question a couple of Choices. The create call constructs a new
+    # Choice object, does the INSERT statement, adds the choice to the set
+    # of available choices and returns the new Choice object. Django creates
+    # a set to hold the "other side" of a ForeignKey relation
+    # (e.g. a question's choice) which can be accessed via the API.
+    >>> q = Question.objects.get(pk=1)
+
+    # Display any choices from the related object set -- none so far.
+    >>> q.choice_set.all()
+    <QuerySet []>
+
+    # Create three choices.
+    >>> q.choice_set.create(choice_text='Not much', votes=0)
+    <Choice: Not much>
+    >>> q.choice_set.create(choice_text='The sky', votes=0)
+    <Choice: The sky>
+    >>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+
+    # Choice objects have API access to their related Question objects.
+    >>> c.question
+    <Question: What's up?>
+
+    # And vice versa: Question objects get access to Choice objects.
+    >>> q.choice_set.all()
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
+    >>> q.choice_set.count()
+    3
+
+    # The API automatically follows relationships as far as you need.
+    # Use double underscores to separate relationships.
+    # This works as many levels deep as you want; there's no limit.
+    # Find all Choices for any question whose pub_date is in this year
+    # (reusing the 'current_year' variable we created above).
+    >>> Choice.objects.filter(question__pub_date__year=current_year)
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
+
+    # Let's delete one of the choices. Use delete() for that.
+    >>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+    >>> c.delete()
+
+For more information on model relations, see :doc:`Accessing related objects
+</ref/models/relations>`. For more on how to use double underscores to perform
+field lookups via the API, see :ref:`Field lookups <field-lookups-intro>`. For
+full details on the database API, see our :doc:`Database API reference
+</topics/db/queries>`.
+
+Introducing the Django Admin
+============================
+
+.. admonition:: Philosophy
+
+    Generating admin sites for your staff or clients to add, change, and delete
     content is tedious work that doesn't require much creativity. For that
     reason, Django entirely automates creation of admin interfaces for models.
 
@@ -22,12 +592,12 @@ automatically-generated admin site.
     managers.
 
 Creating an admin user
-======================
+----------------------
 
 First we'll need to create a user who can login to the admin site. Run the
 following command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py createsuperuser
 
@@ -53,14 +623,14 @@ password twice, the second time as a confirmation of the first.
     Superuser created successfully.
 
 Start the development server
-============================
+----------------------------
 
 The Django admin site is activated by default. Let's start the development
 server and explore it.
 
-Recall from Tutorial 1 that you start the development server like so:
+If the server is not running start it like so:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py runserver
 
@@ -72,23 +642,10 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
 Since :doc:`translation </topics/i18n/translation>` is turned on by default,
 the login screen may be displayed in your own language, depending on your
-browser's settings and on whether Django has a translation for this language.
-
-.. admonition:: Doesn't match what you see?
-
-    If at this point, instead of the above login page, you get an error
-    page reporting something like::
-
-        ImportError at /admin/
-        cannot import name patterns
-        ...
-
-    then you're probably using a version of Django that doesn't match this
-    tutorial version. You'll want to either switch to the older tutorial or the
-    newer Django version.
+browser's settings and if Django has a translation for this language.
 
 Enter the admin site
-====================
+--------------------
 
 Now, try logging in with the superuser account you created in the previous step.
 You should see the Django admin index page:
@@ -101,7 +658,7 @@ provided by :mod:`django.contrib.auth`, the authentication framework shipped
 by Django.
 
 Make the poll app modifiable in the admin
-=========================================
+-----------------------------------------
 
 But where's our poll app? It's not displayed on the admin index page.
 
@@ -113,12 +670,13 @@ file, and edit it to look like this:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Question
+
+    from .models import Question
 
     admin.site.register(Question)
 
 Explore the free admin functionality
-====================================
+------------------------------------
 
 Now that we've registered ``Question``, Django knows that it should be displayed on
 the admin index page:
@@ -127,8 +685,8 @@ the admin index page:
    :alt: Django admin index page, now with polls displayed
 
 Click "Questions". Now you're at the "change list" page for questions. This page
-displays all the question in the database and lets you choose one to change it.
-There's the "What's up?" question we created in the first tutorial:
+displays all the questions in the database and lets you choose one to change it.
+There's the "What's up?" question we created earlier:
 
 .. image:: _images/admin04t.png
    :alt: Polls change list page
@@ -165,9 +723,9 @@ The bottom part of the page gives you a couple of options:
 * Delete -- Displays a delete confirmation page.
 
 If the value of "Date published" doesn't match the time when you created the
-question in Tutorial 1, it probably means you forgot to set the correct value for
-the :setting:`TIME_ZONE` setting. Change it, reload the page and check that
-the correct value appears.
+question in :doc:`Tutorial 1</intro/tutorial01>`, it probably
+means you forgot to set the correct value for the :setting:`TIME_ZONE` setting.
+Change it, reload the page and check that the correct value appears.
 
 Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
 click "Save and continue editing." Then click "History" in the upper right.
@@ -177,409 +735,6 @@ with the timestamp and username of the person who made the change:
 .. image:: _images/admin06t.png
    :alt: History page for question object
 
-Customize the admin form
-========================
-
-Take a few minutes to marvel at all the code you didn't have to write. By
-registering the ``Question`` model with ``admin.site.register(Question)``,
-Django was able to construct a default form representation. Often, you'll want
-to customize how the admin form looks and works. You'll do this by telling
-Django the options you want when you register the object.
-
-Let's see how this works by re-ordering the fields on the edit form. Replace
-the ``admin.site.register(Question)`` line with:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    from django.contrib import admin
-    from polls.models import Question
-
-
-    class QuestionAdmin(admin.ModelAdmin):
-        fields = ['pub_date', 'question_text']
-
-    admin.site.register(Question, QuestionAdmin)
-
-You'll follow this pattern -- create a model admin object, then pass it as the
-second argument to ``admin.site.register()`` -- any time you need to change the
-admin options for an object.
-
-This particular change above makes the "Publication date" come before the
-"Question" field:
-
-.. image:: _images/admin07.png
-   :alt: Fields have been reordered
-
-This isn't impressive with only two fields, but for admin forms with dozens
-of fields, choosing an intuitive order is an important usability detail.
-
-And speaking of forms with dozens of fields, you might want to split the form
-up into fieldsets:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    from django.contrib import admin
-    from polls.models import Question
-
-
-    class QuestionAdmin(admin.ModelAdmin):
-        fieldsets = [
-            (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date']}),
-        ]
-
-    admin.site.register(Question, QuestionAdmin)
-
-The first element of each tuple in
-:attr:`~django.contrib.admin.ModelAdmin.fieldsets` is the title of the fieldset.
-Here's what our form looks like now:
-
-.. image:: _images/admin08t.png
-   :alt: Form has fieldsets now
-
-You can assign arbitrary HTML classes to each fieldset. Django provides a
-``"collapse"`` class that displays a particular fieldset initially collapsed.
-This is useful when you have a long form that contains a number of fields that
-aren't commonly used:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    from django.contrib import admin
-    from polls.models import Question
-
-
-    class QuestionAdmin(admin.ModelAdmin):
-        fieldsets = [
-            (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
-        ]
-
-    admin.site.register(Question, QuestionAdmin)
-
-.. image:: _images/admin09.png
-   :alt: Fieldset is initially collapsed
-
-Adding related objects
-======================
-
-OK, we have our Question admin page. But a ``Question`` has multiple ``Choices``, and
-the admin page doesn't display choices.
-
-Yet.
-
-There are two ways to solve this problem. The first is to register ``Choice``
-with the admin just as we did with ``Question``. That's easy:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    from django.contrib import admin
-    from polls.models import Choice, Question
-    # ...
-    admin.site.register(Choice)
-
-Now "Choices" is an available option in the Django admin. The "Add choice" form
-looks like this:
-
-.. image:: _images/admin10.png
-   :alt: Choice admin page
-
-In that form, the "Question" field is a select box containing every question in the
-database. Django knows that a :class:`~django.db.models.ForeignKey` should be
-represented in the admin as a ``<select>`` box. In our case, only one question
-exists at this point.
-
-Also note the "Add Another" link next to "Question." Every object with a
-``ForeignKey`` relationship to another gets this for free. When you click "Add
-Another," you'll get a popup window with the "Add question" form. If you add a question
-in that window and click "Save," Django will save the question to the database and
-dynamically add it as the selected choice on the "Add choice" form you're
-looking at.
-
-But, really, this is an inefficient way of adding ``Choice`` objects to the system.
-It'd be better if you could add a bunch of Choices directly when you create the
-``Question`` object. Let's make that happen.
-
-Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
-registration code to read:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    from django.contrib import admin
-    from polls.models import Choice, Question
-
-
-    class ChoiceInline(admin.StackedInline):
-        model = Choice
-        extra = 3
-
-
-    class QuestionAdmin(admin.ModelAdmin):
-        fieldsets = [
-            (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
-        ]
-        inlines = [ChoiceInline]
-
-    admin.site.register(Question, QuestionAdmin)
-
-This tells Django: "``Choice`` objects are edited on the ``Question`` admin page. By
-default, provide enough fields for 3 choices."
-
-Load the "Add question" page to see how that looks:
-
-.. image:: _images/admin11t.png
-   :alt: Add question page now has choices on it
-
-It works like this: There are three slots for related Choices -- as specified
-by ``extra`` -- and each time you come back to the "Change" page for an
-already-created object, you get another three extra slots.
-
-At the end of the three current slots you will find an "Add another Choice"
-link.  If you click on it, a new slot will be added. If you want to remove the
-added slot, you can click on the X to the top right of the added slot. Note
-that you can't remove the original three slots. This image shows an added slot:
-
-.. image:: _images/admin15t.png
-   :alt: Additional slot added dynamically
-
-One small problem, though. It takes a lot of screen space to display all the
-fields for entering related ``Choice`` objects. For that reason, Django offers a
-tabular way of displaying inline related objects; you just need to change
-the ``ChoiceInline`` declaration to read:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    class ChoiceInline(admin.TabularInline):
-        #...
-
-With that ``TabularInline`` (instead of ``StackedInline``), the
-related objects are displayed in a more compact, table-based format:
-
-.. image:: _images/admin12t.png
-   :alt: Add question page now has more compact choices
-
-Note that there is an extra "Delete?" column that allows removing rows added
-using the "Add Another Choice" button and rows that have already been saved.
-
-Customize the admin change list
-===============================
-
-Now that the Question admin page is looking good, let's make some tweaks to the
-"change list" page -- the one that displays all the questions in the system.
-
-Here's what it looks like at this point:
-
-.. image:: _images/admin04t.png
-   :alt: Polls change list page
-
-By default, Django displays the ``str()`` of each object. But sometimes it'd be
-more helpful if we could display individual fields. To do that, use the
-:attr:`~django.contrib.admin.ModelAdmin.list_display` admin option, which is a
-tuple of field names to display, as columns, on the change list page for the
-object:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    class QuestionAdmin(admin.ModelAdmin):
-        # ...
-        list_display = ('question_text', 'pub_date')
-
-Just for good measure, let's also include the ``was_published_recently`` custom
-method from Tutorial 1:
-
-.. snippet::
-    :filename: polls/admin.py
-
-    class QuestionAdmin(admin.ModelAdmin):
-        # ...
-        list_display = ('question_text', 'pub_date', 'was_published_recently')
-
-Now the question change list page looks like this:
-
-.. image:: _images/admin13t.png
-   :alt: Polls change list page, updated
-
-You can click on the column headers to sort by those values -- except in the
-case of the ``was_published_recently`` header, because sorting by the output
-of an arbitrary method is not supported. Also note that the column header for
-``was_published_recently`` is, by default, the name of the method (with
-underscores replaced with spaces), and that each line contains the string
-representation of the output.
-
-You can improve that by giving that method (in :file:`polls/models.py`) a few
-attributes, as follows:
-
-.. snippet::
-    :filename: polls/models.py
-
-    class Question(models.Model):
-        # ...
-        def was_published_recently(self):
-            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
-        was_published_recently.admin_order_field = 'pub_date'
-        was_published_recently.boolean = True
-        was_published_recently.short_description = 'Published recently?'
-
-For more information on these method properties, see
-:attr:`~django.contrib.admin.ModelAdmin.list_display`.
-
-Edit your :file:`polls/admin.py` file again and add an improvement to the
-``Question`` change list page: filters using the
-:attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
-``QuestionAdmin``::
-
-    list_filter = ['pub_date']
-
-That adds a "Filter" sidebar that lets people filter the change list by the
-``pub_date`` field:
-
-.. image:: _images/admin14t.png
-   :alt: Polls change list page, updated
-
-The type of filter displayed depends on the type of field you're filtering on.
-Because ``pub_date`` is a :class:`~django.db.models.DateTimeField`, Django
-knows to give appropriate filter options: "Any date," "Today," "Past 7 days,"
-"This month," "This year."
-
-This is shaping up well. Let's add some search capability::
-
-    search_fields = ['question_text']
-
-That adds a search box at the top of the change list. When somebody enters
-search terms, Django will search the ``question_text`` field. You can use as many
-fields as you'd like -- although because it uses a ``LIKE`` query behind the
-scenes, limiting the number of search fields to a reasonable number will make
-it easier for your database to do the search.
-
-Now's also a good time to note that change lists give you free pagination. The
-default is to display 100 items per page. :attr:`Change list pagination
-<django.contrib.admin.ModelAdmin.list_per_page>`, :attr:`search boxes
-<django.contrib.admin.ModelAdmin.search_fields>`, :attr:`filters
-<django.contrib.admin.ModelAdmin.list_filter>`, :attr:`date-hierarchies
-<django.contrib.admin.ModelAdmin.date_hierarchy>`, and
-:attr:`column-header-ordering <django.contrib.admin.ModelAdmin.list_display>`
-all work together like you think they should.
-
-Customize the admin look and feel
-=================================
-
-Clearly, having "Django administration" at the top of each admin page is
-ridiculous. It's just placeholder text.
-
-That's easy to change, though, using Django's template system. The Django admin
-is powered by Django itself, and its interfaces use Django's own template
-system.
-
-.. _ref-customizing-your-projects-templates:
-
-Customizing your *project's* templates
---------------------------------------
-
-Create a ``templates`` directory in your project directory. Templates can
-live anywhere on your filesystem that Django can access. (Django runs as
-whatever user your server runs.) However, keeping your templates within the
-project is a good convention to follow.
-
-Open your settings file (:file:`mysite/settings.py`, remember) and add a
-:setting:`TEMPLATE_DIRS` setting:
-
-.. snippet::
-    :filename: mysite/settings.py
-
-    TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
-
-:setting:`TEMPLATE_DIRS` is an iterable of filesystem directories to check when
-loading Django templates; it's a search path.
-
-Now create a directory called ``admin`` inside ``templates``, and copy the
-template ``admin/base_site.html`` from within the default Django admin
-template directory in the source code of Django itself
-(``django/contrib/admin/templates``) into that directory.
-
-.. admonition:: Where are the Django source files?
-
-    If you have difficulty finding where the Django source files are located
-    on your system, run the following command:
-
-    .. code-block:: bash
-
-        $ python -c "
-        import sys
-        sys.path = sys.path[1:]
-        import django
-        print(django.__path__)"
-
-Then, just edit the file and replace
-``{{ site_header|default:_('Django administration') }}`` (including the curly
-braces) with your own site's name as you see fit. You should end up with
-a line like:
-
-.. code-block:: html+django
-
-    <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
-
-We use this approach to teach you how to override templates. In an actual
-project, you would probably use
-the :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
-make this particular customization.
-
-This template file contains lots of text like ``{% block branding %}``
-and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
-template language. When Django renders ``admin/base_site.html``, this
-template language will be evaluated to produce the final HTML page.
-Don't worry if you can't make any sense of the template right now --
-we'll delve into Django's templating language in Tutorial 3.
-
-Note that any of Django's default admin templates can be overridden. To
-override a template, just do the same thing you did with ``base_site.html`` --
-copy it from the default directory into your custom directory, and make
-changes.
-
-Customizing your *application's* templates
-------------------------------------------
-
-Astute readers will ask: But if :setting:`TEMPLATE_DIRS` was empty by default,
-how was Django finding the default admin templates? The answer is that, by
-default, Django automatically looks for a ``templates/`` subdirectory within
-each application package, for use as a fallback (don't forget that
-``django.contrib.admin`` is an application).
-
-Our poll application is not very complex and doesn't need custom admin
-templates. But if it grew more sophisticated and required modification of
-Django's standard admin templates for some of its functionality, it would be
-more sensible to modify the *application's* templates, rather than those in the
-*project*. That way, you could include the polls application in any new project
-and be assured that it would find the custom templates it needed.
-
-See the :ref:`template loader documentation <template-loaders>` for more
-information about how Django finds its templates.
-
-Customize the admin index page
-==============================
-
-On a similar note, you might want to customize the look and feel of the Django
-admin index page.
-
-By default, it displays all the apps in :setting:`INSTALLED_APPS` that have been
-registered with the admin application, in alphabetical order. You may want to
-make significant changes to the layout. After all, the index is probably the
-most important page of the admin, and it should be easy to use.
-
-The template to customize is ``admin/index.html``. (Do the same as with
-``admin/base_site.html`` in the previous section -- copy it from the default
-directory to your custom template directory.) Edit the file, and you'll see it
-uses a template variable called ``app_list``. That variable contains every
-installed Django app. Instead of using that, you can hard-code links to
-object-specific admin pages in whatever way you think is best. Again,
-don't worry if you can't understand the template language -- we'll cover that
-in more detail in Tutorial 3.
-
-When you're comfortable with the admin site, read :doc:`part 3 of this tutorial
-</intro/tutorial03>` to start working on public poll views.
+When you're comfortable with the models API and have familiarized yourself with
+the admin site, read :doc:`part 3 of this tutorial</intro/tutorial03>` to learn
+about how to add more views to our polls app.

@@ -1,3 +1,4 @@
+================
 Django internals
 ================
 
@@ -10,8 +11,6 @@ you'd like to help improve Django or learn about how Django is managed.
    contributing/index
    mailing-lists
    organization
-   team
-   roles
    security
    release-process
    deprecation

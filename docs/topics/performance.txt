@@ -53,7 +53,7 @@ It's no good just guessing or assuming where the inefficiencies lie in your
 code.
 
 Django tools
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 `django-debug-toolbar
 <https://github.com/django-debug-toolbar/django-debug-toolbar/>`_ is a very
@@ -65,7 +65,7 @@ Third-party panels are also available for the toolbar, that can (for example)
 report on cache performance and template rendering times.
 
 Third-party services
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 There are a number of free services that will analyze and report on the
 performance of your site's pages from the perspective of a remote HTTP client,
@@ -96,7 +96,7 @@ most skills, learning what "looks right" takes practice, but one of the most
 useful guidelines is:
 
 Work at the appropriate level
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django offers many different ways of approaching things, but just because it's
 possible to do something in a certain way doesn't mean that it's the most
@@ -171,14 +171,14 @@ final steps towards producing well-performing code, not a shortcut.
 :class:`~django.utils.functional.cached_property`
 -------------------------------------------------
 
-It's common to have to call a class instances's method more than once. If
+It's common to have to call a class instance's method more than once. If
 that function is expensive, then doing so can be wasteful.
 
-Using the ``@cached_property`` decorator saves the value returned by a
-property; the next time the function is called on that instance, it will return
-the saved value rather than re-computing it. Note that this only works on
-methods that take ``self`` as their only argument and that it changes the
-method to a property.
+Using the :class:`~django.utils.functional.cached_property` decorator saves the
+value returned by a property; the next time the function is called on that
+instance, it will return the saved value rather than re-computing it. Note that
+this only works on methods that take ``self`` as their only argument and that
+it changes the method to a property.
 
 Certain Django components also have their own caching functionality; these are
 discussed below in the sections related to those components.
@@ -223,7 +223,7 @@ QuerySet <when-querysets-are-evaluated>`. Avoiding the premature evaluation of
 a ``QuerySet`` can save making an expensive and unnecessary trip to the
 database.
 
-Django also offers an :meth:`~django.utils.functional.allow_lazy` decorator.
+Django also offers a :meth:`~django.utils.functional.keep_lazy` decorator.
 This allows a function that has been called with a lazy argument to behave
 lazily itself, only being evaluated when it needs to be. Thus the lazy argument
 - which could be an expensive one - will not be called upon for evaluation
@@ -232,8 +232,8 @@ until it's strictly required.
 Databases
 =========
 
-:doc:`Database optimization </topics/db/optimization>`
-------------------------------------------------------
+Database optimization
+---------------------
 
 Django’s database layer provides various ways to help developers get the best
 performance from their databases. The :doc:`database optimization documentation
@@ -259,13 +259,14 @@ Django comes with a few helpful pieces of :doc:`middleware </ref/middleware>`
 that can help optimize your site's performance. They include:
 
 :class:`~django.middleware.http.ConditionalGetMiddleware`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adds support for modern browsers to conditionally GET responses based on the
-``ETag`` and ``Last-Modified`` headers.
+``ETag`` and ``Last-Modified`` headers. It also calculates and sets an ETag if
+needed.
 
 :class:`~django.middleware.gzip.GZipMiddleware`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Compresses responses for all modern browsers, saving bandwidth and transfer
 time. Note that GZipMiddleware is currently considered a security risk, and is
@@ -275,8 +276,8 @@ warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
 Sessions
 --------
 
-:ref:`Using cached sessions <cached-sessions-backend>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using cached sessions
+~~~~~~~~~~~~~~~~~~~~~
 
 :ref:`Using cached sessions <cached-sessions-backend>` may be a way to increase
 performance by eliminating the need to load session data from a slower storage
@@ -290,7 +291,7 @@ Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
@@ -302,7 +303,7 @@ long-term without missing future changes - when a file changes, so will the
 tag, so browsers will reload the asset automatically.
 
 "Minification"
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 Several third-party Django tools and packages provide the ability to "minify"
 HTML, CSS, and JavaScript. They remove unnecessary whitespace, newlines, and
@@ -410,7 +411,7 @@ performance gains for your application to outweigh the potential risks.
 With these caveats in mind, you should be aware of:
 
 `PyPy <http://pypy.org/>`_
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `PyPy <http://pypy.org/>`_ is an implementation of Python in Python itself (the
 'standard' Python implementation is in C). PyPy can offer substantial
@@ -422,7 +423,7 @@ Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 
 C implementations of Python libraries
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some Python libraries are also implemented in C, and can be much faster. They
 aim to offer the same APIs. Note that compatibility issues and behavior

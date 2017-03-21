@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -15,8 +14,8 @@ class SetupTests(SimpleTestCase):
         @setup({})
         def method(self):
             cases.append([
-                settings.TEMPLATE_STRING_IF_INVALID,
-                settings.TEMPLATE_DEBUG,
+                self.engine.string_if_invalid,
+                self.engine.debug,
             ])
 
         method(self)

@@ -1,15 +1,14 @@
 """
 Parser and utilities for the smart 'if' tag
 """
-
-
 # Using a simple top down parser, as described here:
 #    http://effbot.org/zone/simple-top-down-parsing.htm.
 # 'led' = left denotation
 # 'nud' = null denotation
 # 'bp' = binding power (left = lbp, right = rbp)
 
-class TokenBase(object):
+
+class TokenBase:
     """
     Base class for operators and literals, mainly for debugging and for throwing
     syntax errors.
@@ -32,7 +31,7 @@ class TokenBase(object):
 
     def display(self):
         """
-        Returns what to display in error messages for this node
+        Return what to display in error messages for this node
         """
         return self.id
 
@@ -43,8 +42,8 @@ class TokenBase(object):
 
 def infix(bp, func):
     """
-    Creates an infix operator, given a binding power and a function that
-    evaluates the node
+    Create an infix operator, given a binding power and a function that
+    evaluates the node.
     """
     class Operator(TokenBase):
         lbp = bp
@@ -68,7 +67,7 @@ def infix(bp, func):
 
 def prefix(bp, func):
     """
-    Creates a prefix operator, given a binding power and a function that
+    Create a prefix operator, given a binding power and a function that
     evaluates the node.
     """
     class Operator(TokenBase):
@@ -89,8 +88,6 @@ def prefix(bp, func):
 
 
 # Operator precedence follows Python.
-# NB - we can get slightly more accurate syntax error messages by not using the
-# same object for '==' and '='.
 # We defer variable evaluation to the lambda to ensure that terms are
 # lazily evaluated using Python's boolean parsing logic.
 OPERATORS = {
@@ -99,7 +96,8 @@ OPERATORS = {
     'not': prefix(8, lambda context, x: not x.eval(context)),
     'in': infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
     'not in': infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
-    '=': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
+    'is': infix(10, lambda context, x, y: x.eval(context) is y.eval(context)),
+    'is not': infix(10, lambda context, x, y: x.eval(context) is not y.eval(context)),
     '==': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '!=': infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
     '>': infix(10, lambda context, x, y: x.eval(context) > y.eval(context)),
@@ -119,7 +117,7 @@ class Literal(TokenBase):
     """
     # IfParser uses Literal in create_var, but TemplateIfParser overrides
     # create_var so that a proper implementation that actually resolves
-    # variables, filters etc is used.
+    # variables, filters etc. is used.
     id = "literal"
     lbp = 0
 
@@ -145,20 +143,24 @@ class EndToken(TokenBase):
     def nud(self, parser):
         raise parser.error_class("Unexpected end of expression in if tag.")
 
+
 EndToken = EndToken()
 
 
-class IfParser(object):
+class IfParser:
     error_class = ValueError
 
     def __init__(self, tokens):
-        # pre-pass necessary to turn  'not','in' into single token
-        l = len(tokens)
+        # Turn 'is','not' and 'not','in' into single tokens.
+        num_tokens = len(tokens)
         mapped_tokens = []
         i = 0
-        while i < l:
+        while i < num_tokens:
             token = tokens[i]
-            if token == "not" and i + 1 < l and tokens[i + 1] == "in":
+            if token == "is" and i + 1 < num_tokens and tokens[i + 1] == "not":
+                token = "is not"
+                i += 1  # skip 'not'
+            elif token == "not" and i + 1 < num_tokens and tokens[i + 1] == "in":
                 token = "not in"
                 i += 1  # skip 'in'
             mapped_tokens.append(self.translate_token(token))

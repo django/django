@@ -1,18 +1,14 @@
-from __future__ import unicode_literals
-
 import os
 
 from django.apps import apps
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
-from django.utils._os import upath
-from django.utils import six
 
 
-class EggLoadingTest(TestCase):
+class EggLoadingTest(SimpleTestCase):
 
     def setUp(self):
-        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
 
     def tearDown(self):
         apps.clear_cache()
@@ -57,12 +53,12 @@ class EggLoadingTest(TestCase):
         """Loading an app from an egg that has an import error in its models module raises that error"""
         egg_name = '%s/brokenapp.egg' % self.egg_dir
         with extend_sys_path(egg_name):
-            with six.assertRaisesRegex(self, ImportError, 'modelz'):
+            with self.assertRaisesMessage(ImportError, 'modelz'):
                 with self.settings(INSTALLED_APPS=['broken_app']):
                     pass
 
 
-class GetModelsTest(TestCase):
+class GetModelsTest(SimpleTestCase):
     def setUp(self):
         from .not_installed import models
         self.not_installed_module = models

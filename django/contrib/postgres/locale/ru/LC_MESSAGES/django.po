@@ -1,0 +1,138 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# eXtractor <evg.kirov@gmail.com>, 2015
+# Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
+# Алексей Борискин <sun.void@gmail.com>, 2015-2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-20 10:00+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"Language-Team: Russian (http://www.transifex.com/django/django/language/"
+"ru/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Дополнения для PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Элемент массива №%(nth)s не прошёл проверку:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Вложенные массивы должны иметь одинаковую длину."
+
+msgid "Map of strings to strings"
+msgstr "Ассоциативный массив, ключами и значениями которого являются строки."
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "Значение, соответствующее ключу \"%(key)s\", не является строкой."
+
+msgid "A JSON object"
+msgstr "JSON-объект"
+
+msgid "Value must be valid JSON."
+msgstr "Значение должно быть корректным JSON-ом."
+
+msgid "Could not load JSON data."
+msgstr "Не удалось загрузить JSON-данные."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Значение должно быть словарём в формате JSON."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Значение '%(value)s' должно быть корректным JSON-ом."
+
+msgid "Enter two valid values."
+msgstr "Введите два правильных значения."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Значение начала интервала не должно превышать значения его конца."
+
+msgid "Enter two whole numbers."
+msgstr "Введите два целых числа."
+
+msgid "Enter two numbers."
+msgstr "Введите два числа."
+
+msgid "Enter two valid date/times."
+msgstr "Введите две правильные даты со временем."
+
+msgid "Enter two valid dates."
+msgstr "Введите две правильные даты."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Список содержит %(show_value)d элемент, однако количество элементов не "
+"должно превышать %(limit_value)d."
+msgstr[1] ""
+"Список содержит %(show_value)d элемента, однако количество элементов не "
+"должно превышать %(limit_value)d."
+msgstr[2] ""
+"Список содержит %(show_value)d элементов, однако количество элементов не "
+"должно превышать %(limit_value)d."
+msgstr[3] ""
+"Список содержит %(show_value)d элементов, однако количество элементов не "
+"должно превышать %(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Список содержит %(show_value)d элемент, однако количество элементов должно "
+"быть не меньше %(limit_value)d."
+msgstr[1] ""
+"Список содержит %(show_value)d элемента, однако количество элементов должно "
+"быть не меньше %(limit_value)d."
+msgstr[2] ""
+"Список содержит %(show_value)d элементов, однако количество элементов должно "
+"быть не меньше %(limit_value)d."
+msgstr[3] ""
+"Список содержит %(show_value)d элементов, однако количество элементов должно "
+"быть не меньше %(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Не хватает некоторых ключей: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr ""
+"Некоторые из предоставленных ключей не входят в список известных ключей: "
+"%(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Убедитесь, что все значения, принадлежащие этому интервалу, меньше или равны "
+"%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Убедитесь, что все значения, принадлежащие этому интервалу, больше или равны "
+"%(limit_value)s."

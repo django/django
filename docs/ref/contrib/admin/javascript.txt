@@ -1,0 +1,81 @@
+======================================
+JavaScript customizations in the admin
+======================================
+
+.. _admin-javascript-inline-form-events:
+
+Inline form events
+==================
+
+You may want to execute some JavaScript when an inline form is added or removed
+in the admin change form. The ``formset:added`` and ``formset:removed`` jQuery
+events allow this. The event handler is passed three arguments:
+
+* ``event`` is the ``jQuery`` event.
+* ``$row`` is the newly added (or removed) row.
+* ``formsetName`` is the formset the row belongs to.
+
+The event is fired using the :ref:`django.jQuery namespace
+<contrib-admin-jquery>`.
+
+In your custom ``change_form.html`` template, extend the
+``admin_change_form_document_ready`` block and add the event listener code:
+
+.. code-block:: html+django
+
+    {% extends 'admin/change_form.html' %}
+    {% load static %}
+
+    {% block admin_change_form_document_ready %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}"></script>
+    {% endblock %}
+
+.. snippet:: javascript
+    :filename: app/static/app/formset_handlers.js
+
+    (function($) {
+        $(document).on('formset:added', function(event, $row, formsetName) {
+            if (formsetName == 'author_set') {
+                // Do something
+            }
+        });
+
+        $(document).on('formset:removed', function(event, $row, formsetName) {
+            // Row removed
+        });
+    })(django.jQuery);
+
+Two points to keep in mind:
+
+* The JavaScript code must go in a template block if you are inheriting
+  ``admin/change_form.html`` or it won't be rendered in the final HTML.
+* ``{{ block.super }}`` is added because Django's
+  ``admin_change_form_document_ready`` block contains JavaScript code to handle
+  various operations in the change form and we need that to be rendered too.
+
+Sometimes you'll need to work with ``jQuery`` plugins that are not registered
+in the ``django.jQuery`` namespace. To do that, simply change how the code
+listens for events. Instead of wrapping the listener in the ``django.jQuery``
+namespace, just listen to the event triggered from there. For example:
+
+.. code-block:: html+django
+
+    {% extends 'admin/change_form.html' %}
+    {% load static %}
+
+    {% block admin_change_form_document_ready %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}"></script>
+    {% endblock %}
+
+.. snippet:: javascript
+    :filename: app/static/app/unregistered_handlers.js
+
+    django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
+        // Row added
+    });
+
+    django.jQuery(document).on('formset:removed', function(event, $row, formsetName) {
+        // Row removed
+    });

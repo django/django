@@ -1,19 +1,18 @@
-{% load admin_static %}<!DOCTYPE html>
+{% load i18n static %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
 {% block extrastyle %}{% endblock %}
-<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "admin/css/ie.css" %}{% endblock %}" /><![endif]-->
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
-<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
-<script type="text/javascript">window.__admin_utc_offset__ = "{% filter escapejs %}{% now "Z" %}{% endfilter %}";</script>
 {% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
 {% load i18n %}
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
 
 <!-- Container -->
 <div id="container">
@@ -24,7 +23,8 @@
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
-        {% if user.is_active and user.is_staff %}
+        {% block usertools %}
+        {% if has_permission %}
         <div id="user-tools">
             {% block welcome-msg %}
                 {% trans 'Welcome,' %}
@@ -34,9 +34,11 @@
                 {% if site_url %}
                     <a href="{{ site_url }}">{% trans 'View site' %}</a> /
                 {% endif %}
-                {% url 'django-admindocs-docroot' as docsroot %}
-                {% if docsroot %}
-                    <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+                {% if user.is_active and user.is_staff %}
+                    {% url 'django-admindocs-docroot' as docsroot %}
+                    {% if docsroot %}
+                        <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
+                    {% endif %}
                 {% endif %}
                 {% if user.has_usable_password %}
                 <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
@@ -45,6 +47,7 @@
             {% endblock %}
         </div>
         {% endif %}
+        {% endblock %}
         {% block nav-global %}{% endblock %}
     </div>
     <!-- END Header -->

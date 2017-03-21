@@ -1,31 +1,27 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-from django.utils.six import StringIO
 import sys
+from io import StringIO
 
 from django.apps import apps
-from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
 from django.core.checks.registry import CheckRegistry
-from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
-from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.db import models
-from django.test import TestCase
-from django.test.utils import override_settings, override_system_checks
-from django.utils.encoding import force_text
+from django.test import SimpleTestCase
+from django.test.utils import (
+    isolate_apps, override_settings, override_system_checks,
+)
 
-from .models import SimpleModel
+from .models import SimpleModel, my_check
 
 
-class DummyObj(object):
+class DummyObj:
     def __repr__(self):
         return "obj"
 
 
-class SystemCheckFrameworkTests(TestCase):
+class SystemCheckFrameworkTests(SimpleTestCase):
 
     def test_register_and_run_checks(self):
 
@@ -71,78 +67,62 @@ class SystemCheckFrameworkTests(TestCase):
         self.assertEqual(sorted(errors), [4, 5])
 
 
-class MessageTests(TestCase):
+class MessageTests(SimpleTestCase):
 
     def test_printing(self):
         e = Error("Message", hint="Hint", obj=DummyObj())
         expected = "obj: Message\n\tHINT: Hint"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
     def test_printing_no_hint(self):
-        e = Error("Message", hint=None, obj=DummyObj())
+        e = Error("Message", obj=DummyObj())
         expected = "obj: Message"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
     def test_printing_no_object(self):
-        e = Error("Message", hint="Hint", obj=None)
+        e = Error("Message", hint="Hint")
         expected = "?: Message\n\tHINT: Hint"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
     def test_printing_with_given_id(self):
         e = Error("Message", hint="Hint", obj=DummyObj(), id="ID")
         expected = "obj: (ID) Message\n\tHINT: Hint"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
     def test_printing_field_error(self):
         field = SimpleModel._meta.get_field('field')
-        e = Error("Error", hint=None, obj=field)
+        e = Error("Error", obj=field)
         expected = "check_framework.SimpleModel.field: Error"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
     def test_printing_model_error(self):
-        e = Error("Error", hint=None, obj=SimpleModel)
+        e = Error("Error", obj=SimpleModel)
         expected = "check_framework.SimpleModel: Error"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
     def test_printing_manager_error(self):
         manager = SimpleModel.manager
-        e = Error("Error", hint=None, obj=manager)
+        e = Error("Error", obj=manager)
         expected = "check_framework.SimpleModel.manager: Error"
-        self.assertEqual(force_text(e), expected)
+        self.assertEqual(str(e), expected)
 
+    def test_equal_to_self(self):
+        e = Error("Error", obj=SimpleModel)
+        self.assertEqual(e, e)
 
-class Django_1_7_0_CompatibilityChecks(TestCase):
+    def test_equal_to_same_constructed_check(self):
+        e1 = Error("Error", obj=SimpleModel)
+        e2 = Error("Error", obj=SimpleModel)
+        self.assertEqual(e1, e2)
 
-    @override_settings(MIDDLEWARE_CLASSES=('django.contrib.sessions.middleware.SessionMiddleware',))
-    def test_middleware_classes_overridden(self):
-        errors = check_1_7_compatibility()
-        self.assertEqual(errors, [])
+    def test_not_equal_to_different_constructed_check(self):
+        e1 = Error("Error", obj=SimpleModel)
+        e2 = Error("Error2", obj=SimpleModel)
+        self.assertNotEqual(e1, e2)
 
-    def test_middleware_classes_not_set_explicitly(self):
-        # If MIDDLEWARE_CLASSES was set explicitly, temporarily pretend it wasn't
-        middleware_classes_overridden = False
-        if 'MIDDLEWARE_CLASSES' in settings._wrapped._explicit_settings:
-            middleware_classes_overridden = True
-            settings._wrapped._explicit_settings.remove('MIDDLEWARE_CLASSES')
-        try:
-            errors = check_1_7_compatibility()
-            expected = [
-                checks.Warning(
-                    "MIDDLEWARE_CLASSES is not set.",
-                    hint=("Django 1.7 changed the global defaults for the MIDDLEWARE_CLASSES. "
-                          "django.contrib.sessions.middleware.SessionMiddleware, "
-                          "django.contrib.auth.middleware.AuthenticationMiddleware, and "
-                          "django.contrib.messages.middleware.MessageMiddleware were removed from the defaults. "
-                          "If your project needs these middleware then you should configure this setting."),
-                    obj=None,
-                    id='1_7.W001',
-                )
-            ]
-            self.assertEqual(errors, expected)
-        finally:
-            # Restore settings value
-            if middleware_classes_overridden:
-                settings._wrapped._explicit_settings.add('MIDDLEWARE_CLASSES')
+    def test_not_equal_to_non_check(self):
+        e = Error("Error", obj=DummyObj())
+        self.assertNotEqual(e, 'a string')
 
 
 def simple_system_check(**kwargs):
@@ -152,17 +132,21 @@ def simple_system_check(**kwargs):
 
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
-    return []
+    return [checks.Warning('System Check')]
+
+
 tagged_system_check.tags = ['simpletag']
 
 
 def deployment_system_check(**kwargs):
     deployment_system_check.kwargs = kwargs
     return [checks.Warning('Deployment Check')]
+
+
 deployment_system_check.tags = ['deploymenttag']
 
 
-class CheckCommandTests(TestCase):
+class CheckCommandTests(SimpleTestCase):
 
     def setUp(self):
         simple_system_check.kwargs = None
@@ -190,12 +174,13 @@ class CheckCommandTests(TestCase):
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_tag(self):
         call_command('check', tags=['simpletag'])
-        self.assertEqual(simple_system_check.kwargs, None)
+        self.assertIsNone(simple_system_check.kwargs)
         self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
-        self.assertRaises(CommandError, call_command, 'check', tags=['missingtag'])
+        with self.assertRaises(CommandError):
+            call_command('check', tags=['missingtag'])
 
     @override_system_checks([simple_system_check])
     def test_list_tags_empty(self):
@@ -228,28 +213,21 @@ class CheckCommandTests(TestCase):
         call_command('check', deploy=True, tags=['deploymenttag'])
         self.assertIn('Deployment Check', sys.stderr.getvalue())
 
+    @override_system_checks([tagged_system_check])
+    def test_fail_level(self):
+        with self.assertRaises(CommandError):
+            call_command('check', fail_level='WARNING')
+
 
 def custom_error_system_check(app_configs, **kwargs):
-    return [
-        Error(
-            'Error',
-            hint=None,
-            id='myerrorcheck.E001',
-        )
-    ]
+    return [Error('Error', id='myerrorcheck.E001')]
 
 
 def custom_warning_system_check(app_configs, **kwargs):
-    return [
-        Warning(
-            'Warning',
-            hint=None,
-            id='mywarningcheck.E001',
-        )
-    ]
+    return [Warning('Warning', id='mywarningcheck.E001')]
 
 
-class SilencingCheckTests(TestCase):
+class SilencingCheckTests(SimpleTestCase):
 
     def setUp(self):
         self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
@@ -264,49 +242,24 @@ class SilencingCheckTests(TestCase):
     def test_silenced_error(self):
         out = StringIO()
         err = StringIO()
-        try:
-            call_command('check', stdout=out, stderr=err)
-        except CommandError:
-            self.fail("The mycheck.E001 check should be silenced.")
-        self.assertEqual(out.getvalue(), '')
-        self.assertEqual(
-            err.getvalue(),
-            'System check identified some issues:\n\n'
-            'ERRORS:\n'
-            '?: (myerrorcheck.E001) Error\n\n'
-            'System check identified 1 issue (0 silenced).\n'
-        )
+        call_command('check', stdout=out, stderr=err)
+        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
+        self.assertEqual(err.getvalue(), '')
 
     @override_settings(SILENCED_SYSTEM_CHECKS=['mywarningcheck.E001'])
     @override_system_checks([custom_warning_system_check])
     def test_silenced_warning(self):
         out = StringIO()
         err = StringIO()
-        try:
-            call_command('check', stdout=out, stderr=err)
-        except CommandError:
-            self.fail("The mycheck.E001 check should be silenced.")
-
+        call_command('check', stdout=out, stderr=err)
         self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
         self.assertEqual(err.getvalue(), '')
 
 
-class CheckFrameworkReservedNamesTests(TestCase):
-
-    def setUp(self):
-        self.current_models = apps.all_models[__package__]
-        self.saved_models = set(self.current_models)
-
-    def tearDown(self):
-        for model in (set(self.current_models) - self.saved_models):
-            del self.current_models[model]
-        apps.clear_cache()
-
-    @override_settings(
-        SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
-        INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
-    )
-    def test_model_check_method_not_shadowed(self):
+class CheckFrameworkReservedNamesTests(SimpleTestCase):
+    @isolate_apps('check_framework', kwarg_name='apps')
+    @override_system_checks([checks.model_checks.check_all_models])
+    def test_model_check_method_not_shadowed(self, apps):
         class ModelWithAttributeCalledCheck(models.Model):
             check = 42
 
@@ -317,31 +270,37 @@ class CheckFrameworkReservedNamesTests(TestCase):
             pass
 
         class ModelWithDescriptorCalledCheck(models.Model):
-            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck)
-            article = models.ForeignKey(ModelWithRelatedManagerCalledCheck, related_name='check')
+            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck, models.CASCADE)
+            article = models.ForeignKey(
+                ModelWithRelatedManagerCalledCheck,
+                models.CASCADE,
+                related_name='check',
+            )
 
-        errors = checks.run_checks()
+        errors = checks.run_checks(app_configs=apps.get_app_configs())
         expected = [
             Error(
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
                 "currently overridden by 42.",
-                hint=None,
                 obj=ModelWithAttributeCalledCheck,
                 id='models.E020'
             ),
             Error(
                 "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
-                hint=None,
                 obj=ModelWithRelatedManagerCalledCheck,
                 id='models.E020'
             ),
             Error(
                 "The 'ModelWithDescriptorCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
-                hint=None,
                 obj=ModelWithDescriptorCalledCheck,
                 id='models.E020'
             ),
         ]
         self.assertEqual(errors, expected)
+
+
+class ChecksRunDuringTests(SimpleTestCase):
+    def test_registered_check_did_run(self):
+        self.assertTrue(my_check.did_run)

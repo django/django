@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import unittest
 
@@ -8,9 +6,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
 
-from .models import (CustomPKModel, UniqueTogetherModel, UniqueFieldsModel,
-    UniqueForDateModel, ModelToValidate, Post, FlexibleDatePost,
-    UniqueErrorsModel)
+from .models import (
+    CustomPKModel, FlexibleDatePost, ModelToValidate, Post, UniqueErrorsModel,
+    UniqueFieldsModel, UniqueForDateModel, UniqueTogetherModel,
+)
 
 
 class GetUniqueCheckTests(unittest.TestCase):
@@ -40,10 +39,8 @@ class GetUniqueCheckTests(unittest.TestCase):
         objects.
         """
         data = {
-            '2-tuple': (('foo', 'bar'),
-                        (('foo', 'bar'),)),
-            'list': (['foo', 'bar'],
-                     (('foo', 'bar'),)),
+            '2-tuple': (('foo', 'bar'), (('foo', 'bar'),)),
+            'list': (['foo', 'bar'], (('foo', 'bar'),)),
             'already normalized': ((('foo', 'bar'), ('bar', 'baz')),
                                    (('foo', 'bar'), ('bar', 'baz'))),
             'set': ({('foo', 'bar'), ('bar', 'baz')},  # Ref #21469
@@ -56,7 +53,7 @@ class GetUniqueCheckTests(unittest.TestCase):
                 bar = models.IntegerField()
                 baz = models.IntegerField()
 
-                Meta = type(str('Meta'), (), {
+                Meta = type('Meta', (), {
                     'unique_together': unique_together,
                     'apps': Apps()
                 })
@@ -112,9 +109,10 @@ class PerformUniqueChecksTest(TestCase):
             mtv.full_clean()
 
     def test_unique_for_date(self):
-        Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-
+        Post.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         p = Post(title="Django 1.0 is released", posted=datetime.date(2008, 9, 3))
         with self.assertRaises(ValidationError) as cm:
             p.full_clean()
@@ -144,26 +142,22 @@ class PerformUniqueChecksTest(TestCase):
         self.assertEqual(cm.exception.message_dict, {'posted': ['This field cannot be null.']})
 
     def test_unique_for_date_with_nullable_date(self):
-        FlexibleDatePost.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-
+        """
+        unique_for_date/year/month checks shouldn't trigger when the
+        associated DateField is None.
+        """
+        FlexibleDatePost.objects.create(
+            title="Django 1.0 is released", slug="Django 1.0",
+            subtitle="Finally", posted=datetime.date(2008, 9, 3),
+        )
         p = FlexibleDatePost(title="Django 1.0 is released")
-        try:
-            p.full_clean()
-        except ValidationError:
-            self.fail("unique_for_date checks shouldn't trigger when the associated DateField is None.")
+        p.full_clean()
 
         p = FlexibleDatePost(slug="Django 1.0")
-        try:
-            p.full_clean()
-        except ValidationError:
-            self.fail("unique_for_year checks shouldn't trigger when the associated DateField is None.")
+        p.full_clean()
 
         p = FlexibleDatePost(subtitle="Finally")
-        try:
-            p.full_clean()
-        except ValidationError:
-            self.fail("unique_for_month checks shouldn't trigger when the associated DateField is None.")
+        p.full_clean()
 
     def test_unique_errors(self):
         UniqueErrorsModel.objects.create(name='Some Name', no=10)

@@ -58,13 +58,13 @@ class BashCompletionTests(unittest.TestCase):
 
     def test_django_admin_py(self):
         "django_admin.py will autocomplete option flags"
-        self._user_input('django-admin sqlall --verb')
+        self._user_input('django-admin sqlmigrate --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
     def test_manage_py(self):
         "manage.py will autocomplete option flags"
-        self._user_input('manage.py sqlall --verb')
+        self._user_input('manage.py sqlmigrate --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
@@ -78,7 +78,7 @@ class BashCompletionTests(unittest.TestCase):
         "Subcommands can be autocompleted"
         self._user_input('django-admin sql')
         output = self._run_autocomplete()
-        self.assertEqual(output, ['sql sqlall sqlclear sqlcustom sqldropindexes sqlflush sqlindexes sqlmigrate sqlsequencereset'])
+        self.assertEqual(output, ['sqlflush sqlmigrate sqlsequencereset'])
 
     def test_completed_subcommand(self):
         "Show option flags in case a subcommand is completed"
@@ -93,17 +93,12 @@ class BashCompletionTests(unittest.TestCase):
         output = self._run_autocomplete()
         self.assertEqual(output, [''])
 
-    def test_runfcgi(self):
-        "Command arguments will be autocompleted"
-        self._user_input('django-admin runfcgi h')
-        output = self._run_autocomplete()
-        self.assertEqual(output, ['host='])
-
     def test_app_completion(self):
         "Application names will be autocompleted for an AppCommand"
-        self._user_input('django-admin sqlall a')
+        self._user_input('django-admin sqlmigrate a')
         output = self._run_autocomplete()
-        a_labels = sorted(app_config.label
-            for app_config in apps.get_app_configs()
-            if app_config.label.startswith('a'))
+        a_labels = sorted(
+            app_config.label for app_config in apps.get_app_configs()
+            if app_config.label.startswith('a')
+        )
         self.assertEqual(output, a_labels)

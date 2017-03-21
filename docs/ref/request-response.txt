@@ -19,8 +19,8 @@ This document explains the APIs for :class:`HttpRequest` and
 :class:`HttpResponse` objects, which are defined in the :mod:`django.http`
 module.
 
-HttpRequest objects
-===================
+``HttpRequest`` objects
+=======================
 
 .. class:: HttpRequest
 
@@ -29,12 +29,9 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes should be considered read-only, unless stated otherwise below.
-``session`` is a notable exception.
+All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.scheme
-
-    .. versionadded:: 1.7
 
     A string representing the scheme of the request (``http`` or ``https``
     usually).
@@ -51,7 +48,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
-    the domain.
+    the scheme or domain.
 
     Example: ``"/music/bands/the_beatles/"``
 
@@ -87,6 +84,16 @@ All attributes should be considered read-only, unless stated otherwise below.
     from ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if
     you know the form data is not in the :setting:`DEFAULT_CHARSET` encoding.
 
+.. attribute:: HttpRequest.content_type
+
+    A string representing the MIME type of the request, parsed from the
+    ``CONTENT_TYPE`` header.
+
+.. attribute:: HttpRequest.content_params
+
+    A dictionary of key/value parameters included in the ``CONTENT_TYPE``
+    header.
+
 .. attribute:: HttpRequest.GET
 
     A dictionary-like object containing all given HTTP GET parameters. See the
@@ -107,21 +114,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     "POST"`` (see above).
 
     Note: ``POST`` does *not* include file-upload information. See ``FILES``.
-
-.. attribute:: HttpRequest.REQUEST
-
-    .. deprecated:: 1.7
-        Use the more explicit ``GET`` and ``POST`` instead.
-
-    For convenience, a dictionary-like object that searches ``POST`` first,
-    then ``GET``. Inspired by PHP's ``$_REQUEST``.
-
-    For example, if ``GET = {"name": "john"}`` and ``POST = {"age": '34'}``,
-    ``REQUEST["name"]`` would be ``"john"``, and ``REQUEST["age"]`` would be
-    ``"34"``.
-
-    It's strongly suggested that you use ``GET`` and ``POST`` instead of
-    ``REQUEST``, because the former are more explicit.
 
 .. attribute:: HttpRequest.COOKIES
 
@@ -147,8 +139,9 @@ All attributes should be considered read-only, unless stated otherwise below.
     Available headers depend on the client and server, but here are some
     examples:
 
-    * ``CONTENT_LENGTH`` -- the length of the request body (as a string).
-    * ``CONTENT_TYPE`` -- the MIME type of the request body.
+    * ``CONTENT_LENGTH`` -- The length of the request body (as a string).
+    * ``CONTENT_TYPE`` -- The MIME type of the request body.
+    * ``HTTP_ACCEPT`` -- Acceptable content types for the response.
     * ``HTTP_ACCEPT_ENCODING`` -- Acceptable encodings for the response.
     * ``HTTP_ACCEPT_LANGUAGE`` -- Acceptable languages for the response.
     * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
@@ -169,45 +162,74 @@ All attributes should be considered read-only, unless stated otherwise below.
     header called ``X-Bender`` would be mapped to the ``META`` key
     ``HTTP_X_BENDER``.
 
-.. attribute:: HttpRequest.user
-
-    An object of type :setting:`AUTH_USER_MODEL` representing the currently
-    logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of :class:`django.contrib.auth.models.AnonymousUser`. You
-    can tell them apart with
-    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
-
-        if request.user.is_authenticated():
-            # Do something for logged-in users.
-        else:
-            # Do something for anonymous users.
-
-    ``user`` is only available if your Django installation has the
-    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
-    activated. For more, see :doc:`/topics/auth/index`.
-
-.. attribute:: HttpRequest.session
-
-    A readable-and-writable, dictionary-like object that represents the current
-    session. This is only available if your Django installation has session
-    support activated. See the :doc:`session documentation
-    </topics/http/sessions>` for full details.
-
-.. attribute:: HttpRequest.urlconf
-
-    Not defined by Django itself, but will be read if other code (e.g., a custom
-    middleware class) sets it. When present, this will be used as the root
-    URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
-    setting. See :ref:`how-django-processes-a-request` for details.
+    Note that :djadmin:`runserver` strips all headers with underscores in the
+    name, so you won't see them in ``META``. This prevents header-spoofing
+    based on ambiguity between underscores and dashes both being normalizing to
+    underscores in WSGI environment variables. It matches the behavior of
+    Web servers like Nginx and Apache 2.4+.
 
 .. attribute:: HttpRequest.resolver_match
 
-    An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
-    the resolved url. This attribute is only set after url resolving took place,
-    which means it's available in all views but not in middleware methods which
-    are executed before url resolving takes place (like ``process_request``, you
-    can use ``process_view`` instead).
+    An instance of :class:`~django.urls.ResolverMatch` representing the
+    resolved URL. This attribute is only set after URL resolving took place,
+    which means it's available in all views but not in middleware which are
+    executed before URL resolving takes place (you can use it in
+    :meth:`process_view` though).
 
+Attributes set by application code
+----------------------------------
+
+Django doesn't set these attributes itself but makes use of them if set by your
+application.
+
+.. attribute:: HttpRequest.current_app
+
+    The :ttag:`url` template tag will use its value as the ``current_app``
+    argument to :func:`~django.urls.reverse()`.
+
+.. attribute:: HttpRequest.urlconf
+
+    This will be used as the root URLconf for the current request, overriding
+    the :setting:`ROOT_URLCONF` setting. See
+    :ref:`how-django-processes-a-request` for details.
+
+    ``urlconf`` can be set to ``None`` to revert any changes made by previous
+    middleware and return to using the :setting:`ROOT_URLCONF`.
+
+Attributes set by middleware
+----------------------------
+
+Some of the middleware included in Django's contrib apps set attributes on the
+request. If you don't see the attribute on a request, be sure the appropriate
+middleware class is listed in :setting:`MIDDLEWARE`.
+
+.. attribute:: HttpRequest.session
+
+    From the :class:`~django.contrib.sessions.middleware.SessionMiddleware`: A
+    readable and writable, dictionary-like object that represents the current
+    session.
+
+.. attribute:: HttpRequest.site
+
+    From the :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`:
+    An instance of :class:`~django.contrib.sites.models.Site` or
+    :class:`~django.contrib.sites.requests.RequestSite` as returned by
+    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    representing the current site.
+
+.. attribute:: HttpRequest.user
+
+    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    An instance of :setting:`AUTH_USER_MODEL` representing the currently
+    logged-in user. If the user isn't currently logged in, ``user`` will be set
+    to an instance of :class:`~django.contrib.auth.models.AnonymousUser`. You
+    can tell them apart with
+    :attr:`~django.contrib.auth.models.User.is_authenticated`, like so::
+
+        if request.user.is_authenticated:
+            ... # Do something for logged-in users.
+        else:
+            ... # Do something for anonymous users.
 
 Methods
 -------
@@ -226,7 +248,9 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            class MultipleProxyMiddleware(object):
+            from django.utils.deprecation import MiddlewareMixin
+
+            class MultipleProxyMiddleware(MiddlewareMixin):
                 FORWARDED_FOR_FIELDS = [
                     'HTTP_X_FORWARDED_FOR',
                     'HTTP_X_FORWARDED_HOST',
@@ -249,6 +273,12 @@ Methods
         :class:`~django.middleware.common.CommonMiddleware` or
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
+.. method:: HttpRequest.get_port()
+
+    Returns the originating port of the request using information from the
+    ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
+    and ``SERVER_PORT`` ``META`` variables, in that order.
+
 .. method:: HttpRequest.get_full_path()
 
     Returns the ``path``, plus an appended query string, if applicable.
@@ -264,7 +294,15 @@ Methods
     Otherwise the absolute URI is built using the server variables available in
     this request.
 
-    Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+    Example: ``"https://example.com/music/bands/the_beatles/?print=true"``
+
+    .. note::
+
+        Mixing HTTP and HTTPS on the same site is discouraged, therefore
+        :meth:`~HttpRequest.build_absolute_uri()` will always generate an
+        absolute URI with the same scheme the current request has. If you need
+        to redirect users to HTTPS, it's best to let your Web server redirect
+        all HTTP traffic to HTTPS.
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
@@ -285,10 +323,10 @@ Methods
         'Tony'
         >>> request.get_signed_cookie('name', salt='name-salt')
         'Tony' # assuming cookie was set using the same salt
-        >>> request.get_signed_cookie('non-existing-cookie')
+        >>> request.get_signed_cookie('nonexistent-cookie')
         ...
-        KeyError: 'non-existing-cookie'
-        >>> request.get_signed_cookie('non-existing-cookie', False)
+        KeyError: 'nonexistent-cookie'
+        >>> request.get_signed_cookie('nonexistent-cookie', False)
         False
         >>> request.get_signed_cookie('cookie-that-was-tampered-with')
         ...
@@ -317,7 +355,7 @@ Methods
     If a response varies on whether or not it's requested via AJAX and you are
     using some form of caching like Django's :mod:`cache middleware
     <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    :func:`vary_on_headers('X-Requested-With')
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
@@ -330,7 +368,7 @@ Methods
     Methods implementing a file-like interface for reading from an
     HttpRequest instance. This makes it possible to consume an incoming
     request in a streaming fashion. A common use-case would be to process a
-    big XML payload with iterative parser without constructing a whole
+    big XML payload with an iterative parser without constructing a whole
     XML tree in memory.
 
     Given this standard interface, an HttpRequest instance can be
@@ -341,8 +379,8 @@ Methods
             process(element)
 
 
-QueryDict objects
-=================
+``QueryDict`` objects
+=====================
 
 .. class:: QueryDict
 
@@ -378,11 +416,17 @@ a subclass of dictionary. Exceptions are outlined here:
     ``mutable=True`` to its ``__init__()``.
 
     Strings for setting both keys and values will be converted from ``encoding``
-    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+    to ``str``. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
 
-    .. versionchanged:: 1.8
+.. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
-        In previous versions, ``query_string`` was a required positional argument.
+    .. versionadded:: 1.11
+
+    Creates a new ``QueryDict`` with keys from ``iterable`` and each value
+    equal to ``value``. For example::
+
+        >>> QueryDict.fromkeys(['a', 'a', 'b'], value='val')
+        <QueryDict: {'a': ['val', 'val'], 'b': ['val']}>
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -404,12 +448,12 @@ a subclass of dictionary. Exceptions are outlined here:
     Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
     in request.GET``.
 
-.. method:: QueryDict.get(key, default)
+.. method:: QueryDict.get(key, default=None)
 
     Uses the same logic as ``__getitem__()`` above, with a hook for returning a
     default value if the key doesn't exist.
 
-.. method:: QueryDict.setdefault(key, default)
+.. method:: QueryDict.setdefault(key, default=None)
 
     Just like the standard dictionary ``setdefault()`` method, except it uses
     ``__setitem__()`` internally.
@@ -425,7 +469,7 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.getlist('a')
         ['1', '2']
         >>> q['a'] # returns the last
-        ['2']
+        '2'
 
 .. method:: QueryDict.items()
 
@@ -436,17 +480,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.items()
         [('a', '3')]
 
-.. method:: QueryDict.iteritems()
-
-    Just like the standard dictionary ``iteritems()`` method. Like
-    :meth:`QueryDict.items()` this uses the same last-value logic as
-    :meth:`QueryDict.__getitem__()`.
-
-.. method:: QueryDict.iterlists()
-
-    Like :meth:`QueryDict.iteritems()` except it includes all values, as a list,
-    for each member of the dictionary.
-
 .. method:: QueryDict.values()
 
     Just like the standard dictionary ``values()`` method, except this uses the
@@ -456,10 +489,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.values()
         ['3']
 
-.. method:: QueryDict.itervalues()
-
-    Just like :meth:`QueryDict.values()`, except an iterator.
-
 In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.copy()
@@ -467,12 +496,12 @@ In addition, ``QueryDict`` has the following methods:
     Returns a copy of the object, using ``copy.deepcopy()`` from the Python
     standard library. This copy will be mutable even if the original was not.
 
-.. method:: QueryDict.getlist(key, default)
+.. method:: QueryDict.getlist(key, default=None)
 
     Returns the data with the requested key, as a Python list. Returns an
     empty list if the key doesn't exist and no default value was provided.
     It's guaranteed to return a list of some sort unless the default value
-    was no list.
+    provided is not a list.
 
 .. method:: QueryDict.setlist(key, list_)
 
@@ -482,7 +511,7 @@ In addition, ``QueryDict`` has the following methods:
 
     Appends an item to the internal list associated with key.
 
-.. method:: QueryDict.setlistdefault(key, default_list)
+.. method:: QueryDict.setlistdefault(key, default_list=None)
 
     Just like ``setdefault``, except it takes a list of values instead of a
     single value.
@@ -526,7 +555,7 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.dict()
         {'a': '5'}
 
-.. method:: QueryDict.urlencode([safe])
+.. method:: QueryDict.urlencode(safe=None)
 
     Returns a string of the data in query-string format. Example::
 
@@ -542,8 +571,8 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.urlencode(safe='/')
         'next=/a%26b/'
 
-HttpResponse objects
-====================
+``HttpResponse`` objects
+========================
 
 .. class:: HttpResponse
 
@@ -579,7 +608,8 @@ Passing iterators
 
 Finally, you can pass ``HttpResponse`` an iterator rather than strings.
 ``HttpResponse`` will consume the iterator immediately, store its content as a
-string, and discard it.
+string, and discard it. Objects with a ``close()`` method such as files and
+generators are immediately closed.
 
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
@@ -624,12 +654,9 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A bytestring representing the content, encoded from a Unicode
-    object if necessary.
+    A bytestring representing the content, encoded from a string if necessary.
 
 .. attribute:: HttpResponse.charset
-
-    .. versionadded:: 1.8
 
     A string denoting the charset in which the response will be encoded. If not
     given at ``HttpResponse`` instantiation time, it will be extracted from
@@ -638,11 +665,19 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The `HTTP status code`_ for the response.
+    The :rfc:`HTTP status code <7231#section-6>` for the response.
+
+    Unless :attr:`reason_phrase` is explicitly set, modifying the value of
+    ``status_code`` outside the constructor will also modify the value of
+    ``reason_phrase``.
 
 .. attribute:: HttpResponse.reason_phrase
 
-    The HTTP reason phrase for the response.
+    The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
+    <7231#section-6.1>` default reason phrases.
+
+    Unless explicitly set, ``reason_phrase`` is determined by the value of
+    :attr:`status_code`.
 
 .. attribute:: HttpResponse.streaming
 
@@ -652,8 +687,6 @@ Attributes
     differently from regular responses.
 
 .. attribute:: HttpResponse.closed
-
-    .. versionadded:: 1.8
 
     ``True`` if the response has been closed.
 
@@ -676,7 +709,7 @@ Methods
     specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
-    ``status`` is the `HTTP status code`_ for the response.
+    ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -684,10 +717,6 @@ Methods
     ``charset`` is the charset in which the response will be encoded. If not
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
-
-    .. versionadded:: 1.8
-
-        The ``charset`` parameter was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -709,8 +738,6 @@ Methods
     header with the given name.
 
 .. method:: HttpResponse.setdefault(header, value)
-
-    .. versionadded:: 1.8
 
     Sets a header unless it has already been set.
 
@@ -738,7 +765,7 @@ Methods
       header. It is not part of the :rfc:`2109` standard for cookies,
       and it isn't honored consistently by all browsers. However,
       when it is honored, it can be a useful way to mitigate the
-      risk of client side script accessing the protected cookie
+      risk of a client-side script from accessing the protected cookie
       data.
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
@@ -783,31 +810,33 @@ Methods
 
 .. method:: HttpResponse.getvalue()
 
-    .. versionadded:: 1.8
-
     Returns the value of :attr:`HttpResponse.content`. This method makes
     an :class:`HttpResponse` instance a stream-like object.
 
-.. method:: HttpResponse.writable()
+.. method:: HttpResponse.readable()
 
-    .. versionadded:: 1.8
+    Always ``False``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.seekable()
+
+    Always ``False``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.writable()
 
     Always ``True``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
 
 .. method:: HttpResponse.writelines(lines)
 
-    .. versionadded:: 1.8
-
     Writes a list of lines to the response. Line separators are not added. This
     method makes an :class:`HttpResponse` instance a stream-like object.
 
-.. _HTTP status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
-
 .. _ref-httpresponse-subclasses:
 
-HttpResponse subclasses
------------------------
+``HttpResponse`` subclasses
+---------------------------
 
 Django includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
@@ -817,8 +846,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     The first argument to the constructor is required -- the path to redirect
     to. This can be a fully qualified URL
-    (e.g. ``'http://www.yahoo.com/search/'``) or an absolute path with no
-    domain (e.g. ``'/search/'``). See :class:`HttpResponse` for other optional
+    (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
+    (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
+    last case, the client browser will reconstruct the full URL itself
+    according to the current path. See :class:`HttpResponse` for other optional
     constructor arguments. Note that this returns an HTTP status code 302.
 
     .. attribute:: HttpResponseRedirect.url
@@ -870,34 +901,33 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
-JsonResponse objects
-====================
+``JsonResponse`` objects
+========================
 
-.. versionadded:: 1.7
+.. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
 
-.. class:: JsonResponse
+    An :class:`HttpResponse` subclass that helps to create a JSON-encoded
+    response. It inherits most behavior from its superclass with a couple
+    differences:
 
-.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
+    Its default ``Content-Type`` header is set to ``application/json``.
 
-   An :class:`HttpResponse` subclass that helps to create a JSON-encoded
-   response. It inherits most behavior from its superclass with a couple
-   differences:
+    The first parameter, ``data``, should be a ``dict`` instance. If the
+    ``safe`` parameter is set to ``False`` (see below) it can be any
+    JSON-serializable object.
 
-   Its default ``Content-Type`` header is set to ``application/json``.
+    The ``encoder``, which defaults to
+    :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to
+    serialize the data. See :ref:`JSON serialization
+    <serialization-formats-json>` for more details about this serializer.
 
-   The first parameter, ``data``, should be a ``dict`` instance. If the ``safe``
-   parameter is set to ``False`` (see below) it can be any JSON-serializable
-   object.
+    The ``safe`` boolean parameter defaults to ``True``. If it's set to
+    ``False``, any object can be passed for serialization (otherwise only
+    ``dict`` instances are allowed). If ``safe`` is ``True`` and a non-``dict``
+    object is passed as the first argument, a :exc:`TypeError` will be raised.
 
-   The ``encoder``, which defaults to
-   ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
-   serialize the data. See :ref:`JSON serialization
-   <serialization-formats-json>` for more details about this serializer.
-
-   The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
-   any object can be passed for serialization (otherwise only ``dict`` instances
-   are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
-   the first argument, a :exc:`TypeError` will be raised.
+    The ``json_dumps_params`` parameter is a dictionary of keyword arguments
+    to pass to the ``json.dumps()`` call used to generate the response.
 
 Usage
 -----
@@ -907,8 +937,7 @@ Typical usage could look like::
     >>> from django.http import JsonResponse
     >>> response = JsonResponse({'foo': 'bar'})
     >>> response.content
-    '{"foo": "bar"}'
-
+    b'{"foo": "bar"}'
 
 Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -922,8 +951,8 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 
 .. warning::
 
-    Before the `5th edition of EcmaScript
-    <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_
+    Before the `5th edition of ECMAScript
+    <http://www.ecma-international.org/ecma-262/5.1/index.html#sec-11.1.4>`_
     it was possible to poison the JavaScript ``Array`` constructor. For this
     reason, Django does not allow passing non-dict objects to the
     :class:`~django.http.JsonResponse` constructor by default.  However, most
@@ -940,8 +969,8 @@ parameter to the constructor method::
 
 .. _httpresponse-streaming:
 
-StreamingHttpResponse objects
-=============================
+``StreamingHttpResponse`` objects
+=================================
 
 .. class:: StreamingHttpResponse
 
@@ -977,8 +1006,8 @@ with the following notable differences:
 :class:`StreamingHttpResponse` should only be used in situations where it is
 absolutely required that the whole content isn't iterated before transferring
 the data to the client. Because the content can't be accessed, many
-middlewares can't function normally. For example the ``ETag`` and ``Content-
-Length`` headers can't be generated for streaming responses.
+middlewares can't function normally. For example the ``ETag`` and
+``Content-Length`` headers can't be generated for streaming responses.
 
 Attributes
 ----------
@@ -989,12 +1018,36 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.status_code
 
-    The `HTTP status code`_ for the response.
+    The :rfc:`HTTP status code <7231#section-6>` for the response.
+
+    Unless :attr:`reason_phrase` is explicitly set, modifying the value of
+    ``status_code`` outside the constructor will also modify the value of
+    ``reason_phrase``.
 
 .. attribute:: StreamingHttpResponse.reason_phrase
 
-    The HTTP reason phrase for the response.
+    The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
+    <7231#section-6.1>` default reason phrases.
+
+    Unless explicitly set, ``reason_phrase`` is determined by the value of
+    :attr:`status_code`.
 
 .. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
+
+``FileResponse`` objects
+========================
+
+.. class:: FileResponse
+
+:class:`FileResponse` is a subclass of :class:`StreamingHttpResponse` optimized
+for binary files. It uses `wsgi.file_wrapper`_ if provided by the wsgi server,
+otherwise it streams the file out in small chunks.
+
+.. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
+
+``FileResponse`` expects a file open in binary mode like so::
+
+    >>> from django.http import FileResponse
+    >>> response = FileResponse(open('myfile.png', 'rb'))

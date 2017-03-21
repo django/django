@@ -1,53 +1,79 @@
-# -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
-from __future__ import unicode_literals
-
-import copy
 import datetime
-from decimal import Decimal, Rounded
 import re
 import threading
 import unittest
 import warnings
+from decimal import Decimal, Rounded
+from unittest import mock
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
-from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, reset_queries, transaction)
-from django.db.backends import BaseDatabaseWrapper
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connection, connections,
+    reset_queries, transaction,
+)
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
-from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.utils import format_number, CursorWrapper
-from django.db.models import Sum, Avg, Variance, StdDev
+from django.db.backends.utils import CursorWrapper, format_number
+from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
-from django.test import (TestCase, TransactionTestCase, mock, override_settings,
-    skipUnlessDBFeature, skipIfDBFeature)
-from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
-from django.utils import six
-from django.utils.six.moves import range
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+    skipIfDBFeature, skipUnlessDBFeature,
+)
 
-from . import models
+from .models import (
+    Article, Item, Object, ObjectReference, Person, Post, RawData, Reporter,
+    ReporterProxy, SchoolClass, Square,
+    VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ,
+)
 
 
-class DummyBackendTest(TestCase):
+class DatabaseWrapperTests(SimpleTestCase):
+
+    def test_initialization_class_attributes(self):
+        """
+        The "initialization" class attributes like client_class and
+        creation_class should be set on the class and reflected in the
+        corresponding instance attributes of the instantiated backend.
+        """
+        conn = connections[DEFAULT_DB_ALIAS]
+        conn_class = type(conn)
+        attr_names = [
+            ('client_class', 'client'),
+            ('creation_class', 'creation'),
+            ('features_class', 'features'),
+            ('introspection_class', 'introspection'),
+            ('ops_class', 'ops'),
+            ('validation_class', 'validation'),
+        ]
+        for class_attr_name, instance_attr_name in attr_names:
+            class_attr_value = getattr(conn_class, class_attr_name)
+            self.assertIsNotNone(class_attr_value)
+            instance_attr_value = getattr(conn, instance_attr_name)
+            self.assertIsInstance(instance_attr_value, class_attr_value)
+
+
+class DummyBackendTest(SimpleTestCase):
 
     def test_no_databases(self):
         """
-        Test that empty DATABASES setting default to the dummy backend.
+        Empty DATABASES setting default to the dummy backend.
         """
         DATABASES = {}
         conns = ConnectionHandler(DATABASES)
-        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
-            'django.db.backends.dummy')
+        self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'], 'django.db.backends.dummy')
+        with self.assertRaises(ImproperlyConfigured):
+            conns[DEFAULT_DB_ALIAS].ensure_connection()
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', "Test only for Oracle")
 class OracleTests(unittest.TestCase):
 
     def test_quote_name(self):
-        # Check that '%' chars are escaped for query execution.
+        # '%' chars are escaped for query execution.
         name = '"SOME%NAME"'
         quoted_name = connection.ops.quote_name(name)
         self.assertEqual(quoted_name % (), name)
@@ -55,11 +81,8 @@ class OracleTests(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        from django.db.backends.oracle.base import convert_unicode
-
         with connection.cursor() as cursor:
-            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
-                            [convert_unicode('_django_testing!')])
+            cursor.callproc('DBMS_SESSION.SET_IDENTIFIER', ['_django_testing!'])
 
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables
@@ -76,7 +99,7 @@ class OracleTests(unittest.TestCase):
         # than 4000 chars and read it properly
         with connection.cursor() as cursor:
             cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(six.text_type(x) for x in range(4000))
+            long_str = ''.join(str(x) for x in range(4000))
             cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
             cursor.execute('SELECT text FROM ltext')
             row = cursor.fetchone()
@@ -95,7 +118,7 @@ class OracleTests(unittest.TestCase):
         # NLS parameters as per #18465.
         with connection.cursor() as cursor:
             query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
-            # Test that the query succeeds without errors - pre #18465 this
+            # The query succeeds without errors - pre #18465 this
             # wasn't the case.
             cursor.execute(query)
             self.assertEqual(cursor.fetchone()[0], 1)
@@ -108,81 +131,96 @@ class SQLiteTests(TestCase):
 
     def test_autoincrement(self):
         """
-        Check that auto_increment fields are created with the AUTOINCREMENT
-        keyword in order to be monotonically increasing. Refs #10164.
+        auto_increment fields are created with the AUTOINCREMENT keyword
+        in order to be monotonically increasing. Refs #10164.
         """
         with connection.schema_editor(collect_sql=True) as editor:
-            editor.create_model(models.Square)
+            editor.create_model(Square)
             statements = editor.collected_sql
         match = re.search('"id" ([^,]+),', statements[0])
         self.assertIsNotNone(match)
-        self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1), "Wrong SQL used to create an auto-increment "
-            "column on SQLite")
+        self.assertEqual(
+            'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1),
+            "Wrong SQL used to create an auto-increment column on SQLite"
+        )
 
     def test_aggregation(self):
         """
         #19360: Raise NotImplementedError when aggregating on date/time fields.
         """
         for aggregate in (Sum, Avg, Variance, StdDev):
-            self.assertRaises(NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('time'))
-            self.assertRaises(NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('date'))
-            self.assertRaises(NotImplementedError,
-                models.Item.objects.all().aggregate, aggregate('last_modified'))
+            with self.assertRaises(NotImplementedError):
+                Item.objects.all().aggregate(aggregate('time'))
+            with self.assertRaises(NotImplementedError):
+                Item.objects.all().aggregate(aggregate('date'))
+            with self.assertRaises(NotImplementedError):
+                Item.objects.all().aggregate(aggregate('last_modified'))
+            with self.assertRaises(NotImplementedError):
+                Item.objects.all().aggregate(
+                    **{'complex': aggregate('last_modified') + aggregate('last_modified')}
+                )
+
+    def test_memory_db_test_name(self):
+        """
+        A named in-memory db should be allowed where supported.
+        """
+        from django.db.backends.sqlite3.base import DatabaseWrapper
+        settings_dict = {
+            'TEST': {
+                'NAME': 'file:memorydb_test?mode=memory&cache=shared',
+            }
+        }
+        wrapper = DatabaseWrapper(settings_dict)
+        creation = wrapper.creation
+        if creation.connection.features.can_share_in_memory_db:
+            expected = creation.connection.settings_dict['TEST']['NAME']
+            self.assertEqual(creation._get_test_db_name(), expected)
+        else:
+            msg = (
+                "Using a shared memory database with `mode=memory` in the "
+                "database name is not supported in your environment, "
+                "use `:memory:` instead."
+            )
+            with self.assertRaisesMessage(ImproperlyConfigured, msg):
+                creation._get_test_db_name()
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
 class PostgreSQLTests(TestCase):
 
-    def assert_parses(self, version_string, version):
-        self.assertEqual(pg_version._parse_version(version_string), version)
+    def test_nodb_connection(self):
+        """
+        The _nodb_connection property fallbacks to the default connection
+        database when access to the 'postgres' database is not granted.
+        """
+        def mocked_connect(self):
+            if self.settings_dict['NAME'] is None:
+                raise DatabaseError()
+            return ''
 
-    def test_parsing(self):
-        """Test PostgreSQL version parsing from `SELECT version()` output"""
-        self.assert_parses("PostgreSQL 9.3 beta4", 90300)
-        self.assert_parses("PostgreSQL 9.3", 90300)
-        self.assert_parses("EnterpriseDB 9.3", 90300)
-        self.assert_parses("PostgreSQL 9.3.6", 90306)
-        self.assert_parses("PostgreSQL 9.4beta1", 90400)
-        self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
+        nodb_conn = connection._nodb_connection
+        self.assertIsNone(nodb_conn.settings_dict['NAME'])
 
-    def test_version_detection(self):
-        """Test PostgreSQL version detection"""
-
-        # Helper mocks
-        class CursorMock(object):
-            "Very simple mock of DB-API cursor"
-            def execute(self, arg):
-                pass
-
-            def fetchone(self):
-                return ["PostgreSQL 9.3"]
-
-            def __enter__(self):
-                return self
-
-            def __exit__(self, type, value, traceback):
-                pass
-
-        class OlderConnectionMock(object):
-            "Mock of psycopg2 (< 2.0.12) connection"
-            def cursor(self):
-                return CursorMock()
-
-        # psycopg2 < 2.0.12 code path
-        conn = OlderConnectionMock()
-        self.assertEqual(pg_version.get_version(conn), 90300)
+        # Now assume the 'postgres' db isn't available
+        with warnings.catch_warnings(record=True) as w:
+            with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
+                            side_effect=mocked_connect, autospec=True):
+                warnings.simplefilter('always', RuntimeWarning)
+                nodb_conn = connection._nodb_connection
+        self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
+        # Check a RuntimeWarning has been emitted
+        self.assertEqual(len(w), 1)
+        self.assertEqual(w[0].message.__class__, RuntimeWarning)
 
     def test_connect_and_rollback(self):
         """
         PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
         transaction is rolled back (#17062).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+
         try:
             # Ensure the database default time zone is different than
             # the time zone in new_connection.settings_dict. We can
@@ -194,17 +232,22 @@ class PostgreSQLTests(TestCase):
             new_tz = 'Europe/Paris' if db_default_tz == 'UTC' else 'UTC'
             new_connection.close()
 
+            # Invalidate timezone name cache, because the setting_changed
+            # handler cannot know about new_connection.
+            del new_connection.timezone_name
+
             # Fetch a new connection with the new_tz as default
             # time zone, run a query and rollback.
-            new_connection.settings_dict['TIME_ZONE'] = new_tz
-            new_connection.set_autocommit(False)
-            cursor = new_connection.cursor()
-            new_connection.rollback()
+            with self.settings(TIME_ZONE=new_tz):
+                new_connection.set_autocommit(False)
+                cursor = new_connection.cursor()
+                new_connection.rollback()
 
-            # Now let's see if the rollback rolled back the SET TIME ZONE.
-            cursor.execute("SHOW TIMEZONE")
-            tz = cursor.fetchone()[0]
-            self.assertEqual(new_tz, tz)
+                # Now let's see if the rollback rolled back the SET TIME ZONE.
+                cursor.execute("SHOW TIMEZONE")
+                tz = cursor.fetchone()[0]
+                self.assertEqual(new_tz, tz)
+
         finally:
             new_connection.close()
 
@@ -213,14 +256,41 @@ class PostgreSQLTests(TestCase):
         The connection wrapper shouldn't believe that autocommit is enabled
         after setting the time zone when AUTOCOMMIT is False (#21452).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        databases[DEFAULT_DB_ALIAS]['AUTOCOMMIT'] = False
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+        new_connection.settings_dict['AUTOCOMMIT'] = False
+
         try:
             # Open a database connection.
             new_connection.cursor()
             self.assertFalse(new_connection.get_autocommit())
+        finally:
+            new_connection.close()
+
+    def test_connect_isolation_level(self):
+        """
+        Regression test for #18130 and #24318.
+        """
+        import psycopg2
+        from psycopg2.extensions import (
+            ISOLATION_LEVEL_READ_COMMITTED as read_committed,
+            ISOLATION_LEVEL_SERIALIZABLE as serializable,
+        )
+
+        # Since this is a django.test.TestCase, a transaction is in progress
+        # and the isolation level isn't reported as 0. This test assumes that
+        # PostgreSQL is configured with the default isolation level.
+
+        # Check the level on the psycopg2 connection, not the Django wrapper.
+        default_level = read_committed if psycopg2.__version__ < '2.7' else None
+        self.assertEqual(connection.connection.isolation_level, default_level)
+
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable
+        try:
+            # Start a transaction so the isolation level isn't reported as 0.
+            new_connection.set_autocommit(False)
+            # Check the level on the psycopg2 connection, not the Django wrapper.
+            self.assertEqual(new_connection.connection.isolation_level, serializable)
         finally:
             new_connection.close()
 
@@ -240,7 +310,7 @@ class PostgreSQLTests(TestCase):
         self.assertEqual(a[0], b[0])
 
     def test_lookup_cast(self):
-        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+        from django.db.backends.postgresql.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
         for lookup in ('iexact', 'contains', 'icontains', 'startswith',
@@ -248,14 +318,14 @@ class PostgreSQLTests(TestCase):
             self.assertIn('::text', do.lookup_cast(lookup))
 
     def test_correct_extraction_psycopg2_version(self):
-        from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper
-        version_path = 'django.db.backends.postgresql_psycopg2.base.Database.__version__'
+        from django.db.backends.postgresql.base import psycopg2_version
+        version_path = 'django.db.backends.postgresql.base.Database.__version__'
 
         with mock.patch(version_path, '2.6.9'):
-            self.assertEqual(DatabaseWrapper.psycopg2_version.__get__(self), (2, 6, 9))
+            self.assertEqual(psycopg2_version(), (2, 6, 9))
 
         with mock.patch(version_path, '2.5.dev0'):
-            self.assertEqual(DatabaseWrapper.psycopg2_version.__get__(self), (2, 5))
+            self.assertEqual(psycopg2_version(), (2, 5))
 
 
 class DateQuotingTest(TestCase):
@@ -263,28 +333,21 @@ class DateQuotingTest(TestCase):
     def test_django_date_trunc(self):
         """
         Test the custom ``django_date_trunc method``, in particular against
-        fields which clash with strings passed to it (e.g. 'year') - see
-        #12818__.
-
-        __: http://code.djangoproject.com/ticket/12818
-
+        fields which clash with strings passed to it (e.g. 'year') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
-        models.SchoolClass.objects.create(year=2009, last_updated=updated)
-        years = models.SchoolClass.objects.dates('last_updated', 'year')
+        SchoolClass.objects.create(year=2009, last_updated=updated)
+        years = SchoolClass.objects.dates('last_updated', 'year')
         self.assertEqual(list(years), [datetime.date(2010, 1, 1)])
 
     def test_django_date_extract(self):
         """
         Test the custom ``django_date_extract method``, in particular against fields
-        which clash with strings passed to it (e.g. 'day') - see #12818__.
-
-        __: http://code.djangoproject.com/ticket/12818
-
+        which clash with strings passed to it (e.g. 'day') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
-        models.SchoolClass.objects.create(year=2009, last_updated=updated)
-        classes = models.SchoolClass.objects.filter(last_updated__day=20)
+        SchoolClass.objects.create(year=2009, last_updated=updated)
+        classes = SchoolClass.objects.filter(last_updated__day=20)
         self.assertEqual(len(classes), 1)
 
 
@@ -297,36 +360,53 @@ class LastExecutedQueryTest(TestCase):
         query has been run.
         """
         cursor = connection.cursor()
-        try:
-            connection.ops.last_executed_query(cursor, '', ())
-        except Exception:
-            self.fail("'last_executed_query' should not raise an exception.")
+        connection.ops.last_executed_query(cursor, '', ())
 
     def test_debug_sql(self):
-        list(models.Reporter.objects.filter(first_name="test"))
+        list(Reporter.objects.filter(first_name="test"))
         sql = connection.queries[-1]['sql'].lower()
         self.assertIn("select", sql)
-        self.assertIn(models.Reporter._meta.db_table, sql)
+        self.assertIn(Reporter._meta.db_table, sql)
 
     def test_query_encoding(self):
-        """
-        Test that last_executed_query() returns an Unicode string
-        """
-        data = models.RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
+        """last_executed_query() returns a string."""
+        data = RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = data.query.sql_with_params()
         cursor = data.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
-        self.assertIsInstance(last_sql, six.text_type)
+        self.assertIsInstance(last_sql, str)
 
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This test is specific to SQLite.")
     def test_no_interpolation_on_sqlite(self):
-        # Regression for #17158
-        # This shouldn't raise an exception
+        # This shouldn't raise an exception (##17158)
         query = "SELECT strftime('%Y', 'now');"
         connection.cursor().execute(query)
-        self.assertEqual(connection.queries[-1]['sql'],
-            str_prefix("QUERY = %(_)s\"SELECT strftime('%%Y', 'now');\" - PARAMS = ()"))
+        self.assertEqual(connection.queries[-1]['sql'], query)
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This test is specific to SQLite.")
+    def test_parameter_quoting_on_sqlite(self):
+        # The implementation of last_executed_queries isn't optimal. It's
+        # worth testing that parameters are quoted. See #14091.
+        query = "SELECT %s"
+        params = ["\"'\\"]
+        connection.cursor().execute(query, params)
+        # Note that the single quote is repeated
+        substituted = "SELECT '\"''\\'"
+        self.assertEqual(connection.queries[-1]['sql'], substituted)
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This test is specific to SQLite.")
+    def test_large_number_of_parameters_on_sqlite(self):
+        # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
+        # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
+        # can hit the SQLITE_MAX_COLUMN limit. See #26063.
+        cursor = connection.cursor()
+        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
+        params = list(range(2001))
+        # This should not raise an exception.
+        cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
 
 
 class ParameterHandlingTest(TestCase):
@@ -339,13 +419,12 @@ class ParameterHandlingTest(TestCase):
             connection.ops.quote_name('root'),
             connection.ops.quote_name('square')
         ))
-        self.assertRaises(Exception, cursor.executemany, query, [(1, 2, 3)])
-        self.assertRaises(Exception, cursor.executemany, query, [(1,)])
+        with self.assertRaises(Exception):
+            cursor.executemany(query, [(1, 2, 3)])
+        with self.assertRaises(Exception):
+            cursor.executemany(query, [(1,)])
 
 
-# Unfortunately, the following tests would be a good test to run on all
-# backends, but it breaks MySQL hard. Until #13711 is fixed, it can't be run
-# everywhere (although it would be an effective test of #13711).
 class LongNameTest(TransactionTestCase):
     """Long primary keys and model names can result in a sequence name
     that exceeds the database limits, which will result in truncation
@@ -357,21 +436,27 @@ class LongNameTest(TransactionTestCase):
 
     def test_sequence_name_length_limits_create(self):
         """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
-        models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
     def test_sequence_name_length_limits_m2m(self):
-        """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
-        obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
-        rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
+        """
+        An m2m save of a model with a long name and a long m2m field name
+        doesn't error (#8901).
+        """
+        obj = VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        rel_obj = Person.objects.create(first_name='Django', last_name='Reinhardt')
         obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
     def test_sequence_name_length_limits_flush(self):
-        """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
+        """
+        Sequence resetting as part of a flush with model with long name and
+        long pk name doesn't error (#8901).
+        """
         # A full flush is expensive to the full test, so we dig into the
         # internals to generate the likely offending SQL and run it manually
 
         # Some convenience aliases
-        VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        VLM = VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
         VLM_m2m = VLM.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.through
         tables = [
             VLM._meta.db_table,
@@ -393,17 +478,17 @@ class SequenceResetTest(TestCase):
     def test_generic_relation(self):
         "Sequence names are correct when resetting generic relations (Ref #13941)"
         # Create an object with a manually specified PK
-        models.Post.objects.create(id=10, name='1st post', text='hello world')
+        Post.objects.create(id=10, name='1st post', text='hello world')
 
         # Reset the sequences for the database
         cursor = connection.cursor()
-        commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [models.Post])
+        commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [Post])
         for sql in commands:
             cursor.execute(sql)
 
         # If we create a new object now, it should have a PK greater
         # than the PK we specified manually.
-        obj = models.Post.objects.create(name='New post', text='goodbye world')
+        obj = Post.objects.create(name='New post', text='goodbye world')
         self.assertGreater(obj.pk, 10)
 
 
@@ -454,7 +539,7 @@ class EscapingChecks(TestCase):
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This is an sqlite-specific issue")
     def test_sqlite_parameter_escaping(self):
-        #13648: '%s' escaping support for sqlite3
+        # '%s' escaping support for sqlite3 #13648
         cursor = connection.cursor()
         cursor.execute("select strftime('%s', date('now'))")
         response = cursor.fetchall()[0][0]
@@ -476,7 +561,7 @@ class BackendTestCase(TransactionTestCase):
 
     def create_squares(self, args, paramstyle, multiple):
         cursor = connection.cursor()
-        opts = models.Square._meta
+        opts = Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
@@ -492,76 +577,80 @@ class BackendTestCase(TransactionTestCase):
             cursor.execute(query, args)
 
     def test_cursor_executemany(self):
-        #4896: Test cursor.executemany
+        # Test cursor.executemany #4896
         args = [(i, i ** 2) for i in range(-5, 6)]
         self.create_squares_with_executemany(args)
-        self.assertEqual(models.Square.objects.count(), 11)
+        self.assertEqual(Square.objects.count(), 11)
         for i in range(-5, 6):
-            square = models.Square.objects.get(root=i)
+            square = Square.objects.get(root=i)
             self.assertEqual(square.square, i ** 2)
 
     def test_cursor_executemany_with_empty_params_list(self):
-        #4765: executemany with params=[] does nothing
+        # Test executemany with params=[] does nothing #4765
         args = []
         self.create_squares_with_executemany(args)
-        self.assertEqual(models.Square.objects.count(), 0)
+        self.assertEqual(Square.objects.count(), 0)
 
     def test_cursor_executemany_with_iterator(self):
-        #10320: executemany accepts iterators
+        # Test executemany accepts iterators #10320
         args = iter((i, i ** 2) for i in range(-3, 2))
         self.create_squares_with_executemany(args)
-        self.assertEqual(models.Square.objects.count(), 5)
+        self.assertEqual(Square.objects.count(), 5)
 
         args = iter((i, i ** 2) for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
-        self.assertEqual(models.Square.objects.count(), 9)
+        self.assertEqual(Square.objects.count(), 9)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_execute_with_pyformat(self):
-        #10070: Support pyformat style passing of parameters
+        # Support pyformat style passing of parameters #10070
         args = {'root': 3, 'square': 9}
         self.create_squares(args, 'pyformat', multiple=False)
-        self.assertEqual(models.Square.objects.count(), 1)
+        self.assertEqual(Square.objects.count(), 1)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat(self):
-        #10070: Support pyformat style passing of parameters
+        # Support pyformat style passing of parameters #10070
         args = [{'root': i, 'square': i ** 2} for i in range(-5, 6)]
         self.create_squares(args, 'pyformat', multiple=True)
-        self.assertEqual(models.Square.objects.count(), 11)
+        self.assertEqual(Square.objects.count(), 11)
         for i in range(-5, 6):
-            square = models.Square.objects.get(root=i)
+            square = Square.objects.get(root=i)
             self.assertEqual(square.square, i ** 2)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat_iterator(self):
         args = iter({'root': i, 'square': i ** 2} for i in range(-3, 2))
         self.create_squares(args, 'pyformat', multiple=True)
-        self.assertEqual(models.Square.objects.count(), 5)
+        self.assertEqual(Square.objects.count(), 5)
 
         args = iter({'root': i, 'square': i ** 2} for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares(args, 'pyformat', multiple=True)
-        self.assertEqual(models.Square.objects.count(), 9)
+        self.assertEqual(Square.objects.count(), 9)
 
     def test_unicode_fetches(self):
-        #6254: fetchone, fetchmany, fetchall return strings as unicode objects
+        # fetchone, fetchmany, fetchall return strings as unicode objects #6254
         qn = connection.ops.quote_name
-        models.Person(first_name="John", last_name="Doe").save()
-        models.Person(first_name="Jane", last_name="Doe").save()
-        models.Person(first_name="Mary", last_name="Agnelline").save()
-        models.Person(first_name="Peter", last_name="Parker").save()
-        models.Person(first_name="Clark", last_name="Kent").save()
-        opts2 = models.Person._meta
+        Person(first_name="John", last_name="Doe").save()
+        Person(first_name="Jane", last_name="Doe").save()
+        Person(first_name="Mary", last_name="Agnelline").save()
+        Person(first_name="Peter", last_name="Parker").save()
+        Person(first_name="Clark", last_name="Kent").save()
+        opts2 = Person._meta
         f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
-        query2 = ('SELECT %s, %s FROM %s ORDER BY %s'
-          % (qn(f3.column), qn(f4.column), connection.introspection.table_name_converter(opts2.db_table),
-             qn(f3.column)))
         cursor = connection.cursor()
-        cursor.execute(query2)
+        cursor.execute(
+            'SELECT %s, %s FROM %s ORDER BY %s' % (
+                qn(f3.column),
+                qn(f4.column),
+                connection.introspection.table_name_converter(opts2.db_table),
+                qn(f3.column),
+            )
+        )
         self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
         self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
         self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
@@ -587,7 +676,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_database_operations_init(self):
         """
-        Test that DatabaseOperations initialization doesn't query the database.
+        DatabaseOperations initialization doesn't query the database.
         See #17656.
         """
         with self.assertNumQueries(0):
@@ -599,15 +688,15 @@ class BackendTestCase(TransactionTestCase):
         self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
 
     def test_duplicate_table_error(self):
-        """ Test that creating an existing table returns a DatabaseError """
+        """ Creating an existing table returns a DatabaseError """
         cursor = connection.cursor()
-        query = 'CREATE TABLE %s (id INTEGER);' % models.Article._meta.db_table
+        query = 'CREATE TABLE %s (id INTEGER);' % Article._meta.db_table
         with self.assertRaises(DatabaseError):
             cursor.execute(query)
 
     def test_cursor_contextmanager(self):
         """
-        Test that cursors can be used as a context manager
+        Cursors can be used as a context manager
         """
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
@@ -632,9 +721,7 @@ class BackendTestCase(TransactionTestCase):
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_is_usable_after_database_disconnects(self):
         """
-        Test that is_usable() doesn't crash when the database disconnects.
-
-        Regression for #21553.
+        is_usable() doesn't crash when the database disconnects (#21553).
         """
         # Open a connection to the database.
         with connection.cursor():
@@ -664,7 +751,7 @@ class BackendTestCase(TransactionTestCase):
 
         self.assertIsInstance(connection.queries, list)
         self.assertIsInstance(connection.queries[0], dict)
-        six.assertCountEqual(self, connection.queries[0].keys(), ['sql', 'time'])
+        self.assertCountEqual(connection.queries[0].keys(), ['sql', 'time'])
 
         reset_queries()
         self.assertEqual(0, len(connection.queries))
@@ -674,14 +761,11 @@ class BackendTestCase(TransactionTestCase):
     @override_settings(DEBUG=True)
     def test_queries_limit(self):
         """
-        Test that the backend doesn't store an unlimited number of queries.
-
-        Regression for #12581.
+        The backend doesn't store an unlimited number of queries (#12581).
         """
         old_queries_limit = BaseDatabaseWrapper.queries_limit
         BaseDatabaseWrapper.queries_limit = 3
-        new_connections = ConnectionHandler(settings.DATABASES)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
 
         # Initialize the connection and clear initialization statements.
         with new_connection.cursor():
@@ -704,12 +788,18 @@ class BackendTestCase(TransactionTestCase):
             with warnings.catch_warnings(record=True) as w:
                 self.assertEqual(3, len(new_connection.queries))
                 self.assertEqual(1, len(w))
-                self.assertEqual(str(w[0].message), "Limit for query logging "
-                    "exceeded, only the last 3 queries will be returned.")
-
+                self.assertEqual(
+                    str(w[0].message),
+                    "Limit for query logging exceeded, only the last 3 queries will be returned."
+                )
         finally:
             BaseDatabaseWrapper.queries_limit = old_queries_limit
             new_connection.close()
+
+    def test_timezone_none_use_tz_false(self):
+        connection.ensure_connection()
+        with self.settings(TIME_ZONE=None, USE_TZ=False):
+            connection.init_connection_state()
 
 
 # We don't make these tests conditional because that means we would need to
@@ -725,14 +815,14 @@ class FkConstraintsTests(TransactionTestCase):
 
     def setUp(self):
         # Create a Reporter.
-        self.r = models.Reporter.objects.create(first_name='John', last_name='Smith')
+        self.r = Reporter.objects.create(first_name='John', last_name='Smith')
 
     def test_integrity_checks_on_creation(self):
         """
         Try to create a model instance that violates a FK constraint. If it
         fails it should fail with IntegrityError.
         """
-        a1 = models.Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
+        a1 = Article(headline="This is a test", pub_date=datetime.datetime(2005, 7, 27), reporter_id=30)
         try:
             a1.save()
         except IntegrityError:
@@ -740,11 +830,14 @@ class FkConstraintsTests(TransactionTestCase):
         else:
             self.skipTest("This backend does not support integrity checks.")
         # Now that we know this backend supports integrity checks we make sure
-        # constraints are also enforced for proxy models. Refs #17519
-        a2 = models.Article(headline='This is another test', reporter=self.r,
-                            pub_date=datetime.datetime(2012, 8, 3),
-                            reporter_proxy_id=30)
-        self.assertRaises(IntegrityError, a2.save)
+        # constraints are also enforced for proxy  Refs #17519
+        a2 = Article(
+            headline='This is another test', reporter=self.r,
+            pub_date=datetime.datetime(2012, 8, 3),
+            reporter_proxy_id=30,
+        )
+        with self.assertRaises(IntegrityError):
+            a2.save()
 
     def test_integrity_checks_on_update(self):
         """
@@ -752,9 +845,9 @@ class FkConstraintsTests(TransactionTestCase):
         If it fails it should fail with IntegrityError.
         """
         # Create an Article.
-        models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+        Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
         # Retrieve it from the DB
-        a1 = models.Article.objects.get(headline="Test article")
+        a1 = Article.objects.get(headline="Test article")
         a1.reporter_id = 30
         try:
             a1.save()
@@ -763,26 +856,34 @@ class FkConstraintsTests(TransactionTestCase):
         else:
             self.skipTest("This backend does not support integrity checks.")
         # Now that we know this backend supports integrity checks we make sure
-        # constraints are also enforced for proxy models. Refs #17519
+        # constraints are also enforced for proxy  Refs #17519
         # Create another article
-        r_proxy = models.ReporterProxy.objects.get(pk=self.r.pk)
-        models.Article.objects.create(headline='Another article',
-                                      pub_date=datetime.datetime(1988, 5, 15),
-                                      reporter=self.r, reporter_proxy=r_proxy)
-        # Retreive the second article from the DB
-        a2 = models.Article.objects.get(headline='Another article')
+        r_proxy = ReporterProxy.objects.get(pk=self.r.pk)
+        Article.objects.create(
+            headline='Another article',
+            pub_date=datetime.datetime(1988, 5, 15),
+            reporter=self.r, reporter_proxy=r_proxy,
+        )
+        # Retrieve the second article from the DB
+        a2 = Article.objects.get(headline='Another article')
         a2.reporter_proxy_id = 30
-        self.assertRaises(IntegrityError, a2.save)
+        with self.assertRaises(IntegrityError):
+            a2.save()
 
     def test_disable_constraint_checks_manually(self):
         """
-        When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
+        When constraint checks are disabled, should be able to write bad data
+        without IntegrityErrors.
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
-            a = models.Article.objects.get(headline="Test article")
+            a = Article.objects.get(headline="Test article")
             a.reporter_id = 30
             try:
                 connection.disable_constraint_checking()
@@ -794,13 +895,18 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_disable_constraint_checks_context_manager(self):
         """
-        When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
+        When constraint checks are disabled (using context manager), should be
+        able to write bad data without IntegrityErrors.
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
-            a = models.Article.objects.get(headline="Test article")
+            a = Article.objects.get(headline="Test article")
             a.reporter_id = 30
             try:
                 with connection.constraint_checks_disabled():
@@ -815,9 +921,13 @@ class FkConstraintsTests(TransactionTestCase):
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
-            a = models.Article.objects.get(headline="Test article")
+            a = Article.objects.get(headline="Test article")
             a.reporter_id = 30
             with connection.constraint_checks_disabled():
                 a.save()
@@ -832,9 +942,8 @@ class ThreadTests(TransactionTestCase):
 
     def test_default_connection_thread_local(self):
         """
-        Ensure that the default connection (i.e. django.db.connection) is
-        different for each thread.
-        Refs #17258.
+        The default connection (i.e. django.db.connection) is different for
+        each thread (#17258).
         """
         # Map connections by id because connections with identical aliases
         # have the same hash.
@@ -856,7 +965,7 @@ class ThreadTests(TransactionTestCase):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        # Check that each created connection got different inner connection.
+        # Each created connection got different inner connection.
         self.assertEqual(
             len(set(conn.connection for conn in connections_dict.values())),
             3)
@@ -869,8 +978,7 @@ class ThreadTests(TransactionTestCase):
 
     def test_connections_thread_local(self):
         """
-        Ensure that the connections are different for each thread.
-        Refs #17258.
+        The connections are different for each thread (#17258).
         """
         # Map connections by id because connections with identical aliases
         # have the same hash.
@@ -899,17 +1007,16 @@ class ThreadTests(TransactionTestCase):
 
     def test_pass_connection_between_threads(self):
         """
-        Ensure that a connection can be passed from one thread to the other.
-        Refs #17258.
+        A connection can be passed from one thread to the other (#17258).
         """
-        models.Person.objects.create(first_name="John", last_name="Doe")
+        Person.objects.create(first_name="John", last_name="Doe")
 
         def do_thread():
             def runner(main_thread_connection):
                 from django.db import connections
                 connections['default'] = main_thread_connection
                 try:
-                    models.Person.objects.get(first_name="John", last_name="Doe")
+                    Person.objects.get(first_name="John", last_name="Doe")
                 except Exception as e:
                     exceptions.append(e)
             t = threading.Thread(target=runner, args=[connections['default']])
@@ -938,9 +1045,8 @@ class ThreadTests(TransactionTestCase):
 
     def test_closing_non_shared_connections(self):
         """
-        Ensure that a connection that is not explicitly shareable cannot be
-        closed by another thread.
-        Refs #17258.
+        A connection that is not explicitly shareable cannot be closed by
+        another thread (#17258).
         """
         # First, without explicitly enabling the connection for sharing.
         exceptions = set()
@@ -989,41 +1095,41 @@ class MySQLPKZeroTests(TestCase):
     @skipIfDBFeature('allows_auto_pk_0')
     def test_zero_as_autoval(self):
         with self.assertRaises(ValueError):
-            models.Square.objects.create(id=0, root=0, square=1)
+            Square.objects.create(id=0, root=0, square=1)
 
 
 class DBConstraintTestCase(TestCase):
 
     def test_can_reference_existent(self):
-        obj = models.Object.objects.create()
-        ref = models.ObjectReference.objects.create(obj=obj)
+        obj = Object.objects.create()
+        ref = ObjectReference.objects.create(obj=obj)
         self.assertEqual(ref.obj, obj)
 
-        ref = models.ObjectReference.objects.get(obj=obj)
+        ref = ObjectReference.objects.get(obj=obj)
         self.assertEqual(ref.obj, obj)
 
     def test_can_reference_non_existent(self):
-        self.assertFalse(models.Object.objects.filter(id=12345).exists())
-        ref = models.ObjectReference.objects.create(obj_id=12345)
-        ref_new = models.ObjectReference.objects.get(obj_id=12345)
+        self.assertFalse(Object.objects.filter(id=12345).exists())
+        ref = ObjectReference.objects.create(obj_id=12345)
+        ref_new = ObjectReference.objects.get(obj_id=12345)
         self.assertEqual(ref, ref_new)
 
-        with self.assertRaises(models.Object.DoesNotExist):
+        with self.assertRaises(Object.DoesNotExist):
             ref.obj
 
     def test_many_to_many(self):
-        obj = models.Object.objects.create()
+        obj = Object.objects.create()
         obj.related_objects.create()
-        self.assertEqual(models.Object.objects.count(), 2)
+        self.assertEqual(Object.objects.count(), 2)
         self.assertEqual(obj.related_objects.count(), 1)
 
-        intermediary_model = models.Object._meta.get_field_by_name("related_objects")[0].rel.through
+        intermediary_model = Object._meta.get_field("related_objects").remote_field.through
         intermediary_model.objects.create(from_object_id=obj.id, to_object_id=12345)
         self.assertEqual(obj.related_objects.count(), 1)
         self.assertEqual(intermediary_model.objects.count(), 2)
 
 
-class BackendUtilTests(TestCase):
+class BackendUtilTests(SimpleTestCase):
 
     def test_format_number(self):
         """
@@ -1078,124 +1184,19 @@ class BackendUtilTests(TestCase):
                   '1234600000')
 
 
-class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
+@unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite specific test.')
+@skipUnlessDBFeature('can_share_in_memory_db')
+class TestSqliteThreadSharing(TransactionTestCase):
+    available_apps = ['backends']
 
-    mismatch_msg = ("Connection 'test-deprecation' has mismatched TEST "
-                    "and TEST_* database settings.")
+    def test_database_sharing_in_threads(self):
+        def create_object():
+            Object.objects.create()
 
-    @classmethod
-    def setUpClass(cls):
-        super(DBTestSettingsRenamedTests, cls).setUpClass()
-        # Silence "UserWarning: Overriding setting DATABASES can lead to
-        # unexpected behavior."
-        cls.warning_classes.append(UserWarning)
+        create_object()
 
-    def setUp(self):
-        super(DBTestSettingsRenamedTests, self).setUp()
-        self.handler = ConnectionHandler()
-        self.db_settings = {'default': {}}
+        thread = threading.Thread(target=create_object)
+        thread.start()
+        thread.join()
 
-    def test_mismatched_database_test_settings_1(self):
-        # if the TEST setting is used, all TEST_* keys must appear in it.
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {},
-                'TEST_NAME': 'foo',
-            }
-        })
-        with override_settings(DATABASES=self.db_settings):
-            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
-                self.handler.prepare_test_settings('test-deprecation')
-
-    def test_mismatched_database_test_settings_2(self):
-        # if the TEST setting is used, all TEST_* keys must match.
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {'NAME': 'foo'},
-                'TEST_NAME': 'bar',
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
-                self.handler.prepare_test_settings('test-deprecation')
-
-    def test_mismatched_database_test_settings_3(self):
-        # Verifies the mapping of an aliased key.
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {'CREATE_DB': 'foo'},
-                'TEST_CREATE': 'bar',
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
-                self.handler.prepare_test_settings('test-deprecation')
-
-    def test_mismatched_database_test_settings_4(self):
-        # Verifies the mapping of an aliased key when the aliased key is missing.
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {},
-                'TEST_CREATE': 'bar',
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
-                self.handler.prepare_test_settings('test-deprecation')
-
-    def test_mismatched_settings_old_none(self):
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {'CREATE_DB': None},
-                'TEST_CREATE': '',
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
-                self.handler.prepare_test_settings('test-deprecation')
-
-    def test_mismatched_settings_new_none(self):
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {},
-                'TEST_CREATE': None,
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
-                self.handler.prepare_test_settings('test-deprecation')
-
-    def test_matched_test_settings(self):
-        # should be able to define new settings and the old, if they match
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {'NAME': 'foo'},
-                'TEST_NAME': 'foo',
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            self.handler.prepare_test_settings('test-deprecation')
-
-    def test_new_settings_only(self):
-        # should be able to define new settings without the old
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST': {'NAME': 'foo'},
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            self.handler.prepare_test_settings('test-deprecation')
-
-    def test_old_settings_only(self):
-        # should be able to define old settings without the new
-        self.db_settings.update({
-            'test-deprecation': {
-                'TEST_NAME': 'foo',
-            },
-        })
-        with override_settings(DATABASES=self.db_settings):
-            self.handler.prepare_test_settings('test-deprecation')
-
-    def test_empty_settings(self):
-        with override_settings(DATABASES=self.db_settings):
-            self.handler.prepare_test_settings('default')
+        self.assertEqual(Object.objects.count(), 2)

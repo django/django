@@ -1,9 +1,8 @@
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Episode(models.Model):
@@ -12,12 +11,11 @@ class Episode(models.Model):
     author = models.CharField(max_length=100, blank=True)
 
 
-@python_2_unicode_compatible
 class Media(models.Model):
     """
     Media that can associated to any object.
     """
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
     url = models.URLField()
@@ -36,11 +34,11 @@ class Category(models.Model):
 
 
 class PhoneNumber(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     phone_number = models.CharField(max_length=30)
-    category = models.ForeignKey(Category, null=True, blank=True)
+    category = models.ForeignKey(Category, models.SET_NULL, null=True, blank=True)
 
     class Meta:
         unique_together = (('content_type', 'object_id', 'phone_number',),)
@@ -48,7 +46,7 @@ class PhoneNumber(models.Model):
 
 class Contact(models.Model):
     name = models.CharField(max_length=50)
-    phone_numbers = GenericRelation(PhoneNumber)
+    phone_numbers = GenericRelation(PhoneNumber, related_query_name='phone_numbers')
 
 
 #

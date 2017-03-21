@@ -9,11 +9,11 @@ Settings
 .. warning::
 
     Be careful when you override settings, especially when the default value
-    is a non-empty tuple or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
-    and :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the
-    components required by the features of Django you wish to use.
+    is a non-empty list or dictionary, such as :setting:`STATICFILES_FINDERS`.
+    Make sure you keep the components required by the features of Django you
+    wish to use.
 
-Core settings
+Core Settings
 =============
 
 Here's a list of settings available in Django core and their default values.
@@ -23,8 +23,8 @@ guide </topics/settings>`.
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
-ABSOLUTE_URL_OVERRIDES
-----------------------
+``ABSOLUTE_URL_OVERRIDES``
+--------------------------
 
 Default: ``{}`` (Empty dictionary)
 
@@ -40,39 +40,33 @@ a model object and return its URL. This is a way of inserting or overriding
 Note that the model name used in this setting should be all lower-case, regardless
 of the case of the actual model class name.
 
-.. versionchanged:: 1.7.1
-
-    ``ABSOLUTE_URL_OVERRIDES`` now works on models that don't declare
-    ``get_absolute_url()``.
-
 .. setting:: ADMINS
 
-ADMINS
-------
+``ADMINS``
+----------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple that lists people who get code error notifications. When
+A list of all the people who get code error notifications. When
 ``DEBUG=False`` and a view raises an exception, Django will email these people
-with the full exception information. Each member of the tuple should be a tuple
+with the full exception information. Each item in the list should be a tuple
 of (Full name, email address). Example::
 
-    (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+    [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
 
 Note that Django will email *all* of these people whenever an error happens.
 See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_HOSTS
 
-ALLOWED_HOSTS
--------------
+``ALLOWED_HOSTS``
+-----------------
 
 Default: ``[]`` (Empty list)
 
 A list of strings representing the host/domain names that this Django site can
-serve. This is a security measure to prevent an attacker from poisoning caches
-and password reset emails with links to malicious hosts by submitting requests
-with a fake HTTP ``Host`` header, which is possible even under many
+serve. This is a security measure to prevent :ref:`HTTP Host header attacks
+<host-headers-virtual-hosting>`, which are possible even under many
 seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
@@ -83,58 +77,41 @@ can be used as a subdomain wildcard: ``'.example.com'`` will match
 ``example.com``. A value of ``'*'`` will match anything; in this case you are
 responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
-:setting:`MIDDLEWARE_CLASSES`).
+:setting:`MIDDLEWARE`).
 
-.. versionchanged:: 1.7
+Django also allows the `fully qualified domain name (FQDN)`_ of any entries.
+Some browsers include a trailing dot in the ``Host`` header which Django
+strips when performing host validation.
 
-    In previous versions of Django, if you wanted to also allow the
-    `fully qualified domain name (FQDN)`_, which some browsers can send in the
-    ``Host`` header, you had to explicitly add another ``ALLOWED_HOSTS`` entry
-    that included a trailing period. This entry could also be a subdomain
-    wildcard::
-
-        ALLOWED_HOSTS = [
-            '.example.com',  # Allow domain and subdomains
-            '.example.com.',  # Also allow FQDN and subdomains
-        ]
-
-    In Django 1.7, the trailing dot is stripped when performing host validation,
-    thus an entry with a trailing dot isn't required.
-
-.. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
+.. _`fully qualified domain name (FQDN)`: https://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
 list, the :meth:`django.http.HttpRequest.get_host()` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
-When :setting:`DEBUG` is ``True`` or when running tests, host validation is
-disabled; any host will be accepted. Thus it's usually only necessary to set it
-in production.
+When :setting:`DEBUG` is ``True`` and ``ALLOWED_HOSTS`` is empty, the host
+is validated against ``['localhost', '127.0.0.1', '[::1]']``.
+
+``ALLOWED_HOSTS`` is also :ref:`checked when running tests
+<topics-testing-advanced-multiple-hosts>`.
 
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
-.. setting:: ALLOWED_INCLUDE_ROOTS
+.. versionchanged:: 1.11
 
-ALLOWED_INCLUDE_ROOTS
----------------------
+    In older versions, ``ALLOWED_HOSTS`` wasn't checked when running tests.
 
-Default: ``()`` (Empty tuple)
-
-A tuple of strings representing allowed prefixes for the ``{% ssi %}`` template
-tag. This is a security measure, so that template authors can't access files
-that they shouldn't be accessing.
-
-For example, if :setting:`ALLOWED_INCLUDE_ROOTS` is ``('/home/html', '/var/www')``,
-then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
-wouldn't.
+    In older versions, ``ALLOWED_HOSTS`` wasn't checked if ``DEBUG=True``.
+    This was also changed in Django 1.10.3, 1.9.11, and 1.8.16 to prevent a
+    DNS rebinding attack.
 
 .. setting:: APPEND_SLASH
 
-APPEND_SLASH
-------------
+``APPEND_SLASH``
+----------------
 
 Default: ``True``
 
@@ -149,8 +126,8 @@ The :setting:`APPEND_SLASH` setting is only used if
 
 .. setting:: CACHES
 
-CACHES
-------
+``CACHES``
+----------
 
 Default::
 
@@ -172,8 +149,8 @@ The following cache options are available.
 
 .. setting:: CACHES-BACKEND
 
-BACKEND
-~~~~~~~
+``BACKEND``
+~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -192,8 +169,8 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
 .. setting:: CACHES-KEY_FUNCTION
 
-KEY_FUNCTION
-~~~~~~~~~~~~
+``KEY_FUNCTION``
+~~~~~~~~~~~~~~~~
 
 A string containing a dotted path to a function (or any callable) that defines how to
 compose a prefix, version and key into a final cache key. The default
@@ -210,8 +187,8 @@ information.
 
 .. setting:: CACHES-KEY_PREFIX
 
-KEY_PREFIX
-~~~~~~~~~~
+``KEY_PREFIX``
+~~~~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -222,8 +199,8 @@ See the :ref:`cache documentation <cache_key_prefixing>` for more information.
 
 .. setting:: CACHES-LOCATION
 
-LOCATION
-~~~~~~~~
+``LOCATION``
+~~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -240,35 +217,32 @@ identifying name for a local memory cache. e.g.::
 
 .. setting:: CACHES-OPTIONS
 
-OPTIONS
-~~~~~~~
+``OPTIONS``
+~~~~~~~~~~~
 
-Default: None
+Default: ``None``
 
 Extra parameters to pass to the cache backend. Available parameters
 vary depending on your cache backend.
 
 Some information on available parameters can be found in the
-:doc:`Cache Backends </topics/cache>` documentation. For more information,
+:ref:`cache arguments <cache_arguments>` documentation. For more information,
 consult your backend module's own documentation.
 
 .. setting:: CACHES-TIMEOUT
 
-TIMEOUT
-~~~~~~~
+``TIMEOUT``
+~~~~~~~~~~~
 
-Default: 300
+Default: ``300``
 
-The number of seconds before a cache entry is considered stale.
-
-.. versionadded:: 1.7
-
-If the value of this settings is ``None``, cache entries will not expire.
+The number of seconds before a cache entry is considered stale. If the value of
+this settings is ``None``, cache entries will not expire.
 
 .. setting:: CACHES-VERSION
 
-VERSION
-~~~~~~~
+``VERSION``
+~~~~~~~~~~~
 
 Default: ``1``
 
@@ -278,8 +252,8 @@ See the :ref:`cache documentation <cache_versioning>` for more information.
 
 .. setting:: CACHE_MIDDLEWARE_ALIAS
 
-CACHE_MIDDLEWARE_ALIAS
-----------------------
+``CACHE_MIDDLEWARE_ALIAS``
+--------------------------
 
 Default: ``default``
 
@@ -288,8 +262,8 @@ The cache connection to use for the :ref:`cache middleware
 
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
-CACHE_MIDDLEWARE_KEY_PREFIX
----------------------------
+``CACHE_MIDDLEWARE_KEY_PREFIX``
+-------------------------------
 
 Default: ``''`` (Empty string)
 
@@ -301,8 +275,8 @@ See :doc:`/topics/cache`.
 
 .. setting:: CACHE_MIDDLEWARE_SECONDS
 
-CACHE_MIDDLEWARE_SECONDS
-------------------------
+``CACHE_MIDDLEWARE_SECONDS``
+----------------------------
 
 Default: ``600``
 
@@ -315,12 +289,10 @@ See :doc:`/topics/cache`.
 
 .. setting:: CSRF_COOKIE_AGE
 
-CSRF_COOKIE_AGE
----------------
+``CSRF_COOKIE_AGE``
+-------------------
 
-.. versionadded:: 1.7
-
-Default: ``31449600`` (1 year, in seconds)
+Default: ``31449600`` (approximately 1 year, in seconds)
 
 The age of CSRF cookies, in seconds.
 
@@ -331,14 +303,14 @@ would fail in this case.
 
 Some browsers (specifically Internet Explorer) can disallow the use of
 persistent cookies or can have the indexes to the cookie jar corrupted on disk,
-thereby causing CSRF protection checks to fail (and sometimes intermittently).
+thereby causing CSRF protection checks to (sometimes intermittently) fail.
 Change this setting to ``None`` to use session-based CSRF cookies, which
 keep the cookies in-memory instead of on persistent storage.
 
 .. setting:: CSRF_COOKIE_DOMAIN
 
-CSRF_COOKIE_DOMAIN
-------------------
+``CSRF_COOKIE_DOMAIN``
+----------------------
 
 Default: ``None``
 
@@ -354,35 +326,44 @@ protection is safe from cross-subdomain attacks by default - please see the
 
 .. setting:: CSRF_COOKIE_HTTPONLY
 
-CSRF_COOKIE_HTTPONLY
---------------------
+``CSRF_COOKIE_HTTPONLY``
+------------------------
 
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
 
-This can help prevent malicious JavaScript from bypassing CSRF protection. If
-you enable this and need to send the value of the CSRF token with Ajax requests,
-your JavaScript will need to pull the value from a hidden CSRF token form input
-on the page instead of from the cookie.
+Designating the CSRF cookie as ``HttpOnly`` doesn't offer any practical
+protection because CSRF is only to protect against cross-domain attacks. If an
+attacker can read the cookie via JavaScript, they're already on the same domain
+as far as the browser knows, so they can do anything they like anyway. (XSS is
+a much bigger hole than CSRF.)
+
+Although the setting offers little practical benefit, it's sometimes required
+by security auditors.
+
+If you enable this and need to send the value of the CSRF token with an AJAX
+request, your JavaScript must pull the value from a hidden CSRF token form
+input on the page instead of from the cookie.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
 
-CSRF_COOKIE_NAME
-----------------
+``CSRF_COOKIE_NAME``
+--------------------
 
 Default: ``'csrftoken'``
 
-The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/csrf`.
+The name of the cookie to use for the CSRF authentication token. This can be
+whatever you want (as long as it's different from the other cookie names in
+your application). See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
-CSRF_COOKIE_PATH
-----------------
+``CSRF_COOKIE_PATH``
+--------------------
 
 Default: ``'/'``
 
@@ -395,40 +376,94 @@ its own CSRF cookie.
 
 .. setting:: CSRF_COOKIE_SECURE
 
-CSRF_COOKIE_SECURE
-------------------
+``CSRF_COOKIE_SECURE``
+----------------------
 
 Default: ``False``
 
 Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
 the cookie will be marked as "secure," which means browsers may ensure that the
-cookie is only sent under an HTTPS connection.
+cookie is only sent with an HTTPS connection.
+
+.. setting:: CSRF_USE_SESSIONS
+
+``CSRF_USE_SESSIONS``
+---------------------
+
+.. versionadded:: 1.11
+
+Default: ``False``
+
+Whether to store the CSRF token in the user's session instead of in a cookie.
+It requires the use of :mod:`django.contrib.sessions`.
+
+Storing the CSRF token in a cookie (Django's default) is safe, but storing it
+in the session is common practice in other web frameworks and therefore
+sometimes demanded by security auditors.
 
 .. setting:: CSRF_FAILURE_VIEW
 
-CSRF_FAILURE_VIEW
------------------
+``CSRF_FAILURE_VIEW``
+---------------------
 
 Default: ``'django.views.csrf.csrf_failure'``
 
-A dotted path to the view function to be used when an incoming request
-is rejected by the CSRF protection.  The function should have this signature::
+A dotted path to the view function to be used when an incoming request is
+rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
+this signature::
 
-  def csrf_failure(request, reason="")
+    def csrf_failure(request, reason=""):
+        ...
 
-where ``reason`` is a short message (intended for developers or logging, not for
-end users) indicating the reason the request was rejected.  See
-:doc:`/ref/csrf`.
+where ``reason`` is a short message (intended for developers or logging, not
+for end users) indicating the reason the request was rejected. It should return
+an :class:`~django.http.HttpResponseForbidden`.
+
+``django.views.csrf.csrf_failure()`` accepts an additional ``template_name``
+parameter that defaults to ``'403_csrf.html'``. If a template with that name
+exists, it will be used to render the page.
+
+.. setting:: CSRF_HEADER_NAME
+
+``CSRF_HEADER_NAME``
+--------------------
+
+Default: ``'HTTP_X_CSRFTOKEN'``
+
+The name of the request header used for CSRF authentication.
+
+As with other HTTP headers in ``request.META``, the header name received from
+the server is normalized by converting all characters to uppercase, replacing
+any hyphens with underscores, and adding an ``'HTTP_'`` prefix to the name.
+For example, if your client sends a ``'X-XSRF-TOKEN'`` header, the setting
+should be ``'HTTP_X_XSRF_TOKEN'``.
+
+.. setting:: CSRF_TRUSTED_ORIGINS
+
+``CSRF_TRUSTED_ORIGINS``
+------------------------
+
+Default: ``[]`` (Empty list)
+
+A list of hosts which are trusted origins for unsafe requests (e.g. ``POST``).
+For a :meth:`secure <django.http.HttpRequest.is_secure>` unsafe
+request, Django's CSRF protection requires that the request have a ``Referer``
+header that matches the origin present in the ``Host`` header. This prevents,
+for example, a ``POST`` request from ``subdomain.example.com`` from succeeding
+against ``api.example.com``. If you need cross-origin unsafe requests over
+HTTPS, continuing the example, add ``"subdomain.example.com"`` to this list.
+The setting also supports subdomains, so you could add ``".example.com"``, for
+example, to allow access from all subdomains of ``example.com``.
 
 .. setting:: DATABASES
 
-DATABASES
----------
+``DATABASES``
+-------------
 
 Default: ``{}`` (Empty dictionary)
 
 A dictionary containing the settings for all databases to be used with
-Django. It is a nested dictionary whose contents maps database aliases
+Django. It is a nested dictionary whose contents map a database alias
 to a dictionary containing the options for an individual database.
 
 The :setting:`DATABASES` setting must configure a ``default`` database;
@@ -451,7 +486,7 @@ other database types. This example is for PostgreSQL::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'mydatabase',
             'USER': 'mydatabaseuser',
             'PASSWORD': 'mypassword',
@@ -465,18 +500,18 @@ configurations are available:
 
 .. setting:: DATABASE-ATOMIC_REQUESTS
 
-ATOMIC_REQUESTS
-~~~~~~~~~~~~~~~
+``ATOMIC_REQUESTS``
+~~~~~~~~~~~~~~~~~~~
 
 Default: ``False``
 
-Set this to ``True`` to wrap each HTTP request in a transaction on this
-database. See :ref:`tying-transactions-to-http-requests`.
+Set this to ``True`` to wrap each view in a transaction on this database. See
+:ref:`tying-transactions-to-http-requests`.
 
 .. setting:: DATABASE-AUTOCOMMIT
 
-AUTOCOMMIT
-~~~~~~~~~~
+``AUTOCOMMIT``
+~~~~~~~~~~~~~~
 
 Default: ``True``
 
@@ -485,26 +520,25 @@ management <deactivate-transaction-management>` and implement your own.
 
 .. setting:: DATABASE-ENGINE
 
-ENGINE
-~~~~~~
+``ENGINE``
+~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
 The database backend to use. The built-in database backends are:
 
-* ``'django.db.backends.postgresql_psycopg2'``
+* ``'django.db.backends.postgresql'``
 * ``'django.db.backends.mysql'``
 * ``'django.db.backends.sqlite3'``
 * ``'django.db.backends.oracle'``
 
 You can use a database backend that doesn't ship with Django by setting
-``ENGINE`` to a fully-qualified path (i.e.
-``mypackage.backends.whatever``).
+``ENGINE`` to a fully-qualified path (i.e. ``mypackage.backends.whatever``).
 
 .. setting:: HOST
 
-HOST
-~~~~
+``HOST``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -530,8 +564,8 @@ are not available.
 
 .. setting:: NAME
 
-NAME
-~~~~
+``NAME``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -541,8 +575,8 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 .. setting:: CONN_MAX_AGE
 
-CONN_MAX_AGE
-~~~~~~~~~~~~
+``CONN_MAX_AGE``
+~~~~~~~~~~~~~~~~
 
 Default: ``0``
 
@@ -552,8 +586,8 @@ connections at the end of each request — Django's historical behavior — and
 
 .. setting:: OPTIONS
 
-OPTIONS
-~~~~~~~
+``OPTIONS``
+~~~~~~~~~~~
 
 Default: ``{}`` (Empty dictionary)
 
@@ -566,8 +600,8 @@ consult your backend module's own documentation.
 
 .. setting:: PASSWORD
 
-PASSWORD
-~~~~~~~~
+``PASSWORD``
+~~~~~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -575,18 +609,42 @@ The password to use when connecting to the database. Not used with SQLite.
 
 .. setting:: PORT
 
-PORT
-~~~~
+``PORT``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
 The port to use when connecting to the database. An empty string means the
 default port. Not used with SQLite.
 
+.. setting:: DATABASE-TIME_ZONE
+
+``TIME_ZONE``
+~~~~~~~~~~~~~
+
+Default: ``None``
+
+A string representing the time zone for datetimes stored in this database
+(assuming that it doesn't support time zones) or ``None``. The same values are
+accepted as in the general :setting:`TIME_ZONE` setting.
+
+This allows interacting with third-party databases that store datetimes in
+local time rather than UTC. To avoid issues around DST changes, you shouldn't
+set this option for databases managed by Django.
+
+When :setting:`USE_TZ` is ``True`` and the database doesn't support time zones
+(e.g. SQLite, MySQL, Oracle), Django reads and writes datetimes in local time
+according to this option if it is set and in UTC if it isn't.
+
+When :setting:`USE_TZ` is ``True`` and the database supports time zones (e.g.
+PostgreSQL), it is an error to set this option.
+
+When :setting:`USE_TZ` is ``False``, it is an error to set this option.
+
 .. setting:: USER
 
-USER
-~~~~
+``USER``
+~~~~~~~~
 
 Default: ``''`` (Empty string)
 
@@ -594,29 +652,33 @@ The username to use when connecting to the database. Not used with SQLite.
 
 .. setting:: DATABASE-TEST
 
-TEST
-~~~~
+``TEST``
+~~~~~~~~
 
-.. versionchanged:: 1.7
-
-    All :setting:`TEST <DATABASE-TEST>` sub-entries used to be independent
-    entries in the database settings dictionary, with a ``TEST_`` prefix.
-    For backwards compatibility with older versions of Django, you can define
-    both versions of the settings as long as they match.
-    Further, ``TEST_CREATE``, ``TEST_USER_CREATE`` and ``TEST_PASSWD``
-    were changed to ``CREATE_DB``, ``CREATE_USER`` and ``PASSWORD``
-    respectively.
-
-Default: ``{}``
+Default: ``{}`` (Empty dictionary)
 
 A dictionary of settings for test databases; for more details about the
-creation and use of test databases, see :ref:`the-test-database`. The
-following entries are available:
+creation and use of test databases, see :ref:`the-test-database`.
+
+Here's an example with a test database configuration::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'USER': 'mydatabaseuser',
+            'NAME': 'mydatabase',
+            'TEST': {
+                'NAME': 'mytestdatabase',
+            },
+        },
+    }
+
+The following keys in the ``TEST`` dictionary are available:
 
 .. setting:: TEST_CHARSET
 
-CHARSET
-^^^^^^^
+``CHARSET``
+^^^^^^^^^^^
 
 Default: ``None``
 
@@ -624,16 +686,15 @@ The character set encoding used to create the test database. The value of this
 string is passed directly through to the database, so its format is
 backend-specific.
 
-Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
-backends.
+Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
-.. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
-.. _MySQL: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html
+.. _PostgreSQL: https://www.postgresql.org/docs/current/static/multibyte.html
+.. _MySQL: https://dev.mysql.com/doc/refman/en/charset-database.html
 
 .. setting:: TEST_COLLATION
 
-COLLATION
-^^^^^^^^^
+``COLLATION``
+^^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -646,8 +707,8 @@ Only supported for the ``mysql`` backend (see the `MySQL manual`_ for details).
 
 .. setting:: TEST_DEPENDENCIES
 
-DEPENDENCIES
-^^^^^^^^^^^^
+``DEPENDENCIES``
+^^^^^^^^^^^^^^^^
 
 Default: ``['default']``, for all databases other than ``default``,
 which has no dependencies.
@@ -658,8 +719,8 @@ on :ref:`controlling the creation order of test databases
 
 .. setting:: TEST_MIRROR
 
-MIRROR
-^^^^^^
+``MIRROR``
+^^^^^^^^^^
 
 Default: ``None``
 
@@ -674,8 +735,8 @@ configurations of multiple databases. See the documentation on
 
 .. setting:: TEST_NAME
 
-NAME
-^^^^
+``NAME``
+^^^^^^^^
 
 Default: ``None``
 
@@ -689,10 +750,8 @@ See :ref:`the-test-database`.
 
 .. setting:: TEST_SERIALIZE
 
-SERIALIZE
-^^^^^^^^^
-
-.. versionadded:: 1.7.1
+``SERIALIZE``
+^^^^^^^^^^^^^
 
 Boolean value to control whether or not the default test runner serializes the
 database into an in-memory JSON string before running tests (used to restore
@@ -700,22 +759,36 @@ the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
 with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
+.. setting:: TEST_TEMPLATE
+
+``TEMPLATE``
+^^^^^^^^^^^^
+
+.. versionadded:: 1.11
+
+This is a PostgreSQL-specific setting.
+
+The name of a `template`_ (e.g. ``'template0'``) from which to create the test
+database.
+
+.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+
 .. setting:: TEST_CREATE
 
-CREATE_DB
-^^^^^^^^^
+``CREATE_DB``
+^^^^^^^^^^^^^
 
 Default: ``True``
 
 This is an Oracle-specific setting.
 
 If it is set to ``False``, the test tablespaces won't be automatically created
-at the beginning of the tests and dropped at the end.
+at the beginning of the tests or dropped at the end.
 
 .. setting:: TEST_USER_CREATE
 
-CREATE_USER
-^^^^^^^^^^^
+``CREATE_USER``
+^^^^^^^^^^^^^^^
 
 Default: ``True``
 
@@ -726,8 +799,8 @@ beginning of the tests and dropped at the end.
 
 .. setting:: TEST_USER
 
-USER
-^^^^
+``USER``
+^^^^^^^^
 
 Default: ``None``
 
@@ -738,20 +811,25 @@ when running tests. If not provided, Django will use ``'test_' + USER``.
 
 .. setting:: TEST_PASSWD
 
-PASSWORD
-^^^^^^^^
+``PASSWORD``
+^^^^^^^^^^^^
 
 Default: ``None``
 
 This is an Oracle-specific setting.
 
 The password to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will use a hardcoded default value.
+when running tests. If not provided, Django will generate a random password.
+
+.. versionchanged:: 1.11
+
+    Older versions used a hardcoded default password. This was also changed
+    in 1.10.3, 1.9.11, and 1.8.16 to fix possible security implications.
 
 .. setting:: TEST_TBLSPACE
 
-TBLSPACE
-^^^^^^^^
+``TBLSPACE``
+^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -760,14 +838,10 @@ This is an Oracle-specific setting.
 The name of the tablespace that will be used when running tests. If not
 provided, Django will use ``'test_' + USER``.
 
-.. versionchanged:: 1.8
-
-    Previously Django used ``'test_' + NAME`` if not provided.
-
 .. setting:: TEST_TBLSPACE_TMP
 
-TBLSPACE_TMP
-^^^^^^^^^^^^
+``TBLSPACE_TMP``
+^^^^^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -776,16 +850,10 @@ This is an Oracle-specific setting.
 The name of the temporary tablespace that will be used when running tests. If
 not provided, Django will use ``'test_' + USER + '_temp'``.
 
-.. versionchanged:: 1.8
-
-    Previously Django used ``'test_' + NAME + '_temp'`` if not provided.
-
 .. setting:: DATAFILE
 
-DATAFILE
-^^^^^^^^
-
-.. versionadded:: 1.8
+``DATAFILE``
+^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -796,10 +864,8 @@ use ``TBLSPACE + '.dbf'``.
 
 .. setting:: DATAFILE_TMP
 
-DATAFILE_TMP
-^^^^^^^^^^^^
-
-.. versionadded:: 1.8
+``DATAFILE_TMP``
+^^^^^^^^^^^^^^^^
 
 Default: ``None``
 
@@ -810,16 +876,10 @@ will use ``TBLSPACE_TMP + '.dbf'``.
 
 .. setting:: DATAFILE_MAXSIZE
 
-DATAFILE_MAXSIZE
-^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.8
+``DATAFILE_MAXSIZE``
+^^^^^^^^^^^^^^^^^^^^
 
 Default: ``'500M'``
-
-.. versionchanged:: 1.8
-
-    The previous value was 200M and was not user customizable.
 
 This is an Oracle-specific setting.
 
@@ -827,148 +887,73 @@ The maximum size that the DATAFILE is allowed to grow to.
 
 .. setting:: DATAFILE_TMP_MAXSIZE
 
-DATAFILE_TMP_MAXSIZE
-^^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.8
+``DATAFILE_TMP_MAXSIZE``
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Default: ``'500M'``
-
-.. versionchanged:: 1.8
-
-    The previous value was 200M and was not user customizable.
 
 This is an Oracle-specific setting.
 
 The maximum size that the DATAFILE_TMP is allowed to grow to.
 
-.. setting:: OLD_TEST_CHARSET
+.. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
 
-TEST_CHARSET
-~~~~~~~~~~~~
+DATA_UPLOAD_MAX_MEMORY_SIZE
+---------------------------
 
-.. deprecated:: 1.7
+Default: ``2621440`` (i.e. 2.5 MB).
 
-    Use the :setting:`CHARSET <TEST_CHARSET>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
+The maximum size in bytes that a request body may be before a
+:exc:`~django.core.exceptions.SuspiciousOperation` (``RequestDataTooBig``) is
+raised. The check is done when accessing ``request.body`` or ``request.POST``
+and is calculated against the total request size excluding any file upload
+data. You can set this to ``None`` to disable the check. Applications that are
+expected to receive unusually large form posts should tune this setting.
 
-.. setting:: OLD_TEST_COLLATION
+The amount of request data is correlated to the amount of memory needed to
+process the request and populate the GET and POST dictionaries. Large requests
+could be used as a denial-of-service attack vector if left unchecked. Since web
+servers don't typically perform deep request inspection, it's not possible to
+perform a similar check at that level.
 
-TEST_COLLATION
-~~~~~~~~~~~~~~
+See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
-.. deprecated:: 1.7
+.. setting:: DATA_UPLOAD_MAX_NUMBER_FIELDS
 
-    Use the :setting:`COLLATION <TEST_COLLATION>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
+DATA_UPLOAD_MAX_NUMBER_FIELDS
+-----------------------------
 
-.. setting:: OLD_TEST_DEPENDENCIES
+Default: ``1000``
 
-TEST_DEPENDENCIES
-~~~~~~~~~~~~~~~~~
+The maximum number of parameters that may be received via GET or POST before a
+:exc:`~django.core.exceptions.SuspiciousOperation` (``TooManyFields``) is
+raised. You can set this to ``None`` to disable the check. Applications that
+are expected to receive an unusually large number of form fields should tune
+this setting.
 
-.. deprecated:: 1.7
-
-    Use the :setting:`DEPENDENCIES <TEST_DEPENDENCIES>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_MIRROR
-
-TEST_MIRROR
-~~~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`MIRROR <TEST_MIRROR>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_NAME
-
-TEST_NAME
-~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`NAME <TEST_NAME>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_CREATE
-
-TEST_CREATE
-~~~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`CREATE_DB <TEST_CREATE>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_USER
-
-TEST_USER
-~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`USER <TEST_USER>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_USER_CREATE
-
-TEST_USER_CREATE
-~~~~~~~~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`CREATE_USER <TEST_USER_CREATE>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_PASSWD
-
-TEST_PASSWD
-~~~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`PASSWORD <TEST_PASSWD>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_TBLSPACE
-
-TEST_TBLSPACE
-~~~~~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`TBLSPACE <TEST_TBLSPACE>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
-
-.. setting:: OLD_TEST_TBLSPACE_TMP
-
-TEST_TBLSPACE_TMP
-~~~~~~~~~~~~~~~~~
-
-.. deprecated:: 1.7
-
-    Use the :setting:`TBLSPACE_TMP <TEST_TBLSPACE_TMP>` entry in the
-    :setting:`TEST <DATABASE-TEST>` dictionary.
+The number of request parameters is correlated to the amount of time needed to
+process the request and populate the GET and POST dictionaries. Large requests
+could be used as a denial-of-service attack vector if left unchecked. Since web
+servers don't typically perform deep request inspection, it's not possible to
+perform a similar check at that level.
 
 .. setting:: DATABASE_ROUTERS
 
-DATABASE_ROUTERS
-----------------
+``DATABASE_ROUTERS``
+--------------------
 
 Default: ``[]`` (Empty list)
 
 The list of routers that will be used to determine which database
-to use when performing a database queries.
+to use when performing a database query.
 
 See the documentation on :ref:`automatic database routing in multi
 database configurations <topics-db-multi-db-routing>`.
 
 .. setting:: DATE_FORMAT
 
-DATE_FORMAT
------------
+``DATE_FORMAT``
+---------------
 
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
@@ -981,35 +966,34 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 
 .. setting:: DATE_INPUT_FORMATS
 
-DATE_INPUT_FORMATS
-------------------
+``DATE_INPUT_FORMATS``
+----------------------
 
 Default::
 
-    (
+    [
         '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
         '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
         '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
         '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
         '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
-    )
+    ]
 
-A tuple of formats that will be accepted when inputting data on a date field.
+A list of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
-format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
-
 .. setting:: DATETIME_FORMAT
 
-DATETIME_FORMAT
----------------
+``DATETIME_FORMAT``
+-------------------
 
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
@@ -1022,12 +1006,12 @@ See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE
 
 .. setting:: DATETIME_INPUT_FORMATS
 
-DATETIME_INPUT_FORMATS
-----------------------
+``DATETIME_INPUT_FORMATS``
+--------------------------
 
 Default::
 
-    (
+    [
         '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
         '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
         '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
@@ -1040,24 +1024,23 @@ Default::
         '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
         '%m/%d/%y %H:%M',        # '10/25/06 14:30'
         '%m/%d/%y',              # '10/25/06'
-    )
+    ]
 
-A tuple of formats that will be accepted when inputting data on a datetime
+A list of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
-these format strings use Python's datetime_ module syntax, not the format
-strings from the ``date`` Django template tag.
+these format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
-
 .. setting:: DEBUG
 
-DEBUG
------
+``DEBUG``
+---------
 
 Default: ``False``
 
@@ -1075,8 +1058,8 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
-exclude any setting whose name includes any of the following:
+sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
+setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``
@@ -1100,24 +1083,34 @@ Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
 the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
 requests being returned as "Bad Request (400)".
 
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` sets ``DEBUG = True`` for convenience.
+
 .. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
 
-DEBUG_PROPAGATE_EXCEPTIONS
---------------------------
+``DEBUG_PROPAGATE_EXCEPTIONS``
+------------------------------
 
 Default: ``False``
 
-If set to True, Django's normal exception handling of view functions
-will be suppressed, and exceptions will propagate upwards.  This can
-be useful for some test setups, and should never be used on a live
-site.
+If set to ``True``, Django's exception handling of view functions
+(:data:`~django.conf.urls.handler500`, or the debug view if :setting:`DEBUG`
+is ``True``) and logging of 500 responses (:ref:`django-request-logger`) is
+skipped and exceptions propagate upwards.
+
+This can be useful for some test setups. It shouldn't be used on a live site
+unless you want your web server (instead of Django) to generate "Internal
+Server Error" responses. In that case, make sure your server doesn't show the
+stack trace or other sensitive information in the response.
 
 .. setting:: DECIMAL_SEPARATOR
 
-DECIMAL_SEPARATOR
------------------
+``DECIMAL_SEPARATOR``
+---------------------
 
 Default: ``'.'`` (Dot)
 
@@ -1132,8 +1125,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 .. setting:: DEFAULT_CHARSET
 
-DEFAULT_CHARSET
----------------
+``DEFAULT_CHARSET``
+-------------------
 
 Default: ``'utf-8'``
 
@@ -1143,8 +1136,8 @@ manually specified. Used with :setting:`DEFAULT_CONTENT_TYPE` to construct the
 
 .. setting:: DEFAULT_CONTENT_TYPE
 
-DEFAULT_CONTENT_TYPE
---------------------
+``DEFAULT_CONTENT_TYPE``
+------------------------
 
 Default: ``'text/html'``
 
@@ -1152,12 +1145,17 @@ Default content type to use for all ``HttpResponse`` objects, if a MIME type
 isn't manually specified. Used with :setting:`DEFAULT_CHARSET` to construct
 the ``Content-Type`` header.
 
+.. deprecated:: 2.0
+
+    This setting is deprecated because it doesn't interact well with
+    third-party apps and is obsolete since HTML5 has mostly superseded XHTML.
+
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
-DEFAULT_EXCEPTION_REPORTER_FILTER
----------------------------------
+``DEFAULT_EXCEPTION_REPORTER_FILTER``
+-------------------------------------
 
-Default: :class:`django.views.debug.SafeExceptionReporterFilter`
+Default: ``'``:class:`django.views.debug.SafeExceptionReporterFilter`\ ``'``
 
 Default exception reporter filter class to be used if none has been assigned to
 the :class:`~django.http.HttpRequest` instance yet.
@@ -1165,18 +1163,18 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 
 .. setting:: DEFAULT_FILE_STORAGE
 
-DEFAULT_FILE_STORAGE
---------------------
+``DEFAULT_FILE_STORAGE``
+------------------------
 
-Default: :class:`django.core.files.storage.FileSystemStorage`
+Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
 
 .. setting:: DEFAULT_FROM_EMAIL
 
-DEFAULT_FROM_EMAIL
-------------------
+``DEFAULT_FROM_EMAIL``
+----------------------
 
 Default: ``'webmaster@localhost'``
 
@@ -1186,8 +1184,8 @@ and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
-DEFAULT_INDEX_TABLESPACE
-------------------------
+``DEFAULT_INDEX_TABLESPACE``
+----------------------------
 
 Default: ``''`` (Empty string)
 
@@ -1196,8 +1194,8 @@ one, if the backend supports it (see :doc:`/topics/db/tablespaces`).
 
 .. setting:: DEFAULT_TABLESPACE
 
-DEFAULT_TABLESPACE
-------------------
+``DEFAULT_TABLESPACE``
+----------------------
 
 Default: ``''`` (Empty string)
 
@@ -1206,10 +1204,10 @@ backend supports it (see :doc:`/topics/db/tablespaces`).
 
 .. setting:: DISALLOWED_USER_AGENTS
 
-DISALLOWED_USER_AGENTS
-----------------------
+``DISALLOWED_USER_AGENTS``
+--------------------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
 List of compiled regular expression objects representing User-Agent strings that
 are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
@@ -1218,18 +1216,18 @@ This is only used if ``CommonMiddleware`` is installed (see
 
 .. setting:: EMAIL_BACKEND
 
-EMAIL_BACKEND
--------------
+``EMAIL_BACKEND``
+-----------------
 
-Default: ``'django.core.mail.backends.smtp.EmailBackend'``
+Default: ``'``:class:`django.core.mail.backends.smtp.EmailBackend`\ ``'``
 
 The backend to use for sending emails. For the list of available backends see
 :doc:`/topics/email`.
 
 .. setting:: EMAIL_FILE_PATH
 
-EMAIL_FILE_PATH
----------------
+``EMAIL_FILE_PATH``
+-------------------
 
 Default: Not defined
 
@@ -1237,8 +1235,8 @@ The directory used by the ``file`` email backend to store output files.
 
 .. setting:: EMAIL_HOST
 
-EMAIL_HOST
-----------
+``EMAIL_HOST``
+--------------
 
 Default: ``'localhost'``
 
@@ -1248,8 +1246,8 @@ See also :setting:`EMAIL_PORT`.
 
 .. setting:: EMAIL_HOST_PASSWORD
 
-EMAIL_HOST_PASSWORD
--------------------
+``EMAIL_HOST_PASSWORD``
+-----------------------
 
 Default: ``''`` (Empty string)
 
@@ -1262,8 +1260,8 @@ See also :setting:`EMAIL_HOST_USER`.
 
 .. setting:: EMAIL_HOST_USER
 
-EMAIL_HOST_USER
----------------
+``EMAIL_HOST_USER``
+-------------------
 
 Default: ``''`` (Empty string)
 
@@ -1274,8 +1272,8 @@ See also :setting:`EMAIL_HOST_PASSWORD`.
 
 .. setting:: EMAIL_PORT
 
-EMAIL_PORT
-----------
+``EMAIL_PORT``
+--------------
 
 Default: ``25``
 
@@ -1283,8 +1281,8 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 .. setting:: EMAIL_SUBJECT_PREFIX
 
-EMAIL_SUBJECT_PREFIX
---------------------
+``EMAIL_SUBJECT_PREFIX``
+------------------------
 
 Default: ``'[Django] '``
 
@@ -1292,10 +1290,22 @@ Subject-line prefix for email messages sent with ``django.core.mail.mail_admins`
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
+.. setting:: EMAIL_USE_LOCALTIME
+
+``EMAIL_USE_LOCALTIME``
+-----------------------
+
+.. versionadded:: 1.11
+
+Default: ``False``
+
+Whether to send the SMTP ``Date`` header of email messages in the local time
+zone (``True``) or in UTC (``False``).
+
 .. setting:: EMAIL_USE_TLS
 
-EMAIL_USE_TLS
--------------
+``EMAIL_USE_TLS``
+-----------------
 
 Default: ``False``
 
@@ -1306,10 +1316,8 @@ experiencing hanging connections, see the implicit TLS setting
 
 .. setting:: EMAIL_USE_SSL
 
-EMAIL_USE_SSL
--------------
-
-.. versionadded:: 1.7
+``EMAIL_USE_SSL``
+-----------------
 
 Default: ``False``
 
@@ -1323,10 +1331,8 @@ exclusive, so only set one of those settings to ``True``.
 
 .. setting:: EMAIL_SSL_CERTFILE
 
-EMAIL_SSL_CERTFILE
-------------------
-
-.. versionadded:: 1.8
+``EMAIL_SSL_CERTFILE``
+----------------------
 
 Default: ``None``
 
@@ -1336,10 +1342,8 @@ for the SSL connection.
 
 .. setting:: EMAIL_SSL_KEYFILE
 
-EMAIL_SSL_KEYFILE
------------------
-
-.. versionadded:: 1.8
+``EMAIL_SSL_KEYFILE``
+---------------------
 
 Default: ``None``
 
@@ -1355,10 +1359,8 @@ file and private key file are handled.
 
 .. setting:: EMAIL_TIMEOUT
 
-EMAIL_TIMEOUT
--------------
-
-.. versionadded:: 1.8
+``EMAIL_TIMEOUT``
+-----------------
 
 Default: ``None``
 
@@ -1367,8 +1369,8 @@ attempt.
 
 .. setting:: FILE_CHARSET
 
-FILE_CHARSET
-------------
+``FILE_CHARSET``
+----------------
 
 Default: ``'utf-8'``
 
@@ -1377,35 +1379,37 @@ template files and initial SQL data files.
 
 .. setting:: FILE_UPLOAD_HANDLERS
 
-FILE_UPLOAD_HANDLERS
---------------------
+``FILE_UPLOAD_HANDLERS``
+------------------------
 
 Default::
 
-    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler")
+    [
+        'django.core.files.uploadhandler.MemoryFileUploadHandler',
+        'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+    ]
 
-A tuple of handlers to use for uploading. Changing this setting allows complete
+A list of handlers to use for uploading. Changing this setting allows complete
 customization -- even replacement -- of Django's upload process.
 
 See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
-FILE_UPLOAD_MAX_MEMORY_SIZE
----------------------------
+``FILE_UPLOAD_MAX_MEMORY_SIZE``
+-------------------------------
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
 
+See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`.
+
 .. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
 
-FILE_UPLOAD_DIRECTORY_PERMISSIONS
----------------------------------
-
-.. versionadded:: 1.7
+``FILE_UPLOAD_DIRECTORY_PERMISSIONS``
+-------------------------------------
 
 Default: ``None``
 
@@ -1421,8 +1425,8 @@ This value mirrors the functionality and caveats of the
 
 .. setting:: FILE_UPLOAD_PERMISSIONS
 
-FILE_UPLOAD_PERMISSIONS
------------------------
+``FILE_UPLOAD_PERMISSIONS``
+---------------------------
 
 Default: ``None``
 
@@ -1453,12 +1457,12 @@ when using the :djadmin:`collectstatic` management command. See
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
-FILE_UPLOAD_TEMP_DIR
---------------------
+``FILE_UPLOAD_TEMP_DIR``
+------------------------
 
 Default: ``None``
 
-The directory to store data (typically files larger than
+The directory to store data to (typically files larger than
 :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`) temporarily while uploading files.
 If ``None``, Django will use the standard temporary directory for the operating
 system. For example, this will default to ``/tmp`` on \*nix-style operating
@@ -1468,12 +1472,12 @@ See :doc:`/topics/files` for details.
 
 .. setting:: FIRST_DAY_OF_WEEK
 
-FIRST_DAY_OF_WEEK
------------------
+``FIRST_DAY_OF_WEEK``
+---------------------
 
 Default: ``0`` (Sunday)
 
-Number representing the first day of the week. This is especially useful
+A number representing the first day of the week. This is especially useful
 when displaying a calendar. This value is only used when not using
 format internationalization, or when a format cannot be found for the
 current locale.
@@ -1483,10 +1487,10 @@ Monday and so on.
 
 .. setting:: FIXTURE_DIRS
 
-FIXTURE_DIRS
--------------
+``FIXTURE_DIRS``
+----------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
 List of directories searched for fixture files, in addition to the
 ``fixtures`` directory of each application, in search order.
@@ -1497,27 +1501,42 @@ See :ref:`initial-data-via-fixtures` and :ref:`topics-testing-fixtures`.
 
 .. setting:: FORCE_SCRIPT_NAME
 
-FORCE_SCRIPT_NAME
-------------------
+``FORCE_SCRIPT_NAME``
+---------------------
 
 Default: ``None``
 
 If not ``None``, this will be used as the value of the ``SCRIPT_NAME``
 environment variable in any HTTP request. This setting can be used to override
 the server-provided value of ``SCRIPT_NAME``, which may be a rewritten version
-of the preferred value or not supplied at all.
+of the preferred value or not supplied at all. It is also used by
+:func:`django.setup()` to set the URL resolver script prefix outside of the
+request/response cycle (e.g. in management commands and standalone scripts) to
+generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
+
+.. setting:: FORM_RENDERER
+
+``FORM_RENDERER``
+-----------------
+
+.. versionadded:: 1.11
+
+Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
+
+The class that renders form widgets. It must implement :ref:`the low-level
+render API <low-level-widget-render-api>`.
 
 .. setting:: FORMAT_MODULE_PATH
 
-FORMAT_MODULE_PATH
-------------------
+``FORMAT_MODULE_PATH``
+----------------------
 
 Default: ``None``
 
 A full Python path to a Python package that contains format definitions for
 project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
-formats defined on this file.
+formats defined in this file.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
@@ -1530,19 +1549,17 @@ like::
                 __init__.py
                 formats.py
 
-.. versionchanged:: 1.8
+You can also set this setting to a list of Python paths, for example::
 
-    You can also set this setting to a list of Python paths, for example::
+    FORMAT_MODULE_PATH = [
+        'mysite.formats',
+        'some_app.formats',
+    ]
 
-        FORMAT_MODULE_PATH = [
-            'mysite.formats',
-            'some_app.formats',
-        ]
-
-    When Django searches for a certain format, it will go through all given
-    Python paths until it finds a module that actually defines the given
-    format. This means that formats defined in packages farther up in the list
-    will take precedence over the same formats in packages farther down.
+When Django searches for a certain format, it will go through all given Python
+paths until it finds a module that actually defines the given format. This
+means that formats defined in packages farther up in the list will take
+precedence over the same formats in packages farther down.
 
 Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 :setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,
@@ -1553,10 +1570,10 @@ Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 
 .. setting:: IGNORABLE_404_URLS
 
-IGNORABLE_404_URLS
-------------------
+``IGNORABLE_404_URLS``
+----------------------
 
-Default: ``()``
+Default: ``[]`` (Empty list)
 
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
@@ -1572,22 +1589,18 @@ This is only used if
 
 .. setting:: INSTALLED_APPS
 
-INSTALLED_APPS
---------------
+``INSTALLED_APPS``
+------------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple of strings designating all applications that are enabled in this
+A list of strings designating all applications that are enabled in this
 Django installation. Each string should be a dotted Python path to:
 
-* an application configuration class, or
-* a package containing a application.
+* an application configuration class (preferred), or
+* a package containing an application.
 
 :doc:`Learn more about application configurations </ref/applications>`.
-
-.. versionchanged:: 1.7
-
-    :setting:`INSTALLED_APPS` now supports application configurations.
 
 .. admonition:: Use the application registry for introspection
 
@@ -1609,7 +1622,7 @@ Django installation. Each string should be a dotted Python path to:
     different :attr:`~django.apps.AppConfig.label`.
 
     These rules apply regardless of whether :setting:`INSTALLED_APPS`
-    references application configuration classes on application packages.
+    references application configuration classes or application packages.
 
 When several applications provide different versions of the same resource
 (template, static file, management command, translation), the application
@@ -1617,21 +1630,24 @@ listed first in :setting:`INSTALLED_APPS` has precedence.
 
 .. setting:: INTERNAL_IPS
 
-INTERNAL_IPS
-------------
+``INTERNAL_IPS``
+----------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple of IP addresses, as strings, that:
+A list of IP addresses, as strings, that:
 
-* See debug comments, when :setting:`DEBUG` is ``True``
-* Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
-  :doc:`/ref/contrib/admin/admindocs`)
+* Allow the :func:`~django.template.context_processors.debug` context processor
+  to add some variables to the template context.
+* Can use the :ref:`admindocs bookmarklets <admindocs-bookmarklets>` even if
+  not logged in as a staff user.
+* Are marked as "internal" (as opposed to "EXTERNAL") in
+  :class:`~django.utils.log.AdminEmailHandler` emails.
 
 .. setting:: LANGUAGE_CODE
 
-LANGUAGE_CODE
--------------
+``LANGUAGE_CODE``
+-----------------
 
 Default: ``'en-us'``
 
@@ -1646,8 +1662,10 @@ It serves two purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
-* If the locale middleware is active, it provides the fallback translation when
-  no translation exist for a given literal to the user's preferred language.
+* If the locale middleware is active, it provides a fallback language in case the
+  user's preferred language can't be determined or is not supported by the
+  website. It also provides the fallback translation when a translation for a
+  given literal doesn't exist for the user's preferred language.
 
 See :ref:`how-django-discovers-language-preference` for more details.
 
@@ -1655,10 +1673,8 @@ See :ref:`how-django-discovers-language-preference` for more details.
 
 .. setting:: LANGUAGE_COOKIE_AGE
 
-LANGUAGE_COOKIE_AGE
--------------------
-
-.. versionadded:: 1.7
+``LANGUAGE_COOKIE_AGE``
+-----------------------
 
 Default: ``None`` (expires at browser close)
 
@@ -1666,10 +1682,8 @@ The age of the language cookie, in seconds.
 
 .. setting:: LANGUAGE_COOKIE_DOMAIN
 
-LANGUAGE_COOKIE_DOMAIN
-----------------------
-
-.. versionadded:: 1.7
+``LANGUAGE_COOKIE_DOMAIN``
+--------------------------
 
 Default: ``None``
 
@@ -1689,23 +1703,21 @@ deletes the old one.
 
 .. setting:: LANGUAGE_COOKIE_NAME
 
-LANGUAGE_COOKIE_NAME
---------------------
+``LANGUAGE_COOKIE_NAME``
+------------------------
 
 Default: ``'django_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever
-you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
-:doc:`/topics/i18n/index`.
+you want (as long as it's different from the other cookie names in your
+application). See :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGE_COOKIE_PATH
 
-LANGUAGE_COOKIE_PATH
---------------------
+``LANGUAGE_COOKIE_PATH``
+------------------------
 
-.. versionadded:: 1.7
-
-Default: ``/``
+Default: ``'/'``
 
 The path set on the language cookie. This should either match the URL path of your
 Django installation or be a parent of that path.
@@ -1725,17 +1737,17 @@ deletes the one.
 
 .. setting:: LANGUAGES
 
-LANGUAGES
----------
+``LANGUAGES``
+-------------
 
-Default: A tuple of all available languages. This list is continually growing
+Default: A list of all available languages. This list is continually growing
 and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
 ``django/conf/global_settings.py`` (or view the `online source`_).
 
 .. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
 
-The list is a tuple of two-tuples in the format
+The list is a list of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
 ``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See
@@ -1746,41 +1758,41 @@ to restrict language selection to a subset of the Django-provided languages.
 
 If you define a custom :setting:`LANGUAGES` setting, you can mark the
 language names as translation strings using the
-:func:`~django.utils.translation.ugettext_lazy` function.
+:func:`~django.utils.translation.gettext_lazy` function.
 
 Here's a sample settings file::
 
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
-    LANGUAGES = (
+    LANGUAGES = [
         ('de', _('German')),
         ('en', _('English')),
-    )
+    ]
 
 .. setting:: LOCALE_PATHS
 
-LOCALE_PATHS
-------------
+``LOCALE_PATHS``
+----------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple of directories where Django looks for translation files.
+A list of directories where Django looks for translation files.
 See :ref:`how-django-discovers-translations`.
 
 Example::
 
-    LOCALE_PATHS = (
+    LOCALE_PATHS = [
         '/home/www/project/common_files/locale',
         '/var/local/translations/locale',
-    )
+    ]
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
 
 .. setting:: LOGGING
 
-LOGGING
--------
+``LOGGING``
+-----------
 
 Default: A logging configuration dictionary.
 
@@ -1799,39 +1811,33 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
-LOGGING_CONFIG
---------------
+``LOGGING_CONFIG``
+------------------
 
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at a instance of Python's `dictConfig`_
-configuration method by default.
+Django project. Points at a instance of Python's :ref:`dictConfig
+<logging-config-dictschema>` configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
 configuration process will be skipped.
 
-.. versionchanged:: 1.7
-
-    Previously, the default value was ``'django.utils.log.dictConfig'``.
-
-.. _dictConfig: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
-
 .. setting:: MANAGERS
 
-MANAGERS
---------
+``MANAGERS``
+------------
 
-Default: ``()`` (Empty tuple)
+Default: ``[]`` (Empty list)
 
-A tuple in the same format as :setting:`ADMINS` that specifies who should get
+A list in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
 :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
 .. setting:: MEDIA_ROOT
 
-MEDIA_ROOT
-----------
+``MEDIA_ROOT``
+--------------
 
 Default: ``''`` (Empty string)
 
@@ -1852,20 +1858,20 @@ See also :setting:`MEDIA_URL`.
 
 .. setting:: MEDIA_URL
 
-MEDIA_URL
----------
+``MEDIA_URL``
+-------------
 
 Default: ``''`` (Empty string)
 
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
 for :doc:`managing stored files </topics/files>`. It must end in a slash if set
 to a non-empty value. You will need to :ref:`configure these files to be served
-<serving-uploaded-files-in-development>` in both development and production.
+<serving-uploaded-files-in-development>` in both development and production
+environments.
 
-In order to use ``{{ MEDIA_URL }}`` in your templates, you must have
-``'django.core.context_processors.media'`` in your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, but be sure
-to include it if you override that setting and want this behavior.
+If you want to use ``{{ MEDIA_URL }}`` in your templates, add
+``'django.template.context_processors.media'`` in the ``'context_processors'``
+option of :setting:`TEMPLATES`.
 
 Example: ``"http://media.example.com/"``
 
@@ -1880,50 +1886,47 @@ Example: ``"http://media.example.com/"``
     :setting:`MEDIA_URL` and :setting:`STATIC_URL` must have different
     values. See :setting:`MEDIA_ROOT` for more details.
 
-.. setting:: MIDDLEWARE_CLASSES
+.. setting:: MIDDLEWARE
 
-MIDDLEWARE_CLASSES
-------------------
+``MIDDLEWARE``
+--------------
 
-Default::
+Default:: ``None``
 
-    ('django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware')
-
-A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
-
-.. versionchanged:: 1.7
-
-    :class:`~django.contrib.sessions.middleware.SessionMiddleware`,
-    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, and
-    :class:`~django.contrib.messages.middleware.MessageMiddleware` were removed
-    from this setting.
+A list of middleware to use. See :doc:`/topics/http/middleware`.
 
 .. setting:: MIGRATION_MODULES
 
-MIGRATION_MODULES
------------------
+``MIGRATION_MODULES``
+---------------------
 
-Default::
+Default: ``{}`` (Empty dictionary)
 
-    {}  # empty dictionary
-
-A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
-of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
+A dictionary specifying the package where migration modules can be found on a
+per-app basis. The default value of this setting is an empty dictionary, but
+the default package name for migration modules is ``migrations``.
 
 Example::
 
     {'blog': 'blog.db_migrations'}
 
-In this case, migrations pertaining to the ``blog`` app will be contained in the ``blog.db_migrations`` package.
+In this case, migrations pertaining to the ``blog`` app will be contained in
+the ``blog.db_migrations`` package.
 
 If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
 automatically create the package if it doesn't already exist.
 
+When you supply ``None`` as a value for an app, Django will consider the app as
+an app without migrations regardless of an existing ``migrations`` submodule.
+This can be used, for example, in a test settings file to skip migrations while
+testing (tables will still be created for the apps' models). If this is used in
+your general project settings, remember to use the :option:`migrate
+--run-syncdb` option if you want to create tables for the app.
+
 .. setting:: MONTH_DAY_FORMAT
 
-MONTH_DAY_FORMAT
-----------------
+``MONTH_DAY_FORMAT``
+--------------------
 
 Default: ``'F j'``
 
@@ -1945,8 +1948,8 @@ See :tfilter:`allowed date format strings <date>`. See also
 
 .. setting:: NUMBER_GROUPING
 
-NUMBER_GROUPING
-----------------
+``NUMBER_GROUPING``
+-------------------
 
 Default: ``0``
 
@@ -1957,16 +1960,32 @@ no grouping will be applied to the number. If this setting is greater than
 ``0``, then :setting:`THOUSAND_SEPARATOR` will be used as the separator between
 those groups.
 
+Some locales use non-uniform digit grouping, e.g. ``10,00,00,000`` in
+``en_IN``. For this case, you can provide a sequence with the number of digit
+group sizes to be applied. The first number defines the size of the group
+preceding the decimal delimiter, and each number that follows defines the size
+of preceding groups. If the sequence is terminated with ``-1``, no further
+grouping is performed. If the sequence terminates with a ``0``, the last group
+size is used for the remainder of the number.
+
+Example tuple for ``en_IN``::
+
+    NUMBER_GROUPING = (3, 2, 0)
+
 Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
 format has higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
 
+.. versionchanged:: 1.11
+
+    Support for non-uniform digit grouping was added.
+
 .. setting:: PREPEND_WWW
 
-PREPEND_WWW
------------
+``PREPEND_WWW``
+---------------
 
 Default: ``False``
 
@@ -1976,8 +1995,8 @@ used if :class:`~django.middleware.common.CommonMiddleware` is installed
 
 .. setting:: ROOT_URLCONF
 
-ROOT_URLCONF
-------------
+``ROOT_URLCONF``
+----------------
 
 Default: Not defined
 
@@ -1988,8 +2007,8 @@ object. See :ref:`how-django-processes-a-request` for details.
 
 .. setting:: SECRET_KEY
 
-SECRET_KEY
-----------
+``SECRET_KEY``
+--------------
 
 Default: ``''`` (Empty string)
 
@@ -1999,6 +2018,10 @@ unpredictable value.
 
 :djadmin:`django-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
+
+Uses of the key shouldn't assume that it's text or bytes. Every use should go
+through :func:`~django.utils.encoding.force_text` or
+:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
 
@@ -2014,18 +2037,12 @@ The secret key is used for:
 
 * All :doc:`sessions </topics/http/sessions>` if you are using
   any other session backend than ``django.contrib.sessions.backends.cache``,
-  or if you use
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
-  and are using the default
+  or are using the default
   :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
   :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
-* :mod:`Form wizard <formtools.wizard.views>` progress when using
-  cookie storage with
-  :class:`formtools.wizard.views.CookieWizardView`.
-* All :func:`~django.contrib.auth.views.password_reset` tokens.
-* All in progress :mod:`form previews <formtools.preview>`.
+* All :class:`~django.contrib.auth.views.PasswordResetView` tokens.
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
@@ -2033,12 +2050,16 @@ If you rotate your secret key, all of the above will be invalidated.
 Secret keys are not used for passwords of users and key rotation will not
 affect them.
 
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` creates a unique ``SECRET_KEY`` for
+    convenience.
+
 .. setting:: SECURE_BROWSER_XSS_FILTER
 
-SECURE_BROWSER_XSS_FILTER
--------------------------
-
-.. versionadded:: 1.8
+``SECURE_BROWSER_XSS_FILTER``
+-----------------------------
 
 Default: ``False``
 
@@ -2047,10 +2068,8 @@ the :ref:`x-xss-protection` header on all responses that do not already have it.
 
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
-SECURE_CONTENT_TYPE_NOSNIFF
----------------------------
-
-.. versionadded:: 1.8
+``SECURE_CONTENT_TYPE_NOSNIFF``
+-------------------------------
 
 Default: ``False``
 
@@ -2060,28 +2079,44 @@ already have it.
 
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
-SECURE_HSTS_INCLUDE_SUBDOMAINS
-------------------------------
-
-.. versionadded:: 1.8
+``SECURE_HSTS_INCLUDE_SUBDOMAINS``
+----------------------------------
 
 Default: ``False``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
-the ``includeSubDomains`` tag to the :ref:`http-strict-transport-security`
+the ``includeSubDomains`` directive to the :ref:`http-strict-transport-security`
 header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
 non-zero value.
 
 .. warning::
-    Setting this incorrectly can irreversibly (for some time) break your site.
-    Read the :ref:`http-strict-transport-security` documentation first.
+    Setting this incorrectly can irreversibly (for the value of
+    :setting:`SECURE_HSTS_SECONDS`) break your site. Read the
+    :ref:`http-strict-transport-security` documentation first.
+
+.. setting:: SECURE_HSTS_PRELOAD
+
+``SECURE_HSTS_PRELOAD``
+-----------------------
+
+.. versionadded:: 1.11
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
+the ``preload`` directive to the :ref:`http-strict-transport-security`
+header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
+non-zero value.
+
+.. warning::
+    Setting this incorrectly can irreversibly (for at least several months,
+    depending on browser releases) break your site. Read the
+    :ref:`http-strict-transport-security` documentation first.
 
 .. setting:: SECURE_HSTS_SECONDS
 
-SECURE_HSTS_SECONDS
--------------------
-
-.. versionadded:: 1.8
+``SECURE_HSTS_SECONDS``
+-----------------------
 
 Default: ``0``
 
@@ -2096,8 +2131,8 @@ already have it.
 
 .. setting:: SECURE_PROXY_SSL_HEADER
 
-SECURE_PROXY_SSL_HEADER
------------------------
+``SECURE_PROXY_SSL_HEADER``
+---------------------------
 
 Default: ``None``
 
@@ -2157,12 +2192,10 @@ available in ``request.META``.)
 
 .. setting:: SECURE_REDIRECT_EXEMPT
 
-SECURE_REDIRECT_EXEMPT
-----------------------
+``SECURE_REDIRECT_EXEMPT``
+--------------------------
 
-.. versionadded:: 1.8
-
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 If a URL path matches a regular expression in this list, the request will not be
 redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
@@ -2170,10 +2203,8 @@ setting has no effect.
 
 .. setting:: SECURE_SSL_HOST
 
-SECURE_SSL_HOST
----------------
-
-.. versionadded:: 1.8
+``SECURE_SSL_HOST``
+-------------------
 
 Default: ``None``
 
@@ -2184,12 +2215,10 @@ setting has no effect.
 
 .. setting:: SECURE_SSL_REDIRECT
 
-SECURE_SSL_REDIRECT
--------------------
+``SECURE_SSL_REDIRECT``
+-----------------------
 
-.. versionadded:: 1.8
-
-Default: ``False``.
+Default: ``False``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 :ref:`redirects <ssl-redirect>` all non-HTTPS requests to HTTPS (except for
@@ -2206,10 +2235,10 @@ those URLs matching a regular expression listed in
 
 .. setting:: SERIALIZATION_MODULES
 
-SERIALIZATION_MODULES
----------------------
+``SERIALIZATION_MODULES``
+-------------------------
 
-Default: Not defined.
+Default: Not defined
 
 A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
@@ -2219,8 +2248,8 @@ example, to define a YAML serializer, use::
 
 .. setting:: SERVER_EMAIL
 
-SERVER_EMAIL
-------------
+``SERVER_EMAIL``
+----------------
 
 Default: ``'root@localhost'``
 
@@ -2235,10 +2264,10 @@ The email address that error messages come from, such as those sent to
 
 .. setting:: SHORT_DATE_FORMAT
 
-SHORT_DATE_FORMAT
------------------
+``SHORT_DATE_FORMAT``
+---------------------
 
-Default: ``m/d/Y`` (e.g. ``12/31/2003``)
+Default: ``'m/d/Y'`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
 templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
@@ -2249,10 +2278,10 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
 .. setting:: SHORT_DATETIME_FORMAT
 
-SHORT_DATETIME_FORMAT
----------------------
+``SHORT_DATETIME_FORMAT``
+-------------------------
 
-Default: ``m/d/Y P`` (e.g. ``12/31/2003 4 p.m.``)
+Default: ``'m/d/Y P'`` (e.g. ``12/31/2003 4 p.m.``)
 
 An available formatting that can be used for displaying datetime fields on
 templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
@@ -2263,8 +2292,8 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
 .. setting:: SIGNING_BACKEND
 
-SIGNING_BACKEND
----------------
+``SIGNING_BACKEND``
+-------------------
 
 Default: ``'django.core.signing.TimestampSigner'``
 
@@ -2274,100 +2303,113 @@ See also the :doc:`/topics/signing` documentation.
 
 .. setting:: SILENCED_SYSTEM_CHECKS
 
-SILENCED_SYSTEM_CHECKS
-----------------------
+``SILENCED_SYSTEM_CHECKS``
+--------------------------
 
-.. versionadded:: 1.7
-
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 A list of identifiers of messages generated by the system check framework
 (i.e. ``["models.W001"]``) that you wish to permanently acknowledge and ignore.
-Silenced warnings will no longer be output to the console; silenced errors
-will still be printed, but will not prevent management commands from running.
+Silenced checks will not be output to the console.
 
 See also the :doc:`/ref/checks` documentation.
 
-.. setting:: TEMPLATE_CONTEXT_PROCESSORS
+.. setting:: TEMPLATES
 
-TEMPLATE_CONTEXT_PROCESSORS
----------------------------
+``TEMPLATES``
+-------------
 
-Default::
+Default: ``[]`` (Empty list)
 
-    ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+A list containing the settings for all template engines to be used with
+Django. Each item of the list is a dictionary containing the options for an
+individual engine.
 
-A tuple of callables that are used to populate the context in ``RequestContext``.
-These callables take a request object as their argument and return a dictionary
-of items to be merged into the context.
+Here's a simple setup that tells the Django template engine to load templates
+from the ``templates`` subdirectory inside each installed application::
 
-.. setting:: TEMPLATE_DEBUG
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        },
+    ]
 
-TEMPLATE_DEBUG
---------------
+The following options are available for all backends.
+
+.. setting:: TEMPLATES-BACKEND
+
+``BACKEND``
+~~~~~~~~~~~
+
+Default: Not defined
+
+The template backend to use. The built-in template backends are:
+
+* ``'django.template.backends.django.DjangoTemplates'``
+* ``'django.template.backends.jinja2.Jinja2'``
+
+You can use a template backend that doesn't ship with Django by setting
+``BACKEND`` to a fully-qualified path (i.e. ``'mypackage.whatever.Backend'``).
+
+.. setting:: TEMPLATES-NAME
+
+``NAME``
+~~~~~~~~
+
+Default: see below
+
+The alias for this particular template engine. It's an identifier that allows
+selecting an engine for rendering. Aliases must be unique across all
+configured template engines.
+
+It defaults to the name of the module defining the engine class, i.e. the
+next to last piece of :setting:`BACKEND <TEMPLATES-BACKEND>`, when it isn't
+provided. For example if the backend is ``'mypackage.whatever.Backend'`` then
+its default name is ``'whatever'``.
+
+.. setting:: TEMPLATES-DIRS
+
+``DIRS``
+~~~~~~~~
+
+Default: ``[]`` (Empty list)
+
+Directories where the engine should look for template source files, in search
+order.
+
+.. setting:: TEMPLATES-APP_DIRS
+
+``APP_DIRS``
+~~~~~~~~~~~~
 
 Default: ``False``
 
-A boolean that turns on/off template debug mode. If this is ``True``, the fancy
-error page will display a detailed report for any exception raised during
-template rendering. This report contains the relevant snippet of the template,
-with the appropriate line highlighted.
+Whether the engine should look for template source files inside installed
+applications.
 
-Note that Django only displays fancy error pages if :setting:`DEBUG` is ``True``, so
-you'll want to set that to take advantage of this setting.
+.. note::
 
-See also :setting:`DEBUG`.
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` sets ``'APP_DIRS': True``.
 
-.. setting:: TEMPLATE_DIRS
+.. setting:: TEMPLATES-OPTIONS
 
-TEMPLATE_DIRS
--------------
+``OPTIONS``
+~~~~~~~~~~~
 
-Default: ``()`` (Empty tuple)
+Default: ``{}`` (Empty dict)
 
-List of locations of the template source files searched by
-:class:`django.template.loaders.filesystem.Loader`, in search order.
-
-Note that these paths should use Unix-style forward slashes, even on Windows.
-
-See :doc:`/topics/templates`.
-
-.. setting:: TEMPLATE_LOADERS
-
-TEMPLATE_LOADERS
-----------------
-
-Default::
-
-     ('django.template.loaders.filesystem.Loader',
-      'django.template.loaders.app_directories.Loader')
-
-A tuple of template loader classes, specified as strings. Each ``Loader`` class
-knows how to import templates from a particular source. Optionally, a tuple can be
-used instead of a string. The first item in the tuple should be the ``Loader``’s
-module, subsequent items are passed to the ``Loader`` during initialization. See
-:doc:`/ref/templates/api`.
-
-.. setting:: TEMPLATE_STRING_IF_INVALID
-
-TEMPLATE_STRING_IF_INVALID
---------------------------
-
-Default: ``''`` (Empty string)
-
-Output, as a string, that the template system should use for invalid (e.g.
-misspelled) variables. See :ref:`invalid-template-variables`.
+Extra parameters to pass to the template backend. Available parameters vary
+depending on the template backend. See
+:class:`~django.template.backends.django.DjangoTemplates` and
+:class:`~django.template.backends.jinja2.Jinja2` for the options of the
+built-in backends.
 
 .. setting:: TEST_RUNNER
 
-TEST_RUNNER
------------
+``TEST_RUNNER``
+---------------
 
 Default: ``'django.test.runner.DiscoverRunner'``
 
@@ -2376,18 +2418,16 @@ The name of the class to use for starting the test suite. See
 
 .. setting:: TEST_NON_SERIALIZED_APPS
 
-TEST_NON_SERIALIZED_APPS
-------------------------
+``TEST_NON_SERIALIZED_APPS``
+----------------------------
 
-.. versionadded:: 1.7
-
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 In order to restore the database state between tests for
 ``TransactionTestCase``\s and database backends without transactions, Django
-will :ref:`serialize the contents of all apps with migrations
-<test-case-serialized-rollback>` when it starts the test run so it can then
-reload from that copy before tests that need it.
+will :ref:`serialize the contents of all apps <test-case-serialized-rollback>`
+when it starts the test run so it can then reload from that copy before running
+tests that need it.
 
 This slows down the startup time of the test runner; if you have apps that
 you know don't need this feature, you can add their full names in here (e.g.
@@ -2396,10 +2436,10 @@ process.
 
 .. setting:: THOUSAND_SEPARATOR
 
-THOUSAND_SEPARATOR
-------------------
+``THOUSAND_SEPARATOR``
+----------------------
 
-Default: ``,`` (Comma)
+Default: ``','`` (Comma)
 
 Default thousand separator used when formatting numbers. This setting is
 used only when :setting:`USE_THOUSAND_SEPARATOR` is ``True`` and
@@ -2413,8 +2453,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 
 .. setting:: TIME_FORMAT
 
-TIME_FORMAT
------------
+``TIME_FORMAT``
+---------------
 
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
@@ -2427,38 +2467,37 @@ See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
 .. setting:: TIME_INPUT_FORMATS
 
-TIME_INPUT_FORMATS
-------------------
+``TIME_INPUT_FORMATS``
+----------------------
 
 Default::
 
-    (
+    [
         '%H:%M:%S',     # '14:30:59'
         '%H:%M:%S.%f',  # '14:30:59.000200'
         '%H:%M',        # '14:30'
-    )
+    ]
 
-A tuple of formats that will be accepted when inputting data on a time field.
+A list of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
-format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+format strings use Python's :ref:`datetime module syntax
+<strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
+template filter.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
-.. _datetime: https://docs.python.org/library/datetime.html#strftime-strptime-behavior
-
 .. setting:: TIME_ZONE
 
-TIME_ZONE
----------
+``TIME_ZONE``
+-------------
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation, or ``None``. See
-the `list of time zones`_.
+A string representing the time zone for this installation. See the `list of
+time zones`_.
 
 .. note::
     Since Django was first released with the :setting:`TIME_ZONE` set to
@@ -2475,48 +2514,44 @@ will store all datetimes. When :setting:`USE_TZ` is ``True``, this is the
 default time zone that Django will use to display datetimes in templates and
 to interpret datetimes entered in forms.
 
-Django sets the ``os.environ['TZ']`` variable to the time zone you specify in
-the :setting:`TIME_ZONE` setting. Thus, all your views and models will
+On Unix environments (where :func:`time.tzset` is implemented), Django sets the
+``os.environ['TZ']`` variable to the time zone you specify in the
+:setting:`TIME_ZONE` setting. Thus, all your views and models will
 automatically operate in this time zone. However, Django won't set the ``TZ``
-environment variable under the following conditions:
-
-* If you're using the manual configuration option as described in
-  :ref:`manually configuring settings
-  <settings-without-django-settings-module>`, or
-
-* If you specify ``TIME_ZONE = None``. This will cause Django to fall back to
-  using the system timezone. However, this is discouraged when :setting:`USE_TZ
-  = True <USE_TZ>`, because it makes conversions between local time and UTC
-  less reliable.
-
-If Django doesn't set the ``TZ`` environment variable, it's up to you
-to ensure your processes are running in the correct environment.
+environment variable if you're using the manual configuration option as
+described in :ref:`manually configuring settings
+<settings-without-django-settings-module>`. If Django doesn't set the ``TZ``
+environment variable, it's up to you to ensure your processes are running in
+the correct environment.
 
 .. note::
     Django cannot reliably use alternate time zones in a Windows environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
-.. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-.. _pytz: http://pytz.sourceforge.net/
+.. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. setting:: USE_ETAGS
 
-USE_ETAGS
----------
+``USE_ETAGS``
+-------------
 
 Default: ``False``
 
-A boolean that specifies whether to output the "Etag" header. This saves
-bandwidth but slows down performance. This is used by the ``CommonMiddleware``
-(see :doc:`/topics/http/middleware`) and in the``Cache Framework``
-(see :doc:`/topics/cache`).
+A boolean that specifies whether to output the ``ETag`` header. This saves
+bandwidth but slows down performance. This is used by the
+:class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
+framework </topics/cache>`.
+
+.. deprecated:: 1.11
+
+    This setting is deprecated in favor of using ``ConditionalGetMiddleware``,
+    which sets an ETag regardless of this setting.
 
 .. setting:: USE_I18N
 
-USE_I18N
---------
+``USE_I18N``
+------------
 
 Default: ``True``
 
@@ -2527,10 +2562,15 @@ translation machinery.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` includes ``USE_I18N = True`` for convenience.
+
 .. setting:: USE_L10N
 
-USE_L10N
---------
+``USE_L10N``
+------------
 
 Default: ``False``
 
@@ -2547,23 +2587,25 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
-USE_THOUSAND_SEPARATOR
-----------------------
+``USE_THOUSAND_SEPARATOR``
+--------------------------
 
 Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
 When :setting:`USE_L10N` is set to ``True`` and if this is also set to
 ``True``, Django will use the values of :setting:`THOUSAND_SEPARATOR` and
-:setting:`NUMBER_GROUPING` to format numbers.
+:setting:`NUMBER_GROUPING` to format numbers unless the locale already has an
+existing thousands separator. If there is a thousands separator in the locale
+format, it will have higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.
 
 .. setting:: USE_TZ
 
-USE_TZ
-------
+``USE_TZ``
+----------
 
 Default: ``False``
 
@@ -2581,19 +2623,36 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 .. setting:: USE_X_FORWARDED_HOST
 
-USE_X_FORWARDED_HOST
---------------------
+``USE_X_FORWARDED_HOST``
+------------------------
 
 Default: ``False``
 
-A boolean that specifies whether to use the X-Forwarded-Host header in
-preference to the Host header. This should only be enabled if a proxy
+A boolean that specifies whether to use the ``X-Forwarded-Host`` header in
+preference to the ``Host`` header. This should only be enabled if a proxy
 which sets this header is in use.
+
+This setting takes priority over :setting:`USE_X_FORWARDED_PORT`. Per
+:rfc:`7239#page-7`, the ``X-Forwarded-Host`` header can include the port
+number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
+
+.. setting:: USE_X_FORWARDED_PORT
+
+``USE_X_FORWARDED_PORT``
+------------------------
+
+Default: ``False``
+
+A boolean that specifies whether to use the ``X-Forwarded-Port`` header in
+preference to the ``SERVER_PORT`` ``META`` variable. This should only be
+enabled if a proxy which sets this header is in use.
+
+:setting:`USE_X_FORWARDED_HOST` takes priority over this setting.
 
 .. setting:: WSGI_APPLICATION
 
-WSGI_APPLICATION
-----------------
+``WSGI_APPLICATION``
+--------------------
 
 Default: ``None``
 
@@ -2609,8 +2668,8 @@ identical to previous Django versions.
 
 .. setting:: YEAR_MONTH_FORMAT
 
-YEAR_MONTH_FORMAT
------------------
+``YEAR_MONTH_FORMAT``
+---------------------
 
 Default: ``'F Y'``
 
@@ -2632,8 +2691,8 @@ and :setting:`MONTH_DAY_FORMAT`.
 
 .. setting:: X_FRAME_OPTIONS
 
-X_FRAME_OPTIONS
----------------
+``X_FRAME_OPTIONS``
+-------------------
 
 Default: ``'SAMEORIGIN'``
 
@@ -2649,21 +2708,21 @@ Settings for :mod:`django.contrib.auth`.
 
 .. setting:: AUTHENTICATION_BACKENDS
 
-AUTHENTICATION_BACKENDS
------------------------
+``AUTHENTICATION_BACKENDS``
+---------------------------
 
-Default: ``('django.contrib.auth.backends.ModelBackend',)``
+Default: ``['django.contrib.auth.backends.ModelBackend']``
 
-A tuple of authentication backend classes (as strings) to use when attempting to
+A list of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
 <authentication-backends>` for details.
 
 .. setting:: AUTH_USER_MODEL
 
-AUTH_USER_MODEL
----------------
+``AUTH_USER_MODEL``
+-------------------
 
-Default: 'auth.User'
+Default: ``'auth.User'``
 
 The model to use to represent a User. See :ref:`auth-custom-user`.
 
@@ -2677,8 +2736,8 @@ The model to use to represent a User. See :ref:`auth-custom-user`.
 
 .. setting:: LOGIN_REDIRECT_URL
 
-LOGIN_REDIRECT_URL
-------------------
+``LOGIN_REDIRECT_URL``
+----------------------
 
 Default: ``'/accounts/profile/'``
 
@@ -2688,37 +2747,46 @@ The URL where requests are redirected after login when the
 This is used by the :func:`~django.contrib.auth.decorators.login_required`
 decorator, for example.
 
-This setting also accepts view function names and :ref:`named URL patterns
-<naming-url-patterns>` which can be used to reduce configuration duplication
-since you don't have to define the URL in two places (``settings`` and URLconf).
+This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
+can be used to reduce configuration duplication since you don't have to define
+the URL in two places (``settings`` and URLconf).
 
 .. setting:: LOGIN_URL
 
-LOGIN_URL
----------
+``LOGIN_URL``
+-------------
 
 Default: ``'/accounts/login/'``
 
 The URL where requests are redirected for login, especially when using the
 :func:`~django.contrib.auth.decorators.login_required` decorator.
 
-This setting also accepts view function names and :ref:`named URL patterns
-<naming-url-patterns>` which can be used to reduce configuration duplication
-since you don't have to define the URL in two places (``settings`` and URLconf).
+This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
+can be used to reduce configuration duplication since you don't have to define
+the URL in two places (``settings`` and URLconf).
 
-.. setting:: LOGOUT_URL
+.. setting:: LOGOUT_REDIRECT_URL
 
-LOGOUT_URL
-----------
+``LOGOUT_REDIRECT_URL``
+-----------------------
 
-Default: ``'/accounts/logout/'``
+Default: ``None``
 
-LOGIN_URL counterpart.
+The URL where requests are redirected after a user logs out using
+:class:`~django.contrib.auth.views.LogoutView` (if the view doesn't get a
+``next_page`` argument).
+
+If ``None``, no redirect will be performed and the logout view will be
+rendered.
+
+This setting also accepts :ref:`named URL patterns <naming-url-patterns>` which
+can be used to reduce configuration duplication since you don't have to define
+the URL in two places (``settings`` and URLconf).
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
-PASSWORD_RESET_TIMEOUT_DAYS
----------------------------
+``PASSWORD_RESET_TIMEOUT_DAYS``
+-------------------------------
 
 Default: ``3``
 
@@ -2727,20 +2795,31 @@ The number of days a password reset link is valid for. Used by the
 
 .. setting:: PASSWORD_HASHERS
 
-PASSWORD_HASHERS
-----------------
+``PASSWORD_HASHERS``
+--------------------
 
 See :ref:`auth_password_storage`.
 
 Default::
 
-    ('django.contrib.auth.hashers.PBKDF2PasswordHasher',
-     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-     'django.contrib.auth.hashers.BCryptPasswordHasher',
-     'django.contrib.auth.hashers.SHA1PasswordHasher',
-     'django.contrib.auth.hashers.MD5PasswordHasher',
-     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher')
+    [
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.Argon2PasswordHasher',
+        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+    ]
+
+.. setting:: AUTH_PASSWORD_VALIDATORS
+
+``AUTH_PASSWORD_VALIDATORS``
+----------------------------
+
+Default: ``[]`` (Empty list)
+
+The list of validators that are used to check the strength of user's passwords.
+See :ref:`password-validation` for more details. By default, no validation is
+performed and all passwords are accepted.
 
 .. _settings-messages:
 
@@ -2751,8 +2830,8 @@ Settings for :mod:`django.contrib.messages`.
 
 .. setting:: MESSAGE_LEVEL
 
-MESSAGE_LEVEL
--------------
+``MESSAGE_LEVEL``
+-----------------
 
 Default: ``messages.INFO``
 
@@ -2774,8 +2853,8 @@ framework. See :ref:`message levels <message-level>` for more details.
 
 .. setting:: MESSAGE_STORAGE
 
-MESSAGE_STORAGE
----------------
+``MESSAGE_STORAGE``
+-------------------
 
 Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
 
@@ -2795,16 +2874,18 @@ and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
 .. setting:: MESSAGE_TAGS
 
-MESSAGE_TAGS
-------------
+``MESSAGE_TAGS``
+----------------
 
 Default::
 
-    {messages.DEBUG: 'debug',
-    messages.INFO: 'info',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'error'}
+    {
+        messages.DEBUG: 'debug',
+        messages.INFO: 'info',
+        messages.SUCCESS: 'success',
+        messages.WARNING: 'warning',
+        messages.ERROR: 'error',
+    }
 
 This sets the mapping of message level to message tag, which is typically
 rendered as a CSS class in HTML. If you specify a value, it will extend
@@ -2833,18 +2914,18 @@ Settings for :mod:`django.contrib.sessions`.
 
 .. setting:: SESSION_CACHE_ALIAS
 
-SESSION_CACHE_ALIAS
--------------------
+``SESSION_CACHE_ALIAS``
+-----------------------
 
-Default: ``default``
+Default: ``'default'``
 
 If you're using :ref:`cache-based session storage <cached-sessions-backend>`,
 this selects the cache to use.
 
 .. setting:: SESSION_COOKIE_AGE
 
-SESSION_COOKIE_AGE
-------------------
+``SESSION_COOKIE_AGE``
+----------------------
 
 Default: ``1209600`` (2 weeks, in seconds)
 
@@ -2852,8 +2933,8 @@ The age of session cookies, in seconds.
 
 .. setting:: SESSION_COOKIE_DOMAIN
 
-SESSION_COOKIE_DOMAIN
----------------------
+``SESSION_COOKIE_DOMAIN``
+-------------------------
 
 Default: ``None``
 
@@ -2871,8 +2952,8 @@ This setting also affects cookies set by :mod:`django.contrib.messages`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
 
-SESSION_COOKIE_HTTPONLY
------------------------
+``SESSION_COOKIE_HTTPONLY``
+---------------------------
 
 Default: ``True``
 
@@ -2883,34 +2964,30 @@ session cookie.
 HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
 is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
-useful way to mitigate the risk of client side script accessing the
+useful way to mitigate the risk of a client side script accessing the
 protected cookie data.
 
 Turning it on makes it less trivial for an attacker to escalate a cross-site
 scripting vulnerability into full hijacking of a user's session. There's not
 much excuse for leaving this off, either: if your code depends on reading
-session cookies from Javascript, you're probably doing it wrong.
-
-.. versionadded:: 1.7
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
+session cookies from JavaScript, you're probably doing it wrong.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
 .. setting:: SESSION_COOKIE_NAME
 
-SESSION_COOKIE_NAME
--------------------
+``SESSION_COOKIE_NAME``
+-----------------------
 
 Default: ``'sessionid'``
 
-The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from :setting:`LANGUAGE_COOKIE_NAME`).
+The name of the cookie to use for sessions. This can be whatever you want
+(as long as it's different from the other cookie names in your application).
 
 .. setting:: SESSION_COOKIE_PATH
 
-SESSION_COOKIE_PATH
--------------------
+``SESSION_COOKIE_PATH``
+-----------------------
 
 Default: ``'/'``
 
@@ -2923,8 +3000,8 @@ its own session cookie.
 
 .. setting:: SESSION_COOKIE_SECURE
 
-SESSION_COOKIE_SECURE
----------------------
+``SESSION_COOKIE_SECURE``
+-------------------------
 
 Default: ``False``
 
@@ -2939,16 +3016,12 @@ requests and that's a good thing.
 
 .. _Firesheep: http://codebutler.com/firesheep
 
-.. versionadded:: 1.7
-
-This setting also affects cookies set by :mod:`django.contrib.messages`.
-
 .. setting:: SESSION_ENGINE
 
-SESSION_ENGINE
---------------
+``SESSION_ENGINE``
+------------------
 
-Default: ``django.contrib.sessions.backends.db``
+Default: ``'django.contrib.sessions.backends.db'``
 
 Controls where Django stores session data. Included engines are:
 
@@ -2962,8 +3035,8 @@ See :ref:`configuring-sessions` for more details.
 
 .. setting:: SESSION_EXPIRE_AT_BROWSER_CLOSE
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE
--------------------------------
+``SESSION_EXPIRE_AT_BROWSER_CLOSE``
+-----------------------------------
 
 Default: ``False``
 
@@ -2972,8 +3045,8 @@ Whether to expire the session when the user closes their browser. See
 
 .. setting:: SESSION_FILE_PATH
 
-SESSION_FILE_PATH
------------------
+``SESSION_FILE_PATH``
+---------------------
 
 Default: ``None``
 
@@ -2984,19 +3057,20 @@ used, Django will use the standard temporary directory for the system.
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
 
-SESSION_SAVE_EVERY_REQUEST
---------------------------
+``SESSION_SAVE_EVERY_REQUEST``
+------------------------------
 
 Default: ``False``
 
 Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
-that is, if any of its dictionary values have been assigned or deleted.
+that is, if any of its dictionary values have been assigned or deleted. Empty
+sessions won't be created, even if this setting is active.
 
 .. setting:: SESSION_SERIALIZER
 
-SESSION_SERIALIZER
-------------------
+``SESSION_SERIALIZER``
+----------------------
 
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 
@@ -3017,8 +3091,8 @@ Settings for :mod:`django.contrib.sites`.
 
 .. setting:: SITE_ID
 
-SITE_ID
--------
+``SITE_ID``
+-----------
 
 Default: Not defined
 
@@ -3029,15 +3103,15 @@ and a single database can manage content for multiple sites.
 
 .. _settings-staticfiles:
 
-Static files
+Static Files
 ============
 
 Settings for :mod:`django.contrib.staticfiles`.
 
 .. setting:: STATIC_ROOT
 
-STATIC_ROOT
------------
+``STATIC_ROOT``
+---------------
 
 Default: ``None``
 
@@ -3047,13 +3121,14 @@ static files for deployment.
 Example: ``"/var/www/example.com/static/"``
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
-(default) the :djadmin:`collectstatic` management command will collect static
-files into this directory. See the howto on :doc:`managing static
-files</howto/static-files/index>` for more details about usage.
+(as in the default project template), the :djadmin:`collectstatic` management
+command will collect static files into this directory. See the how-to on
+:doc:`managing static files</howto/static-files/index>` for more details about
+usage.
 
 .. warning::
 
-    This should be an (initially empty) destination directory for collecting
+    This should be an initially empty destination directory for collecting
     your static files from their permanent locations into one directory for
     ease of deployment; it is **not** a place to store your static files
     permanently. You should do that in directories that will be found by
@@ -3064,8 +3139,8 @@ files</howto/static-files/index>` for more details about usage.
 
 .. setting:: STATIC_URL
 
-STATIC_URL
-----------
+``STATIC_URL``
+--------------
 
 Default: ``None``
 
@@ -3085,24 +3160,24 @@ You may need to :ref:`configure these files to be served in development
 
 .. setting:: STATICFILES_DIRS
 
-STATICFILES_DIRS
-----------------
+``STATICFILES_DIRS``
+--------------------
 
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 This setting defines the additional locations the staticfiles app will traverse
 if the ``FileSystemFinder`` finder is enabled, e.g. if you use the
 :djadmin:`collectstatic` or :djadmin:`findstatic` management command or use the
 static file serving view.
 
-This should be set to a list or tuple of strings that contain full paths to
+This should be set to a list of strings that contain full paths to
 your additional files directory(ies) e.g.::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         "/home/special.polls.com/polls/static",
         "/home/polls.com/polls/static",
         "/opt/webfiles/common",
-    )
+    ]
 
 Note that these paths should use Unix-style forward slashes, even on Windows
 (e.g. ``"C:/Users/user/mysite/extra_static_content"``).
@@ -3114,10 +3189,10 @@ In case you want to refer to files in one of the locations with an additional
 namespace, you can **optionally** provide a prefix as ``(prefix, path)``
 tuples, e.g.::
 
-    STATICFILES_DIRS = (
+    STATICFILES_DIRS = [
         # ...
         ("downloads", "/opt/webfiles/stats"),
-    )
+    ]
 
 For example, assuming you have :setting:`STATIC_URL` set to ``'/static/'``, the
 :djadmin:`collectstatic` management command would collect the "stats" files
@@ -3133,8 +3208,8 @@ This would allow you to refer to the local file
 
 .. setting:: STATICFILES_STORAGE
 
-STATICFILES_STORAGE
--------------------
+``STATICFILES_STORAGE``
+-----------------------
 
 Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
 
@@ -3148,13 +3223,15 @@ For an example, see :ref:`staticfiles-from-cdn`.
 
 .. setting:: STATICFILES_FINDERS
 
-STATICFILES_FINDERS
--------------------
+``STATICFILES_FINDERS``
+-----------------------
 
 Default::
 
-    ("django.contrib.staticfiles.finders.FileSystemFinder",
-     "django.contrib.staticfiles.finders.AppDirectoriesFinder")
+    [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ]
 
 The list of finder backends that know how to find static files in
 various locations.
@@ -3217,7 +3294,8 @@ Email
 * :setting:`EMAIL_SSL_CERTFILE`
 * :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
-* :setting*`EMAIL_TIMEOUT`
+* :setting:`EMAIL_TIMEOUT`
+* :setting:`EMAIL_USE_LOCALTIME`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
@@ -3242,8 +3320,12 @@ File uploads
 * :setting:`MEDIA_ROOT`
 * :setting:`MEDIA_URL`
 
-Globalization (i18n/l10n)
--------------------------
+Forms
+-----
+* :setting:`FORM_RENDERER`
+
+Globalization (``i18n``/``l10n``)
+---------------------------------
 * :setting:`DATE_FORMAT`
 * :setting:`DATE_INPUT_FORMATS`
 * :setting:`DATETIME_FORMAT`
@@ -3274,17 +3356,20 @@ Globalization (i18n/l10n)
 
 HTTP
 ----
+* :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
+* :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DEFAULT_CONTENT_TYPE`
 * :setting:`DISALLOWED_USER_AGENTS`
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
-* :setting:`MIDDLEWARE_CLASSES`
+* :setting:`MIDDLEWARE`
 * Security
 
   * :setting:`SECURE_BROWSER_XSS_FILTER`
   * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
   * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+  * :setting:`SECURE_HSTS_PRELOAD`
   * :setting:`SECURE_HSTS_SECONDS`
   * :setting:`SECURE_PROXY_SSL_HEADER`
   * :setting:`SECURE_REDIRECT_EXEMPT`
@@ -3293,6 +3378,7 @@ HTTP
 * :setting:`SIGNING_BACKEND`
 * :setting:`USE_ETAGS`
 * :setting:`USE_X_FORWARDED_HOST`
+* :setting:`USE_X_FORWARDED_PORT`
 * :setting:`WSGI_APPLICATION`
 
 Logging
@@ -3308,13 +3394,16 @@ Models
 
 Security
 --------
-* Cross Site Request Forgery protection
+* Cross Site Request Forgery Protection
 
   * :setting:`CSRF_COOKIE_DOMAIN`
   * :setting:`CSRF_COOKIE_NAME`
   * :setting:`CSRF_COOKIE_PATH`
   * :setting:`CSRF_COOKIE_SECURE`
   * :setting:`CSRF_FAILURE_VIEW`
+  * :setting:`CSRF_HEADER_NAME`
+  * :setting:`CSRF_TRUSTED_ORIGINS`
+  * :setting:`CSRF_USE_SESSIONS`
 
 * :setting:`SECRET_KEY`
 * :setting:`X_FRAME_OPTIONS`
@@ -3326,12 +3415,7 @@ Serialization
 
 Templates
 ---------
-* :setting:`ALLOWED_INCLUDE_ROOTS`
-* :setting:`TEMPLATE_CONTEXT_PROCESSORS`
-* :setting:`TEMPLATE_DEBUG`
-* :setting:`TEMPLATE_DIRS`
-* :setting:`TEMPLATE_LOADERS`
-* :setting:`TEMPLATE_STRING_IF_INVALID`
+* :setting:`TEMPLATES`
 
 Testing
 -------

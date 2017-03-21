@@ -1,7 +1,9 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
-from django.contrib.gis.gdal import HAS_GDAL, OGRGeomType
 from django.contrib.gis.db import models
+from django.contrib.gis.gdal import OGRGeomType
+
+spherical_mercator_srid = 3857
 
 
 class GeoModelAdmin(ModelAdmin):
@@ -32,7 +34,7 @@ class GeoModelAdmin(ModelAdmin):
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.13/OpenLayers.js'
+    openlayers_url = 'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js'
     point_zoom = num_zoom - 6
     wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
@@ -44,28 +46,27 @@ class GeoModelAdmin(ModelAdmin):
     @property
     def media(self):
         "Injects OpenLayers JavaScript into the admin."
-        media = super(GeoModelAdmin, self).media
+        media = super().media
         media.add_js([self.openlayers_url])
         media.add_js(self.extra_js)
         return media
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
         Overloaded from ModelAdmin so that an OpenLayersWidget is used
         for viewing/editing 2D GeometryFields (OpenLayers 2 does not support
         3D editing).
         """
         if isinstance(db_field, models.GeometryField) and db_field.dim < 3:
-            kwargs.pop('request', None)
             # Setting the widget with the newly defined widget.
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)
         else:
-            return super(GeoModelAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+            return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def get_map_widget(self, db_field):
         """
-        Returns a subclass of the OpenLayersWidget (or whatever was specified
+        Return a subclass of the OpenLayersWidget (or whatever was specified
         in the `widget` attribute) using the settings from the attributes set
         in this class.
         """
@@ -79,7 +80,7 @@ class GeoModelAdmin(ModelAdmin):
             collection_type = 'None'
 
         class OLMap(self.widget):
-            template = self.map_template
+            template_name = self.map_template
             geom_type = db_field.geom_type
 
             wms_options = ''
@@ -123,14 +124,12 @@ class GeoModelAdmin(ModelAdmin):
                       }
         return OLMap
 
-if HAS_GDAL:
-    spherical_mercator_srid = 3857
 
-    class OSMGeoAdmin(GeoModelAdmin):
-        map_template = 'gis/admin/osm.html'
-        num_zoom = 20
-        map_srid = spherical_mercator_srid
-        max_extent = '-20037508,-20037508,20037508,20037508'
-        max_resolution = '156543.0339'
-        point_zoom = num_zoom - 6
-        units = 'm'
+class OSMGeoAdmin(GeoModelAdmin):
+    map_template = 'gis/admin/osm.html'
+    num_zoom = 20
+    map_srid = spherical_mercator_srid
+    max_extent = '-20037508,-20037508,20037508,20037508'
+    max_resolution = '156543.0339'
+    point_zoom = num_zoom - 6
+    units = 'm'

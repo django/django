@@ -1,6 +1,9 @@
 import unittest
+from datetime import (
+    date as original_date, datetime as original_datetime,
+    time as original_time,
+)
 
-from datetime import date as original_date, datetime as original_datetime, time as original_time
 from django.utils.datetime_safe import date, datetime, time
 
 
@@ -19,17 +22,27 @@ class DatetimeTests(unittest.TestCase):
         self.assertEqual(original_date(*self.more_recent), date(*self.more_recent))
         self.assertEqual(original_date(*self.really_old), date(*self.really_old))
 
-        self.assertEqual(original_date(*self.just_safe).strftime('%Y-%m-%d'), date(*self.just_safe).strftime('%Y-%m-%d'))
-        self.assertEqual(original_datetime(*self.just_safe).strftime('%Y-%m-%d'), datetime(*self.just_safe).strftime('%Y-%m-%d'))
+        self.assertEqual(
+            original_date(*self.just_safe).strftime('%Y-%m-%d'), date(*self.just_safe).strftime('%Y-%m-%d')
+        )
+        self.assertEqual(
+            original_datetime(*self.just_safe).strftime('%Y-%m-%d'), datetime(*self.just_safe).strftime('%Y-%m-%d')
+        )
 
-        self.assertEqual(original_time(*self.just_time).strftime('%H:%M:%S'), time(*self.just_time).strftime('%H:%M:%S'))
+        self.assertEqual(
+            original_time(*self.just_time).strftime('%H:%M:%S'), time(*self.just_time).strftime('%H:%M:%S')
+        )
 
     def test_safe_strftime(self):
         self.assertEqual(date(*self.just_unsafe[:3]).strftime('%Y-%m-%d (weekday %w)'), '1899-12-31 (weekday 0)')
         self.assertEqual(date(*self.just_safe).strftime('%Y-%m-%d (weekday %w)'), '1900-01-01 (weekday 1)')
 
-        self.assertEqual(datetime(*self.just_unsafe).strftime('%Y-%m-%d %H:%M:%S (weekday %w)'), '1899-12-31 23:59:59 (weekday 0)')
-        self.assertEqual(datetime(*self.just_safe).strftime('%Y-%m-%d %H:%M:%S (weekday %w)'), '1900-01-01 00:00:00 (weekday 1)')
+        self.assertEqual(
+            datetime(*self.just_unsafe).strftime('%Y-%m-%d %H:%M:%S (weekday %w)'), '1899-12-31 23:59:59 (weekday 0)'
+        )
+        self.assertEqual(
+            datetime(*self.just_safe).strftime('%Y-%m-%d %H:%M:%S (weekday %w)'), '1900-01-01 00:00:00 (weekday 1)'
+        )
 
         self.assertEqual(time(*self.just_time).strftime('%H:%M:%S AM'), '11:30:59 AM')
 
@@ -43,6 +56,6 @@ class DatetimeTests(unittest.TestCase):
         """
         Regression for #12524
 
-        Check that pre-1000AD dates are padded with zeros if necessary
+        Pre-1000AD dates are padded with zeros if necessary
         """
         self.assertEqual(date(1, 1, 1).strftime("%Y/%m/%d was a %A"), '0001/01/01 was a Monday')

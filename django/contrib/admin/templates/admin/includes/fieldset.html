@@ -14,13 +14,13 @@
                     {% else %}
                         {{ field.label_tag }}
                         {% if field.is_readonly %}
-                            <p>{{ field.contents }}</p>
+                            <div class="readonly">{{ field.contents }}</div>
                         {% else %}
                             {{ field.field }}
                         {% endif %}
                     {% endif %}
                     {% if field.field.help_text %}
-                        <p class="help">{{ field.field.help_text|safe }}</p>
+                        <div class="help">{{ field.field.help_text|safe }}</div>
                     {% endif %}
                 </div>
             {% endfor %}

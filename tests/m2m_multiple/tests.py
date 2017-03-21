@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime
 
 from django.test import TestCase
@@ -15,13 +13,13 @@ class M2MMultipleTests(TestCase):
         ]
 
         a1 = Article.objects.create(
-            headline="Area man steals", pub_date=datetime(2005, 11, 27)
+            headline="Parrot steals", pub_date=datetime(2005, 11, 27)
         )
         a1.primary_categories.add(c2, c3)
         a1.secondary_categories.add(c4)
 
         a2 = Article.objects.create(
-            headline="Area man runs", pub_date=datetime(2005, 11, 28)
+            headline="Parrot runs", pub_date=datetime(2005, 11, 28)
         )
         a2.primary_categories.add(c1, c2)
         a2.secondary_categories.add(c4)
@@ -48,7 +46,7 @@ class M2MMultipleTests(TestCase):
         )
         self.assertQuerysetEqual(
             c1.primary_article_set.all(), [
-                "Area man runs",
+                "Parrot runs",
             ],
             lambda a: a.headline
         )
@@ -57,8 +55,8 @@ class M2MMultipleTests(TestCase):
         )
         self.assertQuerysetEqual(
             c2.primary_article_set.all(), [
-                "Area man steals",
-                "Area man runs",
+                "Parrot steals",
+                "Parrot runs",
             ],
             lambda a: a.headline
         )
@@ -67,7 +65,7 @@ class M2MMultipleTests(TestCase):
         )
         self.assertQuerysetEqual(
             c3.primary_article_set.all(), [
-                "Area man steals",
+                "Parrot steals",
             ],
             lambda a: a.headline
         )
@@ -79,8 +77,8 @@ class M2MMultipleTests(TestCase):
         )
         self.assertQuerysetEqual(
             c4.secondary_article_set.all(), [
-                "Area man steals",
-                "Area man runs",
+                "Parrot steals",
+                "Parrot runs",
             ],
             lambda a: a.headline
         )

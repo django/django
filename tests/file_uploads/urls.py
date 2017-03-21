@@ -2,7 +2,6 @@ from django.conf.urls import url
 
 from . import views
 
-
 urlpatterns = [
     url(r'^upload/$', views.file_upload_view),
     url(r'^verify/$', views.file_upload_view_verify),

@@ -19,7 +19,7 @@ Although you can use Django without a database, it comes with an
 `object-relational mapper`_ in which you describe your database layout in Python
 code.
 
-.. _object-relational mapper: http://en.wikipedia.org/wiki/Object-relational_mapping
+.. _object-relational mapper: https://en.wikipedia.org/wiki/Object-relational_mapping
 
 The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving many years' worth of
@@ -33,16 +33,16 @@ database-schema problems. Here's a quick example:
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.full_name
 
     class Article(models.Model):
         pub_date = models.DateField()
         headline = models.CharField(max_length=200)
         content = models.TextField()
-        reporter = models.ForeignKey(Reporter)
+        reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
 Install it
@@ -51,7 +51,7 @@ Install it
 Next, run the Django command-line utility to create the database tables
 automatically:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py migrate
 
@@ -73,7 +73,7 @@ necessary:
 
     # No reporters are in the system yet.
     >>> Reporter.objects.all()
-    []
+    <QuerySet []>
 
     # Create a new Reporter.
     >>> r = Reporter(full_name='John Smith')
@@ -87,7 +87,7 @@ necessary:
 
     # Now the new reporter is in the database.
     >>> Reporter.objects.all()
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
 
     # Fields are represented as attributes on the Python object.
     >>> r.full_name
@@ -113,7 +113,7 @@ necessary:
 
     # Now the article is in the database.
     >>> Article.objects.all()
-    [<Article: Django is cool>]
+    <QuerySet [<Article: Django is cool>]>
 
     # Article objects get API access to related Reporter objects.
     >>> r = a.reporter
@@ -122,13 +122,13 @@ necessary:
 
     # And vice versa: Reporter objects get API access to Article objects.
     >>> r.article_set.all()
-    [<Article: Django is cool>]
+    <QuerySet [<Article: Django is cool>]>
 
     # The API follows relationships as far as you need, performing efficient
     # JOINs for you behind the scenes.
     # This finds all articles by a reporter whose name starts with "John".
     >>> Article.objects.filter(reporter__full_name__startswith='John')
-    [<Article: Django is cool>]
+    <QuerySet [<Article: Django is cool>]>
 
     # Change an object by altering its attributes and calling save().
     >>> r.full_name = 'Billy Goat'
@@ -142,7 +142,7 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 
 Once your models are defined, Django can automatically create a professional,
 production ready :doc:`administrative interface </ref/contrib/admin/index>` --
-a Web site that lets authenticated users add, change and delete objects. It's
+a website that lets authenticated users add, change and delete objects. It's
 as easy as registering your model in the admin site:
 
 .. snippet::
@@ -154,7 +154,7 @@ as easy as registering your model in the admin site:
         pub_date = models.DateField()
         headline = models.CharField(max_length=200)
         content = models.TextField()
-        reporter = models.ForeignKey(Reporter)
+        reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
 .. snippet::
     :filename: mysite/news/admin.py
@@ -201,15 +201,13 @@ example above:
         url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', views.article_detail),
     ]
 
-The code above maps URLs, as simple `regular expressions`_, to the location of
-Python callback functions ("views"). The regular expressions use parenthesis to
-"capture" values from the URLs. When a user requests a page, Django runs
-through each pattern, in order, and stops at the first one that matches the
-requested URL. (If none of them matches, Django calls a special-case 404 view.)
-This is blazingly fast, because the regular expressions are compiled at load
-time.
-
-.. _regular expressions: https://docs.python.org/howto/regex.html
+The code above maps URLs, as simple :ref:`regular expressions <regex-howto>`,
+to the location of Python callback functions ("views"). The regular expressions
+use parenthesis to "capture" values from the URLs. When a user requests a page,
+Django runs through each pattern, in order, and stops at the first one that
+matches the requested URL. (If none of them matches, Django calls a
+special-case 404 view.) This is blazingly fast, because the regular expressions
+are compiled at load time.
 
 Once one of the regexes matches, Django imports and calls the given view, which
 is a simple Python function. Each view gets passed a request object --
@@ -254,8 +252,8 @@ The code above loads the ``news/year_archive.html`` template.
 
 Django has a template search path, which allows you to minimize redundancy among
 templates. In your Django settings, you specify a list of directories to check
-for templates with :setting:`TEMPLATE_DIRS`. If a template doesn't exist in the
-first directory, it checks the second, and so on.
+for templates with :setting:`DIRS <TEMPLATES-DIRS>`. If a template doesn't exist
+in the first directory, it checks the second, and so on.
 
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
@@ -304,7 +302,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
 .. snippet:: html+django
     :filename: mysite/templates/base.html
 
-    {% load staticfiles %}
+    {% load static %}
     <html>
     <head>
         <title>{% block title %}{% endblock %}</title>

@@ -1,16 +1,14 @@
-import warnings
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 from django.apps import apps as django_apps
 from django.conf import settings
-from django.core import urlresolvers, paginator
+from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import NoReverseMatch, reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.six.moves.urllib.parse import urlencode
-from django.utils.six.moves.urllib.request import urlopen
 
-
-PING_URL = "http://www.google.com/webmasters/tools/ping"
+PING_URL = "https://www.google.com/webmasters/tools/ping"
 
 
 class SitemapNotFound(Exception):
@@ -19,37 +17,42 @@ class SitemapNotFound(Exception):
 
 def ping_google(sitemap_url=None, ping_url=PING_URL):
     """
-    Alerts Google that the sitemap for the current site has been updated.
+    Alert Google that the sitemap for the current site has been updated.
     If sitemap_url is provided, it should be an absolute path to the sitemap
     for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
-    function will attempt to deduce it by using urlresolvers.reverse().
+    function will attempt to deduce it by using urls.reverse().
     """
+    sitemap_full_url = _get_sitemap_full_url(sitemap_url)
+    params = urlencode({'sitemap': sitemap_full_url})
+    urlopen('%s?%s' % (ping_url, params))
+
+
+def _get_sitemap_full_url(sitemap_url):
+    if not django_apps.is_installed('django.contrib.sites'):
+        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+
     if sitemap_url is None:
         try:
             # First, try to get the "index" sitemap URL.
-            sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.index')
-        except urlresolvers.NoReverseMatch:
+            sitemap_url = reverse('django.contrib.sitemaps.views.index')
+        except NoReverseMatch:
             try:
                 # Next, try for the "global" sitemap URL.
-                sitemap_url = urlresolvers.reverse('django.contrib.sitemaps.views.sitemap')
-            except urlresolvers.NoReverseMatch:
+                sitemap_url = reverse('django.contrib.sitemaps.views.sitemap')
+            except NoReverseMatch:
                 pass
 
     if sitemap_url is None:
         raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
 
-    if not django_apps.is_installed('django.contrib.sites'):
-        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
     Site = django_apps.get_model('sites.Site')
     current_site = Site.objects.get_current()
-    url = "http://%s%s" % (current_site.domain, sitemap_url)
-    params = urlencode({'sitemap': url})
-    urlopen("%s?%s" % (ping_url, params))
+    return 'http://%s%s' % (current_site.domain, sitemap_url)
 
 
-class Sitemap(object):
+class Sitemap:
     # This limit is defined by Google. See the index documentation at
-    # http://sitemaps.org/protocol.php#index.
+    # http://www.sitemaps.org/protocol.html#index.
     limit = 50000
 
     # If protocol is None, the URLs in the sitemap will use the protocol
@@ -71,9 +74,9 @@ class Sitemap(object):
     def location(self, obj):
         return obj.get_absolute_url()
 
-    def _get_paginator(self):
+    @property
+    def paginator(self):
         return paginator.Paginator(self.items(), self.limit)
-    paginator = property(_get_paginator)
 
     def get_urls(self, page=1, site=None, protocol=None):
         # Determine protocol
@@ -115,8 +118,8 @@ class Sitemap(object):
         all_items_lastmod = True  # track if all items have a lastmod
         for item in self.paginator.page(page).object_list:
             loc = "%s://%s%s" % (protocol, domain, self.__get('location', item))
-            priority = self.__get('priority', item, None)
-            lastmod = self.__get('lastmod', item, None)
+            priority = self.__get('priority', item)
+            lastmod = self.__get('lastmod', item)
             if all_items_lastmod:
                 all_items_lastmod = lastmod is not None
                 if (all_items_lastmod and
@@ -126,7 +129,7 @@ class Sitemap(object):
                 'item': item,
                 'location': loc,
                 'lastmod': lastmod,
-                'changefreq': self.__get('changefreq', item, None),
+                'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }
             urls.append(url_info)
@@ -135,36 +138,16 @@ class Sitemap(object):
         return urls
 
 
-class FlatPageSitemap(Sitemap):
-    # This class is not a subclass of
-    # django.contrib.flatpages.sitemaps.FlatPageSitemap to avoid a
-    # circular import problem.
-
-    def __init__(self):
-        warnings.warn(
-            "'django.contrib.sitemaps.FlatPageSitemap' is deprecated. "
-            "Use 'django.contrib.flatpages.sitemaps.FlatPageSitemap' instead.",
-            RemovedInDjango19Warning,
-            stacklevel=2
-        )
-
-    def items(self):
-        if not django_apps.is_installed('django.contrib.sites'):
-            raise ImproperlyConfigured("FlatPageSitemap requires django.contrib.sites, which isn't installed.")
-        Site = django_apps.get_model('sites.Site')
-        current_site = Site.objects.get_current()
-        return current_site.flatpage_set.filter(registration_required=False)
-
-
 class GenericSitemap(Sitemap):
     priority = None
     changefreq = None
 
-    def __init__(self, info_dict, priority=None, changefreq=None):
+    def __init__(self, info_dict, priority=None, changefreq=None, protocol=None):
         self.queryset = info_dict['queryset']
-        self.date_field = info_dict.get('date_field', None)
+        self.date_field = info_dict.get('date_field')
         self.priority = priority
         self.changefreq = changefreq
+        self.protocol = protocol
 
     def items(self):
         # Make sure to return a clone; we don't want premature evaluation.

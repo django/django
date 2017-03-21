@@ -1,25 +1,17 @@
-from __future__ import unicode_literals
-
 import string
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.db.models.signals import pre_save, pre_delete
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
-
-from .requests import RequestSite as RealRequestSite
-from .shortcuts import get_current_site as real_get_current_site
-
+from django.db.models.signals import pre_delete, pre_save
+from django.http.request import split_domain_port
+from django.utils.translation import gettext_lazy as _
 
 SITE_CACHE = {}
 
 
 def _simple_domain_name_validator(value):
     """
-    Validates that the given value contains no whitespaces to prevent common
+    Validate that the given value contains no whitespaces to prevent common
     typos.
     """
     if not value:
@@ -43,15 +35,22 @@ class SiteManager(models.Manager):
 
     def _get_site_by_request(self, request):
         host = request.get_host()
-        if host not in SITE_CACHE:
-            site = self.get(domain__iexact=host)
-            SITE_CACHE[host] = site
-        return SITE_CACHE[host]
+        try:
+            # First attempt to look up the site by host with or without port.
+            if host not in SITE_CACHE:
+                SITE_CACHE[host] = self.get(domain__iexact=host)
+            return SITE_CACHE[host]
+        except Site.DoesNotExist:
+            # Fallback to looking up site after stripping port from the host.
+            domain, port = split_domain_port(host)
+            if domain not in SITE_CACHE:
+                SITE_CACHE[domain] = self.get(domain__iexact=domain)
+            return SITE_CACHE[domain]
 
     def get_current(self, request=None):
         """
-        Returns the current Site based on the SITE_ID in the project's settings.
-        If SITE_ID isn't defined, it returns the site with domain matching
+        Return the current Site based on the SITE_ID in the project's settings.
+        If SITE_ID isn't defined, return the site with domain matching
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
@@ -70,16 +69,22 @@ class SiteManager(models.Manager):
         )
 
     def clear_cache(self):
-        """Clears the ``Site`` object cache."""
+        """Clear the ``Site`` object cache."""
         global SITE_CACHE
         SITE_CACHE = {}
 
+    def get_by_natural_key(self, domain):
+        return self.get(domain=domain)
 
-@python_2_unicode_compatible
+
 class Site(models.Model):
 
-    domain = models.CharField(_('domain name'), max_length=100,
-        validators=[_simple_domain_name_validator])
+    domain = models.CharField(
+        _('domain name'),
+        max_length=100,
+        validators=[_simple_domain_name_validator],
+        unique=True,
+    )
     name = models.CharField(_('display name'), max_length=50)
     objects = SiteManager()
 
@@ -92,34 +97,25 @@ class Site(models.Model):
     def __str__(self):
         return self.domain
 
-
-class RequestSite(RealRequestSite):
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "Please import RequestSite from django.contrib.sites.requests.",
-            RemovedInDjango19Warning, stacklevel=2)
-        super(RequestSite, self).__init__(*args, **kwargs)
-
-
-def get_current_site(request):
-    warnings.warn(
-        "Please import get_current_site from django.contrib.sites.shortcuts.",
-        RemovedInDjango19Warning, stacklevel=2)
-    return real_get_current_site(request)
+    def natural_key(self):
+        return (self.domain,)
 
 
 def clear_site_cache(sender, **kwargs):
     """
-    Clears the cache (if primed) each time a site is saved or deleted
+    Clear the cache (if primed) each time a site is saved or deleted.
     """
     instance = kwargs['instance']
+    using = kwargs['using']
     try:
         del SITE_CACHE[instance.pk]
     except KeyError:
         pass
     try:
-        del SITE_CACHE[Site.objects.get(pk=instance.pk).domain]
+        del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
     except (KeyError, Site.DoesNotExist):
         pass
+
+
 pre_save.connect(clear_site_cache, sender=Site)
 pre_delete.connect(clear_site_cache, sender=Site)

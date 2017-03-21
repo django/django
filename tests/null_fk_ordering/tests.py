@@ -1,8 +1,6 @@
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
-from .models import Author, Article, SystemInfo, Forum, Post, Comment
+from .models import Article, Author, Comment, Forum, Post, SystemInfo
 
 
 class NullFkOrderingTests(TestCase):

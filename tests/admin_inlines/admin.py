@@ -1,5 +1,5 @@
-from django.contrib import admin
 from django import forms
+from django.contrib import admin
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
@@ -20,10 +20,12 @@ class BookInline(admin.TabularInline):
 
 class NonAutoPKBookTabularInline(admin.TabularInline):
     model = NonAutoPKBook
+    classes = ('collapse',)
 
 
 class NonAutoPKBookStackedInline(admin.StackedInline):
     model = NonAutoPKBook
+    classes = ('collapse',)
 
 
 class EditablePKBookTabularInline(admin.TabularInline):
@@ -35,9 +37,10 @@ class EditablePKBookStackedInline(admin.StackedInline):
 
 
 class AuthorAdmin(admin.ModelAdmin):
-    inlines = [BookInline,
-        NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
-        EditablePKBookTabularInline, EditablePKBookStackedInline]
+    inlines = [
+        BookInline, NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
+        EditablePKBookTabularInline, EditablePKBookStackedInline,
+    ]
 
 
 class InnerInline(admin.StackedInline):
@@ -72,6 +75,7 @@ class InnerInline3(admin.StackedInline):
 
 
 class TitleForm(forms.ModelForm):
+    title1 = forms.CharField(max_length=100)
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -187,6 +191,10 @@ class SomeChildModelForm(forms.ModelForm):
         widgets = {
             'position': forms.HiddenInput,
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].label = 'new label'
 
 
 class SomeChildModelInline(admin.TabularInline):

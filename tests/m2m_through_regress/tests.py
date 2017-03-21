@@ -1,84 +1,146 @@
-from __future__ import unicode_literals
+from io import StringIO
 
-from django.core import management
 from django.contrib.auth.models import User
+from django.core import management
 from django.test import TestCase
-from django.utils.six import StringIO
 
-from .models import (Person, Group, Membership, UserMembership, Car, Driver,
-    CarDriver)
+from .models import (
+    Car, CarDriver, Driver, Group, Membership, Person, UserMembership,
+)
 
 
 class M2MThroughTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.bob = Person.objects.create(name="Bob")
+        cls.jim = Person.objects.create(name="Jim")
 
-    def test_everything(self):
-        bob = Person.objects.create(name="Bob")
-        jim = Person.objects.create(name="Jim")
+        cls.rock = Group.objects.create(name="Rock")
+        cls.roll = Group.objects.create(name="Roll")
 
-        rock = Group.objects.create(name="Rock")
-        roll = Group.objects.create(name="Roll")
+        cls.frank = User.objects.create_user("frank", "frank@example.com", "password")
+        cls.jane = User.objects.create_user("jane", "jane@example.com", "password")
 
-        frank = User.objects.create_user("frank", "frank@example.com", "password")
-        jane = User.objects.create_user("jane", "jane@example.com", "password")
+        # normal intermediate model
+        cls.bob_rock = Membership.objects.create(person=cls.bob, group=cls.rock)
+        cls.bob_roll = Membership.objects.create(person=cls.bob, group=cls.roll, price=50)
+        cls.jim_rock = Membership.objects.create(person=cls.jim, group=cls.rock, price=50)
 
-        Membership.objects.create(person=bob, group=rock)
-        Membership.objects.create(person=bob, group=roll)
-        Membership.objects.create(person=jim, group=rock)
+        # intermediate model with custom id column
+        cls.frank_rock = UserMembership.objects.create(user=cls.frank, group=cls.rock)
+        cls.frank_roll = UserMembership.objects.create(user=cls.frank, group=cls.roll)
+        cls.jane_rock = UserMembership.objects.create(user=cls.jane, group=cls.rock)
 
+    def test_retrieve_reverse_m2m_items(self):
         self.assertQuerysetEqual(
-            bob.group_set.all(), [
+            self.bob.group_set.all(), [
                 "<Group: Rock>",
                 "<Group: Roll>",
             ],
             ordered=False
         )
 
+    def test_retrieve_forward_m2m_items(self):
         self.assertQuerysetEqual(
-            roll.members.all(), [
+            self.roll.members.all(), [
                 "<Person: Bob>",
             ]
         )
 
-        self.assertRaises(AttributeError, setattr, bob, "group_set", [])
-        self.assertRaises(AttributeError, setattr, roll, "members", [])
+    def test_cannot_use_setattr_on_reverse_m2m_with_intermediary_model(self):
+        msg = (
+            "Cannot set values on a ManyToManyField which specifies an "
+            "intermediary model. Use m2m_through_regress.Membership's Manager "
+            "instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.bob.group_set.set([])
 
-        self.assertRaises(AttributeError, rock.members.create, name="Anne")
-        self.assertRaises(AttributeError, bob.group_set.create, name="Funk")
+    def test_cannot_use_setattr_on_forward_m2m_with_intermediary_model(self):
+        msg = (
+            "Cannot set values on a ManyToManyField which specifies an "
+            "intermediary model. Use m2m_through_regress.Membership's Manager "
+            "instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.roll.members.set([])
 
-        UserMembership.objects.create(user=frank, group=rock)
-        UserMembership.objects.create(user=frank, group=roll)
-        UserMembership.objects.create(user=jane, group=rock)
+    def test_cannot_use_create_on_m2m_with_intermediary_model(self):
+        msg = (
+            "Cannot use create() on a ManyToManyField which specifies an "
+            "intermediary model. Use m2m_through_regress.Membership's "
+            "Manager instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.rock.members.create(name="Anne")
 
+    def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
+        msg = (
+            "Cannot use create() on a ManyToManyField which specifies an "
+            "intermediary model. Use m2m_through_regress.Membership's "
+            "Manager instead."
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.bob.group_set.create(name="Funk")
+
+    def test_retrieve_reverse_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(
-            frank.group_set.all(), [
+            self.frank.group_set.all(), [
                 "<Group: Rock>",
                 "<Group: Roll>",
             ],
             ordered=False
         )
 
+    def test_retrieve_forward_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(
-            roll.user_members.all(), [
+            self.roll.user_members.all(), [
                 "<User: frank>",
             ]
         )
 
+    def test_join_trimming_forwards(self):
+        """
+        Too many copies of the intermediate table aren't involved when doing a
+        join (#8046, #8254).
+        """
+        self.assertQuerysetEqual(
+            self.rock.members.filter(membership__price=50), [
+                "<Person: Jim>",
+            ]
+        )
+
+    def test_join_trimming_reverse(self):
+        self.assertQuerysetEqual(
+            self.bob.group_set.filter(membership__price=50), [
+                "<Group: Roll>",
+            ]
+        )
+
+
+class M2MThroughSerializationTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.bob = Person.objects.create(name="Bob")
+        cls.roll = Group.objects.create(name="Roll")
+        cls.bob_roll = Membership.objects.create(person=cls.bob, group=cls.roll)
+
     def test_serialization(self):
         "m2m-through models aren't serialized as m2m fields. Refs #8134"
-
-        p = Person.objects.create(name="Bob")
-        g = Group.objects.create(name="Roll")
-        m = Membership.objects.create(person=p, group=g)
-
-        pks = {"p_pk": p.pk, "g_pk": g.pk, "m_pk": m.pk}
+        pks = {"p_pk": self.bob.pk, "g_pk": self.roll.pk, "m_pk": self.bob_roll.pk}
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
-        self.assertJSONEqual(out.getvalue().strip(), """[{"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": 100, "group": %(g_pk)s}}, {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": "Bob"}}, {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}}]""" % pks)
+        self.assertJSONEqual(
+            out.getvalue().strip(),
+            '[{"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": '
+            '100, "group": %(g_pk)s}}, {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": '
+            '"Bob"}}, {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}}]'
+            % pks
+        )
 
         out = StringIO()
-        management.call_command("dumpdata", "m2m_through_regress", format="xml",
-            indent=2, stdout=out)
+        management.call_command("dumpdata", "m2m_through_regress", format="xml", indent=2, stdout=out)
         self.assertXMLEqual(out.getvalue().strip(), """
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
@@ -95,30 +157,6 @@ class M2MThroughTestCase(TestCase):
   </object>
 </django-objects>
         """.strip() % pks)
-
-    def test_join_trimming(self):
-        "Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254"
-        bob = Person.objects.create(name="Bob")
-        jim = Person.objects.create(name="Jim")
-
-        rock = Group.objects.create(name="Rock")
-        roll = Group.objects.create(name="Roll")
-
-        Membership.objects.create(person=bob, group=rock)
-        Membership.objects.create(person=jim, group=rock, price=50)
-        Membership.objects.create(person=bob, group=roll, price=50)
-
-        self.assertQuerysetEqual(
-            rock.members.filter(membership__price=50), [
-                "<Person: Jim>",
-            ]
-        )
-
-        self.assertQuerysetEqual(
-            bob.group_set.filter(membership__price=50), [
-                "<Group: Roll>",
-            ]
-        )
 
 
 class ToFieldThroughTests(TestCase):
@@ -174,14 +212,27 @@ class ToFieldThroughTests(TestCase):
             ["<Driver: Barney Gumble>", "<Driver: Ryan Briscoe>"]
         )
 
-    def test_add_null(self):
-        nullcar = Car.objects.create(make=None)
-        with self.assertRaises(ValueError):
-            nullcar.drivers._add_items('car', 'driver', self.unused_driver)
+    def test_m2m_relations_unusable_on_null_to_field(self):
+        nullcar = Car(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make" before this '
+            'many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            nullcar.drivers.all()
+
+    def test_m2m_relations_unusable_on_null_pk_obj(self):
+        msg = (
+            "'Car' instance needs to have a primary key value before a "
+            "many-to-many relationship can be used."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Car(make='Ford').drivers.all()
 
     def test_add_related_null(self):
         nulldriver = Driver.objects.create(name=None)
-        with self.assertRaises(ValueError):
+        msg = 'Cannot add "<Driver: None>": the value for field "driver" is None'
+        with self.assertRaisesMessage(ValueError, msg):
             self.car.drivers._add_items('car', 'driver', nulldriver)
 
     def test_add_reverse(self):
@@ -199,12 +250,17 @@ class ToFieldThroughTests(TestCase):
 
     def test_add_null_reverse(self):
         nullcar = Car.objects.create(make=None)
-        with self.assertRaises(ValueError):
+        msg = 'Cannot add "<Car: None>": the value for field "car" is None'
+        with self.assertRaisesMessage(ValueError, msg):
             self.driver.car_set._add_items('driver', 'car', nullcar)
 
     def test_add_null_reverse_related(self):
         nulldriver = Driver.objects.create(name=None)
-        with self.assertRaises(ValueError):
+        msg = (
+            '"<Driver: None>" needs to have a value for field "name" before '
+            'this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             nulldriver.car_set._add_items('driver', 'car', self.car)
 
     def test_remove(self):
@@ -230,7 +286,15 @@ class ThroughLoadDataTestCase(TestCase):
     fixtures = ["m2m_through"]
 
     def test_sequence_creation(self):
-        "Check that sequences on an m2m_through are created for the through model, not a phantom auto-generated m2m table. Refs #11107"
+        """
+        Sequences on an m2m_through are created for the through model, not a
+        phantom auto-generated m2m table (#11107).
+        """
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
-        self.assertJSONEqual(out.getvalue().strip(), """[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user": 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, "model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]""")
+        self.assertJSONEqual(
+            out.getvalue().strip(),
+            '[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user"'
+            ': 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, '
+            '"model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]'
+        )

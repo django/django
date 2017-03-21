@@ -1,4 +1,5 @@
 from . import site
+
 content = 'Another Bad Module'
 
 site._registry.update({

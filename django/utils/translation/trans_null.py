@@ -3,45 +3,53 @@
 # settings.USE_I18N = False can use this module rather than trans_real.py.
 
 from django.conf import settings
-from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe, SafeData
+
+
+def gettext(message):
+    return message
+
+
+gettext_noop = gettext_lazy = _ = gettext
 
 
 def ngettext(singular, plural, number):
     if number == 1:
         return singular
     return plural
+
+
 ngettext_lazy = ngettext
 
 
-def ungettext(singular, plural, number):
-    return force_text(ngettext(singular, plural, number))
-
-
 def pgettext(context, message):
-    return ugettext(message)
+    return gettext(message)
 
 
 def npgettext(context, singular, plural, number):
-    return ungettext(singular, plural, number)
-
-activate = lambda x: None
-deactivate = deactivate_all = lambda: None
-get_language = lambda: settings.LANGUAGE_CODE
-get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
-check_for_language = lambda x: True
+    return ngettext(singular, plural, number)
 
 
-def gettext(message):
-    if isinstance(message, SafeData):
-        return mark_safe(message)
-    return message
+def activate(x):
+    return None
 
 
-def ugettext(message):
-    return force_text(gettext(message))
+def deactivate():
+    return None
 
-gettext_noop = gettext_lazy = _ = gettext
+
+deactivate_all = deactivate
+
+
+def get_language():
+    return settings.LANGUAGE_CODE
+
+
+def get_language_bidi():
+    return settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
+
+
+def check_for_language(x):
+    return True
 
 
 def to_locale(language):

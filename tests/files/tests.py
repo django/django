@@ -1,20 +1,16 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-from io import BytesIO, StringIO
-import os
 import gzip
+import os
+import struct
 import tempfile
 import unittest
-import zlib
+from io import BytesIO, StringIO, TextIOWrapper
+from unittest import mock
 
 from django.core.files import File
-from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
-from django.utils._os import upath
-from django.utils import six
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 
 try:
     from PIL import Image
@@ -119,6 +115,37 @@ class FileTests(unittest.TestCase):
         f = File(StringIO('one\ntwo\nthree'))
         self.assertEqual(list(f), ['one\n', 'two\n', 'three'])
 
+    def test_readable(self):
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            self.assertTrue(test_file.readable())
+        self.assertFalse(test_file.readable())
+
+    def test_writable(self):
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            self.assertTrue(test_file.writable())
+        self.assertFalse(test_file.writable())
+        with tempfile.TemporaryFile('rb') as temp, File(temp, name='something.txt') as test_file:
+            self.assertFalse(test_file.writable())
+
+    def test_seekable(self):
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            self.assertTrue(test_file.seekable())
+        self.assertFalse(test_file.seekable())
+
+    def test_io_wrapper(self):
+        content = "vive l'été\n"
+        with tempfile.TemporaryFile() as temp, File(temp, name='something.txt') as test_file:
+            test_file.write(content.encode())
+            test_file.seek(0)
+            wrapper = TextIOWrapper(test_file, 'utf-8', newline='\n')
+            self.assertEqual(wrapper.read(), content)
+            wrapper.write(content)
+            wrapper.seek(0)
+            self.assertEqual(wrapper.read(), content * 2)
+            test_file = wrapper.detach()
+            test_file.seek(0)
+            self.assertEqual(test_file.read(), (content * 2).encode())
+
 
 class NoNameFileTestCase(unittest.TestCase):
     """
@@ -126,7 +153,7 @@ class NoNameFileTestCase(unittest.TestCase):
     urllib.urlopen()
     """
     def test_noname_file_default_name(self):
-        self.assertEqual(File(BytesIO(b'A file with no name')).name, None)
+        self.assertIsNone(File(BytesIO(b'A file with no name')).name)
 
     def test_noname_file_get_size(self):
         self.assertEqual(File(BytesIO(b'A file with no name')).size, 19)
@@ -134,30 +161,27 @@ class NoNameFileTestCase(unittest.TestCase):
 
 class ContentFileTestCase(unittest.TestCase):
     def test_content_file_default_name(self):
-        self.assertEqual(ContentFile(b"content").name, None)
+        self.assertIsNone(ContentFile(b"content").name)
 
     def test_content_file_custom_name(self):
         """
-        Test that the constructor of ContentFile accepts 'name' (#16590).
+        The constructor of ContentFile accepts 'name' (#16590).
         """
         name = "I can have a name too!"
         self.assertEqual(ContentFile(b"content", name=name).name, name)
 
     def test_content_file_input_type(self):
         """
-        Test that ContentFile can accept both bytes and unicode and that the
-        retrieved content is of the same type.
+        ContentFile can accept both bytes and strings and the retrieved content
+        is of the same type.
         """
         self.assertIsInstance(ContentFile(b"content").read(), bytes)
-        if six.PY3:
-            self.assertIsInstance(ContentFile("español").read(), six.text_type)
-        else:
-            self.assertIsInstance(ContentFile("español").read(), bytes)
+        self.assertIsInstance(ContentFile("español").read(), str)
 
 
 class DimensionClosingBug(unittest.TestCase):
     """
-    Test that get_image_dimensions() properly closes files (#8817)
+    get_image_dimensions() properly closes files (#8817)
     """
     @unittest.skipUnless(Image, "Pillow not installed")
     def test_not_closing_of_files(self):
@@ -181,7 +205,7 @@ class DimensionClosingBug(unittest.TestCase):
         # get_image_dimensions will call our catching_open instead of the
         # regular builtin one.
 
-        class FileWrapper(object):
+        class FileWrapper:
             _closed = []
 
             def __init__(self, f):
@@ -199,7 +223,7 @@ class DimensionClosingBug(unittest.TestCase):
 
         images.open = catching_open
         try:
-            images.get_image_dimensions(os.path.join(os.path.dirname(upath(__file__)), "test1.png"))
+            images.get_image_dimensions(os.path.join(os.path.dirname(__file__), "test1.png"))
         finally:
             del images.open
         self.assertTrue(FileWrapper._closed)
@@ -207,7 +231,7 @@ class DimensionClosingBug(unittest.TestCase):
 
 class InconsistentGetImageDimensionsBug(unittest.TestCase):
     """
-    Test that get_image_dimensions() works properly after various calls
+    get_image_dimensions() works properly after various calls
     using a file handler (#11158)
     """
     @unittest.skipUnless(Image, "Pillow not installed")
@@ -215,7 +239,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         """
         Multiple calls of get_image_dimensions() should return the same size.
         """
-        img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
+        img_path = os.path.join(os.path.dirname(__file__), "test.png")
         with open(img_path, 'rb') as fh:
             image = images.ImageFile(fh)
             image_pil = Image.open(fh)
@@ -230,22 +254,51 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         Regression test for #19457
         get_image_dimensions fails on some pngs, while Image.size is working good on them
         """
-        img_path = os.path.join(os.path.dirname(upath(__file__)), "magic.png")
-        try:
-            size = images.get_image_dimensions(img_path)
-        except zlib.error:
-            self.fail("Exception raised from get_image_dimensions().")
+        img_path = os.path.join(os.path.dirname(__file__), "magic.png")
+        size = images.get_image_dimensions(img_path)
         with open(img_path, 'rb') as fh:
             self.assertEqual(size, Image.open(fh).size)
 
 
+@unittest.skipUnless(Image, "Pillow not installed")
+class GetImageDimensionsTests(unittest.TestCase):
+
+    def test_invalid_image(self):
+        """
+        get_image_dimensions() should return (None, None) for the dimensions of
+        invalid images (#24441).
+
+        brokenimg.png is not a valid image and it has been generated by:
+        $ echo "123" > brokenimg.png
+        """
+        img_path = os.path.join(os.path.dirname(__file__), "brokenimg.png")
+        with open(img_path, 'rb') as fh:
+            size = images.get_image_dimensions(fh)
+            self.assertEqual(size, (None, None))
+
+    def test_valid_image(self):
+        """
+        get_image_dimensions() should catch struct.error while feeding the PIL
+        Image parser (#24544).
+
+        Emulates the Parser feed error. Since the error is raised on every feed
+        attempt, the resulting image size should be invalid: (None, None).
+        """
+        img_path = os.path.join(os.path.dirname(__file__), "test.png")
+        with mock.patch('PIL.ImageFile.Parser.feed', side_effect=struct.error):
+            with open(img_path, 'rb') as fh:
+                size = images.get_image_dimensions(fh)
+                self.assertEqual(size, (None, None))
+
+
 class FileMoveSafeTests(unittest.TestCase):
     def test_file_move_overwrite(self):
-        handle_a, self.file_a = tempfile.mkstemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
-        handle_b, self.file_b = tempfile.mkstemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
+        handle_a, self.file_a = tempfile.mkstemp()
+        handle_b, self.file_b = tempfile.mkstemp()
 
         # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
-        self.assertRaises(IOError, lambda: file_move_safe(self.file_a, self.file_b, allow_overwrite=False))
+        with self.assertRaises(IOError):
+            file_move_safe(self.file_a, self.file_b, allow_overwrite=False)
 
         # should allow it and continue on if allow_overwrite is True
         self.assertIsNone(file_move_safe(self.file_a, self.file_b, allow_overwrite=True))

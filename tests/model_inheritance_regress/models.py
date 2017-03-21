@@ -1,12 +1,8 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -18,7 +14,6 @@ class Place(models.Model):
         return "%s the place" % self.name
 
 
-@python_2_unicode_compatible
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
@@ -27,7 +22,6 @@ class Restaurant(Place):
         return "%s the restaurant" % self.name
 
 
-@python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
@@ -35,31 +29,24 @@ class ItalianRestaurant(Restaurant):
         return "%s the italian restaurant" % self.name
 
 
-@python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
+    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
     capacity = models.IntegerField()
 
     def __str__(self):
         return "%s the parking lot" % self.name
 
 
-class ParkingLot2(Place):
-    # In lieu of any other connector, an existing OneToOneField will be
-    # promoted to the primary key.
-    parent = models.OneToOneField(Place)
-
-
 class ParkingLot3(Place):
     # The parent_link connector need not be the pk on the model.
     primary_key = models.AutoField(primary_key=True)
-    parent = models.OneToOneField(Place, parent_link=True)
+    parent = models.OneToOneField(Place, models.CASCADE, parent_link=True)
 
 
 class ParkingLot4(models.Model):
     # Test parent_link connector can be discovered in abstract classes.
-    parent = models.OneToOneField(Place, parent_link=True)
+    parent = models.OneToOneField(Place, models.CASCADE, parent_link=True)
 
     class Meta:
         abstract = True
@@ -73,17 +60,16 @@ class ParkingLot4B(Place, ParkingLot4):
     pass
 
 
-@python_2_unicode_compatible
 class Supplier(models.Model):
     name = models.CharField(max_length=50)
-    restaurant = models.ForeignKey(Restaurant)
+    restaurant = models.ForeignKey(Restaurant, models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier, related_name='wholesale_supplier')
+    retailer = models.ForeignKey(Supplier, models.CASCADE, related_name='wholesale_supplier')
 
 
 class Parent(models.Model):
@@ -96,14 +82,13 @@ class Child(Parent):
 
 class SelfRefParent(models.Model):
     parent_data = models.IntegerField()
-    self_data = models.ForeignKey('self', null=True)
+    self_data = models.ForeignKey('self', models.SET_NULL, null=True)
 
 
 class SelfRefChild(SelfRefParent):
     child_data = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
@@ -138,7 +123,6 @@ class QualityControl(Evaluation):
     assignee = models.CharField(max_length=50)
 
 
-@python_2_unicode_compatible
 class BaseM(models.Model):
     base_name = models.CharField(max_length=100)
 
@@ -146,7 +130,6 @@ class BaseM(models.Model):
         return self.base_name
 
 
-@python_2_unicode_compatible
 class DerivedM(BaseM):
     customPK = models.IntegerField(primary_key=True)
     derived_name = models.CharField(max_length=100)
@@ -173,8 +156,7 @@ class InternalCertificationAudit(CertificationAudit):
     auditing_dept = models.CharField(max_length=20)
 
 
-# Check that abstract classes don't get m2m tables autocreated.
-@python_2_unicode_compatible
+# Abstract classes don't get m2m tables autocreated.
 class Person(models.Model):
     name = models.CharField(max_length=100)
 
@@ -185,7 +167,6 @@ class Person(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class AbstractEvent(models.Model):
     name = models.CharField(max_length=100)
     attendees = models.ManyToManyField(Person, related_name="%(class)s_set")
@@ -223,7 +204,6 @@ class Station(SearchableLocation):
 
 
 class BusStation(Station):
-    bus_routes = models.CommaSeparatedIntegerField(max_length=128)
     inbound = models.BooleanField(default=False)
 
 

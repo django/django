@@ -1,9 +1,12 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import SuspiciousOperation
 from django.db import connection, transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
+
+try:
+    from http import HTTPStatus
+except ImportError:  # Python < 3.5
+    pass
 
 
 def regular(request):
@@ -31,3 +34,7 @@ def suspicious(request):
 def malformed_post(request):
     request.POST
     return HttpResponse()
+
+
+def httpstatus_enum(request):
+    return HttpResponse(status=HTTPStatus.OK)

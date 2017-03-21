@@ -2,8 +2,6 @@
 Utility functions for generating "lorem ipsum" Latin text.
 """
 
-from __future__ import unicode_literals
-
 import random
 
 COMMON_P = (
@@ -16,44 +14,48 @@ COMMON_P = (
     'mollit anim id est laborum.'
 )
 
-WORDS = ('exercitationem', 'perferendis', 'perspiciatis', 'laborum', 'eveniet',
-        'sunt', 'iure', 'nam', 'nobis', 'eum', 'cum', 'officiis', 'excepturi',
-        'odio', 'consectetur', 'quasi', 'aut', 'quisquam', 'vel', 'eligendi',
-        'itaque', 'non', 'odit', 'tempore', 'quaerat', 'dignissimos',
-        'facilis', 'neque', 'nihil', 'expedita', 'vitae', 'vero', 'ipsum',
-        'nisi', 'animi', 'cumque', 'pariatur', 'velit', 'modi', 'natus',
-        'iusto', 'eaque', 'sequi', 'illo', 'sed', 'ex', 'et', 'voluptatibus',
-        'tempora', 'veritatis', 'ratione', 'assumenda', 'incidunt', 'nostrum',
-        'placeat', 'aliquid', 'fuga', 'provident', 'praesentium', 'rem',
-        'necessitatibus', 'suscipit', 'adipisci', 'quidem', 'possimus',
-        'voluptas', 'debitis', 'sint', 'accusantium', 'unde', 'sapiente',
-        'voluptate', 'qui', 'aspernatur', 'laudantium', 'soluta', 'amet',
-        'quo', 'aliquam', 'saepe', 'culpa', 'libero', 'ipsa', 'dicta',
-        'reiciendis', 'nesciunt', 'doloribus', 'autem', 'impedit', 'minima',
-        'maiores', 'repudiandae', 'ipsam', 'obcaecati', 'ullam', 'enim',
-        'totam', 'delectus', 'ducimus', 'quis', 'voluptates', 'dolores',
-        'molestiae', 'harum', 'dolorem', 'quia', 'voluptatem', 'molestias',
-        'magni', 'distinctio', 'omnis', 'illum', 'dolorum', 'voluptatum', 'ea',
-        'quas', 'quam', 'corporis', 'quae', 'blanditiis', 'atque', 'deserunt',
-        'laboriosam', 'earum', 'consequuntur', 'hic', 'cupiditate',
-        'quibusdam', 'accusamus', 'ut', 'rerum', 'error', 'minus', 'eius',
-        'ab', 'ad', 'nemo', 'fugit', 'officia', 'at', 'in', 'id', 'quos',
-        'reprehenderit', 'numquam', 'iste', 'fugiat', 'sit', 'inventore',
-        'beatae', 'repellendus', 'magnam', 'recusandae', 'quod', 'explicabo',
-        'doloremque', 'aperiam', 'consequatur', 'asperiores', 'commodi',
-        'optio', 'dolor', 'labore', 'temporibus', 'repellat', 'veniam',
-        'architecto', 'est', 'esse', 'mollitia', 'nulla', 'a', 'similique',
-        'eos', 'alias', 'dolore', 'tenetur', 'deleniti', 'porro', 'facere',
-        'maxime', 'corrupti')
+WORDS = (
+    'exercitationem', 'perferendis', 'perspiciatis', 'laborum', 'eveniet',
+    'sunt', 'iure', 'nam', 'nobis', 'eum', 'cum', 'officiis', 'excepturi',
+    'odio', 'consectetur', 'quasi', 'aut', 'quisquam', 'vel', 'eligendi',
+    'itaque', 'non', 'odit', 'tempore', 'quaerat', 'dignissimos',
+    'facilis', 'neque', 'nihil', 'expedita', 'vitae', 'vero', 'ipsum',
+    'nisi', 'animi', 'cumque', 'pariatur', 'velit', 'modi', 'natus',
+    'iusto', 'eaque', 'sequi', 'illo', 'sed', 'ex', 'et', 'voluptatibus',
+    'tempora', 'veritatis', 'ratione', 'assumenda', 'incidunt', 'nostrum',
+    'placeat', 'aliquid', 'fuga', 'provident', 'praesentium', 'rem',
+    'necessitatibus', 'suscipit', 'adipisci', 'quidem', 'possimus',
+    'voluptas', 'debitis', 'sint', 'accusantium', 'unde', 'sapiente',
+    'voluptate', 'qui', 'aspernatur', 'laudantium', 'soluta', 'amet',
+    'quo', 'aliquam', 'saepe', 'culpa', 'libero', 'ipsa', 'dicta',
+    'reiciendis', 'nesciunt', 'doloribus', 'autem', 'impedit', 'minima',
+    'maiores', 'repudiandae', 'ipsam', 'obcaecati', 'ullam', 'enim',
+    'totam', 'delectus', 'ducimus', 'quis', 'voluptates', 'dolores',
+    'molestiae', 'harum', 'dolorem', 'quia', 'voluptatem', 'molestias',
+    'magni', 'distinctio', 'omnis', 'illum', 'dolorum', 'voluptatum', 'ea',
+    'quas', 'quam', 'corporis', 'quae', 'blanditiis', 'atque', 'deserunt',
+    'laboriosam', 'earum', 'consequuntur', 'hic', 'cupiditate',
+    'quibusdam', 'accusamus', 'ut', 'rerum', 'error', 'minus', 'eius',
+    'ab', 'ad', 'nemo', 'fugit', 'officia', 'at', 'in', 'id', 'quos',
+    'reprehenderit', 'numquam', 'iste', 'fugiat', 'sit', 'inventore',
+    'beatae', 'repellendus', 'magnam', 'recusandae', 'quod', 'explicabo',
+    'doloremque', 'aperiam', 'consequatur', 'asperiores', 'commodi',
+    'optio', 'dolor', 'labore', 'temporibus', 'repellat', 'veniam',
+    'architecto', 'est', 'esse', 'mollitia', 'nulla', 'a', 'similique',
+    'eos', 'alias', 'dolore', 'tenetur', 'deleniti', 'porro', 'facere',
+    'maxime', 'corrupti',
+)
 
-COMMON_WORDS = ('lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur',
-        'adipisicing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt',
-        'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua')
+COMMON_WORDS = (
+    'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur',
+    'adipisicing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt',
+    'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua',
+)
 
 
 def sentence():
     """
-    Returns a randomly generated sentence of lorem ipsum text.
+    Return a randomly generated sentence of lorem ipsum text.
 
     The first word is capitalized, and the sentence ends in either a period or
     question mark. Commas are added at random.
@@ -68,7 +70,7 @@ def sentence():
 
 def paragraph():
     """
-    Returns a randomly generated paragraph of lorem ipsum text.
+    Return a randomly generated paragraph of lorem ipsum text.
 
     The paragraph consists of between 1 and 4 sentences, inclusive.
     """
@@ -77,7 +79,7 @@ def paragraph():
 
 def paragraphs(count, common=True):
     """
-    Returns a list of paragraphs as returned by paragraph().
+    Return a list of paragraphs as returned by paragraph().
 
     If `common` is True, then the first paragraph will be the standard
     'lorem ipsum' paragraph. Otherwise, the first paragraph will be random
@@ -94,15 +96,12 @@ def paragraphs(count, common=True):
 
 def words(count, common=True):
     """
-    Returns a string of `count` lorem ipsum words separated by a single space.
+    Return a string of `count` lorem ipsum words separated by a single space.
 
     If `common` is True, then the first 19 words will be the standard
     'lorem ipsum' words. Otherwise, all words will be selected randomly.
     """
-    if common:
-        word_list = list(COMMON_WORDS)
-    else:
-        word_list = []
+    word_list = list(COMMON_WORDS) if common else []
     c = len(word_list)
     if count > c:
         count -= c

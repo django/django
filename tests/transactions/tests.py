@@ -1,23 +1,20 @@
-from __future__ import unicode_literals
-
 import sys
-try:
-    import threading
-except ImportError:
-    threading = None
+import threading
 import time
 from unittest import skipIf, skipUnless
 
-from django.db import (connection, transaction,
-    DatabaseError, Error, IntegrityError, OperationalError)
-from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils import six
+from django.db import (
+    DatabaseError, Error, IntegrityError, OperationalError, connection,
+    transaction,
+)
+from django.test import (
+    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 
 from .models import Reporter
 
 
-@skipUnless(connection.features.uses_savepoints,
-        "'atomic' requires transactions and savepoints.")
+@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
 class AtomicTests(TransactionTestCase):
     """
     Tests for the atomic decorator and context manager.
@@ -44,7 +41,7 @@ class AtomicTests(TransactionTestCase):
         def make_reporter():
             Reporter.objects.create(first_name="Haddock")
             raise Exception("Oops, that's his last name")
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             make_reporter()
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
@@ -60,7 +57,7 @@ class AtomicTests(TransactionTestCase):
         def make_reporter():
             Reporter.objects.create(first_name="Haddock")
             raise Exception("Oops, that's his last name")
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             make_reporter()
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
@@ -70,7 +67,7 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(first_name="Haddock")
                 raise Exception("Oops, that's his last name")
@@ -81,20 +78,22 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(),
-                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+        self.assertQuerysetEqual(
+            Reporter.objects.all(),
+            ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>']
+        )
 
     def test_nested_commit_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
+            with self.assertRaisesMessage(Exception, "Oops"):
                 with transaction.atomic():
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
     def test_nested_rollback_commit(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
                 with transaction.atomic():
@@ -103,10 +102,10 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_nested_rollback_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic():
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -118,13 +117,15 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic(savepoint=False):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(),
-                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+        self.assertQuerysetEqual(
+            Reporter.objects.all(),
+            ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>']
+        )
 
     def test_merged_commit_rollback(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
+            with self.assertRaisesMessage(Exception, "Oops"):
                 with transaction.atomic(savepoint=False):
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -132,7 +133,7 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_commit(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
                 with transaction.atomic(savepoint=False):
@@ -141,10 +142,10 @@ class AtomicTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_rollback(self):
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -157,14 +158,13 @@ class AtomicTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with atomic:
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(),
-                ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
 
     def test_reuse_commit_rollback(self):
         atomic = transaction.atomic()
         with atomic:
             Reporter.objects.create(first_name="Tintin")
-            with six.assertRaisesRegex(self, Exception, "Oops"):
+            with self.assertRaisesMessage(Exception, "Oops"):
                 with atomic:
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -172,7 +172,7 @@ class AtomicTests(TransactionTestCase):
 
     def test_reuse_rollback_commit(self):
         atomic = transaction.atomic()
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with atomic:
                 Reporter.objects.create(last_name="Tintin")
                 with atomic:
@@ -182,10 +182,10 @@ class AtomicTests(TransactionTestCase):
 
     def test_reuse_rollback_rollback(self):
         atomic = transaction.atomic()
-        with six.assertRaisesRegex(self, Exception, "Oops"):
+        with self.assertRaisesMessage(Exception, "Oops"):
             with atomic:
                 Reporter.objects.create(last_name="Tintin")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with atomic:
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
@@ -228,8 +228,10 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
-@skipIf(connection.features.autocommits_when_autocommit_is_off,
-        "This test requires a non-autocommit mode that doesn't autocommit.")
+@skipIf(
+    connection.features.autocommits_when_autocommit_is_off,
+    "This test requires a non-autocommit mode that doesn't autocommit."
+)
 class AtomicWithoutAutocommitTests(AtomicTests):
     """All basic tests for atomic should also pass when autocommit is turned off."""
 
@@ -243,8 +245,7 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         transaction.set_autocommit(True)
 
 
-@skipUnless(connection.features.uses_savepoints,
-        "'atomic' requires transactions and savepoints.")
+@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
 class AtomicMergeTests(TransactionTestCase):
     """Test merging transactions with savepoint=False."""
 
@@ -255,7 +256,7 @@ class AtomicMergeTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic(savepoint=False):
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
                         Reporter.objects.create(first_name="Calculus")
                         raise Exception("Oops, that's his last name")
@@ -279,7 +280,7 @@ class AtomicMergeTests(TransactionTestCase):
             Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
                     with transaction.atomic(savepoint=False):
                         Reporter.objects.create(first_name="Calculus")
                         raise Exception("Oops, that's his last name")
@@ -294,8 +295,7 @@ class AtomicMergeTests(TransactionTestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
 
 
-@skipUnless(connection.features.uses_savepoints,
-        "'atomic' requires transactions and savepoints.")
+@skipUnless(connection.features.uses_savepoints, "'atomic' requires transactions and savepoints.")
 class AtomicErrorsTests(TransactionTestCase):
 
     available_apps = ['transactions']
@@ -361,18 +361,17 @@ class AtomicMySQLTests(TransactionTestCase):
     @skipIf(threading is None, "Test requires threading")
     def test_implicit_savepoint_rollback(self):
         """MySQL implicitly rolls back savepoints when it deadlocks (#22291)."""
+        Reporter.objects.create(id=1)
+        Reporter.objects.create(id=2)
 
-        other_thread_ready = threading.Event()
+        main_thread_ready = threading.Event()
 
         def other_thread():
             try:
                 with transaction.atomic():
-                    Reporter.objects.create(id=1, first_name="Tintin")
-                    other_thread_ready.set()
-                    # We cannot synchronize the two threads with an event here
-                    # because the main thread locks. Sleep for a little while.
-                    time.sleep(1)
-                    # 2) ... and this line deadlocks. (see below for 1)
+                    Reporter.objects.select_for_update().get(id=1)
+                    main_thread_ready.wait()
+                    # 1) This line locks... (see below for 2)
                     Reporter.objects.exclude(id=1).update(id=2)
             finally:
                 # This is the thread-local connection, not the main connection.
@@ -380,14 +379,18 @@ class AtomicMySQLTests(TransactionTestCase):
 
         other_thread = threading.Thread(target=other_thread)
         other_thread.start()
-        other_thread_ready.wait()
 
-        with six.assertRaisesRegex(self, OperationalError, 'Deadlock found'):
+        with self.assertRaisesMessage(OperationalError, 'Deadlock found'):
             # Double atomic to enter a transaction and create a savepoint.
             with transaction.atomic():
                 with transaction.atomic():
-                    # 1) This line locks... (see above for 2)
-                    Reporter.objects.create(id=1, first_name="Tintin")
+                    Reporter.objects.select_for_update().get(id=2)
+                    main_thread_ready.set()
+                    # The two threads can't be synchronized with an event here
+                    # because the other thread locks. Sleep for a little while.
+                    time.sleep(1)
+                    # 2) ... and this line deadlocks. (see above for 1)
+                    Reporter.objects.exclude(id=2).update(id=1)
 
         other_thread.join()
 
@@ -397,16 +400,18 @@ class AtomicMiscTests(TransactionTestCase):
     available_apps = []
 
     def test_wrap_callable_instance(self):
-        # Regression test for #20028
-        class Callable(object):
+        """#20028 -- Atomic must support wrapping callable instances."""
+
+        class Callable:
             def __call__(self):
                 pass
+
         # Must not raise an exception
         transaction.atomic(Callable())
 
     @skipUnlessDBFeature('can_release_savepoints')
     def test_atomic_does_not_leak_savepoints_on_failure(self):
-        # Regression test for #23074
+        """#23074 -- Savepoints must be released after rollback."""
 
         # Expect an error when rolling back a savepoint that doesn't exist.
         # Done outside of the transaction block to ensure proper recovery.
@@ -416,7 +421,7 @@ class AtomicMiscTests(TransactionTestCase):
             with transaction.atomic():
 
                 # Swallow the intentional error raised in the sub-transaction.
-                with six.assertRaisesRegex(self, Exception, "Oops"):
+                with self.assertRaisesMessage(Exception, "Oops"):
 
                     # Start a sub-transaction with a savepoint.
                     with transaction.atomic():
@@ -425,3 +430,34 @@ class AtomicMiscTests(TransactionTestCase):
 
                 # This is expected to fail because the savepoint no longer exists.
                 connection.savepoint_rollback(sid)
+
+
+@skipIf(
+    connection.features.autocommits_when_autocommit_is_off,
+    "This test requires a non-autocommit mode that doesn't autocommit."
+)
+class NonAutocommitTests(TransactionTestCase):
+
+    available_apps = []
+
+    def test_orm_query_after_error_and_rollback(self):
+        """
+        ORM queries are allowed after an error and a rollback in non-autocommit
+        mode (#27504).
+        """
+        transaction.set_autocommit(False)
+        r1 = Reporter.objects.create(first_name='Archibald', last_name='Haddock')
+        r2 = Reporter(first_name='Cuthbert', last_name='Calculus', id=r1.id)
+        with self.assertRaises(IntegrityError):
+            r2.save(force_insert=True)
+        transaction.rollback()
+        Reporter.objects.last()
+
+    def test_orm_query_without_autocommit(self):
+        """#24921 -- ORM queries must be possible after set_autocommit(False)."""
+        transaction.set_autocommit(False)
+        try:
+            Reporter.objects.create(first_name="Tintin")
+        finally:
+            transaction.rollback()
+            transaction.set_autocommit(True)

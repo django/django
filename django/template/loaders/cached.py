@@ -4,75 +4,93 @@ to load templates from them in order, caching the result.
 """
 
 import hashlib
-from django.template.base import TemplateDoesNotExist
-from django.template.loader import get_template_from_string
+
+from django.template import TemplateDoesNotExist
+from django.template.backends.django import copy_exception
 from django.utils.encoding import force_bytes
 
 from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    is_usable = True
 
     def __init__(self, engine, loaders):
         self.template_cache = {}
-        self.find_template_cache = {}
+        self.get_template_cache = {}
         self.loaders = engine.get_template_loaders(loaders)
-        super(Loader, self).__init__(engine)
+        super().__init__(engine)
 
-    def cache_key(self, template_name, template_dirs):
-        if template_dirs:
-            # If template directories were specified, use a hash to differentiate
-            return '-'.join([template_name, hashlib.sha1(force_bytes('|'.join(template_dirs))).hexdigest()])
-        else:
-            return template_name
+    def get_contents(self, origin):
+        return origin.loader.get_contents(origin)
 
-    def find_template(self, name, dirs=None):
+    def get_template(self, template_name, skip=None):
         """
-        Helper method. Lookup the template :param name: in all the configured loaders
+        Perform the caching that gives this loader its name. Often many of the
+        templates attempted will be missing, so memory use is of concern here.
+        To keep it in check, caching behavior is a little complicated when a
+        template is not found. See ticket #26306 for more details.
+
+        With template debugging disabled, cache the TemplateDoesNotExist class
+        for every missing template and raise a new instance of it after
+        fetching it from the cache.
+
+        With template debugging enabled, a unique TemplateDoesNotExist object
+        is cached for each missing template to preserve debug data. When
+        raising an exception, Python sets __traceback__, __context__, and
+        __cause__ attributes on it. Those attributes can contain references to
+        all sorts of objects up the call chain and caching them creates a
+        memory leak. Thus, unraised copies of the exceptions are cached and
+        copies of those copies are raised after they're fetched from the cache.
         """
-        key = self.cache_key(name, dirs)
+        key = self.cache_key(template_name, skip)
+        cached = self.get_template_cache.get(key)
+        if cached:
+            if isinstance(cached, type) and issubclass(cached, TemplateDoesNotExist):
+                raise cached(template_name)
+            elif isinstance(cached, TemplateDoesNotExist):
+                raise copy_exception(cached)
+            return cached
+
         try:
-            result = self.find_template_cache[key]
-        except KeyError:
-            result = None
-            for loader in self.loaders:
-                try:
-                    template, display_name = loader(name, dirs)
-                except TemplateDoesNotExist:
-                    pass
-                else:
-                    origin = self.engine.make_origin(display_name, loader, name, dirs)
-                    result = template, origin
-                    break
-        self.find_template_cache[key] = result
-        if result:
-            return result
+            template = super().get_template(template_name, skip)
+        except TemplateDoesNotExist as e:
+            self.get_template_cache[key] = copy_exception(e) if self.engine.debug else TemplateDoesNotExist
+            raise
         else:
-            self.template_cache[key] = TemplateDoesNotExist
-            raise TemplateDoesNotExist(name)
+            self.get_template_cache[key] = template
 
-    def load_template(self, template_name, template_dirs=None):
-        key = self.cache_key(template_name, template_dirs)
-        template_tuple = self.template_cache.get(key)
-        # A cached previous failure:
-        if template_tuple is TemplateDoesNotExist:
-            raise TemplateDoesNotExist
-        elif template_tuple is None:
-            template, origin = self.find_template(template_name, template_dirs)
-            if not hasattr(template, 'render'):
-                try:
-                    template = get_template_from_string(template, origin, template_name)
-                except TemplateDoesNotExist:
-                    # If compiling the template we found raises TemplateDoesNotExist,
-                    # back off to returning the source and display name for the template
-                    # we were asked to load. This allows for correct identification (later)
-                    # of the actual template that does not exist.
-                    self.template_cache[key] = (template, origin)
-            self.template_cache[key] = (template, None)
-        return self.template_cache[key]
+        return template
+
+    def get_template_sources(self, template_name):
+        for loader in self.loaders:
+            yield from loader.get_template_sources(template_name)
+
+    def cache_key(self, template_name, skip=None):
+        """
+        Generate a cache key for the template name, dirs, and skip.
+
+        If skip is provided, only origins that match template_name are included
+        in the cache key. This ensures each template is only parsed and cached
+        once if contained in different extend chains like:
+
+            x -> a -> a
+            y -> a -> a
+            z -> a -> a
+        """
+        dirs_prefix = ''
+        skip_prefix = ''
+
+        if skip:
+            matching = [origin.name for origin in skip if origin.template_name == template_name]
+            if matching:
+                skip_prefix = self.generate_hash(matching)
+
+        return '-'.join(filter(bool, [str(template_name), skip_prefix, dirs_prefix]))
+
+    def generate_hash(self, values):
+        return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()
 
     def reset(self):
         "Empty the template cache."
         self.template_cache.clear()
-        self.find_template_cache.clear()
+        self.get_template_cache.clear()

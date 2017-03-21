@@ -1,18 +1,49 @@
-from __future__ import unicode_literals
-
 from datetime import date
+from decimal import Decimal
 
+from django.db.models.query import RawQuerySet
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Author, Book, Coffee, Reviewer, FriendlyAuthor
+from .models import Author, Book, BookFkAsPk, Coffee, FriendlyAuthor, Reviewer
 
 
 class RawQueryTests(TestCase):
-    fixtures = ['raw_query_books.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(first_name='Joe', last_name='Smith', dob=date(1950, 9, 20))
+        cls.a2 = Author.objects.create(first_name='Jill', last_name='Doe', dob=date(1920, 4, 2))
+        cls.a3 = Author.objects.create(first_name='Bob', last_name='Smith', dob=date(1986, 1, 25))
+        cls.a4 = Author.objects.create(first_name='Bill', last_name='Jones', dob=date(1932, 5, 10))
+        cls.b1 = Book.objects.create(
+            title='The awesome book', author=cls.a1, paperback=False,
+            opening_line='It was a bright cold day in April and the clocks were striking thirteen.',
+        )
+        cls.b2 = Book.objects.create(
+            title='The horrible book', author=cls.a1, paperback=True,
+            opening_line=(
+                'On an evening in the latter part of May a middle-aged man '
+                'was walking homeward from Shaston to the village of Marlott, '
+                'in the adjoining Vale of Blakemore, or Blackmoor.'
+            ),
+        )
+        cls.b3 = Book.objects.create(
+            title='Another awesome book', author=cls.a1, paperback=False,
+            opening_line='A squat grey building of only thirty-four stories.',
+        )
+        cls.b4 = Book.objects.create(
+            title='Some other book', author=cls.a3, paperback=True,
+            opening_line='It was the day my grandmother exploded.',
+        )
+        cls.c1 = Coffee.objects.create(brand='dunkin doughnuts')
+        cls.c2 = Coffee.objects.create(brand='starbucks')
+        cls.r1 = Reviewer.objects.create()
+        cls.r2 = Reviewer.objects.create()
+        cls.r1.reviewed.add(cls.b2, cls.b3, cls.b4)
 
     def assertSuccessfulRawQuery(self, model, query, expected_results,
-            expected_annotations=(), params=[], translations=None):
+                                 expected_annotations=(), params=[], translations=None):
         """
         Execute the passed query against the passed model and check the output
         """
@@ -31,7 +62,7 @@ class RawQueryTests(TestCase):
                 setattr(orig_item, *annotation)
 
             for field in model._meta.fields:
-                # Check that all values on the model are equal
+                # All values on the model are equal
                 self.assertEqual(
                     getattr(item, field.attname),
                     getattr(orig_item, field.attname)
@@ -44,20 +75,24 @@ class RawQueryTests(TestCase):
 
     def assertNoAnnotations(self, results):
         """
-        Check that the results of a raw query contain no annotations
+        The results of a raw query contain no annotations
         """
         self.assertAnnotations(results, ())
 
     def assertAnnotations(self, results, expected_annotations):
         """
-        Check that the passed raw query results contain the expected
-        annotations
+        The passed raw query results contain the expected annotations
         """
         if expected_annotations:
             for index, result in enumerate(results):
                 annotation, value = expected_annotations[index]
                 self.assertTrue(hasattr(result, annotation))
                 self.assertEqual(getattr(result, annotation), value)
+
+    def test_rawqueryset_repr(self):
+        queryset = RawQuerySet(raw_query='SELECT * FROM raw_query_author')
+        self.assertEqual(repr(queryset), '<RawQuerySet: SELECT * FROM raw_query_author>')
+        self.assertEqual(repr(queryset.query), '<RawQuery: SELECT * FROM raw_query_author>')
 
     def test_simple_raw_query(self):
         """
@@ -183,20 +218,22 @@ class RawQueryTests(TestCase):
     def test_missing_fields(self):
         query = "SELECT id, first_name, dob FROM raw_query_author"
         for author in Author.objects.raw(query):
-            self.assertNotEqual(author.first_name, None)
+            self.assertIsNotNone(author.first_name)
             # last_name isn't given, but it will be retrieved on demand
-            self.assertNotEqual(author.last_name, None)
+            self.assertIsNotNone(author.last_name)
 
     def test_missing_fields_without_PK(self):
         query = "SELECT first_name, dob FROM raw_query_author"
-        try:
+        with self.assertRaisesMessage(InvalidQuery, 'Raw query must include the primary key'):
             list(Author.objects.raw(query))
-            self.fail('Query without primary key should fail')
-        except InvalidQuery:
-            pass
 
     def test_annotations(self):
-        query = "SELECT a.*, count(b.id) as book_count FROM raw_query_author a LEFT JOIN raw_query_book b ON a.id = b.author_id GROUP BY a.id, a.first_name, a.last_name, a.dob ORDER BY a.id"
+        query = (
+            "SELECT a.*, count(b.id) as book_count "
+            "FROM raw_query_author a "
+            "LEFT JOIN raw_query_book b ON a.id = b.author_id "
+            "GROUP BY a.id, a.first_name, a.last_name, a.dob ORDER BY a.id"
+        )
         expected_annotations = (
             ('book_count', 3),
             ('book_count', 0),
@@ -239,13 +276,11 @@ class RawQueryTests(TestCase):
         first_two = Author.objects.raw(query)[0:2]
         self.assertEqual(len(first_two), 2)
 
-        self.assertRaises(TypeError, lambda: Author.objects.raw(query)['test'])
+        with self.assertRaises(TypeError):
+            Author.objects.raw(query)['test']
 
     def test_inheritance(self):
-        # date is the end of the Cuban Missile Crisis, I have no idea when
-        # Wesley was born
-        f = FriendlyAuthor.objects.create(first_name="Wesley", last_name="Chun",
-            dob=date(1962, 10, 28))
+        f = FriendlyAuthor.objects.create(first_name="Wesley", last_name="Chun", dob=date(1962, 10, 28))
         query = "SELECT * FROM raw_query_friendlyauthor"
         self.assertEqual(
             [o.pk for o in FriendlyAuthor.objects.raw(query)], [f.pk]
@@ -255,7 +290,20 @@ class RawQueryTests(TestCase):
         self.assertNumQueries(1, list, Author.objects.raw("SELECT * FROM raw_query_author"))
 
     def test_subquery_in_raw_sql(self):
-        try:
-            list(Book.objects.raw('SELECT id FROM (SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq'))
-        except InvalidQuery:
-            self.fail("Using a subquery in a RawQuerySet raised InvalidQuery")
+        list(Book.objects.raw('SELECT id FROM (SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq'))
+
+    def test_db_column_name_is_used_in_raw_query(self):
+        """
+        Regression test that ensures the `column` attribute on the field is
+        used to generate the list of fields included in the query, as opposed
+        to the `attname`. This is important when the primary key is a
+        ForeignKey field because `attname` and `column` are not necessarily the
+        same.
+        """
+        b = BookFkAsPk.objects.create(book=self.b1)
+        self.assertEqual(list(BookFkAsPk.objects.raw('SELECT not_the_default FROM raw_query_bookfkaspk')), [b])
+
+    def test_decimal_parameter(self):
+        c = Coffee.objects.create(brand='starbucks', price=20.5)
+        qs = Coffee.objects.raw("SELECT * FROM raw_query_coffee WHERE price >= %s", params=[Decimal(20)])
+        self.assertEqual(list(qs), [c])

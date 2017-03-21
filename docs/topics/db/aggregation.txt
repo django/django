@@ -68,18 +68,19 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     {'price__max': Decimal('81.20')}
 
     # Cost per page
+    >>> from django.db.models import F, FloatField, Sum
     >>> Book.objects.all().aggregate(
     ...    price_per_page=Sum(F('price')/F('pages'), output_field=FloatField()))
     {'price_per_page': 0.4470664529184653}
 
     # All the following queries involve traversing the Book<->Publisher
-    # many-to-many relationship backward
+    # foreign key relationship backwards.
 
     # Each publisher, each with a count of books as a "num_books" attribute.
     >>> from django.db.models import Count
     >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
     >>> pubs
-    [<Publisher BaloneyPress>, <Publisher SalamiPress>, ...]
+    <QuerySet [<Publisher: BaloneyPress>, <Publisher: SalamiPress>, ...]>
     >>> pubs[0].num_books
     73
 
@@ -88,8 +89,8 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> pubs[0].num_books
     1323
 
-Generating aggregates over a QuerySet
-=====================================
+Generating aggregates over a ``QuerySet``
+=========================================
 
 Django provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
@@ -134,8 +135,8 @@ the maximum and minimum price of all books, we would issue the query::
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
-Generating aggregates for each item in a QuerySet
-=================================================
+Generating aggregates for each item in a ``QuerySet``
+=====================================================
 
 The second way to generate summary values is to generate an independent
 summary for each object in a ``QuerySet``. For example, if you are retrieving
@@ -184,16 +185,40 @@ of the ``annotate()`` clause is a ``QuerySet``; this ``QuerySet`` can be
 modified using any other ``QuerySet`` operation, including ``filter()``,
 ``order_by()``, or even additional calls to ``annotate()``.
 
+.. _combining-multiple-aggregations:
+
+Combining multiple aggregations
+-------------------------------
+
+Combining multiple aggregations with ``annotate()`` will `yield the wrong
+results <https://code.djangoproject.com/ticket/10060>`_ because joins are used
+instead of subqueries:
+
+    >>> book = Book.objects.first()
+    >>> book.authors.count()
+    2
+    >>> book.store_set.count()
+    3
+    >>> q = Book.objects.annotate(Count('authors'), Count('store'))
+    >>> q[0].authors__count
+    6
+    >>> q[0].store__count
+    6
+
+For most aggregates, there is no way to avoid this problem, however, the
+:class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
+may help:
+
+    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('store', distinct=True))
+    >>> q[0].authors__count
+    2
+    >>> q[0].store__count
+    3
+
 .. admonition:: If in doubt, inspect the SQL query!
 
     In order to understand what happens in your query, consider inspecting the
     ``query`` property of your ``QuerySet``.
-
-    For instance, combining multiple aggregations with ``annotate()`` will
-    yield the wrong results, as `multiple tables are cross joined`_,
-    resulting in duplicate row aggregations.
-
-.. _multiple tables are cross joined: https://code.djangoproject.com/ticket/10060
 
 Joins and aggregates
 ====================
@@ -220,7 +245,7 @@ price field of the book model to produce a minimum and maximum value.
 
 The same rules apply to the ``aggregate()`` clause. If you wanted to
 know the lowest and highest price of any book that is available for sale
-in a store, you could use the aggregate::
+in any of the stores, you could use the aggregate::
 
     >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Max('books__price'))
 
@@ -271,11 +296,11 @@ file::
 
     >>> Author.objects.aggregate(average_rating=Avg('book__rating'))
 
-(The resulting dictionary will have a key called ``'average__rating'``. If no
+(The resulting dictionary will have a key called ``'average_rating'``. If no
 such alias were specified, it would be the rather long ``'book__rating__avg'``.)
 
-Aggregations and other QuerySet clauses
-=======================================
+Aggregations and other ``QuerySet`` clauses
+===========================================
 
 ``filter()`` and ``exclude()``
 ------------------------------
@@ -318,29 +343,67 @@ Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing a complex query that involves both ``annotate()`` and
-``filter()`` clauses, particular attention should be paid to the order
-in which the clauses are applied to the ``QuerySet``.
+``filter()`` clauses, pay particular attention to the order in which the
+clauses are applied to the ``QuerySet``.
 
-When an ``annotate()`` clause is applied to a query, the annotation is
-computed over the state of the query up to the point where the annotation
-is requested. The practical implication of this is that ``filter()`` and
-``annotate()`` are not commutative operations -- that is, there is a
-difference between the query::
+When an ``annotate()`` clause is applied to a query, the annotation is computed
+over the state of the query up to the point where the annotation is requested.
+The practical implication of this is that ``filter()`` and ``annotate()`` are
+not commutative operations.
 
-    >>> Publisher.objects.annotate(num_books=Count('book')).filter(book__rating__gt=3.0)
+Given:
 
-and the query::
+* Publisher A has two books with ratings 4 and 5.
+* Publisher B has two books with ratings 1 and 4.
+* Publisher C has one book with rating 1.
 
-    >>> Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count('book'))
+Here's an example with the ``Count`` aggregate::
 
-Both queries will return a list of publishers that have at least one good
-book (i.e., a book with a rating exceeding 3.0). However, the annotation in
-the first query will provide the total number of all books published by the
-publisher; the second query will only include good books in the annotated
-count. In the first query, the annotation precedes the filter, so the
-filter has no effect on the annotation. In the second query, the filter
-precedes the annotation, and as a result, the filter constrains the objects
-considered when calculating the annotation.
+    >>> a, b = Publisher.objects.annotate(num_books=Count('book', distinct=True)).filter(book__rating__gt=3.0)
+    >>> a, a.num_books
+    (<Publisher: A>, 2)
+    >>> b, b.num_books
+    (<Publisher: B>, 2)
+
+    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count('book'))
+    >>> a, a.num_books
+    (<Publisher: A>, 2)
+    >>> b, b.num_books
+    (<Publisher: B>, 1)
+
+Both queries return a list of publishers that have at least one book with a
+rating exceeding 3.0, hence publisher C is excluded.
+
+In the first query, the annotation precedes the filter, so the filter has no
+effect on the annotation. ``distinct=True`` is required to avoid a :ref:`query
+bug <combining-multiple-aggregations>`.
+
+The second query counts the number of books that have a rating exceeding 3.0
+for each publisher. The filter precedes the annotation, so the filter
+constrains the objects considered when calculating the annotation.
+
+Here's another example with the ``Avg`` aggregate::
+
+    >>> a, b = Publisher.objects.annotate(avg_rating=Avg('book__rating')).filter(book__rating__gt=3.0)
+    >>> a, a.avg_rating
+    (<Publisher: A>, 4.5)  # (5+4)/2
+    >>> b, b.avg_rating
+    (<Publisher: B>, 2.5)  # (1+4)/2
+
+    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(avg_rating=Avg('book__rating'))
+    >>> a, a.avg_rating
+    (<Publisher: A>, 4.5)  # (5+4)/2
+    >>> b, b.avg_rating
+    (<Publisher: B>, 4.0)  # 4/1 (book with rating 1 excluded)
+
+The first query asks for the average rating of all a publisher's books for
+publisher's that have at least one book with a rating exceeding 3.0. The second
+query asks for the average of a publisher's book's ratings for only those
+ratings exceeding 3.0.
+
+It's difficult to intuit how the ORM will translate complex querysets into SQL
+queries so when in doubt, inspect the SQL with ``str(queryset.query)`` and
+write plenty of tests.
 
 ``order_by()``
 --------------
@@ -416,8 +479,10 @@ will be automatically added to the result set. However, if the ``values()``
 clause is applied after the ``annotate()`` clause, you need to explicitly
 include the aggregate column.
 
+.. _aggregation-ordering-interaction:
+
 Interaction with default ordering or ``order_by()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Fields that are mentioned in the ``order_by()`` part of a queryset (or which
 are used in the default ordering on a model) are used when selecting the

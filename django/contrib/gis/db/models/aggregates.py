@@ -1,35 +1,34 @@
+from django.contrib.gis.db.models.fields import ExtentField
 from django.db.models.aggregates import Aggregate
-from django.contrib.gis.db.models.fields import GeometryField, ExtentField
 
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 
 
 class GeoAggregate(Aggregate):
-    template = None
     function = None
     is_extent = False
 
     def as_sql(self, compiler, connection):
-        if connection.ops.oracle:
-            if not hasattr(self, 'tolerance'):
-                self.tolerance = 0.05
-            self.extra['tolerance'] = self.tolerance
+        # this will be called again in parent, but it's needed now - before
+        # we get the spatial_aggregate_name
+        connection.ops.check_expression_support(self)
+        self.function = connection.ops.spatial_aggregate_name(self.name)
+        return super().as_sql(compiler, connection)
 
-        template, function = connection.ops.spatial_aggregate_sql(self)
-        if template is None:
-            template = '%(function)s(%(expressions)s)'
-        self.extra['template'] = self.extra.get('template', template)
-        self.extra['function'] = self.extra.get('function', function)
-        return super(GeoAggregate, self).as_sql(compiler, connection)
+    def as_oracle(self, compiler, connection):
+        if not hasattr(self, 'tolerance'):
+            self.tolerance = 0.05
+        self.extra['tolerance'] = self.tolerance
+        if not self.is_extent:
+            self.template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
+        return self.as_sql(compiler, connection)
 
-    def prepare(self, query=None, allow_joins=True, reuse=None, summarize=False):
-        c = super(GeoAggregate, self).prepare(query, allow_joins, reuse, summarize)
-        if not isinstance(self.expressions[0].output_field, GeometryField):
-            raise ValueError('Geospatial aggregates only allowed on geometry fields.')
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        for expr in c.get_source_expressions():
+            if not hasattr(expr.field, 'geom_type'):
+                raise ValueError('Geospatial aggregates only allowed on geometry fields.')
         return c
-
-    def convert_value(self, value, connection):
-        return connection.ops.convert_geom(value, self.output_field)
 
 
 class Collect(GeoAggregate):
@@ -41,10 +40,10 @@ class Extent(GeoAggregate):
     is_extent = '2D'
 
     def __init__(self, expression, **extra):
-        super(Extent, self).__init__(expression, output_field=ExtentField(), **extra)
+        super().__init__(expression, output_field=ExtentField(), **extra)
 
-    def convert_value(self, value, connection):
-        return connection.ops.convert_extent(value)
+    def convert_value(self, value, expression, connection, context):
+        return connection.ops.convert_extent(value, context.get('transformed_srid'))
 
 
 class Extent3D(GeoAggregate):
@@ -52,10 +51,10 @@ class Extent3D(GeoAggregate):
     is_extent = '3D'
 
     def __init__(self, expression, **extra):
-        super(Extent3D, self).__init__(expression, output_field=ExtentField(), **extra)
+        super().__init__(expression, output_field=ExtentField(), **extra)
 
-    def convert_value(self, value, connection):
-        return connection.ops.convert_extent3d(value)
+    def convert_value(self, value, expression, connection, context):
+        return connection.ops.convert_extent3d(value, context.get('transformed_srid'))
 
 
 class MakeLine(GeoAggregate):

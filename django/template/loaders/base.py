@@ -1,48 +1,49 @@
-from django.template.base import TemplateDoesNotExist
-from django.template.loader import get_template_from_string
+from django.template import Template, TemplateDoesNotExist
 
 
-class Loader(object):
-    is_usable = False
-    # Only used to raise a deprecation warning. Remove in Django 2.0.
-    _accepts_engine_in_init = True
+class Loader:
 
     def __init__(self, engine):
         self.engine = engine
 
-    def __call__(self, template_name, template_dirs=None):
-        return self.load_template(template_name, template_dirs)
-
-    def load_template(self, template_name, template_dirs=None):
-        source, display_name = self.load_template_source(
-            template_name, template_dirs)
-        origin = self.engine.make_origin(
-            display_name, self.load_template_source,
-            template_name, template_dirs)
-
-        try:
-            template = get_template_from_string(source, origin, template_name)
-        except TemplateDoesNotExist:
-            # If compiling the template we found raises TemplateDoesNotExist,
-            # back off to returning the source and display name for the
-            # template we were asked to load. This allows for correct
-            # identification of the actual template that does not exist.
-            return source, display_name
-        else:
-            return template, None
-
-    def load_template_source(self, template_name, template_dirs=None):
+    def get_template(self, template_name, skip=None):
         """
-        Returns a tuple containing the source and origin for the given
+        Call self.get_template_sources() and return a Template object for
+        the first template matching template_name. If skip is provided, ignore
+        template origins in skip. This is used to avoid recursion during
+        template extending.
+        """
+        tried = []
+
+        for origin in self.get_template_sources(template_name):
+            if skip is not None and origin in skip:
+                tried.append((origin, 'Skipped'))
+                continue
+
+            try:
+                contents = self.get_contents(origin)
+            except TemplateDoesNotExist:
+                tried.append((origin, 'Source does not exist'))
+                continue
+            else:
+                return Template(
+                    contents, origin, origin.template_name, self.engine,
+                )
+
+        raise TemplateDoesNotExist(template_name, tried=tried)
+
+    def get_template_sources(self, template_name):
+        """
+        An iterator that yields possible matching template paths for a
         template name.
         """
         raise NotImplementedError(
-            "subclasses of Loader must provide "
-            "a load_template_source() method")
+            'subclasses of Loader must provide a get_template_sources() method'
+        )
 
     def reset(self):
         """
-        Resets any state maintained by the loader instance (e.g. cached
+        Reset any state maintained by the loader instance (e.g. cached
         templates or cached loader modules).
         """
         pass

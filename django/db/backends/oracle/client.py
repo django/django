@@ -1,6 +1,6 @@
 import subprocess
 
-from django.db.backends import BaseDatabaseClient
+from django.db.backends.base.client import BaseDatabaseClient
 
 
 class DatabaseClient(BaseDatabaseClient):
@@ -9,4 +9,4 @@ class DatabaseClient(BaseDatabaseClient):
     def runshell(self):
         conn_string = self.connection._connect_string()
         args = [self.executable_name, "-L", conn_string]
-        subprocess.call(args)
+        subprocess.check_call(args)

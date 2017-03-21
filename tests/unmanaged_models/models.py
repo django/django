@@ -4,12 +4,11 @@ is generated for the table on various manage.py operations.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+
 
 #  All of these models are created in the database by Django.
 
 
-@python_2_unicode_compatible
 class A01(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
@@ -21,9 +20,8 @@ class A01(models.Model):
         return self.f_a
 
 
-@python_2_unicode_compatible
 class B01(models.Model):
-    fk_a = models.ForeignKey(A01)
+    fk_a = models.ForeignKey(A01, models.CASCADE)
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
 
@@ -36,7 +34,6 @@ class B01(models.Model):
         return self.f_a
 
 
-@python_2_unicode_compatible
 class C01(models.Model):
     mm_a = models.ManyToManyField(A01, db_table='d01')
     f_a = models.CharField(max_length=10, db_index=True)
@@ -53,7 +50,6 @@ class C01(models.Model):
 # since we have told Django they aren't managed by Django.
 
 
-@python_2_unicode_compatible
 class A02(models.Model):
     f_a = models.CharField(max_length=10, db_index=True)
 
@@ -65,13 +61,12 @@ class A02(models.Model):
         return self.f_a
 
 
-@python_2_unicode_compatible
 class B02(models.Model):
     class Meta:
         db_table = 'b01'
         managed = False
 
-    fk_a = models.ForeignKey(A02)
+    fk_a = models.ForeignKey(A02, models.CASCADE)
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
 
@@ -81,7 +76,6 @@ class B02(models.Model):
 
 # To re-use the many-to-many intermediate table, we need to manually set up
 # things up.
-@python_2_unicode_compatible
 class C02(models.Model):
     mm_a = models.ManyToManyField(A02, through="Intermediate")
     f_a = models.CharField(max_length=10, db_index=True)
@@ -96,8 +90,8 @@ class C02(models.Model):
 
 
 class Intermediate(models.Model):
-    a02 = models.ForeignKey(A02, db_column="a01_id")
-    c02 = models.ForeignKey(C02, db_column="c01_id")
+    a02 = models.ForeignKey(A02, models.CASCADE, db_column="a01_id")
+    c02 = models.ForeignKey(C02, models.CASCADE, db_column="c01_id")
 
     class Meta:
         db_table = 'd01'
@@ -128,7 +122,7 @@ class Unmanaged1(models.Model):
         db_table = "unmanaged_models_proxy1"
 
 
-# Unmanged with an m2m to unmanaged: the intermediary table won't be created.
+# Unmanaged with an m2m to unmanaged: the intermediary table won't be created.
 class Unmanaged2(models.Model):
     mm = models.ManyToManyField(Unmanaged1)
 

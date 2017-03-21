@@ -23,10 +23,9 @@ THE SOFTWARE.
 """
 import os
 import shutil
+import stat
 import tarfile
 import zipfile
-
-from django.utils import six
 
 
 class ArchiveException(Exception):
@@ -50,7 +49,7 @@ def extract(path, to_path=''):
         archive.extract(to_path)
 
 
-class Archive(object):
+class Archive:
     """
     The external API class that encapsulates an archive implementation.
     """
@@ -60,7 +59,7 @@ class Archive(object):
     @staticmethod
     def _archive_cls(file):
         cls = None
-        if isinstance(file, six.string_types):
+        if isinstance(file, str):
             filename = file
         else:
             try:
@@ -94,15 +93,24 @@ class Archive(object):
         self._archive.close()
 
 
-class BaseArchive(object):
+class BaseArchive:
     """
     Base Archive class.  Implementations should inherit this class.
     """
+    @staticmethod
+    def _copy_permissions(mode, filename):
+        """
+        If the file in the archive has some permissions (this assumes a file
+        won't be writable/executable without being readable), apply those
+        permissions to the unarchived file.
+        """
+        if mode & stat.S_IROTH:
+            os.chmod(filename, mode)
+
     def split_leading_dir(self, path):
         path = str(path)
         path = path.lstrip('/').lstrip('\\')
-        if '/' in path and (('\\' in path and path.find('/') < path.find('\\'))
-                            or '\\' not in path):
+        if '/' in path and (('\\' in path and path.find('/') < path.find('\\')) or '\\' not in path):
             return path.split('/', 1)
         elif '\\' in path:
             return path.split('\\', 1)
@@ -111,8 +119,8 @@ class BaseArchive(object):
 
     def has_leading_dir(self, paths):
         """
-        Returns true if all the paths have the same leading path name
-        (i.e., everything is in one subdirectory in an archive)
+        Return True if all the paths have the same leading path name
+        (i.e., everything is in one subdirectory in an archive).
         """
         common_prefix = None
         for path in paths:
@@ -141,9 +149,7 @@ class TarArchive(BaseArchive):
         self._archive.list(*args, **kwargs)
 
     def extract(self, to_path):
-        # note: python<=2.5 doesn't seem to know about pax headers, filter them
-        members = [member for member in self._archive.getmembers()
-                   if member.name != 'pax_global_header']
+        members = self._archive.getmembers()
         leading = self.has_leading_dir(x.name for x in members)
         for member in members:
             name = member.name
@@ -167,6 +173,7 @@ class TarArchive(BaseArchive):
                         os.makedirs(dirname)
                     with open(filename, 'wb') as outfile:
                         shutil.copyfileobj(extracted, outfile)
+                        self._copy_permissions(member.mode, filename)
                 finally:
                     if extracted:
                         extracted.close()
@@ -188,6 +195,7 @@ class ZipArchive(BaseArchive):
         leading = self.has_leading_dir(namelist)
         for name in namelist:
             data = self._archive.read(name)
+            info = self._archive.getinfo(name)
             if leading:
                 name = self.split_leading_dir(name)[1]
             filename = os.path.join(to_path, name)
@@ -201,9 +209,13 @@ class ZipArchive(BaseArchive):
             else:
                 with open(filename, 'wb') as outfile:
                     outfile.write(data)
+                # Convert ZipInfo.external_attr to mode
+                mode = info.external_attr >> 16
+                self._copy_permissions(mode, filename)
 
     def close(self):
         self._archive.close()
+
 
 extension_map = {
     '.tar': TarArchive,

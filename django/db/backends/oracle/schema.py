@@ -1,11 +1,11 @@
+import binascii
 import copy
 import datetime
-import binascii
+import re
 
-from django.utils import six
-from django.utils.text import force_text
-from django.db.backends.schema import BaseDatabaseSchemaEditor
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
+from django.utils.text import force_text
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -22,9 +22,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
-        elif isinstance(value, six.string_types):
-            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
-        elif isinstance(value, six.buffer_types):
+        elif isinstance(value, str):
+            return "'%s'" % value.replace("\'", "\'\'")
+        elif isinstance(value, (bytes, bytearray, memoryview)):
             return "'%s'" % force_text(binascii.hexlify(value))
         elif isinstance(value, bool):
             return "1" if value else "0"
@@ -33,14 +33,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model):
         # Run superclass action
-        super(DatabaseSchemaEditor, self).delete_model(model)
+        super().delete_model(model)
         # Clean up any autoincrement trigger
         self.execute("""
             DECLARE
                 i INTEGER;
             BEGIN
-                SELECT COUNT(*) INTO i FROM USER_CATALOG
-                    WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
+                SELECT COUNT(1) INTO i FROM USER_SEQUENCES
+                    WHERE SEQUENCE_NAME = '%(sq_name)s';
                 IF i = 1 THEN
                     EXECUTE IMMEDIATE 'DROP SEQUENCE "%(sq_name)s"';
                 END IF;
@@ -49,52 +49,63 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def alter_field(self, model, old_field, new_field, strict=False):
         try:
-            # Run superclass action
-            super(DatabaseSchemaEditor, self).alter_field(model, old_field, new_field, strict)
+            super().alter_field(model, old_field, new_field, strict)
         except DatabaseError as e:
             description = str(e)
-            # If we're changing to/from LOB fields, we need to do a
+            # If we're changing type to an unsupported type we need a
             # SQLite-ish workaround
             if 'ORA-22858' in description or 'ORA-22859' in description:
-                self._alter_field_lob_workaround(model, old_field, new_field)
+                self._alter_field_type_workaround(model, old_field, new_field)
             else:
                 raise
 
-    def _alter_field_lob_workaround(self, model, old_field, new_field):
+    def _alter_field_type_workaround(self, model, old_field, new_field):
         """
-        Oracle refuses to change a column type from/to LOB to/from a regular
-        column. In Django, this shows up when the field is changed from/to
-        a TextField.
+        Oracle refuses to change from some type to other type.
         What we need to do instead is:
-        - Add the desired field with a temporary name
+        - Add a nullable version of the desired field with a temporary name
         - Update the table to transfer values from old to new
         - Drop old column
-        - Rename the new column
+        - Rename the new column and possibly drop the nullable property
         """
         # Make a new field that's like the new one but with a temporary
         # column name.
         new_temp_field = copy.deepcopy(new_field)
+        new_temp_field.null = True
         new_temp_field.column = self._generate_temp_name(new_field.column)
         # Add it
         self.add_field(model, new_temp_field)
+        # Explicit data type conversion
+        # https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements002.htm#sthref340
+        new_value = self.quote_name(old_field.column)
+        old_type = old_field.db_type(self.connection)
+        if re.match('^N?CLOB', old_type):
+            new_value = "TO_CHAR(%s)" % new_value
+            old_type = 'VARCHAR2'
+        if re.match('^N?VARCHAR2', old_type):
+            new_internal_type = new_field.get_internal_type()
+            if new_internal_type == 'DateField':
+                new_value = "TO_DATE(%s, 'YYYY-MM-DD')" % new_value
+            elif new_internal_type == 'DateTimeField':
+                new_value = "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
+            elif new_internal_type == 'TimeField':
+                # TimeField are stored as TIMESTAMP with a 1900-01-01 date part.
+                new_value = "TO_TIMESTAMP(CONCAT('1900-01-01 ', %s), 'YYYY-MM-DD HH24:MI:SS.FF')" % new_value
         # Transfer values across
         self.execute("UPDATE %s set %s=%s" % (
             self.quote_name(model._meta.db_table),
             self.quote_name(new_temp_field.column),
-            self.quote_name(old_field.column),
+            new_value,
         ))
         # Drop the old field
         self.remove_field(model, old_field)
-        # Rename the new field
-        self.alter_field(model, new_temp_field, new_field)
-        # Close the connection to force cx_Oracle to get column types right
-        # on a new cursor
-        self.connection.close()
+        # Rename and possibly make the new field NOT NULL
+        super().alter_field(model, new_temp_field, new_field)
 
     def normalize_name(self, name):
         """
         Get the properly shortened and uppercased identifier as returned by
-        quote_name(), but without the actual quotes.
+        quote_name() but without the quotes.
         """
         nn = self.quote_name(name)
         if nn[0] == '"' and nn[-1] == '"':
@@ -102,9 +113,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return nn
 
     def _generate_temp_name(self, for_name):
-        """
-        Generates temporary names for workarounds that need temp columns
-        """
+        """Generate temporary names for workarounds that need temp columns."""
         suffix = hex(hash(for_name)).upper()[1:]
         return self.normalize_name(for_name + "_" + suffix)
 

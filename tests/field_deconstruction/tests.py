@@ -1,13 +1,10 @@
-from __future__ import unicode_literals
-
-import warnings
-
+from django.apps import apps
 from django.db import models
-from django.test import TestCase, override_settings
-from django.utils import six
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import isolate_lru_cache
 
 
-class FieldDeconstructionTests(TestCase):
+class FieldDeconstructionTests(SimpleTestCase):
     """
     Tests the deconstruct() method on all core fields.
     """
@@ -23,9 +20,8 @@ class FieldDeconstructionTests(TestCase):
         field.set_attributes_from_name("is_awesome_test")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(name, "is_awesome_test")
-        self.assertIsInstance(name, six.text_type)
         # Now try with a ForeignKey
-        field = models.ForeignKey("some_fake.ModelName")
+        field = models.ForeignKey("some_fake.ModelName", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertIsNone(name)
         field.set_attributes_from_name("author")
@@ -70,6 +66,13 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.CharField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"max_length": 65, "null": True, "blank": True})
+
+    def test_char_field_choices(self):
+        field = models.CharField(max_length=1, choices=(("A", "One"), ("B", "Two")))
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.CharField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": [("A", "One"), ("B", "Two")], "max_length": 1})
 
     def test_csi_field(self):
         field = models.CommaSeparatedIntegerField(max_length=100)
@@ -151,11 +154,11 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {"upload_to": "foo/bar", "max_length": 200})
 
     def test_file_path_field(self):
-        field = models.FilePathField(match=".*\.txt$")
+        field = models.FilePathField(match=r".*\.txt$")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"match": ".*\.txt$"})
+        self.assertEqual(kwargs, {"match": r".*\.txt$"})
         field = models.FilePathField(recursive=True, allow_folders=True, max_length=123)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
@@ -172,55 +175,57 @@ class FieldDeconstructionTests(TestCase):
     def test_foreign_key(self):
         # Test basic pointing
         from django.contrib.auth.models import Permission
-        field = models.ForeignKey("auth.Permission")
-        field.rel.to = Permission
-        field.rel.field_name = "id"
+        field = models.ForeignKey("auth.Permission", models.CASCADE)
+        field.remote_field.model = Permission
+        field.remote_field.field_name = "id"
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
         self.assertFalse(hasattr(kwargs['to'], "setting_name"))
         # Test swap detection for swappable model
-        field = models.ForeignKey("auth.User")
+        field = models.ForeignKey("auth.User", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.User"})
+        self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
         # Test nonexistent (for now) model
-        field = models.ForeignKey("something.Else")
+        field = models.ForeignKey("something.Else", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "something.Else"})
+        self.assertEqual(kwargs, {"to": "something.Else", "on_delete": models.CASCADE})
         # Test on_delete
-        field = models.ForeignKey("auth.User", on_delete=models.SET_NULL)
+        field = models.ForeignKey("auth.User", models.SET_NULL)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.SET_NULL})
         # Test to_field preservation
-        field = models.ForeignKey("auth.Permission", to_field="foobar")
+        field = models.ForeignKey("auth.Permission", models.CASCADE, to_field="foobar")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "to_field": "foobar"})
+        self.assertEqual(kwargs, {"to": "auth.Permission", "to_field": "foobar", "on_delete": models.CASCADE})
         # Test related_name preservation
-        field = models.ForeignKey("auth.Permission", related_name="foobar")
+        field = models.ForeignKey("auth.Permission", models.CASCADE, related_name="foobar")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar"})
+        self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar", "on_delete": models.CASCADE})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
-        # It doesn't matter that we swapped out user for permission;
-        # there's no validation. We just want to check the setting stuff works.
-        field = models.ForeignKey("auth.Permission")
-        name, path, args, kwargs = field.deconstruct()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            # It doesn't matter that we swapped out user for permission;
+            # there's no validation. We just want to check the setting stuff works.
+            field = models.ForeignKey("auth.Permission", models.CASCADE)
+            name, path, args, kwargs = field.deconstruct()
+
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_image_field(self):
@@ -238,9 +243,7 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(kwargs, {})
 
     def test_ip_address_field(self):
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            field = models.IPAddressField()
+        field = models.IPAddressField()
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.IPAddressField")
         self.assertEqual(args, [])
@@ -294,10 +297,12 @@ class FieldDeconstructionTests(TestCase):
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_many_to_many_field_swapped(self):
-        # It doesn't matter that we swapped out user for permission;
-        # there's no validation. We just want to check the setting stuff works.
-        field = models.ManyToManyField("auth.Permission")
-        name, path, args, kwargs = field.deconstruct()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            # It doesn't matter that we swapped out user for permission;
+            # there's no validation. We just want to check the setting stuff works.
+            field = models.ManyToManyField("auth.Permission")
+            name, path, args, kwargs = field.deconstruct()
+
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.Permission"})

@@ -1,26 +1,29 @@
-from unittest import skipIf
 import warnings
+from unittest import skipIf
 
-from django.conf import settings
 from django.test import SimpleTestCase
 
-from ..utils import render, setup
+from ..utils import setup
 
 try:
     import numpy
+    VisibleDeprecationWarning = numpy.VisibleDeprecationWarning
 except ImportError:
     numpy = False
+except AttributeError:  # numpy < 1.9.0, e.g. 1.8.2 in Debian 8
+    VisibleDeprecationWarning = DeprecationWarning
 
 
 @skipIf(numpy is False, "Numpy must be installed to run these tests.")
 class NumpyTests(SimpleTestCase):
     # Ignore numpy deprecation warnings (#23890)
-    warnings.filterwarnings(
-        "ignore",
-        "Using a non-integer number instead of an "
-        "integer will result in an error in the future",
-        DeprecationWarning
-    )
+    if numpy:
+        warnings.filterwarnings(
+            "ignore",
+            "Using a non-integer number instead of an "
+            "integer will result in an error in the future",
+            VisibleDeprecationWarning
+        )
 
     @setup({'numpy-array-index01': '{{ var.1 }}'})
     def test_numpy_array_index01(self):
@@ -28,7 +31,7 @@ class NumpyTests(SimpleTestCase):
         Numpy's array-index syntax allows a template to access a certain
         item of a subscriptable object.
         """
-        output = render(
+        output = self.engine.render_to_string(
             'numpy-array-index01',
             {'var': numpy.array(["first item", "second item"])},
         )
@@ -39,11 +42,11 @@ class NumpyTests(SimpleTestCase):
         """
         Fail silently when the array index is out of range.
         """
-        output = render(
+        output = self.engine.render_to_string(
             'numpy-array-index02',
             {'var': numpy.array(["first item", "second item"])},
         )
-        if settings.TEMPLATE_STRING_IF_INVALID:
+        if self.engine.string_if_invalid:
             self.assertEqual(output, 'INVALID')
         else:
             self.assertEqual(output, '')

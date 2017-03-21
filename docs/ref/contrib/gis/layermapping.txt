@@ -3,7 +3,7 @@
 ====================================
 
 .. module:: django.contrib.gis.utils.layermapping
-   :synopsis: Spatial data import utility for GeoDjango models.
+    :synopsis: Spatial data import utility for GeoDjango models.
 
 .. currentmodule:: django.contrib.gis.utils
 
@@ -57,9 +57,8 @@ Example
     class TestGeo(models.Model):
         name = models.CharField(max_length=25) # corresponds to the 'str' field
         poly = models.PolygonField(srid=4269) # we want our model in a different SRID
-        objects = models.GeoManager()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return 'Name: %s' % self.name
 
 3. Use :class:`LayerMapping` to extract all the features and place them in the
@@ -85,7 +84,7 @@ system is defined for the layer, use the ``source_srs`` keyword with a
 ``LayerMapping`` API
 ====================
 
-.. class:: LayerMapping(model, data_source, mapping[, layer=0, source_srs=None, encoding=None, transaction_mode='commit_on_success', transform=True, unique=True, using='default'])
+.. class:: LayerMapping(model, data_source, mapping, layer=0, source_srs=None, encoding=None, transaction_mode='commit_on_success', transform=True, unique=True, using='default')
 
 The following are the arguments and keywords that may be used during
 instantiation of ``LayerMapping`` objects.
@@ -134,7 +133,7 @@ Keyword Arguments
 
 ``unique``             Setting this to the name, or a tuple of names,
                        from the given  model will create models unique
-                       only to the given name(s). Geometries will from
+                       only to the given name(s). Geometries from
                        each feature will be added into the collection
                        associated with the unique model.  Forces
                        the transaction mode to be ``'autocommit'``.
@@ -146,7 +145,7 @@ Keyword Arguments
 ``save()`` Keyword Arguments
 ----------------------------
 
-.. method:: LayerMapping.save([verbose=False, fid_range=False, step=False, progress=False, silent=False, stream=sys.stdout, strict=False])
+.. method:: LayerMapping.save(verbose=False, fid_range=False, step=False, progress=False, silent=False, stream=sys.stdout, strict=False)
 
 The ``save()`` method also accepts keywords.  These keywords are
 used for controlling output logging, error handling, and for importing

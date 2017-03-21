@@ -1,5 +1,3 @@
-from django.utils import six
-
 from psycopg2 import ProgrammingError
 from psycopg2.extras import register_hstore
 
@@ -9,10 +7,7 @@ def register_hstore_handler(connection, **kwargs):
         return
 
     try:
-        if six.PY2:
-            register_hstore(connection.connection, globally=True, unicode=True)
-        else:
-            register_hstore(connection.connection, globally=True)
+        register_hstore(connection.connection, globally=True)
     except ProgrammingError:
         # Hstore is not available on the database.
         #

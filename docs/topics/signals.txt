@@ -47,10 +47,11 @@ You can also `define and send your own custom signals`_; see below.
 Listening to signals
 ====================
 
-To receive a signal, you need to register a *receiver* function that gets
-called when the signal is sent by using the :meth:`Signal.connect` method:
+To receive a signal, register a *receiver* function using the
+:meth:`Signal.connect` method. The receiver function is called when the signal
+is sent.
 
-.. method:: Signal.connect(receiver, [sender=None, weak=True, dispatch_uid=None])
+.. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
     :param receiver: The callback function which will be connected to this
         signal. See :ref:`receiver-functions` for more information.
@@ -140,12 +141,6 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     decorator, simply import the ``signals`` submodule inside
     :meth:`~django.apps.AppConfig.ready`.
 
-    .. versionchanged:: 1.7
-
-        Since :meth:`~django.apps.AppConfig.ready` didn't exist in previous
-        versions of Django, signal registration usually happened in the
-        ``models`` module.
-
 .. note::
 
     The :meth:`~django.apps.AppConfig.ready` method may be executed more than
@@ -192,7 +187,7 @@ Preventing duplicate signals
 
 In some circumstances, the code connecting receivers to signals may run
 multiple times. This can cause your receiver function to be registered more
-than once, and thus called multiples times for a single signal event.
+than once, and thus called multiple times for a single signal event.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as
@@ -214,7 +209,7 @@ its own signals.
 Defining signals
 ----------------
 
-.. class:: Signal([providing_args=list])
+.. class:: Signal(providing_args=list)
 
 All signals are :class:`django.dispatch.Signal` instances. The
 ``providing_args`` is a list of the names of arguments the signal will provide
@@ -241,9 +236,10 @@ There are two ways to send signals in Django.
 .. method:: Signal.send(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)
 
-To send a signal, call either :meth:`Signal.send` or :meth:`Signal.send_robust`.
-You must provide the ``sender`` argument (which is a class most of the time),
-and may provide as many other keyword arguments as you like.
+To send a signal, call either :meth:`Signal.send` (all built-in signals use
+this) or :meth:`Signal.send_robust`. You must provide the ``sender`` argument
+(which is a class most of the time) and may provide as many other keyword
+arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look::
 
@@ -267,18 +263,17 @@ be notified of a signal in the face of an error.
 and ensures all receivers are notified of the signal. If an error occurs, the
 error instance is returned in the tuple pair for the receiver that raised the error.
 
-.. versionadded:: 1.8
-
-    The tracebacks are present on the ``__traceback__`` attribute
-    of the errors returned when calling ``send_robust()``.
+The tracebacks are present on the ``__traceback__`` attribute of the errors
+returned when calling ``send_robust()``.
 
 Disconnecting signals
 =====================
 
-.. method:: Signal.disconnect([receiver=None, sender=None, weak=True, dispatch_uid=None])
+.. method:: Signal.disconnect(receiver=None, sender=None, dispatch_uid=None)
 
 To disconnect a receiver from a signal, call :meth:`Signal.disconnect`. The
-arguments are as described in :meth:`.Signal.connect`.
+arguments are as described in :meth:`.Signal.connect`. The method returns
+``True`` if a receiver was disconnected and ``False`` if not.
 
-The *receiver* argument indicates the registered receiver to disconnect. It may
-be ``None`` if ``dispatch_uid`` is used to identify the receiver.
+The ``receiver`` argument indicates the registered receiver to disconnect. It
+may be ``None`` if ``dispatch_uid`` is used to identify the receiver.

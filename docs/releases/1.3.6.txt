@@ -11,15 +11,15 @@ This is the sixth bugfix/security release in the Django 1.3 series.
 
 
 Host header poisoning
----------------------
+=====================
 
 Some parts of Django -- independent of end-user-written applications -- make
 use of full URLs, including domain name, which are generated from the HTTP Host
 header. Django's documentation has for some time contained notes advising users
-on how to configure webservers to ensure that only valid Host headers can reach
+on how to configure Web servers to ensure that only valid Host headers can reach
 the Django application. However, it has been reported to us that even with the
-recommended webserver configurations there are still techniques available for
-tricking many common webservers into supplying the application with an
+recommended Web server configurations there are still techniques available for
+tricking many common Web servers into supplying the application with an
 incorrect and possibly malicious Host header.
 
 For this reason, Django 1.3.6 adds a new setting, ``ALLOWED_HOSTS``, which
@@ -36,7 +36,7 @@ This host validation is disabled when ``DEBUG`` is ``True`` or when running test
 
 
 XML deserialization
--------------------
+===================
 
 The XML parser in the Python standard library is vulnerable to a number of
 attacks via external entities and entity expansion. Django uses this parser for
@@ -57,7 +57,7 @@ management command, you will need to ensure they do not contain a DTD.
 
 
 Formset memory exhaustion
--------------------------
+=========================
 
 Previous versions of Django did not validate or limit the form-count data
 provided by the client in a formset's management form, making it possible to
@@ -70,7 +70,7 @@ factory argument).
 
 
 Admin history view information leakage
---------------------------------------
+======================================
 
 In previous versions of Django, an admin user without change permission on a
 model could still view the unicode representation of instances via their admin

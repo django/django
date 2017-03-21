@@ -6,8 +6,8 @@ Django 1.6.6 release notes
 
 Django 1.6.6 fixes several security issues and bugs in 1.6.5.
 
-:func:`~django.core.urlresolvers.reverse()` could generate URLs pointing to other hosts
-=======================================================================================
+``reverse()`` could generate URLs pointing to other hosts
+=========================================================
 
 In certain situations, URL reversing could generate scheme-relative URLs  (URLs
 starting with two slashes), which could unexpectedly redirect a user  to a

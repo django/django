@@ -1,25 +1,20 @@
 """
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
-from django.db import connection, models
-from django.contrib.gis.db.backends.base import SpatialRefSysMixin
-from django.utils.encoding import python_2_unicode_compatible
+from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
+from django.db import models
 
 
-@python_2_unicode_compatible
 class SpatialiteGeometryColumns(models.Model):
     """
     The 'geometry_columns' table from SpatiaLite.
     """
     f_table_name = models.CharField(max_length=256)
     f_geometry_column = models.CharField(max_length=256)
-    if connection.ops.spatial_version[0] >= 4:
-        type = models.IntegerField(db_column='geometry_type')
-    else:
-        type = models.CharField(max_length=30)
     coord_dimension = models.IntegerField()
     srid = models.IntegerField(primary_key=True)
     spatial_index_enabled = models.IntegerField()
+    type = models.IntegerField(db_column='geometry_type')
 
     class Meta:
         app_label = 'gis'
@@ -29,7 +24,7 @@ class SpatialiteGeometryColumns(models.Model):
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the feature table
+        Return the name of the metadata column used to store the feature table
         name.
         """
         return 'f_table_name'
@@ -37,7 +32,7 @@ class SpatialiteGeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the feature
+        Return the name of the metadata column used to store the feature
         geometry column.
         """
         return 'f_geometry_column'
@@ -57,15 +52,11 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     auth_srid = models.IntegerField()
     ref_sys_name = models.CharField(max_length=256)
     proj4text = models.CharField(max_length=2048)
-    if connection.ops.spatial_version[0] >= 4:
-        srtext = models.CharField(max_length=2048)
+    srtext = models.CharField(max_length=2048)
 
     @property
     def wkt(self):
-        if hasattr(self, 'srtext'):
-            return self.srtext
-        from django.contrib.gis.gdal import SpatialReference
-        return SpatialReference(self.proj4text).wkt
+        return self.srtext
 
     class Meta:
         app_label = 'gis'

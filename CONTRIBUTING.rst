@@ -24,3 +24,9 @@ Django uses Trac to keep track of bugs, feature requests, and associated
 patches because GitHub doesn't provide adequate tooling for its community.
 Patches can be submitted as pull requests, but if you don't file a ticket,
 it's unlikely that we'll notice your contribution.
+
+Code of Conduct
+===============
+
+As a contributor, you can help us keep the Django community open and inclusive.
+Please read and follow our `Code of Conduct <https://www.djangoproject.com/conduct/>`_.

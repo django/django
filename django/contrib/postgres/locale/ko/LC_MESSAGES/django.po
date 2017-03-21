@@ -1,0 +1,112 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Chr0m3 <chr0m3.kr@gmail.com>, 2015
+# 조민권 <minkwon007@gmail.com>, 2016
+# minsung kang, 2015
+# Subin Choi <os1742@gmail.com>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-28 09:49+0000\n"
+"Last-Translator: 조민권 <minkwon007@gmail.com>\n"
+"Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ko\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL 확장"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "배열 안의 %(nth)s 이/가 확인되지 않았습니다."
+
+msgid "Nested arrays must have the same length."
+msgstr "네스팅된 배열은 반드시 같은 길이를 가져야 합니다."
+
+msgid "Map of strings to strings"
+msgstr "문자열을 문자열로 매핑"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "값 \"%(key)s\"은/는 문자열이 아닙니다."
+
+msgid "A JSON object"
+msgstr "JSON 객체"
+
+msgid "Value must be valid JSON."
+msgstr "올바른 JSON 형식이여야 합니다."
+
+msgid "Could not load JSON data."
+msgstr "JSON 데이터를 불러오지 못했습니다."
+
+msgid "Input must be a JSON dictionary."
+msgstr "입력은 JSON 사전이어야만 합니다."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' 값은 올바른 JSON 형식이여야 합니다."
+
+msgid "Enter two valid values."
+msgstr "유효한 두 값을 입력하세요."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "범위의 시작은 끝보다 클 수 없습니다."
+
+msgid "Enter two whole numbers."
+msgstr "두 정수를 입력하세요."
+
+msgid "Enter two numbers."
+msgstr "두 숫자를 입력하세요."
+
+msgid "Enter two valid date/times."
+msgstr "올바른 날짜/시각 두 개를 입력하세요."
+
+msgid "Enter two valid dates."
+msgstr "올바른 날짜 두 개를 입력하세요."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"리스트는 %(show_value)d 아이템들을 포함하며, %(limit_value)d를 초과해서 포함"
+"할 수 없습니다."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"리스트는 %(show_value)d 아이템들을 포함하며, %(limit_value)d 이상 포함해야 합"
+"니다."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "일부 키가 누락되어있습니다: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "일부 알 수 없는 키가 제공되었습니다. : %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "주어진 범위가 %(limit_value)s 보다 작거나 같은지 확인하십시오."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "주어진 범위가 %(limit_value)s 보다 크거나 같은지 확인하십시오."

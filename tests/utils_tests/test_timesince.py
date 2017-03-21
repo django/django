@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-
 import datetime
 import unittest
 
 from django.test.utils import requires_tz_support
-from django.utils.timesince import timesince, timeuntil
 from django.utils import timezone
+from django.utils.timesince import timesince, timeuntil
 
 
 class TimesinceTests(unittest.TestCase):
@@ -28,71 +26,53 @@ class TimesinceTests(unittest.TestCase):
 
     def test_ignore_microseconds_and_seconds(self):
         """ Microseconds and seconds are ignored. """
-        self.assertEqual(timesince(self.t, self.t + self.onemicrosecond),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t + self.onesecond),
-            '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t + self.onemicrosecond), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t + self.onesecond), '0\xa0minutes')
 
     def test_other_units(self):
         """ Test other units. """
-        self.assertEqual(timesince(self.t, self.t + self.oneminute),
-            '1\xa0minute')
+        self.assertEqual(timesince(self.t, self.t + self.oneminute), '1\xa0minute')
         self.assertEqual(timesince(self.t, self.t + self.onehour), '1\xa0hour')
         self.assertEqual(timesince(self.t, self.t + self.oneday), '1\xa0day')
         self.assertEqual(timesince(self.t, self.t + self.oneweek), '1\xa0week')
-        self.assertEqual(timesince(self.t, self.t + self.onemonth),
-            '1\xa0month')
+        self.assertEqual(timesince(self.t, self.t + self.onemonth), '1\xa0month')
         self.assertEqual(timesince(self.t, self.t + self.oneyear), '1\xa0year')
 
     def test_multiple_units(self):
         """ Test multiple units. """
-        self.assertEqual(timesince(self.t,
-            self.t + 2 * self.oneday + 6 * self.onehour), '2\xa0days, 6\xa0hours')
-        self.assertEqual(timesince(self.t,
-            self.t + 2 * self.oneweek + 2 * self.oneday), '2\xa0weeks, 2\xa0days')
+        self.assertEqual(timesince(self.t, self.t + 2 * self.oneday + 6 * self.onehour), '2\xa0days, 6\xa0hours')
+        self.assertEqual(timesince(self.t, self.t + 2 * self.oneweek + 2 * self.oneday), '2\xa0weeks, 2\xa0days')
 
     def test_display_first_unit(self):
         """
         If the two differing units aren't adjacent, only the first unit is
         displayed.
         """
-        self.assertEqual(timesince(self.t,
-            self.t + 2 * self.oneweek + 3 * self.onehour + 4 * self.oneminute),
-            '2\xa0weeks')
-
-        self.assertEqual(timesince(self.t,
-            self.t + 4 * self.oneday + 5 * self.oneminute), '4\xa0days')
+        self.assertEqual(
+            timesince(self.t, self.t + 2 * self.oneweek + 3 * self.onehour + 4 * self.oneminute),
+            '2\xa0weeks'
+        )
+        self.assertEqual(timesince(self.t, self.t + 4 * self.oneday + 5 * self.oneminute), '4\xa0days')
 
     def test_display_second_before_first(self):
         """
         When the second date occurs before the first, we should always
         get 0 minutes.
         """
-        self.assertEqual(timesince(self.t, self.t - self.onemicrosecond),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.onesecond),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.oneminute),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.onehour),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.oneday),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.oneweek),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.onemonth),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t, self.t - self.oneyear),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t,
-            self.t - 2 * self.oneday - 6 * self.onehour), '0\xa0minutes')
-        self.assertEqual(timesince(self.t,
-            self.t - 2 * self.oneweek - 2 * self.oneday), '0\xa0minutes')
-        self.assertEqual(timesince(self.t,
-            self.t - 2 * self.oneweek - 3 * self.onehour - 4 * self.oneminute),
-            '0\xa0minutes')
-        self.assertEqual(timesince(self.t,
-            self.t - 4 * self.oneday - 5 * self.oneminute), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.onemicrosecond), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.onesecond), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.oneminute), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.onehour), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.oneday), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.oneweek), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.onemonth), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - self.oneyear), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - 2 * self.oneday - 6 * self.onehour), '0\xa0minutes')
+        self.assertEqual(timesince(self.t, self.t - 2 * self.oneweek - 2 * self.oneday), '0\xa0minutes')
+        self.assertEqual(
+            timesince(self.t, self.t - 2 * self.oneweek - 3 * self.onehour - 4 * self.oneminute), '0\xa0minutes'
+        )
+        self.assertEqual(timesince(self.t, self.t - 4 * self.oneday - 5 * self.oneminute), '0\xa0minutes')
 
     @requires_tz_support
     def test_different_timezones(self):
@@ -123,6 +103,17 @@ class TimesinceTests(unittest.TestCase):
         self.assertEqual(timeuntil(today - self.oneday, today), '0\xa0minutes')
         self.assertEqual(timeuntil(today + self.oneweek, today), '1\xa0week')
 
+    def test_leap_year(self):
+        start_date = datetime.date(2016, 12, 25)
+        self.assertEqual(timeuntil(start_date + self.oneweek, start_date), '1\xa0week')
+        self.assertEqual(timesince(start_date, start_date + self.oneweek), '1\xa0week')
+
+    def test_leap_year_new_years_eve(self):
+        t = datetime.date(2016, 12, 31)
+        now = datetime.datetime(2016, 12, 31, 18, 0, 0)
+        self.assertEqual(timesince(t + self.oneday, now), '0\xa0minutes')
+        self.assertEqual(timeuntil(t - self.oneday, now), '0\xa0minutes')
+
     def test_naive_datetime_with_tzinfo_attribute(self):
         class naive(datetime.tzinfo):
             def utcoffset(self, dt):
@@ -131,3 +122,8 @@ class TimesinceTests(unittest.TestCase):
         self.assertEqual(timesince(future), '0\xa0minutes')
         past = datetime.datetime(1980, 1, 1, tzinfo=naive())
         self.assertEqual(timeuntil(past), '0\xa0minutes')
+
+    def test_thousand_years_ago(self):
+        t = datetime.datetime(1007, 8, 14, 13, 46, 0)
+        self.assertEqual(timesince(t, self.t), '1000\xa0years')
+        self.assertEqual(timeuntil(self.t, t), '1000\xa0years')

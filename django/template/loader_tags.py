@@ -1,27 +1,30 @@
+import logging
+import posixpath
+import warnings
 from collections import defaultdict
 
-from django.template.base import TemplateSyntaxError, Library, Node, TextNode,\
-    token_kwargs, Variable
-from django.template.loader import get_template
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.safestring import mark_safe
-from django.utils import six
+
+from .base import (
+    Node, Template, TemplateSyntaxError, TextNode, Variable, token_kwargs,
+)
+from .library import Library
 
 register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
 
-
-class ExtendsError(Exception):
-    pass
+logger = logging.getLogger('django.template')
 
 
-class BlockContext(object):
+class BlockContext:
     def __init__(self):
         # Dictionary of FIFO queues.
         self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
-        for name, block in six.iteritems(blocks):
+        for name, block in blocks.items():
             self.blocks[name].insert(0, block)
 
     def pop(self, name):
@@ -81,6 +84,7 @@ class BlockNode(Node):
 
 class ExtendsNode(Node):
     must_be_first = True
+    context_key = 'extends_context'
 
     def __init__(self, nodelist, parent_name, template_dirs=None):
         self.nodelist = nodelist
@@ -89,7 +93,23 @@ class ExtendsNode(Node):
         self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
-        return '<ExtendsNode: extends %s>' % self.parent_name.token
+        return '<%s: extends %s>' % (self.__class__.__name__, self.parent_name.token)
+
+    def find_template(self, template_name, context):
+        """
+        This is a wrapper around engine.find_template(). A history is kept in
+        the render_context attribute between successive extends calls and
+        passed as the skip argument. This enables extends to work recursively
+        without extending the same template twice.
+        """
+        history = context.render_context.setdefault(
+            self.context_key, [context.template.origin],
+        )
+        template, origin = context.template.engine.find_template(
+            template_name, skip=history,
+        )
+        history.append(origin)
+        return template
 
     def get_parent(self, context):
         parent = self.parent_name.resolve(context)
@@ -100,9 +120,13 @@ class ExtendsNode(Node):
                 error_msg += " Got this from the '%s' variable." %\
                     self.parent_name.token
             raise TemplateSyntaxError(error_msg)
-        if hasattr(parent, 'render'):
-            return parent  # parent is a Template object
-        return get_template(parent)
+        if isinstance(parent, Template):
+            # parent is a django.template.Template
+            return parent
+        if isinstance(getattr(parent, 'template', None), Template):
+            # parent is a django.template.backends.django.Template
+            return parent.template
+        return self.find_template(parent, context)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
@@ -131,30 +155,59 @@ class ExtendsNode(Node):
 
 
 class IncludeNode(Node):
-    def __init__(self, template, *args, **kwargs):
+    context_key = '__include_context'
+
+    def __init__(self, template, *args, extra_context=None, isolated_context=False, **kwargs):
         self.template = template
-        self.extra_context = kwargs.pop('extra_context', {})
-        self.isolated_context = kwargs.pop('isolated_context', False)
-        super(IncludeNode, self).__init__(*args, **kwargs)
+        self.extra_context = extra_context or {}
+        self.isolated_context = isolated_context
+        super().__init__(*args, **kwargs)
 
     def render(self, context):
+        """
+        Render the specified template and context. Cache the template object
+        in render_context to avoid reparsing and loading when used in a for
+        loop.
+        """
         try:
             template = self.template.resolve(context)
             # Does this quack like a Template?
             if not callable(getattr(template, 'render', None)):
-                # If not, we'll try get_template
-                template = get_template(template)
+                # If not, we'll try our cache, and get_template()
+                template_name = template
+                cache = context.render_context.setdefault(self.context_key, {})
+                template = cache.get(template_name)
+                if template is None:
+                    template = context.template.engine.get_template(template_name)
+                    cache[template_name] = template
+            # Use the base.Template of a backends.django.Template.
+            elif hasattr(template, 'template'):
+                template = template.template
             values = {
                 name: var.resolve(context)
-                for name, var in six.iteritems(self.extra_context)
+                for name, var in self.extra_context.items()
             }
             if self.isolated_context:
                 return template.render(context.new(values))
             with context.push(**values):
                 return template.render(context)
-        except Exception:
-            if context.engine.debug:
+        except Exception as e:
+            if context.template.engine.debug:
                 raise
+            template_name = getattr(context, 'template_name', None) or 'unknown'
+            warnings.warn(
+                "Rendering {%% include '%s' %%} raised %s. In Django 2.1, "
+                "this exception will be raised rather than silenced and "
+                "rendered as an empty string." %
+                (template_name, e.__class__.__name__),
+                RemovedInDjango21Warning,
+            )
+            logger.warning(
+                "Exception raised while rendering {%% include %%} for "
+                "template '%s'. Empty string rendered instead.",
+                template_name,
+                exc_info=True,
+            )
             return ''
 
 
@@ -187,6 +240,36 @@ def do_block(parser, token):
     return BlockNode(block_name, nodelist)
 
 
+def construct_relative_path(current_template_name, relative_name):
+    """
+    Convert a relative path (starting with './' or '../') to the full template
+    name based on the current_template_name.
+    """
+    if not any(relative_name.startswith(x) for x in ["'./", "'../", '"./', '"../']):
+        # relative_name is a variable or a literal that doesn't contain a
+        # relative path.
+        return relative_name
+
+    new_name = posixpath.normpath(
+        posixpath.join(
+            posixpath.dirname(current_template_name.lstrip('/')),
+            relative_name.strip('\'"')
+        )
+    )
+    if new_name.startswith('../'):
+        raise TemplateSyntaxError(
+            "The relative path '%s' points outside the file hierarchy that "
+            "template '%s' is in." % (relative_name, current_template_name)
+        )
+    if current_template_name.lstrip('/') == new_name:
+        raise TemplateSyntaxError(
+            "The relative path '%s' was translated to template name '%s', the "
+            "same template in which the tag appears."
+            % (relative_name, current_template_name)
+        )
+    return '"%s"' % new_name
+
+
 @register.tag('extends')
 def do_extends(parser, token):
     """
@@ -201,6 +284,7 @@ def do_extends(parser, token):
     bits = token.split_contents()
     if len(bits) != 2:
         raise TemplateSyntaxError("'%s' takes one argument" % bits[0])
+    bits[1] = construct_relative_path(parser.origin.template_name, bits[1])
     parent_name = parser.compile_filter(bits[1])
     nodelist = parser.parse()
     if nodelist.get_nodes_by_type(ExtendsNode):
@@ -211,7 +295,7 @@ def do_extends(parser, token):
 @register.tag('include')
 def do_include(parser, token):
     """
-    Loads a template and renders it with the current context. You can pass
+    Load a template and render it with the current context. You can pass
     additional context using keyword arguments.
 
     Example::
@@ -251,5 +335,6 @@ def do_include(parser, token):
         options[option] = value
     isolated_context = options.get('only', False)
     namemap = options.get('with', {})
+    bits[1] = construct_relative_path(parser.origin.template_name, bits[1])
     return IncludeNode(parser.compile_filter(bits[1]), extra_context=namemap,
                        isolated_context=isolated_context)

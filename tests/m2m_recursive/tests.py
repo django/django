@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
 from django.test import TestCase
@@ -21,7 +19,6 @@ class RecursiveM2MTests(TestCase):
         self.d.friends.add(self.a, self.c)
 
     def test_recursive_m2m_all(self):
-        """ Test that m2m relations are reported correctly """
         # Who is friends with Anne?
         self.assertQuerysetEqual(
             self.a.friends.all(), [
@@ -59,8 +56,6 @@ class RecursiveM2MTests(TestCase):
         )
 
     def test_recursive_m2m_reverse_add(self):
-        """ Test reverse m2m relation is consistent """
-
         # Bill is already friends with Anne - add Anne again, but in the
         # reverse direction
         self.b.friends.add(self.a)
@@ -84,8 +79,6 @@ class RecursiveM2MTests(TestCase):
         )
 
     def test_recursive_m2m_remove(self):
-        """ Test that we can remove items from an m2m relationship """
-
         # Remove Anne from Bill's friends
         self.b.friends.remove(self.a)
 
@@ -104,8 +97,6 @@ class RecursiveM2MTests(TestCase):
         )
 
     def test_recursive_m2m_clear(self):
-        """ Tests the clear method works as expected on m2m fields """
-
         # Clear Anne's group of friends
         self.a.friends.clear()
 
@@ -132,8 +123,6 @@ class RecursiveM2MTests(TestCase):
         )
 
     def test_recursive_m2m_add_via_related_name(self):
-        """ Tests that we can add m2m relations via the related_name attribute """
-
         # David is idolized by Anne and Chuck - add in reverse direction
         self.d.stalkers.add(self.a)
 
@@ -152,8 +141,7 @@ class RecursiveM2MTests(TestCase):
         )
 
     def test_recursive_m2m_add_in_both_directions(self):
-        """ Check that adding the same relation twice results in a single relation """
-
+        """Adding the same relation twice results in a single relation."""
         # Ann idolizes David
         self.a.idols.add(self.d)
 
@@ -173,8 +161,6 @@ class RecursiveM2MTests(TestCase):
         self.assertEqual(self.a.idols.all().count(), 1)
 
     def test_recursive_m2m_related_to_self(self):
-        """ Check the expected behavior when an instance is related to itself """
-
         # Ann idolizes herself
         self.a.idols.add(self.a)
 

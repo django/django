@@ -1,1 +1,1 @@
-In app media directory.
+In static directory.

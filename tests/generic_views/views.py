@@ -1,20 +1,18 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from .test_forms import AuthorForm, ContactForm
-from .models import Artist, Author, Book, Page, BookSigning
+from .forms import AuthorForm, ContactForm
+from .models import Artist, Author, Book, BookSigning, Page
 
 
 class CustomTemplateView(generic.TemplateView):
     template_name = 'generic_views/about.html'
 
     def get_context_data(self, **kwargs):
-        context = super(CustomTemplateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({'key': 'value'})
         return context
 
@@ -32,6 +30,17 @@ class ArtistDetail(generic.DetailView):
 
 class AuthorDetail(generic.DetailView):
     queryset = Author.objects.all()
+
+
+class AuthorCustomDetail(generic.DetailView):
+    template_name = 'generic_views/author_detail.html'
+    queryset = Author.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        # Ensures get_context_object_name() doesn't reference self.object.
+        author = self.get_object()
+        context = {'custom_' + self.get_context_object_name(author): author}
+        return self.render_to_response(context)
 
 
 class PageDetail(generic.DetailView):
@@ -63,22 +72,14 @@ class BookList(generic.ListView):
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super(CustomPaginator, self).__init__(
-            queryset,
-            page_size,
-            orphans=2,
-            allow_empty_first_page=allow_empty_first_page)
+        super().__init__(queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page)
 
 
 class AuthorListCustomPaginator(AuthorList):
     paginate_by = 5
 
     def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        return super(AuthorListCustomPaginator, self).get_paginator(
-            queryset,
-            page_size,
-            orphans=2,
-            allow_empty_first_page=allow_empty_first_page)
+        return super().get_paginator(queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page)
 
 
 class ContactView(generic.FormView):
@@ -136,9 +137,14 @@ class NaiveAuthorUpdate(generic.UpdateView):
 
 
 class AuthorUpdate(generic.UpdateView):
+    get_form_called_count = 0  # Used to ensure get_form() is called once.
     model = Author
     success_url = '/list/authors/'
     fields = '__all__'
+
+    def get_form(self, *args, **kwargs):
+        self.get_form_called_count += 1
+        return super().get_form(*args, **kwargs)
 
 
 class OneAuthorUpdate(generic.UpdateView):
@@ -172,12 +178,10 @@ class SpecializedAuthorDelete(generic.DeleteView):
     queryset = Author.objects.all()
     template_name = 'generic_views/confirm_delete.html'
     context_object_name = 'thingy'
-
-    def get_success_url(self):
-        return reverse('authors_list')
+    success_url = reverse_lazy('authors_list')
 
 
-class BookConfig(object):
+class BookConfig:
     queryset = Book.objects.all()
     date_field = 'pubdate'
 
@@ -219,8 +223,7 @@ class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
 
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
-        return super(BookDetailGetObjectCustomQueryset, self).get_object(
-            queryset=Book.objects.filter(pk=2))
+        return super().get_object(queryset=Book.objects.filter(pk=self.kwargs['pk']))
 
 
 class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):
@@ -243,7 +246,7 @@ class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
     def get_context_data(self, **kwargs):
         context = {'custom_key': 'custom_value'}
         context.update(kwargs)
-        return super(CustomContextView, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
     def get_context_object_name(self, obj):
         return "test_name"
@@ -254,7 +257,7 @@ class CustomSingleObjectView(generic.detail.SingleObjectMixin, generic.View):
     object = Book(name="dummy")
 
 
-class BookSigningConfig(object):
+class BookSigningConfig:
     model = BookSigning
     date_field = 'event_date'
     # use the same templates as for books
@@ -291,7 +294,7 @@ class BookSigningDetail(BookSigningConfig, generic.DateDetailView):
     context_object_name = 'book'
 
 
-class NonModel(object):
+class NonModel:
     id = "non_model_1"
 
     _meta = None
@@ -309,3 +312,13 @@ class NonModelDetail(generic.DetailView):
 class ObjectDoesNotExistDetail(generic.DetailView):
     def get_queryset(self):
         return Book.does_not_exist.all()
+
+
+class LateValidationView(generic.FormView):
+    form_class = ContactForm
+    success_url = reverse_lazy('authors_list')
+    template_name = 'generic_views/form.html'
+
+    def form_valid(self, form):
+        form.add_error(None, 'There is an error')
+        return self.form_invalid(form)

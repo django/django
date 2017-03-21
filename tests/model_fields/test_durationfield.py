@@ -1,11 +1,12 @@
 import datetime
 import json
 
+from django import forms
 from django.core import exceptions, serializers
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
-from .models import DurationModel
+from .models import DurationModel, NullDurationModel
 
 
 class TestSaveLoad(TestCase):
@@ -15,6 +16,17 @@ class TestSaveLoad(TestCase):
         DurationModel.objects.create(field=duration)
         loaded = DurationModel.objects.get()
         self.assertEqual(loaded.field, duration)
+
+    def test_create_empty(self):
+        NullDurationModel.objects.create()
+        loaded = NullDurationModel.objects.get()
+        self.assertIsNone(loaded.field)
+
+    def test_fractional_seconds(self):
+        value = datetime.timedelta(seconds=2.05)
+        d = DurationModel.objects.create(field=value)
+        d.refresh_from_db()
+        self.assertEqual(d.field, value)
 
 
 class TestQuerying(TestCase):
@@ -40,7 +52,7 @@ class TestQuerying(TestCase):
         )
 
 
-class TestSerialization(TestCase):
+class TestSerialization(SimpleTestCase):
     test_data = '[{"fields": {"field": "1 01:00:00"}, "model": "model_fields.durationmodel", "pk": null}]'
 
     def test_dumping(self):
@@ -53,7 +65,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.field, datetime.timedelta(days=1, hours=1))
 
 
-class TestValidation(TestCase):
+class TestValidation(SimpleTestCase):
 
     def test_invalid_string(self):
         field = models.DurationField()
@@ -65,3 +77,11 @@ class TestValidation(TestCase):
             "'not a datetime' value has an invalid format. "
             "It must be in [DD] [HH:[MM:]]ss[.uuuuuu] format."
         )
+
+
+class TestFormField(SimpleTestCase):
+    # Tests for forms.DurationField are in the forms_tests app.
+
+    def test_formfield(self):
+        field = models.DurationField()
+        self.assertIsInstance(field.formfield(), forms.DurationField)

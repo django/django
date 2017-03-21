@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Bare-bones model
 
 This is a basic model with only two non-primary-key fields.
 """
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
@@ -26,10 +23,14 @@ class ArticleSelectOnSave(Article):
         select_on_save = True
 
 
-@python_2_unicode_compatible
 class SelfRef(models.Model):
-    selfref = models.ForeignKey('self', null=True, blank=True,
-                                related_name='+')
+    selfref = models.ForeignKey(
+        'self',
+        models.SET_NULL,
+        null=True, blank=True,
+        related_name='+',
+    )
+    article = models.ForeignKey(Article, models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         # This method intentionally doesn't work for all cases - part

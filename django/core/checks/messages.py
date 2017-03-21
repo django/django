@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-from django.utils.encoding import python_2_unicode_compatible, force_str
-
+from django.utils.encoding import force_text
 
 # Levels
 DEBUG = 10
@@ -12,8 +8,7 @@ ERROR = 40
 CRITICAL = 50
 
 
-@python_2_unicode_compatible
-class CheckMessage(object):
+class CheckMessage:
 
     def __init__(self, level, msg, hint=None, obj=None, id=None):
         assert isinstance(level, int), "The first argument should be level."
@@ -24,11 +19,11 @@ class CheckMessage(object):
         self.id = id
 
     def __eq__(self, other):
-        return all(getattr(self, attr) == getattr(other, attr)
-                   for attr in ['level', 'msg', 'hint', 'obj', 'id'])
-
-    def __ne__(self, other):
-        return not (self == other)
+        return (
+            isinstance(other, self.__class__) and
+            all(getattr(self, attr) == getattr(other, attr)
+                for attr in ['level', 'msg', 'hint', 'obj', 'id'])
+        )
 
     def __str__(self):
         from django.db import models
@@ -38,11 +33,9 @@ class CheckMessage(object):
         elif isinstance(self.obj, models.base.ModelBase):
             # We need to hardcode ModelBase and Field cases because its __str__
             # method doesn't return "applabel.modellabel" and cannot be changed.
-            model = self.obj
-            app = model._meta.app_label
-            obj = '%s.%s' % (app, model._meta.object_name)
+            obj = self.obj._meta.label
         else:
-            obj = force_str(self.obj)
+            obj = force_text(self.obj)
         id = "(%s) " % self.id if self.id else ""
         hint = "\n\tHINT: %s" % self.hint if self.hint else ''
         return "%s: %s%s%s" % (obj, id, self.msg, hint)
@@ -51,8 +44,8 @@ class CheckMessage(object):
         return "<%s: level=%r, msg=%r, hint=%r, obj=%r, id=%r>" % \
             (self.__class__.__name__, self.level, self.msg, self.hint, self.obj, self.id)
 
-    def is_serious(self):
-        return self.level >= ERROR
+    def is_serious(self, level=ERROR):
+        return self.level >= level
 
     def is_silenced(self):
         from django.conf import settings
@@ -61,24 +54,24 @@ class CheckMessage(object):
 
 class Debug(CheckMessage):
     def __init__(self, *args, **kwargs):
-        super(Debug, self).__init__(DEBUG, *args, **kwargs)
+        super().__init__(DEBUG, *args, **kwargs)
 
 
 class Info(CheckMessage):
     def __init__(self, *args, **kwargs):
-        super(Info, self).__init__(INFO, *args, **kwargs)
+        super().__init__(INFO, *args, **kwargs)
 
 
 class Warning(CheckMessage):
     def __init__(self, *args, **kwargs):
-        super(Warning, self).__init__(WARNING, *args, **kwargs)
+        super().__init__(WARNING, *args, **kwargs)
 
 
 class Error(CheckMessage):
     def __init__(self, *args, **kwargs):
-        super(Error, self).__init__(ERROR, *args, **kwargs)
+        super().__init__(ERROR, *args, **kwargs)
 
 
 class Critical(CheckMessage):
     def __init__(self, *args, **kwargs):
-        super(Critical, self).__init__(CRITICAL, *args, **kwargs)
+        super().__init__(CRITICAL, *args, **kwargs)

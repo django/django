@@ -1,10 +1,13 @@
-from __future__ import unicode_literals
+from unittest import mock, skipUnless
 
 from django.db import connection
+from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango21Warning
 
-from .models import Reporter, Article
+from .models import Article, ArticleReporter, City, District, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -14,10 +17,8 @@ class IntrospectionTests(TransactionTestCase):
     def test_table_names(self):
         tl = connection.introspection.table_names()
         self.assertEqual(tl, sorted(tl))
-        self.assertIn(Reporter._meta.db_table, tl,
-                     "'%s' isn't in table_list()." % Reporter._meta.db_table)
-        self.assertIn(Article._meta.db_table, tl,
-                     "'%s' isn't in table_list()." % Article._meta.db_table)
+        self.assertIn(Reporter._meta.db_table, tl, "'%s' isn't in table_list()." % Reporter._meta.db_table)
+        self.assertIn(Article._meta.db_table, tl, "'%s' isn't in table_list()." % Article._meta.db_table)
 
     def test_django_table_names(self):
         with connection.cursor() as cursor:
@@ -28,7 +29,7 @@ class IntrospectionTests(TransactionTestCase):
                              "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
-        #15216 - Table name is a list
+        # Table name is a list #15216
         tl = connection.introspection.django_table_names(only_existing=True)
         self.assertIs(type(tl), list)
         tl = connection.introspection.django_table_names(only_existing=False)
@@ -46,10 +47,12 @@ class IntrospectionTests(TransactionTestCase):
                 else:
                     raise
 
-        self.assertIn('introspection_article_view',
-                      connection.introspection.table_names(include_views=True))
-        self.assertNotIn('introspection_article_view',
-                         connection.introspection.table_names())
+        self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
+        self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+
+    def test_unmanaged_through_model(self):
+        tables = connection.introspection.django_table_names()
+        self.assertNotIn(ArticleReporter._meta.db_table, tables)
 
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
@@ -59,8 +62,7 @@ class IntrospectionTests(TransactionTestCase):
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
         expected = {'table': Reporter._meta.db_table, 'column': 'id'}
-        self.assertIn(expected, sequences,
-                     'Reporter sequence not found in sequence_list()')
+        self.assertIn(expected, sequences, 'Reporter sequence not found in sequence_list()')
 
     def test_get_table_description_names(self):
         with connection.cursor() as cursor:
@@ -80,9 +82,6 @@ class IntrospectionTests(TransactionTestCase):
              'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
-    # The following test fails on Oracle due to #17202 (can't correctly
-    # inspect the length of character columns).
-    @skipUnlessDBFeature('can_introspect_max_length')
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
@@ -101,6 +100,12 @@ class IntrospectionTests(TransactionTestCase):
             [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
 
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_bigautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
+        self.assertIn('BigAutoField', [datatype(r[1], r) for r in desc])
+
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):
@@ -110,17 +115,43 @@ class IntrospectionTests(TransactionTestCase):
             cursor.execute('DROP TABLE django_ixn_real_test_table;')
         self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
 
+    @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_relations(self):
         with connection.cursor() as cursor:
             relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
 
-        # Older versions of MySQL don't have the chops to report on this stuff,
-        # so just skip it if no relations come back. If they do, though, we
-        # should test that the response is correct.
-        if relations:
-            # That's {field_index: (field_index_other_table, other_table)}
-            self.assertEqual(relations, {3: (0, Reporter._meta.db_table),
-                                         4: (0, Article._meta.db_table)})
+        # That's {field_name: (field_name_other_table, other_table)}
+        expected_relations = {
+            'reporter_id': ('id', Reporter._meta.db_table),
+            'response_to_id': ('id', Article._meta.db_table),
+        }
+        self.assertEqual(relations, expected_relations)
+
+        # Removing a field shouldn't disturb get_relations (#17785)
+        body = Article._meta.get_field('body')
+        with connection.schema_editor() as editor:
+            editor.remove_field(Article, body)
+        with connection.cursor() as cursor:
+            relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
+        with connection.schema_editor() as editor:
+            editor.add_field(Article, body)
+        self.assertEqual(relations, expected_relations)
+
+    @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
+    def test_get_relations_alt_format(self):
+        """
+        With SQLite, foreign keys can be added with different syntaxes and
+        formatting.
+        """
+        create_table_statements = [
+            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));",
+            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY (art_id) REFERENCES {}(id));"
+        ]
+        for statement in create_table_statements:
+            with connection.cursor() as cursor:
+                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table)])
+                relations = connection.introspection.get_relations(cursor, 'mocked_table')
+            self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
@@ -134,22 +165,54 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:
             primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
+            pk_fk_column = connection.introspection.get_primary_key_column(cursor, District._meta.db_table)
         self.assertEqual(primary_key_column, 'id')
+        self.assertEqual(pk_fk_column, 'city_id')
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes(self):
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes_multicol(self):
         """
-        Test that multicolumn indexes are not included in the introspection
-        results.
+        Multicolumn indexes are not included in the introspection results.
         """
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
+
+    def test_get_constraints_index_types(self):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        index = {}
+        for key, val in constraints.items():
+            if val['columns'] == ['headline', 'pub_date']:
+                index = val
+        self.assertEqual(index['type'], Index.suffix)
+
+    @skipUnlessDBFeature('supports_index_column_ordering')
+    def test_get_constraints_indexes_orders(self):
+        """
+        Indexes have the 'orders' key with a list of 'ASC'/'DESC' values.
+        """
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        indexes_verified = 0
+        expected_columns = [
+            ['reporter_id'],
+            ['headline', 'pub_date'],
+            ['response_to_id'],
+        ]
+        for key, val in constraints.items():
+            if val['index'] and not (val['primary_key'] or val['unique']):
+                self.assertIn(val['columns'], expected_columns)
+                self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))
+                indexes_verified += 1
+        self.assertEqual(indexes_verified, 3)
 
 
 def datatype(dbtype, description):

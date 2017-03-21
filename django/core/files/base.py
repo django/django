@@ -1,16 +1,9 @@
-from __future__ import unicode_literals
-
 import os
 from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
-from django.utils import six
-from django.utils.encoding import (
-    force_bytes, force_str, python_2_unicode_compatible, smart_text,
-)
 
 
-@python_2_unicode_compatible
 class File(FileProxyMixin):
     DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
@@ -23,16 +16,13 @@ class File(FileProxyMixin):
             self.mode = file.mode
 
     def __str__(self):
-        return smart_text(self.name or '')
+        return self.name or ''
 
     def __repr__(self):
-        return force_str("<%s: %s>" % (self.__class__.__name__, self or "None"))
+        return "<%s: %s>" % (self.__class__.__name__, self or "None")
 
     def __bool__(self):
         return bool(self.name)
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
     def __len__(self):
         return self.size
@@ -64,13 +54,9 @@ class File(FileProxyMixin):
 
     size = property(_get_size, _set_size)
 
-    def _get_closed(self):
-        return not self.file or self.file.closed
-    closed = property(_get_closed)
-
     def chunks(self, chunk_size=None):
         """
-        Read the file and yield chucks of ``chunk_size`` bytes (defaults to
+        Read the file and yield chunks of ``chunk_size`` bytes (defaults to
         ``UploadedFile.DEFAULT_CHUNK_SIZE``).
         """
         if not chunk_size:
@@ -89,7 +75,7 @@ class File(FileProxyMixin):
 
     def multiple_chunks(self, chunk_size=None):
         """
-        Returns ``True`` if you can expect multiple chunks.
+        Return ``True`` if you can expect multiple chunks.
 
         NB: If a particular file representation is in memory, subclasses should
         always return ``False`` -- there's no good reason to read from memory in
@@ -144,18 +130,13 @@ class File(FileProxyMixin):
         self.file.close()
 
 
-@python_2_unicode_compatible
 class ContentFile(File):
     """
-    A File-like object that takes just raw content, rather than an actual file.
+    A File-like object that take just raw content, rather than an actual file.
     """
     def __init__(self, content, name=None):
-        if six.PY3:
-            stream_class = StringIO if isinstance(content, six.text_type) else BytesIO
-        else:
-            stream_class = BytesIO
-            content = force_bytes(content)
-        super(ContentFile, self).__init__(stream_class(content), name=name)
+        stream_class = StringIO if isinstance(content, str) else BytesIO
+        super().__init__(stream_class(content), name=name)
         self.size = len(content)
 
     def __str__(self):
@@ -163,9 +144,6 @@ class ContentFile(File):
 
     def __bool__(self):
         return True
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
     def open(self, mode=None):
         self.seek(0)
@@ -175,21 +153,15 @@ class ContentFile(File):
 
 
 def endswith_cr(line):
-    """
-    Return True if line (a text or byte string) ends with '\r'.
-    """
-    return line.endswith('\r' if isinstance(line, six.text_type) else b'\r')
+    """Return True if line (a text or byte string) ends with '\r'."""
+    return line.endswith('\r' if isinstance(line, str) else b'\r')
 
 
 def endswith_lf(line):
-    """
-    Return True if line (a text or byte string) ends with '\n'.
-    """
-    return line.endswith('\n' if isinstance(line, six.text_type) else b'\n')
+    """Return True if line (a text or byte string) ends with '\n'."""
+    return line.endswith('\n' if isinstance(line, str) else b'\n')
 
 
 def equals_lf(line):
-    """
-    Return True if line (a text or byte string) equals '\n'.
-    """
-    return line == ('\n' if isinstance(line, six.text_type) else b'\n')
+    """Return True if line (a text or byte string) equals '\n'."""
+    return line == ('\n' if isinstance(line, str) else b'\n')

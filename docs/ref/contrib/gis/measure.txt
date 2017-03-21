@@ -3,7 +3,7 @@ Measurement Objects
 ===================
 
 .. module:: django.contrib.gis.measure
-   :synopsis: GeoDjango's distance and area measurement objects.
+    :synopsis: GeoDjango's distance and area measurement objects.
 
 The :mod:`django.contrib.gis.measure` module contains objects that allow
 for convenient representation of distance and area units of measure. [#]_
@@ -113,66 +113,66 @@ Measurement API
 
 .. class:: Distance(**kwargs)
 
-   To initialize a distance object, pass in a keyword corresponding to
-   the desired :ref:`unit attribute name <supported_units>` set with
-   desired value.  For example, the following creates a distance
-   object representing 5 miles::
+    To initialize a distance object, pass in a keyword corresponding to the
+    desired :ref:`unit attribute name <supported_units>` set with desired
+    value. For example, the following creates a distance object representing 5
+    miles::
 
-       >>> dist = Distance(mi=5)
+        >>> dist = Distance(mi=5)
 
-   .. method:: __getattr__(unit_att)
+    .. method:: __getattr__(unit_att)
 
-   Returns the distance value in units corresponding to the given unit
-   attribute.  For example::
+    Returns the distance value in units corresponding to the given unit
+    attribute. For example::
 
-       >>> print(dist.km)
-       8.04672
+        >>> print(dist.km)
+        8.04672
 
-   .. classmethod:: unit_attname(unit_name)
+    .. classmethod:: unit_attname(unit_name)
 
-   Returns the distance unit attribute name for the given full unit name.
-   For example::
+    Returns the distance unit attribute name for the given full unit name. For
+    example::
 
-       >>> Distance.unit_attname('Mile')
-       'mi'
+        >>> Distance.unit_attname('Mile')
+        'mi'
 
 .. class:: D
 
-   Alias for :class:`Distance` class.
+    Alias for :class:`Distance` class.
 
 ``Area``
 --------
 
 .. class:: Area(**kwargs)
 
-   To initialize an area object, pass in a keyword corresponding to
-   the desired :ref:`unit attribute name <supported_units>` set with
-   desired value.  For example, the following creates an area
-   object representing 5 square miles::
+    To initialize an area object, pass in a keyword corresponding to the
+    desired :ref:`unit attribute name <supported_units>` set with desired
+    value. For example, the following creates an area object representing 5
+    square miles::
 
-       >>> a = Area(sq_mi=5)
+        >>> a = Area(sq_mi=5)
 
-   .. method:: __getattr__(unit_att)
+    .. method:: __getattr__(unit_att)
 
-   Returns the area value in units corresponding to the given unit
-   attribute.  For example::
+    Returns the area value in units corresponding to the given unit attribute.
+    For example::
 
-       >>> print(a.sq_km)
-       12.949940551680001
+        >>> print(a.sq_km)
+        12.949940551680001
 
-   .. classmethod:: unit_attname(unit_name)
+    .. classmethod:: unit_attname(unit_name)
 
-   Returns the area unit attribute name for the given full unit name.
-   For example::
+    Returns the area unit attribute name for the given full unit name. For
+    example::
 
         >>> Area.unit_attname('Kilometer')
         'sq_km'
 
 .. class:: A
 
-   Alias for :class:`Area` class.
+    Alias for :class:`Area` class.
 
 .. rubric:: Footnotes
 .. [#] `Robert Coup <https://koordinates.com/>`_ is the initial author of the measure objects,
-       and was inspired by Brian Beck's work in `geopy <http://code.google.com/p/geopy/>`_
+       and was inspired by Brian Beck's work in `geopy <https://github.com/geopy/geopy/>`_
        and Geoff Biggs' PhD work on dimensioned units for robotics.

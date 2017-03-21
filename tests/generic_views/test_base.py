@@ -1,16 +1,12 @@
-from __future__ import unicode_literals
-
 import time
 import unittest
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.views.generic import View, TemplateView, RedirectView
+from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test.utils import require_jinja2
+from django.urls import resolve
+from django.views.generic import RedirectView, TemplateView, View
 
 from . import views
 
@@ -45,7 +41,7 @@ class DecoratedDispatchView(SimpleView):
 
     @decorator
     def dispatch(self, request, *args, **kwargs):
-        return super(DecoratedDispatchView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class AboutTemplateView(TemplateView):
@@ -78,23 +74,17 @@ class ViewTest(unittest.TestCase):
 
     def test_no_init_kwargs(self):
         """
-        Test that a view can't be accidentally instantiated before deployment
+        A view can't be accidentally instantiated before deployment
         """
-        try:
+        with self.assertRaises(AttributeError):
             SimpleView(key='value').as_view()
-            self.fail('Should not be able to instantiate a view')
-        except AttributeError:
-            pass
 
     def test_no_init_args(self):
         """
-        Test that a view can't be accidentally instantiated before deployment
+        A view can't be accidentally instantiated before deployment
         """
-        try:
+        with self.assertRaises(TypeError):
             SimpleView.as_view('value')
-            self.fail('Should not be able to use non-keyword arguments instantiating a view')
-        except TypeError:
-            pass
 
     def test_pathological_http_method(self):
         """
@@ -141,18 +131,20 @@ class ViewTest(unittest.TestCase):
 
     def test_invalid_keyword_argument(self):
         """
-        Test that view arguments must be predefined on the class and can't
+        View arguments must be predefined on the class and can't
         be named like a HTTP method.
         """
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:
             kwargs = dict(((method, "value"),))
-            self.assertRaises(TypeError, SimpleView.as_view, **kwargs)
+            with self.assertRaises(TypeError):
+                SimpleView.as_view(**kwargs)
 
         # Check the case view argument is ok if predefined on the class...
         CustomizableView.as_view(parameter="value")
         # ...but raises errors otherwise.
-        self.assertRaises(TypeError, CustomizableView.as_view, foobar="value")
+        with self.assertRaises(TypeError):
+            CustomizableView.as_view(foobar="value")
 
     def test_calling_more_than_once(self):
         """
@@ -164,7 +156,7 @@ class ViewTest(unittest.TestCase):
 
     def test_class_attributes(self):
         """
-        Test that the callable returned from as_view() has proper
+        The callable returned from as_view() has proper
         docstring, name and module.
         """
         self.assertEqual(SimpleView.__doc__, SimpleView.as_view().__doc__)
@@ -173,14 +165,14 @@ class ViewTest(unittest.TestCase):
 
     def test_dispatch_decoration(self):
         """
-        Test that attributes set by decorators on the dispatch method
+        Attributes set by decorators on the dispatch method
         are also present on the closure.
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
     def test_options(self):
         """
-        Test that views respond to HTTP OPTIONS requests with an Allow header
+        Views respond to HTTP OPTIONS requests with an Allow header
         appropriate for the methods implemented by the view class.
         """
         request = self.rf.options('/')
@@ -191,7 +183,7 @@ class ViewTest(unittest.TestCase):
 
     def test_options_for_get_view(self):
         """
-        Test that a view implementing GET allows GET and HEAD.
+        A view implementing GET allows GET and HEAD.
         """
         request = self.rf.options('/')
         view = SimpleView.as_view()
@@ -200,7 +192,7 @@ class ViewTest(unittest.TestCase):
 
     def test_options_for_get_and_post_view(self):
         """
-        Test that a view implementing GET and POST allows GET, HEAD, and POST.
+        A view implementing GET and POST allows GET, HEAD, and POST.
         """
         request = self.rf.options('/')
         view = SimplePostView.as_view()
@@ -209,7 +201,7 @@ class ViewTest(unittest.TestCase):
 
     def test_options_for_post_view(self):
         """
-        Test that a view implementing POST allows POST.
+        A view implementing POST allows POST.
         """
         request = self.rf.options('/')
         view = PostOnlyView.as_view()
@@ -243,13 +235,12 @@ class ViewTest(unittest.TestCase):
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class TemplateViewTest(TestCase):
+class TemplateViewTest(SimpleTestCase):
 
     rf = RequestFactory()
 
     def _assert_about(self, response):
         response.render()
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<h1>About</h1>')
 
     def test_get(self):
@@ -281,9 +272,23 @@ class TemplateViewTest(TestCase):
 
     def test_template_name_required(self):
         """
-        A template view must provide a template name
+        A template view must provide a template name.
         """
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/template/no_template/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/template/no_template/')
+
+    @require_jinja2
+    def test_template_engine(self):
+        """
+        A template view may provide a template engine.
+        """
+        request = self.rf.get('/using/')
+        view = TemplateView.as_view(template_name='generic_views/using.html')
+        self.assertEqual(view(request).render().content, b'DTL\n')
+        view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='django')
+        self.assertEqual(view(request).render().content, b'DTL\n')
+        view = TemplateView.as_view(template_name='generic_views/using.html', template_engine='jinja2')
+        self.assertEqual(view(request).render().content, b'Jinja2\n')
 
     def test_template_params(self):
         """
@@ -330,9 +335,18 @@ class TemplateViewTest(TestCase):
         response = self.client.get('/template/content_type/')
         self.assertEqual(response['Content-Type'], 'text/plain')
 
+    def test_resolve_view(self):
+        match = resolve('/template/content_type/')
+        self.assertIs(match.func.view_class, TemplateView)
+        self.assertEqual(match.func.view_initkwargs['content_type'], 'text/plain')
+
+    def test_resolve_login_required_view(self):
+        match = resolve('/template/login_required/')
+        self.assertIs(match.func.view_class, TemplateView)
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class RedirectViewTest(IgnoreDeprecationWarningsMixin, TestCase):
+class RedirectViewTest(SimpleTestCase):
 
     rf = RequestFactory()
 
@@ -341,14 +355,20 @@ class RedirectViewTest(IgnoreDeprecationWarningsMixin, TestCase):
         response = RedirectView.as_view()(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 410)
 
-    def test_permanent_redirect(self):
-        "Default is a permanent redirect"
+    def test_default_redirect(self):
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/bar/')
+
+    def test_permanent_redirect(self):
+        "Permanent redirects are an option"
+        response = RedirectView.as_view(url='/bar/', permanent=True)(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.url, '/bar/')
 
     def test_temporary_redirect(self):
-        "Permanent redirects are an option"
+        "Temporary redirects are an option"
         response = RedirectView.as_view(url='/bar/', permanent=False)(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
@@ -356,83 +376,78 @@ class RedirectViewTest(IgnoreDeprecationWarningsMixin, TestCase):
     def test_include_args(self):
         "GET arguments can be included in the redirected URL"
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
         response = RedirectView.as_view(url='/bar/', query_string=True)(self.rf.get('/foo/?pork=spam'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/?pork=spam')
 
     def test_include_urlencoded_args(self):
         "GET arguments can be URL-encoded when included in the redirected URL"
         response = RedirectView.as_view(url='/bar/', query_string=True)(
             self.rf.get('/foo/?unicode=%E2%9C%93'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/?unicode=%E2%9C%93')
 
     def test_parameter_substitution(self):
         "Redirection URLs can be parameterized"
         response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/42/')
 
     def test_named_url_pattern(self):
         "Named pattern parameter should reverse to the matching pattern"
         response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), pk=1)
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/detail/artist/1/')
 
     def test_named_url_pattern_using_args(self):
         response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), 1)
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/detail/artist/1/')
 
-    def test_wrong_named_url_pattern(self):
-        "A wrong pattern name returns 410 GONE"
-        response = RedirectView.as_view(pattern_name='wrong.pattern_name')(self.rf.get('/foo/'))
-        self.assertEqual(response.status_code, 410)
-
     def test_redirect_POST(self):
-        "Default is a permanent redirect"
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.post('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_HEAD(self):
-        "Default is a permanent redirect"
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.head('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_OPTIONS(self):
-        "Default is a permanent redirect"
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.options('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_PUT(self):
-        "Default is a permanent redirect"
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.put('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_PATCH(self):
-        "Default is a permanent redirect"
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.patch('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_DELETE(self):
-        "Default is a permanent redirect"
+        "Default is a temporary redirect"
         response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_when_meta_contains_no_query_string(self):
         "regression for #16705"
         # we can't use self.rf.get because it always sets QUERY_STRING
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
 
     def test_direct_instantiation(self):
         """
@@ -442,69 +457,6 @@ class RedirectViewTest(IgnoreDeprecationWarningsMixin, TestCase):
         view = RedirectView()
         response = view.dispatch(self.rf.head('/foo/'))
         self.assertEqual(response.status_code, 410)
-
-
-@override_settings(ROOT_URLCONF='generic_views.urls')
-class RedirectViewDeprecationTest(TestCase):
-
-    rf = RequestFactory()
-
-    def test_deprecation_warning_init(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-
-            view = RedirectView()
-            response = view.dispatch(self.rf.head('/python/'))
-
-        self.assertEqual(response.status_code, 410)
-        self.assertEqual(len(warns), 1)
-        self.assertIs(warns[0].category, RemovedInDjango19Warning)
-        self.assertEqual(
-            six.text_type(warns[0].message),
-            "Default value of 'RedirectView.permanent' will change "
-            "from True to False in Django 1.9. Set an explicit value "
-            "to silence this warning.",
-        )
-
-    def test_deprecation_warning_raised_when_permanent_not_passed(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-
-            view_function = RedirectView.as_view(url='/bbb/')
-            request = self.rf.request(PATH_INFO='/aaa/')
-            view_function(request)
-
-        self.assertEqual(len(warns), 1)
-        self.assertIs(warns[0].category, RemovedInDjango19Warning)
-        self.assertEqual(
-            six.text_type(warns[0].message),
-            "Default value of 'RedirectView.permanent' will change "
-            "from True to False in Django 1.9. Set an explicit value "
-            "to silence this warning.",
-        )
-
-    def test_no_deprecation_warning_when_permanent_passed(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-
-            view_function = RedirectView.as_view(url='/bar/', permanent=False)
-            request = self.rf.request(PATH_INFO='/foo/')
-            view_function(request)
-
-        self.assertEqual(len(warns), 0)
-
-    def test_no_deprecation_warning_with_custom_redirectview(self):
-        class CustomRedirectView(RedirectView):
-            permanent = False
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-
-            view_function = CustomRedirectView.as_view(url='/eggs/')
-            request = self.rf.request(PATH_INFO='/spam/')
-            view_function(request)
-
-        self.assertEqual(len(warns), 0)
 
 
 class GetContextDataTest(unittest.TestCase):
@@ -565,4 +517,5 @@ class SingleObjectTemplateResponseMixinTest(unittest.TestCase):
         TemplateDoesNotExist.
         """
         view = views.TemplateResponseWithoutTemplate()
-        self.assertRaises(ImproperlyConfigured, view.get_template_names)
+        with self.assertRaises(ImproperlyConfigured):
+            view.get_template_names()

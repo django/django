@@ -19,7 +19,7 @@ Backwards incompatible changes
 ==============================
 
 CSRF exception for AJAX requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Django includes a CSRF-protection mechanism, which makes use of a
 token inserted into outgoing forms. Middleware then checks for the
@@ -68,7 +68,7 @@ documentation for your version of Django, as the exact code necessary
 is different for some older versions of Django.
 
 FileField no longer deletes files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 In earlier Django versions, when a model instance containing a
 :class:`~django.db.models.FileField` was deleted,
@@ -82,7 +82,7 @@ yourself (for instance, with a custom management command that can be run
 manually or scheduled to run periodically via e.g. cron).
 
 Use of custom SQL to load initial data in tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 Django provides a custom SQL hooks as a way to inject hand-crafted SQL
 into the database synchronization process. One of the possible uses
@@ -105,14 +105,14 @@ the policy that data inserted by custom SQL will *not* be visible
 during testing.
 
 This change only affects the testing process. You can still use custom
-SQL to load data into your production database as part of the syncdb
+SQL to load data into your production database as part of the ``syncdb``
 process. If you require data to exist during test conditions, you
 should either insert it using :ref:`test fixtures
 <topics-testing-fixtures>`, or using the ``setUp()`` method of your
 test case.
 
 ModelAdmin.lookup_allowed signature changed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 Django 1.2.4 introduced a method ``lookup_allowed`` on ``ModelAdmin``, to cope
 with a security issue (changeset `[15033]

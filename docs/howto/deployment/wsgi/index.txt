@@ -22,7 +22,7 @@ Django includes getting-started documentation for the following WSGI servers:
    uwsgi
 
 The ``application`` object
---------------------------
+==========================
 
 The key concept of deploying with WSGI is the ``application`` callable which
 the application server uses to communicate with your code. It's commonly
@@ -36,13 +36,13 @@ It's used both by Django's development server and in production WSGI
 deployments.
 
 WSGI servers obtain the path to the ``application`` callable from their
-configuration. Django's built-in servers, namely the :djadmin:`runserver` and
-:djadmin:`runfcgi` commands, read it from the :setting:`WSGI_APPLICATION`
-setting. By default, it's set to ``<project_name>.wsgi.application``, which
-points to the ``application`` callable in :file:`<project_name>/wsgi.py`.
+configuration. Django's built-in server, namely the :djadmin:`runserver`
+command, reads it from the :setting:`WSGI_APPLICATION` setting. By default, it's
+set to ``<project_name>.wsgi.application``, which points to the ``application``
+callable in :file:`<project_name>/wsgi.py`.
 
 Configuring the settings module
--------------------------------
+===============================
 
 When the WSGI server loads your application, Django needs to import the
 settings module — that's where your entire application is defined.
@@ -68,7 +68,7 @@ If this variable isn't set, the default :file:`wsgi.py` sets it to
 
 
 Applying WSGI middleware
-------------------------
+========================
 
 To apply `WSGI middleware`_ you can simply wrap the application object. For
 instance you could add these lines at the bottom of :file:`wsgi.py`::
@@ -85,7 +85,6 @@ to combine a Django application with a WSGI application of another framework.
 .. note::
 
     Some third-party WSGI middleware do not call ``close`` on the response
-    object after handling a request — most notably Sentry's error reporting
-    middleware up to version 2.0.7. In those cases the
+    object after handling a request. In those cases the
     :data:`~django.core.signals.request_finished` signal isn't sent. This can
     result in idle connections to database and memcache servers.

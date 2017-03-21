@@ -22,7 +22,7 @@ over time, so you'll need a copy of the Git client (a program called ``git``)
 on your computer, and you'll want to familiarize yourself with the basics of
 how Git works.
 
-Git's web site offers downloads for various operating systems. The site also
+Git's website offers downloads for various operating systems. The site also
 contains vast amounts of `documentation`_.
 
 The Django Git repository is located online at `github.com/django/django
@@ -36,8 +36,8 @@ The Git repository includes several `branches`_:
   activity is focused.
 
 * ``stable/A.B.x`` are the branches where release preparation work happens.
-  They are also used for support and bugfix releases which occur as necessary
-  after the initial release of a major or minor version.
+  They are also used for bugfix and security releases which occur as necessary
+  after the initial release of a feature version.
 
 * ``soc20XX/<project>`` branches were used by students who worked on Django
   during the 2009 and 2010 Google Summer of Code programs.
@@ -48,8 +48,8 @@ The Git repository includes several `branches`_:
 The Git repository also contains `tags`_. These are the exact revisions from
 which packaged Django releases were produced, since version 1.0.
 
-The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_ web
-site can be found at `github.com/django/djangoproject.com
+The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_
+website can be found at `github.com/django/djangoproject.com
 <https://github.com/django/djangoproject.com>`_.
 
 .. _Git: http://git-scm.com/
@@ -84,8 +84,7 @@ coding style and how to generate and submit a patch.
 Other branches
 ==============
 
-Django uses branches to prepare for releases of Django (whether they be
-:term:`major <Major release>` or :term:`minor <Minor release>`).
+Django uses branches to prepare for releases of Django.
 
 In the past when Django was hosted on Subversion, branches were also used for
 feature development. Now Django is hosted on Git and feature development is
@@ -243,8 +242,7 @@ branches, used for Google Summer of Code projects.
 Tags
 ====
 
-Each Django release is tagged and signed by a :ref:`releaser
-<releasers-list>`.
+Each Django release is tagged and signed by the releaser.
 
 The tags can be found on GitHub's `tags`_ page.
 

@@ -1,88 +1,51 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Attila Nagy <>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hungarian (http://www.transifex.com/projects/p/django/"
-"language/hu/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-19 07:40+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
+"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Adminisztrációs dokumentáció"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
-#: contrib/admindocs/templates/admin_doc/index.html:6
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:6
-#: contrib/admindocs/templates/admin_doc/model_detail.html:14
-#: contrib/admindocs/templates/admin_doc/model_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_detail.html:6
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:7
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:7
-#: contrib/admindocs/templates/admin_doc/view_detail.html:6
-#: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Kezdőlap"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:10
-#: contrib/admindocs/templates/admin_doc/index.html:14
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:7
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:14
-#: contrib/admindocs/templates/admin_doc/model_detail.html:15
-#: contrib/admindocs/templates/admin_doc/model_index.html:9
-#: contrib/admindocs/templates/admin_doc/template_detail.html:7
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:8
-#: contrib/admindocs/templates/admin_doc/view_detail.html:7
-#: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Dokumentáció"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-#: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr "Könyvjelzők"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Dokumentum könyvjelzők"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">A könyvjelzők felvételéhez húzza a könyvjelzők linkjét az "
-"eszköztárra, vagy kattintson rájuk jobb egérgombbal és úgy adja hozzá. "
-"Ezután \n"
-"már ki tudja választani a könyvjelzőt a honlap bármely oldaláról. A "
-"könyvjelzők között néhány oldal csak \"belső\" gépekről nézhető meg.\n"
-"(Kérdezze meg rendszergazdáját, hogy az Ön gépe \"belső\" gép-e.).</p>\n"
+"A könyvjelzők felvételéhez húzza a könyvjelzők linkjét az eszköztárra, vagy "
+"kattintson rájuk jobb egérgombbal és úgy adja hozzá. Ezután már ki tudja "
+"választani a könyvjelzőt a honlap bármely oldaláról."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Az oldal dokumentációja"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -90,313 +53,241 @@ msgstr ""
 "Bármely oldalról annak a nézetnek a dokumentációjára ugrik, amely a kérdéses "
 "oldalt generálta."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
-msgid "Show object ID"
-msgstr "Az objektum ID mutatása"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Az objektum által reprezentált oldalak 'content-type' és 'unique ID' "
-"értékeit mutatja."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
-msgid "Edit this object (current window)"
-msgstr "Objektum szerkesztése (aktuális ablakban)"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Az objektumhoz tartozó oldalak adminisztrációjához ugrik."
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
-msgid "Edit this object (new window)"
-msgstr "Objektum szerkesztése (új ablakban)"
-
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
-msgid "As above, but opens the admin page in a new window."
-msgstr "Mint fentebb, de az adminisztrációs oldalt új ablakban nyitja meg."
-
-#: contrib/admindocs/templates/admin_doc/index.html:17
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Címkék"
 
-#: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
 msgstr ""
+"Az összes sablon címke (template tags) és a hozzá tartozó függvények listája"
 
-#: contrib/admindocs/templates/admin_doc/index.html:20
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "Szűrők"
 
-#: contrib/admindocs/templates/admin_doc/index.html:21
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"A szűrők olyan műveletek, amelyeket változókon végrehajtva a sablon kimenete "
+"módosul."
 
-#: contrib/admindocs/templates/admin_doc/index.html:23
-#: contrib/admindocs/templates/admin_doc/model_detail.html:16
-#: contrib/admindocs/templates/admin_doc/model_index.html:10
-#: contrib/admindocs/templates/admin_doc/model_index.html:14
 msgid "Models"
 msgstr "Modellek"
 
-#: contrib/admindocs/templates/admin_doc/index.html:24
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"A modellek a rendszerben található objektumok és a hozzá tartozó mezők "
+"leírásai. Minden modell rendelkezik mezőkkel, amelyek a sablonokban "
+"változóként érhetők el."
 
-#: contrib/admindocs/templates/admin_doc/index.html:26
-#: contrib/admindocs/templates/admin_doc/view_detail.html:8
-#: contrib/admindocs/templates/admin_doc/view_index.html:9
-#: contrib/admindocs/templates/admin_doc/view_index.html:12
 msgid "Views"
 msgstr "Nézetek"
 
-#: contrib/admindocs/templates/admin_doc/index.html:27
 msgid ""
 "Each page on the public site is generated by a view. The view defines which "
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"A honlapon minden oldalt egy nézet generál. A nézet definiálja, melyik "
+"sablonból készül az oldal, és milyen objektumok állnak az adott nézet "
+"rendelkezésére."
 
-#: contrib/admindocs/templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
-msgstr ""
+msgstr "Segédeszközök a böngészőjébe az admin funkciók gyors eléréséhez."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
-msgstr ""
+msgstr "Kérem telepítse a docutils-t"
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
+"Az adminisztrációs dokumentáció működéséhez szükség van a Python <a href="
+"\"%(link)s\">docutils</a> könyvtárára."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"Kérje meg a rendszergazdát, hogy telepítse a <a href=\"%(link)s\">docutils</"
+"a>-t."
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "%(name)s modell"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:35
+msgid "Fields"
+msgstr "Mezők"
+
 msgid "Field"
-msgstr ""
+msgstr "Mező"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
-msgstr ""
+msgstr "Típus"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
-msgstr ""
+msgstr "Leírás"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:52
-msgid "Back to Model Documentation"
-msgstr ""
+msgid "Methods with arguments"
+msgstr "Metódusok és paramétereik"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:18
+msgid "Method"
+msgstr "Metódus"
+
+msgid "Arguments"
+msgstr "Paraméterek"
+
+msgid "Back to Model documentation"
+msgstr "Vissza a modell dokumentációhoz"
+
 msgid "Model documentation"
-msgstr ""
+msgstr "Modell dokumentáció"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
-msgstr ""
+msgstr "Modell csoportok"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Sablonok"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "%(name)s sablon"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "%(name)s sablon"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:18
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "\"%(name)s\" sablon keresési útvonala:"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
-msgstr ""
+msgstr "(nem létezik)"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Vissza a dokumentációhoz"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
-msgstr ""
+msgstr "Sablon szűrők"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Sablon szűrő dokumentáci"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
-msgstr ""
+msgstr "Beépített szűrők"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"Ezen szűrők használatához a <code>%(code)s</code> kódrészletnek kell "
+"szerepelnie használat előtt a sablonban."
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
-msgstr ""
+msgstr "Sablon címkék"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
-msgstr ""
+msgstr "Sablon címke dokumentáció"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
-msgstr ""
+msgstr "Beépített címkék"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Ezen címkék használatához a <code>%(code)s</code> kódrészletnek kell "
+"szerepelnie használat előtt a sablonban."
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "%(name)s nézet"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:23
 msgid "Context:"
-msgstr ""
+msgstr "Környezet:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:28
 msgid "Templates:"
-msgstr ""
+msgstr "Sablonok:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:32
-msgid "Back to Views Documentation"
-msgstr ""
+msgid "Back to View documentation"
+msgstr "Vissza a nézetek dokumentációhoz"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
-msgstr ""
+msgstr "Nézet dokumentáció"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Ugrás a névtérhez"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
-msgstr ""
+msgstr "Üres névtér"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "%(name)s névtérhez tartozó nézetek"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Névtér nélküli nézetek"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:49
 #, python-format
 msgid ""
 "\n"
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"    Nézet függvény: <code>%(full_name)s</code>. Név: <code>%(url_name)s</"
+"code>.\n"
 
-#: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
 
-#: contrib/admindocs/tests/test_fields.py:42
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Mezőtípus: %(field_type)s"
 
-#: contrib/admindocs/views.py:76 contrib/admindocs/views.py:78
-#: contrib/admindocs/views.py:80
 msgid "tag:"
 msgstr "címke:"
 
-#: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
-#: contrib/admindocs/views.py:113
 msgid "filter:"
 msgstr "szűrő:"
 
-#: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
-#: contrib/admindocs/views.py:164
 msgid "view:"
 msgstr "nézet:"
 
-#: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "%(app_label)r alkalmazás nem található"
 
-#: contrib/admindocs/views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
 "%(model_name)r modell nem található a következő alkalmazásban: %(app_label)r"
 
-#: contrib/admindocs/views.py:208
+msgid "model:"
+msgstr "modell:"
+
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "a kapcsolódó '%(app_label)s.%(data_type)s' objektum"
 
-#: contrib/admindocs/views.py:212 contrib/admindocs/views.py:232
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:251
-#: contrib/admindocs/views.py:265 contrib/admindocs/views.py:270
-msgid "model:"
-msgstr "modell:"
-
-#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "kapcsolódó '%(app_label)s.%(object_name)s' objektumok"
 
-#: contrib/admindocs/views.py:232 contrib/admindocs/views.py:265
 #, python-format
 msgid "all %s"
 msgstr "minden %s"
 
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:270
 #, python-format
 msgid "number of %s"
 msgstr "%s mennyisége"
 
-#. Translators: %s is an object type name
-#: contrib/admindocs/views.py:275
-#, python-format
-msgid "Attributes on %s objects"
-msgstr ""
-
-#: contrib/admindocs/views.py:369
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s nem tűnik egy urlpattern objektumnak."

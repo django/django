@@ -1,2 +1,0 @@
--r base.txt
-python-memcached

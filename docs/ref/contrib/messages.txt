@@ -27,22 +27,23 @@ already contains all the settings required to enable message functionality:
 
 * ``'django.contrib.messages'`` is in :setting:`INSTALLED_APPS`.
 
-* :setting:`MIDDLEWARE_CLASSES` contains
+* :setting:`MIDDLEWARE` contains
   ``'django.contrib.sessions.middleware.SessionMiddleware'`` and
   ``'django.contrib.messages.middleware.MessageMiddleware'``.
 
   The default :ref:`storage backend <message-storage-backends>` relies on
   :doc:`sessions </topics/http/sessions>`. That's why ``SessionMiddleware``
   must be enabled and appear before ``MessageMiddleware`` in
-  :setting:`MIDDLEWARE_CLASSES`.
+  :setting:`MIDDLEWARE`.
 
-* :setting:`TEMPLATE_CONTEXT_PROCESSORS`   contains
+* The ``'context_processors'`` option of the ``DjangoTemplates`` backend
+  defined in your :setting:`TEMPLATES` setting contains
   ``'django.contrib.messages.context_processors.messages'``.
 
 If you don't want to use messages, you can remove
 ``'django.contrib.messages'`` from your :setting:`INSTALLED_APPS`, the
-``MessageMiddleware`` line from :setting:`MIDDLEWARE_CLASSES`, and the
-``messages`` context processor from :setting:`TEMPLATE_CONTEXT_PROCESSORS`.
+``MessageMiddleware`` line from :setting:`MIDDLEWARE`, and the ``messages``
+context processor from :setting:`TEMPLATES`.
 
 Configuring the message engine
 ==============================
@@ -197,8 +198,6 @@ Even if you know there is only just one message, you should still iterate over
 the ``messages`` sequence, because otherwise the message storage will not be cleared
 for the next request.
 
-.. versionadded:: 1.7
-
 The context processor also provides a ``DEFAULT_MESSAGE_LEVELS`` variable which
 is a mapping of the message level names to their numeric value::
 
@@ -212,8 +211,6 @@ is a mapping of the message level names to their numeric value::
         {% endfor %}
     </ul>
     {% endif %}
-
-
 
 **Outside of templates**, you can use
 :func:`~django.contrib.messages.get_messages`::
@@ -251,8 +248,6 @@ The ``Message`` class
 
     * ``extra_tags``: A string containing custom tags for this message,
       separated by spaces. It's empty by default.
-
-    .. versionadded:: 1.7
 
     * ``level_tag``: The string representation of the level. By default, it's
       the lowercase version of the name of the associated constant, but this
@@ -325,8 +320,7 @@ Adding extra message tags
 For more direct control over message tags, you can optionally provide a string
 containing extra tags to any of the add methods::
 
-    messages.add_message(request, messages.INFO, 'Over 9000!',
-                         extra_tags='dragonball')
+    messages.add_message(request, messages.INFO, 'Over 9000!', extra_tags='dragonball')
     messages.error(request, 'Email box full', extra_tags='email')
 
 Extra tags are added before the default tag for that level and are space
@@ -341,8 +335,10 @@ if they don't want to, you may pass an additional keyword argument
 ``fail_silently=True`` to any of the ``add_message`` family of methods. For
 example::
 
-    messages.add_message(request, messages.SUCCESS, 'Profile details updated.',
-                         fail_silently=True)
+    messages.add_message(
+        request, messages.SUCCESS, 'Profile details updated.',
+        fail_silently=True,
+    )
     messages.info(request, 'Hello world.', fail_silently=True)
 
 .. note::
@@ -351,7 +347,7 @@ example::
    use one of the ``add_message`` family of methods. It does not hide failures
    that may occur for other reasons.
 
-Adding messages in Class Based Views
+Adding messages in class-based views
 ------------------------------------
 
 .. class:: views.SuccessMessageMixin
@@ -393,8 +389,10 @@ method.
         success_message = "%(calculated_field)s was created successfully"
 
         def get_success_message(self, cleaned_data):
-            return self.success_message % dict(cleaned_data,
-                                               calculated_field=self.object.calculated_field)
+            return self.success_message % dict(
+                cleaned_data,
+                calculated_field=self.object.calculated_field,
+            )
 
 Expiration of messages
 ======================
@@ -436,8 +434,6 @@ behavior:
 * :setting:`MESSAGE_LEVEL`
 * :setting:`MESSAGE_STORAGE`
 * :setting:`MESSAGE_TAGS`
-
-.. versionadded:: 1.7
 
 For backends that use cookies, the settings for the cookie are taken from
 the session cookie settings:

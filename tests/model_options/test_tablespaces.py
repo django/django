@@ -1,12 +1,11 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models.tablespaces import (Article, ArticleRef, Authors, Reviewers,
-    Scientist, ScientistRef)
+from .models.tablespaces import (
+    Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef,
+)
 
 
 def sql_for_table(model):
@@ -42,8 +41,7 @@ class TablespacesTests(TestCase):
 
     def assertNumContains(self, haystack, needle, count):
         real_count = haystack.count(needle)
-        self.assertEqual(real_count, count, "Found %d instances of '%s', "
-                "expected %d" % (real_count, needle, count))
+        self.assertEqual(real_count, count, "Found %d instances of '%s', expected %d" % (real_count, needle, count))
 
     @skipUnlessDBFeature('supports_tablespaces')
     def test_tablespace_for_model(self):

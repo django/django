@@ -1,4 +1,7 @@
+import json
+
 from django import template
+from django.template.context import Context
 
 register = template.Library()
 
@@ -6,7 +9,7 @@ register = template.Library()
 @register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)
 def prepopulated_fields_js(context):
     """
-    Creates a list of prepopulated_fields that should render Javascript for
+    Create a list of prepopulated_fields that should render Javascript for
     the prepopulated fields for both the admin form and inlines.
     """
     prepopulated_fields = []
@@ -17,21 +20,37 @@ def prepopulated_fields_js(context):
             for inline_admin_form in inline_admin_formset:
                 if inline_admin_form.original is None:
                     prepopulated_fields.extend(inline_admin_form.prepopulated_fields)
-    context.update({'prepopulated_fields': prepopulated_fields})
+
+    prepopulated_fields_json = []
+    for field in prepopulated_fields:
+        prepopulated_fields_json.append({
+            "id": "#%s" % field["field"].auto_id,
+            "name": field["field"].name,
+            "dependency_ids": ["#%s" % dependency.auto_id for dependency in field["dependencies"]],
+            "dependency_list": [dependency.name for dependency in field["dependencies"]],
+            "maxLength": field["field"].field.max_length or 50,
+            "allowUnicode": getattr(field["field"].field, "allow_unicode", False)
+        })
+
+    context.update({
+        'prepopulated_fields': prepopulated_fields,
+        'prepopulated_fields_json': json.dumps(prepopulated_fields_json),
+    })
     return context
 
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
     """
-    Displays the row of buttons for delete and save.
+    Display the row of buttons for delete and save.
     """
-    opts = context['opts']
     change = context['change']
     is_popup = context['is_popup']
     save_as = context['save_as']
-    ctx = {
-        'opts': opts,
+    show_save = context.get('show_save', True)
+    show_save_and_continue = context.get('show_save_and_continue', True)
+    ctx = Context(context)
+    ctx.update({
         'show_delete_link': (
             not is_popup and context['has_delete_permission'] and
             change and context.get('show_delete', True)
@@ -41,19 +60,15 @@ def submit_row(context):
             context['has_add_permission'] and not is_popup and
             (not save_as or context['add'])
         ),
-        'show_save_and_continue': not is_popup and context['has_change_permission'],
-        'is_popup': is_popup,
-        'show_save': True,
-        'preserved_filters': context.get('preserved_filters'),
-    }
-    if context.get('original') is not None:
-        ctx['original'] = context['original']
+        'show_save_and_continue': not is_popup and context['has_change_permission'] and show_save_and_continue,
+        'show_save': show_save,
+    })
     return ctx
 
 
 @register.filter
 def cell_count(inline_admin_form):
-    """Returns the number of cells used in a tabular inline"""
+    """Return the number of cells used in a tabular inline."""
     count = 1  # Hidden cell with hidden 'id' field
     for fieldset in inline_admin_form:
         # Loop through all the fields (one per cell)

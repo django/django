@@ -1,121 +1,240 @@
 ====================================================
-The Django template language: For Python programmers
+The Django template language: for Python programmers
 ====================================================
 
-.. module:: django.template
-    :synopsis: Django's template system
+.. currentmodule:: django.template
 
 This document explains the Django template system from a technical
 perspective -- how it works and how to extend it. If you're just looking for
-reference on the language syntax, see :doc:`/topics/templates`.
+reference on the language syntax, see :doc:`/ref/templates/language`.
 
-If you're looking to use the Django template system as part of another
-application -- i.e., without the rest of the framework -- make sure to read
-the `configuration`_ section later in this document.
+It assumes an understanding of templates, contexts, variables, tags, and
+rendering. Start with the :ref:`introduction to the Django template language
+<template-language-intro>` if you aren't familiar with these concepts.
 
-.. _configuration: `configuring the template system in standalone mode`_
+Overview
+========
 
-Basics
-======
+Using the template system in Python is a three-step process:
 
-A **template** is a text document, or a normal Python string, that is marked-up
-using the Django template language. A template can contain **block tags** or
-**variables**.
+1. You configure an :class:`Engine`.
+2. You compile template code into a :class:`Template`.
+3. You render the template with a :class:`Context`.
 
-A **block tag** is a symbol within a template that does something.
+Django projects generally rely on the :ref:`high level, backend agnostic APIs
+<template-engines>` for each of these steps instead of the template system's
+lower level APIs:
 
-This definition is deliberately vague. For example, a block tag can output
-content, serve as a control structure (an "if" statement or "for" loop), grab
-content from a database or enable access to other template tags.
+1. For each :class:`~django.template.backends.django.DjangoTemplates` backend
+   in the :setting:`TEMPLATES` setting, Django instantiates an
+   :class:`Engine`. :class:`~django.template.backends.django.DjangoTemplates`
+   wraps :class:`Engine` and adapts it to the common template backend API.
+2. The :mod:`django.template.loader` module provides functions such as
+   :func:`~django.template.loader.get_template` for loading templates. They
+   return a ``django.template.backends.django.Template`` which wraps the
+   actual :class:`django.template.Template`.
+3. The ``Template`` obtained in the previous step has a
+   :meth:`~django.template.backends.base.Template.render` method which
+   marshals a context and possibly a request into a :class:`Context` and
+   delegates the rendering to the underlying :class:`Template`.
 
-Block tags are surrounded by ``"{%"`` and ``"%}"``.
+Configuring an engine
+=====================
 
-Example template with block tags:
+If you are simply using the
+:class:`~django.template.backends.django.DjangoTemplates` backend, this
+probably isn't the documentation you're looking for. An instance of the
+``Engine`` class described below is accessible using the ``engine`` attribute
+of that backend and any attribute defaults mentioned below are overridden by
+what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
-.. code-block:: html+django
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
 
-    {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
+    When instantiating an ``Engine`` all arguments must be passed as keyword
+    arguments:
 
-A **variable** is a symbol within a template that outputs a value.
+    * ``dirs`` is a list of directories where the engine should look for
+      template source files. It is used to configure
+      :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`.
 
-Variable tags are surrounded by ``"{{"`` and ``"}}"``.
+      It defaults to an empty list.
 
-Example template with variables:
+    * ``app_dirs`` only affects the default value of ``loaders``. See below.
 
-.. code-block:: html+django
+      It defaults to ``False``.
 
-    My first name is {{ first_name }}. My last name is {{ last_name }}.
+    * ``autoescape`` controls whether HTML autoescaping is enabled.
 
-A **context** is a "variable name" -> "variable value" mapping that is passed
-to a template.
+      It defaults to ``True``.
 
-A template **renders** a context by replacing the variable "holes" with values
-from the context and executing all block tags.
+      .. warning::
 
-Using the template system
-=========================
+          Only set it to ``False`` if you're rendering non-HTML templates!
+
+    * ``context_processors`` is a list of dotted Python paths to callables
+      that are used to populate the context when a template is rendered with a
+      request. These callables take a request object as their argument and
+      return a :class:`dict` of items to be merged into the context.
+
+      It defaults to an empty list.
+
+      See :class:`~django.template.RequestContext` for more information.
+
+    * ``debug`` is a boolean that turns on/off template debug mode. If it is
+      ``True``, the template engine will store additional debug information
+      which can be used to display a detailed report for any exception raised
+      during template rendering.
+
+      It defaults to ``False``.
+
+    * ``loaders`` is a list of template loader classes, specified as strings.
+      Each ``Loader`` class knows how to import templates from a particular
+      source. Optionally, a tuple can be used instead of a string. The first
+      item in the tuple should be the ``Loader`` class name, subsequent items
+      are passed to the ``Loader`` during initialization.
+
+      It defaults to a list containing:
+
+      * ``'django.template.loaders.filesystem.Loader'``
+      * ``'django.template.loaders.app_directories.Loader'`` if and only if
+        ``app_dirs`` is ``True``.
+
+      If ``debug`` is ``False``, these loaders are wrapped in
+      :class:`django.template.loaders.cached.Loader`.
+
+      See :ref:`template-loaders` for details.
+
+      .. versionchanged:: 1.11
+
+          Enabling of the cached template loader when ``debug`` is ``False``
+          was added.
+
+    * ``string_if_invalid`` is the output, as a string, that the template
+      system should use for invalid (e.g. misspelled) variables.
+
+      It defaults to the empty string.
+
+      See :ref:`invalid-template-variables` for details.
+
+    * ``file_charset`` is the charset used to read template files on disk.
+
+      It defaults to ``'utf-8'``.
+
+    * ``'libraries'``: A dictionary of labels and dotted Python paths of template
+      tag modules to register with the template engine. This is used to add new
+      libraries or provide alternate labels for existing ones. For example::
+
+          Engine(
+              libraries={
+                  'myapp_tags': 'path.to.myapp.tags',
+                  'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+              },
+          )
+
+      Libraries can be loaded by passing the corresponding dictionary key to
+      the :ttag:`{% load %}<load>` tag.
+
+    * ``'builtins'``: A list of dotted Python paths of template tag modules to
+      add to :doc:`built-ins </ref/templates/builtins>`. For example::
+
+          Engine(
+              builtins=['myapp.builtins'],
+          )
+
+      Tags and filters from built-in libraries can be used without first calling
+      the :ttag:`{% load %}<load>` tag.
+
+.. staticmethod:: Engine.get_default()
+
+    When a Django project configures one and only one
+    :class:`~django.template.backends.django.DjangoTemplates` engine, this
+    method returns the underlying :class:`Engine`. In other circumstances it
+    will raise :exc:`~django.core.exceptions.ImproperlyConfigured`.
+
+    It's required for preserving APIs that rely on a globally available,
+    implicitly configured engine. Any other use is strongly discouraged.
+
+.. method:: Engine.from_string(template_code)
+
+    Compiles the given template code and returns a :class:`Template` object.
+
+.. method:: Engine.get_template(template_name)
+
+    Loads a template with the given name, compiles it and returns a
+    :class:`Template` object.
+
+.. method:: Engine.select_template(template_name_list)
+
+    Like :meth:`~Engine.get_template`, except it takes a list of names
+    and returns the first template that was found.
+
+Loading a template
+==================
+
+The recommended way to create a :class:`Template` is by calling the factory
+methods of the :class:`Engine`: :meth:`~Engine.get_template`,
+:meth:`~Engine.select_template` and :meth:`~Engine.from_string`.
+
+In a Django project where the :setting:`TEMPLATES` setting defines exactly one
+:class:`~django.template.backends.django.DjangoTemplates` engine, it's
+possible to instantiate a :class:`Template` directly.
 
 .. class:: Template
 
-Using the template system in Python is a two-step process:
+    This class lives at ``django.template.Template``. The constructor takes
+    one argument — the raw template code::
 
-* First, you compile the raw template code into a ``Template`` object.
-* Then, you call the ``render()`` method of the ``Template`` object with a
-  given context.
+        from django.template import Template
 
-Compiling a string
-------------------
-
-The easiest way to create a ``Template`` object is by instantiating it
-directly. The class lives at :class:`django.template.Template`. The constructor
-takes one argument -- the raw template code::
-
-    >>> from django.template import Template
-    >>> t = Template("My name is {{ my_name }}.")
-    >>> print(t)
-    <django.template.Template instance>
+        template = Template("My name is {{ my_name }}.")
 
 .. admonition:: Behind the scenes
 
     The system only parses your raw template code once -- when you create the
-    ``Template`` object. From then on, it's stored internally as a "node"
+    ``Template`` object. From then on, it's stored internally as a tree
     structure for performance.
 
     Even the parsing itself is quite fast. Most of the parsing happens via a
     single call to a single, short, regular expression.
 
 Rendering a context
--------------------
+===================
 
-.. method:: render(context)
+Once you have a compiled :class:`Template` object, you can render a context
+with it. You can reuse the same template to render it several times with
+different contexts.
 
-Once you have a compiled ``Template`` object, you can render a context -- or
-multiple contexts -- with it. The ``Context`` class lives at
-:class:`django.template.Context`, and the constructor takes two (optional)
-arguments:
+.. class:: Context(dict_=None)
 
-* A dictionary mapping variable names to variable values.
+    This class lives at ``django.template.Context``. The constructor takes
+    two optional arguments:
 
-* The name of the current application. This application name is used
-  to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
-  If you're not using namespaced URLs, you can ignore this argument.
+    * A dictionary mapping variable names to variable values.
 
-Call the ``Template`` object's ``render()`` method with the context to "fill" the
-template::
+    * The name of the current application. This application name is used
+      to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
+      If you're not using namespaced URLs, you can ignore this argument.
 
-    >>> from django.template import Context, Template
-    >>> t = Template("My name is {{ my_name }}.")
+    For details, see :ref:`playing-with-context` below.
 
-    >>> c = Context({"my_name": "Adrian"})
-    >>> t.render(c)
-    "My name is Adrian."
+.. method:: Template.render(context)
 
-    >>> c = Context({"my_name": "Dolores"})
-    >>> t.render(c)
-    "My name is Dolores."
+    Call the :class:`Template` object's ``render()`` method with a
+    :class:`Context` to "fill" the template::
+
+        >>> from django.template import Context, Template
+        >>> template = Template("My name is {{ my_name }}.")
+
+        >>> context = Context({"my_name": "Adrian"})
+        >>> template.render(context)
+        "My name is Adrian."
+
+        >>> context = Context({"my_name": "Dolores"})
+        >>> template.render(context)
+        "My name is Dolores."
 
 Variables and lookups
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Variable names must consist of any letter (A-Z), any digit (0-9), an underscore
 (but they must not start with an underscore) or a dot.
@@ -170,8 +289,8 @@ straight lookups. Here are some things to keep in mind:
   propagated, unless the exception has an attribute
   ``silent_variable_failure`` whose value is ``True``. If the exception
   *does* have a ``silent_variable_failure`` attribute whose value is
-  ``True``, the variable will render as the value of the
-  :setting:`TEMPLATE_STRING_IF_INVALID` setting (an empty string, by default).
+  ``True``, the variable will render as the value of the engine's
+  ``string_if_invalid`` configuration option (an empty string, by default).
   Example::
 
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -200,7 +319,8 @@ straight lookups. Here are some things to keep in mind:
   silently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
-  the system will return the value of :setting:`TEMPLATE_STRING_IF_INVALID`.
+  the system will return the value of the engine's ``string_if_invalid``
+  option.
 
 .. _alters-data-description:
 
@@ -217,7 +337,7 @@ straight lookups. Here are some things to keep in mind:
   To prevent this, set an ``alters_data`` attribute on the callable
   variable. The template system won't call a variable if it has
   ``alters_data=True`` set, and will instead replace the variable with
-  :setting:`TEMPLATE_STRING_IF_INVALID`, unconditionally.  The
+  ``string_if_invalid``, unconditionally.  The
   dynamically-generated :meth:`~django.db.models.Model.delete` and
   :meth:`~django.db.models.Model.save` methods on Django model objects get
   ``alters_data=True`` automatically. Example::
@@ -236,48 +356,46 @@ straight lookups. Here are some things to keep in mind:
 .. _invalid-template-variables:
 
 How invalid variables are handled
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
-Generally, if a variable doesn't exist, the template system inserts the
-value of the :setting:`TEMPLATE_STRING_IF_INVALID` setting, which is set to
+Generally, if a variable doesn't exist, the template system inserts the value
+of the engine's ``string_if_invalid`` configuration option, which is set to
 ``''`` (the empty string) by default.
 
 Filters that are applied to an invalid variable will only be applied if
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to ``''`` (the empty string). If
-:setting:`TEMPLATE_STRING_IF_INVALID` is set to any other value, variable
-filters will be ignored.
+``string_if_invalid`` is set to ``''`` (the empty string). If
+``string_if_invalid`` is set to any other value, variable filters will be
+ignored.
 
 This behavior is slightly different for the ``if``, ``for`` and ``regroup``
 template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
-If :setting:`TEMPLATE_STRING_IF_INVALID` contains a ``'%s'``, the format marker will
-be replaced with the name of the invalid variable.
+If ``string_if_invalid`` contains a ``'%s'``, the format marker will be
+replaced with the name of the invalid variable.
 
 .. admonition:: For debug purposes only!
 
-    While :setting:`TEMPLATE_STRING_IF_INVALID` can be a useful debugging tool,
-    it is a bad idea to turn it on as a 'development default'.
+    While ``string_if_invalid`` can be a useful debugging tool, it is a bad
+    idea to turn it on as a 'development default'.
 
-    Many templates, including those in the Admin site, rely upon the
-    silence of the template system when a non-existent variable is
-    encountered. If you assign a value other than ``''`` to
-    :setting:`TEMPLATE_STRING_IF_INVALID`, you will experience rendering
-    problems with these templates and sites.
+    Many templates, including those in the Admin site, rely upon the silence
+    of the template system when a nonexistent variable is encountered. If you
+    assign a value other than ``''`` to ``string_if_invalid``, you will
+    experience rendering problems with these templates and sites.
 
-    Generally, :setting:`TEMPLATE_STRING_IF_INVALID` should only be enabled
-    in order to debug a specific template problem, then cleared
-    once debugging is complete.
+    Generally, ``string_if_invalid`` should only be enabled in order to debug
+    a specific template problem, then cleared once debugging is complete.
 
-Builtin variables
-~~~~~~~~~~~~~~~~~
+Built-in variables
+------------------
 
 Every context contains ``True``, ``False`` and ``None``. As you would expect,
 these variables resolve to the corresponding Python objects.
 
 Limitations with string literals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Django's template language has no way to escape the characters used for its own
 syntax. For example, the :ttag:`templatetag` tag is required if you need to
@@ -301,12 +419,12 @@ arguments::
 If you need to use strings with these sequences, store them in template
 variables or use a custom template tag or filter to workaround the limitation.
 
-Playing with Context objects
-----------------------------
+.. _playing-with-context:
 
-.. class:: Context
+Playing with ``Context`` objects
+================================
 
-Most of the time, you'll instantiate ``Context`` objects by passing in a
+Most of the time, you'll instantiate :class:`Context` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
 from a ``Context`` object once it's been instantiated, too, using standard
 dictionary syntax::
@@ -317,10 +435,22 @@ dictionary syntax::
     'bar'
     >>> del c['foo']
     >>> c['foo']
-    ''
+    Traceback (most recent call last):
+    ...
+    KeyError: 'foo'
     >>> c['newvariable'] = 'hello'
     >>> c['newvariable']
     'hello'
+
+.. method:: Context.get(key, otherwise=None)
+
+    Returns the value for ``key`` if ``key`` is in the context, else returns
+    ``otherwise``.
+
+.. method:: Context.setdefault(key, default=None)
+
+    If ``key`` is in the context, returns its value. Otherwise inserts ``key``
+    with a value of ``default`` and returns ``default``.
 
 .. method:: Context.pop()
 .. method:: Context.push()
@@ -349,16 +479,14 @@ If you ``pop()`` too much, it'll raise
     ...
     ContextPopException
 
-.. versionadded:: 1.7
-
 You can also use ``push()`` as a context manager to ensure a matching ``pop()``
 is called.
 
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> with c.push():
-    >>>     c['foo'] = 'second level'
-    >>>     c['foo']
+    ...     c['foo'] = 'second level'
+    ...     c['foo']
     'second level'
     >>> c['foo']
     'first level'
@@ -369,12 +497,12 @@ used to build the new context level.
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> with c.push(foo='second level'):
-    >>>     c['foo']
+    ...     c['foo']
     'second level'
     >>> c['foo']
     'first level'
 
-.. method:: update(other_dict)
+.. method:: Context.update(other_dict)
 
 In addition to ``push()`` and ``pop()``, the ``Context``
 object also defines an ``update()`` method. This works like ``push()``
@@ -392,12 +520,21 @@ the stack instead of an empty one.
     >>> c['foo']
     'first level'
 
-Using a ``Context`` as a stack comes in handy in some custom template tags, as
-you'll see below.
+Like ``push()``, you can use ``update()`` as a context manager to ensure a
+matching ``pop()`` is called.
+
+    >>> c = Context()
+    >>> c['foo'] = 'first level'
+    >>> with c.update({'foo': 'second level'}):
+    ...     c['foo']
+    'second level'
+    >>> c['foo']
+    'first level'
+
+Using a ``Context`` as a stack comes in handy in :ref:`some custom template
+tags <howto-writing-custom-template-tags>`.
 
 .. method:: Context.flatten()
-
-.. versionadded:: 1.7
 
 Using ``flatten()`` method you can get whole ``Context`` stack as one dictionary
 including builtin variables.
@@ -428,19 +565,21 @@ against ``dict``::
             c1 = Context()
             c1['update'] = 'value'
             self.assertEqual(c1.flatten(), {
-                'True': True, 'None': None, 'False': False,
-                'update': 'value'})
-
+                'True': True,
+                'None': None,
+                'False': False,
+                'update': 'value',
+            })
 
 .. _subclassing-context-requestcontext:
 
-Subclassing Context: RequestContext
------------------------------------
+Using ``RequestContext``
+------------------------
 
-.. class:: RequestContext
+.. class:: RequestContext(request, dict_=None, processors=None)
 
 Django comes with a special ``Context`` class,
-``django.template.RequestContext``, that acts slightly differently than the
+``django.template.RequestContext``, that acts slightly differently from the
 normal ``django.template.Context``. The first difference is that it takes an
 :class:`~django.http.HttpRequest` as its first argument. For example::
 
@@ -448,27 +587,28 @@ normal ``django.template.Context``. The first difference is that it takes an
         'foo': 'bar',
     })
 
-The second difference is that it automatically populates the context with a few
-variables, according to your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+The second difference is that it automatically populates the context with a
+few variables, according to the engine's ``context_processors`` configuration
+option.
 
-The :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting is a tuple of callables --
-called **context processors** -- that take a request object as their argument
-and return a dictionary of items to be merged into the context. By default,
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` is set to::
+The ``context_processors`` option is a list of callables -- called **context
+processors** -- that take a request object as their argument and return a
+dictionary of items to be merged into the context. In the default generated
+settings file, the default template engine contains the following context
+processors::
 
-    ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+    [
+        'django.template.context_processors.debug',
+        'django.template.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages',
+    ]
 
-In addition to these, ``RequestContext`` always uses
-``django.core.context_processors.csrf``.  This is a security
-related context processor required by the admin and other contrib apps, and,
-in case of accidental misconfiguration, it is deliberately hardcoded in and
-cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+In addition to these, :class:`RequestContext` always enables
+``'django.template.context_processors.csrf'``.  This is a security related
+context processor required by the admin and other contrib apps, and, in case
+of accidental misconfiguration, it is deliberately hardcoded in and cannot be
+turned off in the ``context_processors`` option.
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -477,46 +617,57 @@ below.
 
 .. admonition:: When context processors are applied
 
-    Context processors are applied *after* the context itself is processed.
-    This means that a context processor may overwrite variables you've
-    supplied to your ``Context`` or ``RequestContext``, so take care
-    to avoid variable names that overlap with those supplied by your
-    context processors.
+    Context processors are applied on top of context data. This means that a
+    context processor may overwrite variables you've supplied to your
+    :class:`Context` or :class:`RequestContext`, so take care to avoid
+    variable names that overlap with those supplied by your context
+    processors.
 
-Also, you can give ``RequestContext`` a list of additional processors, using the
-optional, third positional argument, ``processors``. In this example, the
-``RequestContext`` instance gets a ``ip_address`` variable::
+    If you want context data to take priority over context processors, use the
+    following pattern::
+
+        from django.template import RequestContext
+
+        request_context = RequestContext(request)
+        request_context.push({"my_name": "Adrian"})
+
+    Django does this to allow context data to override context processors in
+    APIs such as :func:`~django.shortcuts.render` and
+    :class:`~django.template.response.TemplateResponse`.
+
+Also, you can give :class:`RequestContext` a list of additional processors,
+using the optional, third positional argument, ``processors``. In this
+example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
 
     from django.http import HttpResponse
-    from django.template import RequestContext
+    from django.template import RequestContext, Template
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
 
-    def some_view(request):
-        # ...
-        c = RequestContext(request, {
-            'foo': 'bar',
+    def client_ip_view(request):
+        template = Template('{{ title }}: {{ ip_address }}')
+        context = RequestContext(request, {
+            'title': 'Your IP Address',
         }, [ip_address_processor])
-        return HttpResponse(t.render(c))
+        return HttpResponse(template.render(context))
 
-.. note::
+.. _context-processors:
 
-    If you're using Django's :func:`~django.shortcuts.render_to_response()`
-    shortcut to populate a template with the contents of a dictionary, your
-    template will be passed a ``Context`` instance by default (not a
-    ``RequestContext``). To use a ``RequestContext`` in your template
-    rendering, use the :meth:`~django.shortcuts.render()` shortcut which is
-    the same as a call to :func:`~django.shortcuts.render_to_response()` with a
-    ``context_instance`` argument that forces the use of a ``RequestContext``.
+Built-in template context processors
+------------------------------------
 
-Here's what each of the default processors does:
+Here's what each of the built-in processors does:
 
-django.contrib.auth.context_processors.auth
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. currentmodule:: django.contrib.auth.context_processors
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these variables:
+``django.contrib.auth.context_processors.auth``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: auth
+
+If this processor is enabled, every ``RequestContext`` will contain these
+variables:
 
 * ``user`` -- An ``auth.User`` instance representing the currently
   logged-in user (or an ``AnonymousUser`` instance, if the client isn't
@@ -526,28 +677,30 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   ``django.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
-.. currentmodule:: django.core.context_processors
+.. currentmodule:: django.template.context_processors
 
-django.core.context_processors.debug
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.debug``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables -- but only if your
-:setting:`DEBUG` setting is set to ``True`` and the request's IP address
-(``request.META['REMOTE_ADDR']``) is in the :setting:`INTERNAL_IPS` setting:
+.. function:: debug
+
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
+the request's IP address (``request.META['REMOTE_ADDR']``) is in the
+:setting:`INTERNAL_IPS` setting:
 
 * ``debug`` -- ``True``. You can use this in templates to test whether
   you're in :setting:`DEBUG` mode.
 * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
   representing every SQL query that has happened so far during the request
-  and how long it took. The list is in order by query and lazily generated
-  on access.
+  and how long it took. The list is in order by database alias and then by
+  query. It's lazily generated on access.
 
-django.core.context_processors.i18n
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.i18n``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables:
 
 * ``LANGUAGES`` -- The value of the :setting:`LANGUAGES` setting.
 * ``LANGUAGE_CODE`` -- ``request.LANGUAGE_CODE``, if it exists. Otherwise,
@@ -555,88 +708,96 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
 See :doc:`/topics/i18n/index` for more.
 
-django.core.context_processors.media
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.media``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
-value of the :setting:`MEDIA_URL` setting.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``MEDIA_URL``, providing the value of the :setting:`MEDIA_URL` setting.
 
-django.core.context_processors.static
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.static``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``STATIC_URL``, providing the
-value of the :setting:`STATIC_URL` setting.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
 
-django.core.context_processors.csrf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.csrf``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
-django.core.context_processors.request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.request``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a variable ``request``, which is the current
-:class:`~django.http.HttpRequest`. Note that this processor is not enabled by default;
-you'll have to activate it.
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``request``, which is the current :class:`~django.http.HttpRequest`.
 
-django.contrib.messages.context_processors.messages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.tz``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain these two variables:
+.. function:: tz
+
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``TIME_ZONE``, providing the name of the currently active time zone.
+
+``django.contrib.messages.context_processors.messages``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If this processor is enabled, every ``RequestContext`` will contain these two
+variables:
 
 * ``messages`` -- A list of messages (as strings) that have been set
   via the :doc:`messages framework </ref/contrib/messages>`.
 * ``DEFAULT_MESSAGE_LEVELS`` -- A mapping of the message level names to
   :ref:`their numeric value <message-level-constants>`.
 
-.. versionchanged:: 1.7
-
-       The ``DEFAULT_MESSAGE_LEVELS`` variable was added.
-
 Writing your own context processors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
-A context processor has a very simple interface: It's just a Python function
+A context processor has a very simple interface: It's a Python function
 that takes one argument, an :class:`~django.http.HttpRequest` object, and
 returns a dictionary that gets added to the template context. Each context
 processor *must* return a dictionary.
 
-Custom context processors can live anywhere in your code base. All Django cares
-about is that your custom context processors are pointed-to by your
-:setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
+Custom context processors can live anywhere in your code base. All Django
+cares about is that your custom context processors are pointed to by the
+``'context_processors'`` option in your :setting:`TEMPLATES` setting — or the
+``context_processors`` argument of :class:`~django.template.Engine` if you're
+using it directly.
 
 Loading templates
------------------
+=================
 
-Generally, you'll store templates in files on your filesystem rather than using
-the low-level ``Template`` API yourself. Save templates in a directory
-specified as a **template directory**.
+Generally, you'll store templates in files on your filesystem rather than
+using the low-level :class:`~django.template.Template` API yourself. Save
+templates in a directory specified as a **template directory**.
 
 Django searches for template directories in a number of places, depending on
-your template-loader settings (see "Loader types" below), but the most basic
-way of specifying template directories is by using the :setting:`TEMPLATE_DIRS`
-setting.
+your template loading settings (see "Loader types" below), but the most basic
+way of specifying template directories is by using the :setting:`DIRS
+<TEMPLATES-DIRS>` option.
 
-The TEMPLATE_DIRS setting
-~~~~~~~~~~~~~~~~~~~~~~~~~
+The :setting:`DIRS <TEMPLATES-DIRS>` option
+-------------------------------------------
 
-Tell Django what your template directories are by using the
-:setting:`TEMPLATE_DIRS` setting in your settings file. This should be set to a
-list or tuple of strings that contain full paths to your template
-directory(ies). Example::
+Tell Django what your template directories are by using the :setting:`DIRS
+<TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
+file — or the ``dirs`` argument of :class:`~django.template.Engine`. This
+should be set to a list of strings that contain full paths to your template
+directories::
 
-    TEMPLATE_DIRS = (
-        "/home/html/templates/lawrence.com",
-        "/home/html/templates/default",
-    )
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [
+                '/home/html/templates/lawrence.com',
+                '/home/html/templates/default',
+            ],
+        },
+    ]
 
 Your templates can go anywhere you want, as long as the directories and
 templates are readable by the Web server. They can have any extension you want,
@@ -644,101 +805,21 @@ such as ``.html`` or ``.txt``, or they can have no extension at all.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
-.. _ref-templates-api-the-python-api:
-
-The Python API
-~~~~~~~~~~~~~~
-
-.. module:: django.template.loader
-
-``django.template.loader`` has two functions to load templates from files:
-
-.. function:: get_template(template_name[, dirs])
-
-    ``get_template`` returns the compiled template (a ``Template`` object) for
-    the template with the given name. If the template doesn't exist, it raises
-    ``django.template.TemplateDoesNotExist``.
-
-    .. versionchanged:: 1.7
-
-       The ``dirs`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-.. function:: select_template(template_name_list[, dirs])
-
-    ``select_template`` is just like ``get_template``, except it takes a list
-    of template names. Of the list, it returns the first template that exists.
-
-    .. versionchanged:: 1.7
-
-       The ``dirs`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-For example, if you call ``get_template('story_detail.html')`` and have the
-above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
-in order:
-
-* ``/home/html/templates/lawrence.com/story_detail.html``
-* ``/home/html/templates/default/story_detail.html``
-
-If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
-
-* ``/home/html/templates/lawrence.com/story_253_detail.html``
-* ``/home/html/templates/default/story_253_detail.html``
-* ``/home/html/templates/lawrence.com/story_detail.html``
-* ``/home/html/templates/default/story_detail.html``
-
-When Django finds a template that exists, it stops looking.
-
-.. admonition:: Tip
-
-    You can use ``select_template()`` for super-flexible "templatability." For
-    example, if you've written a news story and want some stories to have
-    custom templates, use something like
-    ``select_template(['story_%s_detail.html' % story.id, 'story_detail.html'])``.
-    That'll allow you to use a custom template for an individual story, with a
-    fallback template for stories that don't have custom templates.
-
-Using subdirectories
-~~~~~~~~~~~~~~~~~~~~
-
-It's possible -- and preferable -- to organize templates in subdirectories of
-the template directory. The convention is to make a subdirectory for each
-Django app, with subdirectories within those subdirectories as needed.
-
-Do this for your own sanity. Storing all templates in the root level of a
-single directory gets messy.
-
-To load a template that's within a subdirectory, just use a slash, like so::
-
-    get_template('news/story_detail.html')
-
-Using the same :setting:`TEMPLATE_DIRS` setting from above, this example
-``get_template()`` call will attempt to load the following templates:
-
-* ``/home/html/templates/lawrence.com/news/story_detail.html``
-* ``/home/html/templates/default/news/story_detail.html``
-
 .. _template-loaders:
 
 Loader types
-~~~~~~~~~~~~
+------------
 
 By default, Django uses a filesystem-based template loader, but Django comes
 with a few other template loaders, which know how to load templates from other
 sources.
 
 Some of these other loaders are disabled by default, but you can activate them
-by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
-should be a tuple of strings or tuples, where each represents a template loader
-class. Here are the template loaders that come with Django:
+by adding a ``'loaders'`` option to your ``DjangoTemplates`` backend in the
+:setting:`TEMPLATES` setting or passing a ``loaders`` argument to
+:class:`~django.template.Engine`. ``loaders`` should be a list of strings or
+tuples, where each represents a template loader class. Here are the template
+loaders that come with Django:
 
 .. currentmodule:: django.template.loaders
 
@@ -746,8 +827,36 @@ class. Here are the template loaders that come with Django:
 
 .. class:: filesystem.Loader
 
-    Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
-    This loader is enabled by default.
+    Loads templates from the filesystem, according to
+    :setting:`DIRS <TEMPLATES-DIRS>`.
+
+    This loader is enabled by default. However it won't find any templates
+    until you set :setting:`DIRS <TEMPLATES-DIRS>` to a non-empty list::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        }]
+
+    You can also override ``'DIRS'`` and specify specific directories for a
+    particular filesystem loader::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    (
+                        'django.template.loaders.filesystem.Loader',
+                        [os.path.join(BASE_DIR, 'templates')],
+                    ),
+                ],
+            },
+        }]
+
+    .. versionchanged:: 1.11
+
+        The ability to specify directories for a particular filesystem loader
+        was added.
 
 ``django.template.loaders.app_directories.Loader``
 
@@ -762,7 +871,7 @@ class. Here are the template loaders that come with Django:
 
     For example, for this setting::
 
-        INSTALLED_APPS = ('myproject.polls', 'myproject.music')
+        INSTALLED_APPS = ['myproject.polls', 'myproject.music']
 
     ...then ``get_template('foo.html')`` will look for ``foo.html`` in these
     directories, in this order:
@@ -784,40 +893,48 @@ class. Here are the template loaders that come with Django:
     it caches a list of which :setting:`INSTALLED_APPS` packages have a
     ``templates`` subdirectory.
 
-    This loader is enabled by default.
+    You can enable this loader simply by setting
+    :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` to ``True``::
 
-``django.template.loaders.eggs.Loader``
-
-.. class:: eggs.Loader
-
-    Just like ``app_directories`` above, but it loads templates from Python
-    eggs rather than from the filesystem.
-
-    This loader is disabled by default.
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        }]
 
 ``django.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
 
-    By default, the templating system will read and compile your templates every
-    time they need to be rendered. While the Django templating system is quite
-    fast, the overhead from reading and compiling templates can add up.
+    By default (when :setting:`DEBUG` is ``True``), the template system reads
+    and compiles your templates every time they're rendered. While the Django
+    template system is quite fast, the overhead from reading and compiling
+    templates can add up.
 
-    The cached template loader is a class-based loader that you configure with
-    a list of other loaders that it should wrap. The wrapped loaders are used to
-    locate unknown templates when they are first encountered. The cached loader
-    then stores the compiled ``Template`` in memory. The cached ``Template``
-    instance is returned for subsequent requests to load the same template.
+    You configure the cached template loader with a list of other loaders that
+    it should wrap. The wrapped loaders are used to locate unknown templates
+    when they're first encountered. The cached loader then stores the compiled
+    ``Template`` in memory. The cached ``Template`` instance is returned for
+    subsequent requests to load the same template.
 
-    For example, to enable template caching with the ``filesystem`` and
-    ``app_directories`` template loaders you might use the following settings::
+    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
+    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
 
-        TEMPLATE_LOADERS = (
-            ('django.template.loaders.cached.Loader', (
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-            )),
-        )
+    You can also enable template caching with some custom template loaders
+    using settings like this::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.cached.Loader', [
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                        'path.to.custom.Loader',
+                    ]),
+                ],
+            },
+        }]
 
     .. note::
 
@@ -825,14 +942,15 @@ class. Here are the template loaders that come with Django:
         cached loader, but if you're using custom template tags that come from
         third party packages, or that you wrote yourself, you should ensure
         that the ``Node`` implementation for each tag is thread-safe. For more
-        information, see :ref:`template tag thread safety
-        considerations<template_tag_thread_safety>`.
+        information, see :ref:`template tag thread safety considerations
+        <template_tag_thread_safety>`.
 
-    This loader is disabled by default.
+    .. versionchanged:: 1.11
+
+        The automatic enabling of the cached template loader when ``debug`` is
+        ``False`` was added.
 
 ``django.template.loaders.locmem.Loader``
-
-.. versionadded:: 1.8
 
 .. class:: locmem.Loader
 
@@ -840,32 +958,98 @@ class. Here are the template loaders that come with Django:
 
     This loader takes a dictionary of templates as its first argument::
 
-        TEMPLATE_LOADERS = (
-            ('django.template.loaders.locmem.Loader', {
-                'index.html': 'content here',
-            }),
-        )
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.locmem.Loader', {
+                        'index.html': 'content here',
+                    }),
+                ],
+            },
+        }]
 
     This loader is disabled by default.
 
-Django uses the template loaders in order according to the
-:setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
-match.
+Django uses the template loaders in order according to the ``'loaders'``
+option. It uses each loader until a loader finds a match.
 
-.. currentmodule:: django.template
+.. _custom-template-loaders:
+
+.. currentmodule:: django.template.loaders.base
+
+Custom loaders
+==============
+
+It's possible to load templates from additional sources using custom template
+loaders. Custom ``Loader`` classes should inherit from
+``django.template.loaders.base.Loader`` and define the ``get_contents()`` and
+``get_template_sources()`` methods.
+
+Loader methods
+--------------
+
+.. class:: Loader
+
+    Loads templates from a given source, such as the filesystem or a database.
+
+    .. method:: get_template_sources(template_name)
+
+        A method that takes a ``template_name`` and yields
+        :class:`~django.template.base.Origin` instances for each possible
+        source.
+
+        For example, the filesystem loader may receive ``'index.html'`` as a
+        ``template_name`` argument.  This method would yield origins for the
+        full path of ``index.html`` as it appears in each template directory
+        the loader looks at.
+
+        The method doesn't need to verify that the template exists at a given
+        path, but it should ensure the path is valid. For instance, the
+        filesystem loader makes sure the path lies under a valid template
+        directory.
+
+    .. method:: get_contents(origin)
+
+        Returns the contents for a template given a
+        :class:`~django.template.base.Origin` instance.
+
+        This is where a filesystem loader would read contents from the
+        filesystem, or a database loader would read from the database. If a
+        matching template doesn't exist, this should raise a
+        :exc:`~django.template.TemplateDoesNotExist` error.
+
+    .. method:: get_template(template_name, skip=None)
+
+        Returns a ``Template`` object for a given ``template_name`` by looping
+        through results from :meth:`get_template_sources` and calling
+        :meth:`get_contents`. This returns the first matching template. If no
+        template is found, :exc:`~django.template.TemplateDoesNotExist` is
+        raised.
+
+        The optional ``skip`` argument is a list of origins to ignore when
+        extending templates. This allow templates to extend other templates of
+        the same name. It also used to avoid recursion errors.
+
+        In general, it is enough to define :meth:`get_template_sources` and
+        :meth:`get_contents` for custom template loaders. ``get_template()``
+        will usually not need to be overridden.
+
+.. admonition:: Building your own
+
+    For examples, `read the source code for Django's built-in loaders`_.
+
+.. _read the source code for Django's built-in loaders: https://github.com/django/django/tree/master/django/template/loaders
+
+.. currentmodule:: django.template.base
 
 Template origin
-~~~~~~~~~~~~~~~
+===============
 
-.. versionadded:: 1.7
+Templates have an ``origin`` containing attributes depending on the source
+they are loaded from.
 
-When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
-``origin`` attribute depending on the source they are loaded from.
-
-.. class:: loader.LoaderOrigin
-
-    Templates created from a template loader will use the
-    ``django.template.loader.LoaderOrigin`` class.
+.. class:: Origin
 
     .. attribute:: name
 
@@ -873,147 +1057,13 @@ When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
         For loaders that read from the file system, this is the full
         path to the template.
 
-    .. attribute:: loadname
+        If the template is instantiated directly rather than through a
+        template loader, this is a string value of ``<unknown_source>``.
+
+    .. attribute:: template_name
 
         The relative path to the template as passed into the
         template loader.
 
-.. class:: StringOrigin
-
-    Templates created from a ``Template`` class will use the
-    ``django.template.StringOrigin`` class.
-
-    .. attribute:: source
-
-        The string used to create the template.
-
-The ``render_to_string`` shortcut
-===================================
-
-.. function:: loader.render_to_string(template_name, dictionary=None, context_instance=None)
-
-To cut down on the repetitive nature of loading and rendering
-templates, Django provides a shortcut function which largely
-automates the process: ``render_to_string()`` in
-:mod:`django.template.loader`, which loads a template, renders it and
-returns the resulting string::
-
-    from django.template.loader import render_to_string
-    rendered = render_to_string('my_template.html', {'foo': 'bar'})
-
-The ``render_to_string`` shortcut takes one required argument --
-``template_name``, which should be the name of the template to load
-and render (or a list of template names, in which case Django will use
-the first template in the list that exists) -- and two optional arguments:
-
-dictionary
-    A dictionary to be used as variables and values for the
-    template's context. This can also be passed as the second
-    positional argument.
-
-context_instance
-    An instance of :class:`~django.template.Context` or a subclass (e.g., an
-    instance of :class:`~django.template.RequestContext`) to use as the
-    template's context. This can also be passed as the third positional argument.
-
-See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
-calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
-suitable for returning directly from a view.
-
-Configuring the template system in standalone mode
-==================================================
-
-.. note::
-
-    This section is only of interest to people trying to use the template
-    system as an output component in another application. If you're using the
-    template system as part of a Django application, nothing here applies to
-    you.
-
-Normally, Django will load all the configuration information it needs from its
-own default configuration file, combined with the settings in the module given
-in the :envvar:`DJANGO_SETTINGS_MODULE` environment variable. But if you're
-using the template system independently of the rest of Django, the environment
-variable approach isn't very convenient, because you probably want to configure
-the template system in line with the rest of your application rather than
-dealing with settings files and pointing to them via environment variables.
-
-To solve this problem, you need to use the manual configuration option described
-in :ref:`settings-without-django-settings-module`. Simply import the appropriate
-pieces of the templating system and then, *before* you call any of the
-templating functions, call :func:`django.conf.settings.configure()` with any
-settings you wish to specify. You might want to consider setting at least
-:setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
-:setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
-and :setting:`TEMPLATE_DEBUG`. If you plan to use the :ttag:`url` template tag,
-you will also need to set the :setting:`ROOT_URLCONF` setting. All available
-settings are described in the :doc:`settings documentation </ref/settings>`,
-and any setting starting with ``TEMPLATE_`` is of obvious interest.
-
-.. _topic-template-alternate-language:
-
-Using an alternative template language
-======================================
-
-The Django ``Template`` and ``Loader`` classes implement a simple API for
-loading and rendering templates. By providing some simple wrapper classes that
-implement this API we can use third party template systems like `Jinja2
-<http://jinja.pocoo.org/docs/>`_. This
-allows us to use third-party template libraries without giving up useful Django
-features like the Django ``Context`` object and handy shortcuts like
-:func:`~django.shortcuts.render_to_response()`.
-
-The core component of the Django templating system is the ``Template`` class.
-This class has a very simple interface: it has a constructor that takes a single
-positional argument specifying the template string, and a ``render()`` method
-that takes a :class:`~django.template.Context` object and returns a string
-containing the rendered response.
-
-Suppose we're using a template language that defines a ``Template`` object with
-a ``render()`` method that takes a dictionary rather than a ``Context`` object.
-We can write a simple wrapper that implements the Django ``Template`` interface::
-
-    import some_template_language
-    class Template(some_template_language.Template):
-        def render(self, context):
-            # flatten the Django Context into a single dictionary.
-            context_dict = {}
-            for d in context.dicts:
-                context_dict.update(d)
-            return super(Template, self).render(context_dict)
-
-That's all that's required to make our fictional ``Template`` class compatible
-with the Django loading and rendering system!
-
-The next step is to write a ``Loader`` class that returns instances of our custom
-template class instead of the default :class:`~django.template.Template`. Custom ``Loader``
-classes should inherit from ``django.template.loaders.base.Loader`` and override
-the ``load_template_source()`` method, which takes a ``template_name`` argument,
-loads the template from disk (or elsewhere), and returns a tuple:
-``(template_string, template_origin)``.
-
-.. versionchanged:: 1.8
-
-    ``django.template.loaders.base.Loader`` used to be defined at
-    ``django.template.loader.BaseLoader``.
-
-The ``load_template()`` method of the ``Loader`` class retrieves the template
-string by calling ``load_template_source()``, instantiates a ``Template`` from
-the template source, and returns a tuple: ``(template, template_origin)``. Since
-this is the method that actually instantiates the ``Template``, we'll need to
-override it to use our custom template class instead. We can inherit from the
-builtin :class:`django.template.loaders.app_directories.Loader` to take advantage
-of the ``load_template_source()`` method implemented there::
-
-    from django.template.loaders import app_directories
-    class Loader(app_directories.Loader):
-        is_usable = True
-
-        def load_template(self, template_name, template_dirs=None):
-            source, origin = self.load_template_source(template_name, template_dirs)
-            template = Template(source)
-            return template, origin
-
-Finally, we need to modify our project settings, telling Django to use our custom
-loader. Now we can write all of our templates in our alternative template
-language while continuing to use the rest of the Django templating system.
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.

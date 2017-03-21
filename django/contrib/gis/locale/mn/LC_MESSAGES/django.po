@@ -3,75 +3,72 @@
 # Translators:
 # Jacara <baskhuujacara@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2014
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
+# Zorig <zorig_ezd@yahoo.com>, 2014,2016
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-10 10:44+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-03-08 14:33+0000\n"
 "Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
-"Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
-"language/mn/)\n"
+"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "Газар зүйн мэдээлэл"
 
-#: contrib/gis/db/models/fields.py:56
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
-"Үндсэн GIS талбар -- OpenGIS газрын зургын Геометрын дүрсны онцгой төрөлтэй "
-"байна."
+msgid "The base GIS field."
+msgstr "Ерөнхий GIS талбар"
 
-#: contrib/gis/db/models/fields.py:298
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Үндсэн Geometry талбар -- OpenGIS газрын зургын Геометрын дүрсны онцгой "
+"төрөлтэй байна."
+
 msgid "Point"
 msgstr "Цэг"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Тэмдэгт мөр"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Олон өнцөгт"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Олон цэг"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Олон мөр бүхий тэмтэгт мөр"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Олон өнцөгтийн олонлог"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Дүрсний цуглуулга"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Aggregate талбарыг өргөтгөх"
+
+msgid "Raster Field"
+msgstr "Растер талбар"
+
 msgid "No geometry value provided."
 msgstr "Дүрс оруулаагүй байна."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Буруу дүрс байна."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Дүрсийн төрөл буруу байна."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -79,26 +76,21 @@ msgstr ""
 "An error occurred when transforming the geometry to the SRID дүрсний форм "
 "талбарын SRID утгыг хөрвүүлэхэд алдаа гарлаа."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Энэ хэсэгт Sitemap алга: %r"
+msgid "Delete all Features"
+msgstr "Бүх онцлогүүдыг устгах"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "%s хуудас хоосон"
+msgid "WKT debugging window:"
+msgstr "WKT шинжлэх цонх:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "'%s' хуудас байхгүй"
+msgid "Google Maps via GeoDjango"
+msgstr "GeoDjango -оор дамжсан Google Maps"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "Шинжлэх цонх (дугаарлагдсан утга) "
+
 msgid "No feeds are registered."
 msgstr "Бүртгэгдсэн feeds байхгүй байна."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "%r слаг бүгтгэгдээгүй байна"

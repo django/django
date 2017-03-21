@@ -1,80 +1,68 @@
 """
-This is the Django template system.
+Django's support for templates.
 
-How it works:
+The django.template namespace contains two independent subsystems:
 
-The Lexer.tokenize() function converts a template string (i.e., a string containing
-markup with custom template tags) to tokens, which can be either plain text
-(TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
+1. Multiple Template Engines: support for pluggable template backends,
+   built-in backends and backend-independent APIs
+2. Django Template Language: Django's own template engine, including its
+   built-in loaders, context processors, tags and filters.
 
-The Parser() class takes a list of tokens in its constructor, and its parse()
-method returns a compiled template -- which is, under the hood, a list of
-Node objects.
+Ideally these subsystems would be implemented in distinct packages. However
+keeping them together made the implementation of Multiple Template Engines
+less disruptive .
 
-Each Node is responsible for creating some sort of output -- e.g. simple text
-(TextNode), variable values in a given context (VariableNode), results of basic
-logic (IfNode), results of looping (ForNode), or anything else. The core Node
-types are TextNode, VariableNode, IfNode and ForNode, but plugin modules can
-define their own custom node types.
+Here's a breakdown of which modules belong to which subsystem.
 
-Each Node has a render() method, which takes a Context and returns a string of
-the rendered node. For example, the render() method of a Variable Node returns
-the variable's value as a string. The render() method of a ForNode returns the
-rendered output of whatever was inside the loop, recursively.
+Multiple Template Engines:
 
-The Template class is a convenient wrapper that takes care of template
-compilation and rendering.
+- django.template.backends.*
+- django.template.loader
+- django.template.response
 
-Usage:
+Django Template Language:
 
-The only thing you should ever use directly in this file is the Template class.
-Create a compiled template object with a template_string, then call render()
-with a context. In the compilation stage, the TemplateSyntaxError exception
-will be raised if the template doesn't have proper syntax.
+- django.template.base
+- django.template.context
+- django.template.context_processors
+- django.template.loaders.*
+- django.template.debug
+- django.template.defaultfilters
+- django.template.defaulttags
+- django.template.engine
+- django.template.loader_tags
+- django.template.smartif
 
-Sample code:
+Shared:
 
->>> from django import template
->>> s = u'<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
->>> t = template.Template(s)
+- django.template.utils
 
-(t is now a compiled template, and its render() method can be called multiple
-times with multiple contexts)
-
->>> c = template.Context({'test':True, 'varvalue': 'Hello'})
->>> t.render(c)
-u'<html><h1>Hello</h1></html>'
->>> c = template.Context({'test':False, 'varvalue': 'Hello'})
->>> t.render(c)
-u'<html></html>'
 """
 
-# Template lexing symbols
-from django.template.base import (ALLOWED_VARIABLE_CHARS, BLOCK_TAG_END,  # NOQA
-    BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
-    FILTER_ARGUMENT_SEPARATOR, FILTER_SEPARATOR, SINGLE_BRACE_END,
-    SINGLE_BRACE_START, TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR,
-    TRANSLATOR_COMMENT_MARK, UNKNOWN_SOURCE, VARIABLE_ATTRIBUTE_SEPARATOR,
-    VARIABLE_TAG_END, VARIABLE_TAG_START, filter_re, tag_re)
+# Multiple Template Engines
 
-# Exceptions
-from django.template.base import (ContextPopException, InvalidTemplateLibrary,  # NOQA
-    TemplateDoesNotExist, TemplateEncodingError, TemplateSyntaxError,
-    VariableDoesNotExist)
+from .engine import Engine
+from .utils import EngineHandler
+
+engines = EngineHandler()
+
+__all__ = ('Engine', 'engines')
+
+
+# Django Template Language
+
+# Public exceptions
+from .base import VariableDoesNotExist                                  # NOQA isort:skip
+from .context import ContextPopException                                # NOQA isort:skip
+from .exceptions import TemplateDoesNotExist, TemplateSyntaxError       # NOQA isort:skip
 
 # Template parts
-from django.template.base import (Context, FilterExpression, Lexer, Node,  # NOQA
-    NodeList, Parser, RequestContext, Origin, StringOrigin, Template,
-    TextNode, Token, TokenParser, Variable, VariableNode, constant_string,
-    filter_raw_string)
-
-# Compiling templates
-from django.template.base import (resolve_variable,  # NOQA
-    unescape_string_literal, generic_tag_compiler)
+from .base import (                                                     # NOQA isort:skip
+    Context, Node, NodeList, Origin, RequestContext, Template, Variable,
+)
 
 # Library management
-from django.template.base import (Library, add_to_builtins, builtins,  # NOQA
-    get_library, get_templatetags_modules, get_text_list, import_library,
-    libraries)
+from .library import Library                                            # NOQA isort:skip
 
-__all__ = ('Template', 'Context', 'RequestContext')
+
+__all__ += ('Template', 'Context', 'RequestContext')

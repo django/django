@@ -1,83 +1,51 @@
 import sys
-import time
 
 from django.conf import settings
-from django.db.backends.creation import BaseDatabaseCreation
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.utils import DatabaseError
-from django.utils.six.moves import input
-
+from django.utils.crypto import get_random_string
+from django.utils.functional import cached_property
 
 TEST_DATABASE_PREFIX = 'test_'
-PASSWORD = 'Im_a_lumberjack'
 
 
 class DatabaseCreation(BaseDatabaseCreation):
-    # This dictionary maps Field objects to their associated Oracle column
-    # types, as strings. Column-type strings can contain format strings; they'll
-    # be interpolated against the values of Field.__dict__ before being output.
-    # If a column type is set to None, it won't be included in the output.
-    #
-    # Any format strings starting with "qn_" are quoted before being used in the
-    # output (the "qn_" prefix is stripped before the lookup is performed.
 
-    data_types = {
-        'AutoField': 'NUMBER(11)',
-        'BinaryField': 'BLOB',
-        'BooleanField': 'NUMBER(1)',
-        'CharField': 'NVARCHAR2(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'VARCHAR2(%(max_length)s)',
-        'DateField': 'DATE',
-        'DateTimeField': 'TIMESTAMP',
-        'DecimalField': 'NUMBER(%(max_digits)s, %(decimal_places)s)',
-        'DurationField': 'INTERVAL DAY(9) TO SECOND(6)',
-        'FileField': 'NVARCHAR2(%(max_length)s)',
-        'FilePathField': 'NVARCHAR2(%(max_length)s)',
-        'FloatField': 'DOUBLE PRECISION',
-        'IntegerField': 'NUMBER(11)',
-        'BigIntegerField': 'NUMBER(19)',
-        'IPAddressField': 'VARCHAR2(15)',
-        'GenericIPAddressField': 'VARCHAR2(39)',
-        'NullBooleanField': 'NUMBER(1)',
-        'OneToOneField': 'NUMBER(11)',
-        'PositiveIntegerField': 'NUMBER(11)',
-        'PositiveSmallIntegerField': 'NUMBER(11)',
-        'SlugField': 'NVARCHAR2(%(max_length)s)',
-        'SmallIntegerField': 'NUMBER(11)',
-        'TextField': 'NCLOB',
-        'TimeField': 'TIMESTAMP',
-        'URLField': 'VARCHAR2(%(max_length)s)',
-        'UUIDField': 'VARCHAR2(32)',
-    }
-
-    data_type_check_constraints = {
-        'BooleanField': '%(qn_column)s IN (0,1)',
-        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
-        'PositiveIntegerField': '%(qn_column)s >= 0',
-        'PositiveSmallIntegerField': '%(qn_column)s >= 0',
-    }
-
-    def __init__(self, connection):
-        super(DatabaseCreation, self).__init__(connection)
+    @cached_property
+    def _maindb_connection(self):
+        """
+        This is analogous to other backends' `_nodb_connection` property,
+        which allows access to an "administrative" connection which can
+        be used to manage the test databases.
+        For Oracle, the only connection that can be used for that purpose
+        is the main (non-test) connection.
+        """
+        settings_dict = settings.DATABASES[self.connection.alias]
+        user = settings_dict.get('SAVED_USER') or settings_dict['USER']
+        password = settings_dict.get('SAVED_PASSWORD') or settings_dict['PASSWORD']
+        settings_dict = settings_dict.copy()
+        settings_dict.update(USER=user, PASSWORD=password)
+        DatabaseWrapper = type(self.connection)
+        return DatabaseWrapper(settings_dict, alias=self.connection.alias)
 
     def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         parameters = self._get_test_db_params()
-        cursor = self.connection.cursor()
+        cursor = self._maindb_connection.cursor()
         if self._test_database_create():
             try:
-                self._execute_test_db_creation(cursor, parameters, verbosity)
+                self._execute_test_db_creation(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                # if we want to keep the db, then no need to do any of the below,
-                # just return and skip it all.
-                if keepdb:
-                    return
-                sys.stderr.write("Got an error creating the test database: %s\n" % e)
+                if 'ORA-01543' not in str(e):
+                    # All errors except "tablespace already exists" cancel tests
+                    sys.stderr.write("Got an error creating the test database: %s\n" % e)
+                    sys.exit(2)
                 if not autoclobber:
                     confirm = input(
                         "It appears the test database, %s, already exists. "
                         "Type 'yes' to delete it, or 'no' to cancel: " % parameters['user'])
                 if autoclobber or confirm == 'yes':
                     if verbosity >= 1:
-                        print("Destroying old test database '%s'..." % self.connection.alias)
+                        print("Destroying old test database for alias '%s'..." % self.connection.alias)
                     try:
                         self._execute_test_db_destruction(cursor, parameters, verbosity)
                     except DatabaseError as e:
@@ -92,7 +60,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         sys.stderr.write("Got an error destroying the old test database: %s\n" % e)
                         sys.exit(2)
                     try:
-                        self._execute_test_db_creation(cursor, parameters, verbosity)
+                        self._execute_test_db_creation(cursor, parameters, verbosity, keepdb)
                     except Exception as e:
                         sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                         sys.exit(2)
@@ -104,9 +72,12 @@ class DatabaseCreation(BaseDatabaseCreation):
             if verbosity >= 1:
                 print("Creating test user...")
             try:
-                self._create_test_user(cursor, parameters, verbosity)
+                self._create_test_user(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                sys.stderr.write("Got an error creating the test user: %s\n" % e)
+                if 'ORA-01920' not in str(e):
+                    # All errors except "user already exists" cancel tests
+                    sys.stderr.write("Got an error creating the test user: %s\n" % e)
+                    sys.exit(2)
                 if not autoclobber:
                     confirm = input(
                         "It appears the test user, %s, already exists. Type "
@@ -118,7 +89,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         self._destroy_test_user(cursor, parameters, verbosity)
                         if verbosity >= 1:
                             print("Creating test user...")
-                        self._create_test_user(cursor, parameters, verbosity)
+                        self._create_test_user(cursor, parameters, verbosity, keepdb)
                     except Exception as e:
                         sys.stderr.write("Got an error recreating the test user: %s\n" % e)
                         sys.exit(2)
@@ -126,8 +97,19 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
 
-        self.connection.close()  # done with main user -- test user and tablespaces created
+        self._maindb_connection.close()  # done with main user -- test user and tablespaces created
+        self._switch_to_test_user(parameters)
+        return self.connection.settings_dict['NAME']
 
+    def _switch_to_test_user(self, parameters):
+        """
+        Switch to the user that's used for creating the test database.
+
+        Oracle doesn't have the concept of separate databases under the same
+        user, so a separate user is used; see _create_test_db(). The main user
+        is also needed for cleanup when testing is completed, so save its
+        credentials in the SAVED_USER/SAVED_PASSWORD key in the settings dict.
+        """
         real_settings = settings.DATABASES[self.connection.alias]
         real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = \
             self.connection.settings_dict['USER']
@@ -139,7 +121,13 @@ class DatabaseCreation(BaseDatabaseCreation):
             self.connection.settings_dict['USER'] = parameters['user']
         real_settings['PASSWORD'] = self.connection.settings_dict['PASSWORD'] = parameters['password']
 
-        return self.connection.settings_dict['NAME']
+    def set_as_test_mirror(self, primary_settings_dict):
+        """
+        Set this database up to be used in testing as a mirror of a primary
+        database whose settings are given.
+        """
+        self.connection.settings_dict['USER'] = primary_settings_dict['USER']
+        self.connection.settings_dict['PASSWORD'] = primary_settings_dict['PASSWORD']
 
     def _handle_objects_preventing_db_destruction(self, cursor, parameters, verbosity, autoclobber):
         # There are objects in the test tablespace which prevent dropping it
@@ -162,7 +150,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     sys.exit(2)
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database '%s'..." % self.connection.alias)
+                        print("Destroying old test database for alias '%s'..." % self.connection.alias)
                     self._execute_test_db_destruction(cursor, parameters, verbosity)
                 except Exception as e:
                     sys.stderr.write("Got an error destroying the test database: %s\n" % e)
@@ -179,13 +167,13 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _destroy_test_db(self, test_database_name, verbosity=1):
         """
         Destroy a test database, prompting the user for confirmation if the
-        database already exists. Returns the name of the test database created.
+        database already exists. Return the name of the test database created.
         """
         self.connection.settings_dict['USER'] = self.connection.settings_dict['SAVED_USER']
         self.connection.settings_dict['PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD']
+        self.connection.close()
         parameters = self._get_test_db_params()
-        cursor = self.connection.cursor()
-        time.sleep(1)  # To avoid "database is being accessed by other users" errors.
+        cursor = self._maindb_connection.cursor()
         if self._test_user_create():
             if verbosity >= 1:
                 print('Destroying test user...')
@@ -194,9 +182,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             if verbosity >= 1:
                 print('Destroying test database tables...')
             self._execute_test_db_destruction(cursor, parameters, verbosity)
-        self.connection.close()
+        self._maindb_connection.close()
 
-    def _execute_test_db_creation(self, cursor, parameters, verbosity):
+    def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
             print("_create_test_db(): dbname = %s" % parameters['user'])
         statements = [
@@ -209,14 +197,16 @@ class DatabaseCreation(BaseDatabaseCreation):
                REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize_tmp)s
             """,
         ]
-        self._execute_statements(cursor, statements, parameters, verbosity)
+        # Ignore "tablespace already exists" error when keepdb is on.
+        acceptable_ora_err = 'ORA-01543' if keepdb else None
+        self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
 
-    def _create_test_user(self, cursor, parameters, verbosity):
+    def _create_test_user(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
             print("_create_test_user(): username = %s" % parameters['user'])
         statements = [
             """CREATE USER %(user)s
-               IDENTIFIED BY %(password)s
+               IDENTIFIED BY "%(password)s"
                DEFAULT TABLESPACE %(tblspace)s
                TEMPORARY TABLESPACE %(tblspace_temp)s
                QUOTA UNLIMITED ON %(tblspace)s
@@ -228,18 +218,18 @@ class DatabaseCreation(BaseDatabaseCreation):
                      CREATE TRIGGER
                TO %(user)s""",
         ]
-        self._execute_statements(cursor, statements, parameters, verbosity)
+        # Ignore "user already exists" error when keepdb is on
+        acceptable_ora_err = 'ORA-01920' if keepdb else None
+        success = self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
+        # If the password was randomly generated, change the user accordingly.
+        if not success and self._test_settings_get('PASSWORD') is None:
+            set_password = 'ALTER USER %(user)s IDENTIFIED BY "%(password)s"'
+            self._execute_statements(cursor, [set_password], parameters, verbosity)
         # Most test-suites can be run without the create-view privilege. But some need it.
         extra = "GRANT CREATE VIEW TO %(user)s"
-        try:
-            self._execute_statements(cursor, [extra], parameters, verbosity, allow_quiet_fail=True)
-        except DatabaseError as err:
-            description = str(err)
-            if 'ORA-01031' in description:
-                if verbosity >= 2:
-                    print("Failed to grant CREATE VIEW permission to test user. This may be ok.")
-            else:
-                raise
+        success = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
+        if not success and verbosity >= 2:
+            print("Failed to grant CREATE VIEW permission to test user. This may be ok.")
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:
@@ -271,6 +261,23 @@ class DatabaseCreation(BaseDatabaseCreation):
                     sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
+    def _execute_allow_fail_statements(self, cursor, statements, parameters, verbosity, acceptable_ora_err):
+        """
+        Execute statements which are allowed to fail silently if the Oracle
+        error code given by `acceptable_ora_err` is raised. Return True if the
+        statements execute without an exception, or False otherwise.
+        """
+        try:
+            # Statement can fail when acceptable_ora_err is not None
+            allow_quiet_fail = acceptable_ora_err is not None and len(acceptable_ora_err) > 0
+            self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=allow_quiet_fail)
+            return True
+        except DatabaseError as err:
+            description = str(err)
+            if acceptable_ora_err is None or acceptable_ora_err not in description:
+                raise
+            return False
+
     def _get_test_db_params(self):
         return {
             'dbname': self._test_database_name(),
@@ -286,13 +293,12 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _test_settings_get(self, key, default=None, prefixed=None):
         """
-        Return a value from the test settings dict,
-        or a given default,
-        or a prefixed entry from the main settings dict
+        Return a value from the test settings dict, or a given default, or a
+        prefixed entry from the main settings dict.
         """
         settings_dict = self.connection.settings_dict
         val = settings_dict['TEST'].get(key, default)
-        if val is None:
+        if val is None and prefixed:
             val = TEST_DATABASE_PREFIX + settings_dict[prefixed]
         return val
 
@@ -309,7 +315,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         return self._test_settings_get('USER', prefixed='USER')
 
     def _test_database_passwd(self):
-        return self._test_settings_get('PASSWORD', default=PASSWORD)
+        password = self._test_settings_get('PASSWORD')
+        if password is None and self._test_user_create():
+            # Oracle passwords are limited to 30 chars and can't contain symbols.
+            password = get_random_string(length=30)
+        return password
 
     def _test_database_tblspace(self):
         return self._test_settings_get('TBLSPACE', prefixed='USER')
@@ -335,9 +345,9 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _get_test_db_name(self):
         """
-        We need to return the 'production' DB name to get the test DB creation
-        machinery to work. This isn't a great deal in this case because DB
-        names as handled by Django haven't real counterparts in Oracle.
+        Return the 'production' DB name to get the test DB creation machinery
+        to work. This isn't a great deal in this case because DB names as
+        handled by Django don't have real counterparts in Oracle.
         """
         return self.connection.settings_dict['NAME']
 

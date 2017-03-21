@@ -18,13 +18,13 @@ Sessions are implemented via a piece of :doc:`middleware </ref/middleware>`.
 
 To enable session functionality, do the following:
 
-* Edit the :setting:`MIDDLEWARE_CLASSES` setting and make sure
-  it contains ``'django.contrib.sessions.middleware.SessionMiddleware'``.
-  The default ``settings.py`` created by ``django-admin startproject``
-  has ``SessionMiddleware`` activated.
+* Edit the :setting:`MIDDLEWARE` setting and make sure it contains
+  ``'django.contrib.sessions.middleware.SessionMiddleware'``. The default
+  ``settings.py`` created by ``django-admin startproject`` has
+  ``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
-``SessionMiddleware`` line from :setting:`MIDDLEWARE_CLASSES` and
+``SessionMiddleware`` line from :setting:`MIDDLEWARE` and
 ``'django.contrib.sessions'`` from your :setting:`INSTALLED_APPS`.
 It'll save you a small bit of overhead.
 
@@ -94,11 +94,6 @@ session data be expunged from time to time, the ``cache`` backend is for you.
 
 If you use the ``cached_db`` session backend, you also need to follow the
 configuration instructions for the `using database-backed sessions`_.
-
-.. versionchanged:: 1.7
-
-    Before version 1.7, the ``cached_db`` backend always used the ``default``
-    cache rather than the :setting:`SESSION_CACHE_ALIAS`.
 
 Using file-based sessions
 -------------------------
@@ -170,8 +165,8 @@ and the :setting:`SECRET_KEY` setting.
 
     Finally, the size of a cookie can have an impact on the `speed of your site`_.
 
-.. _`common limit of 4096 bytes`: http://tools.ietf.org/html/rfc2965#section-5.3
-.. _`replay attacks`: http://en.wikipedia.org/wiki/Replay_attack
+.. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
+.. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
 .. _`speed of your site`: http://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
@@ -210,9 +205,9 @@ You can edit it multiple times.
 
       Example: ``fav_color = request.session.get('fav_color', 'red')``
 
-    .. method:: pop(key)
+    .. method:: pop(key, default=__not_given)
 
-      Example: ``fav_color = request.session.pop('fav_color')``
+      Example: ``fav_color = request.session.pop('fav_color', 'blue')``
 
     .. method:: keys()
 
@@ -226,16 +221,10 @@ You can edit it multiple times.
 
     .. method:: flush()
 
-      Delete the current session data from the session and delete the session
+      Deletes the current session data from the session and deletes the session
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
-
-      .. versionchanged:: 1.8
-
-          Deletion of the session cookie is a behavior new in Django 1.8.
-          Previously, the behavior was to regenerate the session key value that
-          was sent back to the user in the cookie.
 
     .. method:: set_test_cookie()
 
@@ -324,30 +313,24 @@ You can edit it multiple times.
 Session serialization
 ---------------------
 
-Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
-session data before storing it in the backend. If you're using the :ref:`signed
-cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
-known by an attacker (there isn't an inherent vulnerability in Django that
-would cause it to leak), the attacker could insert a string into their session
-which, when unpickled, executes arbitrary code on the server. The technique for
-doing so is simple and easily available on the internet. Although the cookie
-session storage signs the cookie-stored data to prevent tampering, a
-:setting:`SECRET_KEY` leak immediately escalates to a remote code execution
-vulnerability.
-
-This attack can be mitigated by serializing session data using JSON rather
-than :mod:`pickle`. To facilitate this, Django 1.5.3 introduced a new setting,
-:setting:`SESSION_SERIALIZER`, to customize the session serialization format.
-For backwards compatibility, this setting defaults to
-using :class:`django.contrib.sessions.serializers.PickleSerializer` in
-Django 1.5.x, but, for security hardening, defaults to
-:class:`django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
-Even with the caveats described in :ref:`custom-serializers`, we highly
+By default, Django serializes session data using JSON. You can use the
+:setting:`SESSION_SERIALIZER` setting to customize the session serialization
+format. Even with the caveats described in :ref:`custom-serializers`, we highly
 recommend sticking with JSON serialization *especially if you are using the
 cookie backend*.
 
-Bundled Serializers
-^^^^^^^^^^^^^^^^^^^
+For example, here's an attack scenario if you use :mod:`pickle` to serialize
+session data. If you're using the :ref:`signed cookie session backend
+<cookie-session-backend>` and :setting:`SECRET_KEY` is known by an attacker
+(there isn't an inherent vulnerability in Django that would cause it to leak),
+the attacker could insert a string into their session which, when unpickled,
+executes arbitrary code on the server. The technique for doing so is simple and
+easily available on the internet. Although the cookie session storage signs the
+cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
+immediately escalates to a remote code execution vulnerability.
+
+Bundled serializers
+~~~~~~~~~~~~~~~~~~~
 
 .. class:: serializers.JSONSerializer
 
@@ -365,6 +348,9 @@ Bundled Serializers
         >>> request.session['0']
         'bar'
 
+    Similarly, data that can't be encoded in JSON, such as non-UTF8 bytes like
+    ``'\xd9'`` (which raises :exc:`UnicodeDecodeError`), can't be stored.
+
     See the :ref:`custom-serializers` section for more details on limitations
     of JSON serialization.
 
@@ -376,8 +362,8 @@ Bundled Serializers
 
 .. _custom-serializers:
 
-Write Your Own Serializer
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Write your own serializer
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
 the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle
@@ -387,7 +373,7 @@ including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
 to write a custom serializer (or convert such values to a JSON serializable
 object before storing them in ``request.session``). While serializing these
 values is fairly straightforward
-(``django.core.serializers.json.DateTimeAwareJSONEncoder`` may be helpful),
+(:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
@@ -468,6 +454,9 @@ yourself. Do this after you've verified that the test cookie worked.
 
 Here's a typical usage example::
 
+    from django.http import HttpResponse
+    from django.shortcuts import render
+
     def login(request):
         if request.method == 'POST':
             if request.session.test_cookie_worked():
@@ -476,7 +465,7 @@ Here's a typical usage example::
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render_to_response('foo/login_form.html')
+        return render(request, 'foo/login_form.html')
 
 Using sessions out of views
 ===========================
@@ -498,22 +487,19 @@ An API is available to manipulate session data outside of a view::
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
     >>> s['last_login'] = 1376587691
-    >>> s.save()
+    >>> s.create()
     >>> s.session_key
     '2b1189a188b44ad18c35e113ac6ceead'
-
     >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
     >>> s['last_login']
     1376587691
 
-In order to mitigate session fixation attacks, sessions keys that don't exist
-are regenerated::
-
-    >>> from django.contrib.sessions.backends.db import SessionStore
-    >>> s = SessionStore(session_key='no-such-session-here')
-    >>> s.save()
-    >>> s.session_key
-    'ff882814010ccbc3c870523934fee5a2'
+``SessionStore.create()`` is designed to create a new session (i.e. one not
+loaded from the session store and with ``session_key=None``). ``save()`` is
+designed to save an existing session (i.e. one loaded from the session store).
+Calling ``save()`` on a new session may also work but has a small chance of
+generating a ``session_key`` that collides with an existing one. ``create()``
+calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is just a normal Django model. The ``Session`` model is defined in
@@ -525,8 +511,10 @@ access sessions using the normal Django database API::
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
-Note that you'll need to call ``get_decoded()`` to get the session dictionary.
-This is necessary because the dictionary is stored in an encoded format::
+Note that you'll need to call
+:meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
+dictionary. This is necessary because the dictionary is stored in an encoded
+format::
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
@@ -646,6 +634,7 @@ behavior:
 * :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
+* :setting:`SESSION_SERIALIZER`
 
 .. _topics-session-security:
 
@@ -672,7 +661,7 @@ Technical details
 
 * The session dictionary accepts any :mod:`json` serializable value when using
   :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
-  pickleable Python object when using
+  picklable Python object when using
   :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
   :mod:`pickle` module for more information.
 
@@ -680,6 +669,163 @@ Technical details
 
 * Django only sends a cookie if it needs to. If you don't set any session
   data, it won't send a session cookie.
+
+The ``SessionStore`` object
+---------------------------
+
+When working with sessions internally, Django uses a session store object from
+the corresponding session engine. By convention, the session store object class
+is named ``SessionStore`` and is located in the module designated by
+:setting:`SESSION_ENGINE`.
+
+All ``SessionStore`` classes available in Django inherit from
+:class:`~backends.base.SessionBase` and implement data manipulation methods,
+namely:
+
+* ``exists()``
+* ``create()``
+* ``save()``
+* ``delete()``
+* ``load()``
+* :meth:`~backends.base.SessionBase.clear_expired`
+
+In order to build a custom session engine or to customize an existing one, you
+may create a new class inheriting from :class:`~backends.base.SessionBase` or
+any other existing ``SessionStore`` class.
+
+Extending most of the session engines is quite straightforward, but doing so
+with database-backed session engines generally requires some extra effort (see
+the next section for details).
+
+.. _extending-database-backed-session-engines:
+
+Extending database-backed session engines
+=========================================
+
+Creating a custom database-backed session engine built upon those included in
+Django (namely ``db`` and ``cached_db``) may be done by inheriting
+:class:`~base_session.AbstractBaseSession` and either ``SessionStore`` class.
+
+``AbstractBaseSession`` and ``BaseSessionManager`` are importable from
+``django.contrib.sessions.base_session`` so that they can be imported without
+including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
+
+.. class:: base_session.AbstractBaseSession
+
+
+    The abstract base session model.
+
+    .. attribute:: session_key
+
+        Primary key. The field itself may contain up to 40 characters. The
+        current implementation generates a 32-character string (a random
+        sequence of digits and lowercase ASCII letters).
+
+    .. attribute:: session_data
+
+        A string containing an encoded and serialized session dictionary.
+
+    .. attribute:: expire_date
+
+        A datetime designating when the session expires.
+
+        Expired sessions are not available to a user, however, they may still
+        be stored in the database until the :djadmin:`clearsessions` management
+        command is run.
+
+    .. classmethod:: get_session_store_class()
+
+        Returns a session store class to be used with this session model.
+
+    .. method:: get_decoded()
+
+        Returns decoded session data.
+
+        Decoding is performed by the session store class.
+
+You can also customize the model manager by subclassing
+:class:`~django.contrib.sessions.base_session.BaseSessionManager`:
+
+.. class:: base_session.BaseSessionManager
+
+    .. method:: encode(session_dict)
+
+        Returns the given session dictionary serialized and encoded as a string.
+
+        Encoding is performed by the session store class tied to a model class.
+
+    .. method:: save(session_key, session_dict, expire_date)
+
+        Saves session data for a provided session key, or deletes the session
+        in case the data is empty.
+
+Customization of ``SessionStore`` classes is achieved by overriding methods
+and properties described below:
+
+.. class:: backends.db.SessionStore
+
+    Implements database-backed session store.
+
+    .. classmethod:: get_model_class()
+
+        Override this method to return a custom session model if you need one.
+
+    .. method:: create_model_instance(data)
+
+        Returns a new instance of the session model object, which represents
+        the current session state.
+
+        Overriding this method provides the ability to modify session model
+        data before it's saved to database.
+
+.. class:: backends.cached_db.SessionStore
+
+    Implements cached database-backed session store.
+
+    .. attribute:: cache_key_prefix
+
+        A prefix added to a session key to build a cache key string.
+
+Example
+-------
+
+The example below shows a custom database-backed session engine that includes
+an additional database column to store an account ID (thus providing an option
+to query the database for all active sessions for an account)::
+
+    from django.contrib.sessions.backends.db import SessionStore as DBStore
+    from django.contrib.sessions.base_session import AbstractBaseSession
+    from django.db import models
+
+    class CustomSession(AbstractBaseSession):
+        account_id = models.IntegerField(null=True, db_index=True)
+
+        @classmethod
+        def get_session_store_class(cls):
+            return SessionStore
+
+    class SessionStore(DBStore):
+        @classmethod
+        def get_model_class(cls):
+            return CustomSession
+
+        def create_model_instance(self, data):
+            obj = super().create_model_instance(data)
+            try:
+                account_id = int(data.get('_auth_user_id'))
+            except (ValueError, TypeError):
+                account_id = None
+            obj.account_id = account_id
+            return obj
+
+If you are migrating from the Django's built-in ``cached_db`` session store to
+a custom one based on ``cached_db``, you should override the cache key prefix
+in order to prevent a namespace clash::
+
+    class SessionStore(CachedDBStore):
+        cache_key_prefix = 'mysessions.custom_cached_db_backend'
+
+        # ...
 
 Session IDs in URLs
 ===================

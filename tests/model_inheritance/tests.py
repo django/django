@@ -1,24 +1,21 @@
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.core.management import call_command
-from django.db import connection
-from django.test import TestCase, TransactionTestCase
-from django.test.utils import CaptureQueriesContext
-from django.utils import six
+from django.core.exceptions import FieldError, ValidationError
+from django.db import connection, models
+from django.test import SimpleTestCase, TestCase
+from django.test.utils import CaptureQueriesContext, isolate_apps
 
 from .models import (
-    Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
-    Restaurant, Student, Supplier, Worker, MixinModel,
-    Title, Copy, Base, SubBase)
+    Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
+    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
+    Supplier, Title, Worker,
+)
 
 
 class ModelInheritanceTests(TestCase):
     def test_abstract(self):
         # The Student and Worker models both have 'name' and 'age' fields on
-        # them and inherit the __unicode__() method, just as with normal Python
+        # them and inherit the __str__() method, just as with normal Python
         # subclassing. This is useful if you want to factor out common
         # information for programming purposes, but still completely
         # independent separate models at the database level.
@@ -27,17 +24,16 @@ class ModelInheritanceTests(TestCase):
 
         s = Student.objects.create(name="Pebbles", age=5, school_class="1B")
 
-        self.assertEqual(six.text_type(w1), "Worker Fred")
-        self.assertEqual(six.text_type(s), "Student Pebbles")
+        self.assertEqual(str(w1), "Worker Fred")
+        self.assertEqual(str(s), "Student Pebbles")
 
         # The children inherit the Meta class of their parents (if they don't
         # specify their own).
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Worker.objects.values("name"), [
                 {"name": "Barney"},
                 {"name": "Fred"},
             ],
-            lambda o: o
         )
 
         # Since Student does not subclass CommonInfo's Meta, it has the effect
@@ -47,14 +43,16 @@ class ModelInheritanceTests(TestCase):
 
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
-        self.assertRaises(AttributeError, lambda: CommonInfo.objects.all())
+        with self.assertRaises(AttributeError):
+            CommonInfo.objects.all()
 
     def test_reverse_relation_for_different_hierarchy_tree(self):
         # Even though p.supplier for a Place 'p' (a parent of a Supplier), a
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
         self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
-        self.assertRaises(FieldError, Restaurant.objects.filter, supplier__name="foo")
+        with self.assertRaises(FieldError):
+            Restaurant.objects.filter(supplier__name="foo")
 
     def test_model_with_distinct_accessors(self):
         # The Post model has distinct accessors for the Comment and Link models.
@@ -67,9 +65,17 @@ class ModelInheritanceTests(TestCase):
 
         # The Post model doesn't have an attribute called
         # 'attached_%(class)s_set'.
-        self.assertRaises(
-            AttributeError, getattr, post, "attached_%(class)s_set"
-        )
+        with self.assertRaises(AttributeError):
+            getattr(post, "attached_%(class)s_set")
+
+    def test_model_with_distinct_related_query_name(self):
+        self.assertQuerysetEqual(Post.objects.filter(attached_model_inheritance_comments__is_spam=True), [])
+
+        # The Post model doesn't have a related query accessor based on
+        # related_name (attached_comment_set).
+        msg = "Cannot resolve keyword 'attached_comment_set' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            Post.objects.filter(attached_comment_set__is_spam=True)
 
     def test_meta_fields_and_ordering(self):
         # Make sure Restaurant and ItalianRestaurant have the right fields in
@@ -100,9 +106,8 @@ class ModelInheritanceTests(TestCase):
 
     def test_update_parent_filtering(self):
         """
-        Test that updating a field of a model subclass doesn't issue an UPDATE
-        query constrained by an inner query.
-        Refs #10399
+        Updating a field of a model subclass doesn't issue an UPDATE
+        query constrained by an inner query (#10399).
         """
         supplier = Supplier.objects.create(
             name='Central market',
@@ -128,6 +133,22 @@ class ModelInheritanceTests(TestCase):
     def test_mixin_init(self):
         m = MixinModel()
         self.assertEqual(m.other_attr, 1)
+
+    @isolate_apps('model_inheritance')
+    def test_abstract_parent_link(self):
+        class A(models.Model):
+            pass
+
+        class B(A):
+            a = models.OneToOneField('A', parent_link=True, on_delete=models.CASCADE)
+
+            class Meta:
+                abstract = True
+
+        class C(B):
+            pass
+
+        self.assertIs(C._meta.parents[A], C._meta.get_field('a'))
 
 
 class ModelInheritanceDataTests(TestCase):
@@ -210,39 +231,32 @@ class ModelInheritanceDataTests(TestCase):
     def test_parent_child_one_to_one_link_on_nonrelated_objects(self):
         # This won't work because the Demon Dogs restaurant is not an Italian
         # restaurant.
-        self.assertRaises(
-            ItalianRestaurant.DoesNotExist,
-            lambda: Place.objects.get(name="Demon Dogs").restaurant.italianrestaurant
-        )
+        with self.assertRaises(ItalianRestaurant.DoesNotExist):
+            Place.objects.get(name="Demon Dogs").restaurant.italianrestaurant
 
     def test_inherited_does_not_exist_exception(self):
         # An ItalianRestaurant which does not exist is also a Place which does
         # not exist.
-        self.assertRaises(
-            Place.DoesNotExist,
-            ItalianRestaurant.objects.get, name="The Noodle Void"
-        )
+        with self.assertRaises(Place.DoesNotExist):
+            ItalianRestaurant.objects.get(name="The Noodle Void")
 
     def test_inherited_multiple_objects_returned_exception(self):
         # MultipleObjectsReturned is also inherited.
-        self.assertRaises(
-            Place.MultipleObjectsReturned,
-            Restaurant.objects.get, id__lt=12321
-        )
+        with self.assertRaises(Place.MultipleObjectsReturned):
+            Restaurant.objects.get()
 
     def test_related_objects_for_inherited_models(self):
         # Related objects work just as they normally do.
         s1 = Supplier.objects.create(name="Joe's Chickens", address="123 Sesame St")
-        s1.customers = [self.restaurant, self.italian_restaurant]
+        s1.customers .set([self.restaurant, self.italian_restaurant])
         s2 = Supplier.objects.create(name="Luigi's Pasta", address="456 Sesame St")
-        s2.customers = [self.italian_restaurant]
+        s2.customers.set([self.italian_restaurant])
 
         # This won't work because the Place we select is not a Restaurant (it's
         # a Supplier).
         p = Place.objects.get(name="Joe's Chickens")
-        self.assertRaises(
-            Restaurant.DoesNotExist, lambda: p.restaurant
-        )
+        with self.assertRaises(Restaurant.DoesNotExist):
+            p.restaurant
 
         self.assertEqual(p.supplier, s1)
         self.assertQuerysetEqual(
@@ -294,11 +308,10 @@ class ModelInheritanceDataTests(TestCase):
 
     def test_values_works_on_parent_model_fields(self):
         # The values() command also works on fields from parent models.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             ItalianRestaurant.objects.values("name", "rating"), [
                 {"rating": 4, "name": "Ristorante Miron"},
             ],
-            lambda o: o
         )
 
     def test_select_related_works_on_parent_model_fields(self):
@@ -316,17 +329,15 @@ class ModelInheritanceDataTests(TestCase):
         #23370 - Should be able to defer child fields when using
         select_related() from parent to child.
         """
-        qs = (Restaurant.objects
-            .select_related("italianrestaurant")
-            .defer("italianrestaurant__serves_gnocchi")
-            .order_by("rating"))
+        qs = (Restaurant.objects.select_related("italianrestaurant")
+              .defer("italianrestaurant__serves_gnocchi").order_by("rating"))
 
-        # Test that the field was actually deferred
+        # The field was actually deferred
         with self.assertNumQueries(2):
             objs = list(qs.all())
             self.assertTrue(objs[1].italianrestaurant.serves_gnocchi)
 
-        # Test that model fields where assigned correct values
+        # Model fields where assigned correct values
         self.assertEqual(qs[0].name, 'Demon Dogs')
         self.assertEqual(qs[0].rating, 2)
         self.assertEqual(qs[1].italianrestaurant.name, 'Ristorante Miron')
@@ -334,8 +345,7 @@ class ModelInheritanceDataTests(TestCase):
 
     def test_update_query_counts(self):
         """
-        Test that update queries do not generate non-necessary queries.
-        Refs #18304.
+        Update queries do not generate unnecessary queries (#18304).
         """
         with self.assertNumQueries(3):
             self.italian_restaurant.save()
@@ -381,45 +391,64 @@ class ModelInheritanceDataTests(TestCase):
         )
 
 
-class InheritanceSameModelNameTests(TransactionTestCase):
+@isolate_apps('model_inheritance', 'model_inheritance.tests')
+class InheritanceSameModelNameTests(SimpleTestCase):
+    def test_abstract_fk_related_name(self):
+        related_name = '%(app_label)s_%(class)s_references'
 
-    available_apps = ['model_inheritance']
+        class Referenced(models.Model):
+            class Meta:
+                app_label = 'model_inheritance'
 
-    def setUp(self):
-        # The Title model has distinct accessors for both
-        # model_inheritance.Copy and model_inheritance_same_model_name.Copy
-        # models.
-        self.title = Title.objects.create(title='Lorem Ipsum')
+        class AbstractReferent(models.Model):
+            reference = models.ForeignKey(Referenced, models.CASCADE, related_name=related_name)
 
-    def test_inheritance_related_name(self):
-        self.assertEqual(
-            self.title.attached_model_inheritance_copy_set.create(
-                content='Save $ on V1agr@',
-                url='http://v1agra.com/',
-                title='V1agra is spam',
-            ), Copy.objects.get(
-                content='Save $ on V1agr@',
-            ))
+            class Meta:
+                app_label = 'model_inheritance'
+                abstract = True
 
-    def test_inheritance_with_same_model_name(self):
-        with self.modify_settings(
-                INSTALLED_APPS={'append': ['model_inheritance.same_model_name']}):
-            call_command('migrate', verbosity=0)
-            from .same_model_name.models import Copy
-            copy = self.title.attached_same_model_name_copy_set.create(
-                content='The Web framework for perfectionists with deadlines.',
-                url='http://www.djangoproject.com/',
-                title='Django Rocks'
-            )
-            self.assertEqual(
-                copy,
-                Copy.objects.get(
-                    content='The Web framework for perfectionists with deadlines.',
-                ))
-            # We delete the copy manually so that it doesn't block the flush
-            # command under Oracle (which does not cascade deletions).
-            copy.delete()
+        class Referent(AbstractReferent):
+            class Meta:
+                app_label = 'model_inheritance'
 
-    def test_related_name_attribute_exists(self):
-        # The Post model doesn't have an attribute called 'attached_%(app_label)s_%(class)s_set'.
-        self.assertFalse(hasattr(self.title, 'attached_%(app_label)s_%(class)s_set'))
+        LocalReferent = Referent
+
+        class Referent(AbstractReferent):
+            class Meta:
+                app_label = 'tests'
+
+        ForeignReferent = Referent
+
+        self.assertFalse(hasattr(Referenced, related_name))
+        self.assertTrue(Referenced.model_inheritance_referent_references.rel.model, LocalReferent)
+        self.assertTrue(Referenced.tests_referent_references.rel.model, ForeignReferent)
+
+
+class InheritanceUniqueTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.grand_parent = GrandParent.objects.create(
+            email='grand_parent@example.com',
+            first_name='grand',
+            last_name='parent',
+        )
+
+    def test_unique(self):
+        grand_child = GrandChild(
+            email=self.grand_parent.email,
+            first_name='grand',
+            last_name='child',
+        )
+        msg = 'Grand parent with this Email already exists.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            grand_child.validate_unique()
+
+    def test_unique_together(self):
+        grand_child = GrandChild(
+            email='grand_child@example.com',
+            first_name=self.grand_parent.first_name,
+            last_name=self.grand_parent.last_name,
+        )
+        msg = 'Grand parent with this First name and Last name already exists.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            grand_child.validate_unique()

@@ -1,3 +1,4 @@
+===============
 Error reporting
 ===============
 
@@ -12,10 +13,10 @@ You need to keep track of errors that occur in deployed sites, so Django can be
 configured to create reports with details about those errors.
 
 Email reports
--------------
+=============
 
 Server errors
-~~~~~~~~~~~~~
+-------------
 
 When :setting:`DEBUG` is ``False``, Django will email the users listed in the
 :setting:`ADMINS` setting whenever your code raises an unhandled exception and
@@ -49,20 +50,22 @@ To activate this behavior, put the email addresses of the recipients in the
     </topics/logging>`.
 
 404 errors
-~~~~~~~~~~
+----------
 
 Django can also be configured to email errors about broken links (404 "page
 not found" errors). Django sends emails about 404 errors when:
 
 * :setting:`DEBUG` is ``False``;
 
-* Your :setting:`MIDDLEWARE_CLASSES` setting includes
+* Your :setting:`MIDDLEWARE` setting includes
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware`.
 
 If those conditions are met, Django will email the users listed in the
 :setting:`MANAGERS` setting whenever your code raises a 404 and the request has
-a referer. (It doesn't bother to email for 404s that don't have a referer --
-those are usually just people typing in broken URLs or broken Web 'bots).
+a referer. It doesn't bother to email for 404s that don't have a referer --
+those are usually just people typing in broken URLs or broken Web bots. It also
+ignores 404s when the referer is equal to the requested URL, since this
+behavior is from broken Web bots too.
 
 .. note::
 
@@ -70,17 +73,17 @@ those are usually just people typing in broken URLs or broken Web 'bots).
     before other middleware that intercepts 404 errors, such as
     :class:`~django.middleware.locale.LocaleMiddleware` or
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`.
-    Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
+    Put it towards the top of your :setting:`MIDDLEWARE` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
-:setting:`IGNORABLE_404_URLS` setting. It should be a tuple of compiled
+:setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
 regular expression objects. For example::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'\.(php|cgi)$'),
         re.compile(r'^/phpmyadmin/'),
-    )
+    ]
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
@@ -89,11 +92,11 @@ The following example shows how to exclude some conventional URLs that browsers 
 crawlers often request::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'^/apple-touch-icon.*\.png$'),
         re.compile(r'^/favicon\.ico$'),
         re.compile(r'^/robots\.txt$'),
-    )
+    ]
 
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)
@@ -112,10 +115,18 @@ and override its methods.
 .. _filtering-error-reports:
 
 Filtering error reports
------------------------
+=======================
+
+.. warning::
+
+    Filtering sensitive data is a hard problem, and it's nearly impossible to
+    guarantee that sensitive data won't leak into an error report. Therefore,
+    error reports should only be available to trusted team members and you
+    should avoid transmitting error reports unencrypted over the Internet
+    (such as through email).
 
 Filtering sensitive information
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 .. currentmodule:: django.views.decorators.debug
 
@@ -127,13 +138,15 @@ exception raised, each `traceback frame`_’s local variables, and the
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
-credit card number. So Django offers a set of function decorators to help you
-control which information should be filtered out of error reports in a
-production environment (that is, where :setting:`DEBUG` is set to ``False``):
-:func:`sensitive_variables` and :func:`sensitive_post_parameters`.
+credit card number. So in addition to filtering out settings that appear to be
+sensitive as described in the :setting:`DEBUG` documentation, Django offers a
+set of function decorators to help you control which information should be
+filtered out of error reports in a production environment (that is, where
+:setting:`DEBUG` is set to ``False``): :func:`sensitive_variables` and
+:func:`sensitive_post_parameters`.
 
-.. _`full traceback`: http://en.wikipedia.org/wiki/Stack_trace
-.. _`traceback frame`: http://en.wikipedia.org/wiki/Stack_frame
+.. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
+.. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
 
 .. function:: sensitive_variables(*variables)
 
@@ -189,10 +202,12 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 
         @sensitive_post_parameters('pass_word', 'credit_card_number')
         def record_user_profile(request):
-            UserProfile.create(user=request.user,
-                               password=request.POST['pass_word'],
-                               credit_card=request.POST['credit_card_number'],
-                               name=request.POST['name'])
+            UserProfile.create(
+                user=request.user,
+                password=request.POST['pass_word'],
+                credit_card=request.POST['credit_card_number'],
+                name=request.POST['name'],
+            )
             ...
 
     In the above example, the values for the ``pass_word`` and
@@ -216,7 +231,7 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 .. _custom-error-reports:
 
 Custom error reports
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 All :func:`sensitive_variables` and :func:`sensitive_post_parameters` do is,
 respectively, annotate the decorated function with the names of sensitive
@@ -238,7 +253,7 @@ given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
 attribute::
 
     def my_view(request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.exception_reporter_filter = CustomExceptionReporterFilter()
         ...
 
@@ -254,13 +269,6 @@ following methods:
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
-
-.. method:: SafeExceptionReporterFilter.get_request_repr(request)
-
-    Returns the representation string of the request object, that is, the
-    value that would be returned by ``repr(request)``, except it uses the
-    filtered dictionary of POST parameters as determined by
-    :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 

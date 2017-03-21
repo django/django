@@ -1,0 +1,223 @@
+=======================
+Conditional Expressions
+=======================
+
+.. currentmodule:: django.db.models.expressions
+
+Conditional expressions let you use :keyword:`if` ... :keyword:`elif` ...
+:keyword:`else` logic within filters, annotations, aggregations, and updates. A
+conditional expression evaluates a series of conditions for each row of a
+table and returns the matching result expression. Conditional expressions can
+also be combined and nested like other :doc:`expressions <expressions>`.
+
+The conditional expression classes
+==================================
+
+We'll be using the following model in the subsequent examples::
+
+    from django.db import models
+
+    class Client(models.Model):
+        REGULAR = 'R'
+        GOLD = 'G'
+        PLATINUM = 'P'
+        ACCOUNT_TYPE_CHOICES = (
+            (REGULAR, 'Regular'),
+            (GOLD, 'Gold'),
+            (PLATINUM, 'Platinum'),
+        )
+        name = models.CharField(max_length=50)
+        registered_on = models.DateField()
+        account_type = models.CharField(
+            max_length=1,
+            choices=ACCOUNT_TYPE_CHOICES,
+            default=REGULAR,
+        )
+
+``When``
+--------
+
+.. class:: When(condition=None, then=None, **lookups)
+
+A ``When()`` object is used to encapsulate a condition and its result for use
+in the conditional expression. Using a ``When()`` object is similar to using
+the :meth:`~django.db.models.query.QuerySet.filter` method. The condition can
+be specified using :ref:`field lookups <field-lookups>` or
+:class:`~django.db.models.Q` objects. The result is provided using the ``then``
+keyword.
+
+Some examples::
+
+    >>> from django.db.models import When, F, Q
+    >>> # String arguments refer to fields; the following two examples are equivalent:
+    >>> When(account_type=Client.GOLD, then='name')
+    >>> When(account_type=Client.GOLD, then=F('name'))
+    >>> # You can use field lookups in the condition
+    >>> from datetime import date
+    >>> When(registered_on__gt=date(2014, 1, 1),
+    ...      registered_on__lt=date(2015, 1, 1),
+    ...      then='account_type')
+    >>> # Complex conditions can be created using Q objects
+    >>> When(Q(name__startswith="John") | Q(name__startswith="Paul"),
+    ...      then='name')
+
+Keep in mind that each of these values can be an expression.
+
+.. note::
+
+    Since the ``then`` keyword argument is reserved for the result of the
+    ``When()``, there is a potential conflict if a
+    :class:`~django.db.models.Model` has a field named ``then``. This can be
+    resolved in two ways::
+
+        >>> When(then__exact=0, then=1)
+        >>> When(Q(then=0), then=1)
+
+``Case``
+--------
+
+.. class:: Case(*cases, **extra)
+
+A ``Case()`` expression is like the :keyword:`if` ... :keyword:`elif` ...
+:keyword:`else` statement in ``Python``. Each ``condition`` in the provided
+``When()`` objects is evaluated in order, until one evaluates to a
+truthful value. The ``result`` expression from the matching ``When()`` object
+is returned.
+
+A simple example::
+
+    >>>
+    >>> from datetime import date, timedelta
+    >>> from django.db.models import CharField, Case, Value, When
+    >>> Client.objects.create(
+    ...     name='Jane Doe',
+    ...     account_type=Client.REGULAR,
+    ...     registered_on=date.today() - timedelta(days=36))
+    >>> Client.objects.create(
+    ...     name='James Smith',
+    ...     account_type=Client.GOLD,
+    ...     registered_on=date.today() - timedelta(days=5))
+    >>> Client.objects.create(
+    ...     name='Jack Black',
+    ...     account_type=Client.PLATINUM,
+    ...     registered_on=date.today() - timedelta(days=10 * 365))
+    >>> # Get the discount for each Client based on the account type
+    >>> Client.objects.annotate(
+    ...     discount=Case(
+    ...         When(account_type=Client.GOLD, then=Value('5%')),
+    ...         When(account_type=Client.PLATINUM, then=Value('10%')),
+    ...         default=Value('0%'),
+    ...         output_field=CharField(),
+    ...     ),
+    ... ).values_list('name', 'discount')
+    [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')]
+
+``Case()`` accepts any number of ``When()`` objects as individual arguments.
+Other options are provided using keyword arguments. If none of the conditions
+evaluate to ``TRUE``, then the expression given with the ``default`` keyword
+argument is returned. If a ``default`` argument isn't provided, ``None`` is
+used.
+
+If we wanted to change our previous query to get the discount based on how long
+the ``Client`` has been with us, we could do so using lookups::
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> # Get the discount for each Client based on the registration date
+    >>> Client.objects.annotate(
+    ...     discount=Case(
+    ...         When(registered_on__lte=a_year_ago, then=Value('10%')),
+    ...         When(registered_on__lte=a_month_ago, then=Value('5%')),
+    ...         default=Value('0%'),
+    ...         output_field=CharField(),
+    ...     )
+    ... ).values_list('name', 'discount')
+    [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]
+
+.. note::
+
+    Remember that the conditions are evaluated in order, so in the above
+    example we get the correct result even though the second condition matches
+    both Jane Doe and Jack Black. This works just like an :keyword:`if` ...
+    :keyword:`elif` ... :keyword:`else` statement in ``Python``.
+
+``Case()`` also works in a ``filter()`` clause. For example, to find gold
+clients that registered more than a month ago and platinum clients that
+registered more than a year ago::
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> Client.objects.filter(
+    ...     registered_on__lte=Case(
+    ...         When(account_type=Client.GOLD, then=a_month_ago),
+    ...         When(account_type=Client.PLATINUM, then=a_year_ago),
+    ...     ),
+    ... ).values_list('name', 'account_type')
+    [('Jack Black', 'P')]
+
+Advanced queries
+================
+
+Conditional expressions can be used in annotations, aggregations, lookups, and
+updates. They can also be combined and nested with other expressions. This
+allows you to make powerful conditional queries.
+
+Conditional update
+------------------
+
+Let's say we want to change the ``account_type`` for our clients to match
+their registration dates. We can do this using a conditional expression and the
+:meth:`~django.db.models.query.QuerySet.update` method::
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> # Update the account_type for each Client from the registration date
+    >>> Client.objects.update(
+    ...     account_type=Case(
+    ...         When(registered_on__lte=a_year_ago,
+    ...              then=Value(Client.PLATINUM)),
+    ...         When(registered_on__lte=a_month_ago,
+    ...              then=Value(Client.GOLD)),
+    ...         default=Value(Client.REGULAR)
+    ...     ),
+    ... )
+    >>> Client.objects.values_list('name', 'account_type')
+    [('Jane Doe', 'G'), ('James Smith', 'R'), ('Jack Black', 'P')]
+
+Conditional aggregation
+-----------------------
+
+What if we want to find out how many clients there are for each
+``account_type``? We can nest conditional expression within
+:ref:`aggregate functions <aggregation-functions>` to achieve this::
+
+    >>> # Create some more Clients first so we can have something to count
+    >>> Client.objects.create(
+    ...     name='Jean Grey',
+    ...     account_type=Client.REGULAR,
+    ...     registered_on=date.today())
+    >>> Client.objects.create(
+    ...     name='James Bond',
+    ...     account_type=Client.PLATINUM,
+    ...     registered_on=date.today())
+    >>> Client.objects.create(
+    ...     name='Jane Porter',
+    ...     account_type=Client.PLATINUM,
+    ...     registered_on=date.today())
+    >>> # Get counts for each value of account_type
+    >>> from django.db.models import IntegerField, Sum
+    >>> Client.objects.aggregate(
+    ...     regular=Sum(
+    ...         Case(When(account_type=Client.REGULAR, then=1),
+    ...              output_field=IntegerField())
+    ...     ),
+    ...     gold=Sum(
+    ...         Case(When(account_type=Client.GOLD, then=1),
+    ...              output_field=IntegerField())
+    ...     ),
+    ...     platinum=Sum(
+    ...         Case(When(account_type=Client.PLATINUM, then=1),
+    ...              output_field=IntegerField())
+    ...     )
+    ... )
+    {'regular': 2, 'gold': 1, 'platinum': 3}

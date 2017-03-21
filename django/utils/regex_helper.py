@@ -5,10 +5,9 @@ Used internally by Django and not intended for external use.
 This is not, and is not intended to be, a complete reg-exp decompiler. It
 should be good enough for a large class of URLS, however.
 """
-from __future__ import unicode_literals
+import warnings
 
-from django.utils import six
-from django.utils.six.moves import zip
+from django.utils.deprecation import RemovedInDjango21Warning
 
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
@@ -28,28 +27,20 @@ ESCAPE_MAPPINGS = {
 
 
 class Choice(list):
-    """
-    Used to represent multiple possibilities at this point in a pattern string.
-    We use a distinguished type, rather than a list, so that the usage in the
-    code is clear.
-    """
+    """Represent multiple possibilities at this point in a pattern string."""
 
 
 class Group(list):
-    """
-    Used to represent a capturing group in the pattern string.
-    """
+    """Represent a capturing group in the pattern string."""
 
 
 class NonCapture(list):
-    """
-    Used to represent a non-capturing group in the pattern string.
-    """
+    """Represent a non-capturing group in the pattern string."""
 
 
 def normalize(pattern):
-    """
-    Given a reg-exp pattern, normalizes it to an iterable of forms that
+    r"""
+    Given a reg-exp pattern, normalize it to an iterable of forms that
     suffice for reverse matching. This does the following:
 
     (1) For any repeating sections, keeps the minimum number of occurrences
@@ -59,11 +50,8 @@ def normalize(pattern):
     (3) Select the first (essentially an arbitrary) element from any character
         class. Select an arbitrary character for any unordered class (e.g. '.'
         or '\w') in the pattern.
-    (5) Ignore comments and any of the reg-exp flags that won't change
-        what we construct ("iLmsu"). "(?x)" is an error, however.
-    (6) Raise an error on all other non-capturing (?...) forms (e.g.
-        look-ahead and look-behind matches) and any disjunctive ('|')
-        constructs.
+    (4) Ignore look-ahead and look-behind assertions.
+    (5) Raise an error on any disjunctive ('|') constructs.
 
     Django's URLs for forward resolving are either all positional arguments or
     all keyword arguments. That is assumed here, as well. Although reverse
@@ -129,9 +117,15 @@ def normalize(pattern):
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
-                    if ch in "iLmsu#":
+                    if ch in '!=<':
                         # All of these are ignorable. Walk to the end of the
                         # group.
+                        walk_to_end(ch, pattern_iter)
+                    elif ch in 'iLmsu#':
+                        warnings.warn(
+                            'Using (?%s) in url() patterns is deprecated.' % ch,
+                            RemovedInDjango21Warning
+                        )
                         walk_to_end(ch, pattern_iter)
                     elif ch == ':':
                         # Non-capturing group
@@ -165,7 +159,7 @@ def normalize(pattern):
                         else:
                             result.append(Group((("%%(%s)s" % param), None)))
             elif ch in "*?+{":
-                # Quanitifers affect the previous item in the result list.
+                # Quantifiers affect the previous item in the result list.
                 count, ch = get_quantifier(ch, pattern_iter)
                 if ch:
                     # We had to look ahead, but it wasn't need to compute the
@@ -204,13 +198,13 @@ def normalize(pattern):
 
 
 def next_char(input_iter):
-    """
+    r"""
     An iterator that yields the next character from "pattern_iter", respecting
     escape sequences. An escaped character is replaced by a representative of
     its class (e.g. \w -> "x"). If the escaped character is one that is
     skipped, it is not returned (the next character is returned instead).
 
-    Yields the next character, along with a boolean indicating whether it is a
+    Yield the next character, along with a boolean indicating whether it is a
     raw (unescaped) character or not.
     """
     for ch in input_iter:
@@ -226,8 +220,8 @@ def next_char(input_iter):
 
 def walk_to_end(ch, input_iter):
     """
-    The iterator is currently inside a capturing group. We want to walk to the
-    close of this group, skipping over any nested groups and handling escaped
+    The iterator is currently inside a capturing group. Walk to the close of
+    this group, skipping over any nested groups and handling escaped
     parentheses correctly.
     """
     if ch == '(':
@@ -250,7 +244,7 @@ def get_quantifier(ch, input_iter):
     Parse a quantifier from the input, where "ch" is the first character in the
     quantifier.
 
-    Returns the minimum number of occurrences permitted by the quantifier and
+    Return the minimum number of occurrences permitted by the quantifier and
     either None or the next character from the input_iter if the next character
     is not part of the quantifier.
     """
@@ -284,7 +278,7 @@ def get_quantifier(ch, input_iter):
 
 def contains(source, inst):
     """
-    Returns True if the "source" contains an instance of "inst". False,
+    Return True if the "source" contains an instance of "inst". False,
     otherwise.
     """
     if isinstance(source, inst):
@@ -298,8 +292,8 @@ def contains(source, inst):
 
 def flatten_result(source):
     """
-    Turns the given source sequence into a list of reg-exp possibilities and
-    their arguments. Returns a list of strings and a list of argument lists.
+    Turn the given source sequence into a list of reg-exp possibilities and
+    their arguments. Return a list of strings and a list of argument lists.
     Each of the two lists will be of the same length.
     """
     if source is None:
@@ -314,7 +308,7 @@ def flatten_result(source):
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
-        if isinstance(elt, six.string_types):
+        if isinstance(elt, str):
             continue
         piece = ''.join(source[last:pos])
         if isinstance(elt, Group):

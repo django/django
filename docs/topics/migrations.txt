@@ -5,42 +5,27 @@ Migrations
 .. module:: django.db.migrations
    :synopsis: Schema migration support for Django models
 
-.. versionadded:: 1.7
-
 Migrations are Django's way of propagating changes you make to your models
 (adding a field, deleting a model, etc.) into your database schema. They're
 designed to be mostly automatic, but you'll need to know when to make
 migrations, when to run them, and the common problems you might run into.
 
-A Brief History
----------------
-
-Prior to version 1.7, Django only supported adding new models to the
-database; it was not possible to alter or remove existing models via the
-``syncdb`` command (the predecessor to :djadmin:`migrate`).
-
-Third-party tools, most notably `South <http://south.aeracode.org>`_,
-provided support for these additional types of change, but it was considered
-important enough that support was brought into core Django.
-
 The Commands
-------------
+============
 
 There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
 
-* :djadmin:`migrate`, which is responsible for applying migrations, as well as
-  unapplying and listing their status.
+* :djadmin:`migrate`, which is responsible for applying and unapplying
+  migrations.
 
 * :djadmin:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
 
 * :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
-It's worth noting that migrations are created and run on a per-app basis.
-In particular, it's possible to have apps that *do not use migrations* (these
-are referred to as "unmigrated" apps) - these apps will instead mimic the
-legacy behavior of just adding new models.
+* :djadmin:`showmigrations`, which lists a project's migrations and their
+  status.
 
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
@@ -69,7 +54,7 @@ need those options in some data migrations later on (for example, if you've
 set custom validators).
 
 Backend Support
----------------
+===============
 
 Migrations are supported on all backends that Django ships with, as well
 as any third-party backends if they have programmed in support for schema
@@ -79,7 +64,7 @@ However, some databases are more capable than others when it comes to
 schema migrations; some of the caveats are covered below.
 
 PostgreSQL
-~~~~~~~~~~
+----------
 
 PostgreSQL is the most capable of all the databases here in terms of schema
 support; the only caveat is that adding columns with default values will
@@ -89,7 +74,7 @@ For this reason, it's recommended you always create new columns with
 ``null=True``, as this way they will be added immediately.
 
 MySQL
-~~~~~
+-----
 
 MySQL lacks support for transactions around schema alteration operations,
 meaning that if a migration fails to apply you will have to manually unpick
@@ -102,13 +87,13 @@ add or remove columns. On slower hardware this can be worse than a minute per
 million rows - adding a few columns to a table with just a few million rows
 could lock your site up for over ten minutes.
 
-Finally, MySQL has reasonably small limits on name lengths for columns, tables
+Finally, MySQL has relatively small limits on name lengths for columns, tables
 and indexes, as well as a limit on the combined size of all columns an index
 covers. This means that indexes that are possible on other backends will
 fail to be created under MySQL.
 
 SQLite
-~~~~~~
+------
 
 SQLite has very little built-in schema alteration support, and so Django
 attempts to emulate it by:
@@ -126,14 +111,14 @@ developers to use SQLite on their local machines to develop less complex
 Django projects without the need for a full database.
 
 Workflow
---------
+========
 
 Working with migrations is simple. Make changes to your models - say, add
 a field and remove a model - and then run :djadmin:`makemigrations`::
 
     $ python manage.py makemigrations
     Migrations for 'books':
-      0003_auto.py:
+      books/migrations/0003_auto.py:
         - Alter field author on book
 
 Your models will be scanned and compared to the versions currently
@@ -147,19 +132,10 @@ database to make sure they work as expected::
 
     $ python manage.py migrate
     Operations to perform:
-      Synchronize unmigrated apps: sessions, admin, messages, auth, staticfiles, contenttypes
       Apply all migrations: books
-    Synchronizing apps without migrations:
-      Creating tables...
-      Installing custom SQL...
-      Installing indexes...
-    Installed 0 object(s) from 0 fixture(s)
     Running migrations:
+      Rendering model states... DONE
       Applying books.0003_auto... OK
-
-The command runs in two stages; first, it synchronizes unmigrated apps
-(performing the same functionality that ``syncdb`` used to provide), and
-then it runs any migrations that have not yet been applied.
 
 Once the migration is applied, commit the migration and the models change
 to your version control system as a single commit - that way, when other
@@ -167,8 +143,13 @@ developers (or your production servers) check out the code, they'll
 get both the changes to your models and the accompanying migration at the
 same time.
 
+If you want to give the migration(s) a meaningful name instead of a generated
+one, you can use the :option:`makemigrations --name` option::
+
+    $ python manage.py makemigrations --name changed_my_model your_app_label
+
 Version control
-~~~~~~~~~~~~~~~
+---------------
 
 Because migrations are stored in version control, you'll occasionally
 come across situations where you and another developer have both committed
@@ -188,7 +169,7 @@ yourself - don't worry, this isn't difficult, and is explained more in
 :ref:`migration-files` below.
 
 Dependencies
-------------
+============
 
 While migrations are per-app, the tables and relationships implied by
 your models are too complex to be created for just one app at a time. When
@@ -209,30 +190,10 @@ restrict to a single app. Restricting to a single app (either in
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
 
-.. _unmigrated-dependencies:
-
-Be aware, however, that unmigrated apps cannot depend on migrated apps, by the
-very nature of not having migrations. This means that it is not generally
-possible to have an unmigrated app have a ``ForeignKey`` or ``ManyToManyField``
-to a migrated app; some cases may work, but it will eventually fail.
-
-.. warning::
-
-    Even if things appear to work with unmigrated apps depending on migrated
-    apps, Django may not generate all the necessary foreign key constraints!
-
-This is particularly apparent if you use swappable models (e.g.
-``AUTH_USER_MODEL``), as every app that uses swappable models will need
-to have migrations if you're unlucky. As time goes on, more and more
-third-party apps will get migrations, but in the meantime you can either
-give them migrations yourself (using :setting:`MIGRATION_MODULES` to
-store those modules outside of the app's own module if you wish), or
-keep the app with your user model unmigrated.
-
 .. _migration-files:
 
 Migration files
----------------
+===============
 
 Migrations are stored as an on-disk format, referred to here as
 "migration files". These files are actually just normal Python files with
@@ -278,20 +239,18 @@ more complex operations are not autodetectable and are only available via
 a hand-written migration, so don't be scared about editing them if you have to.
 
 Custom fields
-~~~~~~~~~~~~~
+-------------
 
 You can't modify the number of positional arguments in an already migrated
 custom field without raising a ``TypeError``. The old migration will call the
 modified ``__init__`` method with the old signature. So if you need a new
 argument, please create a keyword argument and add something like
-``assert kwargs.get('argument_name') is not None`` in the constructor.
+``assert 'argument_name' in kwargs`` in the constructor.
 
 .. _using-managers-in-migrations:
 
 Model managers
-~~~~~~~~~~~~~~
-
-.. versionadded:: 1.8
+--------------
 
 You can optionally serialize managers into migrations and have them available
 in :class:`~django.db.migrations.operations.RunPython` operations. This is done
@@ -316,8 +275,47 @@ class to make it importable::
 Please refer to the notes about :ref:`historical-models` in migrations to see
 the implications that come along.
 
+Initial migrations
+------------------
+
+.. attribute:: Migration.initial
+
+The "initial migrations" for an app are the migrations that create the first
+version of that app's tables. Usually an app will have just one initial
+migration, but in some cases of complex model interdependencies it may have two
+or more.
+
+Initial migrations are marked with an ``initial = True`` class attribute on the
+migration class. If an ``initial`` class attribute isn't found, a migration
+will be considered "initial" if it is the first migration in the app (i.e. if
+it has no dependencies on any other migration in the same app).
+
+When the :option:`migrate --fake-initial` option is used, these initial
+migrations are treated specially. For an initial migration that creates one or
+more tables (``CreateModel`` operation), Django checks that all of those tables
+already exist in the database and fake-applies the migration if so. Similarly,
+for an initial migration that adds one or more fields (``AddField`` operation),
+Django checks that all of the respective columns already exist in the database
+and fake-applies the migration if so. Without ``--fake-initial``, initial
+migrations are treated no differently from any other migration.
+
+.. _migration-history-consistency:
+
+History consistency
+-------------------
+
+As previously discussed, you may need to linearize migrations manually when two
+development branches are joined. While editing migration dependencies, you can
+inadvertently create an inconsistent history state where a migration has been
+applied but some of its dependencies haven't. This is a strong indication that
+the dependencies are incorrect, so Django will refuse to run migrations or make
+new migrations until it's fixed. When using multiple databases, you can use the
+:meth:`allow_migrate` method of :ref:`database routers
+<topics-db-multi-db-routing>` to control which databases
+:djadmin:`makemigrations` checks for consistent history.
+
 Adding migrations to apps
--------------------------
+=========================
 
 Adding migrations to new apps is straightforward - they come preconfigured to
 accept migrations, and so just run :djadmin:`makemigrations` once you've made
@@ -329,10 +327,12 @@ need to convert it to use migrations; this is a simple process::
 
     $ python manage.py makemigrations your_app_label
 
-This will make a new initial migration for your app. Now, when you run
-:djadmin:`migrate`, Django will detect that you have an initial migration
-*and* that the tables it wants to create already exist, and will mark the
-migration as already applied.
+This will make a new initial migration for your app. Now, run ``python
+manage.py migrate --fake-initial``, and Django will detect that you have an
+initial migration *and* that the tables it wants to create already exist, and
+will mark the migration as already applied. (Without the :option:`migrate
+--fake-initial` flag, the command would error out because the tables it wants
+to create already exist.)
 
 Note that this only works given two things:
 
@@ -344,17 +344,10 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
-.. versionadded:: 1.8
-
-If you want to give the migration(s) a meaningful name instead of a generated one,
-you can use the :djadminopt:`--name` option::
-
-    $ python manage.py makemigrations --name changed_my_model your_app_label
-
 .. _historical-models:
 
 Historical models
------------------
+=================
 
 When you run migrations, Django is working from historical versions of your
 models stored in the migration files. If you write Python code using the
@@ -387,10 +380,60 @@ contains a reference to them. On the plus side, methods and managers from these
 base classes inherit normally, so if you absolutely need access to these you
 can opt to move them into a superclass.
 
+To remove old references, you can :ref:`squash migrations <migration-squashing>`
+or, if there aren't many references, copy them into the migration files.
+
+.. _migrations-removing-model-fields:
+
+Considerations when removing model fields
+=========================================
+
+Similar to the "references to historical functions" considerations described in
+the previous section, removing custom model fields from your project or
+third-party app will cause a problem if they are referenced in old migrations.
+
+To help with this situation, Django provides some model field attributes to
+assist with model field deprecation using the :doc:`system checks framework
+</topics/checks>`.
+
+Add the ``system_check_deprecated_details`` attribute to your model field
+similar to the following::
+
+    class IPAddressField(Field):
+        system_check_deprecated_details = {
+            'msg': (
+                'IPAddressField has been deprecated. Support for it (except '
+                'in historical migrations) will be removed in Django 1.9.'
+            ),
+            'hint': 'Use GenericIPAddressField instead.',  # optional
+            'id': 'fields.W900',  # pick a unique ID for your field.
+        }
+
+After a deprecation period of your choosing (two or three feature releases for
+fields in Django itself), change the ``system_check_deprecated_details``
+attribute to ``system_check_removed_details`` and update the dictionary similar
+to::
+
+    class IPAddressField(Field):
+        system_check_removed_details = {
+            'msg': (
+                'IPAddressField has been removed except for support in '
+                'historical migrations.'
+            ),
+            'hint': 'Use GenericIPAddressField instead.',
+            'id': 'fields.E900',  # pick a unique ID for your field.
+        }
+
+You should keep the field's methods that are required for it to operate in
+database migrations such as ``__init__()``, ``deconstruct()``, and
+``get_internal_type()``. Keep this stub field for as long as any migrations
+which reference the field exist. For example, after squashing migrations and
+removing the old ones, you should be able to remove the field completely.
+
 .. _data-migrations:
 
 Data Migrations
----------------
+===============
 
 As well as changing the database schema, you can also use migrations to change
 the data in the database itself, in conjunction with the schema if you want.
@@ -411,10 +454,11 @@ the file in the right place, suggest a name, and add dependencies for you)::
 
 Then, open up the file; it should look something like this::
 
-    # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    # Generated by Django A.B on YYYY-MM-DD HH:MM
+    from django.db import migrations
 
     class Migration(migrations.Migration):
+        initial = True
 
         dependencies = [
             ('yourappname', '0001_initial'),
@@ -438,8 +482,7 @@ combined values of ``first_name`` and ``last_name`` (we've come to our senses
 and realized that not everyone has first and last names). All we
 need to do is use the historical model and iterate over the rows::
 
-    # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    from django.db import migrations
 
     def combine_names(apps, schema_editor):
         # We can't import the Person model directly as it may be a newer
@@ -450,6 +493,7 @@ need to do is use the historical model and iterate over the rows::
             person.save()
 
     class Migration(migrations.Migration):
+        initial = True
 
         dependencies = [
             ('yourappname', '0001_initial'),
@@ -467,14 +511,45 @@ You can pass a second callable to
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
+Accessing models from other apps
+--------------------------------
+
+When writing a ``RunPython`` function that uses models from apps other than the
+one in which the migration is located, the migration's ``dependencies``
+attribute should include the latest migration of each app that is involved,
+otherwise you may get an error similar to: ``LookupError: No installed app
+with label 'myappname'`` when you try to retrieve the model in the ``RunPython``
+function using ``apps.get_model()``.
+
+In the following example, we have a migration in ``app1`` which needs to use
+models in ``app2``. We aren't concerned with the details of ``move_m1`` other
+than the fact it will need to access models from both apps. Therefore we've
+added a dependency that specifies the last migration of ``app2``::
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('app1', '0001_initial'),
+            # added dependency to enable using models from app2 in move_m1
+            ('app2', '0004_foobar'),
+        ]
+
+        operations = [
+            migrations.RunPython(move_m1),
+        ]
+
+More advanced migrations
+------------------------
+
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
-</ref/migration-operations>`.
+</ref/migration-operations>` and the "how-to" on :doc:`writing migrations
+</howto/writing-migrations>`.
 
 .. _migration-squashing:
 
 Squashing migrations
---------------------
+====================
 
 You are encouraged to make migrations freely and not worry about how many you
 have; the migration code is optimized to deal with hundreds at a time without
@@ -496,8 +571,8 @@ Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
 any :class:`~django.db.migrations.operations.RunSQL`
 or :class:`~django.db.migrations.operations.RunPython` operations (which can't
-be optimized through) - Django will then write it back out into a new set of
-initial migration files.
+be optimized through unless they are marked as ``elidable``) - Django will then
+write it back out into a new set of migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
 so they can coexist with the old migration files, and Django will intelligently
@@ -549,12 +624,13 @@ migrations it replaces and distribute this change to all running instances
 of your application, making sure that they run ``migrate`` to store the change
 in their database.
 
-After this has been done, you must then transition the squashed migration to
-a normal initial migration, by:
+You must then transition the squashed migration to a normal migration by:
 
-- Deleting all the migration files it replaces
-- Removing the ``replaces`` argument in the ``Migration`` class of the
-  squashed migration (this is how Django tells that it is a squashed migration)
+- Deleting all the migration files it replaces.
+- Updating all migrations that depend on the deleted migrations to depend on
+  the squashed migration instead.
+- Removing the ``replaces`` attribute in the ``Migration`` class of the
+  squashed migration (this is how Django tells that it is a squashed migration).
 
 .. note::
     Once you've squashed a migration, you should not then re-squash that squashed
@@ -564,7 +640,7 @@ a normal initial migration, by:
 .. _migration-serializing:
 
 Serializing values
-------------------
+==================
 
 Migrations are just Python files containing the old definitions of your models
 - thus, to write them, Django must take the current state of your models and
@@ -577,23 +653,25 @@ for basic values, and doesn't specify import paths).
 
 Django can serialize the following:
 
-- ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
+- ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
+- ``enum.Enum`` instances
+- ``uuid.UUID`` instances
+- ``functools.partial`` instances which have serializable ``func``, ``args``,
+  and ``keywords`` values.
+- ``LazyObject`` instances which wrap a serializable value.
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
+- Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 1.7.1
+.. versionchanged:: 1.11
 
-    Support for serializing timezone-aware datetimes was added.
-
-Django can serialize the following on Python 3 only:
-
-- Unbound methods used from within the class body (see below)
+    Serialization support for ``uuid.UUID`` was added.
 
 Django cannot serialize:
 
@@ -601,25 +679,10 @@ Django cannot serialize:
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
 
-Due to the fact ``__qualname__`` was only introduced in Python 3, Django can only
-serialize the following pattern (an unbound method used within the class body)
-on Python 3, and will fail to serialize a reference to it on Python 2::
-
-    class MyModel(models.Model):
-
-        def upload_to(self):
-            return "something dynamic"
-
-        my_file = models.FileField(upload_to=upload_to)
-
-If you are using Python 2, we recommend you move your methods for upload_to
-and similar arguments that accept callables (e.g. ``default``) to live in
-the main module body, rather than the class body.
-
 .. _custom-deconstruct-method:
 
-Adding a deconstruct() method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Adding a ``deconstruct()`` method
+---------------------------------
 
 You can let Django serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple
@@ -670,69 +733,26 @@ The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when
 deconstruct() is called.
 
-Supporting Python 2 and 3
--------------------------
+Supporting multiple Django versions
+===================================
 
-In order to generate migrations that support both Python 2 and 3, all string
-literals used in your models and fields (e.g. ``verbose_name``,
-``related_name``, etc.), must be consistently either bytestrings or text
-(unicode) strings in both Python 2 and 3 (rather than bytes in Python 2 and
-text in Python 3, the default situation for unmarked string literals.)
-Otherwise running :djadmin:`makemigrations` under Python 3 will generate
-spurious new migrations to convert all these string attributes to text.
+If you are the maintainer of a third-party app with models, you may need to
+ship migrations that support multiple Django versions. In this case, you should
+always run :djadmin:`makemigrations` **with the lowest Django version you wish
+to support**.
 
-The easiest way to achieve this is to follow the advice in Django's
-:doc:`Python 3 porting guide </topics/python3>` and make sure that all your
-modules begin with ``from __future__ import unicode_literals``, so that all
-unmarked string literals are always unicode, regardless of Python version. When
-you add this to an app with existing migrations generated on Python 2, your
-next run of :djadmin:`makemigrations` on Python 3 will likely generate many
-changes as it converts all the bytestring attributes to text strings; this is
-normal and should only happen once.
-
-.. _upgrading-from-south:
-
-Upgrading from South
---------------------
-
-If you already have pre-existing migrations created with
-`South <http://south.aeracode.org>`_, then the upgrade process to use
-``django.db.migrations`` is quite simple:
-
-* Ensure all installs are fully up-to-date with their migrations.
-* Remove ``'south'`` from :setting:`INSTALLED_APPS`.
-* Delete all your (numbered) migration files, but not the directory or
-  ``__init__.py`` - make sure you remove the ``.pyc`` files too.
-* Run ``python manage.py makemigrations``. Django should see the empty
-  migration directories and make new initial migrations in the new format.
-* Run ``python manage.py migrate``. Django will see that the tables for the
-  initial migrations already exist and mark them as applied without running
-  them.
-
-That's it! The only complication is if you have a circular dependency loop
-of foreign keys; in this case, ``makemigrations`` might make more than one
-initial migration, and you'll need to mark them all as applied using::
-
-    python manage.py migrate --fake yourappnamehere
-
-Libraries/Third-party Apps
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you are a library or app maintainer, and wish to support both South migrations
-(for Django 1.6 and below) and Django migrations (for 1.7 and above) you should
-keep two parallel migration sets in your app, one in each format.
-
-To aid in this, South 1.0 will automatically look for South-format migrations
-in a ``south_migrations`` directory first, before looking in ``migrations``,
-meaning that users' projects will transparently use the correct set as long
-as you put your South migrations in the ``south_migrations`` directory and
-your Django migrations in the ``migrations`` directory.
-
-More information is available in the
-`South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
+The migrations system will maintain backwards-compatibility according to the
+same policy as the rest of Django, so migration files generated on Django X.Y
+should run unchanged on Django X.Y+1. The migrations system does not promise
+forwards-compatibility, however. New features may be added, and migration files
+generated with newer versions of Django may not work on older versions.
 
 .. seealso::
 
     :doc:`The Migrations Operations Reference </ref/migration-operations>`
         Covers the schema operations API, special operations, and writing your
         own operations.
+
+    :doc:`The Writing Migrations "how-to" </howto/writing-migrations>`
+        Explains how to structure and write database migrations for different
+        scenarios you might encounter.

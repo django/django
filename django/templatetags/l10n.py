@@ -1,7 +1,5 @@
-from django.template import Node
-from django.template import TemplateSyntaxError, Library
+from django.template import Library, Node, TemplateSyntaxError
 from django.utils import formats
-from django.utils.encoding import force_text
 
 register = Library()
 
@@ -9,19 +7,19 @@ register = Library()
 @register.filter(is_safe=False)
 def localize(value):
     """
-    Forces a value to be rendered as a localized value,
+    Force a value to be rendered as a localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
-    return force_text(formats.localize(value, use_l10n=True))
+    return str(formats.localize(value, use_l10n=True))
 
 
 @register.filter(is_safe=False)
 def unlocalize(value):
     """
-    Forces a value to be rendered as a non-localized value,
+    Force a value to be rendered as a non-localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
-    return force_text(value)
+    return str(value)
 
 
 class LocalizeNode(Node):
@@ -30,7 +28,7 @@ class LocalizeNode(Node):
         self.use_l10n = use_l10n
 
     def __repr__(self):
-        return "<LocalizeNode>"
+        return '<%s>' % self.__class__.__name__
 
     def render(self, context):
         old_setting = context.use_l10n
@@ -43,7 +41,7 @@ class LocalizeNode(Node):
 @register.tag('localize')
 def localize_tag(parser, token):
     """
-    Forces or prevents localization of values, regardless of the value of
+    Force or prevents localization of values, regardless of the value of
     `settings.USE_L10N`.
 
     Sample usage::
@@ -51,7 +49,6 @@ def localize_tag(parser, token):
         {% localize off %}
             var pi = {{ 3.1415 }};
         {% endlocalize %}
-
     """
     use_l10n = None
     bits = list(token.split_contents())

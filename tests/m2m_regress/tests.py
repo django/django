@@ -1,11 +1,10 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.test import TestCase
-from django.utils import six
 
-from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet, RegressionModelSplit)
+from .models import (
+    Entry, Line, Post, RegressionModelSplit, SelfRefer, SelfReferChild,
+    SelfReferChildSibling, Tag, TagCollection, Worksheet,
+)
 
 
 class M2MRegressionTests(TestCase):
@@ -35,10 +34,9 @@ class M2MRegressionTests(TestCase):
     def test_internal_related_name_not_in_error_msg(self):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
-
-        six.assertRaisesRegex(
-            self, FieldError,
-            "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling$",
+        self.assertRaisesMessage(
+            FieldError,
+            "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling",
             lambda: SelfRefer.objects.filter(porcupine='fred')
         )
 
@@ -72,7 +70,7 @@ class M2MRegressionTests(TestCase):
         t2 = Tag.objects.create(name='t2')
 
         c1 = TagCollection.objects.create(name='c1')
-        c1.tags = [t1, t2]
+        c1.tags.set([t1, t2])
         c1 = TagCollection.objects.get(name='c1')
 
         self.assertQuerysetEqual(c1.tags.all(), ["<Tag: t1>", "<Tag: t2>"], ordered=False)
@@ -102,10 +100,21 @@ class M2MRegressionTests(TestCase):
         t1 = Tag.objects.create(name='t1')
         t2 = Tag.objects.create(name='t2')
         c1 = TagCollection.objects.create(name='c1')
-        c1.tags = [t1, t2]
+        c1.tags.set([t1, t2])
 
         with self.assertRaises(TypeError):
-            c1.tags = 7
+            c1.tags.set(7)
 
         c1.refresh_from_db()
         self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])
+
+    def test_multiple_forwards_only_m2m(self):
+        # Regression for #24505 - Multiple ManyToManyFields to same "to"
+        # model with related_name set to '+'.
+        foo = Line.objects.create(name='foo')
+        bar = Line.objects.create(name='bar')
+        post = Post.objects.create()
+        post.primary_lines.add(foo)
+        post.secondary_lines.add(bar)
+        self.assertQuerysetEqual(post.primary_lines.all(), ['<Line: foo>'])
+        self.assertQuerysetEqual(post.secondary_lines.all(), ['<Line: bar>'])

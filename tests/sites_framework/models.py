@@ -1,10 +1,8 @@
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class AbstractArticle(models.Model):
     title = models.CharField(max_length=50)
 
@@ -23,11 +21,11 @@ class SyndicatedArticle(AbstractArticle):
 
 
 class ExclusiveArticle(AbstractArticle):
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, models.CASCADE)
 
 
 class CustomArticle(AbstractArticle):
-    places_this_article_should_appear = models.ForeignKey(Site)
+    places_this_article_should_appear = models.ForeignKey(Site, models.CASCADE)
 
     objects = models.Manager()
     on_site = CurrentSiteManager("places_this_article_should_appear")

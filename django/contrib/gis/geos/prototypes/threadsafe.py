@@ -1,19 +1,20 @@
 import threading
-from django.contrib.gis.geos.libgeos import lgeos, notice_h, error_h, CONTEXT_PTR
+
+from django.contrib.gis.geos.base import GEOSBase
+from django.contrib.gis.geos.libgeos import (
+    CONTEXT_PTR, error_h, lgeos, notice_h,
+)
 
 
-class GEOSContextHandle(object):
-    """
-    Python object representing a GEOS context handle.
-    """
+class GEOSContextHandle(GEOSBase):
+    """Represent a GEOS context handle."""
+    ptr_type = CONTEXT_PTR
+    destructor = lgeos.finishGEOS_r
+
     def __init__(self):
         # Initializing the context handler for this thread with
         # the notice and error handler.
         self.ptr = lgeos.initGEOS_r(notice_h, error_h)
-
-    def __del__(self):
-        if self.ptr and lgeos:
-            lgeos.finishGEOS_r(self.ptr)
 
 
 # Defining a thread-local object and creating an instance
@@ -21,13 +22,14 @@ class GEOSContextHandle(object):
 class GEOSContext(threading.local):
     handle = None
 
+
 thread_context = GEOSContext()
 
 
-class GEOSFunc(object):
+class GEOSFunc:
     """
-    Class that serves as a wrapper for GEOS C Functions, and will
-    use thread-safe function variants when available.
+    Serve as a wrapper for GEOS C Functions. Use thread-safe function
+    variants when available.
     """
     def __init__(self, func_name):
         try:

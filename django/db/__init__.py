@@ -1,15 +1,16 @@
 from django.core import signals
-from django.db.utils import (DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY,
-    DataError, OperationalError, IntegrityError, InternalError, ProgrammingError,
-    NotSupportedError, DatabaseError, InterfaceError, Error, ConnectionHandler,
-    ConnectionRouter)
-
+from django.db.utils import (
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, ConnectionHandler,
+    ConnectionRouter, DatabaseError, DataError, Error, IntegrityError,
+    InterfaceError, InternalError, NotSupportedError, OperationalError,
+    ProgrammingError,
+)
 
 __all__ = [
-    'backend', 'connection', 'connections', 'router', 'DatabaseError',
-    'IntegrityError', 'InternalError', 'ProgrammingError', 'DataError',
-    'NotSupportedError', 'Error', 'InterfaceError', 'OperationalError',
-    'DEFAULT_DB_ALIAS', 'DJANGO_VERSION_PICKLE_KEY'
+    'connection', 'connections', 'router', 'DatabaseError', 'IntegrityError',
+    'InternalError', 'ProgrammingError', 'DataError', 'NotSupportedError',
+    'Error', 'InterfaceError', 'OperationalError', 'DEFAULT_DB_ALIAS',
+    'DJANGO_VERSION_PICKLE_KEY',
 ]
 
 connections = ConnectionHandler()
@@ -17,16 +18,12 @@ connections = ConnectionHandler()
 router = ConnectionRouter()
 
 
-# `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
-# for backend bits.
-
-# DatabaseWrapper.__init__() takes a dictionary, not a settings module, so
-# we manually create the dictionary from the settings, passing only the
-# settings that the database backends care about. Note that TIME_ZONE is used
-# by the PostgreSQL backends.
+# DatabaseWrapper.__init__() takes a dictionary, not a settings module, so we
+# manually create the dictionary from the settings, passing only the settings
+# that the database backends care about.
 # We load all these up for backwards compatibility, you should use
 # connections['default'] instead.
-class DefaultConnectionProxy(object):
+class DefaultConnectionProxy:
     """
     Proxy for accessing the default DatabaseWrapper object's attributes. If you
     need to access the DatabaseWrapper object itself, use
@@ -44,8 +41,6 @@ class DefaultConnectionProxy(object):
     def __eq__(self, other):
         return connections[DEFAULT_DB_ALIAS] == other
 
-    def __ne__(self, other):
-        return connections[DEFAULT_DB_ALIAS] != other
 
 connection = DefaultConnectionProxy()
 
@@ -54,6 +49,8 @@ connection = DefaultConnectionProxy()
 def reset_queries(**kwargs):
     for conn in connections.all():
         conn.queries_log.clear()
+
+
 signals.request_started.connect(reset_queries)
 
 
@@ -62,5 +59,7 @@ signals.request_started.connect(reset_queries)
 def close_old_connections(**kwargs):
     for conn in connections.all():
         conn.close_if_unusable_or_obsolete()
+
+
 signals.request_started.connect(close_old_connections)
 signals.request_finished.connect(close_old_connections)

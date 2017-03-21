@@ -19,7 +19,7 @@ Backwards incompatible changes
 ==============================
 
 CSRF exception for AJAX requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Django includes a CSRF-protection mechanism, which makes use of a
 token inserted into outgoing forms. Middleware then checks for the

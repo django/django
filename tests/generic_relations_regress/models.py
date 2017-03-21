@@ -1,20 +1,17 @@
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.deletion import ProtectedError
-
 
 __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
            'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',
            'Contact', 'Organization', 'Note', 'Company')
 
 
-@python_2_unicode_compatible
 class Link(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
@@ -22,7 +19,6 @@ class Link(models.Model):
         return "Link to %s id=%s" % (self.content_type, self.object_id)
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=100)
     links = GenericRelation(Link)
@@ -31,19 +27,17 @@ class Place(models.Model):
         return "Place: %s" % self.name
 
 
-@python_2_unicode_compatible
 class Restaurant(Place):
     def __str__(self):
         return "Restaurant: %s" % self.name
 
 
-@python_2_unicode_compatible
 class Address(models.Model):
     street = models.CharField(max_length=80)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=2)
     zipcode = models.CharField(max_length=5)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
@@ -51,7 +45,6 @@ class Address(models.Model):
         return '%s %s, %s %s' % (self.street, self.city, self.state, self.zipcode)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     account = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
@@ -62,13 +55,13 @@ class Person(models.Model):
 
 
 class CharLink(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.CharField(max_length=100)
     content_object = GenericForeignKey()
 
 
 class TextLink(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.TextField()
     content_object = GenericForeignKey()
 
@@ -85,7 +78,7 @@ class OddRelation2(models.Model):
 
 # models for test_q_object_or:
 class Note(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
     note = models.TextField()
@@ -100,7 +93,6 @@ class Organization(models.Model):
     contacts = models.ManyToManyField(Contact, related_name='organizations')
 
 
-@python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=100)
     links = GenericRelation(Link)
@@ -114,7 +106,6 @@ class Developer(models.Model):
     name = models.CharField(max_length=15)
 
 
-@python_2_unicode_compatible
 class Team(models.Model):
     name = models.CharField(max_length=15)
     members = models.ManyToManyField(Developer)
@@ -130,13 +121,12 @@ class Guild(models.Model):
     name = models.CharField(max_length=15)
     members = models.ManyToManyField(Developer)
 
-    def __nonzero__(self):
-
-        return self.members.count()
+    def __bool__(self):
+        return False
 
 
 class Tag(models.Model):
-    content_type = models.ForeignKey(ContentType, related_name='g_r_r_tags')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='g_r_r_tags')
     object_id = models.CharField(max_length=15)
     content_object = GenericForeignKey()
     label = models.CharField(max_length=15)
@@ -148,7 +138,7 @@ class Board(models.Model):
 
 class SpecialGenericRelation(GenericRelation):
     def __init__(self, *args, **kwargs):
-        super(SpecialGenericRelation, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.editable = True
         self.save_form_data_calls = 0
 
@@ -169,7 +159,7 @@ class HasLinkThing(HasLinks):
 
 class A(models.Model):
     flag = models.NullBooleanField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -182,14 +172,14 @@ class B(models.Model):
 
 
 class C(models.Model):
-    b = models.ForeignKey(B)
+    b = models.ForeignKey(B, models.CASCADE)
 
     class Meta:
         ordering = ('id',)
 
 
 class D(models.Model):
-    b = models.ForeignKey(B, null=True)
+    b = models.ForeignKey(B, models.SET_NULL, null=True)
 
     class Meta:
         ordering = ('id',)
@@ -198,14 +188,14 @@ class D(models.Model):
 # Ticket #22998
 
 class Node(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content = GenericForeignKey('content_type', 'object_id')
 
 
 class Content(models.Model):
     nodes = GenericRelation(Node)
-    related_obj = models.ForeignKey('Related', on_delete=models.CASCADE)
+    related_obj = models.ForeignKey('Related', models.CASCADE)
 
 
 class Related(models.Model):
@@ -214,5 +204,6 @@ class Related(models.Model):
 
 def prevent_deletes(sender, instance, **kwargs):
     raise ProtectedError("Not allowed to delete.", [instance])
+
 
 models.signals.pre_delete.connect(prevent_deletes, sender=Node)

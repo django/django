@@ -28,21 +28,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
-
 import os
 import signal
+import subprocess
 import sys
 import time
 import traceback
 
+import _thread
+
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
-try:
-    from django.utils.six.moves import _thread as thread
-except ImportError:
-    from django.utils.six.moves import _dummy_thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -76,6 +73,7 @@ I18N_MODIFIED = 2
 _mtimes = {}
 _win = (sys.platform == "win32")
 
+_exception = None
 _error_files = []
 _cached_modules = set()
 _cached_filenames = []
@@ -83,8 +81,7 @@ _cached_filenames = []
 
 def gen_filenames(only_new=False):
     """
-    Returns a list of filenames referenced in sys.modules and translation
-    files.
+    Return a list of filenames referenced in sys.modules and translation files.
     """
     # N.B. ``list(...)`` is needed, because this runs in parallel with
     # application code which might be mutating ``sys.modules``, and this will
@@ -97,7 +94,7 @@ def gen_filenames(only_new=False):
         if only_new:
             return []
         else:
-            return _cached_filenames
+            return _cached_filenames + clean_files(_error_files)
 
     new_modules = module_values - _cached_modules
     new_filenames = clean_files(
@@ -124,7 +121,7 @@ def gen_filenames(only_new=False):
     _cached_modules = _cached_modules.union(new_modules)
     _cached_filenames += new_filenames
     if only_new:
-        return new_filenames
+        return new_filenames + clean_files(_error_files)
     else:
         return _cached_filenames + clean_files(_error_files)
 
@@ -154,7 +151,7 @@ def reset_translations():
 
 def inotify_code_changed():
     """
-    Checks for changed code using inotify. After being called
+    Check for changed code using inotify. After being called
     it blocks until a change event has been fired.
     """
     class EventHandler(pyinotify.ProcessEvent):
@@ -180,7 +177,9 @@ def inotify_code_changed():
             pyinotify.IN_ATTRIB |
             pyinotify.IN_MOVED_FROM |
             pyinotify.IN_MOVED_TO |
-            pyinotify.IN_CREATE
+            pyinotify.IN_CREATE |
+            pyinotify.IN_DELETE_SELF |
+            pyinotify.IN_MOVE_SELF
         )
         for path in gen_filenames(only_new=True):
             wm.add_watch(path, mask)
@@ -221,11 +220,13 @@ def code_changed():
 
 def check_errors(fn):
     def wrapper(*args, **kwargs):
+        global _exception
         try:
             fn(*args, **kwargs)
-        except (ImportError, IndentationError, NameError, SyntaxError,
-                TypeError, AttributeError):
-            et, ev, tb = sys.exc_info()
+        except Exception:
+            _exception = sys.exc_info()
+
+            et, ev, tb = _exception
 
             if getattr(ev, 'filename', None) is None:
                 # get the filename from the last item in the stack
@@ -239,6 +240,12 @@ def check_errors(fn):
             raise
 
     return wrapper
+
+
+def raise_last_exception():
+    global _exception
+    if _exception is not None:
+        raise _exception[0](_exception[1]).with_traceback(_exception[2])
 
 
 def ensure_echo_on():
@@ -275,18 +282,16 @@ def reloader_thread():
 def restart_with_reloader():
     while True:
         args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
-        if sys.platform == "win32":
-            args = ['"%s"' % arg for arg in args]
         new_environ = os.environ.copy()
         new_environ["RUN_MAIN"] = 'true'
-        exit_code = os.spawnve(os.P_WAIT, sys.executable, args, new_environ)
+        exit_code = subprocess.call(args, env=new_environ)
         if exit_code != 3:
             return exit_code
 
 
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
-        thread.start_new_thread(main_func, args, kwargs)
+        _thread.start_new_thread(main_func, args, kwargs)
         try:
             reloader_thread()
         except KeyboardInterrupt:
@@ -304,7 +309,7 @@ def python_reloader(main_func, args, kwargs):
 
 def jython_reloader(main_func, args, kwargs):
     from _systemrestart import SystemRestart
-    thread.start_new_thread(main_func, args)
+    _thread.start_new_thread(main_func, args)
     while True:
         if code_changed():
             raise SystemRestart

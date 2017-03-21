@@ -1,25 +1,33 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
+import os
+import sys
 import unittest
+from io import StringIO
+from unittest import mock
 
+from django.conf import settings
 from django.conf.urls import url
+from django.contrib.staticfiles.finders import get_finder, get_finders
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
-from django.core.urlresolvers import NoReverseMatch, reverse
-from django.db import connection, router
+from django.db import connection, models, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, override_settings
-from django.utils import six
+from django.test.utils import (
+    CaptureQueriesContext, isolate_apps, override_settings,
+    setup_test_environment,
+)
+from django.urls import NoReverseMatch, reverse
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
-class SkippingTestCase(TestCase):
+class SkippingTestCase(SimpleTestCase):
     def _assert_skipping(self, func, expected_exc):
         # We cannot simply use assertRaises because a SkipTest exception will go unnoticed
         try:
@@ -87,27 +95,35 @@ class SkippingTestCase(TestCase):
         self._assert_skipping(test_func5, ValueError)
 
 
-class SkippingClassTestCase(TestCase):
+class SkippingClassTestCase(SimpleTestCase):
     def test_skip_class_unless_db_feature(self):
         @skipUnlessDBFeature("__class__")
         class NotSkippedTests(unittest.TestCase):
             def test_dummy(self):
                 return
 
+        @skipUnlessDBFeature("missing")
         @skipIfDBFeature("__class__")
         class SkippedTests(unittest.TestCase):
             def test_will_be_skipped(self):
                 self.fail("We should never arrive here.")
 
+        @skipIfDBFeature("__dict__")
+        class SkippedTestsSubclass(SkippedTests):
+            pass
+
         test_suite = unittest.TestSuite()
         test_suite.addTest(NotSkippedTests('test_dummy'))
         try:
             test_suite.addTest(SkippedTests('test_will_be_skipped'))
+            test_suite.addTest(SkippedTestsSubclass('test_will_be_skipped'))
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised at this stage")
-        result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
-        self.assertEqual(result.testsRun, 2)
-        self.assertEqual(len(result.skipped), 1)
+        result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
+        self.assertEqual(result.testsRun, 3)
+        self.assertEqual(len(result.skipped), 2)
+        self.assertEqual(result.skipped[0][1], 'Database has feature(s) __class__')
+        self.assertEqual(result.skipped[1][1], 'Database has feature(s) __class__')
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
@@ -117,7 +133,8 @@ class AssertNumQueriesTests(TestCase):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
+        with self.assertRaises(ValueError):
+            self.assertNumQueries(2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')
@@ -181,7 +198,7 @@ class AssertQuerysetEqualTests(TestCase):
 
     def test_repeated_values(self):
         """
-        Test that assertQuerysetEqual checks the number of appearance of each item
+        assertQuerysetEqual checks the number of appearance of each item
         when used with option ordered=False.
         """
         batmobile = Car.objects.create(name='Batmobile')
@@ -211,7 +228,7 @@ class AssertQuerysetEqualTests(TestCase):
 class CaptureQueriesContextManagerTests(TestCase):
 
     def setUp(self):
-        self.person_pk = six.text_type(Person.objects.create(name='test').pk)
+        self.person_pk = str(Person.objects.create(name='test').pk)
 
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:
@@ -301,7 +318,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
-class AssertTemplateUsedContextManagerTests(TestCase):
+class AssertTemplateUsedContextManagerTests(SimpleTestCase):
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
@@ -347,22 +364,26 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             pass
 
     def test_error_message(self):
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+        msg = 'template_used/base.html was not rendered. No template was rendered.'
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        msg2 = (
+            'template_used/base.html was not rendered. Following templates '
+            'were rendered: template_used/alternative.html'
+        )
+        with self.assertRaisesMessage(AssertionError, msg2):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
-        with self.assertRaises(AssertionError) as cm:
+        with self.assertRaisesMessage(AssertionError, 'No templates used to render the response'):
             response = self.client.get('/test_utils/no_template_used/')
             self.assertTemplateUsed(response, 'template_used/base.html')
-        self.assertEqual(cm.exception.args[0], "No templates used to render the response")
 
     def test_failure(self):
         with self.assertRaises(TypeError):
@@ -398,7 +419,7 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             self.assertTemplateNotUsed(response, 'template.html')
 
 
-class HTMLEqualTests(TestCase):
+class HTMLEqualTests(SimpleTestCase):
     def test_html_parser(self):
         element = parse_html('<div><p>Hello</p></div>')
         self.assertEqual(len(element.children), 1)
@@ -428,8 +449,10 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        self_closing_tags = ('br', 'hr', 'input', 'img', 'meta', 'spacer',
-            'link', 'frame', 'base', 'col')
+        self_closing_tags = (
+            'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame',
+            'base', 'col',
+        )
         for tag in self_closing_tags:
             dom = parse_html('<p>Hello <%s> world</p>' % tag)
             self.assertEqual(len(dom.children), 3)
@@ -511,13 +534,16 @@ class HTMLEqualTests(TestCase):
 <td><input type="text" value="1940-10-9" name="birthday" id="id_birthday" /></td></tr>""",
             """
         <tr><th>
-            <label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" value="John" id="id_first_name" />
+            <label for="id_first_name">First name:</label></th><td>
+            <input type="text" name="first_name" value="John" id="id_first_name" />
         </td></tr>
         <tr><th>
-            <label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" value="Lennon" id="id_last_name" />
+            <label for="id_last_name">Last name:</label></th><td>
+            <input type="text" name="last_name" value="Lennon" id="id_last_name" />
         </td></tr>
         <tr><th>
-            <label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
+            <label for="id_birthday">Birthday:</label></th><td>
+            <input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
         </td></tr>
         """)
 
@@ -572,6 +598,8 @@ class HTMLEqualTests(TestCase):
         self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
         self.assertIn(dom1, dom2)
+        dom1 = parse_html('<div><p>foo</p><p>bar</p></div>')
+        self.assertIn(dom2, dom1)
 
     def test_count(self):
         # equal html contains each other one time
@@ -607,11 +635,25 @@ class HTMLEqualTests(TestCase):
         dom2 = parse_html('<p>foo<p>bar</p></p>')
         self.assertEqual(dom2.count(dom1), 0)
 
+        # html with a root element contains the same html with no root element
+        dom1 = parse_html('<p>foo</p><p>bar</p>')
+        dom2 = parse_html('<div><p>foo</p><p>bar</p></div>')
+        self.assertEqual(dom2.count(dom1), 1)
+
     def test_parsing_errors(self):
         with self.assertRaises(AssertionError):
             self.assertHTMLEqual('<p>', '')
         with self.assertRaises(AssertionError):
             self.assertHTMLEqual('', '<p>')
+        error_msg = (
+            "First argument is not valid HTML:\n"
+            "('Unexpected end tag `div` (Line 1, Column 6)', (1, 6))"
+        ) if sys.version_info >= (3, 5) else (
+            "First argument is not valid HTML:\n"
+            "Unexpected end tag `div` (Line 1, Column 6), at line 1, column 7"
+        )
+        with self.assertRaisesMessage(AssertionError, error_msg):
+            self.assertHTMLEqual('< div></ div>', '<div></div>')
         with self.assertRaises(HTMLParseError):
             parse_html('</p>')
 
@@ -637,10 +679,14 @@ class HTMLEqualTests(TestCase):
 
     def test_unicode_handling(self):
         response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
-        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+        self.assertContains(
+            response,
+            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            html=True
+        )
 
 
-class JSONEqualTests(TestCase):
+class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'
         json2 = '{"attr1": "foo", "attr2":"baz"}'
@@ -685,7 +731,7 @@ class JSONEqualTests(TestCase):
             self.assertJSONNotEqual(valid_json, invalid_json)
 
 
-class XMLEqualTests(TestCase):
+class XMLEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
         xml2 = "<elem attr1='a' attr2='b' />"
@@ -700,6 +746,19 @@ class XMLEqualTests(TestCase):
         xml1 = "<elem attr1='a' />"
         xml2 = "<elem attr2='b' attr1='a' />"
         with self.assertRaises(AssertionError):
+            self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_equal_raises_message(self):
+        xml1 = "<elem attr1='a' />"
+        xml2 = "<elem attr2='b' attr1='a' />"
+
+        msg = '''{xml1} != {xml2}
+- <elem attr1='a' />
++ <elem attr2='b' attr1='a' />
+?      ++++++++++
+'''.format(xml1=repr(xml1), xml2=repr(xml2))
+
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertXMLEqual(xml1, xml2)
 
     def test_simple_not_equal(self):
@@ -724,6 +783,16 @@ class XMLEqualTests(TestCase):
         xml2 = "<?xml version='1.0'?><!-- comment2 --><elem attr2='b' attr1='a' />"
         self.assertXMLEqual(xml1, xml2)
 
+    def test_simple_equal_with_leading_or_trailing_whitespace(self):
+        xml1 = "<elem>foo</elem> \t\n"
+        xml2 = " \t\n<elem>foo</elem>"
+        self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_not_equal_with_whitespace_in_the_middle(self):
+        xml1 = "<elem>foo</elem><elem>bar</elem>"
+        xml2 = "<elem>foo</elem> <elem>bar</elem>"
+        self.assertXMLNotEqual(xml1, xml2)
+
 
 class SkippingExtraTests(TestCase):
     fixtures = ['should_not_be_loaded.json']
@@ -732,7 +801,7 @@ class SkippingExtraTests(TestCase):
     def __call__(self, result=None):
         # Detect fixture loading by counting SQL queries, should be zero
         with self.assertNumQueries(0):
-            super(SkippingExtraTests, self).__call__(result)
+            super().__call__(result)
 
     @unittest.skip("Fixture loading should not be performed for skipped tests.")
     def test_fixtures_are_skipped(self):
@@ -741,11 +810,26 @@ class SkippingExtraTests(TestCase):
 
 class AssertRaisesMsgTest(SimpleTestCase):
 
+    def test_assert_raises_message(self):
+        msg = "'Expected message' not found in 'Unexpected message'"
+        # context manager form of assertRaisesMessage()
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertRaisesMessage(ValueError, "Expected message"):
+                raise ValueError("Unexpected message")
+
+        # callable form
+        def func():
+            raise ValueError("Unexpected message")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRaisesMessage(ValueError, "Expected message", func)
+
     def test_special_re_chars(self):
         """assertRaisesMessage shouldn't interpret RE special chars."""
         def func1():
             raise ValueError("[.*x+]y?")
-        self.assertRaisesMessage(ValueError, "[.*x+]y?", func1)
+        with self.assertRaisesMessage(ValueError, "[.*x+]y?"):
+            func1()
 
 
 class AssertFieldOutputTests(SimpleTestCase):
@@ -753,9 +837,14 @@ class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ['Enter a valid email address.']
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']})
+        with self.assertRaises(AssertionError):
+            self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
+        with self.assertRaises(AssertionError):
+            self.assertFieldOutput(EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
+        with self.assertRaises(AssertionError):
+            self.assertFieldOutput(
+                EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']}
+            )
 
     def test_custom_required_message(self):
         class MyCustomField(IntegerField):
@@ -773,7 +862,24 @@ class SecondUrls:
     urlpatterns = [url(r'second/$', empty_response, name='second')]
 
 
-class OverrideSettingsTests(TestCase):
+class SetupTestEnvironmentTests(SimpleTestCase):
+
+    def test_setup_test_environment_calling_more_than_once(self):
+        with self.assertRaisesMessage(RuntimeError, "setup_test_environment() was already called"):
+            setup_test_environment()
+
+    def test_allowed_hosts(self):
+        for type_ in (list, tuple):
+            with self.subTest(type_=type_):
+                allowed_hosts = type_('*')
+                with mock.patch('django.test.utils._TestState') as x:
+                    del x.saved_data
+                    with self.settings(ALLOWED_HOSTS=allowed_hosts):
+                        setup_test_environment()
+                        self.assertEqual(settings.ALLOWED_HOSTS, ['*', 'testserver'])
+
+
+class OverrideSettingsTests(SimpleTestCase):
 
     # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or
@@ -788,22 +894,29 @@ class OverrideSettingsTests(TestCase):
         reverse('second')
 
     def test_urlconf_cache(self):
-        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
-        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+        with self.assertRaises(NoReverseMatch):
+            reverse('first')
+        with self.assertRaises(NoReverseMatch):
+            reverse('second')
 
         with override_settings(ROOT_URLCONF=FirstUrls):
             self.client.get(reverse('first'))
-            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+            with self.assertRaises(NoReverseMatch):
+                reverse('second')
 
             with override_settings(ROOT_URLCONF=SecondUrls):
-                self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+                with self.assertRaises(NoReverseMatch):
+                    reverse('first')
                 self.client.get(reverse('second'))
 
             self.client.get(reverse('first'))
-            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+            with self.assertRaises(NoReverseMatch):
+                reverse('second')
 
-        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
-        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+        with self.assertRaises(NoReverseMatch):
+            reverse('first')
+        with self.assertRaises(NoReverseMatch):
+            reverse('second')
 
     def test_override_media_root(self):
         """
@@ -847,6 +960,159 @@ class OverrideSettingsTests(TestCase):
         """
         Overriding DATABASE_ROUTERS should update the master router.
         """
-        test_routers = (object(),)
+        test_routers = [object()]
         with self.settings(DATABASE_ROUTERS=test_routers):
-            self.assertSequenceEqual(router.routers, test_routers)
+            self.assertEqual(router.routers, test_routers)
+
+    def test_override_static_url(self):
+        """
+        Overriding the STATIC_URL setting should be reflected in the
+        base_url attribute of
+        django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        with self.settings(STATIC_URL='/test/'):
+            self.assertEqual(staticfiles_storage.base_url, '/test/')
+
+    def test_override_static_root(self):
+        """
+        Overriding the STATIC_ROOT setting should be reflected in the
+        location attribute of
+        django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        with self.settings(STATIC_ROOT='/tmp/test'):
+            self.assertEqual(staticfiles_storage.location, os.path.abspath('/tmp/test'))
+
+    def test_override_staticfiles_storage(self):
+        """
+        Overriding the STATICFILES_STORAGE setting should be reflected in
+        the value of django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        new_class = 'CachedStaticFilesStorage'
+        new_storage = 'django.contrib.staticfiles.storage.' + new_class
+        with self.settings(STATICFILES_STORAGE=new_storage):
+            self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
+
+    def test_override_staticfiles_finders(self):
+        """
+        Overriding the STATICFILES_FINDERS setting should be reflected in
+        the return value of django.contrib.staticfiles.finders.get_finders.
+        """
+        current = get_finders()
+        self.assertGreater(len(list(current)), 1)
+        finders = ['django.contrib.staticfiles.finders.FileSystemFinder']
+        with self.settings(STATICFILES_FINDERS=finders):
+            self.assertEqual(len(list(get_finders())), len(finders))
+
+    def test_override_staticfiles_dirs(self):
+        """
+        Overriding the STATICFILES_DIRS setting should be reflected in
+        the locations attribute of the
+        django.contrib.staticfiles.finders.FileSystemFinder instance.
+        """
+        finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+        test_path = '/tmp/test'
+        expected_location = ('', test_path)
+        self.assertNotIn(expected_location, finder.locations)
+        with self.settings(STATICFILES_DIRS=[test_path]):
+            finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+            self.assertIn(expected_location, finder.locations)
+
+
+class TestBadSetUpTestData(TestCase):
+    """
+    An exception in setUpTestData() shouldn't leak a transaction which would
+    cascade across the rest of the test suite.
+    """
+    class MyException(Exception):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            super().setUpClass()
+        except cls.MyException:
+            cls._in_atomic_block = connection.in_atomic_block
+
+    @classmethod
+    def tearDownClass(Cls):
+        # override to avoid a second cls._rollback_atomics() which would fail.
+        # Normal setUpClass() methods won't have exception handling so this
+        # method wouldn't typically be run.
+        pass
+
+    @classmethod
+    def setUpTestData(cls):
+        # Simulate a broken setUpTestData() method.
+        raise cls.MyException()
+
+    def test_failure_in_setUpTestData_should_rollback_transaction(self):
+        # setUpTestData() should call _rollback_atomics() so that the
+        # transaction doesn't leak.
+        self.assertFalse(self._in_atomic_block)
+
+
+class DisallowedDatabaseQueriesTests(SimpleTestCase):
+    def test_disallowed_database_queries(self):
+        expected_message = (
+            "Database queries aren't allowed in SimpleTestCase. "
+            "Either use TestCase or TransactionTestCase to ensure proper test isolation or "
+            "set DisallowedDatabaseQueriesTests.allow_database_queries to True to silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            Car.objects.first()
+
+
+class DisallowedDatabaseQueriesChunkedCursorsTests(SimpleTestCase):
+    def test_disallowed_database_queries(self):
+        expected_message = (
+            "Database queries aren't allowed in SimpleTestCase. Either use "
+            "TestCase or TransactionTestCase to ensure proper test isolation or "
+            "set DisallowedDatabaseQueriesChunkedCursorsTests.allow_database_queries "
+            "to True to silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            next(Car.objects.iterator())
+
+
+class AllowedDatabaseQueriesTests(SimpleTestCase):
+    allow_database_queries = True
+
+    def test_allowed_database_queries(self):
+        Car.objects.first()
+
+
+@isolate_apps('test_utils', attr_name='class_apps')
+class IsolatedAppsTests(SimpleTestCase):
+    def test_installed_apps(self):
+        self.assertEqual([app_config.label for app_config in self.class_apps.get_app_configs()], ['test_utils'])
+
+    def test_class_decoration(self):
+        class ClassDecoration(models.Model):
+            pass
+        self.assertEqual(ClassDecoration._meta.apps, self.class_apps)
+
+    @isolate_apps('test_utils', kwarg_name='method_apps')
+    def test_method_decoration(self, method_apps):
+        class MethodDecoration(models.Model):
+            pass
+        self.assertEqual(MethodDecoration._meta.apps, method_apps)
+
+    def test_context_manager(self):
+        with isolate_apps('test_utils') as context_apps:
+            class ContextManager(models.Model):
+                pass
+        self.assertEqual(ContextManager._meta.apps, context_apps)
+
+    @isolate_apps('test_utils', kwarg_name='method_apps')
+    def test_nested(self, method_apps):
+        class MethodDecoration(models.Model):
+            pass
+        with isolate_apps('test_utils') as context_apps:
+            class ContextManager(models.Model):
+                pass
+            with isolate_apps('test_utils') as nested_context_apps:
+                class NestedContextManager(models.Model):
+                    pass
+        self.assertEqual(MethodDecoration._meta.apps, method_apps)
+        self.assertEqual(ContextManager._meta.apps, context_apps)
+        self.assertEqual(NestedContextManager._meta.apps, nested_context_apps)

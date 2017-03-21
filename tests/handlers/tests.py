@@ -1,17 +1,20 @@
-# -*- coding: utf-8 -*-
+import unittest
 
-from __future__ import unicode_literals
-
-from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
-from django.core.signals import request_started, request_finished
+from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
+from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
-from django.test import RequestFactory, TestCase, TransactionTestCase
-from django.test import override_settings
-from django.utils.encoding import force_str
-from django.utils import six
+from django.test import (
+    RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
+)
+
+try:
+    from http import HTTPStatus
+except ImportError:  # Python < 3.5
+    HTTPStatus = None
 
 
-class HandlerTests(TestCase):
+class HandlerTests(SimpleTestCase):
 
     def setUp(self):
         request_started.disconnect(close_old_connections)
@@ -19,31 +22,25 @@ class HandlerTests(TestCase):
     def tearDown(self):
         request_started.connect(close_old_connections)
 
-    # Mangle settings so the handler will fail
-    @override_settings(MIDDLEWARE_CLASSES=42)
-    def test_lock_safety(self):
-        """
-        Tests for bug #11193 (errors inside middleware shouldn't leave
-        the initLock locked).
-        """
-        # Try running the handler, it will fail in load_middleware
+    def test_middleware_initialized(self):
         handler = WSGIHandler()
-        self.assertEqual(handler.initLock.locked(), False)
-        with self.assertRaises(Exception):
-            handler(None, None)
-        self.assertEqual(handler.initLock.locked(), False)
+        self.assertIsNotNone(handler._request_middleware)
 
     def test_bad_path_info(self):
-        """Tests for bug #15672 ('request' referenced before assignment)"""
+        """
+        A non-UTF-8 path populates PATH_INFO with an URL-encoded path and
+        produces a 404.
+        """
         environ = RequestFactory().get('/').environ
-        environ['PATH_INFO'] = b'\xed' if six.PY2 else '\xed'
+        environ['PATH_INFO'] = '\xed'
         handler = WSGIHandler()
         response = handler(environ, lambda *a, **k: None)
-        self.assertEqual(response.status_code, 400)
+        # The path of the request will be encoded to '/%ED'.
+        self.assertEqual(response.status_code, 404)
 
     def test_non_ascii_query_string(self):
         """
-        Test that non-ASCII query strings are properly decoded (#20530, #22996).
+        Non-ASCII query strings are properly decoded (#20530, #22996).
         """
         environ = RequestFactory().get('/').environ
         raw_query_strings = [
@@ -54,31 +51,20 @@ class HandlerTests(TestCase):
         ]
         got = []
         for raw_query_string in raw_query_strings:
-            if six.PY3:
-                # Simulate http.server.BaseHTTPRequestHandler.parse_request handling of raw request
-                environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
-            else:
-                environ['QUERY_STRING'] = raw_query_string
+            # Simulate http.server.BaseHTTPRequestHandler.parse_request handling of raw request
+            environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
             request = WSGIRequest(environ)
             got.append(request.GET['want'])
-        if six.PY2:
-            self.assertListEqual(got, ['café', 'café', 'café', 'café'])
-        else:
-            # On Python 3, %E9 is converted to the unicode replacement character by parse_qsl
-            self.assertListEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
+        # %E9 is converted to the unicode replacement character by parse_qsl
+        self.assertEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
     def test_non_ascii_cookie(self):
-        """Test that non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
+        """Non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
         environ = RequestFactory().get('/').environ
-        raw_cookie = 'want="café"'
-        if six.PY3:
-            raw_cookie = raw_cookie.encode('utf-8').decode('iso-8859-1')
+        raw_cookie = 'want="café"'.encode('utf-8').decode('iso-8859-1')
         environ['HTTP_COOKIE'] = raw_cookie
         request = WSGIRequest(environ)
-        # If would be nicer if request.COOKIES returned unicode values.
-        # However the current cookie parser doesn't do this and fixing it is
-        # much more work than fixing #20557. Feel free to remove force_str()!
-        self.assertEqual(request.COOKIES['want'], force_str("café"))
+        self.assertEqual(request.COOKIES['want'], "café")
 
     def test_invalid_unicode_cookie(self):
         """
@@ -107,7 +93,7 @@ class HandlerTests(TestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@override_settings(ROOT_URLCONF='handlers.urls')
+@override_settings(ROOT_URLCONF='handlers.urls', MIDDLEWARE=[])
 class TransactionsPerRequestTests(TransactionTestCase):
 
     available_apps = []
@@ -136,7 +122,7 @@ class TransactionsPerRequestTests(TransactionTestCase):
 
 
 @override_settings(ROOT_URLCONF='handlers.urls')
-class SignalsTests(TestCase):
+class SignalsTests(SimpleTestCase):
 
     def setUp(self):
         self.signals = []
@@ -168,34 +154,67 @@ class SignalsTests(TestCase):
         self.assertEqual(self.signals, ['started', 'finished'])
 
 
+def empty_middleware(get_response):
+    pass
+
+
 @override_settings(ROOT_URLCONF='handlers.urls')
-class HandlerSuspiciousOpsTest(TestCase):
+class HandlerRequestTests(SimpleTestCase):
 
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')
         self.assertEqual(response.status_code, 400)
 
-
-@override_settings(ROOT_URLCONF='handlers.urls')
-class HandlerNotFoundTest(TestCase):
-
     def test_invalid_urls(self):
         response = self.client.get('~%A9helloworld')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '~%A9helloworld', status_code=404)
 
         response = self.client.get('d%aao%aaw%aan%aal%aao%aaa%aad%aa/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, 'd%AAo%AAw%AAn%AAl%AAo%AAa%AAd%AA', status_code=404)
 
         response = self.client.get('/%E2%99%E2%99%A5/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '%E2%99\u2665', status_code=404)
 
         response = self.client.get('/%E2%98%8E%E2%A9%E2%99%A5/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '\u260e%E2%A9\u2665', status_code=404)
 
     def test_environ_path_info_type(self):
         environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
-        self.assertIsInstance(environ['PATH_INFO'], six.text_type)
+        self.assertIsInstance(environ['PATH_INFO'], str)
+
+    @unittest.skipIf(HTTPStatus is None, 'HTTPStatus only exists on Python 3.5+')
+    def test_handle_accepts_httpstatus_enum_value(self):
+        def start_response(status, headers):
+            start_response.status = status
+
+        environ = RequestFactory().get('/httpstatus_enum/').environ
+        WSGIHandler()(environ, start_response)
+        self.assertEqual(start_response.status, '200 OK')
+
+    @override_settings(MIDDLEWARE=['handlers.tests.empty_middleware'])
+    def test_middleware_returns_none(self):
+        msg = 'Middleware factory handlers.tests.empty_middleware returned None.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/')
+
+
+class ScriptNameTests(SimpleTestCase):
+    def test_get_script_name(self):
+        # Regression test for #23173
+        # Test first without PATH_INFO
+        script_name = get_script_name({'SCRIPT_URL': '/foobar/'})
+        self.assertEqual(script_name, '/foobar/')
+
+        script_name = get_script_name({'SCRIPT_URL': '/foobar/', 'PATH_INFO': '/'})
+        self.assertEqual(script_name, '/foobar')
+
+    def test_get_script_name_double_slashes(self):
+        """
+        WSGI squashes multiple successive slashes in PATH_INFO, get_script_name
+        should take that into account when forming SCRIPT_NAME (#17133).
+        """
+        script_name = get_script_name({
+            'SCRIPT_URL': '/mst/milestones//accounts/login//help',
+            'PATH_INFO': '/milestones/accounts/login/help',
+        })
+        self.assertEqual(script_name, '/mst')

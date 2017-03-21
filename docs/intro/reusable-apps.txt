@@ -2,11 +2,11 @@
 Advanced tutorial: How to write reusable apps
 =============================================
 
-This advanced tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>`
+This advanced tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>`
 left off. We'll be turning our Web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
-If you haven't recently completed Tutorials 1–6, we encourage you to review
+If you haven't recently completed Tutorials 1–7, we encourage you to review
 these so that your example project matches the one described below.
 
 Reusability matters
@@ -34,9 +34,9 @@ projects and ready to publish for others to install and use.
 
 .. admonition:: Package? App?
 
-    A Python `package <https://docs.python.org/tutorial/modules.html#packages>`_
-    provides a way of grouping related Python code for easy reuse. A package
-    contains one or more files of Python code (also known as "modules").
+    A Python :term:`package` provides a way of grouping related Python code for
+    easy reuse. A package contains one or more files of Python code (also known
+    as "modules").
 
     A package can be imported with ``import foo.bar`` or ``from foo import
     bar``. For a directory (like ``polls``) to form a package, it must contain
@@ -87,7 +87,7 @@ After the previous tutorials, our project should look like this::
             admin/
                 base_site.html
 
-You created ``mysite/templates`` in :doc:`Tutorial 2 </intro/tutorial02>`,
+You created ``mysite/templates`` in :doc:`Tutorial 7 </intro/tutorial07>`,
 and ``polls/templates`` in :doc:`Tutorial 3 </intro/tutorial03>`. Now perhaps
 it is clearer why we chose to have separate template directories for the
 project and application: everything that is part of the polls application is in
@@ -159,10 +159,10 @@ this. For a small app like polls, this process isn't too difficult.
 
        1. Add "polls" to your INSTALLED_APPS setting like this::
 
-           INSTALLED_APPS = (
+           INSTALLED_APPS = [
                ...
                'polls',
-           )
+           ]
 
        2. Include the polls URLconf in your project urls.py like this::
 
@@ -185,7 +185,7 @@ this. For a small app like polls, this process isn't too difficult.
 5. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
-   <http://pythonhosted.org/setuptools/setuptools.html>`_ have a good
+   <https://setuptools.readthedocs.io/en/latest/>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 
@@ -193,7 +193,7 @@ this. For a small app like polls, this process isn't too difficult.
        :filename: django-polls/setup.py
 
        import os
-       from setuptools import setup
+       from setuptools import find_packages, setup
 
        with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
            README = readme.read()
@@ -204,25 +204,24 @@ this. For a small app like polls, this process isn't too difficult.
        setup(
            name='django-polls',
            version='0.1',
-           packages=['polls'],
+           packages=find_packages(),
            include_package_data=True,
            license='BSD License',  # example license
            description='A simple Django app to conduct Web-based polls.',
            long_description=README,
-           url='http://www.example.com/',
+           url='https://www.example.com/',
            author='Your Name',
            author_email='yourname@example.com',
            classifiers=[
                'Environment :: Web Environment',
                'Framework :: Django',
+               'Framework :: Django :: X.Y',  # replace "X.Y" as appropriate
                'Intended Audience :: Developers',
-               'License :: OSI Approved :: BSD License', # example license
+               'License :: OSI Approved :: BSD License',  # example license
                'Operating System :: OS Independent',
                'Programming Language :: Python',
-               # Replace these appropriately if you are stuck on Python 2.
-               'Programming Language :: Python :: 3',
-               'Programming Language :: Python :: 3.2',
-               'Programming Language :: Python :: 3.3',
+               'Programming Language :: Python :: 3.5',
+               'Programming Language :: Python :: 3.6',
                'Topic :: Internet :: WWW/HTTP',
                'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
            ],
@@ -300,7 +299,7 @@ the world! If this wasn't just an example, you could now:
 
 * Email the package to a friend.
 
-* Upload the package on your Web site.
+* Upload the package on your website.
 
 * Post the package on a public repository, such as `the Python Package Index
   (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
@@ -320,6 +319,6 @@ disadvantages:
 
 Typically, these situations only arise once you're maintaining several Django
 projects. When they do, the best solution is to use `virtualenv
-<http://www.virtualenv.org/>`_. This tool allows you to maintain multiple
+<https://virtualenv.pypa.io/>`_. This tool allows you to maintain multiple
 isolated Python environments, each with its own copy of the libraries and
 package namespace.

@@ -1,0 +1,134 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# GunChleoc, 2016
+# GunChleoc, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 10:28+0000\n"
+"Last-Translator: GunChleoc\n"
+"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"language/gd/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gd\n"
+"Plural-Forms: nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : "
+"(n > 2 && n < 20) ? 2 : 3;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Leudachain PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Cha deach le dearbhadh an nì %(nth)s san arraigh: "
+
+msgid "Nested arrays must have the same length."
+msgstr "Feumaidh an aon fhaid a bhith aig a h-uile arraigh neadaichte."
+
+msgid "Map of strings to strings"
+msgstr "Mapaichean de shreangan gu sreangan"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "Chan eil an luach air “%(key)s” ’na shreang."
+
+msgid "A JSON object"
+msgstr "Oibjeact JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Feumaidh an luach a bhith ’na JSON dligheach."
+
+msgid "Could not load JSON data."
+msgstr "Cha deach leinn dàta JSON a luchdadh."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Feumaidh an t-ion-chur a bhith 'na fhaclair JSON."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Feumaidh “%(value)s” a bhith ’na JSON dligheach."
+
+msgid "Enter two valid values."
+msgstr "Cuir a-steach dà luach dligheach."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Chan fhaod toiseach na rainse a bith nas motha na deireadh na rainse."
+
+msgid "Enter two whole numbers."
+msgstr "Cuir a-steach dà àireamh shlàn."
+
+msgid "Enter two numbers."
+msgstr "Cuir a-steach dà àireamh."
+
+msgid "Enter two valid date/times."
+msgstr "Cuir a-steach dà cheann-là ’s àm dligheach."
+
+msgid "Enter two valid dates."
+msgstr "Cuir a-steach dà cheann-là dligheach."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Tha %(show_value)d nì air an liosta ach cha bu chòir corr is %(limit_value)d "
+"a bhith oirre."
+msgstr[1] ""
+"Tha %(show_value)d nì air an liosta ach cha bu chòir corr is %(limit_value)d "
+"a bhith oirre."
+msgstr[2] ""
+"Tha %(show_value)d nithean air an liosta ach cha bu chòir corr is "
+"%(limit_value)d a bhith oirre."
+msgstr[3] ""
+"Tha %(show_value)d nì air an liosta ach cha bu chòir corr is %(limit_value)d "
+"a bhith oirre."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Tha %(show_value)d nì air an liosta ach cha bu chòir nas lugha na "
+"%(limit_value)d a bhith oirre."
+msgstr[1] ""
+"Tha %(show_value)d nì air an liosta ach cha bu chòir nas lugha na "
+"%(limit_value)d a bhith oirre."
+msgstr[2] ""
+"Tha %(show_value)d nithean air an liosta ach cha bu chòir nas lugha na "
+"%(limit_value)d a bhith oirre."
+msgstr[3] ""
+"Tha %(show_value)d nì air an liosta ach cha bu chòir nas lugha na "
+"%(limit_value)d a bhith oirre."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Bha cuid a dh’iuchraichean a dhìth: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Chaidh iuchraichean nach aithne dhuinn a shònrachadh: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Dèan cinnteach gu bheil an rainse seo nas lugha na no co-ionnan ri "
+"%(limit_value)s air fad."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Dèan cinnteach gu bheil an rainse seo nas motha na no co-ionnan ri "
+"%(limit_value)s air fad."

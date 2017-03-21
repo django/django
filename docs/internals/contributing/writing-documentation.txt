@@ -19,7 +19,7 @@ This section explains how writers can craft their documentation changes
 in the most useful and least error-prone ways.
 
 Getting the raw documentation
------------------------------
+=============================
 
 Though Django's documentation is intended to be read as HTML at
 https://docs.djangoproject.com/, we edit it as a collection of text files for
@@ -36,7 +36,7 @@ to have the docs for the last release be up-to-date and correct (see
 :ref:`differences-between-doc-versions`).
 
 Getting started with Sphinx
----------------------------
+===========================
 
 Django's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
@@ -48,15 +48,6 @@ __ http://docutils.sourceforge.net/
 To actually build the documentation locally, you'll currently need to install
 Sphinx -- ``pip install Sphinx`` should do the trick.
 
-.. note::
-
-    Building the Django documentation requires Sphinx 1.0.2 or newer. Sphinx
-    also requires the Pygments__ library for syntax highlighting; building the
-    Django documentation requires Pygments 1.1 or newer (a new-enough version
-    should automatically be installed along with Sphinx).
-
-__ http://pygments.org
-
 Then, building the HTML is easy; just ``make html`` (or ``make.bat html`` on
 Windows) from the ``docs`` directory.
 
@@ -65,8 +56,64 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 :ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
 metadata, indexing, and cross-references.
 
+Your locally-built documentation will be themed differently than the
+documentation at `docs.djangoproject.com <https://docs.djangoproject.com>`_.
+This is OK! If your changes look good on your local machine, they'll look good
+on the website.
+
+How the documentation is organized
+==================================
+
+The documentation is organized into several categories:
+
+* :doc:`Tutorials </intro/index>` take the reader by the hand through a series
+  of steps to create something.
+
+  The important thing in a tutorial is to help the reader achieve something
+  useful, preferably as early as possible, in order to give them confidence.
+
+  Explain the nature of the problem we're solving, so that the reader
+  understands what we're trying to achieve. Don't feel that you need to begin
+  with explanations of how things work - what matters is what the reader does,
+  not what you explain. It can be helpful to refer back to what you've done and
+  explain afterwards.
+
+* :doc:`Topic guides </topics/index>` aim to explain a concept or subject at a
+  fairly high level.
+
+  Link to reference material rather than repeat it. Use examples and don't be
+  reluctant to explain things that seem very basic to you - it might be the
+  explanation someone else needs.
+
+  Providing background context helps a newcomer connect the topic to things
+  that they already know.
+
+* :doc:`Reference guides </ref/index>` contain technical reference for APIs.
+  They describe the functioning of Django's internal machinery and instruct in
+  its use.
+
+  Keep reference material tightly focused on the subject. Assume that the
+  reader already understands the basic concepts involved but needs to know or
+  be reminded of how Django does it.
+
+  Reference guides aren't the place for general explanation. If you find
+  yourself explaining basic concepts, you may want to move that material to a
+  topic guide.
+
+* :doc:`How-to guides </howto/index>` are recipes that take the reader through
+  steps in key subjects.
+
+  What matters most in a how-to guide is what a user wants to achieve.
+  A how-to should always be result-oriented rather than focused on internal
+  details of how Django implements whatever is being discussed.
+
+  These guides are more advanced than tutorials and assume some knowledge about
+  how Django works. Assume that the reader has followed the tutorials and don't
+  hesitate to refer the reader back to the appropriate tutorial rather than
+  repeat the same material.
+
 Writing style
--------------
+=============
 
 When using pronouns in reference to a hypothetical person, such as "a user with
 a session cookie", gender neutral pronouns (they/their/them) should be used.
@@ -79,7 +126,7 @@ Instead of:
 * himself or herself... use themselves.
 
 Commonly used terms
--------------------
+===================
 
 Here are some style guidelines on commonly used terms throughout the
 documentation:
@@ -106,10 +153,10 @@ documentation:
 * **Web**, **World Wide Web**, **the Web** -- note Web is always
   capitalized when referring to the World Wide Web.
 
-* **Web site** -- use two words, with Web capitalized.
+* **website** -- use one word, without capitalization.
 
 Django-specific terminology
----------------------------
+===========================
 
 * **model** -- it's not capitalized.
 
@@ -121,7 +168,7 @@ Django-specific terminology
 * **view** -- it's not capitalized.
 
 Guidelines for reStructuredText files
--------------------------------------
+=====================================
 
 These guidelines regulate the format of our reST (reStructuredText)
 documentation:
@@ -142,19 +189,44 @@ documentation:
       Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
   This is because Sphinx will generate proper links for the latter, which
-  greatly helps readers. There's basically no limit to the amount of
-  useful markup you can add.
+  greatly helps readers.
+
+  You can prefix the target with a ``~`` (that's a tilde) to get just the
+  "last bit" of that path. So ``:mod:`~django.contrib.auth``` will just
+  display a link with the title "auth".
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
 
+* Add ``.. code-block:: <lang>`` to literal blocks so that they get
+  highlighted. Prefer relying on automatic highlighting simply using ``::``
+  (two colons). This has the benefit that if the code contains some invalid
+  syntax, it won't be highlighted. Adding ``.. code-block:: python``, for
+  example, will force highlighting despite invalid syntax.
+
+* Use these heading styles::
+
+    ===
+    One
+    ===
+
+    Two
+    ===
+
+    Three
+    -----
+
+    Four
+    ~~~~
+
+    Five
+    ^^^^
+
 Django-specific markup
-----------------------
+======================
 
-Besides the `Sphinx built-in markup`__, Django's docs defines some extra
-description units:
-
-__ http://sphinx-doc.org/markup/
+Besides the :ref:`Sphinx built-in markup <sphinx:sphinxmarkup>`, Django's
+docs defines some extra description units:
 
 * Settings::
 
@@ -190,16 +262,17 @@ __ http://sphinx-doc.org/markup/
 
         .. django-admin-option:: --traceback
 
-  To link, use ``:djadminopt:`--traceback```.
+  To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
+  for the options shared by all commands like ``--verbosity``).
 
-* Links to Trac tickets (typically reserved for minor release notes)::
+* Links to Trac tickets (typically reserved for patch release notes)::
 
         :ticket:`12345`
 
 .. _documenting-new-features:
 
 Documenting new features
-------------------------
+========================
 
 Our policy for new features is:
 
@@ -210,14 +283,69 @@ Our policy for new features is:
 
 Our preferred way for marking new features is by prefacing the features'
 documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional content (indented).
+blank line and an optional description (indented).
 
 General improvements, or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
 
+These ``versionadded`` and ``versionchanged`` blocks should be "self-contained."
+In other words, since we only keep these annotations around for two releases,
+it's nice to be able to remove the annotation and its contents without having
+to reflow, reindent, or edit the surrounding text. For example, instead of
+putting the entire description of a new or changed feature in a block, do
+something like this::
+
+    .. class:: Author(first_name, last_name, middle_name=None)
+
+        A person who writes books.
+
+        ``first_name`` is ...
+
+        ...
+
+        ``middle_name`` is ...
+
+        .. versionchanged:: A.B
+
+            The ``middle_name`` argument was added.
+
+Put the changed annotation notes at the bottom of a section, not the top.
+
+Also, avoid referring to a specific version of Django outside a
+``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
+redundant to do so as these annotations render as "New in Django A.B:" and
+"Changed in Django A.B", respectively.
+
+If a function, attribute, etc. is added, it's also okay to use a
+``versionadded`` annotation like this::
+
+    .. attribute:: Author.middle_name
+
+        .. versionadded:: A.B
+
+        An author's middle name.
+
+We can simply remove the ``.. versionadded:: A.B`` annotation without any
+indentation changes when the time comes.
+
+Minimizing images
+=================
+
+Optimize image compression where possible. For PNG files, use OptiPNG and
+AdvanceCOMP's ``advpng``:
+
+.. code-block:: console
+
+   $ cd docs/
+   $ optipng -o7 -zm1-9 -i0 -strip all `find . -type f -not -path "./_build/*" -name "*.png"`
+   $ advpng -z4 `find . -type f -not -path "./_build/*" -name "*.png"`
+
+This is based on OptiPNG version 0.7.5. Older versions may complain about the
+``--strip all`` option being lossy.
+
 An example
-----------
+==========
 
 For a quick example of how it all fits together, consider this hypothetical
 example:
@@ -270,16 +398,16 @@ example:
     .. setting:: ADMINS
 
     ADMINS
-    ------
+    ======
 
-    Default: ``()`` (Empty tuple)
+    Default: ``[]`` (Empty list)
 
-    A tuple that lists people who get code error notifications. When
+    A list of all the people who get code error notifications. When
     ``DEBUG=False`` and a view raises an exception, Django will email these people
-    with the full exception information. Each member of the tuple should be a tuple
+    with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
-        (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+        [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
 
     Note that Django will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.
@@ -290,69 +418,10 @@ example:
 
 That's basically how everything fits together.
 
-.. _improving-the-documentation:
-
-Improving the documentation
----------------------------
-
-A few small improvements can be made to make the documentation read and
-look better:
-
-* Most of the various ``index.txt`` documents have *very* short or even
-  non-existent intro text. Each of those documents needs a good short
-  intro the content below that point.
-
-* The glossary is very perfunctory. It needs to be filled out.
-
-* Add more metadata targets. Lots of places look like::
-
-        ``File.close()``
-        ~~~~~~~~~~~~~~~~
-
-  \... these should be::
-
-        .. method:: File.close()
-
-  That is, use metadata instead of titles.
-
-* Add more links -- nearly everything that's an inline code literal
-  right now can probably be turned into a xref.
-
-  See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
-  to help do this work.
-
-  This will probably be a continuing, never-ending project.
-
-* Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
-  of ````ADMINS````.
-
-* Use directives where appropriate. Some directives
-  (e.g. ``.. setting::``) are prefix-style directives; they go *before*
-  the unit they're describing. These are known as "crossref" directives.
-  Others (e.g. ``.. class::``) generate their own markup; these should go
-  inside the section they're describing. These are called
-  "description units".
-
-  You can tell which are which by looking at in
-  :file:`_ext/djangodocs.py`; it registers roles as one of the other.
-
-* Add ``.. code-block:: <lang>`` to literal blocks so that they get
-  highlighted.
-
-* When referring to classes/functions/modules, etc., you'll want to use
-  the fully-qualified name of the target
-  (``:class:`django.contrib.contenttypes.models.ContentType```).
-
-  Since this doesn't look all that awesome in the output -- it shows the
-  entire path to the object -- you can prefix the target with a ``~``
-  (that's a tilde) to get just the "last bit" of that path. So
-  ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
-  display a link with the title "ContentType".
-
 .. _documentation-spelling-check:
 
 Spelling check
---------------
+==============
 
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install a couple packages first:
@@ -376,7 +445,23 @@ one of the following:
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
 
 Translating documentation
--------------------------
+=========================
 
 See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
+
+.. _django-admin-manpage:
+
+``django-admin`` man page
+=========================
+
+Sphinx can generate a manual page for the
+:doc:`django-admin </ref/django-admin>` command. This is configured in
+``docs/conf.py``. Unlike other documentation output, this man page should be
+included in the Django repository and the releases as
+``docs/man/django-admin.1``. There isn't a need to update this file when
+updating the documentation, as it's updated once as part of the release process.
+
+To generate an updated version of the man page, run ``make man`` in the
+``docs`` directory. The new man page will be written in
+``docs/_build/man/django-admin.1``.

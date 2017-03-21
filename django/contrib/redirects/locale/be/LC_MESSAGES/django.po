@@ -1,42 +1,43 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
-"language/be/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-09-15 03:48+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
-msgstr ""
+msgstr "Перанакіраванні"
 
-#: contrib/redirects/models.py:10
+msgid "site"
+msgstr "сайт"
+
 msgid "redirect from"
 msgstr "накіраваць з"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
 "Тут мусіць быць поўны шлях бяз назвы дамэна. Прыклад: «/events/search/»."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "накіраваць да"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -44,10 +45,8 @@ msgstr ""
 "Тут, як і ўверсе, мусіць быць поўны шлях, або поўная сеціўная спасылка, якая "
 "пачынаецца з «http://»."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "накіраваньне"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "накіраваньні"

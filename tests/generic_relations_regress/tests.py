@@ -1,14 +1,13 @@
 from django.db.models import Q, Sum
-from django.db.utils import IntegrityError
-from django.test import TestCase, skipIfDBFeature
-from django.forms.models import modelform_factory
 from django.db.models.deletion import ProtectedError
+from django.db.utils import IntegrityError
+from django.forms.models import modelform_factory
+from django.test import TestCase, skipIfDBFeature
 
 from .models import (
-    Address, Place, Restaurant, Link, CharLink, TextLink,
-    Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D,
-    Related, Content, Node,
+    A, Address, B, Board, C, CharLink, Company, Contact, Content, D, Developer,
+    Guild, HasLinkThing, Link, Node, Note, OddRelation1, OddRelation2,
+    Organization, Person, Place, Related, Restaurant, Tag, Team, TextLink,
 )
 
 
@@ -16,10 +15,8 @@ class GenericRelationTests(TestCase):
 
     def test_inherited_models_content_type(self):
         """
-        Test that GenericRelations on inherited classes use the correct content
-        type.
+        GenericRelations on inherited classes use the correct content type.
         """
-
         p = Place.objects.create(name="South Park")
         r = Restaurant.objects.create(name="Chubby's")
         l1 = Link.objects.create(content_object=p)
@@ -29,7 +26,7 @@ class GenericRelationTests(TestCase):
 
     def test_reverse_relation_pk(self):
         """
-        Test that the correct column name is used for the primary key on the
+        The correct column name is used for the primary key on the
         originating model of a query.  See #12664.
         """
         p = Person.objects.create(account=23, name='Chef')
@@ -53,10 +50,8 @@ class GenericRelationTests(TestCase):
 
     def test_q_object_or(self):
         """
-        Tests that SQL query parameters for generic relations are properly
-        grouped when OR is used.
-
-        Test for bug http://code.djangoproject.com/ticket/11535
+        SQL query parameters for generic relations are properly
+        grouped when OR is used (#11535).
 
         In this bug the first query (below) works while the second, with the
         query parameters the same but in reverse order, does not.
@@ -89,7 +84,7 @@ class GenericRelationTests(TestCase):
 
     def test_generic_relation_ordering(self):
         """
-        Test that ordering over a generic relation does not include extraneous
+        Ordering over a generic relation does not include extraneous
         duplicate results, nor excludes rows not participating in the relation.
         """
         p1 = Place.objects.create(name="South Park")
@@ -112,25 +107,24 @@ class GenericRelationTests(TestCase):
         # Fails with another, ORM-level error
         dev1 = Developer(name='Joe')
         note = Note(note='Deserves promotion', content_object=dev1)
-        self.assertRaises(IntegrityError, note.save)
+        with self.assertRaises(IntegrityError):
+            note.save()
 
     def test_target_model_len_zero(self):
-        """Test for #13085 -- __len__() returns 0"""
+        """
+        Saving a model with a GenericForeignKey to a model instance whose
+        __len__ method returns 0 (Team.__len__() here) shouldn't fail (#13085).
+        """
         team1 = Team.objects.create(name='Backend devs')
-        try:
-            note = Note(note='Deserve a bonus', content_object=team1)
-        except Exception as e:
-            if (issubclass(type(e), Exception) and
-                    str(e) == 'Impossible arguments to GFK.get_content_type!'):
-                self.fail("Saving model with GenericForeignKey to model instance whose "
-                          "__len__ method returns 0 shouldn't fail.")
-            raise e
+        note = Note(note='Deserve a bonus', content_object=team1)
         note.save()
 
-    def test_target_model_nonzero_false(self):
-        """Test related to #13085"""
-        # __nonzero__() returns False -- This actually doesn't currently fail.
-        # This test validates that
+    def test_target_model_bool_false(self):
+        """
+        Saving a model with a GenericForeignKey to a model instance whose
+        __bool__ method returns False (Guild.__bool__() here) shouldn't fail
+        (#13085).
+        """
         g1 = Guild.objects.create(name='First guild')
         note = Note(note='Note for guild', content_object=g1)
         note.save()
@@ -145,22 +139,18 @@ class GenericRelationTests(TestCase):
         tag.save()
 
     def test_ticket_20378(self):
+        # Create a couple of extra HasLinkThing so that the autopk value
+        # isn't the same for Link and HasLinkThing.
         hs1 = HasLinkThing.objects.create()
         hs2 = HasLinkThing.objects.create()
-        l1 = Link.objects.create(content_object=hs1)
-        l2 = Link.objects.create(content_object=hs2)
-        self.assertQuerysetEqual(
-            HasLinkThing.objects.filter(links=l1),
-            [hs1], lambda x: x)
-        self.assertQuerysetEqual(
-            HasLinkThing.objects.filter(links=l2),
-            [hs2], lambda x: x)
-        self.assertQuerysetEqual(
-            HasLinkThing.objects.exclude(links=l2),
-            [hs1], lambda x: x)
-        self.assertQuerysetEqual(
-            HasLinkThing.objects.exclude(links=l1),
-            [hs2], lambda x: x)
+        hs3 = HasLinkThing.objects.create()
+        hs4 = HasLinkThing.objects.create()
+        l1 = Link.objects.create(content_object=hs3)
+        l2 = Link.objects.create(content_object=hs4)
+        self.assertSequenceEqual(HasLinkThing.objects.filter(links=l1), [hs3])
+        self.assertSequenceEqual(HasLinkThing.objects.filter(links=l2), [hs4])
+        self.assertSequenceEqual(HasLinkThing.objects.exclude(links=l2), [hs1, hs2, hs3])
+        self.assertSequenceEqual(HasLinkThing.objects.exclude(links=l1), [hs1, hs2, hs4])
 
     def test_ticket_20564(self):
         b1 = B.objects.create()
@@ -171,14 +161,8 @@ class GenericRelationTests(TestCase):
         c3 = C.objects.create(b=b3)
         A.objects.create(flag=None, content_object=b1)
         A.objects.create(flag=True, content_object=b2)
-        self.assertQuerysetEqual(
-            C.objects.filter(b__a__flag=None),
-            [c1, c3], lambda x: x
-        )
-        self.assertQuerysetEqual(
-            C.objects.exclude(b__a__flag=None),
-            [c2], lambda x: x
-        )
+        self.assertSequenceEqual(C.objects.filter(b__a__flag=None), [c1, c3])
+        self.assertSequenceEqual(C.objects.exclude(b__a__flag=None), [c2])
 
     def test_ticket_20564_nullable_fk(self):
         b1 = B.objects.create()
@@ -191,22 +175,10 @@ class GenericRelationTests(TestCase):
         A.objects.create(flag=None, content_object=b1)
         A.objects.create(flag=True, content_object=b1)
         A.objects.create(flag=True, content_object=b2)
-        self.assertQuerysetEqual(
-            D.objects.exclude(b__a__flag=None),
-            [d2], lambda x: x
-        )
-        self.assertQuerysetEqual(
-            D.objects.filter(b__a__flag=None),
-            [d1, d3, d4], lambda x: x
-        )
-        self.assertQuerysetEqual(
-            B.objects.filter(a__flag=None),
-            [b1, b3], lambda x: x
-        )
-        self.assertQuerysetEqual(
-            B.objects.exclude(a__flag=None),
-            [b2], lambda x: x
-        )
+        self.assertSequenceEqual(D.objects.exclude(b__a__flag=None), [d2])
+        self.assertSequenceEqual(D.objects.filter(b__a__flag=None), [d1, d3, d4])
+        self.assertSequenceEqual(B.objects.filter(a__flag=None), [b1, b3])
+        self.assertSequenceEqual(B.objects.exclude(a__flag=None), [b2])
 
     def test_extra_join_condition(self):
         # A crude check that content_type_id is taken in account in the
@@ -224,15 +196,15 @@ class GenericRelationTests(TestCase):
         HasLinkThing.objects.create()
         b = Board.objects.create(name=str(hs1.pk))
         Link.objects.create(content_object=hs2)
-        l = Link.objects.create(content_object=hs1)
+        link = Link.objects.create(content_object=hs1)
         Link.objects.create(content_object=b)
         qs = HasLinkThing.objects.annotate(Sum('links')).filter(pk=hs1.pk)
         # If content_type restriction isn't in the query's join condition,
         # then wrong results are produced here as the link to b will also match
         # (b and hs1 have equal pks).
         self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs[0].links__sum, l.id)
-        l.delete()
+        self.assertEqual(qs[0].links__sum, link.id)
+        link.delete()
         # Now if we don't have proper left join, we will not produce any
         # results at all here.
         # clear cached results
@@ -247,11 +219,9 @@ class GenericRelationTests(TestCase):
     def test_filter_targets_related_pk(self):
         HasLinkThing.objects.create()
         hs2 = HasLinkThing.objects.create()
-        l = Link.objects.create(content_object=hs2)
-        self.assertNotEqual(l.object_id, l.pk)
-        self.assertQuerysetEqual(
-            HasLinkThing.objects.filter(links=l.pk),
-            [hs2], lambda x: x)
+        link = Link.objects.create(content_object=hs2)
+        self.assertNotEqual(link.object_id, link.pk)
+        self.assertSequenceEqual(HasLinkThing.objects.filter(links=link.pk), [hs2])
 
     def test_editable_generic_rel(self):
         GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')
@@ -260,7 +230,7 @@ class GenericRelationTests(TestCase):
         form = GenericRelationForm({'links': None})
         self.assertTrue(form.is_valid())
         form.save()
-        links = HasLinkThing._meta.get_field_by_name('links')[0]
+        links = HasLinkThing._meta.get_field('links')
         self.assertEqual(links.save_form_data_calls, 1)
 
     def test_ticket_22998(self):

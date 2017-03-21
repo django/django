@@ -1,42 +1,30 @@
-# coding: utf-8
-
-from __future__ import unicode_literals
-
 import functools
+import os
 
-from django import template
-from django.template import Library
-from django.template.base import Context
 from django.template.engine import Engine
-from django.template.loader import get_template
 from django.test.utils import override_settings
-from django.utils import translation
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
-
-def render(template_name, context=None):
-    if context is None:
-        context = {}
-
-    t = get_template(template_name)
-    with translation.override(context.get('LANGUAGE_CODE', 'en-us')):
-        return t.render(Context(context))
+ROOT = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(ROOT, 'templates')
 
 
-def setup(templates, *args):
+def setup(templates, *args, **kwargs):
     """
     Runs test method multiple times in the following order:
 
-    TEMPLATE_DEBUG      CACHED      TEMPLATE_STRING_IF_INVALID
-    --------------      ------      --------------------------
-    False               False
-    False               True
-    False               False       INVALID
-    False               True        INVALID
-    True                False
-    True                True
+    debug       cached      string_if_invalid
+    -----       ------      -----------------
+    False       False
+    False       True
+    False       False       INVALID
+    False       True        INVALID
+    True        False
+    True        True
     """
+    # when testing deprecation warnings, it's useful to run just one test since
+    # the message won't be displayed multiple times
+    test_once = kwargs.get('test_once', False)
 
     for arg in args:
         templates.update(arg)
@@ -45,68 +33,53 @@ def setup(templates, *args):
     # add this in here for simplicity
     templates["inclusion.html"] = "{{ result }}"
 
+    loaders = [
+        ('django.template.loaders.cached.Loader', [
+            ('django.template.loaders.locmem.Loader', templates),
+        ]),
+    ]
+
     def decorator(func):
-        @register_test_tags
-        @override_settings(TEMPLATE_LOADERS=[
-            ('django.template.loaders.cached.Loader', [
-                ('django.template.loaders.locmem.Loader', templates),
-            ]),
-        ])
+        # Make Engine.get_default() raise an exception to ensure that tests
+        # are properly isolated from Django's global settings.
+        @override_settings(TEMPLATES=None)
         @functools.wraps(func)
         def inner(self):
-            loader = Engine.get_default().template_loaders[0]
+            # Set up custom template tag libraries if specified
+            libraries = getattr(self, 'libraries', {})
 
+            self.engine = Engine(
+                libraries=libraries,
+                loaders=loaders,
+            )
+            func(self)
+            if test_once:
+                return
+            func(self)
+
+            self.engine = Engine(
+                libraries=libraries,
+                loaders=loaders,
+                string_if_invalid='INVALID',
+            )
             func(self)
             func(self)
-            loader.reset()
 
-            with override_settings(TEMPLATE_STRING_IF_INVALID='INVALID'):
-                func(self)
-                func(self)
-                loader.reset()
+            self.engine = Engine(
+                debug=True,
+                libraries=libraries,
+                loaders=loaders,
+            )
+            func(self)
+            func(self)
 
-            with override_settings(TEMPLATE_DEBUG=True):
-                func(self)
-                func(self)
-                loader.reset()
         return inner
+
     return decorator
 
 
-# Custom template tag for tests
-
-register = Library()
-
-
-class EchoNode(template.Node):
-    def __init__(self, contents):
-        self.contents = contents
-
-    def render(self, context):
-        return ' '.join(self.contents)
-
-
-@register.tag
-def echo(parser, token):
-    return EchoNode(token.contents.split()[1:])
-register.tag('other_echo', echo)
-
-
-@register.filter
-def upper(value):
-    return value.upper()
-
-
-def register_test_tags(func):
-    @functools.wraps(func)
-    def inner(self):
-        template.libraries['testtags'] = register
-        func(self)
-        del template.libraries['testtags']
-    return inner
-
-
 # Helper objects
+
 
 class SomeException(Exception):
     silent_variable_failure = True
@@ -158,13 +131,17 @@ class SomeClass:
     def attribute_error_attribute(self):
         raise AttributeError
 
+    @property
+    def type_error_attribute(self):
+        raise TypeError
+
 
 class OtherClass:
     def method(self):
         return 'OtherClass.method'
 
 
-class TestObj(object):
+class TestObj:
     def is_true(self):
         return True
 
@@ -175,32 +152,29 @@ class TestObj(object):
         raise ShouldNotExecuteException()
 
 
-class SilentGetItemClass(object):
+class SilentGetItemClass:
     def __getitem__(self, key):
         raise SomeException
 
 
-class SilentAttrClass(object):
+class SilentAttrClass:
     def b(self):
         raise SomeException
     b = property(b)
 
 
-@python_2_unicode_compatible
 class UTF8Class:
-    "Class whose __str__ returns non-ASCII data on Python 2"
+    "Class whose __str__ returns non-ASCII data"
     def __str__(self):
         return 'ŠĐĆŽćžšđ'
 
 
-# These two classes are used to test auto-escaping of unicode output.
-@python_2_unicode_compatible
+# These two classes are used to test auto-escaping of string output.
 class UnsafeClass:
     def __str__(self):
         return 'you & me'
 
 
-@python_2_unicode_compatible
 class SafeClass:
     def __str__(self):
         return mark_safe('you &gt; me')

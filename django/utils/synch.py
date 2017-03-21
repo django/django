@@ -7,13 +7,10 @@ Synchronization primitives:
 """
 
 import contextlib
-try:
-    import threading
-except ImportError:
-    import dummy_threading as threading
+import threading
 
 
-class RWLock(object):
+class RWLock:
     """
     Classic implementation of reader-writer lock with preference to writers.
 

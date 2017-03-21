@@ -1,12 +1,13 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
+from django.utils.functional import lazy
 
 from . import ValidationTestCase
-from .models import (Author, Article, ModelToValidate,
-    GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest)
+from .models import (
+    Article, Author, GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest,
+    ModelToValidate,
+)
 
 
 class BaseModelValidationTests(ValidationTestCase):
@@ -17,7 +18,7 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_with_correct_value_model_validates(self):
         mtv = ModelToValidate(number=10, name='Some Name')
-        self.assertEqual(None, mtv.full_clean())
+        self.assertIsNone(mtv.full_clean())
 
     def test_custom_validate_method(self):
         mtv = ModelToValidate(number=11)
@@ -25,17 +26,20 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_wrong_FK_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=3)
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'parent',
-            ['model to validate instance with id %r does not exist.' % mtv.parent_id])
-
+        self.assertFieldFailsValidationWithMessage(
+            mtv.full_clean, 'parent',
+            ['model to validate instance with id %r does not exist.' % mtv.parent_id]
+        )
         mtv = ModelToValidate(number=10, name='Some Name', ufm_id='Some Name')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'ufm',
-            ["unique fields model instance with unique_charfield %r does not exist." % mtv.name])
+        self.assertFieldFailsValidationWithMessage(
+            mtv.full_clean, 'ufm',
+            ["unique fields model instance with unique_charfield %r does not exist." % mtv.name]
+        )
 
     def test_correct_FK_value_validates(self):
         parent = ModelToValidate.objects.create(number=10, name='Some Name')
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=parent.pk)
-        self.assertEqual(None, mtv.full_clean())
+        self.assertIsNone(mtv.full_clean())
 
     def test_limited_FK_raises_error(self):
         # The limit_choices_to on the parent field says that a parent object's
@@ -50,7 +54,7 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_correct_email_value_passes(self):
         mtv = ModelToValidate(number=10, name='Some Name', email='valid@email.com')
-        self.assertEqual(None, mtv.full_clean())
+        self.assertIsNone(mtv.full_clean())
 
     def test_wrong_url_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
@@ -107,7 +111,7 @@ class ModelFormsTests(TestCase):
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
         self.assertEqual(list(form.errors), [])
-        self.assertNotEqual(form.instance.pub_date, None)
+        self.assertIsNotNone(form.instance.pub_date)
         article = form.save()
 
     def test_validation_with_invalid_blank_field(self):
@@ -127,6 +131,10 @@ class GenericIPAddressFieldTests(ValidationTestCase):
     def test_correct_generic_ip_passes(self):
         giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4")
         self.assertIsNone(giptm.full_clean())
+        giptm = GenericIPAddressTestModel(generic_ip=" 1.2.3.4 ")
+        self.assertIsNone(giptm.full_clean())
+        giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4\n")
+        self.assertIsNone(giptm.full_clean())
         giptm = GenericIPAddressTestModel(generic_ip="2001::2")
         self.assertIsNone(giptm.full_clean())
 
@@ -134,6 +142,10 @@ class GenericIPAddressFieldTests(ValidationTestCase):
         giptm = GenericIPAddressTestModel(generic_ip="294.4.2.1")
         self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
         giptm = GenericIPAddressTestModel(generic_ip="1:2")
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
+        giptm = GenericIPAddressTestModel(generic_ip=1)
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
+        giptm = GenericIPAddressTestModel(generic_ip=lazy(lambda: 1, int))
         self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
 
     def test_correct_v4_ip_passes(self):

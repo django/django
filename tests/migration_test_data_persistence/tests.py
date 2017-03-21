@@ -1,11 +1,12 @@
-from django.test import TransactionTestCase, TestCase
+from django.test import TestCase, TransactionTestCase
+
 from .models import Book
 
 
 class MigrationDataPersistenceTestCase(TransactionTestCase):
     """
-    Tests that data loaded in migrations is available if we set
-    serialized_rollback = True on TransactionTestCase
+    Data loaded in migrations is available if
+    TransactionTestCase.serialized_rollback = True.
     """
 
     available_apps = ["migration_test_data_persistence"]
@@ -20,7 +21,7 @@ class MigrationDataPersistenceTestCase(TransactionTestCase):
 
 class MigrationDataNormalPersistenceTestCase(TestCase):
     """
-    Tests that data loaded in migrations is available on TestCase
+    Data loaded in migrations is available on TestCase
     """
 
     def test_persistence(self):

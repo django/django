@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-
-from django.test import TestCase
 from django.core.exceptions import FieldError
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies,
-    Pizza, TaggedItem, Bookmark,
+    Bookmark, Domain, Family, Genus, HybridSpecies, Kingdom, Klass, Order,
+    Phylum, Pizza, Species, TaggedItem,
 )
 
 
@@ -53,7 +51,11 @@ class SelectRelatedTests(TestCase):
         extra queries
         """
         with self.assertNumQueries(1):
-            person = Species.objects.select_related('genus__family__order__klass__phylum__kingdom__domain').get(name="sapiens")
+            person = (
+                Species.objects
+                .select_related('genus__family__order__klass__phylum__kingdom__domain')
+                .get(name="sapiens")
+            )
             domain = person.genus.family.order.klass.phylum.kingdom.domain
             self.assertEqual(domain.name, 'Eukaryota')
 
@@ -96,8 +98,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(5):
             world = Species.objects.all().select_related('genus__family')
             orders = [o.genus.family.order.name for o in world]
-            self.assertEqual(sorted(orders),
-                ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
+            self.assertEqual(sorted(orders), ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
 
     def test_select_related_with_extra(self):
         s = (Species.objects.all()
@@ -116,8 +117,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(1):
             world = Species.objects.select_related('genus__family')
             families = [o.genus.family.name for o in world]
-            self.assertEqual(sorted(families),
-                ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
+            self.assertEqual(sorted(families), ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
 
     def test_more_certain_fields(self):
         """
@@ -130,12 +130,6 @@ class SelectRelatedTests(TestCase):
             orders = [o.genus.family.order.name for o in world]
             self.assertEqual(orders, ['Agaricales'])
 
-    def test_single_related_field(self):
-        with self.assertNumQueries(1):
-            species = Species.objects.select_related('genus__name')
-            names = [s.genus.name for s in species]
-            self.assertEqual(sorted(names), ['Amanita', 'Drosophila', 'Homo', 'Pisum'])
-
     def test_field_traversal(self):
         with self.assertNumQueries(1):
             s = (Species.objects.all()
@@ -144,15 +138,12 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(s, 'Diptera')
 
     def test_depth_fields_fails(self):
-        self.assertRaises(
-            TypeError,
-            Species.objects.select_related,
-            'genus__family__order', depth=4
-        )
+        with self.assertRaises(TypeError):
+            Species.objects.select_related('genus__family__order', depth=4)
 
     def test_none_clears_list(self):
         queryset = Species.objects.select_related('genus').select_related(None)
-        self.assertEqual(queryset.query.select_related, False)
+        self.assertIs(queryset.query.select_related, False)
 
     def test_chaining(self):
         parent_1, parent_2 = Species.objects.all()[:2]
@@ -163,8 +154,24 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
 
+    def test_select_related_after_values(self):
+        """
+        Running select_related() after calling values() raises a TypeError
+        """
+        message = "Cannot call select_related() after .values() or .values_list()"
+        with self.assertRaisesMessage(TypeError, message):
+            list(Species.objects.values('name').select_related('genus'))
 
-class SelectRelatedValidationTests(TestCase):
+    def test_select_related_after_values_list(self):
+        """
+        Running select_related() after calling values_list() raises a TypeError
+        """
+        message = "Cannot call select_related() after .values() or .values_list()"
+        with self.assertRaisesMessage(TypeError, message):
+            list(Species.objects.values_list('name').select_related('genus'))
+
+
+class SelectRelatedValidationTests(SimpleTestCase):
     """
     select_related() should thrown an error on fields that do not exist and
     non-relational fields.
@@ -181,6 +188,10 @@ class SelectRelatedValidationTests(TestCase):
 
         with self.assertRaisesMessage(FieldError, self.non_relational_error % ('name', '(none)')):
             list(Domain.objects.select_related('name'))
+
+    def test_non_relational_field_nested(self):
+        with self.assertRaisesMessage(FieldError, self.non_relational_error % ('name', 'family')):
+            list(Species.objects.select_related('genus__name'))
 
     def test_many_to_many_field(self):
         with self.assertRaisesMessage(FieldError, self.invalid_error % ('toppings', '(none)')):

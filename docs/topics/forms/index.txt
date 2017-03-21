@@ -11,7 +11,7 @@ Working with forms
     the forms API, see :doc:`/ref/forms/api`, :doc:`/ref/forms/fields`, and
     :doc:`/ref/forms/validation`.
 
-Unless you're planning to build Web sites and applications that do nothing but
+Unless you're planning to build websites and applications that do nothing but
 publish content, and don't accept input from your visitors, you're going to
 need to understand and use forms.
 
@@ -27,10 +27,10 @@ objects or controls, and so on, and then send that information back to the
 server.
 
 Some of these form interface elements - text input or checkboxes - are fairly
-simple and built-in to HTML itself. Others are much more complex; an interface
-that pops up a date picker or allows you to move a slider or manipulate
-controls will typically use JavaScript and CSS as well as HTML form ``<input>``
-elements to achieve these effects.
+simple and are built into HTML itself. Others are much more complex; an
+interface that pops up a date picker or allows you to move a slider or
+manipulate controls will typically use JavaScript and CSS as well as HTML form
+``<input>`` elements to achieve these effects.
 
 As well as its ``<input>`` elements, a form must specify two things:
 
@@ -59,8 +59,8 @@ data is returned to ``/admin/``.
 ``GET`` and ``POST`` are the only HTTP methods to use when dealing with forms.
 
 Django's login form is returned using the ``POST`` method, in which the browser
-bundles up the form data, encodes it for transmission, sends it back to the
-server, and then receives its response.
+bundles up the form data, encodes it for transmission, sends it to the server,
+and then receives back its response.
 
 ``GET``, by contrast, bundles the submitted data into a string, and uses this
 to compose a URL. The URL contains the address where the data must be sent, as
@@ -102,7 +102,7 @@ do in code they wrote themselves.
 
 Django handles three distinct parts of the work involved in forms:
 
-* preparing and restructuring data ready for rendering
+* preparing and restructuring data to make it ready for rendering
 * creating HTML forms for the data
 * receiving and processing submitted forms and data from the client
 
@@ -138,7 +138,7 @@ validation when a form is submitted. A :class:`DateField` and a
 :class:`FileField` handle very different kinds of data and have to do
 different things with it.
 
-A form field is represented to a user in the browser as a HTML "widget" - a
+A form field is represented to a user in the browser as an HTML "widget" - a
 piece of user interface machinery. Each field type has an appropriate default
 :doc:`Widget class </ref/forms/widgets/>`, but these can be overridden as
 required.
@@ -156,7 +156,7 @@ Rendering a form in a template involves nearly the same work as rendering any
 other kind of object, but there are some key differences.
 
 In the case of a model instance that contained no data, it would rarely if ever
-be useful to do anything with one in a template. On the other hand, it makes
+be useful to do anything with it in a template. On the other hand, it makes
 perfect sense to render an unpopulated form - that's what we do when we want
 the user to populate it.
 
@@ -172,7 +172,7 @@ example with:
 * data received from a previous HTML form submission
 
 The last of these cases is the most interesting, because it's what makes it
-possible for users not just to read a Web site, but to send information back
+possible for users not just to read a website, but to send information back
 to it too.
 
 Building a form
@@ -181,7 +181,7 @@ Building a form
 The work that needs to be done
 ------------------------------
 
-Suppose you want to create a simple form on your Web site, in order to obtain
+Suppose you want to create a simple form on your website, in order to obtain
 the user's name. You'd need something like this in your template:
 
 .. code-block:: html+django
@@ -221,10 +221,13 @@ Building a form in Django
 -------------------------
 
 The :class:`Form` class
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 We already know what we want our HTML form to look like. Our starting point for
-it in Django is this::
+it in Django is this:
+
+.. snippet::
+    :filename: forms.py
 
     from django import forms
 
@@ -256,7 +259,7 @@ The whole form, when rendered for the first time, will look like:
 .. code-block:: html+django
 
     <label for="your_name">Your name: </label>
-    <input id="your_name" type="text" name="your_name" maxlength="100">
+    <input id="your_name" type="text" name="your_name" maxlength="100" required />
 
 Note that it **does not** include the ``<form>`` tags, or a submit button.
 We'll have to provide those ourselves in the template.
@@ -264,17 +267,22 @@ We'll have to provide those ourselves in the template.
 .. _using-a-form-in-a-view:
 
 The view
-^^^^^^^^
+~~~~~~~~
 
-Form data sent back to a Django Web site is processed by a view, generally the
+Form data sent back to a Django website is processed by a view, generally the
 same view which published the form. This allows us to reuse some of the same
 logic.
 
 To handle the form we need to instantiate it in the view for the URL where we
-want it to be published::
+want it to be published:
+
+.. snippet::
+    :filename: views.py
 
     from django.shortcuts import render
     from django.http import HttpResponseRedirect
+
+    from .forms import NameForm
 
     def get_name(request):
         # if this is a POST request we need to process the form data
@@ -316,7 +324,7 @@ telling it where to go next.
 .. _topics-forms-index-basic-form-template:
 
 The template
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 We don't need to do much in our ``name.html`` template. The simplest example
 is:
@@ -356,8 +364,8 @@ by a view, and rendered as an HTML ``<form>``.
 
 That's all you need to get started, but the forms framework puts a lot more at
 your fingertips. Once you understand the basics of the process described above,
-you should be aware of what else is readily available in the forms system
-and know a little bit about some of the underlying machinery.
+you should be prepared to understand other features of the forms system and
+ready to learn a bit more about the underlying machinery.
 
 More about Django :class:`Form` classes
 =======================================
@@ -385,14 +393,17 @@ The distinction between :ref:`ref-forms-api-bound-unbound` is important:
   is valid. If an invalid bound form is rendered, it can include inline error
   messages telling the user what data to correct.
 
-The form's ``is_bound()`` method will tell you whether a form has data bound to
-it or not.
+The form's :attr:`~Form.is_bound` attribute will tell you whether a form has
+data bound to it or not.
 
 More on fields
 --------------
 
 Consider a more useful form than our minimal example above, which we could use
-to implement "contact me" functionality on a personal Web site::
+to implement "contact me" functionality on a personal website:
+
+.. snippet::
+    :filename: forms.py
 
     from django import forms
 
@@ -409,7 +420,7 @@ this case, our form has four fields: ``subject``, ``message``, ``sender`` and
 can be found in :doc:`/ref/forms/fields`.
 
 Widgets
-^^^^^^^
+~~~~~~~
 
 Each form field has a corresponding :doc:`Widget class </ref/forms/widgets/>`,
 which in turn corresponds to an HTML form widget such as ``<input
@@ -422,7 +433,7 @@ instead, you'd specify the appropriate widget when defining your form field,
 as we have done for the ``message`` field.
 
 Field data
-^^^^^^^^^^
+~~~~~~~~~~
 
 Whatever the data submitted with a form, once it has been successfully
 validated by calling ``is_valid()`` (and ``is_valid()`` has returned ``True``),
@@ -438,7 +449,10 @@ In the contact form example above, ``cc_myself`` will be a boolean value.
 Likewise, fields such as :class:`IntegerField` and :class:`FloatField` convert
 values to a Python ``int`` and ``float`` respectively.
 
-Here's how the form data could be processed in the view that handles this form::
+Here's how the form data could be processed in the view that handles this form:
+
+.. snippet::
+    :filename: views.py
 
     from django.core.mail import send_mail
 
@@ -498,11 +512,11 @@ Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
 .. code-block:: html+django
 
     <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+        <input id="id_subject" type="text" name="subject" maxlength="100" required /></p>
     <p><label for="id_message">Message:</label>
-        <input type="text" name="message" id="id_message" /></p>
+        <textarea name="message" id="id_message" required></textarea></p>
     <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" /></p>
+        <input type="email" name="sender" id="id_sender" required /></p>
     <p><label for="id_cc_myself">Cc myself:</label>
         <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
@@ -546,7 +560,7 @@ in a Django template, will be rendered appropriately. For example:
         {{ form.cc_myself }}
     </div>
 
-Complete ``<label>`` element can also be generated using the
+Complete ``<label>`` elements can also be generated using the
 :meth:`~django.forms.BoundField.label_tag`. For example:
 
 .. code-block:: html+django
@@ -559,7 +573,7 @@ Complete ``<label>`` element can also be generated using the
 
 
 Rendering form error messages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Of course, the price of this flexibility is more work. Until now we haven't had
 to worry about how to display form errors, because that's taken care of for us.
@@ -601,10 +615,6 @@ errors. For example, ``{{ form.non_field_errors }}`` would look like:
         <li>Generic validation error</li>
     </ul>
 
-.. versionchanged:: 1.8
-
-    The ``nonfield`` class as described in the example above was added.
-
 See :doc:`/ref/forms/api` for more on errors, styling, and working with form
 attributes in templates.
 
@@ -621,6 +631,9 @@ loop:
         <div class="fieldWrapper">
             {{ field.errors }}
             {{ field.label_tag }} {{ field }}
+            {% if field.help_text %}
+            <p class="help">{{ field.help_text|safe }}</p>
+            {% endif %}
         </div>
     {% endfor %}
 
@@ -676,8 +689,13 @@ Useful attributes on ``{{ field }}`` include:
     :class:`~django.forms.Field` attributes, e.g.
     ``{{ char_field.field.max_length }}``.
 
+.. seealso::
+
+    For a complete list of attributes and methods, see
+    :class:`~django.forms.BoundField`.
+
 Looping over hidden and visible fields
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're manually laying out a form in a template, as opposed to relying on
 Django's default form layout, you might want to treat ``<input type="hidden">``

@@ -7,7 +7,7 @@ Django 1.4.2 release notes
 This is the second security release in the Django 1.4 series.
 
 Host header poisoning
----------------------
+=====================
 
 Some parts of Django -- independent of end-user-written applications -- make
 use of full URLs, including domain name, which are generated from the HTTP Host

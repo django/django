@@ -79,8 +79,8 @@ see `the admin`_ below for more details.
     A contributor to djangosnippets__ has written a script that'll `scan your
     models.py and generate a corresponding admin.py`__.
 
-    __ http://www.djangosnippets.org/
-    __ http://www.djangosnippets.org/snippets/603/
+    __ https://www.djangosnippets.org/
+    __ https://www.djangosnippets.org/snippets/603/
 
 Example
 ~~~~~~~
@@ -302,7 +302,7 @@ Work with file fields using the new API
 
 The internal implementation of :class:`django.db.models.FileField` have changed.
 A visible result of this is that the way you access special attributes (URL,
-filename, image size, etc) of these model fields has changed. You will need to
+filename, image size, etc.) of these model fields has changed. You will need to
 make the following changes, assuming your model's
 :class:`~django.db.models.FileField` is called ``myfile``:
 
@@ -556,7 +556,7 @@ need to reload your data. Do this after you have made the change to using
 To upgrade each application to use a ``DecimalField``, you can do the
 following, replacing ``<app>`` in the code below with each app's name:
 
-.. code-block:: bash
+.. code-block:: console
 
       $ ./manage.py dumpdata --format=xml <app> > data-dump.xml
       $ ./manage.py reset <app>
@@ -685,13 +685,13 @@ Subcommands must now precede options
 ``django-admin.py`` and ``manage.py`` now require subcommands to precede
 options. So:
 
-.. code-block:: bash
+.. code-block:: console
 
       $ django-admin.py --settings=foo.bar runserver
 
 ...no longer works and should be changed to:
 
-.. code-block:: bash
+.. code-block:: console
 
       $ django-admin.py runserver --settings=foo.bar
 
@@ -714,12 +714,12 @@ Data structures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``django.newforms.forms.SortedDictFromList`` was removed.
-:class:`django.utils.datastructures.SortedDict` can now be instantiated with
+``django.utils.datastructures.SortedDict`` can now be instantiated with
 a sequence of tuples.
 
 To update your code:
 
-1. Use :class:`django.utils.datastructures.SortedDict` wherever you were
+1. Use ``django.utils.datastructures.SortedDict`` wherever you were
    using ``django.newforms.forms.SortedDictFromList``.
 
 2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't

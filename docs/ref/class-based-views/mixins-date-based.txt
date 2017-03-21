@@ -10,8 +10,8 @@ Date-based mixins
     :func:`~time.strftime` format characters. Do not try to use the format
     characters from the :ttag:`now` template tag as they are not compatible.
 
-YearMixin
----------
+``YearMixin``
+=============
 
 .. class:: YearMixin
 
@@ -62,8 +62,8 @@ YearMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-MonthMixin
-----------
+``MonthMixin``
+==============
 
 .. class:: MonthMixin
 
@@ -114,8 +114,8 @@ MonthMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-DayMixin
---------
+``DayMixin``
+============
 
 .. class:: DayMixin
 
@@ -166,8 +166,8 @@ DayMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-WeekMixin
----------
+``WeekMixin``
+=============
 
 .. class:: WeekMixin
 
@@ -219,8 +219,8 @@ WeekMixin
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
-DateMixin
----------
+``DateMixin``
+=============
 
 .. class:: DateMixin
 
@@ -265,8 +265,8 @@ DateMixin
         is greater than the current date/time. Returns
         :attr:`~DateMixin.allow_future` by default.
 
-BaseDateListView
-----------------
+``BaseDateListView``
+====================
 
 .. class:: BaseDateListView
 

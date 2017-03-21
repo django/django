@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:17+0200\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,19 +13,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contrib/contenttypes/apps.py:9
+#: contrib/contenttypes/apps.py:12
 msgid "Content Types"
 msgstr ""
 
-#: contrib/contenttypes/models.py:134
+#: contrib/contenttypes/models.py:160
 msgid "python model class name"
 msgstr ""
 
-#: contrib/contenttypes/models.py:138
+#: contrib/contenttypes/models.py:164
 msgid "content type"
 msgstr ""
 
-#: contrib/contenttypes/models.py:139
+#: contrib/contenttypes/models.py:165
 msgid "content types"
 msgstr ""
 

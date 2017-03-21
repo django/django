@@ -1,17 +1,17 @@
-from __future__ import unicode_literals
-
 from django.apps.registry import Apps
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.db.utils import DatabaseError
 from django.utils.timezone import now
 
+from .exceptions import MigrationSchemaMissing
 
-class MigrationRecorder(object):
+
+class MigrationRecorder:
     """
-    Deals with storing migration records in the database.
+    Deal with storing migration records in the database.
 
     Because this table is actually itself used for dealing with model
-    creation, it's the one thing we can't do normally via syncdb or migrations.
+    creation, it's the one thing we can't do normally via migrations.
     We manually handle table creation/schema updating (using schema backend)
     and then have a floating model to do queries with.
 
@@ -19,7 +19,6 @@ class MigrationRecorder(object):
     a row in the table always means a migration is applied.
     """
 
-    @python_2_unicode_compatible
     class Migration(models.Model):
         app = models.CharField(max_length=255)
         name = models.CharField(max_length=255)
@@ -41,40 +40,33 @@ class MigrationRecorder(object):
         return self.Migration.objects.using(self.connection.alias)
 
     def ensure_schema(self):
-        """
-        Ensures the table exists and has the correct schema.
-        """
+        """Ensure the table exists and has the correct schema."""
         # If the table's there, that's fine - we've never changed its schema
         # in the codebase.
         if self.Migration._meta.db_table in self.connection.introspection.table_names(self.connection.cursor()):
             return
         # Make the table
-        with self.connection.schema_editor() as editor:
-            editor.create_model(self.Migration)
+        try:
+            with self.connection.schema_editor() as editor:
+                editor.create_model(self.Migration)
+        except DatabaseError as exc:
+            raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc)
 
     def applied_migrations(self):
-        """
-        Returns a set of (app, name) of applied migrations.
-        """
+        """Return a set of (app, name) of applied migrations."""
         self.ensure_schema()
         return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
 
     def record_applied(self, app, name):
-        """
-        Records that a migration was applied.
-        """
+        """Record that a migration was applied."""
         self.ensure_schema()
         self.migration_qs.create(app=app, name=name)
 
     def record_unapplied(self, app, name):
-        """
-        Records that a migration was unapplied.
-        """
+        """Record that a migration was unapplied."""
         self.ensure_schema()
         self.migration_qs.filter(app=app, name=name).delete()
 
     def flush(self):
-        """
-        Deletes all migration records. Useful if you're testing migrations.
-        """
+        """Delete all migration records. Useful for testing migrations."""
         self.migration_qs.all().delete()

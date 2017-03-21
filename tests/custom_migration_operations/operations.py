@@ -31,3 +31,64 @@ class TestOperation(Operation):
 
 class CreateModel(TestOperation):
     pass
+
+
+class ArgsOperation(TestOperation):
+    def __init__(self, arg1, arg2):
+        self.arg1, self.arg2 = arg1, arg2
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.arg1, self.arg2],
+            {}
+        )
+
+
+class KwargsOperation(TestOperation):
+    def __init__(self, kwarg1=None, kwarg2=None):
+        self.kwarg1, self.kwarg2 = kwarg1, kwarg2
+
+    def deconstruct(self):
+        kwargs = {}
+        if self.kwarg1 is not None:
+            kwargs['kwarg1'] = self.kwarg1
+        if self.kwarg2 is not None:
+            kwargs['kwarg2'] = self.kwarg2
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
+
+class ArgsKwargsOperation(TestOperation):
+    def __init__(self, arg1, arg2, kwarg1=None, kwarg2=None):
+        self.arg1, self.arg2 = arg1, arg2
+        self.kwarg1, self.kwarg2 = kwarg1, kwarg2
+
+    def deconstruct(self):
+        kwargs = {}
+        if self.kwarg1 is not None:
+            kwargs['kwarg1'] = self.kwarg1
+        if self.kwarg2 is not None:
+            kwargs['kwarg2'] = self.kwarg2
+        return (
+            self.__class__.__name__,
+            [self.arg1, self.arg2],
+            kwargs,
+        )
+
+
+class ExpandArgsOperation(TestOperation):
+    serialization_expand_args = ['arg']
+
+    def __init__(self, arg):
+        self.arg = arg
+
+    def deconstruct(self):
+        return (
+            self.__class__.__name__,
+            [self.arg],
+            {}
+        )

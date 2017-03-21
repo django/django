@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.test import TestCase
 
-from .models import User, Poll, Choice
+from .models import Choice, Poll, User
 
 
 class ReverseLookupTests(TestCase):
@@ -48,5 +46,5 @@ class ReverseLookupTests(TestCase):
         """
         If a related_name is given you can't use the field name instead
         """
-        self.assertRaises(FieldError, Poll.objects.get,
-            choice__name__exact="This is the answer")
+        with self.assertRaises(FieldError):
+            Poll.objects.get(choice__name__exact="This is the answer")

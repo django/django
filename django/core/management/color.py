@@ -2,16 +2,16 @@
 Sets up the terminal color scheme.
 """
 
+import functools
 import os
 import sys
 
-from django.utils import lru_cache
 from django.utils import termcolors
 
 
 def supports_color():
     """
-    Returns True if the running system's terminal supports color,
+    Return True if the running system's terminal supports color,
     and False otherwise.
     """
     plat = sys.platform
@@ -24,14 +24,16 @@ def supports_color():
     return True
 
 
+class Style:
+    pass
+
+
 def make_style(config_string=''):
     """
     Create a Style object from the given config_string.
 
     If config_string is empty django.utils.termcolors.DEFAULT_PALETTE is used.
     """
-    class Style(object):
-        pass
 
     style = Style()
 
@@ -45,7 +47,8 @@ def make_style(config_string=''):
             format = color_settings.get(role, {})
             style_func = termcolors.make_style(**format)
         else:
-            style_func = lambda x: x
+            def style_func(x):
+                return x
         setattr(style, role, style_func)
 
     # For backwards compatibility,
@@ -55,17 +58,17 @@ def make_style(config_string=''):
     return style
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def no_style():
     """
-    Returns a Style object with no color scheme.
+    Return a Style object with no color scheme.
     """
     return make_style('nocolor')
 
 
 def color_style():
     """
-    Returns a Style object from the Django color scheme.
+    Return a Style object from the Django color scheme.
     """
     if not supports_color():
         return no_style()

@@ -7,9 +7,11 @@
 # >>> datetime_safe.date(1850, 8, 2).strftime("%Y/%m/%d was a %A")
 # '1850/08/02 was a Friday'
 
-from datetime import date as real_date, time as real_time, datetime as real_datetime
 import re
 import time as ttime
+from datetime import (
+    date as real_date, datetime as real_datetime, time as real_time,
+)
 
 
 class date(real_date):
@@ -48,6 +50,7 @@ def new_datetime(d):
     if isinstance(d, real_datetime):
         kw.extend([d.hour, d.minute, d.second, d.microsecond, d.tzinfo])
     return datetime(*kw)
+
 
 # This library does not support strftime's "%s" or "%y" format strings.
 # Allowed if there's an even number of "%"s because they are escaped.

@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.test import TestCase
-from django.utils import six
 
-from .models import Author, Article
+from .models import Article, Author
 
 
 class CustomColumnsTests(TestCase):
@@ -15,14 +12,14 @@ class CustomColumnsTests(TestCase):
         self.authors = [self.a1, self.a2]
 
         self.article = Article.objects.create(headline="Django lets you build Web apps easily", primary_author=self.a1)
-        self.article.authors = self.authors
+        self.article.authors.set(self.authors)
 
     def test_query_all_available_authors(self):
         self.assertQuerysetEqual(
             Author.objects.all(), [
                 "Peter Jones", "John Smith",
             ],
-            six.text_type
+            str
         )
 
     def test_get_first_name(self):
@@ -36,14 +33,12 @@ class CustomColumnsTests(TestCase):
             Author.objects.filter(first_name__exact="John"), [
                 "John Smith",
             ],
-            six.text_type
+            str
         )
 
     def test_field_error(self):
-        self.assertRaises(
-            FieldError,
-            lambda: Author.objects.filter(firstname__exact="John")
-        )
+        with self.assertRaises(FieldError):
+            Author.objects.filter(firstname__exact="John")
 
     def test_attribute_error(self):
         with self.assertRaises(AttributeError):
@@ -58,7 +53,7 @@ class CustomColumnsTests(TestCase):
                 "Peter Jones",
                 "John Smith",
             ],
-            six.text_type
+            str
         )
 
     def test_get_all_articles_for_an_author(self):
@@ -74,7 +69,7 @@ class CustomColumnsTests(TestCase):
             self.article.authors.filter(last_name='Jones'), [
                 "Peter Jones"
             ],
-            six.text_type
+            str
         )
 
     def test_author_querying(self):
@@ -93,30 +88,22 @@ class CustomColumnsTests(TestCase):
         self.assertEqual(self.a1, Author.objects.get(first_name__exact='John'))
 
     def test_filter_on_nonexistent_field(self):
-        self.assertRaisesMessage(
-            FieldError,
-            "Cannot resolve keyword 'firstname' into field. Choices are: Author_ID, article, first_name, last_name, primary_set",
-            Author.objects.filter,
-            firstname__exact='John'
+        msg = (
+            "Cannot resolve keyword 'firstname' into field. Choices are: "
+            "Author_ID, article, first_name, last_name, primary_set"
         )
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.filter(firstname__exact='John')
 
     def test_author_get_attributes(self):
         a = Author.objects.get(last_name__exact='Smith')
         self.assertEqual('John', a.first_name)
         self.assertEqual('Smith', a.last_name)
-        self.assertRaisesMessage(
-            AttributeError,
-            "'Author' object has no attribute 'firstname'",
-            getattr,
-            a, 'firstname'
-        )
+        with self.assertRaisesMessage(AttributeError, "'Author' object has no attribute 'firstname'"):
+            getattr(a, 'firstname')
 
-        self.assertRaisesMessage(
-            AttributeError,
-            "'Author' object has no attribute 'last'",
-            getattr,
-            a, 'last'
-        )
+        with self.assertRaisesMessage(AttributeError, "'Author' object has no attribute 'last'"):
+            getattr(a, 'last')
 
     def test_m2m_table(self):
         self.assertQuerysetEqual(

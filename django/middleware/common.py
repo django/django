@@ -1,44 +1,43 @@
-import hashlib
-import logging
 import re
+import warnings
+from urllib.parse import urlparse
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
-from django.core import urlresolvers
-from django import http
-from django.utils.encoding import force_text
-from django.utils.http import urlquote
-from django.utils import six
+from django.http import HttpResponsePermanentRedirect
+from django.urls import is_valid_path
+from django.utils.cache import (
+    cc_delim_re, get_conditional_response, set_response_etag,
+)
+from django.utils.deprecation import MiddlewareMixin, RemovedInDjango21Warning
 
 
-logger = logging.getLogger('django.request')
-
-
-class CommonMiddleware(object):
+class CommonMiddleware(MiddlewareMixin):
     """
     "Common" middleware for taking care of some basic operations:
 
-        - Forbids access to User-Agents in settings.DISALLOWED_USER_AGENTS
+        - Forbid access to User-Agents in settings.DISALLOWED_USER_AGENTS
 
         - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
-          this middleware appends missing slashes and/or prepends missing
-          "www."s.
+          append missing slashes and/or prepends missing "www."s.
 
             - If APPEND_SLASH is set and the initial URL doesn't end with a
-              slash, and it is not found in urlpatterns, a new URL is formed by
+              slash, and it is not found in urlpatterns, form a new URL by
               appending a slash at the end. If this new URL is found in
-              urlpatterns, then an HTTP-redirect is returned to this new URL;
-              otherwise the initial URL is processed as usual.
+              urlpatterns, return an HTTP redirect to this new URL; otherwise
+              process the initial URL as usual.
 
           This behavior can be customized by subclassing CommonMiddleware and
           overriding the response_redirect_class attribute.
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
-          appropriately.
+          appropriately. USE_ETAGS is deprecated in favor of
+          ConditionalGetMiddleware.
     """
 
-    response_redirect_class = http.HttpResponsePermanentRedirect
+    response_redirect_class = HttpResponsePermanentRedirect
 
     def process_request(self, request):
         """
@@ -50,96 +49,109 @@ class CommonMiddleware(object):
         if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
-                    logger.warning('Forbidden (User agent): %s', request.path,
-                        extra={
-                            'status_code': 403,
-                            'request': request
-                        }
-                    )
-                    return http.HttpResponseForbidden('<h1>Forbidden</h1>')
+                    raise PermissionDenied('Forbidden user agent')
 
-        # Check for a redirect based on settings.APPEND_SLASH
-        # and settings.PREPEND_WWW
+        # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
-        old_url = [host, request.path]
-        new_url = old_url[:]
+        must_prepend = settings.PREPEND_WWW and host and not host.startswith('www.')
+        redirect_url = ('%s://www.%s' % (request.scheme, host)) if must_prepend else ''
 
-        if (settings.PREPEND_WWW and old_url[0] and
-                not old_url[0].startswith('www.')):
-            new_url[0] = 'www.' + old_url[0]
-
-        # Append a slash if APPEND_SLASH is set and the URL doesn't have a
-        # trailing slash and there is no pattern for the current path
-        if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
-            urlconf = getattr(request, 'urlconf', None)
-            if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
-                    urlresolvers.is_valid_path("%s/" % request.path_info, urlconf)):
-                new_url[1] = new_url[1] + '/'
-                if settings.DEBUG and request.method == 'POST':
-                    raise RuntimeError((""
-                    "You called this URL via POST, but the URL doesn't end "
-                    "in a slash and you have APPEND_SLASH set. Django can't "
-                    "redirect to the slash URL while maintaining POST data. "
-                    "Change your form to point to %s%s (note the trailing "
-                    "slash), or set APPEND_SLASH=False in your Django "
-                    "settings.") % (new_url[0], new_url[1]))
-
-        if new_url == old_url:
-            # No redirects required.
-            return
-        if new_url[0]:
-            newurl = "%s://%s%s" % (
-                request.scheme,
-                new_url[0], urlquote(new_url[1]))
+        # Check if a slash should be appended
+        if self.should_redirect_with_slash(request):
+            path = self.get_full_path_with_slash(request)
         else:
-            newurl = urlquote(new_url[1])
-        if request.META.get('QUERY_STRING', ''):
-            if six.PY3:
-                newurl += '?' + request.META['QUERY_STRING']
-            else:
-                # `query_string` is a bytestring. Appending it to the unicode
-                # string `newurl` will fail if it isn't ASCII-only. This isn't
-                # allowed; only broken software generates such query strings.
-                # Better drop the invalid query string than crash (#15152).
-                try:
-                    newurl += '?' + request.META['QUERY_STRING'].decode()
-                except UnicodeDecodeError:
-                    pass
-        return self.response_redirect_class(newurl)
+            path = request.get_full_path()
+
+        # Return a redirect if necessary
+        if redirect_url or path != request.get_full_path():
+            redirect_url += path
+            return self.response_redirect_class(redirect_url)
+
+    def should_redirect_with_slash(self, request):
+        """
+        Return True if settings.APPEND_SLASH is True and appending a slash to
+        the request path turns an invalid path into a valid one.
+        """
+        if settings.APPEND_SLASH and not request.path_info.endswith('/'):
+            urlconf = getattr(request, 'urlconf', None)
+            return (
+                not is_valid_path(request.path_info, urlconf) and
+                is_valid_path('%s/' % request.path_info, urlconf)
+            )
+        return False
+
+    def get_full_path_with_slash(self, request):
+        """
+        Return the full path of the request with a trailing slash appended.
+
+        Raise a RuntimeError if settings.DEBUG is True and request.method is
+        POST, PUT, or PATCH.
+        """
+        new_path = request.get_full_path(force_append_slash=True)
+        if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
+            raise RuntimeError(
+                "You called this URL via %(method)s, but the URL doesn't end "
+                "in a slash and you have APPEND_SLASH set. Django can't "
+                "redirect to the slash URL while maintaining %(method)s data. "
+                "Change your form to point to %(url)s (note the trailing "
+                "slash), or set APPEND_SLASH=False in your Django settings." % {
+                    'method': request.method,
+                    'url': request.get_host() + new_path,
+                }
+            )
+        return new_path
 
     def process_response(self, request, response):
         """
         Calculate the ETag, if needed.
+
+        When the status code of the response is 404, it may redirect to a path
+        with an appended slash if should_redirect_with_slash() returns True.
         """
-        if settings.USE_ETAGS:
+        # If the given URL is "Not Found", then check if we should redirect to
+        # a path with a slash appended.
+        if response.status_code == 404:
+            if self.should_redirect_with_slash(request):
+                return self.response_redirect_class(self.get_full_path_with_slash(request))
+
+        if settings.USE_ETAGS and self.needs_etag(response):
+            warnings.warn(
+                "The USE_ETAGS setting is deprecated in favor of "
+                "ConditionalGetMiddleware which sets the ETag regardless of "
+                "the setting. CommonMiddleware won't do ETag processing in "
+                "Django 2.1.",
+                RemovedInDjango21Warning
+            )
+            if not response.has_header('ETag'):
+                set_response_etag(response)
+
             if response.has_header('ETag'):
-                etag = response['ETag']
-            elif response.streaming:
-                etag = None
-            else:
-                etag = '"%s"' % hashlib.md5(response.content).hexdigest()
-            if etag is not None:
-                if (200 <= response.status_code < 300
-                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
-                    cookies = response.cookies
-                    response = http.HttpResponseNotModified()
-                    response.cookies = cookies
-                else:
-                    response['ETag'] = etag
+                return get_conditional_response(
+                    request,
+                    etag=response['ETag'],
+                    response=response,
+                )
+        # Add the Content-Length header to non-streaming responses if not
+        # already set.
+        if not response.streaming and not response.has_header('Content-Length'):
+            response['Content-Length'] = str(len(response.content))
 
         return response
 
+    def needs_etag(self, response):
+        """Return True if an ETag header should be added to response."""
+        cache_control_headers = cc_delim_re.split(response.get('Cache-Control', ''))
+        return all(header.lower() != 'no-store' for header in cache_control_headers)
 
-class BrokenLinkEmailsMiddleware(object):
+
+class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
-        """
-        Send broken link emails for relevant 404 NOT FOUND responses.
-        """
+        """Send broken link emails for relevant 404 NOT FOUND responses."""
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+            referer = request.META.get('HTTP_REFERER', '')
 
             if not self.is_ignorable_request(request, path, domain, referer):
                 ua = request.META.get('HTTP_USER_AGENT', '<none>')
@@ -156,17 +168,35 @@ class BrokenLinkEmailsMiddleware(object):
 
     def is_internal_request(self, domain, referer):
         """
-        Returns True if the referring URL is the same domain as the current request.
+        Return True if the referring URL is the same domain as the current
+        request.
         """
         # Different subdomains are treated as different domains.
         return bool(re.match("^https?://%s/" % re.escape(domain), referer))
 
     def is_ignorable_request(self, request, uri, domain, referer):
         """
-        Returns True if the given request *shouldn't* notify the site managers.
+        Return True if the given request *shouldn't* notify the site managers
+        according to project settings or in situations outlined by the inline
+        comments.
         """
-        # '?' in referer is identified as search engine source
-        if (not referer or
-                (not self.is_internal_request(domain, referer) and '?' in referer)):
+        # The referer is empty.
+        if not referer:
             return True
+
+        # APPEND_SLASH is enabled and the referer is equal to the current URL
+        # without a trailing slash indicating an internal redirect.
+        if settings.APPEND_SLASH and uri.endswith('/') and referer == uri[:-1]:
+            return True
+
+        # A '?' in referer is identified as a search engine source.
+        if not self.is_internal_request(domain, referer) and '?' in referer:
+            return True
+
+        # The referer is equal to the current URL, ignoring the scheme (assumed
+        # to be a poorly implemented bot).
+        parsed_referer = urlparse(referer)
+        if parsed_referer.netloc in ['', domain] and parsed_referer.path == uri:
+            return True
+
         return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)

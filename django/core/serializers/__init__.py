@@ -20,7 +20,6 @@ import importlib
 
 from django.apps import apps
 from django.conf import settings
-from django.utils import six
 from django.core.serializers.base import SerializerDoesNotExist
 
 # Built-in serializers
@@ -34,7 +33,7 @@ BUILTIN_SERIALIZERS = {
 _serializers = {}
 
 
-class BadSerializer(object):
+class BadSerializer:
     """
     Stub serializer to hold exception raised during registration
 
@@ -72,7 +71,7 @@ def register_serializer(format, serializer_module, serializers=None):
     except ImportError as exc:
         bad_serializer = BadSerializer(exc)
 
-        module = type('BadSerializerModule', (object,), {
+        module = type('BadSerializerModule', (), {
             'Deserializer': bad_serializer,
             'Serializer': bad_serializer,
         })
@@ -109,7 +108,7 @@ def get_serializer_formats():
 def get_public_serializer_formats():
     if not _serializers:
         _load_serializers()
-    return [k for k, v in six.iteritems(_serializers) if not v.Serializer.internal_use_only]
+    return [k for k, v in _serializers.items() if not v.Serializer.internal_use_only]
 
 
 def get_deserializer(format):
@@ -132,7 +131,7 @@ def serialize(format, queryset, **options):
 
 def deserialize(format, stream_or_string, **options):
     """
-    Deserialize a stream or a string. Returns an iterator that yields ``(obj,
+    Deserialize a stream or a string. Return an iterator that yields ``(obj,
     m2m_relation_dict)``, where ``obj`` is an instantiated -- but *unsaved* --
     object, and ``m2m_relation_dict`` is a dictionary of ``{m2m_field_name :
     list_of_related_objects}``.
@@ -184,16 +183,16 @@ def sort_dependencies(app_list):
             # Now add a dependency for any FK relation with a model that
             # defines a natural key
             for field in model._meta.fields:
-                if hasattr(field.rel, 'to'):
-                    rel_model = field.rel.to
+                if field.remote_field:
+                    rel_model = field.remote_field.model
                     if hasattr(rel_model, 'natural_key') and rel_model != model:
                         deps.append(rel_model)
             # Also add a dependency for any simple M2M relation with a model
             # that defines a natural key.  M2M relations with explicit through
             # models don't count as dependencies.
             for field in model._meta.many_to_many:
-                if field.rel.through._meta.auto_created:
-                    rel_model = field.rel.to
+                if field.remote_field.through._meta.auto_created:
+                    rel_model = field.remote_field.model
                     if hasattr(rel_model, 'natural_key') and rel_model != model:
                         deps.append(rel_model)
             model_dependencies.append((model, deps))
@@ -227,9 +226,12 @@ def sort_dependencies(app_list):
             else:
                 skipped.append((model, deps))
         if not changed:
-            raise RuntimeError("Can't resolve dependencies for %s in serialized app list." %
-                ', '.join('%s.%s' % (model._meta.app_label, model._meta.object_name)
-                for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__))
+            raise RuntimeError(
+                "Can't resolve dependencies for %s in serialized app list." %
+                ', '.join(
+                    '%s.%s' % (model._meta.app_label, model._meta.object_name)
+                    for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__)
+                )
             )
         model_dependencies = skipped
 

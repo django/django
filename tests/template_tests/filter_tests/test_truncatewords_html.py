@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import truncatewords_html
 from django.test import SimpleTestCase
 

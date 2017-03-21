@@ -4,8 +4,8 @@
 
 .form-row {
     overflow: hidden;
-    padding: 8px 12px;
-    font-size: 11px;
+    padding: 10px;
+    font-size: 13px;
     border-bottom: 1px solid #eee;
 }
 
@@ -13,9 +13,13 @@
     vertical-align: middle;
 }
 
+.form-row label input[type="checkbox"] {
+    margin-top: 0;
+    vertical-align: 0;
+}
+
 form .form-row p {
     padding-left: 0;
-    font-size: 11px;
 }
 
 .hidden {
@@ -24,21 +28,15 @@ form .form-row p {
 
 /* FORM LABELS */
 
-form h4 {
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-}
-
 label {
-    font-weight: normal !important;
+    font-weight: normal;
     color: #666;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .required label, label.required {
-    font-weight: bold !important;
-    color: #333 !important;
+    font-weight: bold;
+    color: #333;
 }
 
 /* RADIO BUTTONS */
@@ -50,6 +48,11 @@ form ul.radiolist li {
 form ul.radiolist label {
     float: none;
     display: inline;
+}
+
+form ul.radiolist input[type="radio"] {
+    margin: -2px 4px 0 0;
+    padding: 0;
 }
 
 form ul.inline {
@@ -66,10 +69,25 @@ form ul.inline li {
 
 .aligned label {
     display: block;
-    padding: 3px 10px 0 0;
+    padding: 4px 10px 0 0;
     float: left;
-    width: 8em;
+    width: 160px;
     word-wrap: break-word;
+    line-height: 1;
+}
+
+.aligned label:not(.vCheckboxLabel):after {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    height: 26px;
+}
+
+.aligned label + p, .aligned label + div.help, .aligned label + div.readonly {
+    padding: 6px 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 170px;
 }
 
 .aligned ul label {
@@ -78,13 +96,57 @@ form ul.inline li {
     width: auto;
 }
 
+.aligned .form-row input {
+    margin-bottom: 0;
+}
+
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField {
     width: 350px;
 }
 
-form .aligned p, form .aligned ul {
-    margin-left: 7em;
-    padding-left: 30px;
+form .aligned ul {
+    margin-left: 160px;
+    padding-left: 10px;
+}
+
+form .aligned ul.radiolist {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+form .aligned p.help,
+form .aligned div.help {
+    clear: left;
+    margin-top: 0;
+    margin-left: 160px;
+    padding-left: 10px;
+}
+
+form .aligned label + p.help,
+form .aligned label + div.help {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+form .aligned p.help:last-child,
+form .aligned div.help:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+form .aligned input + p.help,
+form .aligned textarea + p.help,
+form .aligned select + p.help,
+form .aligned input + div.help,
+form .aligned textarea + div.help,
+form .aligned select + div.help {
+    margin-left: 160px;
+    padding-left: 10px;
+}
+
+form .aligned ul li {
+    list-style: none;
 }
 
 form .aligned table p {
@@ -92,23 +154,27 @@ form .aligned table p {
     padding-left: 0;
 }
 
-form .aligned p.help {
-    padding-left: 38px;
+.aligned .vCheckboxLabel {
+    float: none;
+    width: auto;
+    display: inline-block;
+    vertical-align: -3px;
+    padding: 0 0 5px 5px;
 }
 
-.aligned .vCheckboxLabel {
-    float: none !important;
-    display: inline;
-    padding-left: 4px;
+.aligned .vCheckboxLabel + p.help,
+.aligned .vCheckboxLabel + div.help {
+    margin-top: -4px;
 }
 
 .colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField {
     width: 610px;
 }
 
-.checkbox-row p.help {
+.checkbox-row p.help,
+.checkbox-row div.help {
     margin-left: 0;
-    padding-left: 0 !important;
+    padding-left: 0;
 }
 
 fieldset .field-box {
@@ -119,15 +185,23 @@ fieldset .field-box {
 /* WIDE FIELDSETS */
 
 .wide label {
-    width: 15em !important;
+    width: 200px;
 }
 
-form .wide p {
-    margin-left: 15em;
+form .wide p,
+form .wide input + p.help,
+form .wide input + div.help {
+    margin-left: 200px;
 }
 
-form .wide p.help {
+form .wide p.help,
+form .wide div.help {
     padding-left: 38px;
+}
+
+form div.help ul {
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
@@ -141,34 +215,45 @@ fieldset.collapsed * {
 }
 
 fieldset.collapsed h2, fieldset.collapsed {
-    display: block !important;
+    display: block;
+}
+
+fieldset.collapsed {
+    border: 1px solid #eee;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 fieldset.collapsed h2 {
-    background-image: url(../img/nav-bg.gif);
-    background-position: bottom left;
-    color: #999;
+    background: #f8f8f8;
+    color: #666;
+}
+
+fieldset .collapse-toggle {
+    color: #fff;
 }
 
 fieldset.collapsed .collapse-toggle {
     background: transparent;
-    display: inline !important;
+    display: inline;
+    color: #447e9b;
 }
 
 /* MONOSPACE TEXTAREAS */
 
 fieldset.monospace textarea {
-    font-family: "Bitstream Vera Sans Mono",Monaco,"Courier New",Courier,monospace;
+    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
 }
 
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 5px 7px;
+    padding: 12px 14px;
+    margin: 0 0 20px;
+    background: #f8f8f8;
+    border: 1px solid #eee;
+    border-radius: 4px;
     text-align: right;
-    background: white url(../img/nav-bg.gif) 0 100% repeat-x;
-    border: 1px solid #ccc;
-    margin: 5px 0;
     overflow: hidden;
 }
 
@@ -177,7 +262,14 @@ body.popup .submit-row {
 }
 
 .submit-row input {
+    height: 35px;
+    line-height: 15px;
     margin: 0 0 0 5px;
+}
+
+.submit-row input.default {
+    margin: 0 0 0 8px;
+    text-transform: uppercase;
 }
 
 .submit-row p {
@@ -186,17 +278,29 @@ body.popup .submit-row {
 
 .submit-row p.deletelink-box {
     float: left;
+    margin: 0;
 }
 
-.submit-row .deletelink {
-    background: url(../img/icon_deletelink.gif) 0 50% no-repeat;
-    padding-left: 14px;
+.submit-row a.deletelink {
+    display: block;
+    background: #ba2121;
+    border-radius: 4px;
+    padding: 10px 15px;
+    height: 15px;
+    line-height: 15px;
+    color: #fff;
+}
+
+.submit-row a.deletelink:focus,
+.submit-row a.deletelink:hover,
+.submit-row a.deletelink:active {
+    background: #a41515;
 }
 
 /* CUSTOM FORM FIELDS */
 
 .vSelectMultipleField {
-    vertical-align: top !important;
+    vertical-align: top;
 }
 
 .vCheckboxField {
@@ -205,6 +309,7 @@ body.popup .submit-row {
 
 .vDateField, .vTimeField {
     margin-right: 2px;
+    margin-bottom: 4px;
 }
 
 .vDateField {
@@ -251,12 +356,15 @@ body.popup .submit-row {
 
 .inline-group {
     padding: 0;
-    border: 1px solid #ccc;
-    margin: 10px 0;
+    margin: 0 0 30px;
+}
+
+.inline-group thead th {
+    padding: 8px 10px;
 }
 
 .inline-group .aligned label {
-    width: 8em;
+    width: 160px;
 }
 
 .inline-related {
@@ -266,10 +374,11 @@ body.popup .submit-row {
 .inline-related h3 {
     margin: 0;
     color: #666;
-    padding: 3px 5px;
-    font-size: 11px;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
-    border-bottom: 1px solid #ddd;
+    padding: 5px;
+    font-size: 13px;
+    background: #f8f8f8;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
 }
 
 .inline-related h3 span.delete {
@@ -300,7 +409,6 @@ body.popup .submit-row {
 
 .inline-group .tabular fieldset.module {
     border: none;
-    border-bottom: 1px solid #ddd;
 }
 
 .inline-related.tabular fieldset.module table {
@@ -330,7 +438,7 @@ body.popup .submit-row {
     position: absolute;
     left: 0;
     height: 1.1em;
-    padding: 2px 7px;
+    padding: 2px 9px;
     overflow: hidden;
     font-size: 9px;
     font-weight: bold;
@@ -352,23 +460,22 @@ body.popup .submit-row {
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
     color: #666;
-    padding: 3px 5px;
-    border-bottom: 1px solid #ddd;
-    background: #e1e1e1 url(../img/nav-bg.gif) top left repeat-x;
+    background: #f8f8f8;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
 }
 
 .inline-group .tabular tr.add-row td {
-    padding: 4px 5px 3px;
-    border-bottom: none;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
 }
 
 .inline-group ul.tools a.add,
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
-    background: url(../img/icon_addlink.gif) 0 50% no-repeat;
-    padding-left: 14px;
-    font-size: 11px;
-    outline: 0; /* Remove dotted border around link */
+    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
+    padding-left: 16px;
+    font-size: 12px;
 }
 
 .empty-form {
@@ -380,16 +487,29 @@ body.popup .submit-row {
 .add-another, .related-lookup {
     margin-left: 5px;
     display: inline-block;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-size: 14px;
 }
 
 .add-another {
-    width: 10px;
-    height: 10px;
-    background-image: url(../img/icon_addlink.gif);
+    width: 16px;
+    height: 16px;
+    background-image: url(../img/icon-addlink.svg);
 }
 
 .related-lookup {
     width: 16px;
     height: 16px;
-    background-image: url(../img/selector-search.gif);
+    background-image: url(../img/search.svg);
+}
+
+form .related-widget-wrapper ul {
+    display: inline-block;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.clearable-file-input input {
+    margin-top: 0;
 }

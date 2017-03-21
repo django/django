@@ -1,8 +1,8 @@
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
-from .models import Person, Movie, Event, Screening, ScreeningNullFK, Package, PackageNullFK
+from .models import (
+    Event, Movie, Package, PackageNullFK, Person, Screening, ScreeningNullFK,
+)
 
 
 # These are tests for #16715. The basic scheme is always the same: 3 models with
@@ -138,7 +138,10 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.assertEqual(len(Event.objects.values()), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__director__pk')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__director__name')), 2)
-        self.assertEqual(len(Event.objects.values('screening__movie__director__pk', 'screening__movie__director__name')), 2)
+        self.assertEqual(
+            len(Event.objects.values('screening__movie__director__pk', 'screening__movie__director__name')),
+            2
+        )
         self.assertEqual(len(Event.objects.values('screening__movie__pk', 'screening__movie__director__pk')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__pk', 'screening__movie__director__name')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__title', 'screening__movie__director__pk')), 2)
@@ -158,7 +161,10 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.assertEqual(len(Package.objects.values()), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__director__pk')), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__director__name')), 2)
-        self.assertEqual(len(Package.objects.values('screening__movie__director__pk', 'screening__movie__director__name')), 2)
+        self.assertEqual(
+            len(Package.objects.values('screening__movie__director__pk', 'screening__movie__director__name')),
+            2
+        )
         self.assertEqual(len(Package.objects.values('screening__movie__pk', 'screening__movie__director__pk')), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__pk', 'screening__movie__director__name')), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__title', 'screening__movie__director__pk')), 2)

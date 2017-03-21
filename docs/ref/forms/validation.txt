@@ -1,15 +1,14 @@
-.. currentmodule:: django.forms
-
-.. _form-and-field-validation:
-
+=========================
 Form and field validation
 =========================
 
+.. currentmodule:: django.forms
+
 Form validation happens when the data is cleaned. If you want to customize
-this process, there are various places you can change, each one serving a
+this process, there are various places to make changes, each one serving a
 different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
-method on a form. There are other things that can trigger cleaning and
+method on a form. There are other things that can also trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
@@ -25,35 +24,35 @@ reused easily. Validators are simple functions (or callables) that take a single
 argument and raise ``ValidationError`` on invalid input. Validators are run
 after the field's ``to_python`` and ``validate`` methods have been called.
 
-Validation of a Form is split into several steps, which can be customized or
+Validation of a form is split into several steps, which can be customized or
 overridden:
 
-* The ``to_python()`` method on a Field is the first step in every
-  validation. It coerces the value to correct datatype and raises
+* The ``to_python()`` method on a ``Field`` is the first step in every
+  validation. It coerces the value to a correct datatype and raises
   ``ValidationError`` if that is not possible. This method accepts the raw
   value from the widget and returns the converted value. For example, a
-  FloatField will turn the data into a Python ``float`` or raise a
+  ``FloatField`` will turn the data into a Python ``float`` or raise a
   ``ValidationError``.
 
-* The ``validate()`` method on a Field handles field-specific validation
-  that is not suitable for a validator, It takes a value that has been
-  coerced to correct datatype and raises ``ValidationError`` on any error.
+* The ``validate()`` method on a ``Field`` handles field-specific validation
+  that is not suitable for a validator. It takes a value that has been
+  coerced to a correct datatype and raises ``ValidationError`` on any error.
   This method does not return anything and shouldn't alter the value. You
   should override it to handle validation logic that you can't or don't
   want to put in a validator.
 
-* The ``run_validators()`` method on a Field runs all of the field's
+* The ``run_validators()`` method on a ``Field`` runs all of the field's
   validators and aggregates all the errors into a single
   ``ValidationError``. You shouldn't need to override this method.
 
-* The ``clean()`` method on a Field subclass. This is responsible for
-  running ``to_python``, ``validate`` and ``run_validators`` in the correct
+* The ``clean()`` method on a ``Field`` subclass is responsible for running
+  ``to_python()``, ``validate()``, and ``run_validators()`` in the correct
   order and propagating their errors. If, at any time, any of the methods
   raise ``ValidationError``, the validation stops and that error is raised.
   This method returns the clean data, which is then inserted into the
   ``cleaned_data`` dictionary of the form.
 
-* The ``clean_<fieldname>()`` method in a form subclass -- where
+* The ``clean_<fieldname>()`` method is called on a form subclass -- where
   ``<fieldname>`` is replaced with the name of the form field attribute.
   This method does any cleaning that is specific to that particular
   attribute, unrelated to the type of field that it is. This method is not
@@ -70,15 +69,15 @@ overridden:
   formfield-specific piece of validation and, possibly,
   cleaning/normalizing the data.
 
-  This method should return the cleaned value obtained from cleaned_data,
-  regardless of whether it changed anything or not.
+  The return value of this method replaces the existing value in
+  ``cleaned_data``, so it must be the field's value from ``cleaned_data`` (even
+  if this method didn't change it) or a new cleaned value.
 
-* The Form subclass's ``clean()`` method. This method can perform
-  any validation that requires access to multiple fields from the form at
-  once. This is where you might put in things to check that if field ``A``
-  is supplied, field ``B`` must contain a valid email address and the
-  like. This method can return a completely different dictionary if it wishes,
-  which will be used as the ``cleaned_data``.
+* The form subclass's ``clean()`` method can perform validation that requires
+  access to multiple form fields. This is where you might put in checks such as
+  "if field ``A`` is supplied, field ``B`` must contain a valid email address".
+  This method can return a completely different dictionary if it wishes, which
+  will be used as the ``cleaned_data``.
 
   Since the field validation methods have been run by the time ``clean()`` is
   called, you also have access to the form's ``errors`` attribute which
@@ -113,7 +112,7 @@ for all remaining fields are still executed.
 .. _raising-validation-error:
 
 Raising ``ValidationError``
----------------------------
+===========================
 
 In order to make error messages flexible and easy to override, consider the
 following guidelines:
@@ -179,15 +178,13 @@ to override your error message you can still opt for the less verbose::
 
     ValidationError(_('Invalid value: %s') % value)
 
-.. versionadded:: 1.7
-
 The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
 :meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
 greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
 and a ``params`` dictionary).
 
 Raising multiple errors
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 If you detect multiple errors during a cleaning method and wish to signal all
 of them to the form submitter, it is possible to pass a list of errors to the
@@ -209,7 +206,7 @@ with ``code``\s and ``params`` but a list of strings will also work::
     ])
 
 Using validation in practice
-----------------------------
+============================
 
 The previous sections explained how validation works in general for forms.
 Since it can sometimes be easier to put things into place by seeing each
@@ -219,7 +216,7 @@ previous features.
 .. _validators:
 
 Using validators
-~~~~~~~~~~~~~~~~
+----------------
 
 Django's form (and model) fields support use of simple utility functions and
 classes known as validators. A validator is merely a callable object or
@@ -257,9 +254,9 @@ argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
 available and for an example of how to write a validator.
 
 Form field default cleaning
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
-Let's firstly create a custom form field that validates its input is a string
+Let's first create a custom form field that validates its input is a string
 containing comma-separated email addresses. The full class looks like this::
 
     from django import forms
@@ -267,19 +264,16 @@ containing comma-separated email addresses. The full class looks like this::
 
     class MultiEmailField(forms.Field):
         def to_python(self, value):
-            "Normalize data to a list of strings."
-
+            """Normalize data to a list of strings."""
             # Return an empty list if no input was given.
             if not value:
                 return []
             return value.split(',')
 
         def validate(self, value):
-            "Check if value consists only of valid emails."
-
+            """Check if value consists only of valid emails."""
             # Use the parent's handling of required fields, etc.
-            super(MultiEmailField, self).validate(value)
-
+            super().validate(value)
             for email in value:
                 validate_email(email)
 
@@ -303,7 +297,7 @@ method will be run as part of the cleaning process and it will, in turn, call
 the custom ``to_python()`` and ``validate()`` methods.
 
 Cleaning a specific field attribute
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 Continuing on from the previous example, suppose that in our ``ContactForm``,
 we want to make sure that the ``recipients`` field always contains the address
@@ -322,14 +316,14 @@ write a cleaning method that operates on the ``recipients`` field, like so::
             if "fred@example.com" not in data:
                 raise forms.ValidationError("You have forgotten about Fred!")
 
-            # Always return the cleaned data, whether you have changed it or
-            # not.
+            # Always return a value to use as the new cleaned data, even if
+            # this method didn't change it.
             return data
 
 .. _validating-fields-with-clean:
 
 Cleaning and validating fields that depend on each other
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------
 
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are
@@ -359,35 +353,39 @@ example::
         ...
 
         def clean(self):
-            cleaned_data = super(ContactForm, self).clean()
+            cleaned_data = super().clean()
             cc_myself = cleaned_data.get("cc_myself")
             subject = cleaned_data.get("subject")
 
             if cc_myself and subject:
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
-                    raise forms.ValidationError("Did not send for 'help' in "
-                            "the subject despite CC'ing yourself.")
-
-.. versionchanged:: 1.7
-
-    In previous versions of Django, ``form.clean()`` was required to return
-    a dictionary of ``cleaned_data``. This method may still return a dictionary
-    of data to be used, but it's no longer required.
+                    raise forms.ValidationError(
+                        "Did not send for 'help' in the subject despite "
+                        "CC'ing yourself."
+                    )
 
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
 
-Note that the call to ``super(ContactForm, self).clean()`` in the example code
-ensures that any validation logic in parent classes is maintained.
+The call to ``super().clean()`` in the example code ensures that any validation
+logic in parent classes is maintained. If your form inherits another that
+doesn't return a ``cleaned_data`` dictionary in its ``clean()`` method (doing
+so is optional), then don't assign ``cleaned_data`` to the result of the
+``super()`` call and use ``self.cleaned_data`` instead::
 
-The second approach might involve assigning the error message to one of the
-fields. In this case, let's assign an error message to both the "subject" and
-"cc_myself" rows in the form display. Be careful when doing this in practice,
-since it can lead to confusing form output. We're showing what is possible
-here and leaving it up to you and your designers to work out what works
-effectively in your particular situation. Our new code (replacing the previous
-sample) looks like this::
+    def clean(self):
+        super().clean()
+        cc_myself = self.cleaned_data.get("cc_myself")
+        ...
+
+The second approach for reporting validation errors might involve assigning the
+error message to one of the fields. In this case, let's assign an error message
+to both the "subject" and "cc_myself" rows in the form display. Be careful when
+doing this in practice, since it can lead to confusing form output. We're
+showing what is possible here and leaving it up to you and your designers to
+work out what works effectively in your particular situation. Our new code
+(replacing the previous sample) looks like this::
 
     from django import forms
 
@@ -396,7 +394,7 @@ sample) looks like this::
         ...
 
         def clean(self):
-            cleaned_data = super(ContactForm, self).clean()
+            cleaned_data = super().clean()
             cc_myself = cleaned_data.get("cc_myself")
             subject = cleaned_data.get("subject")
 

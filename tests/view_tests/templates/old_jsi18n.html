@@ -1,0 +1,44 @@
+<html>
+<head>
+  <script type="text/javascript" src="/old_jsi18n_admin/"></script>
+</head>
+
+<body>
+  <p id="gettext">
+    <script type="text/javascript">
+    document.write(gettext("Remove"));
+    </script>
+  </p>
+
+  <p id="ngettext_sing">
+    <script type="text/javascript">
+    document.write(interpolate(ngettext("%s item", "%s items", 1), [1]));
+    </script>
+  </p>
+
+  <p id="ngettext_plur">
+    <script type="text/javascript">
+    document.write(interpolate(ngettext("%s item", "%s items", 455), [455]));
+    </script>
+  </p>
+
+  <p id="pgettext">
+    <script type="text/javascript">
+    document.write(pgettext("verb", "May"));
+    </script>
+  </p>
+
+  <p id="npgettext_sing">
+    <script type="text/javascript">
+    document.write(interpolate(npgettext("search", "%s result", "%s results", 1), [1]));
+    </script>
+  </p>
+
+  <p id="npgettext_plur">
+    <script type="text/javascript">
+    document.write(interpolate(npgettext("search", "%s result", "%s results", 455), [455]));
+    </script>
+  </p>
+
+</body>
+</html>

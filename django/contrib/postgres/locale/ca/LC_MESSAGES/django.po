@@ -1,0 +1,120 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Antoni Aloy <aaloy@apsl.net>, 2015
+# duub qnnp, 2015
+# Roger Pons <rogerpons@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
+"ca/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ca\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Extensions de PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "L'element %(nth)s de la matriu no valida:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Les matrius niades han de tenir la mateixa longitud."
+
+msgid "Map of strings to strings"
+msgstr "Mapa de cadenes a cadenes"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "El valor de \"%(key)s\" no és una cadena."
+
+msgid "A JSON object"
+msgstr "Un objecte JSON"
+
+msgid "Value must be valid JSON."
+msgstr "El valor ha de ser JSON vàlid."
+
+msgid "Could not load JSON data."
+msgstr "No es poden carregar les dades JSON"
+
+msgid "Input must be a JSON dictionary."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "El valor '%(value)s' ha de ser JSON vàlid."
+
+msgid "Enter two valid values."
+msgstr "Introdueixi dos valors vàlids."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "L'inici del rang no pot excedir el seu final."
+
+msgid "Enter two whole numbers."
+msgstr "Introduïu dos números enters positius."
+
+msgid "Enter two numbers."
+msgstr "Introduïu dos números."
+
+msgid "Enter two valid date/times."
+msgstr "Introduïu dues data/hora vàlides."
+
+msgid "Enter two valid dates."
+msgstr "Introduïu dos dates vàlides."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"La llista conté %(show_value)d element, no n'hauria de tenir més de "
+"%(limit_value)d."
+msgstr[1] ""
+"La llista conté %(show_value)d elements, no n'hauria de tenir més de "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"La llista conté %(show_value)d element, no n'hauria de contenir menys de "
+"%(limit_value)d."
+msgstr[1] ""
+"La llista conté %(show_value)d elements, no n'hauria de contenir menys de "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Algunes claus no hi són: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "S'han facilitat claus desconegudes: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Asseguri's que aquest rang és completament menor o igual a %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Asseguri's que aquest rang és completament major o igual a %(limit_value)s."

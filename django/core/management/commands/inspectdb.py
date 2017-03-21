@@ -1,11 +1,10 @@
-from __future__ import unicode_literals
-
-from collections import OrderedDict
 import keyword
 import re
+from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.models.constants import LOOKUP_SEP
 
 
 class Command(BaseCommand):
@@ -16,9 +15,14 @@ class Command(BaseCommand):
     db_module = 'django.db'
 
     def add_arguments(self, parser):
-        parser.add_argument('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
-            'introspect. Defaults to using the "default" database.')
+        parser.add_argument(
+            'table', action='store', nargs='*', type=str,
+            help='Selects what tables or views should be introspected.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to introspect. Defaults to using the "default" database.',
+        )
 
     def handle(self, **options):
         try:
@@ -32,52 +36,62 @@ class Command(BaseCommand):
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
-        table2model = lambda table_name: re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
-        strip_prefix = lambda s: s[1:] if s.startswith("u'") else s
+        def table2model(table_name):
+            return re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
+
+        def strip_prefix(s):
+            return s[1:] if s.startswith("u'") else s
 
         with connection.cursor() as cursor:
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
             yield "#   * Make sure each model has one field with primary_key=True"
+            yield "#   * Make sure each ForeignKey has `on_delete` set to the desired behavior."
             yield (
                 "#   * Remove `managed = False` lines if you wish to allow "
                 "Django to create, modify, and delete the table"
             )
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
-            yield "#"
-            yield "# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'"
-            yield "# into your database."
-            yield "from __future__ import unicode_literals"
-            yield ''
             yield 'from %s import models' % self.db_module
             known_models = []
-            for table_name in connection.introspection.table_names(cursor):
+            tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
+
+            for table_name in tables_to_introspect:
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
+                try:
+                    try:
+                        relations = connection.introspection.get_relations(cursor, table_name)
+                    except NotImplementedError:
+                        relations = {}
+                    try:
+                        constraints = connection.introspection.get_constraints(cursor, table_name)
+                    except NotImplementedError:
+                        constraints = {}
+                    primary_key_column = connection.introspection.get_primary_key_column(cursor, table_name)
+                    unique_columns = [
+                        c['columns'][0] for c in constraints.values()
+                        if c['unique'] and len(c['columns']) == 1
+                    ]
+                    table_description = connection.introspection.get_table_description(cursor, table_name)
+                except Exception as e:
+                    yield "# Unable to inspect table '%s'" % table_name
+                    yield "# The error was: %s" % e
+                    continue
+
                 yield ''
                 yield ''
                 yield 'class %s(models.Model):' % table2model(table_name)
                 known_models.append(table2model(table_name))
-                try:
-                    relations = connection.introspection.get_relations(cursor, table_name)
-                except NotImplementedError:
-                    relations = {}
-                try:
-                    indexes = connection.introspection.get_indexes(cursor, table_name)
-                except NotImplementedError:
-                    indexes = {}
-                try:
-                    constraints = connection.introspection.get_constraints(cursor, table_name)
-                except NotImplementedError:
-                    constraints = {}
                 used_column_names = []  # Holds column names used in the table so far
-                for i, row in enumerate(connection.introspection.get_table_description(cursor, table_name)):
+                column_to_field_name = {}  # Maps column names to names of model fields
+                for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
                     column_name = row[0]
-                    is_relation = i in relations
+                    is_relation = column_name in relations
 
                     att_name, params, notes = self.normalize_col_name(
                         column_name, used_column_names, is_relation)
@@ -85,16 +99,19 @@ class Command(BaseCommand):
                     comment_notes.extend(notes)
 
                     used_column_names.append(att_name)
+                    column_to_field_name[column_name] = att_name
 
                     # Add primary_key and unique, if necessary.
-                    if column_name in indexes:
-                        if indexes[column_name]['primary_key']:
-                            extra_params['primary_key'] = True
-                        elif indexes[column_name]['unique']:
-                            extra_params['unique'] = True
+                    if column_name == primary_key_column:
+                        extra_params['primary_key'] = True
+                    elif column_name in unique_columns:
+                        extra_params['unique'] = True
 
                     if is_relation:
-                        rel_to = "self" if relations[i][1] == table_name else table2model(relations[i][1])
+                        rel_to = (
+                            "self" if relations[column_name][1] == table_name
+                            else table2model(relations[column_name][1])
+                        )
                         if rel_to in known_models:
                             field_type = 'ForeignKey(%s' % rel_to
                         else:
@@ -131,6 +148,9 @@ class Command(BaseCommand):
                         '' if '.' in field_type else 'models.',
                         field_type,
                     )
+                    if field_type.startswith('ForeignKey('):
+                        field_desc += ', models.DO_NOTHING'
+
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '
@@ -141,7 +161,7 @@ class Command(BaseCommand):
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)
                     yield '    %s' % field_desc
-                for meta_line in self.get_meta(table_name, constraints):
+                for meta_line in self.get_meta(table_name, constraints, column_to_field_name):
                     yield meta_line
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
@@ -165,10 +185,10 @@ class Command(BaseCommand):
         if num_repl > 0:
             field_notes.append('Field renamed to remove unsuitable characters.')
 
-        if new_name.find('__') >= 0:
-            while new_name.find('__') >= 0:
-                new_name = new_name.replace('__', '_')
-            if col_name.lower().find('__') >= 0:
+        if new_name.find(LOOKUP_SEP) >= 0:
+            while new_name.find(LOOKUP_SEP) >= 0:
+                new_name = new_name.replace(LOOKUP_SEP, '_')
+            if col_name.lower().find(LOOKUP_SEP) >= 0:
                 # Only add the comment if the double underscore was in the original name
                 field_notes.append("Field renamed because it contained more than one '_' in a row.")
 
@@ -238,7 +258,7 @@ class Command(BaseCommand):
 
         return field_type, field_params, field_notes
 
-    def get_meta(self, table_name, constraints):
+    def get_meta(self, table_name, constraints, column_to_field_name):
         """
         Return a sequence comprising the lines of code necessary
         to construct the inner Meta class for the model corresponding
@@ -251,7 +271,7 @@ class Command(BaseCommand):
                 if len(columns) > 1:
                     # we do not want to include the u"" or u'' prefix
                     # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join("'%s'" % c for c in columns) + ')'
+                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
                     unique_together.append(tup)
         meta = ["",
                 "    class Meta:",

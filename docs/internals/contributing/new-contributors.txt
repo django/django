@@ -5,8 +5,13 @@ Advice for new contributors
 New contributor and not sure what to do? Want to help but just don't know how
 to get started? This is the section for you.
 
+.. admonition:: Basic tools and workflow
+
+    If you are new to contributing to Django, the :doc:`/intro/contributing`
+    tutorial will give you an introduction to the tools and the workflow.
+
 First steps
------------
+===========
 
 Start with these easy tasks to discover Django's development process.
 
@@ -31,9 +36,10 @@ Start with these easy tasks to discover Django's development process.
 
   Mark the appropriate flags if a patch needs docs or tests. Look through the
   changes a patch makes, and keep an eye out for syntax that is incompatible
-  with older but still supported versions of Python. Run the tests and make
-  sure they pass on your system.  Where possible and relevant, try them out on
-  a database other than SQLite. Leave comments and feedback!
+  with older but still supported versions of Python. :doc:`Run the tests
+  </internals/contributing/writing-code/unit-tests>` and make sure they pass.
+  Where possible and relevant, try them out on a database other than SQLite.
+  Leave comments and feedback!
 
 * **Keep old patches up to date**
 
@@ -47,8 +53,7 @@ Start with these easy tasks to discover Django's development process.
   Django's documentation is great but it can always be improved. Did you find
   a typo? Do you think that something should be clarified? Go ahead and
   suggest a documentation patch! See also the guide on
-  :doc:`writing-documentation`, in particular the tips for
-  :ref:`improving-the-documentation`.
+  :doc:`writing-documentation`.
 
   .. note::
 
@@ -64,7 +69,7 @@ Start with these easy tasks to discover Django's development process.
 
 
 Guidelines
-----------
+==========
 
 As a newcomer on a large project, it's easy to experience frustration. Here's
 some advice to make your work on Django more useful and rewarding.
@@ -81,9 +86,9 @@ some advice to make your work on Django more useful and rewarding.
   When reading Trac, you need to take into account who says things, and when
   they were said. Support for an idea two years ago doesn't necessarily mean
   that the idea will still have support. You also need to pay attention to who
-  *hasn't* spoken -- for example, if a core team member hasn't been recently
-  involved in a discussion, then a ticket may not have the support required to
-  get into trunk.
+  *hasn't* spoken -- for example, if an experienced contributor hasn't been
+  recently involved in a discussion, then a ticket may not have the support
+  required to get into Django.
 
 * **Start small**
 
@@ -94,15 +99,15 @@ some advice to make your work on Django more useful and rewarding.
   support first**
 
   This means getting someone else to confirm that a bug is real before you fix
-  the issue, and ensuring that the core team supports a proposed feature
-  before you go implementing it.
+  the issue, and ensuring that there's consensus on a proposed feature before
+  you go implementing it.
 
 * **Be bold! Leave feedback!**
 
   Sometimes it can be scary to put your opinion out to the world and say "this
   ticket is correct" or "this patch needs work", but it's the only way the
   project moves forward. The contributions of the broad Django community
-  ultimately have a much greater impact than that of the core team. We can't
+  ultimately have a much greater impact than that of any one person. We can't
   do it without **you**!
 
 * **Err on the side of caution when marking things Ready For Check-in**
@@ -132,16 +137,16 @@ some advice to make your work on Django more useful and rewarding.
 .. _new-contributors-faq:
 
 FAQ
----
+===
 
 1. **This ticket I care about has been ignored for days/weeks/months! What can
    I do to get it committed?**
 
    First off, it's not personal. Django is entirely developed by volunteers
-   (even the core team), and sometimes folks just don't have time. The best
-   thing to do is to send a gentle reminder to the |django-developers| mailing
-   list asking for review on the ticket, or to bring it up in the #django-dev
-   IRC channel.
+   (except the Django fellow), and sometimes folks just don't have time. The
+   best thing to do is to send a gentle reminder to the |django-developers|
+   mailing list asking for review on the ticket, or to bring it up in the
+   `#django-dev` IRC channel.
 
 2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
    myself?**

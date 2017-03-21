@@ -19,7 +19,7 @@ Related objects reference
                 pass
 
             class Article(models.Model):
-                reporter = models.ForeignKey(Reporter)
+                reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
       In the above example, the methods below will be available on
       the manager ``reporter.article_set``.
@@ -36,7 +36,7 @@ Related objects reference
       In this example, the methods below will be available both on
       ``topping.pizza_set`` and on ``pizza.toppings``.
 
-    .. method:: add(obj1, [obj2, ...])
+    .. method:: add(*objs, bulk=True)
 
         Adds the specified model objects to the related object set.
 
@@ -48,7 +48,13 @@ Related objects reference
 
         In the example above, in the case of a
         :class:`~django.db.models.ForeignKey` relationship,
-        ``e.save()`` is called by the related manager to perform the update.
+        :meth:`QuerySet.update() <django.db.models.query.QuerySet.update>`
+        is used to perform the update. This requires the objects to already be
+        saved.
+
+        You can use the ``bulk=False`` argument to instead have the related
+        manager perform the update by calling ``e.save()``.
+
         Using ``add()`` with a many-to-many relationship, however, will not
         call any ``save()`` methods, but rather create the relationships
         using :meth:`QuerySet.bulk_create()
@@ -86,7 +92,7 @@ Related objects reference
         parameter ``blog`` to ``create()``. Django figures out that the new
         ``Entry`` object's ``blog`` field should be set to ``b``.
 
-    .. method:: remove(obj1, [obj2, ...])
+    .. method:: remove(*objs)
 
         Removes the specified model objects from the related object set::
 
@@ -109,8 +115,6 @@ Related objects reference
         ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
         the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
-
-        .. versionchanged 1.7::
 
         For :class:`~django.db.models.ForeignKey` objects, this method accepts
         a ``bulk`` argument to control how to perform the operation.
@@ -135,29 +139,41 @@ Related objects reference
         :class:`~django.db.models.ForeignKey`\s where ``null=True`` and it also
         accepts the ``bulk`` keyword argument.
 
+    .. method:: set(objs, bulk=True, clear=False)
+
+        Replace the set of related objects::
+
+            >>> new_list = [obj1, obj2, obj3]
+            >>> e.related_set.set(new_list)
+
+        This method accepts a ``clear`` argument to control how to perform the
+        operation. If ``False`` (the default), the elements missing from the
+        new set are removed using ``remove()`` and only the new ones are added.
+        If ``clear=True``, the ``clear()`` method is called instead and the
+        whole set is added at once.
+
+        The ``bulk`` argument is passed on to :meth:`add`.
+
+        Note that since ``set()`` is a compound operation, it is subject to
+        race conditions. For instance, new objects may be added to the database
+        in between the call to ``clear()`` and the call to ``add()``.
+
     .. note::
 
-       Note that ``add()``, ``create()``, ``remove()``, and ``clear()`` all
-       apply database changes immediately for all types of related fields. In
-       other words, there is no need to call ``save()`` on either end of the
-       relationship.
+       Note that ``add()``, ``create()``, ``remove()``, ``clear()``, and
+       ``set()`` all apply database changes immediately for all types of
+       related fields. In other words, there is no need to call ``save()``
+       on either end of the relationship.
 
        Also, if you are using :ref:`an intermediate model
-       <intermediary-manytomany>` for a many-to-many relationship, some of the
-       related manager's methods are disabled.
+       <intermediary-manytomany>` for a many-to-many relationship, then the
+       ``add()``, ``create()``, ``remove()``, and ``set()`` methods are
+       disabled.
 
-.. _direct-assignment:
+       If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
+       the ``add()``, ``remove()``, ``clear()``, and ``set()`` methods clear
+       the prefetched cache.
 
-Direct Assignment
------------------
+       .. versionchanged:: 1.11
 
-A related object set can be replaced in bulk with one operation by assigning a
-new iterable of objects to it::
-
-    >>> new_list = [obj1, obj2, obj3]
-    >>> e.related_set = new_list
-
-If the foreign key relationship has ``null=True``, then the related manager
-will first call ``clear()`` to disassociate any existing objects in the related
-set before adding the contents of ``new_list``. Otherwise the objects in
-``new_list`` will be added to the existing related object set.
+            The clearing of the prefetched cache described above was added.

@@ -1,7 +1,11 @@
 import re
+import warnings
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
-
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
+from django.db.models.indexes import Index
+from django.utils.deprecation import RemovedInDjango21Warning
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
@@ -15,7 +19,7 @@ def get_field_size(name):
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
-class FlexibleFieldLookupDict(object):
+class FlexibleFieldLookupDict:
     # Maps SQL types to Django Field types. Some of the SQL types have multiple
     # entries here because SQLite allows for anything and doesn't normalize the
     # field type; it uses whatever was given.
@@ -54,9 +58,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
     def get_table_list(self, cursor):
-        """
-        Returns a list of table and view names in the current database.
-        """
+        """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
         cursor.execute("""
@@ -66,9 +68,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
-        return [FieldInfo(info['name'], info['type'], None, info['size'], None, None,
-                 info['null_ok']) for info in self._table_info(cursor, table_name)]
+        """
+        Return a description of the table with the DB-API cursor.description
+        interface.
+        """
+        return [
+            FieldInfo(
+                info['name'],
+                info['type'],
+                None,
+                info['size'],
+                None,
+                None,
+                info['null_ok'],
+                info['default'],
+            ) for info in self._table_info(cursor, table_name)
+        ]
 
     def column_name_converter(self, name):
         """
@@ -87,10 +102,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Return a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
-
         # Dictionary of relations to return
         relations = {}
 
@@ -106,16 +120,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
         # to create the table we can look for REFERENCES statements used there.
-        for field_index, field_desc in enumerate(results.split(',')):
+        for field_desc in results.split(','):
             field_desc = field_desc.strip()
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('references (.*) \(["|](.*)["|]\)', field_desc, re.I)
+            m = re.search(r'references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
             if not m:
                 continue
-
             table, column = [s.strip('"') for s in m.groups()]
+
+            if field_desc.startswith("FOREIGN KEY"):
+                # Find name of the target FK field
+                m = re.match(r'FOREIGN KEY\s*\(([^\)]*)\).*', field_desc, re.I)
+                field_name = m.groups()[0].strip('"')
+            else:
+                field_name = field_desc.split()[0].strip('"')
 
             cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s", [table])
             result = cursor.fetchall()[0]
@@ -123,22 +143,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             li, ri = other_table_results.index('('), other_table_results.rindex(')')
             other_table_results = other_table_results[li + 1:ri]
 
-            for other_index, other_desc in enumerate(other_table_results.split(',')):
+            for other_desc in other_table_results.split(','):
                 other_desc = other_desc.strip()
                 if other_desc.startswith('UNIQUE'):
                     continue
 
-                name = other_desc.split(' ', 1)[0].strip('"')
-                if name == column:
-                    relations[field_index] = (other_index, table)
+                other_name = other_desc.split(' ', 1)[0].strip('"')
+                if other_name == column:
+                    relations[field_name] = (other_name, table)
                     break
 
         return relations
 
     def get_key_columns(self, cursor, table_name):
         """
-        Returns a list of (column_name, referenced_table_name, referenced_column_name) for all
-        key columns in given table.
+        Return a list of (column_name, referenced_table_name, referenced_column_name)
+        for all key columns in given table.
         """
         key_columns = []
 
@@ -155,7 +175,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('"(.*)".*references (.*) \(["|](.*)["|]\)', field_desc, re.I)
+            m = re.search(r'"(.*)".*references (.*) \(["|](.*)["|]\)', field_desc, re.I)
             if not m:
                 continue
 
@@ -165,6 +185,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return key_columns
 
     def get_indexes(self, cursor, table_name):
+        warnings.warn(
+            "get_indexes() is deprecated in favor of get_constraints().",
+            RemovedInDjango21Warning, stacklevel=2
+        )
         indexes = {}
         for info in self._table_info(cursor, table_name):
             if info['pk'] != 0:
@@ -184,9 +208,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return indexes
 
     def get_primary_key_column(self, cursor, table_name):
-        """
-        Get the column name of the primary key for the given table.
-        """
+        """Return the column name of the primary key for the given table."""
         # Don't use PRAGMA because that causes issues with some transactions
         cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
         row = cursor.fetchone()
@@ -196,29 +218,35 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         results = results[results.index('(') + 1:results.rindex(')')]
         for field_desc in results.split(','):
             field_desc = field_desc.strip()
-            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?$', field_desc)
+            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?', field_desc)
             if m:
                 return m.groups()[0]
         return None
 
     def _table_info(self, cursor, name):
         cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(name))
-        # cid, name, type, notnull, dflt_value, pk
-        return [{'name': field[1],
-                 'type': field[2],
-                 'size': get_field_size(field[2]),
-                 'null_ok': not field[3],
-                 'pk': field[5]     # undocumented
-                 } for field in cursor.fetchall()]
+        # cid, name, type, notnull, default_value, pk
+        return [{
+            'name': field[1],
+            'type': field[2],
+            'size': get_field_size(field[2]),
+            'null_ok': not field[3],
+            'default': field[4],
+            'pk': field[5],  # undocumented
+        } for field in cursor.fetchall()]
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        Retrieve any constraints or keys (unique, pk, fk, check, index) across
+        one or more columns.
         """
         constraints = {}
         # Get the index info
         cursor.execute("PRAGMA index_list(%s)" % self.connection.ops.quote_name(table_name))
-        for number, index, unique in cursor.fetchall():
+        for row in cursor.fetchall():
+            # Sqlite3 3.8.9+ has 5 columns, however older versions only give 3
+            # columns. Discard last 2 columns if there.
+            number, index, unique = row[:3]
             # Get the index info for that index
             cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
             for index_rank, column_rank, column in cursor.fetchall():
@@ -232,6 +260,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "index": True,
                     }
                 constraints[index]['columns'].append(column)
+            # Add type and column orders for indexes
+            if constraints[index]['index'] and not constraints[index]['unique']:
+                # SQLite doesn't support any index type other than b-tree
+                constraints[index]['type'] = Index.suffix
+                cursor.execute(
+                    "SELECT sql FROM sqlite_master "
+                    "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
+                )
+                orders = []
+                # There would be only 1 row to loop over
+                for sql, in cursor.fetchall():
+                    order_info = sql.split('(')[-1].split(')')[0].split(',')
+                    orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
+                constraints[index]['orders'] = orders
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:

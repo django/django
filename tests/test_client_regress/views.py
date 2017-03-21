@@ -1,17 +1,12 @@
-import json
-import warnings
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.core.serializers.json import DjangoJSONEncoder
-from django.template import RequestContext
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
-from django.test.utils import setup_test_environment
-from django.utils.six.moves.urllib.parse import urlencode
 
 
 class CustomTestException(Exception):
@@ -31,28 +26,19 @@ def staff_only_view(request):
         raise CustomTestException()
 
 
+@login_required
 def get_view(request):
     "A simple login protected view"
     return HttpResponse("Hello world")
-get_view = login_required(get_view)
 
 
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
-
-    # request.REQUEST is deprecated, but needs testing until removed.
-    with warnings.catch_warnings(record=True):
-        warnings.simplefilter("always")
-        request_foo = request.REQUEST.get('foo')
-        request_bar = request.REQUEST.get('bar')
-
-    return render_to_response(template, {
+    return render(request, template, {
         'get-foo': request.GET.get('foo'),
         'get-bar': request.GET.get('bar'),
         'post-foo': request.POST.get('foo'),
         'post-bar': request.POST.get('bar'),
-        'request-foo': request_foo,
-        'request-bar': request_bar,
         'data': data,
     })
 
@@ -74,16 +60,15 @@ def nested_view(request):
     """
     A view that uses test client to call another view.
     """
-    setup_test_environment()
     c = Client()
-    c.get("/no_template_view")
-    return render_to_response('base.html', {'nested': 'yes'})
+    c.get("/no_template_view/")
+    return render(request, 'base.html', {'nested': 'yes'})
 
 
+@login_required
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/get_view/')
-login_protected_redirect_view = login_required(login_protected_redirect_view)
 
 
 def redirect_to_self_with_changing_query_view(request):
@@ -109,7 +94,7 @@ def request_methods_view(request):
 
 
 def return_unicode(request):
-    return render_to_response('unicode.html')
+    return render(request, 'unicode.html')
 
 
 def return_undecodable_binary(request):
@@ -118,20 +103,21 @@ def return_undecodable_binary(request):
     )
 
 
-def return_json_file(request):
-    "A view that parses and returns a JSON string as a file."
+def return_json_response(request):
+    content_type = request.GET.get('content_type')
+    kwargs = {'content_type': content_type} if content_type else {}
+    return JsonResponse({'key': 'value'}, **kwargs)
+
+
+def return_text_file(request):
+    "A view that parses and returns text as a file."
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
     if match:
         charset = match.group(1)
     else:
         charset = settings.DEFAULT_CHARSET
 
-    # This just checks that the uploaded data is JSON
-    obj_dict = json.loads(request.body.decode(charset))
-    obj_json = json.dumps(obj_dict, cls=DjangoJSONEncoder, ensure_ascii=False)
-    response = HttpResponse(obj_json.encode(charset), status=200,
-                            content_type='application/json; charset=%s' % charset)
-    response['Content-Disposition'] = 'attachment; filename=testfile.json'
+    response = HttpResponse(request.body, status=200, content_type='text/plain; charset=%s' % charset)
     return response
 
 
@@ -158,7 +144,7 @@ def read_buffer(request):
 def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest
     request.special_path = request.path
-    return render_to_response('request_context.html', context_instance=RequestContext(request, {}))
+    return render(request, 'request_context.html')
 
 
 def render_template_multiple_times(request):

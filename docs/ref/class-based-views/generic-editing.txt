@@ -15,7 +15,7 @@ editing content:
     Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         from django.db import models
 
         class Author(models.Model):
@@ -24,8 +24,8 @@ editing content:
             def get_absolute_url(self):
                 return reverse('author-detail', kwargs={'pk': self.pk})
 
-FormView
---------
+``FormView``
+============
 
 .. class:: django.views.generic.edit.FormView
 
@@ -68,7 +68,7 @@ FormView
                 # This method is called when valid form data has been POSTed.
                 # It should return an HttpResponse.
                 form.send_email()
-                return super(ContactView, self).form_valid(form)
+                return super().form_valid(form)
 
     **Example myapp/contact.html**:
 
@@ -80,8 +80,8 @@ FormView
         </form>
 
 
-CreateView
-----------
+``CreateView``
+==============
 
 .. class:: django.views.generic.edit.CreateView
 
@@ -132,11 +132,11 @@ CreateView
 
         <form action="" method="post">{% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="Create" />
+            <input type="submit" value="Save" />
         </form>
 
-UpdateView
-----------
+``UpdateView``
+==============
 
 .. class:: django.views.generic.edit.UpdateView
 
@@ -192,8 +192,8 @@ UpdateView
             <input type="submit" value="Update" />
         </form>
 
-DeleteView
-----------
+``DeleteView``
+==============
 
 .. class:: django.views.generic.edit.DeleteView
 
@@ -227,7 +227,7 @@ DeleteView
     **Example myapp/views.py**::
 
         from django.views.generic.edit import DeleteView
-        from django.core.urlresolvers import reverse_lazy
+        from django.urls import reverse_lazy
         from myapp.models import Author
 
         class AuthorDelete(DeleteView):

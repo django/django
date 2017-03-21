@@ -29,7 +29,7 @@ databases -- a default PostgreSQL database and a MySQL database called
     DATABASES = {
         'default': {
             'NAME': 'app_data',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'USER': 'postgres_user',
             'PASSWORD': 's3krit'
         },
@@ -45,11 +45,11 @@ If the concept of a ``default`` database doesn't make sense in the context
 of your project, you need to be careful to always specify the database
 that you want to use. Django requires that a ``default`` database entry
 be defined, but the parameters dictionary can be left blank if it will not be
-used. You must setup :setting:`DATABASE_ROUTERS` for all of your apps' models,
-including those in any contrib and third-party apps you are using, so that no
-queries are routed to the default database in order to do this. The following
-is an example ``settings.py`` snippet defining two non-default databases, with
-the ``default`` entry intentionally left empty::
+used. To do this, you must set up :setting:`DATABASE_ROUTERS` for all of your
+apps' models, including those in any contrib and third-party apps you're using,
+so that no queries are routed to the default database. The following is an
+example ``settings.py`` snippet defining two non-default databases, with the
+``default`` entry intentionally left empty::
 
     DATABASES = {
         'default': {},
@@ -76,9 +76,9 @@ Synchronizing your databases
 
 The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
-providing a :djadminopt:`--database` argument, you can tell :djadmin:`migrate`
+providing the :option:`--database <migrate --database>` option, you can tell it
 to synchronize a different database. So, to synchronize all models onto
-all databases in our example, you would need to call::
+all databases in the first example above, you would need to call::
 
     $ ./manage.py migrate
     $ ./manage.py migrate --database=users
@@ -88,13 +88,26 @@ particular database, you can define a :ref:`database
 router<topics-db-multi-db-routing>` that implements a policy
 constraining the availability of particular models.
 
+If, as in the second example above, you've left the ``default`` database empty,
+you must provide a database name each time you run :djadmin:`migrate`. Omitting
+the database name would raise an error. For the second example::
+
+    $ ./manage.py migrate --database=users
+    $ ./manage.py migrate --database=customers
+
 Using other management commands
 -------------------------------
 
-The other ``django-admin`` commands that interact with the database
-operate in the same way as :djadmin:`migrate` -- they only ever operate
-on one database at a time, using :djadminopt:`--database` to control
-the database used.
+Most other ``django-admin`` commands that interact with the database operate in
+the same way as :djadmin:`migrate` -- they only ever operate on one database at
+a time, using ``--database`` to control the database used.
+
+An exception to this rule is the :djadmin:`makemigrations` command. It
+validates the migration history in the databases to catch problems with the
+existing migration files (which could be caused by editing them) before
+creating new migrations. By default, it checks only the ``default`` database,
+but it consults the :meth:`allow_migrate` method of :ref:`routers
+<topics-db-multi-db-routing>` if any are installed.
 
 .. _topics-db-multi-db-routing:
 
@@ -128,7 +141,7 @@ A database Router is a class that provides up to four methods:
     provided in the ``hints`` dictionary. Details on valid hints are
     provided :ref:`below <topics-db-multi-db-hints>`.
 
-    Returns None if there is no suggestion.
+    Returns ``None`` if there is no suggestion.
 
 .. method:: db_for_write(model, **hints)
 
@@ -140,32 +153,50 @@ A database Router is a class that provides up to four methods:
     provided in the ``hints`` dictionary. Details on valid hints are
     provided :ref:`below <topics-db-multi-db-hints>`.
 
-    Returns None if there is no suggestion.
+    Returns ``None`` if there is no suggestion.
 
 .. method:: allow_relation(obj1, obj2, **hints)
 
-    Return True if a relation between obj1 and obj2 should be
-    allowed, False if the relation should be prevented, or None if
+    Return ``True`` if a relation between ``obj1`` and ``obj2`` should be
+    allowed, ``False`` if the relation should be prevented, or ``None`` if
     the router has no opinion. This is purely a validation operation,
     used by foreign key and many to many operations to determine if a
     relation should be allowed between two objects.
 
-.. method:: allow_migrate(db, model)
+.. method:: allow_migrate(db, app_label, model_name=None, **hints)
 
-    Determine if the ``model`` should have tables/indexes created in the
-    database with alias ``db``. Return True if the model should be
-    migrated, False if it should not be migrated, or None if
-    the router has no opinion. This method can be used to determine
-    the availability of a model on a given database.
+    Determine if the migration operation is allowed to run on the database with
+    alias ``db``. Return ``True`` if the operation should run, ``False`` if it
+    shouldn't run, or ``None`` if the router has no opinion.
 
-    Note that migrations will just silently not perform any operations
-    on a model for which this returns ``False``. This may result in broken
-    ForeignKeys, extra tables or missing tables if you change it once you
-    have applied some migrations.
+    The ``app_label`` positional argument is the label of the application
+    being migrated.
 
-    The value passed for ``model`` may be a
-    :ref:`historical model <historical-models>`, and thus not have any
-    custom attributes, methods or managers. You should only rely on ``_meta``.
+    ``model_name`` is set by most migration operations to the value of
+    ``model._meta.model_name`` (the lowercased version of the model
+    ``__name__``) of the model being migrated. Its value is ``None`` for the
+    :class:`~django.db.migrations.operations.RunPython` and
+    :class:`~django.db.migrations.operations.RunSQL` operations unless they
+    provide it using hints.
+
+    ``hints`` are used by certain operations to communicate additional
+    information to the router.
+
+    When ``model_name`` is set, ``hints`` normally contains the model class
+    under the key ``'model'``. Note that it may be a :ref:`historical model
+    <historical-models>`, and thus not have any custom attributes, methods, or
+    managers. You should only rely on ``_meta``.
+
+    This method can also be used to determine the availability of a model on a
+    given database.
+
+    :djadmin:`makemigrations` always creates migrations for model changes, but
+    if ``allow_migrate()`` returns ``False``, any migration operations for the
+    ``model_name`` will be silently skipped when running :djadmin:`migrate` on
+    the ``db``. Changing the behavior of ``allow_migrate()`` for models that
+    already have migrations may result in broken foreign keys, extra tables,
+    or missing tables. When :djadmin:`makemigrations` verifies the migration
+    history, it skips databases where no app is allowed to migrate.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
@@ -234,6 +265,7 @@ with two read replicas. Here are the settings specifying these
 databases::
 
     DATABASES = {
+        'default': {},
         'auth_db': {
             'NAME': 'auth_db',
             'ENGINE': 'django.db.backends.mysql',
@@ -293,15 +325,13 @@ send queries for the ``auth`` app to ``auth_db``::
                return True
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             """
             Make sure the auth app only appears in the 'auth_db'
             database.
             """
-            if db == 'auth_db':
-                return model._meta.app_label == 'auth'
-            elif model._meta.app_label == 'auth':
-                return False
+            if app_label == 'auth':
+                return db == 'auth_db'
             return None
 
 And we also want a router that sends all other apps to the
@@ -333,21 +363,21 @@ from::
                 return True
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             """
             All non-auth models end up in this pool.
             """
             return True
 
 Finally, in the settings file, we add the following (substituting
-``path.to.`` with the actual python path to the module(s) where the
+``path.to.`` with the actual Python path to the module(s) where the
 routers are defined)::
 
     DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
 
 The order in which routers are processed is significant. Routers will
-be queried in the order the are listed in the
-:setting:`DATABASE_ROUTERS` setting . In this example, the
+be queried in the order they are listed in the
+:setting:`DATABASE_ROUTERS` setting. In this example, the
 ``AuthRouter`` is processed before the ``PrimaryReplicaRouter``, and as a
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
@@ -381,6 +411,13 @@ With this setup installed, lets run some Django code::
     >>> # ... but if we re-retrieve the object, it will come back on a replica
     >>> mh = Book.objects.get(title='Mostly Harmless')
 
+This example defined a router to handle interaction with models from the
+``auth`` app, and other routers to handle interaction with all other apps. If
+you left your ``default`` database empty and don't want to define a catch-all
+database router to handle all apps not otherwise specified, your routers must
+handle the names of all apps in :setting:`INSTALLED_APPS` before you migrate.
+See :ref:`contrib_app_multiple_databases` for information about contrib apps
+that must be together in one database.
 
 Manually selecting a database
 =============================
@@ -512,7 +549,7 @@ solution is to use ``db_manager()``, like this::
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
 Using ``get_queryset()`` with multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're overriding ``get_queryset()`` on your manager, be sure to
 either call the method on the parent (using ``super()``) or do the
@@ -555,17 +592,17 @@ multiple-database support::
 
         def get_queryset(self, request):
             # Tell Django to look for objects on the 'other' database.
-            return super(MultiDBModelAdmin, self).get_queryset(request).using(self.using)
+            return super().get_queryset(request).using(self.using)
 
-        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super(MultiDBModelAdmin, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+            return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
 
-        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super(MultiDBModelAdmin, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+            return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
 The implementation provided here implements a multi-database strategy
 where all objects of a given type are stored on a specific database
@@ -573,24 +610,25 @@ where all objects of a given type are stored on a specific database
 usage of multiple databases is more complex, your ``ModelAdmin`` will
 need to reflect that strategy.
 
-Inlines can be handled in a similar fashion. They require three customized methods::
+:class:`~django.contrib.admin.InlineModelAdmin` objects can be handled in a
+similar fashion. They require three customized methods::
 
     class MultiDBTabularInline(admin.TabularInline):
         using = 'other'
 
         def get_queryset(self, request):
             # Tell Django to look for inline objects on the 'other' database.
-            return super(MultiDBTabularInline, self).get_queryset(request).using(self.using)
+            return super().get_queryset(request).using(self.using)
 
-        def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super(MultiDBTabularInline, self).formfield_for_foreignkey(db_field, request=request, using=self.using, **kwargs)
+            return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
 
-        def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super(MultiDBTabularInline, self).formfield_for_manytomany(db_field, request=request, using=self.using, **kwargs)
+            return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
 Once you've written your model admin definitions, they can be
 registered with any ``Admin`` instance::
@@ -671,7 +709,7 @@ how you can split these models across databases:
 - ``auth`` models — ``User``, ``Group`` and ``Permission`` — are linked
   together and linked to ``ContentType``, so they must be stored in the same
   database as ``ContentType``.
-- ``admin`` depends on ``auth``, so their models must be in the same database
+- ``admin`` depends on ``auth``, so its models must be in the same database
   as ``auth``.
 - ``flatpages`` and ``redirects`` depend on ``sites``, so their models must be
   in the same database as ``sites``.

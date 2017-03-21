@@ -8,11 +8,11 @@ This is Django 1.5.3, the third release in the Django 1.5 series. It addresses
 one security issue and also contains an opt-in feature to enhance the security
 of :mod:`django.contrib.sessions`.
 
-Directory traversal vulnerability in :ttag:`ssi` template tag
--------------------------------------------------------------
+Directory traversal vulnerability in ``ssi`` template tag
+=========================================================
 
 In previous versions of Django it was possible to bypass the
-:setting:`ALLOWED_INCLUDE_ROOTS` setting used for security with the :ttag:`ssi`
+``ALLOWED_INCLUDE_ROOTS`` setting used for security with the ``ssi``
 template tag by specifying a relative path that starts with one of the allowed
 roots. For example, if ``ALLOWED_INCLUDE_ROOTS = ("/var/www",)`` the following
 would be possible:
@@ -22,11 +22,11 @@ would be possible:
     {% ssi "/var/www/../../etc/passwd" %}
 
 In practice this is not a very common problem, as it would require the template
-author to put the :ttag:`ssi` file in a user-controlled variable, but it's
-possible in principle.
+author to put the ``ssi`` file in a user-controlled variable, but it's possible
+in principle.
 
 Mitigating a remote-code execution vulnerability in :mod:`django.contrib.sessions`
-----------------------------------------------------------------------------------
+==================================================================================
 
 :mod:`django.contrib.sessions` currently uses :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed

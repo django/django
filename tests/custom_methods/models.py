@@ -7,10 +7,8 @@ Any method you add to a model will be available to instances.
 import datetime
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
@@ -35,6 +33,6 @@ class Article(models.Model):
                 SELECT id, headline, pub_date
                 FROM custom_methods_article
                 WHERE pub_date = %s
-                    AND id != %s""", [connection.ops.value_to_db_date(self.pub_date),
+                    AND id != %s""", [connection.ops.adapt_datefield_value(self.pub_date),
                                       self.id])
             return [self.__class__(*row) for row in cursor.fetchall()]

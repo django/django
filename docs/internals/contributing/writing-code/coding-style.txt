@@ -4,8 +4,15 @@ Coding style
 
 Please follow these coding standards when writing code for inclusion in Django.
 
+.. _coding-style-python:
+
 Python style
-------------
+============
+
+* Please conform to the indentation style dictated in the ``.editorconfig``
+  file. We recommend using a text editor with `EditorConfig`_ support to avoid
+  indentation and whitespace issues. The Python files use 4 spaces for
+  indentation and the HTML files use 2 spaces.
 
 * Unless otherwise specified, follow :pep:`8`.
 
@@ -27,37 +34,121 @@ Python style
 * Use four spaces for indentation.
 
 * Use underscores, not camelCase, for variable, function and method names
-  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters()``).
 
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
-* Use convenience imports whenever available. For example, do this::
-
-      from django.views.generic import View
-
-  Don't do this::
-
-      from django.views.generic.base import View
-
-* In docstrings, use "action words" such as::
-
-      def foo():
-          """
-          Calculates something and returns the result.
-          """
-          pass
-
-  Here's an example of what not to do::
+* In docstrings, follow :pep:`257`. For example::
 
       def foo():
           """
           Calculate something and return the result.
           """
-          pass
+          ...
+
+* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
+  of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
+  message. Use :meth:`~unittest.TestCase.assertRaisesRegex` only if you need
+  regular expression matching.
+
+* In test docstrings, state the expected behavior that each test demonstrates.
+  Don't include preambles such as "Tests that" or "Ensures that".
+
+  Reserve ticket references for obscure issues where the ticket has additional
+  details that can't be easily described in docstrings or comments. Include the
+  ticket number at the end of a sentence like this::
+
+    def test_foo():
+        """
+        A test docstring looks like this (#123456).
+        """
+        ...
+
+.. _coding-style-imports:
+
+Imports
+=======
+
+* Use `isort <https://github.com/timothycrosley/isort#readme>`_ to automate
+  import sorting using the guidelines below.
+
+  Quick start:
+
+  .. code-block:: console
+
+      $ pip install isort
+      $ isort -rc .
+
+  This runs ``isort`` recursively from your current directory, modifying any
+  files that don't conform to the guidelines. If you need to have imports out
+  of order (to avoid a circular import, for example) use a comment like this::
+
+      import module  # isort:skip
+
+* Put imports in these groups: future, standard library, third-party libraries,
+  other Django components, local Django component, try/excepts. Sort lines in
+  each group alphabetically by the full module name. Place all ``import module``
+  statements before ``from module import objects`` in each section. Use absolute
+  imports for other Django components and relative imports for local components.
+
+* On each line, alphabetize the items with the upper case items grouped before
+  the lower case items.
+
+* Break long lines using parentheses and indent continuation lines by 4 spaces.
+  Include a trailing comma after the last import and put the closing
+  parenthesis on its own line.
+
+  Use a single blank line between the last import and any module level code,
+  and use two blank lines above the first function or class.
+
+  For example (comments are for explanatory purposes only):
+
+  .. snippet::
+      :filename: django/contrib/admin/example.py
+
+      # future
+      from __future__ import unicode_literals
+
+      # standard library
+      import json
+      from itertools import chain
+
+      # third-party
+      import bcrypt
+
+      # Django
+      from django.http import Http404
+      from django.http.response import (
+          Http404, HttpResponse, HttpResponseNotAllowed, StreamingHttpResponse,
+          cookie,
+      )
+
+      # local Django
+      from .models import LogEntry
+
+      # try/except
+      try:
+          import yaml
+      except ImportError:
+          yaml = None
+
+      CONSTANT = 'foo'
+
+
+      class Example(object):
+          # ...
+
+* Use convenience imports whenever available. For example, do this::
+
+      from django.views import View
+
+  instead of::
+
+      from django.views.generic.base import View
 
 Template style
---------------
+==============
 
 * In Django template code, put one (and only one) space between the curly
   brackets and the tag contents.
@@ -75,7 +166,7 @@ Template style
       {{foo}}
 
 View style
-----------
+==========
 
 * In Django views, the first parameter in a view function should be called
   ``request``.
@@ -91,7 +182,7 @@ View style
           # ...
 
 Model style
------------
+===========
 
 * Field names should be all lowercase, using underscores instead of
   camelCase.
@@ -137,10 +228,6 @@ Model style
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
 
-* If you define a ``__str__`` method (previously ``__unicode__`` before Python 3
-  was supported), decorate the model class with
-  :func:`~django.utils.encoding.python_2_unicode_compatible`.
-
 * The order of model inner classes and standard methods should be as
   follows (noting that these are not all required):
 
@@ -165,7 +252,7 @@ Model style
         )
 
 Use of ``django.conf.settings``
--------------------------------
+===============================
 
 Modules should not in general use settings stored in ``django.conf.settings``
 at the top level (i.e. evaluated when the module is imported). The explanation
@@ -187,7 +274,7 @@ already been configured).
 So, if there is a module containing some code as follows::
 
     from django.conf import settings
-    from django.core.urlresolvers import get_callable
+    from django.urls import get_callable
 
     default_foo_view = get_callable(settings.FOO_VIEW)
 
@@ -201,7 +288,7 @@ such as ``django.utils.functional.LazyObject``,
 ``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
--------------
+=============
 
 * Mark all strings for internationalization; see the :doc:`i18n
   documentation </topics/i18n/index>` for details.
@@ -223,4 +310,11 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
+JavaScript style
+================
+
+For details about the JavaScript code style used by Django, see
+:doc:`javascript`.
+
+.. _editorconfig: http://editorconfig.org/
 .. _flake8: https://pypi.python.org/pypi/flake8

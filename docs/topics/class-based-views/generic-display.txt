@@ -1,7 +1,5 @@
-.. _Generic views:
-
 ==================================
-Built-in Class-based generic views
+Built-in class-based generic views
 ==================================
 
 Writing Web applications can be monotonous, because we repeat certain patterns
@@ -89,7 +87,7 @@ We'll be using these models::
         class Meta:
             ordering = ["-name"]
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Author(models.Model):
@@ -98,13 +96,13 @@ We'll be using these models::
         email = models.EmailField()
         headshot = models.ImageField(upload_to='author_headshots')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
         authors = models.ManyToManyField('Author')
-        publisher = models.ForeignKey(Publisher)
+        publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
         publication_date = models.DateField()
 
 Now we need to define a view::
@@ -136,10 +134,9 @@ bit is just the lowercased version of the model's name.
 
 .. note::
 
-    Thus, when (for example) the
-    :class:`django.template.loaders.app_directories.Loader` template loader is
-    enabled in :setting:`TEMPLATE_LOADERS`, a template location could be:
-    /path/to/project/books/templates/books/publisher_list.html
+    Thus, when (for example) the ``APP_DIRS`` option of a ``DjangoTemplates``
+    backend is set to True in :setting:`TEMPLATES`, a template location could
+    be: /path/to/project/books/templates/books/publisher_list.html
 
 This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A very simple template
@@ -221,7 +218,7 @@ template, but you can override it to send more::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = super(PublisherDetail, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             # Add in a QuerySet of all the books
             context['book_list'] = Book.objects.all()
             return context
@@ -237,6 +234,11 @@ template, but you can override it to send more::
     to super), any children of that class will also need to explicitly set it
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
+
+    Another consideration is that the context data from class-based generic
+    views will override data provided by context processors; see
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data` for
+    an example.
 
 .. _generic-views-list-subsets:
 
@@ -288,7 +290,7 @@ technique::
     class AcmeBookList(ListView):
 
         context_object_name = 'book_list'
-        queryset = Book.objects.filter(publisher__name='Acme Publishing')
+        queryset = Book.objects.filter(publisher__name='ACME Publishing')
         template_name = 'books/acme_list.html'
 
 Notice that along with a filtered ``queryset``, we're also using a custom
@@ -363,7 +365,7 @@ use it in the template::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = super(PublisherBookList, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             # Add in the publisher
             context['publisher'] = self.publisher
             return context
@@ -417,7 +419,7 @@ object -- so we simply override it and wrap the call::
 
         def get_object(self):
             # Call the superclass
-            object = super(AuthorDetailView, self).get_object()
+            object = super().get_object()
             # Record the last accessed date
             object.last_accessed = timezone.now()
             object.save()

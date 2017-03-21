@@ -1,38 +1,53 @@
-from __future__ import unicode_literals
-
-from collections import defaultdict
 import datetime
 import decimal
+from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
+from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.forms.forms import pretty_name
-from django.utils import formats
+from django.db.models.sql.constants import QUERY_TERMS
+from django.forms.utils import pretty_name
+from django.urls import NoReverseMatch, reverse
+from django.utils import formats, timezone
+from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
-from django.utils import timezone
-from django.utils.encoding import force_str, force_text, smart_text
-from django.utils import six
-from django.utils.translation import ungettext
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.translation import ngettext, override as translation_override
+
+
+class FieldIsAForeignKeyColumnName(Exception):
+    """A field is a foreign key attname, i.e. <FK>_id."""
+    pass
 
 
 def lookup_needs_distinct(opts, lookup_path):
     """
-    Returns True if 'distinct()' should be used to query the given lookup path.
+    Return True if 'distinct()' should be used to query the given lookup path.
     """
-    field_name = lookup_path.split('__', 1)[0]
-    field = opts.get_field_by_name(field_name)[0]
-    if hasattr(field, 'get_path_info') and any(path.m2m for path in field.get_path_info()):
-        return True
+    lookup_fields = lookup_path.split(LOOKUP_SEP)
+    # Remove the last item of the lookup path if it is a query term
+    if lookup_fields[-1] in QUERY_TERMS:
+        lookup_fields = lookup_fields[:-1]
+    # Now go through the fields (following all relations) and look for an m2m
+    for field_name in lookup_fields:
+        if field_name == 'pk':
+            field_name = opts.pk.name
+        field = opts.get_field(field_name)
+        if hasattr(field, 'get_path_info'):
+            # This field is a relation, update opts to follow the relation
+            path_info = field.get_path_info()
+            opts = path_info[-1].to_opts
+            if any(path.m2m for path in path_info):
+                # This field is a m2m relation so we know we need to call distinct
+                return True
     return False
 
 
 def prepare_lookup_value(key, value):
     """
-    Returns a lookup value prepared to be used in queryset filtering.
+    Return a lookup value prepared to be used in queryset filtering.
     """
     # if key ends with __in, split parameter into separate values
     if key.endswith('__in'):
@@ -53,12 +68,12 @@ def quote(s):
     Similar to urllib.quote, except that the quoting is slightly different so
     that it doesn't get automatically unquoted by the Web browser.
     """
-    if not isinstance(s, six.string_types):
+    if not isinstance(s, str):
         return s
     res = list(s)
     for i in range(len(res)):
         c = res[i]
-        if c in """:/_#?;@&=+$,"[]<>%\\""":
+        if c in """:/_#?;@&=+$,"[]<>%\n\\""":
             res[i] = '_%02X' % ord(c)
     return ''.join(res)
 
@@ -85,8 +100,9 @@ def unquote(s):
 
 
 def flatten(fields):
-    """Returns a list which is a single level of flattening of the
-    original list."""
+    """
+    Return a list which is a single level of flattening of the original list.
+    """
     flat = []
     for field in fields:
         if isinstance(field, (list, tuple)):
@@ -97,7 +113,7 @@ def flatten(fields):
 
 
 def flatten_fieldsets(fieldsets):
-    """Returns a list of field names from an admin fieldsets structure."""
+    """Return a list of field names from an admin fieldsets structure."""
     field_names = []
     for name, opts in fieldsets:
         field_names.extend(
@@ -111,9 +127,8 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
 
-    Returns a nested list of strings suitable for display in the
+    Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
-
     """
     collector = NestedObjects(using=using)
     collector.collect(objs)
@@ -123,8 +138,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
         has_admin = obj.__class__ in admin_site._registry
         opts = obj._meta
 
-        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name),
-                                   force_text(obj))
+        no_edit_link = '%s: %s' % (capfirst(opts.verbose_name), obj)
 
         if has_admin:
             try:
@@ -154,16 +168,17 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
     to_delete = collector.nested(format_callback)
 
     protected = [format_callback(obj) for obj in collector.protected]
+    model_count = {model._meta.verbose_name_plural: len(objs) for model, objs in collector.model_objs.items()}
 
-    return to_delete, collector.model_count, perms_needed, protected
+    return to_delete, model_count, perms_needed, protected
 
 
 class NestedObjects(Collector):
     def __init__(self, *args, **kwargs):
-        super(NestedObjects, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
-        self.model_count = defaultdict(int)
+        self.model_objs = defaultdict(set)
 
     def add_edge(self, source, target):
         self.edges.setdefault(source, []).append(target)
@@ -178,14 +193,14 @@ class NestedObjects(Collector):
                 self.add_edge(getattr(obj, related_name), obj)
             else:
                 self.add_edge(None, obj)
-            self.model_count[obj._meta.verbose_name_plural] += 1
+            self.model_objs[obj._meta.model].add(obj)
         try:
-            return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+            return super().collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
     def related_objects(self, related, objs):
-        qs = super(NestedObjects, self).related_objects(related, objs)
+        qs = super().related_objects(related, objs)
         return qs.select_related(related.field.name)
 
     def _nested(self, obj, seen, format_callback):
@@ -206,7 +221,6 @@ class NestedObjects(Collector):
     def nested(self, format_callback=None):
         """
         Return the graph as a nested list.
-
         """
         seen = set()
         roots = []
@@ -228,7 +242,6 @@ def model_format_dict(obj):
     typically for use with string formatting.
 
     `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
-
     """
     if isinstance(obj, (models.Model, models.base.ModelBase)):
         opts = obj._meta
@@ -237,8 +250,8 @@ def model_format_dict(obj):
     else:
         opts = obj
     return {
-        'verbose_name': force_text(opts.verbose_name),
-        'verbose_name_plural': force_text(opts.verbose_name_plural)
+        'verbose_name': opts.verbose_name,
+        'verbose_name_plural': opts.verbose_name_plural,
     }
 
 
@@ -250,7 +263,6 @@ def model_ngettext(obj, n=None):
     `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
     If `obj` is a `QuerySet` instance, `n` is optional and the length of the
     `QuerySet` is used.
-
     """
     if isinstance(obj, models.query.QuerySet):
         if n is None:
@@ -258,23 +270,20 @@ def model_ngettext(obj, n=None):
         obj = obj.model
     d = model_format_dict(obj)
     singular, plural = d["verbose_name"], d["verbose_name_plural"]
-    return ungettext(singular, plural, n or 0)
+    return ngettext(singular, plural, n or 0)
 
 
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
-        f = opts.get_field(name)
-    except models.FieldDoesNotExist:
+        f = _get_non_gfk_field(opts, name)
+    except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
         # For non-field values, the value is either a method, property or
         # returned via a callable.
         if callable(name):
             attr = name
             value = attr(obj)
-        elif (model_admin is not None and
-                hasattr(model_admin, name) and
-                not name == '__str__' and
-                not name == '__unicode__'):
+        elif model_admin is not None and hasattr(model_admin, name) and name != '__str__':
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:
@@ -290,29 +299,47 @@ def lookup_field(name, obj, model_admin=None):
     return f, attr, value
 
 
+def _get_non_gfk_field(opts, name):
+    """
+    For historical reasons, the admin app relies on GenericForeignKeys as being
+    "not found" by get_field(). This could likely be cleaned up.
+
+    Reverse relations should also be excluded as these aren't attributes of the
+    model (rather something like `foo_set`).
+    """
+    field = opts.get_field(name)
+    if (field.is_relation and
+            # Generic foreign keys OR reverse relations
+            ((field.many_to_one and not field.related_model) or field.one_to_many)):
+        raise FieldDoesNotExist()
+
+    # Avoid coercing <FK>_id fields to FK
+    if field.is_relation and not field.many_to_many and hasattr(field, 'attname') and field.attname == name:
+        raise FieldIsAForeignKeyColumnName()
+
+    return field
+
+
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
-    Returns a sensible label for a field name. The name can be a callable,
-    property (but not created with @property decorator) or the name of an
-    object's attribute, as well as a genuine fields. If return_attr is
-    True, the resolved attribute (which could be a callable) is also returned.
-    This will be None if (and only if) the name refers to a field.
+    Return a sensible label for a field name. The name can be a callable,
+    property (but not created with @property decorator), or the name of an
+    object's attribute, as well as a model field. If return_attr is True, also
+    return the resolved attribute (which could be a callable). This will be
+    None if (and only if) the name refers to a field.
     """
     attr = None
     try:
-        field = model._meta.get_field_by_name(name)[0]
+        field = _get_non_gfk_field(model._meta, name)
         try:
             label = field.verbose_name
         except AttributeError:
             # field is likely a ForeignObjectRel
-            label = field.opts.verbose_name
-    except models.FieldDoesNotExist:
-        if name == "__unicode__":
+            label = field.related_model._meta.verbose_name
+    except FieldDoesNotExist:
+        if name == "__str__":
             label = force_text(model._meta.verbose_name)
-            attr = six.text_type
-        elif name == "__str__":
-            label = force_str(model._meta.verbose_name)
-            attr = bytes
+            attr = str
         else:
             if callable(name):
                 attr = name
@@ -339,6 +366,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
                     label = pretty_name(attr.__name__)
             else:
                 label = pretty_name(name)
+    except FieldIsAForeignKeyColumnName:
+        label = pretty_name(name)
+        attr = name
+
     if return_attr:
         return (label, attr)
     else:
@@ -348,56 +379,57 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 def help_text_for_field(name, model):
     help_text = ""
     try:
-        field_data = model._meta.get_field_by_name(name)
-    except models.FieldDoesNotExist:
+        field = _get_non_gfk_field(model._meta, name)
+    except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
         pass
     else:
-        field = field_data[0]
         if hasattr(field, 'help_text'):
             help_text = field.help_text
-    return smart_text(help_text)
+    return help_text
 
 
-def display_for_field(value, field):
+def display_for_field(value, field, empty_value_display):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
-    if field.flatchoices:
-        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+    if getattr(field, 'flatchoices', None):
+        return dict(field.flatchoices).get(value, empty_value_display)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return empty_value_display
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(field, (models.DateField, models.TimeField)):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):
         return formats.number_format(value, field.decimal_places)
-    elif isinstance(field, models.FloatField):
+    elif isinstance(field, (models.IntegerField, models.FloatField)):
         return formats.number_format(value)
+    elif isinstance(field, models.FileField) and value:
+        return format_html('<a href="{}">{}</a>', value.url, value)
     else:
-        return smart_text(value)
+        return display_for_value(value, empty_value_display)
 
 
-def display_for_value(value, boolean=False):
+def display_for_value(value, empty_value_display, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
     if boolean:
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return empty_value_display
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
+    elif isinstance(value, (int, decimal.Decimal, float)):
         return formats.number_format(value)
+    elif isinstance(value, (list, tuple)):
+        return ', '.join(force_text(v) for v in value)
     else:
-        return smart_text(value)
+        return force_text(value)
 
 
 class NotRelationField(Exception):
@@ -418,25 +450,26 @@ def reverse_field_path(model, path):
     return (Group, "user__order").
 
     Final field must be a related model, not a data field.
-
     """
     reversed_path = []
     parent = model
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
-        field, model, direct, m2m = parent._meta.get_field_by_name(piece)
+        field = parent._meta.get_field(piece)
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
                 get_model_from_relation(field)
             except NotRelationField:
                 break
-        if direct:
+
+        # Field should point to another model
+        if field.is_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
-            parent = field.rel.to
+            parent = field.remote_field.model
         else:
             related_name = field.field.name
-            parent = field.model
+            parent = field.related_model
         reversed_path.insert(0, related_name)
     return (parent, LOOKUP_SEP.join(reversed_path))
 
@@ -457,34 +490,45 @@ def get_fields_from_path(model, path):
             parent = get_model_from_relation(fields[-1])
         else:
             parent = model
-        fields.append(parent._meta.get_field_by_name(piece)[0])
+        fields.append(parent._meta.get_field(piece))
     return fields
 
 
-def remove_trailing_data_field(fields):
-    """ Discard trailing non-relation field if extant. """
-    try:
-        get_model_from_relation(fields[-1])
-    except NotRelationField:
-        fields = fields[:-1]
-    return fields
-
-
-def get_limit_choices_to_from_path(model, path):
-    """ Return Q object for limiting choices if applicable.
-
-    If final model in path is linked via a ForeignKey or ManyToManyField which
-    has a ``limit_choices_to`` attribute, return it as a Q object.
+def construct_change_message(form, formsets, add):
     """
-    fields = get_fields_from_path(model, path)
-    fields = remove_trailing_data_field(fields)
-    get_limit_choices_to = (
-        fields and hasattr(fields[-1], 'rel') and
-        getattr(fields[-1].rel, 'get_limit_choices_to', None))
-    if not get_limit_choices_to:
-        return models.Q()  # empty Q
-    limit_choices_to = get_limit_choices_to()
-    if isinstance(limit_choices_to, models.Q):
-        return limit_choices_to  # already a Q
-    else:
-        return models.Q(**limit_choices_to)  # convert dict to Q
+    Construct a JSON structure describing changes from a changed object.
+    Translations are deactivated so that strings are stored untranslated.
+    Translation happens later on LogEntry access.
+    """
+    change_message = []
+    if add:
+        change_message.append({'added': {}})
+    elif form.changed_data:
+        change_message.append({'changed': {'fields': form.changed_data}})
+
+    if formsets:
+        with translation_override(None):
+            for formset in formsets:
+                for added_object in formset.new_objects:
+                    change_message.append({
+                        'added': {
+                            'name': force_text(added_object._meta.verbose_name),
+                            'object': force_text(added_object),
+                        }
+                    })
+                for changed_object, changed_fields in formset.changed_objects:
+                    change_message.append({
+                        'changed': {
+                            'name': force_text(changed_object._meta.verbose_name),
+                            'object': force_text(changed_object),
+                            'fields': changed_fields,
+                        }
+                    })
+                for deleted_object in formset.deleted_objects:
+                    change_message.append({
+                        'deleted': {
+                            'name': force_text(deleted_object._meta.verbose_name),
+                            'object': force_text(deleted_object),
+                        }
+                    })
+    return change_message

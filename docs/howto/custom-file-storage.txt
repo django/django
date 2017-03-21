@@ -1,3 +1,4 @@
+===============================
 Writing a custom storage system
 ===============================
 
@@ -50,7 +51,7 @@ typically have to be overridden:
 * :meth:`Storage.size`
 * :meth:`Storage.url`
 
-Note however that not all these methods are required and may be deliberately 
+Note however that not all these methods are required and may be deliberately
 omitted. As it happens, it is possible to leave each method unimplemented and
 still have a working Storage.
 
@@ -87,30 +88,25 @@ instead).
 
 .. method:: get_valid_name(name)
 
-
 Returns a filename suitable for use with the underlying storage system. The
-``name`` argument passed to this method is the original filename sent to the
-server, after having any path information removed. Override this to customize
-how non-standard characters are converted to safe filenames.
+``name`` argument passed to this method is either the original filename sent to
+the server or, if ``upload_to`` is a callable, the filename returned by that
+method after any path information is removed. Override this to customize how
+non-standard characters are converted to safe filenames.
 
 The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.
 
-.. method:: get_available_name(name)
+.. method:: get_available_name(name, max_length=None)
 
 Returns a filename that is available in the storage mechanism, possibly taking
 the provided filename into account. The ``name`` argument passed to this method
 will have already cleaned to a filename valid for the storage system, according
 to the ``get_valid_name()`` method described above.
 
-.. versionchanged:: 1.7
+The length of the filename will not exceed ``max_length``, if provided. If a
+free unique filename cannot be found, a :exc:`SuspiciousFileOperation
+<django.core.exceptions.SuspiciousOperation>` exception is raised.
 
-    If a file with ``name`` already exists, an underscore plus a random 7
-    character alphanumeric string is appended to the filename before the
-    extension.
-
-    Previously, an underscore followed by a number (e.g. ``"_1"``, ``"_2"``,
-    etc.) was appended to the filename until an available name in the destination
-    directory was found. A malicious user could exploit this deterministic
-    algorithm to create a denial-of-service attack. This change was also made
-    in Django 1.6.6, 1.5.9, and 1.4.14.
+If a file with ``name`` already exists, an underscore plus a random 7 character
+alphanumeric string is appended to the filename before the extension.

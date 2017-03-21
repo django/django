@@ -1,3 +1,4 @@
+===============
 "How-to" guides
 ===============
 
@@ -26,6 +27,7 @@ you quickly accomplish common tasks.
    static-files/index
    static-files/deployment
    windows
+   writing-migrations
 
 .. seealso::
 

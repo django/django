@@ -9,56 +9,66 @@
 import logging
 import os
 import re
-from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
+from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
 from django.contrib.gis.geos.error import GEOSException
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.functional import SimpleLazyObject
 
 logger = logging.getLogger('django.contrib.gis')
 
-# Custom library path set?
-try:
-    from django.conf import settings
-    lib_path = settings.GEOS_LIBRARY_PATH
-except (AttributeError, EnvironmentError,
-        ImportError, ImproperlyConfigured):
-    lib_path = None
 
-# Setting the appropriate names for the GEOS-C library.
-if lib_path:
-    lib_names = None
-elif os.name == 'nt':
-    # Windows NT libraries
-    lib_names = ['geos_c', 'libgeos_c-1']
-elif os.name == 'posix':
-    # *NIX libraries
-    lib_names = ['geos_c', 'GEOS']
-else:
-    raise ImportError('Unsupported OS "%s"' % os.name)
+def load_geos():
+    # Custom library path set?
+    try:
+        from django.conf import settings
+        lib_path = settings.GEOS_LIBRARY_PATH
+    except (AttributeError, EnvironmentError,
+            ImportError, ImproperlyConfigured):
+        lib_path = None
 
-# Using the ctypes `find_library` utility to find the path to the GEOS
-# shared library.  This is better than manually specifying each library name
-# and extension (e.g., libgeos_c.[so|so.1|dylib].).
-if lib_names:
-    for lib_name in lib_names:
-        lib_path = find_library(lib_name)
-        if lib_path is not None:
-            break
+    # Setting the appropriate names for the GEOS-C library.
+    if lib_path:
+        lib_names = None
+    elif os.name == 'nt':
+        # Windows NT libraries
+        lib_names = ['geos_c', 'libgeos_c-1']
+    elif os.name == 'posix':
+        # *NIX libraries
+        lib_names = ['geos_c', 'GEOS']
+    else:
+        raise ImportError('Unsupported OS "%s"' % os.name)
 
-# No GEOS library could be found.
-if lib_path is None:
-    raise ImportError(
-        'Could not find the GEOS library (tried "%s"). '
-        'Try setting GEOS_LIBRARY_PATH in your settings.' %
-        '", "'.join(lib_names)
-    )
+    # Using the ctypes `find_library` utility to find the path to the GEOS
+    # shared library.  This is better than manually specifying each library name
+    # and extension (e.g., libgeos_c.[so|so.1|dylib].).
+    if lib_names:
+        for lib_name in lib_names:
+            lib_path = find_library(lib_name)
+            if lib_path is not None:
+                break
 
-# Getting the GEOS C library.  The C interface (CDLL) is used for
-# both *NIX and Windows.
-# See the GEOS C API source code for more details on the library function calls:
-#  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
-lgeos = CDLL(lib_path)
+    # No GEOS library could be found.
+    if lib_path is None:
+        raise ImportError(
+            'Could not find the GEOS library (tried "%s"). '
+            'Try setting GEOS_LIBRARY_PATH in your settings.' %
+            '", "'.join(lib_names)
+        )
+    # Getting the GEOS C library.  The C interface (CDLL) is used for
+    # both *NIX and Windows.
+    # See the GEOS C API source code for more details on the library function calls:
+    #  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
+    _lgeos = CDLL(lib_path)
+    # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
+    # routines.  These functions aren't actually called until they are
+    # attached to a GEOS context handle -- this actually occurs in
+    # geos/prototypes/threadsafe.py.
+    _lgeos.initGEOS_r.restype = CONTEXT_PTR
+    _lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+    return _lgeos
+
 
 # The notice and error handler C function callback definitions.
 # Supposed to mimic the GEOS message handler (C below):
@@ -72,7 +82,9 @@ def notice_h(fmt, lst):
         warn_msg = fmt % lst
     except TypeError:
         warn_msg = fmt
-    logger.warning('GEOS_NOTICE: %s\n' % warn_msg)
+    logger.warning('GEOS_NOTICE: %s\n', warn_msg)
+
+
 notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
@@ -84,10 +96,12 @@ def error_h(fmt, lst):
         err_msg = fmt % lst
     except TypeError:
         err_msg = fmt
-    logger.error('GEOS_ERROR: %s\n' % err_msg)
+    logger.error('GEOS_ERROR: %s\n', err_msg)
+
+
 error_h = ERRORFUNC(error_h)
 
-#### GEOS Geometry C data structures, and utility functions. ####
+# #### GEOS Geometry C data structures, and utility functions. ####
 
 
 # Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR
@@ -106,6 +120,7 @@ class GEOSCoordSeq_t(Structure):
 class GEOSContextHandle_t(Structure):
     pass
 
+
 # Pointers to opaque GEOS geometry structures.
 GEOM_PTR = POINTER(GEOSGeom_t)
 PREPGEOM_PTR = POINTER(GEOSPrepGeom_t)
@@ -116,15 +131,52 @@ CONTEXT_PTR = POINTER(GEOSContextHandle_t)
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
 #  GEOS routines
 def get_pointer_arr(n):
-    "Gets a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
+    "Get a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
     GeomArr = GEOM_PTR * n
     return GeomArr()
 
-# Returns the string version of the GEOS library. Have to set the restype
+
+lgeos = SimpleLazyObject(load_geos)
+
+
+class GEOSFuncFactory:
+    """
+    Lazy loading of GEOS functions.
+    """
+    argtypes = None
+    restype = None
+    errcheck = None
+
+    def __init__(self, func_name, *args, restype=None, errcheck=None, argtypes=None, **kwargs):
+        self.func_name = func_name
+        if restype is not None:
+            self.restype = restype
+        if errcheck is not None:
+            self.errcheck = errcheck
+        if argtypes is not None:
+            self.argtypes = argtypes
+        self.args = args
+        self.kwargs = kwargs
+        self.func = None
+
+    def __call__(self, *args, **kwargs):
+        if self.func is None:
+            self.func = self.get_func(*self.args, **self.kwargs)
+        return self.func(*args, **kwargs)
+
+    def get_func(self, *args, **kwargs):
+        from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
+        func = GEOSFunc(self.func_name)
+        func.argtypes = self.argtypes or []
+        func.restype = self.restype
+        if self.errcheck:
+            func.errcheck = self.errcheck
+        return func
+
+
+# Return the string version of the GEOS library. Have to set the restype
 # explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
-geos_version = lgeos.GEOSversion
-geos_version.argtypes = None
-geos_version.restype = c_char_p
+geos_version = GEOSFuncFactory('GEOSversion', restype=c_char_p)
 
 # Regular expression should be able to parse version strings such as
 # '3.0.0rc4-CAPI-1.3.3', '3.0.0-CAPI-1.4.1', '3.4.0dev-CAPI-1.8.0' or '3.4.0dev-CAPI-1.8.0 r0'
@@ -136,7 +188,7 @@ version_regex = re.compile(
 
 def geos_version_info():
     """
-    Returns a dictionary containing the various version metadata parsed from
+    Return a dictionary containing the various version metadata parsed from
     the GEOS version string, including the version number, whether the version
     is a release candidate (and what number release candidate), and the C API
     version.
@@ -147,18 +199,3 @@ def geos_version_info():
         raise GEOSException('Could not parse version info string "%s"' % ver)
     return {key: m.group(key) for key in (
         'version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor')}
-
-# Version numbers and whether or not prepared geometry support is available.
-_verinfo = geos_version_info()
-GEOS_MAJOR_VERSION = int(_verinfo['major'])
-GEOS_MINOR_VERSION = int(_verinfo['minor'])
-GEOS_SUBMINOR_VERSION = int(_verinfo['subminor'])
-del _verinfo
-GEOS_VERSION = (GEOS_MAJOR_VERSION, GEOS_MINOR_VERSION, GEOS_SUBMINOR_VERSION)
-
-# Here we set up the prototypes for the initGEOS_r and finishGEOS_r
-# routines.  These functions aren't actually called until they are
-# attached to a GEOS context handle -- this actually occurs in
-# geos/prototypes/threadsafe.py.
-lgeos.initGEOS_r.restype = CONTEXT_PTR
-lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]

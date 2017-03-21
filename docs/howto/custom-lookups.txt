@@ -2,8 +2,6 @@
 Custom Lookups
 ==============
 
-.. versionadded:: 1.7
-
 .. currentmodule:: django.db.models
 
 Django offers a wide variety of :ref:`built-in lookups <field-lookups>` for
@@ -12,7 +10,7 @@ explains how to write custom lookups and how to alter the working of existing
 lookups. For the API references of lookups, see the :doc:`/ref/models/lookups`.
 
 A simple lookup example
-~~~~~~~~~~~~~~~~~~~~~~~
+=======================
 
 Let's start with a simple custom lookup. We will write a custom lookup ``ne``
 which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
@@ -50,13 +48,9 @@ Lookup registration can also be done using a decorator pattern::
 
     from django.db.models.fields import Field
 
-    @Field.registerLookup
+    @Field.register_lookup
     class NotEqualLookup(Lookup):
         # ...
-
-.. versionchanged:: 1.8
-
-    The ability to use the decorator pattern was added.
 
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
 this registration happens before you try to create any querysets using it. You
@@ -73,7 +67,7 @@ We then need to define the ``as_sql`` method. This takes a ``SQLCompiler``
 object, called ``compiler``,  and the active database connection.
 ``SQLCompiler`` objects are not documented, but the only thing we need to know
 about them is that they have a ``compile()`` method which returns a tuple
-containing a SQL string, and the parameters to be interpolated into that
+containing an SQL string, and the parameters to be interpolated into that
 string. In most cases, you don't need to use it directly and can pass it on to
 ``process_lhs()`` and ``process_rhs()``.
 
@@ -94,12 +88,12 @@ example, ``process_lhs`` returns ``('"author"."name"', [])`` and
 parameters for the left hand side, but this would depend on the object we have,
 so we still need to include them in the parameters we return.
 
-Finally we combine the parts into a SQL expression with ``<>``, and supply all
+Finally we combine the parts into an SQL expression with ``<>``, and supply all
 the parameters for the query. We then return a tuple containing the generated
 SQL string and the parameters.
 
 A simple transformer example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================
 
 The custom lookup above is great, but in some cases you may want to be able to
 chain lookups together. For example, let's suppose we are building an
@@ -122,10 +116,7 @@ function ``ABS()`` to transform the value before comparison::
 
   class AbsoluteValue(Transform):
       lookup_name = 'abs'
-
-      def as_sql(self, compiler, connection):
-          lhs, params = compiler.compile(self.lhs)
-          return "ABS(%s)" % lhs, params
+      function = 'ABS'
 
 Next, let's register it for ``IntegerField``::
 
@@ -159,10 +150,7 @@ be done by adding an ``output_field`` attribute to the transform::
 
     class AbsoluteValue(Transform):
         lookup_name = 'abs'
-
-        def as_sql(self, compiler, connection):
-            lhs, params = compiler.compile(self.lhs)
-            return "ABS(%s)" % lhs, params
+        function = 'ABS'
 
         @property
         def output_field(self):
@@ -171,8 +159,8 @@ be done by adding an ``output_field`` attribute to the transform::
 This ensures that further lookups like ``abs__lte`` behave as they would for
 a ``FloatField``.
 
-Writing an efficient abs__lt lookup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Writing an efficient ``abs__lt`` lookup
+=======================================
 
 When using the above written ``abs`` lookup, the SQL produced will not use
 indexes efficiently in some cases. In particular, when we use
@@ -202,10 +190,10 @@ The implementation is::
 There are a couple of notable things going on. First, ``AbsoluteValueLessThan``
 isn't calling ``process_lhs()``. Instead it skips the transformation of the
 ``lhs`` done by ``AbsoluteValue`` and uses the original ``lhs``. That is, we
-want to get ``27`` not ``ABS(27)``. Referring directly to ``self.lhs.lhs`` is
-safe as ``AbsoluteValueLessThan`` can be accessed only from the
-``AbsoluteValue`` lookup, that is the ``lhs`` is always an instance of
-``AbsoluteValue``.
+want to get ``"experiments"."change"`` not ``ABS("experiments"."change")``.
+Referring directly to ``self.lhs.lhs`` is safe as ``AbsoluteValueLessThan``
+can be accessed only from the ``AbsoluteValue`` lookup, that is the ``lhs``
+is always an instance of ``AbsoluteValue``.
 
 Notice also that  as both sides are used multiple times in the query the params
 need to contain ``lhs_params`` and ``rhs_params`` multiple times.
@@ -223,7 +211,7 @@ transformations in Python.
     be very efficient.
 
 A bilateral transformer example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================
 
 The ``AbsoluteValue`` example we discussed previously is a transformation which
 applies to the left-hand side of the lookup. There may be some cases where you
@@ -245,11 +233,8 @@ this transformation should apply to both ``lhs`` and ``rhs``::
 
   class UpperCase(Transform):
       lookup_name = 'upper'
+      function = 'UPPER'
       bilateral = True
-
-      def as_sql(self, compiler, connection):
-          lhs, params = compiler.compile(self.lhs)
-          return "UPPER(%s)" % lhs, params
 
 Next, let's register it::
 
@@ -263,7 +248,7 @@ insensitive query like this::
     SELECT ... WHERE UPPER("author"."name") = UPPER('doe')
 
 Writing alternative implementations for existing lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+========================================================
 
 Sometimes different database vendors require different SQL for the same
 operation. For this example we will rewrite a custom implementation for
@@ -291,7 +276,7 @@ methods, and then falls back to ``as_sql``. The vendor names for the in-built
 backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
 How Django determines the lookups and transforms which are used
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================================================
 
 In some cases you may wish to dynamically change which ``Transform`` or
 ``Lookup`` is returned based on the name passed in, rather than fixing it. As
@@ -307,9 +292,9 @@ would override ``get_lookup`` with something like::
                     dimension = int(lookup_name[1:])
                 except ValueError:
                     pass
-                finally:
+                else:
                     return get_coordinate_lookup(dimension)
-            return super(CoordinatesField, self).get_lookup(lookup_name)
+            return super().get_lookup(lookup_name)
 
 You would then define ``get_coordinate_lookup`` appropriately to return a
 ``Lookup`` subclass which handles the relevant value of ``dimension``.

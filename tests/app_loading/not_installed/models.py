@@ -12,7 +12,7 @@ class RelatedModel(models.Model):
     class Meta:
         app_label = 'not_installed'
 
-    not_installed = models.ForeignKey(NotInstalledModel)
+    not_installed = models.ForeignKey(NotInstalledModel, models.CASCADE)
 
 
 class M2MRelatedModel(models.Model):

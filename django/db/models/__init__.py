@@ -1,38 +1,55 @@
-from functools import wraps
-import sys
-import warnings
-
-from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # NOQA
-from django.db.models.query import Q, QuerySet, Prefetch  # NOQA
-from django.db.models.expressions import ExpressionNode, F, Value, Func  # NOQA
-from django.db.models.manager import Manager  # NOQA
-from django.db.models.base import Model  # NOQA
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import signals
 from django.db.models.aggregates import *  # NOQA
+from django.db.models.aggregates import __all__ as aggregates_all
+from django.db.models.deletion import (
+    CASCADE, DO_NOTHING, PROTECT, SET, SET_DEFAULT, SET_NULL, ProtectedError,
+)
+from django.db.models.expressions import (
+    Case, Exists, Expression, ExpressionWrapper, F, Func, OuterRef, Subquery,
+    Value, When,
+)
 from django.db.models.fields import *  # NOQA
-from django.db.models.fields.subclassing import SubfieldBase        # NOQA
-from django.db.models.fields.files import FileField, ImageField  # NOQA
-from django.db.models.fields.related import (  # NOQA
+from django.db.models.fields import __all__ as fields_all
+from django.db.models.fields.files import FileField, ImageField
+from django.db.models.fields.proxy import OrderWrt
+from django.db.models.indexes import *  # NOQA
+from django.db.models.indexes import __all__ as indexes_all
+from django.db.models.lookups import Lookup, Transform
+from django.db.models.manager import Manager
+from django.db.models.query import (
+    Prefetch, Q, QuerySet, prefetch_related_objects,
+)
+
+# Imports that would create circular imports if sorted
+from django.db.models.base import DEFERRED, Model  # isort:skip
+from django.db.models.fields.related import (  # isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
-    ManyToOneRel, ManyToManyRel, OneToOneRel)
-from django.db.models.fields.proxy import OrderWrt  # NOQA
-from django.db.models.deletion import (  # NOQA
-    CASCADE, PROTECT, SET, SET_NULL, SET_DEFAULT, DO_NOTHING, ProtectedError)
-from django.db.models.lookups import Lookup, Transform  # NOQA
-from django.db.models import signals  # NOQA
-from django.utils.deprecation import RemovedInDjango19Warning
+    ManyToOneRel, ManyToManyRel, OneToOneRel,
+)
 
 
 def permalink(func):
     """
-    Decorator that calls urlresolvers.reverse() to return a URL using
-    parameters returned by the decorated function "func".
+    Decorator that calls urls.reverse() to return a URL using parameters
+    returned by the decorated function "func".
 
     "func" should be a function that returns a tuple in one of the
     following formats:
         (viewname, viewargs)
         (viewname, viewargs, viewkwargs)
     """
-    from django.core.urlresolvers import reverse
+    import warnings
+    from functools import wraps
+
+    from django.urls import reverse
+    from django.utils.deprecation import RemovedInDjango21Warning
+
+    warnings.warn(
+        'permalink() is deprecated in favor of calling django.urls.reverse() '
+        'in the decorated method.',
+        RemovedInDjango21Warning
+    )
 
     @wraps(func)
     def inner(*args, **kwargs):
@@ -41,24 +58,15 @@ def permalink(func):
     return inner
 
 
-# Deprecated aliases for functions were exposed in this module.
-
-def make_alias(function_name):
-    # Close function_name.
-    def alias(*args, **kwargs):
-        warnings.warn(
-            "django.db.models.%s is deprecated." % function_name,
-            RemovedInDjango19Warning, stacklevel=2)
-        # This raises a second warning.
-        from . import loading
-        return getattr(loading, function_name)(*args, **kwargs)
-    alias.__name__ = function_name
-    return alias
-
-this_module = sys.modules['django.db.models']
-
-for function_name in ('get_apps', 'get_app_path', 'get_app_paths', 'get_app',
-                      'get_models', 'get_model', 'register_models'):
-    setattr(this_module, function_name, make_alias(function_name))
-
-del this_module, make_alias, function_name
+__all__ = aggregates_all + fields_all + indexes_all
+__all__ += [
+    'ObjectDoesNotExist', 'signals',
+    'CASCADE', 'DO_NOTHING', 'PROTECT', 'SET', 'SET_DEFAULT', 'SET_NULL',
+    'ProtectedError',
+    'Case', 'Exists', 'Expression', 'ExpressionWrapper', 'F', 'Func',
+    'OuterRef', 'Subquery', 'Value', 'When',
+    'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
+    'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
+    'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
+    'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel', 'permalink',
+]

@@ -16,10 +16,14 @@ different types of fields.
 For example, here's a validator that only allows even numbers::
 
     from django.core.exceptions import ValidationError
+    from django.utils.translation import gettext_lazy as _
 
     def validate_even(value):
         if value % 2 != 0:
-            raise ValidationError('%s is not an even number' % value)
+            raise ValidationError(
+                _('%(value)s is not an even number'),
+                params={'value': value},
+            )
 
 You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::
@@ -67,7 +71,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
-.. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None, flags=0])
+
+.. class:: RegexValidator(regex=None, message=None, code=None, inverse_match=None, flags=0)
 
     :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
         expression string or a pre-compiled regular expression.
@@ -102,23 +107,19 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: inverse_match
 
-        .. versionadded:: 1.7
-
         The match mode for :attr:`regex`. Defaults to ``False``.
 
     .. attribute:: flags
 
-        .. versionadded:: 1.7
-
-        The flags used when compiling the regular expression string :attr:`regex`.
-        If :attr:`regex` is a pre-compiled regular expression, and :attr:`flags` is overridden,
-        :exc:`TypeError` is raised.
-        Defaults to `0`.
+        The flags used when compiling the regular expression string
+        :attr:`regex`. If :attr:`regex` is a pre-compiled regular expression,
+        and :attr:`flags` is overridden, :exc:`TypeError` is raised. Defaults
+        to ``0``.
 
 ``EmailValidator``
 ------------------
 
-.. class:: EmailValidator([message=None, code=None, whitelist=None])
+.. class:: EmailValidator(message=None, code=None, whitelist=None)
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
@@ -146,40 +147,52 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``URLValidator``
 ----------------
-.. class:: URLValidator([schemes=None, regex=None, message=None, code=None])
+
+.. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
     A :class:`RegexValidator` that ensures a value looks like a URL, and raises
-    an error code of ``'invalid'`` if it doesn't. In addition to the optional
-    arguments of its parent :class:`RegexValidator` class, ``URLValidator``
-    accepts an extra optional attribute:
+    an error code of ``'invalid'`` if it doesn't.
+
+    Loopback addresses and reserved IP spaces are considered valid. Literal
+    IPv6 addresses (:rfc:`2732`) and unicode domains are both supported.
+
+    In addition to the optional arguments of its parent :class:`RegexValidator`
+    class, ``URLValidator`` accepts an extra optional attribute:
 
     .. attribute:: schemes
 
         URL/URI scheme list to validate against. If not provided, the default
         list is ``['http', 'https', 'ftp', 'ftps']``. As a reference, the IANA
-        Web site provides a full list of `valid URI schemes`_.
+        website provides a full list of `valid URI schemes`_.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 
-    .. versionchanged:: 1.7
-
-        The optional ``schemes`` attribute was added.
-
 ``validate_email``
 ------------------
+
 .. data:: validate_email
 
     An :class:`EmailValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------
+
 .. data:: validate_slug
 
     A :class:`RegexValidator` instance that ensures a value consists of only
     letters, numbers, underscores or hyphens.
 
+``validate_unicode_slug``
+-------------------------
+
+.. data:: validate_unicode_slug
+
+    A :class:`RegexValidator` instance that ensures a value consists of only
+    Unicode letters, numbers, underscores, or hyphens.
+
 ``validate_ipv4_address``
 -------------------------
+
 .. data:: validate_ipv4_address
 
     A :class:`RegexValidator` instance that ensures a value looks like an IPv4
@@ -202,51 +215,90 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_comma_separated_integer_list``
 -----------------------------------------
+
 .. data:: validate_comma_separated_integer_list
 
     A :class:`RegexValidator` instance that ensures a value is a
     comma-separated list of integers.
 
+``int_list_validator``
+----------------------
+
+.. function:: int_list_validator(sep=',', message=None, code='invalid', allow_negative=False)
+
+    Returns a :class:`RegexValidator` instance that ensures a string consists
+    of integers separated by ``sep``. It allows negative integers when
+    ``allow_negative`` is ``True``.
+
 ``MaxValueValidator``
 ---------------------
+
 .. class:: MaxValueValidator(max_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_value'`` if ``value`` is greater than ``max_value``.
 
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
-
 ``MinValueValidator``
 ---------------------
+
 .. class:: MinValueValidator(min_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_value'`` if ``value`` is less than ``min_value``.
 
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
-
 ``MaxLengthValidator``
 ----------------------
+
 .. class:: MaxLengthValidator(max_length, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
 
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
-
 ``MinLengthValidator``
 ----------------------
+
 .. class:: MinLengthValidator(min_length, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_length'`` if the length of ``value`` is less than ``min_length``.
 
-    .. versionchanged:: 1.8
+``DecimalValidator``
+--------------------
 
-       The ``message`` parameter was added.
+.. class:: DecimalValidator(max_digits, decimal_places)
+
+    Raises :exc:`~django.core.exceptions.ValidationError` with the following
+    codes:
+
+    - ``'max_digits'`` if the number of digits is larger than ``max_digits``.
+    - ``'max_decimal_places'`` if the number of decimals is larger than
+      ``decimal_places``.
+    - ``'max_whole_digits'`` if the number of whole digits is larger than
+      the difference between ``max_digits`` and ``decimal_places``.
+
+``FileExtensionValidator``
+--------------------------
+
+.. class:: FileExtensionValidator(allowed_extensions, message, code)
+
+    .. versionadded:: 1.11
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'invalid_extension'`` if the ``value`` cannot be found in
+    ``allowed_extensions``.
+
+    .. warning::
+
+        Don't rely on validation of the file extension to determine a file's
+        type. Files can be renamed to have any extension no matter what data
+        they contain.
+
+``validate_image_file_extension``
+---------------------------------
+
+.. data:: validate_image_file_extension
+
+    .. versionadded:: 1.11
+
+    Uses Pillow to ensure that the ``value`` is `a valid image extension
+    <https://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html>`_.

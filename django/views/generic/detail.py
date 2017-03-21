@@ -1,15 +1,13 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
-from django.utils.translation import ugettext as _
-from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
+from django.utils.translation import gettext as _
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 
 class SingleObjectMixin(ContextMixin):
     """
-    Provides the ability to retrieve a single object for further manipulation.
+    Provide the ability to retrieve a single object for further manipulation.
     """
     model = None
     queryset = None
@@ -21,10 +19,10 @@ class SingleObjectMixin(ContextMixin):
 
     def get_object(self, queryset=None):
         """
-        Returns the object the view is displaying.
+        Return the object the view is displaying.
 
-        By default this requires `self.queryset` and a `pk` or `slug` argument
-        in the URLconf, but subclasses can override this to return any object.
+        Require `self.queryset` and a `pk` or `slug` argument in the URLconf.
+        Subclasses can override this to return any object.
         """
         # Use a custom queryset if provided; this is required for subclasses
         # like DateDetailView
@@ -32,8 +30,8 @@ class SingleObjectMixin(ContextMixin):
             queryset = self.get_queryset()
 
         # Next, try looking up by primary key.
-        pk = self.kwargs.get(self.pk_url_kwarg, None)
-        slug = self.kwargs.get(self.slug_url_kwarg, None)
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        slug = self.kwargs.get(self.slug_url_kwarg)
         if pk is not None:
             queryset = queryset.filter(pk=pk)
 
@@ -60,8 +58,8 @@ class SingleObjectMixin(ContextMixin):
         """
         Return the `QuerySet` that will be used to look up the object.
 
-        Note that this method is called by the default implementation of
-        `get_object` and may not be called if `get_object` is overridden.
+        This method is called by the default implementation of get_object() and
+        may not be called if get_object() is overridden.
         """
         if self.queryset is None:
             if self.model:
@@ -77,15 +75,11 @@ class SingleObjectMixin(ContextMixin):
         return self.queryset.all()
 
     def get_slug_field(self):
-        """
-        Get the name of a slug field to be used to look up by slug.
-        """
+        """Get the name of a slug field to be used to look up by slug."""
         return self.slug_field
 
     def get_context_object_name(self, obj):
-        """
-        Get the name to use for the object.
-        """
+        """Get the name to use for the object."""
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
@@ -94,9 +88,7 @@ class SingleObjectMixin(ContextMixin):
             return None
 
     def get_context_data(self, **kwargs):
-        """
-        Insert the single object into the context dict.
-        """
+        """Insert the single object into the context dict."""
         context = {}
         if self.object:
             context['object'] = self.object
@@ -104,13 +96,11 @@ class SingleObjectMixin(ContextMixin):
             if context_object_name:
                 context[context_object_name] = self.object
         context.update(kwargs)
-        return super(SingleObjectMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class BaseDetailView(SingleObjectMixin, View):
-    """
-    A base view for displaying a single object
-    """
+    """A base view for displaying a single object."""
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
@@ -124,7 +114,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
     def get_template_names(self):
         """
         Return a list of template names to be used for the request. May not be
-        called if render_to_response is overridden. Returns the following list:
+        called if render_to_response() is overridden. Return the following list:
 
         * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
@@ -132,7 +122,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * ``<app_label>/<model_name><template_name_suffix>.html``
         """
         try:
-            names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.
@@ -149,9 +139,10 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
             if isinstance(self.object, models.Model):
+                object_meta = self.object._meta
                 names.append("%s/%s%s.html" % (
-                    self.object._meta.app_label,
-                    self.object._meta.model_name,
+                    object_meta.app_label,
+                    object_meta.model_name,
                     self.template_name_suffix
                 ))
             elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):

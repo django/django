@@ -1,10 +1,11 @@
+================
 File storage API
 ================
 
 .. module:: django.core.files.storage
 
 Getting the current storage class
----------------------------------
+=================================
 
 Django provides two convenient ways to access the current storage class:
 
@@ -15,7 +16,7 @@ Django provides two convenient ways to access the current storage class:
     :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
     :func:`~django.core.files.storage.get_storage_class` internally.
 
-.. function:: get_storage_class([import_path=None])
+.. function:: get_storage_class(import_path=None)
 
     Returns a class or module which implements the storage API.
 
@@ -26,10 +27,10 @@ Django provides two convenient ways to access the current storage class:
     given path and will return it if successful. An exception will be
     raised if the import is unsuccessful.
 
-The FileSystemStorage Class
----------------------------
+The ``FileSystemStorage`` class
+===============================
 
-.. class:: FileSystemStorage([location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None])
+.. class:: FileSystemStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
 
     The :class:`~django.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
@@ -51,29 +52,18 @@ The FileSystemStorage Class
         The file system permissions that the file will receive when it is
         saved. Defaults to :setting:`FILE_UPLOAD_PERMISSIONS`.
 
-        .. versionadded:: 1.7
-
-            The ``file_permissions_mode`` attribute was added. Previously files
-            always received :setting:`FILE_UPLOAD_PERMISSIONS` permissions.
-
     .. attribute:: directory_permissions_mode
 
         The file system permissions that the directory will receive when it is
         saved. Defaults to :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
-
-        .. versionadded:: 1.7
-
-            The ``directory_permissions_mode`` attribute was added. Previously
-            directories always received
-            :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS` permissions.
 
     .. note::
 
         The ``FileSystemStorage.delete()`` method will not raise
         an exception if the given file name does not exist.
 
-The Storage Class
------------------
+The ``Storage`` class
+=====================
 
 .. class:: Storage
 
@@ -83,24 +73,9 @@ The Storage Class
     as necessary.
 
     .. note::
-        For methods returning naive ``datetime`` objects, the
-        effective timezone used will be the current value of
-        ``os.environ['TZ']``; note that this is usually set from
-        Django's :setting:`TIME_ZONE`.
-
-    .. method:: accessed_time(name)
-
-        Returns a naive ``datetime`` object containing the last
-        accessed time of the file. For storage systems that aren't
-        able to return the last accessed time this will raise
-        ``NotImplementedError`` instead.
-
-    .. method:: created_time(name)
-
-        Returns a naive ``datetime`` object containing the creation
-        time of the file.  For storage systems that aren't able to
-        return the creation time this will raise
-        ``NotImplementedError`` instead.
+        When methods return naive ``datetime`` objects, the effective timezone
+        used will be the current value of ``os.environ['TZ']``; note that this
+        is usually set from Django's :setting:`TIME_ZONE`.
 
     .. method:: delete(name)
 
@@ -114,29 +89,65 @@ The Storage Class
         in the storage system, or ``False`` if the name is available for a new
         file.
 
-    .. method:: get_available_name(name)
+    .. method:: get_accessed_time(name)
+
+        Returns a :class:`~datetime.datetime` of the last accessed time of the
+        file. For storage systems unable to return the last accessed time this
+        will raise :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
+
+    .. method:: get_available_name(name, max_length=None)
 
         Returns a filename based on the ``name`` parameter that's free and
         available for new content to be written to on the target storage
         system.
 
+        The length of the filename will not exceed ``max_length``, if provided.
+        If a free unique filename cannot be found, a
+        :exc:`SuspiciousFileOperation
+        <django.core.exceptions.SuspiciousOperation>` exception will be raised.
+
         If a file with ``name`` already exists, an underscore plus a random
         7 character alphanumeric string is appended to the filename before
         the extension.
 
-        .. versionchanged:: 1.7
+    .. method:: get_created_time(name)
 
-            Previously, an underscore followed by a number (e.g. ``"_1"``,
-            ``"_2"``, etc.) was appended to the filename until an available
-            name in the destination directory was found. A malicious user could
-            exploit this deterministic algorithm to create a denial-of-service
-            attack. This change was also made in Django 1.6.6, 1.5.9, and
-            1.4.14.
+        Returns a :class:`~datetime.datetime` of the creation time of the file.
+        For storage systems unable to return the creation time this will raise
+        :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
+
+    .. method:: get_modified_time(name)
+
+        Returns a :class:`~datetime.datetime` of the last modified time of the
+        file. For storage systems unable to return the last modified time this
+        will raise :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
 
     .. method:: get_valid_name(name)
 
         Returns a filename based on the ``name`` parameter that's suitable
         for use on the target storage system.
+
+    .. method:: generate_filename(filename)
+
+        Validates the ``filename`` by calling :attr:`get_valid_name()` and
+        returns a filename to be passed to the :meth:`save` method.
+
+        The ``filename`` argument may include a path as returned by
+        :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`.
+        In that case, the path won't be passed to :attr:`get_valid_name()` but
+        will be prepended back to the resulting name.
+
+        The default implementation uses :mod:`os.path` operations. Override
+        this method if that's not appropriate for your storage.
 
     .. method:: listdir(path)
 
@@ -144,13 +155,6 @@ The Storage Class
         the first item being directories, the second item being files. For
         storage systems that aren't able to provide such a listing, this will
         raise a ``NotImplementedError`` instead.
-
-    .. method:: modified_time(name)
-
-        Returns a naive ``datetime`` object containing the last
-        modified time. For storage systems that aren't able to return
-        the last modified time, this will raise
-        ``NotImplementedError`` instead.
 
     .. method:: open(name, mode='rb')
 
@@ -165,16 +169,19 @@ The Storage Class
         standard ``open()``. For storage systems that aren't accessible from
         the local filesystem, this will raise ``NotImplementedError`` instead.
 
-    .. method:: save(name, content)
+    .. method:: save(name, content, max_length=None)
 
         Saves a new file using the storage system, preferably with the name
         specified. If there already exists a file with this name ``name``, the
         storage system may modify the filename as necessary to get a unique
         name. The actual name of the stored file will be returned.
 
+        The ``max_length`` argument is passed along to
+        :meth:`get_available_name`.
+
         The ``content`` argument must be an instance of
-        :class:`django.core.files.File` or of a subclass of
-        :class:`~django.core.files.File`.
+        :class:`django.core.files.File` or a file-like object that can be
+        wrapped in ``File``.
 
     .. method:: size(name)
 

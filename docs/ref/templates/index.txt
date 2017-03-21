@@ -11,6 +11,7 @@ material, see :doc:`/topics/templates` topic guide.
 .. toctree::
    :maxdepth: 2
 
+   language
    builtins
    api
 

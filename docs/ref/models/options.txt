@@ -24,16 +24,22 @@ Available ``Meta`` options
 
 .. attribute:: Options.app_label
 
-    If a model exists outside of the standard locations (:file:`models.py` or
-    a ``models`` package in an app), the model must define which app it is part
-    of::
+    If a model is defined outside of an application in
+    :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
 
         app_label = 'myapp'
 
-    .. versionadded:: 1.7
+    If you want to represent a model with the format ``app_label.object_name``
+    or ``app_label.model_name`` you can use ``model._meta.label``
+    or ``model._meta.label_lower`` respectively.
 
-        ``app_label`` is no longer required for models that are defined
-        outside the ``models`` module of an application.
+``base_manager_name``
+---------------------
+
+.. attribute:: Options.base_manager_name
+
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
@@ -95,15 +101,23 @@ Django quotes column and table names behind the scenes.
     setting, if set. If the backend doesn't support tablespaces, this option is
     ignored.
 
+``default_manager_name``
+------------------------
+
+.. attribute:: Options.default_manager_name
+
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._default_manager`.
+
 ``default_related_name``
 ------------------------
 
 .. attribute:: Options.default_related_name
 
-.. versionadded:: 1.8
-
     The name that will be used by default for the relation from a related object
     back to this one. The default is ``<model_name>_set``.
+
+    This option also sets :attr:`~ForeignKey.related_query_name`.
 
     As the reverse name for a field should be unique, be careful if you intend
     to subclass your model. To work around name collisions, part of the name
@@ -173,11 +187,11 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.order_with_respect_to
 
-    Marks this object as "orderable" with respect to the given field. This is almost
-    always used with related objects to allow them to be ordered with respect to a
-    parent object. For example, if an ``Answer`` relates to a ``Question`` object,
-    and a question has more than one answer, and the order of answers matters, you'd
-    do this::
+    Makes this object orderable with respect to the given field, usually a
+    ``ForeignKey``. This can be used to make related objects orderable with
+    respect to a parent object. For example, if an ``Answer`` relates to a
+    ``Question`` object, and a question has more than one answer, and the order
+    of answers matters, you'd do this::
 
         from django.db import models
 
@@ -186,7 +200,7 @@ Django quotes column and table names behind the scenes.
             # ...
 
         class Answer(models.Model):
-            question = models.ForeignKey(Question)
+            question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:
@@ -218,12 +232,20 @@ Django quotes column and table names behind the scenes.
         >>> answer.get_previous_in_order()
         <Answer: 1>
 
-.. admonition:: Changing order_with_respect_to
+.. admonition:: ``order_with_respect_to`` implicitly sets the ``ordering`` option
 
-        ``order_with_respect_to`` adds an additional field/database column
-        named ``_order``, so be sure to make and apply the appropriate
-        migrations if you add or change ``order_with_respect_to``
-        after your initial :djadmin:`migrate`.
+    Internally, ``order_with_respect_to`` adds an additional field/database
+    column named ``_order`` and sets the model's :attr:`~Options.ordering`
+    option to this field. Consequently, ``order_with_respect_to`` and
+    ``ordering`` cannot be used together, and the ordering added by
+    ``order_with_respect_to`` will apply whenever you obtain a list of objects
+    of this model.
+
+.. admonition:: Changing ``order_with_respect_to``
+
+    Because ``order_with_respect_to`` adds a new database column, be sure to
+    make and apply the appropriate migrations if you add or change
+    ``order_with_respect_to`` after your initial :djadmin:`migrate`.
 
 ``ordering``
 ------------
@@ -250,11 +272,20 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
+    Default ordering also affects :ref:`aggregation queries
+    <aggregation-ordering-interaction>`.
+
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
     incurs a cost to your database. Each foreign key you add will
     implicitly include all of its default orderings as well.
+
+    If a query doesn't have an ordering specified, results are returned from
+    the database in an unspecified order. A particular ordering is guaranteed
+    only when ordering by a set of fields that uniquely identify each object in
+    the results. For example, if a ``name`` field isn't unique, ordering by it
+    won't guarantee objects with the same name always appear in the same order.
 
 ``permissions``
 ---------------
@@ -271,11 +302,9 @@ Django quotes column and table names behind the scenes.
     human_readable_permission_name)``.
 
 ``default_permissions``
-------------------------------
+-----------------------
 
 .. attribute:: Options.default_permissions
-
-    .. versionadded:: 1.7
 
     Defaults to ``('add', 'change', 'delete')``. You may customize this list,
     for example, by setting this to an empty list if your app doesn't require
@@ -290,6 +319,28 @@ Django quotes column and table names behind the scenes.
 
     If ``proxy = True``, a model which subclasses another model will be treated as
     a :ref:`proxy model <proxy-models>`.
+
+``required_db_features``
+------------------------
+
+.. attribute:: Options.required_db_features
+
+    List of database features that the current connection should have so that
+    the model is considered during the migration phase. For example, if you set
+    this list to ``['gis_enabled']``, the model will only be synchronized on
+    GIS-enabled databases. It's also useful to skip some models when testing
+    with several database backends. Avoid relations between models that may or
+    may not be created as the ORM doesn't handle this.
+
+``required_db_vendor``
+----------------------
+
+.. attribute:: Options.required_db_vendor
+
+    Name of a supported database vendor that this model is specific to. Current
+    built-in vendor names are: ``sqlite``, ``postgresql``, ``mysql``,
+    ``oracle``. If this attribute is not empty and the current connection vendor
+    doesn't match it, the model will not be synchronized.
 
 ``select_on_save``
 ------------------
@@ -310,6 +361,28 @@ Django quotes column and table names behind the scenes.
 
     See :meth:`django.db.models.Model.save()` for more about the old and
     new saving algorithm.
+
+``indexes``
+-----------
+
+.. attribute:: Options.indexes
+
+    .. versionadded:: 1.11
+
+    A list of :doc:`indexes </ref/models/indexes>` that you want to define on
+    the model::
+
+        from django.db import models
+
+        class Customer(models.Model):
+            first_name = models.CharField(max_length=100)
+            last_name = models.CharField(max_length=100)
+
+            class Meta:
+                indexes = [
+                    models.Index(fields=['last_name', 'first_name']),
+                    models.Index(fields=['first_name'], name='first_name_idx'),
+                ]
 
 ``unique_together``
 -------------------
@@ -336,10 +409,8 @@ Django quotes column and table names behind the scenes.
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
-    .. versionchanged:: 1.7
-
-        The ``ValidationError`` raised during model validation when the
-        constraint is violated has the ``unique_together`` error code.
+    The ``ValidationError`` raised during model validation when the constraint
+    is violated has the ``unique_together`` error code.
 
 ``index_together``
 ------------------
@@ -354,8 +425,6 @@ Django quotes column and table names behind the scenes.
 
     This list of fields will be indexed together (i.e. the appropriate
     ``CREATE INDEX`` statement will be issued.)
-
-    .. versionchanged:: 1.7
 
     For convenience, ``index_together`` can be a single list when dealing with a single
     set of fields::
@@ -384,3 +453,22 @@ Django quotes column and table names behind the scenes.
         verbose_name_plural = "stories"
 
     If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+
+Read-only ``Meta`` attributes
+=============================
+
+``label``
+---------
+
+.. attribute:: Options.label
+
+    Representation of the object, returns ``app_label.object_name``, e.g.
+    ``'polls.Question'``.
+
+``label_lower``
+---------------
+
+.. attribute:: Options.label_lower
+
+    Representation of the model, returns ``app_label.model_name``, e.g.
+    ``'polls.question'``.

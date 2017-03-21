@@ -1,33 +1,30 @@
-from __future__ import unicode_literals
-
 import json
-import sys
-
-try:
-    from collections import UserList
-except ImportError:  # Python 2
-    from UserList import UserList
+from collections import UserList
 
 from django.conf import settings
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import format_html, format_html_join, escape
+from django.core.exceptions import ValidationError  # backwards compatibility
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.utils import six
+from django.utils.html import escape, format_html, format_html_join, html_safe
+from django.utils.translation import gettext_lazy as _
 
-# Import ValidationError so that it can be imported from this
-# module to maintain backwards compatibility.
-from django.core.exceptions import ValidationError
+
+def pretty_name(name):
+    """Convert 'first_name' to 'First name'."""
+    if not name:
+        return ''
+    return name.replace('_', ' ').capitalize()
 
 
 def flatatt(attrs):
     """
     Convert a dictionary of attributes to a single string.
     The returned string will contain a leading space followed by key="value",
-    XML-style pairs.  It is assumed that the keys do not need to be XML-escaped.
-    If the passed dictionary is empty, then return an empty string.
+    XML-style pairs. In the case of a boolean value, the key will appear
+    without a value. It is assumed that the keys do not need to be
+    XML-escaped. If the passed dictionary is empty, then return an empty
+    string.
 
-    The result is passed through 'mark_safe'.
+    The result is passed through 'mark_safe' (by way of 'format_html_join').
     """
     key_value_attrs = []
     boolean_attrs = []
@@ -35,7 +32,7 @@ def flatatt(attrs):
         if isinstance(value, bool):
             if value:
                 boolean_attrs.append((attr,))
-        else:
+        elif value is not None:
             key_value_attrs.append((attr, value))
 
     return (
@@ -44,7 +41,7 @@ def flatatt(attrs):
     )
 
 
-@python_2_unicode_compatible
+@html_safe
 class ErrorDict(dict):
     """
     A collection of errors that knows how to display itself in various formats.
@@ -62,7 +59,7 @@ class ErrorDict(dict):
             return ''
         return format_html(
             '<ul class="errorlist">{}</ul>',
-            format_html_join('', '<li>{}{}</li>', ((k, force_text(v)) for k, v in self.items()))
+            format_html_join('', '<li>{}{}</li>', self.items())
         )
 
     def as_text(self):
@@ -76,13 +73,13 @@ class ErrorDict(dict):
         return self.as_ul()
 
 
-@python_2_unicode_compatible
+@html_safe
 class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
     def __init__(self, initlist=None, error_class=None):
-        super(ErrorList, self).__init__(initlist)
+        super().__init__(initlist)
 
         if error_class is None:
             self.error_class = 'errorlist'
@@ -112,7 +109,7 @@ class ErrorList(UserList, list):
         return format_html(
             '<ul class="{}">{}</ul>',
             self.error_class,
-            format_html_join('', '<li>{}</li>', ((force_text(e),) for e in self))
+            format_html_join('', '<li>{}</li>', ((e,) for e in self))
         )
 
     def as_text(self):
@@ -130,14 +127,11 @@ class ErrorList(UserList, list):
     def __eq__(self, other):
         return list(self) == other
 
-    def __ne__(self, other):
-        return list(self) != other
-
     def __getitem__(self, i):
         error = self.data[i]
         if isinstance(error, ValidationError):
             return list(error)[0]
-        return force_text(error)
+        return error
 
     def __reduce_ex__(self, *args, **kwargs):
         # The `list` reduce function returns an iterator as the fourth element
@@ -160,25 +154,21 @@ def from_current_timezone(value):
         current_timezone = timezone.get_current_timezone()
         try:
             return timezone.make_aware(value, current_timezone)
-        except Exception:
-            message = _(
-                '%(datetime)s couldn\'t be interpreted '
-                'in time zone %(current_timezone)s; it '
-                'may be ambiguous or it may not exist.'
-            )
-            params = {'datetime': value, 'current_timezone': current_timezone}
-            six.reraise(ValidationError, ValidationError(
-                message,
+        except Exception as exc:
+            raise ValidationError(
+                _('%(datetime)s couldn\'t be interpreted '
+                  'in time zone %(current_timezone)s; it '
+                  'may be ambiguous or it may not exist.'),
                 code='ambiguous_timezone',
-                params=params,
-            ), sys.exc_info()[2])
+                params={'datetime': value, 'current_timezone': current_timezone}
+            ) from exc
     return value
 
 
 def to_current_timezone(value):
     """
     When time zone support is enabled, convert aware datetimes
-    to naive dateimes in the current time zone for display.
+    to naive datetimes in the current time zone for display.
     """
     if settings.USE_TZ and value is not None and timezone.is_aware(value):
         current_timezone = timezone.get_current_timezone()

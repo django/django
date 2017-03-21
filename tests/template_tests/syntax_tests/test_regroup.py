@@ -1,10 +1,9 @@
 from datetime import date
 
-from django.template.base import TemplateSyntaxError
-from django.template.loader import get_template
+from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 
-from ..utils import render, setup
+from ..utils import setup
 
 
 class RegroupTagTests(SimpleTestCase):
@@ -18,7 +17,7 @@ class RegroupTagTests(SimpleTestCase):
                          '{% endfor %},'
                          '{% endfor %}'})
     def test_regroup01(self):
-        output = render('regroup01', {
+        output = self.engine.render_to_string('regroup01', {
             'data': [{'foo': 'c', 'bar': 1},
                      {'foo': 'd', 'bar': 1},
                      {'foo': 'a', 'bar': 2},
@@ -39,7 +38,7 @@ class RegroupTagTests(SimpleTestCase):
         """
         Test for silent failure when target variable isn't found
         """
-        output = render('regroup02', {})
+        output = self.engine.render_to_string('regroup02', {})
         self.assertEqual(output, '')
 
     @setup({'regroup03': ''
@@ -55,7 +54,7 @@ class RegroupTagTests(SimpleTestCase):
         Regression tests for #17675
         The date template filter has expects_localtime = True
         """
-        output = render('regroup03', {
+        output = self.engine.render_to_string('regroup03', {
             'data': [{'at': date(2012, 2, 14)},
                      {'at': date(2012, 2, 28)},
                      {'at': date(2012, 7, 4)}],
@@ -74,7 +73,7 @@ class RegroupTagTests(SimpleTestCase):
         """
         The join template filter has needs_autoescape = True
         """
-        output = render('regroup04', {
+        output = self.engine.render_to_string('regroup04', {
             'data': [{'foo': 'x', 'bar': ['ab', 'c']},
                      {'foo': 'y', 'bar': ['a', 'bc']},
                      {'foo': 'z', 'bar': ['a', 'd']}],
@@ -85,19 +84,38 @@ class RegroupTagTests(SimpleTestCase):
     @setup({'regroup05': '{% regroup data by bar as %}'})
     def test_regroup05(self):
         with self.assertRaises(TemplateSyntaxError):
-            get_template('regroup05')
+            self.engine.get_template('regroup05')
 
     @setup({'regroup06': '{% regroup data by bar thisaintright grouped %}'})
     def test_regroup06(self):
         with self.assertRaises(TemplateSyntaxError):
-            get_template('regroup06')
+            self.engine.get_template('regroup06')
 
     @setup({'regroup07': '{% regroup data thisaintright bar as grouped %}'})
     def test_regroup07(self):
         with self.assertRaises(TemplateSyntaxError):
-            get_template('regroup07')
+            self.engine.get_template('regroup07')
 
     @setup({'regroup08': '{% regroup data by bar as grouped toomanyargs %}'})
     def test_regroup08(self):
         with self.assertRaises(TemplateSyntaxError):
-            get_template('regroup08')
+            self.engine.get_template('regroup08')
+
+    @setup({'regroup_unpack': '{% regroup data by bar as grouped %}'
+                              '{% for grouper, group in grouped %}'
+                              '{{ grouper }}:'
+                              '{% for item in group %}'
+                              '{{ item.foo }}'
+                              '{% endfor %},'
+                              '{% endfor %}'})
+    def test_regroup_unpack(self):
+        output = self.engine.render_to_string('regroup_unpack', {
+            'data': [
+                {'foo': 'c', 'bar': 1},
+                {'foo': 'd', 'bar': 1},
+                {'foo': 'a', 'bar': 2},
+                {'foo': 'b', 'bar': 2},
+                {'foo': 'x', 'bar': 3},
+            ],
+        })
+        self.assertEqual(output, '1:cd,2:ab,3:x,')

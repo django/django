@@ -1,3 +1,4 @@
+===============
 Getting started
 ===============
 
@@ -15,6 +16,7 @@ place: read this material to quickly get up and running.
    tutorial04
    tutorial05
    tutorial06
+   tutorial07
    reusable-apps
    whatsnext
    contributing

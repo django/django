@@ -1,0 +1,62 @@
+==========================
+Django 1.8.2 release notes
+==========================
+
+*May 20, 2015*
+
+Django 1.8.2 fixes a security issue and several bugs in 1.8.1.
+
+Fixed session flushing in the ``cached_db`` backend
+===================================================
+
+A change to ``session.flush()`` in the ``cached_db`` session backend in Django
+1.8 mistakenly sets the session key to an empty string rather than ``None``. An
+empty string is treated as a valid session key and the session cookie is set
+accordingly. Any users with an empty string in their session cookie will use
+the same session store. ``session.flush()`` is called by
+``django.contrib.auth.logout()`` and, more seriously, by
+``django.contrib.auth.login()`` when a user switches accounts. If a user is
+logged in and logs in again to a different account (without logging out) the
+session is flushed to avoid reuse. After the session is flushed (and its
+session key becomes ``''``) the account details are set on the session and the
+session is saved. Any users with an empty string in their session cookie will
+now be logged into that account.
+
+Bugfixes
+========
+
+* Fixed check for template engine alias uniqueness (:ticket:`24685`).
+
+* Fixed crash when reusing the same ``Case`` instance in a query
+  (:ticket:`24752`).
+
+* Corrected join promotion for ``Case`` expressions. For example, annotating a
+  query with a  ``Case`` expression could unexpectedly filter out results
+  (:ticket:`24766`).
+
+* Fixed negated ``Q`` objects in expressions. Cases like
+  ``Case(When(~Q(friends__age__lte=30)))`` tried to generate a subquery which
+  resulted in a crash (:ticket:`24705`).
+
+* Fixed incorrect GROUP BY clause generation on MySQL when the query's model
+  has a self-referential foreign key (:ticket:`24748`).
+
+* Implemented ``ForeignKey.get_db_prep_value()`` so that ``ForeignKey``\s
+  pointing to :class:`~django.db.models.UUIDField` and inheritance on models
+  with ``UUIDField`` primary keys work correctly (:ticket:`24698`,
+  :ticket:`24712`).
+
+* Fixed ``isnull`` lookup for ``HStoreField`` (:ticket:`24751`).
+
+* Fixed a MySQL crash when a migration removes a combined index (unique_together
+  or index_together) containing a foreign key (:ticket:`24757`).
+
+* Fixed session cookie deletion when using :setting:`SESSION_COOKIE_DOMAIN`
+  (:ticket:`24799`).
+
+* On PostgreSQL, when no access is granted for the ``postgres`` database,
+  Django now falls back to the default database when it normally requires a
+  "no database" connection (:ticket:`24791`).
+
+* Fixed display of ``contrib.admin``’s ``ForeignKey`` widget when it's used
+  in a row with other fields (:ticket:`24784`).

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2012
+# Erik Wognsen <r4mses@gmail.com>, 2012,2015-2016
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014
@@ -10,24 +10,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-27 10:34+0000\n"
-"Last-Translator: valberg <valberg@orn.li>\n"
-"Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
-"da/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:16+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
+"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "Tilgængelige %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -36,39 +33,31 @@ msgstr ""
 "markere dem i kassen nedenfor og derefter klikke på \"Vælg\"-pilen mellem de "
 "to kasser."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "Skriv i dette felt for at filtrere listen af tilgængelige %s."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Filtrér"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Vælg alle"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Klik for at vælge alle %s med det samme."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Vælg"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Fjern"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Valgte %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -77,24 +66,18 @@ msgstr ""
 "dem i kassen nedenfor og derefter klikke på \"Fjern\"-pilen mellem de to "
 "kasser."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Fjern alle"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klik for at fjerne alle valgte %s med det samme."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s af %(cnt)s valgt"
 msgstr[1] "%(sel)s af %(cnt)s valgt"
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -102,8 +85,6 @@ msgstr ""
 "Du har ugemte ændringer af et eller flere redigerbare felter. Hvis du "
 "udfører en handling fra drop-down-menuen, vil du miste disse ændringer."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -112,8 +93,6 @@ msgstr ""
 "Du har valgt en handling, men du har ikke gemt dine ændringer til et eller "
 "flere felter. Klik venligst OK for at gemme og vælg dernæst handlingen igen."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -122,86 +101,120 @@ msgstr ""
 "Du har valgt en handling, og du har ikke udført nogen ændringer på felter. "
 "Det, du søger er formentlig Udfør-knappen i stedet for Gem-knappen."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Obs: Du er %s time forud i forhold servertiden."
 msgstr[1] "Obs: Du er %s timer forud i forhold servertiden."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Obs: Du er %s time bagud i forhold servertiden."
 msgstr[1] "Obs: Du er %s timer forud i forhold servertiden."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "Nu"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
-msgid "Clock"
-msgstr "Ur"
+msgid "Choose a Time"
+msgstr "Vælg et Tidspunkt"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "Vælg et tidspunkt"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "Midnat"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
-msgstr "6 morgen"
+msgstr "Klokken 6"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "Middag"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
+msgid "6 p.m."
+msgstr "Klokken 18"
+
 msgid "Cancel"
 msgstr "Annuller"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "I dag"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
-msgid "Calendar"
-msgstr "Kalender"
+msgid "Choose a Date"
+msgstr "Vælg en Dato"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "I går"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "I morgen"
 
-#: contrib/admin/static/admin/js/calendar.js:8
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Januar Februar Marts April Maj Juni Juli August September Oktober November "
-"December"
+msgid "January"
+msgstr "Januar"
 
-#: contrib/admin/static/admin/js/calendar.js:9
-msgid "S M T W T F S"
-msgstr "S M T O T F L"
+msgid "February"
+msgstr "Februar"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
+msgid "March"
+msgstr "Marts"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Maj"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "December"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "S"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "M"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "O"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "F"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "L"
+
 msgid "Show"
 msgstr "Vis"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Skjul"

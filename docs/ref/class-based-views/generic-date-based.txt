@@ -13,7 +13,7 @@ views for displaying drilldown pages for date-based data.
     defined as follows in ``myapp/models.py``::
 
         from django.db import models
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class Article(models.Model):
             title = models.CharField(max_length=200)
@@ -22,8 +22,8 @@ views for displaying drilldown pages for date-based data.
             def get_absolute_url(self):
                 return reverse('article-detail', kwargs={'pk': self.pk})
 
-ArchiveIndexView
-----------------
+``ArchiveIndexView``
+====================
 
 .. class:: ArchiveIndexView
 
@@ -48,11 +48,9 @@ ArchiveIndexView
     :class:`django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      containing all years that have objects available according to
-      ``queryset``, represented as
-      :class:`datetime.datetime<python:datetime.datetime>` objects, in
+    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+      object containing all years that have objects available according to
+      ``queryset``, represented as :class:`datetime.datetime` objects, in
       descending order.
 
     **Notes**
@@ -88,8 +86,8 @@ ArchiveIndexView
 
     This will output all articles.
 
-YearArchiveView
----------------
+``YearArchiveView``
+===================
 
 .. class:: YearArchiveView
 
@@ -128,11 +126,9 @@ YearArchiveView
     :class:`django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      containing all months that have objects available according to
-      ``queryset``, represented as
-      :class:`datetime.datetime<python:datetime.datetime>` objects, in
+    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+      object containing all months that have objects available according to
+      ``queryset``, represented as :class:`datetime.datetime` objects, in
       ascending order.
 
     * ``year``: A :class:`~datetime.date` object
@@ -195,8 +191,8 @@ YearArchiveView
             {% endfor %}
         </div>
 
-MonthArchiveView
-----------------
+``MonthArchiveView``
+====================
 
 .. class:: MonthArchiveView
 
@@ -223,12 +219,10 @@ MonthArchiveView
     :class:`~django.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
-    * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
-      containing all days that have objects available in the given month,
-      according to ``queryset``, represented as
-      :class:`datetime.datetime<python:datetime.datetime>` objects, in
-      ascending order.
+    * ``date_list``: A :meth:`QuerySet <django.db.models.query.QuerySet.dates>`
+      object containing all days that have objects available in the given month,
+      according to ``queryset``, represented as :class:`datetime.datetime`
+      objects, in ascending order.
 
     * ``month``: A :class:`~datetime.date` object
       representing the given month.
@@ -256,7 +250,6 @@ MonthArchiveView
         class ArticleMonthArchiveView(MonthArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -295,8 +288,8 @@ MonthArchiveView
             {% endif %}
         </p>
 
-WeekArchiveView
----------------
+``WeekArchiveView``
+===================
 
 .. class:: WeekArchiveView
 
@@ -340,6 +333,15 @@ WeekArchiveView
 
     * Uses a default ``template_name_suffix`` of ``_archive_week``.
 
+    * The ``week_format`` attribute is a :func:`~time.strptime` format string
+      used to parse the week number. The following values are supported:
+
+      * ``'%U'``: Based on the United States week system where the week
+        begins on Sunday. This is the default value.
+
+      * ``'%W'``: Similar to ``'%U'``, except it assumes that the week
+        begins on Monday. This is not the same as the ISO 8601 week number.
+
     **Example myapp/views.py**::
 
         from django.views.generic.dates import WeekArchiveView
@@ -349,7 +351,6 @@ WeekArchiveView
         class ArticleWeekArchiveView(WeekArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             week_format = "%W"
             allow_future = True
 
@@ -380,27 +381,26 @@ WeekArchiveView
 
         <p>
             {% if previous_week %}
-                Previous Week: {{ previous_week|date:"F Y" }}
+                Previous Week: {{ previous_week|date:"W" }} of year {{ previous_week|date:"Y" }}
             {% endif %}
             {% if previous_week and next_week %}--{% endif %}
             {% if next_week %}
-                Next week: {{ next_week|date:"F Y" }}
+                Next week: {{ next_week|date:"W" }} of year {{ next_week|date:"Y" }}
             {% endif %}
         </p>
 
-    In this example, you are outputting the week number. The default
-    ``week_format`` in the ``WeekArchiveView`` uses  week format ``'%U'``
-    which is based on the United States week system where the week begins on a
-    Sunday. The ``'%W'`` format uses the ISO week format and its week
-    begins on a Monday.  The ``'%W'`` format is the same in both the
-    :func:`~time.strftime` and the :tfilter:`date`.
+    In this example, you are outputting the week number. Keep in mind that week
+    numbers computed by the :tfilter:`date` template filter with the ``'W'``
+    format character are not always the same as those computed by
+    :func:`~time.strftime` and :func:`~time.strptime` with the ``'%W'`` format
+    string. For year 2015, for example, week numbers output by :tfilter:`date`
+    are higher by one compared to those output by :func:`~time.strftime`. There
+    isn't an equivalent for the ``'%U'`` :func:`~time.strftime` format string
+    in :tfilter:`date`. Therefore, you should avoid using :tfilter:`date` to
+    generate URLs for ``WeekArchiveView``.
 
-    However, the :tfilter:`date` template filter does not have an equivalent
-    output format that supports the US based week system. The :tfilter:`date`
-    filter ``'%U'`` outputs the number of seconds since the Unix epoch.
-
-DayArchiveView
---------------
+``DayArchiveView``
+==================
 
 .. class:: DayArchiveView
 
@@ -464,7 +464,6 @@ DayArchiveView
         class ArticleDayArchiveView(DayArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -502,8 +501,8 @@ DayArchiveView
             {% endif %}
         </p>
 
-TodayArchiveView
-----------------
+``TodayArchiveView``
+====================
 
 .. class:: TodayArchiveView
 
@@ -538,7 +537,6 @@ TodayArchiveView
         class ArticleTodayArchiveView(TodayArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -560,8 +558,8 @@ TodayArchiveView
         a different template, set the ``template_name`` attribute to be the
         name of the new template.
 
-DateDetailView
---------------
+``DateDetailView``
+==================
 
 .. class:: DateDetailView
 
@@ -597,7 +595,7 @@ DateDetailView
         from django.views.generic.dates import DateDetailView
 
         urlpatterns = [
-            url(r'^(?P<year>[0-9]+)/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
                 DateDetailView.as_view(model=Article, date_field="pub_date"),
                 name="archive_date_detail"),
         ]

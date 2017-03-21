@@ -1,3 +1,4 @@
+=================================
 Form Assets (the ``Media`` class)
 =================================
 
@@ -42,7 +43,7 @@ in a form suitable for easy inclusion on your Web page.
 .. _assets-as-a-static-definition:
 
 Assets as a static definition
------------------------------
+=============================
 
 The easiest way to define assets is as a static definition. Using this
 method, the declaration is an inner ``Media`` class. The properties of the
@@ -77,7 +78,7 @@ can be retrieved through this property::
 Here's a list of all possible ``Media`` options. There are no required options.
 
 ``css``
-~~~~~~~
+-------
 
 A dictionary describing the CSS files required for various forms of output
 media.
@@ -118,14 +119,14 @@ If this last CSS definition were to be rendered, it would become the following H
     <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
 
 ``js``
-~~~~~~
+------
 
 A tuple describing the required JavaScript files. See :ref:`the
 section on paths <form-asset-paths>` for details of how to specify
 paths to these files.
 
 ``extend``
-~~~~~~~~~~
+----------
 
 A boolean defining inheritance behavior for ``Media`` declarations.
 
@@ -174,7 +175,7 @@ complete control over which files are inherited, and which are not.
 .. _dynamic-property:
 
 ``Media`` as a dynamic property
--------------------------------
+===============================
 
 If you need to perform some more sophisticated manipulation of asset
 requirements, you can define the ``media`` property directly. This is
@@ -187,10 +188,10 @@ For example, the static definition for our Calendar Widget could also
 be defined in a dynamic fashion::
 
     class CalendarWidget(forms.TextInput):
-        def _media(self):
+        @property
+        def media(self):
             return forms.Media(css={'all': ('pretty.css',)},
                                js=('animations.js', 'actions.js'))
-        media = property(_media)
 
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic ``media`` properties.
@@ -198,17 +199,18 @@ return values for dynamic ``media`` properties.
 .. _form-asset-paths:
 
 Paths in asset definitions
---------------------------
+==========================
 
 Paths used to specify assets can be either relative or absolute. If a
 path starts with ``/``, ``http://`` or ``https://``, it will be
 interpreted as an absolute path, and left as-is. All other paths will
-be prepended with the value of the appropriate prefix.
+be prepended with the value of the appropriate prefix. If the
+:mod:`django.contrib.staticfiles` app is installed, it will be used to serve
+assets.
 
-As part of the introduction of the
-:doc:`staticfiles app </ref/contrib/staticfiles>` two new settings were added
-to refer to "static files" (images, CSS, Javascript, etc.) that are needed
-to render a complete web page: :setting:`STATIC_URL` and :setting:`STATIC_ROOT`.
+Whether or not you use :mod:`django.contrib.staticfiles`,  the
+:setting:`STATIC_URL` and :setting:`STATIC_ROOT` settings are required to
+render a complete web page.
 
 To find the appropriate prefix to use, Django will check if the
 :setting:`STATIC_URL` setting is not ``None`` and automatically fall back
@@ -238,9 +240,17 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
+Or if :mod:`~django.contrib.staticfiles` is configured using the
+`~django.contib.staticfiles.ManifestStaticFilesStorage`::
+
+    >>> w = CalendarWidget()
+    >>> print(w.media)
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
+    <script type="text/javascript" src="https://static.example.com/animations.27e20196a850.js"></script>
+    <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
 ``Media`` objects
------------------
+=================
 
 When you interrogate the ``media`` attribute of a widget or form, the
 value that is returned is a ``forms.Media`` object. As we have already
@@ -251,7 +261,7 @@ HTML page.
 However, ``Media`` objects have some other interesting properties.
 
 Subsets of assets
-~~~~~~~~~~~~~~~~~
+-----------------
 
 If you only want files of a particular type, you can use the subscript
 operator to filter out a medium of interest. For example::
@@ -269,7 +279,7 @@ When you use the subscript operator, the value that is returned is a
 new ``Media`` object -- but one that only contains the media of interest.
 
 Combining ``Media`` objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 ``Media`` objects can also be added together. When two ``Media`` objects are
 added, the resulting ``Media`` object contains the union of the assets
@@ -296,7 +306,7 @@ specified by both::
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 ``Media`` on Forms
-------------------
+==================
 
 Widgets aren't the only objects that can have ``media`` definitions --
 forms can also define ``media``. The rules for ``media`` definitions

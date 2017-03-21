@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 
 def module_to_dict(module, omittable=lambda k: k.startswith('_')):
-    """Converts a module namespace to a Python dictionary."""
+    """Convert a module namespace to a Python dictionary."""
     return {k: repr(v) for k, v in module.__dict__.items() if not omittable(k)}
 
 
@@ -14,19 +14,28 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def add_arguments(self, parser):
-        parser.add_argument('--all', action='store_true', dest='all', default=False,
-            help='Display all settings, regardless of their value. '
-            'Default values are prefixed by "###".')
+        parser.add_argument(
+            '--all', action='store_true', dest='all', default=False,
+            help='Display all settings, regardless of their value. Default values are prefixed by "###".',
+        )
+        parser.add_argument(
+            '--default', dest='default', metavar='MODULE', default=None,
+            help=(
+                "The settings module to compare the current settings against. Leave empty to "
+                "compare against Django's default settings."
+            ),
+        )
 
     def handle(self, **options):
         # Inspired by Postfix's "postconf -n".
-        from django.conf import settings, global_settings
+        from django.conf import settings, Settings, global_settings
 
         # Because settings are imported lazily, we need to explicitly load them.
         settings._setup()
 
         user_settings = module_to_dict(settings._wrapped)
-        default_settings = module_to_dict(global_settings)
+        default = options['default']
+        default_settings = module_to_dict(Settings(default) if default else global_settings)
 
         output = []
         for key in sorted(user_settings):

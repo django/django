@@ -1,40 +1,46 @@
-# Default Django settings. Override these with settings in the module
-# pointed-to by the DJANGO_SETTINGS_MODULE environment variable.
+"""
+Default Django settings. Override these with settings in the module pointed to
+by the DJANGO_SETTINGS_MODULE environment variable.
+"""
+
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
-gettext_noop = lambda s: s
+def gettext_noop(s):
+    return s
+
 
 ####################
 # CORE             #
 ####################
 
 DEBUG = False
-TEMPLATE_DEBUG = False
 
 # Whether the framework should propagate raw exceptions rather than catching
 # them. This is useful under some testing situations and should never be used
 # on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
-# Whether to use the "Etag" header. This saves bandwidth but slows down performance.
+# Whether to use the "ETag" header. This saves bandwidth but slows down performance.
+# Deprecated (RemovedInDjango21Warning) in favor of ConditionalGetMiddleware
+# which sets the ETag regardless of this setting.
 USE_ETAGS = False
 
 # People who get code error notifications.
-# In the format (('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com'))
-ADMINS = ()
+# In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
+ADMINS = []
 
-# Tuple of IP addresses, as strings, that:
+# List of IP addresses, as strings, that:
 #   * See debug comments, when DEBUG is true
 #   * Receive x-headers
-INTERNAL_IPS = ()
+INTERNAL_IPS = []
 
 # Hosts/domain names that are valid for this site.
 # "*" matches anything, ".example.com" matches example.com and all subdomains
 ALLOWED_HOSTS = []
 
 # Local time zone for this installation. All choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
+# https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
 # interpreted as the default user time zone.
 TIME_ZONE = 'America/Chicago'
@@ -47,7 +53,7 @@ USE_TZ = False
 LANGUAGE_CODE = 'en-us'
 
 # Languages we provide translations for, out of the box.
-LANGUAGES = (
+LANGUAGES = [
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
     ('ast', gettext_noop('Asturian')),
@@ -62,6 +68,7 @@ LANGUAGES = (
     ('cy', gettext_noop('Welsh')),
     ('da', gettext_noop('Danish')),
     ('de', gettext_noop('German')),
+    ('dsb', gettext_noop('Lower Sorbian')),
     ('el', gettext_noop('Greek')),
     ('en', gettext_noop('English')),
     ('en-au', gettext_noop('Australian English')),
@@ -69,6 +76,7 @@ LANGUAGES = (
     ('eo', gettext_noop('Esperanto')),
     ('es', gettext_noop('Spanish')),
     ('es-ar', gettext_noop('Argentinian Spanish')),
+    ('es-co', gettext_noop('Colombian Spanish')),
     ('es-mx', gettext_noop('Mexican Spanish')),
     ('es-ni', gettext_noop('Nicaraguan Spanish')),
     ('es-ve', gettext_noop('Venezuelan Spanish')),
@@ -79,10 +87,12 @@ LANGUAGES = (
     ('fr', gettext_noop('French')),
     ('fy', gettext_noop('Frisian')),
     ('ga', gettext_noop('Irish')),
+    ('gd', gettext_noop('Scottish Gaelic')),
     ('gl', gettext_noop('Galician')),
     ('he', gettext_noop('Hebrew')),
     ('hi', gettext_noop('Hindi')),
     ('hr', gettext_noop('Croatian')),
+    ('hsb', gettext_noop('Upper Sorbian')),
     ('hu', gettext_noop('Hungarian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
@@ -103,7 +113,7 @@ LANGUAGES = (
     ('mn', gettext_noop('Mongolian')),
     ('mr', gettext_noop('Marathi')),
     ('my', gettext_noop('Burmese')),
-    ('nb', gettext_noop('Norwegian Bokmal')),
+    ('nb', gettext_noop('Norwegian Bokmål')),
     ('ne', gettext_noop('Nepali')),
     ('nl', gettext_noop('Dutch')),
     ('nn', gettext_noop('Norwegian Nynorsk')),
@@ -130,19 +140,17 @@ LANGUAGES = (
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
     ('vi', gettext_noop('Vietnamese')),
-    ('zh-cn', gettext_noop('Simplified Chinese')),
     ('zh-hans', gettext_noop('Simplified Chinese')),
     ('zh-hant', gettext_noop('Traditional Chinese')),
-    ('zh-tw', gettext_noop('Traditional Chinese')),
-)
+]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar", "fa", "ur")
+LANGUAGES_BIDI = ["he", "ar", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-LOCALE_PATHS = ()
+LOCALE_PATHS = []
 
 # Settings for language cookie
 LANGUAGE_COOKIE_NAME = 'django_language'
@@ -189,6 +197,9 @@ EMAIL_HOST = 'localhost'
 # Port for sending email.
 EMAIL_PORT = 25
 
+# Whether to send SMTP 'Date' header in the local time zone or in UTC.
+EMAIL_USE_LOCALTIME = False
+
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
@@ -199,36 +210,12 @@ EMAIL_SSL_KEYFILE = None
 EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
-INSTALLED_APPS = ()
+INSTALLED_APPS = []
 
-# List of locations of the template source files, in search order.
-TEMPLATE_DIRS = ()
+TEMPLATES = []
 
-# List of callables that know how to import templates from various sources.
-# See the comments in django/core/template/loader.py for interface
-# documentation.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    # 'django.template.loaders.eggs.Loader',
-)
-
-# List of processors used by RequestContext to populate the context.
-# Each one should be a callable that takes the request object as its
-# only parameter and returns a dictionary to add to the context.
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.core.context_processors.tz',
-    # 'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-)
-
-# Output to use in template system for invalid (e.g. misspelled) variables.
-TEMPLATE_STRING_IF_INVALID = ''
+# Default form rendering class.
+FORM_RENDERER = 'django.forms.renderers.DjangoTemplates'
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -251,31 +238,27 @@ FORCE_SCRIPT_NAME = None
 # that are not allowed to visit any page, systemwide. Use this for bad
 # robots/crawlers. Here are a few examples:
 #     import re
-#     DISALLOWED_USER_AGENTS = (
+#     DISALLOWED_USER_AGENTS = [
 #         re.compile(r'^NaverBot.*'),
 #         re.compile(r'^EmailSiphon.*'),
 #         re.compile(r'^SiteSucker.*'),
 #         re.compile(r'^sohu-search')
-#     )
-DISALLOWED_USER_AGENTS = ()
+#     ]
+DISALLOWED_USER_AGENTS = []
 
 ABSOLUTE_URL_OVERRIDES = {}
-
-# Tuple of strings representing allowed prefixes for the {% ssi %} tag.
-# Example: ('/home/html', '/var/www')
-ALLOWED_INCLUDE_ROOTS = ()
 
 # List of compiled regular expression objects representing URLs that need not
 # be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
 #    import re
-#    IGNORABLE_404_URLS = (
+#    IGNORABLE_404_URLS = [
 #        re.compile(r'^/apple-touch-icon.*\.png$'),
 #        re.compile(r'^/favicon.ico$),
 #        re.compile(r'^/robots.txt$),
 #        re.compile(r'^/phpmyadmin/),
 #        re.compile(r'\.(cgi|php|pl)$'),
-#    )
-IGNORABLE_404_URLS = ()
+#    ]
+IGNORABLE_404_URLS = []
 
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain
@@ -302,14 +285,22 @@ STATIC_ROOT = None
 STATIC_URL = None
 
 # List of upload handler classes to be applied in order.
-FILE_UPLOAD_HANDLERS = (
+FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-)
+]
 
 # Maximum size, in bytes, of a request before it will be streamed to the
 # file system instead of into memory.
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
+
+# Maximum size in bytes of request data (excluding file uploads) that will be
+# read before a SuspiciousOperation (RequestDataTooBig) is raised.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
+
+# Maximum number of GET/POST parameters that will be read before a
+# SuspiciousOperation (TooManyFieldsSent) is raised.
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
@@ -317,12 +308,12 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 FILE_UPLOAD_TEMP_DIR = None
 
 # The numeric mode to set newly-uploaded files to. The value should be a mode
-# you'd pass directly to os.chmod; see http://docs.python.org/lib/os-file-dir.html.
+# you'd pass directly to os.chmod; see https://docs.python.org/3/library/os.html#files-and-directories.
 FILE_UPLOAD_PERMISSIONS = None
 
 # The numeric mode to assign to newly-created directories, when uploading files.
 # The value should be a mode as you'd pass to os.chmod;
-# see http://docs.python.org/lib/os-file-dir.html.
+# see https://docs.python.org/3/library/os.html#files-and-directories.
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = None
 
 # Python module path where user will place custom format definition.
@@ -366,30 +357,30 @@ SHORT_DATETIME_FORMAT = 'm/d/Y P'
 # See all available format string here:
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-DATE_INPUT_FORMATS = (
+DATE_INPUT_FORMATS = [
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
     '%b %d %Y', '%b %d, %Y',             # 'Oct 25 2006', 'Oct 25, 2006'
     '%d %b %Y', '%d %b, %Y',             # '25 Oct 2006', '25 Oct, 2006'
     '%B %d %Y', '%B %d, %Y',             # 'October 25 2006', 'October 25, 2006'
     '%d %B %Y', '%d %B, %Y',             # '25 October 2006', '25 October, 2006'
-)
+]
 
 # Default formats to be used when parsing times from input boxes, in order
 # See all available format string here:
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-TIME_INPUT_FORMATS = (
+TIME_INPUT_FORMATS = [
     '%H:%M:%S',     # '14:30:59'
     '%H:%M:%S.%f',  # '14:30:59.000200'
     '%H:%M',        # '14:30'
-)
+]
 
 # Default formats to be used when parsing dates and times from input boxes,
 # in order
 # See all available format string here:
 # http://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
-DATETIME_INPUT_FORMATS = (
+DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
     '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
     '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
@@ -402,7 +393,7 @@ DATETIME_INPUT_FORMATS = (
     '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
-)
+]
 
 # First day of week, to be used on calendars
 # 0 means Sunday, 1 means Monday...
@@ -429,9 +420,10 @@ DEFAULT_INDEX_TABLESPACE = ''
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 USE_X_FORWARDED_HOST = False
+USE_X_FORWARDED_PORT = False
 
-# The Python dotted path to the WSGI application that Django's internal servers
-# (runserver, runfcgi) will use. If `None`, the return value of
+# The Python dotted path to the WSGI application that Django's internal server
+# (runserver) will use. If `None`, the return value of
 # 'django.core.wsgi.get_wsgi_application' is used, thus preserving the same
 # behavior as previous versions of Django. Otherwise this should point to an
 # actual WSGI application object.
@@ -450,13 +442,10 @@ SECURE_PROXY_SSL_HEADER = None
 # MIDDLEWARE #
 ##############
 
-# List of middleware classes to use.  Order is important; in the request phase,
-# this middleware classes will be applied in the order given, and in the
-# response phase the middleware will be applied in reverse order.
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-)
+# List of middleware to use. Order is important; in the request phase, these
+# middleware will be applied in the order given, and in the response
+# phase the middleware will be applied in reverse order.
+MIDDLEWARE = []
 
 ############
 # SESSIONS #
@@ -508,13 +497,13 @@ CACHE_MIDDLEWARE_ALIAS = 'default'
 
 AUTH_USER_MODEL = 'auth.User'
 
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 LOGIN_URL = '/accounts/login/'
 
-LOGOUT_URL = '/accounts/logout/'
-
 LOGIN_REDIRECT_URL = '/accounts/profile/'
+
+LOGOUT_REDIRECT_URL = None
 
 # The number of days a password reset link is valid for
 PASSWORD_RESET_TIMEOUT_DAYS = 3
@@ -522,17 +511,15 @@ PASSWORD_RESET_TIMEOUT_DAYS = 3
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
 # upon login
-PASSWORD_HASHERS = (
+PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
-    'django.contrib.auth.hashers.MD5PasswordHasher',
-    'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
-    'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-    'django.contrib.auth.hashers.CryptPasswordHasher',
-)
+]
+
+AUTH_PASSWORD_VALIDATORS = []
 
 ###########
 # SIGNING #
@@ -555,6 +542,9 @@ CSRF_COOKIE_DOMAIN = None
 CSRF_COOKIE_PATH = '/'
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_TRUSTED_ORIGINS = []
+CSRF_USE_SESSIONS = False
 
 ############
 # MESSAGES #
@@ -596,25 +586,25 @@ TEST_NON_SERIALIZED_APPS = []
 ############
 
 # The list of directories to search for fixtures
-FIXTURE_DIRS = ()
+FIXTURE_DIRS = []
 
 ###############
 # STATICFILES #
 ###############
 
 # A list of locations of additional static files
-STATICFILES_DIRS = ()
+STATICFILES_DIRS = []
 
 # The default file storage backend used during the build process
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
+]
 
 ##############
 # MIGRATIONS #
@@ -639,6 +629,7 @@ SILENCED_SYSTEM_CHECKS = []
 SECURE_BROWSER_XSS_FILTER = False
 SECURE_CONTENT_TYPE_NOSNIFF = False
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 SECURE_HSTS_SECONDS = 0
 SECURE_REDIRECT_EXEMPT = []
 SECURE_SSL_HOST = None

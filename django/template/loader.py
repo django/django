@@ -1,50 +1,66 @@
-import warnings
-
-from django.utils.deprecation import RemovedInDjango20Warning
-
-from .base import Origin
-from .engine import Engine
+from . import engines
+from .exceptions import TemplateDoesNotExist
 
 
-class LoaderOrigin(Origin):
-    def __init__(self, display_name, loader, name, dirs):
-        super(LoaderOrigin, self).__init__(display_name)
-        self.loader, self.loadname, self.dirs = loader, name, dirs
+def get_template(template_name, using=None):
+    """
+    Load and return a template for the given name.
 
-    def reload(self):
-        return self.loader(self.loadname, self.dirs)[0]
+    Raise TemplateDoesNotExist if no such template exists.
+    """
+    chain = []
+    engines = _engine_list(using)
+    for engine in engines:
+        try:
+            return engine.get_template(template_name)
+        except TemplateDoesNotExist as e:
+            chain.append(e)
 
-
-def find_template(*args, **kwargs):
-    return Engine.get_default().find_template(*args, **kwargs)
-
-
-def get_template(*args, **kwargs):
-    return Engine.get_default().get_template(*args, **kwargs)
-
-
-def get_template_from_string(*args, **kwargs):
-    return Engine.get_default().get_template_from_string(*args, **kwargs)
+    raise TemplateDoesNotExist(template_name, chain=chain)
 
 
-def render_to_string(*args, **kwargs):
-    return Engine.get_default().render_to_string(*args, **kwargs)
+def select_template(template_name_list, using=None):
+    """
+    Load and return a template for one of the given names.
+
+    Try names in order and return the first template found.
+
+    Raise TemplateDoesNotExist if no such template exists.
+    """
+    if isinstance(template_name_list, str):
+        raise TypeError(
+            'select_template() takes an iterable of template names but got a '
+            'string: %r. Use get_template() if you want to load a single '
+            'template by name.' % template_name_list
+        )
+
+    chain = []
+    engines = _engine_list(using)
+    for template_name in template_name_list:
+        for engine in engines:
+            try:
+                return engine.get_template(template_name)
+            except TemplateDoesNotExist as e:
+                chain.append(e)
+
+    if template_name_list:
+        raise TemplateDoesNotExist(', '.join(template_name_list), chain=chain)
+    else:
+        raise TemplateDoesNotExist("No template names provided")
 
 
-def select_template(*args, **kwargs):
-    return Engine.get_default().select_template(*args, **kwargs)
+def render_to_string(template_name, context=None, request=None, using=None):
+    """
+    Load a template and render it with a context. Return a string.
+
+    template_name may be a string or a list of strings.
+    """
+    if isinstance(template_name, (list, tuple)):
+        template = select_template(template_name, using=using)
+    else:
+        template = get_template(template_name, using=using)
+    return template.render(context, request)
 
 
-# This line must remain at the bottom to avoid import loops.
-from .loaders import base
-
-
-class BaseLoader(base.Loader):
-    _accepts_engine_in_init = False
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "django.template.loader.BaseLoader was superseded by "
-            "django.template.loaders.base.Loader.",
-            RemovedInDjango20Warning, stacklevel=2)
-        super(BaseLoader, self).__init__(*args, **kwargs)
+def _engine_list(using=None):
+    return engines.all() if using is None else [engines[using]]

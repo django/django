@@ -1,0 +1,120 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Zorig <zorig_ezd@yahoo.com>, 2016
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2015
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
+"mn/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: mn\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL -ын өргөтгөлүүд"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Массивд байгаа %(nth)s буруу байна"
+
+msgid "Nested arrays must have the same length."
+msgstr "Түүвэрлэсэн массив ижил урттай байх ёстой."
+
+msgid "Map of strings to strings"
+msgstr ""
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "\"%(key)s\" -ийн утга тэмдэгт мөр биш байна."
+
+msgid "A JSON object"
+msgstr "JSON объект"
+
+msgid "Value must be valid JSON."
+msgstr "Утга заавал JSON байх ёстой"
+
+msgid "Could not load JSON data."
+msgstr "JSON дата-г уншиж чадахгүй байна."
+
+msgid "Input must be a JSON dictionary."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' JSON байх ёстой."
+
+msgid "Enter two valid values."
+msgstr "Хоёр зөв утга оруулна уу"
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Хүрээний эхлэл төгсгөлөөс хэтрэхгүй байх ёстой."
+
+msgid "Enter two whole numbers."
+msgstr "Хоёр бүхэл тоон утга оруулна уу."
+
+msgid "Enter two numbers."
+msgstr "Хоёр тоо оруулна уу."
+
+msgid "Enter two valid date/times."
+msgstr "хоёр зөв огноо/цаг-ыг оруулна уу."
+
+msgid "Enter two valid dates."
+msgstr "Хоёр зөв огноо оруулна уу"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Жагсаалтанд %(show_value)d зүйл байна, %(limit_value)d -ээс хэтрэхгүй байх "
+"ёстой."
+msgstr[1] ""
+"Жагсаалтанд %(show_value)d зүйлүүд байна, %(limit_value)d -ээс хэтрэхгүй "
+"байх ёстой."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Жагсаалтанд %(show_value)d зүйл байна, %(limit_value)d -ээс ихгүй байх ёстой."
+msgstr[1] ""
+"Жагсаалтанд %(show_value)d зүйлүүд байна, %(limit_value)d -ээс ихгүй байх "
+"ёстой."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Зарим түлхүүр байхгүй байна: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Хэсэг үл мэдэгдэх түлхүүр байна: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Энэ хүрээ нь %(limit_value)s -тэй бүрэн тэнцүү буюу түүнээс бага байгаа "
+"эсэхийг шалгана уу"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Энэ хүрээ нь %(limit_value)s -с их буюу тэнцүү байгаа эсэхийг шалгана уу"

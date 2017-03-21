@@ -1,0 +1,132 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-09-15 09:30+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
+"be/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: be\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Пашырэнні PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Элемент масіву нумар %(nth)s не прайшоў праверкі:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Укладзенныя масівы павінны мець аднолькавую даўжыню."
+
+msgid "Map of strings to strings"
+msgstr "Адпаведнасць радкоў у радкі."
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "Значэнне \"%(key)s\" не з'яўляецца радком."
+
+msgid "A JSON object"
+msgstr "JSON аб’ект"
+
+msgid "Value must be valid JSON."
+msgstr "Значэнне павінна быць сапраўдным JSON."
+
+msgid "Could not load JSON data."
+msgstr "Не атрымалася загрузіць дадзеныя JSON."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Значэнне павінна быць JSON слоўнікам. "
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' значэнне павінна быць сапраўдным JSON."
+
+msgid "Enter two valid values."
+msgstr "Увядзіце два сапраўдных значэнні."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Пачатак дыяпазону не павінен перавышаць канец дыяпазону."
+
+msgid "Enter two whole numbers."
+msgstr "Увядзіце два цэлых лікі."
+
+msgid "Enter two numbers."
+msgstr "Увядзіце два лікі."
+
+msgid "Enter two valid date/times."
+msgstr "Увядзіце дзве/два сапраўдных даты/часу."
+
+msgid "Enter two valid dates."
+msgstr "Увядзіце дзве сапраўдных даты."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Спіс мае %(show_value)d элемент, ён павінен мець не болей чым "
+"%(limit_value)d."
+msgstr[1] ""
+"Спіс мае %(show_value)d элемента, ён павінен мець не болей чым "
+"%(limit_value)d."
+msgstr[2] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не болей чым "
+"%(limit_value)d."
+msgstr[3] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не болей чым "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Спіс мае %(show_value)d элемент, ён павінен мець не менш чым %(limit_value)d."
+msgstr[1] ""
+"Спіс мае %(show_value)d элемента, ён павінен мець не менш чым "
+"%(limit_value)d."
+msgstr[2] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не менш чым "
+"%(limit_value)d."
+msgstr[3] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не менш чым "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Не хапае нейкіх ключоў: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Дадзены нейкія невядомыя ключы: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Упэўніцеся, что ўсе элементы гэтага інтэрвалу менш ці раўны %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Упэўніцеся, что ўсе элементы гэтага інтэрвалу больш ці раўны %(limit_value)s."

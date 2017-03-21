@@ -4,8 +4,8 @@ from django.views.generic import RedirectView
 
 from . import views
 
-
 urlpatterns = [
+    url(r'^upload_view/$', views.upload_view, name='upload_view'),
     url(r'^get_view/$', views.get_view, name='get_view'),
     url(r'^post_view/$', views.post_view),
     url(r'^trace_view/$', views.trace_view),
@@ -15,8 +15,8 @@ urlpatterns = [
     url(r'^secure_view/$', views.view_with_secure),
     url(r'^permanent_redirect_view/$', RedirectView.as_view(url='/get_view/', permanent=True)),
     url(r'^temporary_redirect_view/$', RedirectView.as_view(url='/get_view/', permanent=False)),
-    url(r'^http_redirect_view/$', RedirectView.as_view(url='/secure_view/', permanent=True)),
-    url(r'^https_redirect_view/$', RedirectView.as_view(url='https://testserver/secure_view/', permanent=True)),
+    url(r'^http_redirect_view/$', RedirectView.as_view(url='/secure_view/')),
+    url(r'^https_redirect_view/$', RedirectView.as_view(url='https://testserver/secure_view/')),
     url(r'^double_redirect_view/$', views.double_redirect_view),
     url(r'^bad_view/$', views.bad_view),
     url(r'^form_view/$', views.form_view),
@@ -32,8 +32,11 @@ urlpatterns = [
     url(r'^broken_view/$', views.broken_view),
     url(r'^mail_sending_view/$', views.mail_sending_view),
     url(r'^mass_mail_sending_view/$', views.mass_mail_sending_view),
+    url(r'^nesting_exception_view/$', views.nesting_exception_view),
     url(r'^django_project_redirect/$', views.django_project_redirect),
 
-    url(r'^accounts/login/$', auth_views.login, {'template_name': 'login.html'}),
-    url(r'^accounts/logout/$', auth_views.logout),
+    url(r'^accounts/$', RedirectView.as_view(url='login/')),
+    url(r'^accounts/no_trailing_slash$', RedirectView.as_view(url='login/')),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.html')),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view()),
 ]

@@ -1,8 +1,8 @@
 import os
 import sys
-
-from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
+
+from setuptools import find_packages, setup
 
 # Warn if we are installing over top of an existing installation. This can
 # cause issues where files that were deleted from a more recent Django are
@@ -35,7 +35,7 @@ version = __import__('django').get_version()
 setup(
     name='Django',
     version=version,
-    url='http://www.djangoproject.com/',
+    url='https://www.djangoproject.com/',
     author='Django Software Foundation',
     author_email='foundation@djangoproject.com',
     description=('A high-level Python Web framework that encourages '
@@ -47,24 +47,24 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
+    install_requires=['pytz'],
     extras_require={
         "bcrypt": ["bcrypt"],
+        "argon2": ["argon2-cffi >= 16.1.0"],
     },
     zip_safe=False,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: WSGI',

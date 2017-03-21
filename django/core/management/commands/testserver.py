@@ -5,23 +5,30 @@ from django.db import connection
 
 class Command(BaseCommand):
     help = 'Runs a development server with data from the given fixture(s).'
-    args = '[fixture ...]'
 
     requires_system_checks = False
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='fixture', nargs='*',
-            help='Path(s) to fixtures to load before running the server.')
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_argument('--addrport', default='',
-            help='Port number or ipaddr:port to run the server on.')
-        parser.add_argument('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
-            help='Tells Django to use an IPv6 address.')
+        parser.add_argument(
+            'args', metavar='fixture', nargs='*',
+            help='Path(s) to fixtures to load before running the server.',
+        )
+        parser.add_argument(
+            '--noinput', '--no-input', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '--addrport', default='',
+            help='Port number or ipaddr:port to run the server on.',
+        )
+        parser.add_argument(
+            '--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
+            help='Tells Django to use an IPv6 address.',
+        )
 
     def handle(self, *fixture_labels, **options):
-        verbosity = options.get('verbosity')
-        interactive = options.get('interactive')
+        verbosity = options['verbosity']
+        interactive = options['interactive']
 
         # Create a test database.
         db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive, serialize=False)

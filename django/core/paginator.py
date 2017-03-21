@@ -1,7 +1,13 @@
 import collections
+import warnings
 from math import ceil
 
-from django.utils import six
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+
+
+class UnorderedObjectListWarning(RuntimeWarning):
+    pass
 
 
 class InvalidPage(Exception):
@@ -16,37 +22,33 @@ class EmptyPage(InvalidPage):
     pass
 
 
-class Paginator(object):
+class Paginator:
 
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
+        self._check_object_list_is_ordered()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
-        self._num_pages = self._count = None
 
     def validate_number(self, number):
-        """
-        Validates the given 1-based page number.
-        """
+        """Validate the given 1-based page number."""
         try:
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger('That page number is not an integer')
+            raise PageNotAnInteger(_('That page number is not an integer'))
         if number < 1:
-            raise EmptyPage('That page number is less than 1')
+            raise EmptyPage(_('That page number is less than 1'))
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise EmptyPage('That page contains no results')
+                raise EmptyPage(_('That page contains no results'))
         return number
 
     def page(self, number):
-        """
-        Returns a Page object for the given 1-based page number.
-        """
+        """Return a Page object for the given 1-based page number."""
         number = self.validate_number(number)
         bottom = (number - 1) * self.per_page
         top = bottom + self.per_page
@@ -56,48 +58,50 @@ class Paginator(object):
 
     def _get_page(self, *args, **kwargs):
         """
-        Returns an instance of a single page.
+        Return an instance of a single page.
 
         This hook can be used by subclasses to use an alternative to the
         standard :cls:`Page` object.
         """
         return Page(*args, **kwargs)
 
-    def _get_count(self):
-        """
-        Returns the total number of objects, across all pages.
-        """
-        if self._count is None:
-            try:
-                self._count = self.object_list.count()
-            except (AttributeError, TypeError):
-                # AttributeError if object_list has no count() method.
-                # TypeError if object_list.count() requires arguments
-                # (i.e. is of type list).
-                self._count = len(self.object_list)
-        return self._count
-    count = property(_get_count)
+    @cached_property
+    def count(self):
+        """Return the total number of objects, across all pages."""
+        try:
+            return self.object_list.count()
+        except (AttributeError, TypeError):
+            # AttributeError if object_list has no count() method.
+            # TypeError if object_list.count() requires arguments
+            # (i.e. is of type list).
+            return len(self.object_list)
 
-    def _get_num_pages(self):
-        """
-        Returns the total number of pages.
-        """
-        if self._num_pages is None:
-            if self.count == 0 and not self.allow_empty_first_page:
-                self._num_pages = 0
-            else:
-                hits = max(1, self.count - self.orphans)
-                self._num_pages = int(ceil(hits / float(self.per_page)))
-        return self._num_pages
-    num_pages = property(_get_num_pages)
+    @cached_property
+    def num_pages(self):
+        """Return the total number of pages."""
+        if self.count == 0 and not self.allow_empty_first_page:
+            return 0
+        hits = max(1, self.count - self.orphans)
+        return int(ceil(hits / float(self.per_page)))
 
-    def _get_page_range(self):
+    @property
+    def page_range(self):
         """
-        Returns a 1-based range of pages for iterating through within
+        Return a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return list(six.moves.range(1, self.num_pages + 1))
-    page_range = property(_get_page_range)
+        return range(1, self.num_pages + 1)
+
+    def _check_object_list_is_ordered(self):
+        """
+        Warn if self.object_list is unordered (typically a QuerySet).
+        """
+        if hasattr(self.object_list, 'ordered') and not self.object_list.ordered:
+            warnings.warn(
+                'Pagination may yield inconsistent results with an unordered '
+                'object_list: {!r}'.format(self.object_list),
+                UnorderedObjectListWarning
+            )
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
@@ -117,7 +121,7 @@ class Page(collections.Sequence):
         return len(self.object_list)
 
     def __getitem__(self, index):
-        if not isinstance(index, (slice,) + six.integer_types):
+        if not isinstance(index, (int, slice)):
             raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
@@ -142,7 +146,7 @@ class Page(collections.Sequence):
 
     def start_index(self):
         """
-        Returns the 1-based index of the first object on this page,
+        Return the 1-based index of the first object on this page,
         relative to total objects in the paginator.
         """
         # Special case, return zero if no items.
@@ -152,7 +156,7 @@ class Page(collections.Sequence):
 
     def end_index(self):
         """
-        Returns the 1-based index of the last object on this page,
+        Return the 1-based index of the last object on this page,
         relative to total objects found (hits).
         """
         # Special case for the last page because there can be orphans.

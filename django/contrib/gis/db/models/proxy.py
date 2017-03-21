@@ -1,68 +1,79 @@
 """
-The GeometryProxy object, allows for lazy-geometries.  The proxy uses
-Python descriptors for instantiating and setting Geometry objects
-corresponding to geographic model fields.
+The SpatialProxy object allows for lazy-geometries and lazy-rasters. The proxy
+uses Python descriptors for instantiating and setting Geometry or Raster
+objects corresponding to geographic model fields.
 
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
-from django.utils import six
+from django.db.models.query_utils import DeferredAttribute
 
 
-class GeometryProxy(object):
+class SpatialProxy(DeferredAttribute):
     def __init__(self, klass, field):
         """
-        Proxy initializes on the given Geometry class (not an instance) and
-        the GeometryField.
+        Initialize on the given Geometry or Raster class (not an instance)
+        and the corresponding field.
         """
         self._field = field
         self._klass = klass
+        super().__init__(field.attname, klass)
 
-    def __get__(self, obj, type=None):
+    def __get__(self, instance, cls=None):
         """
-        This accessor retrieves the geometry, initializing it using the geometry
-        class specified during initialization and the HEXEWKB value of the field.
-        Currently, only GEOS or OGR geometries are supported.
+        Retrieve the geometry or raster, initializing it using the
+        corresponding class specified during initialization and the value of
+        the field. Currently, GEOS or OGR geometries as well as GDALRasters are
+        supported.
         """
-        if obj is None:
+        if instance is None:
             # Accessed on a class, not an instance
             return self
 
         # Getting the value of the field.
-        geom_value = obj.__dict__[self._field.attname]
+        try:
+            geo_value = instance.__dict__[self._field.attname]
+        except KeyError:
+            geo_value = super().__get__(instance, cls)
 
-        if isinstance(geom_value, self._klass):
-            geom = geom_value
-        elif (geom_value is None) or (geom_value == ''):
-            geom = None
+        if isinstance(geo_value, self._klass):
+            geo_obj = geo_value
+        elif (geo_value is None) or (geo_value == ''):
+            geo_obj = None
         else:
-            # Otherwise, a Geometry object is built using the field's contents,
-            # and the model's corresponding attribute is set.
-            geom = self._klass(geom_value)
-            setattr(obj, self._field.attname, geom)
-        return geom
+            # Otherwise, a geometry or raster object is built using the field's
+            # contents, and the model's corresponding attribute is set.
+            geo_obj = self._klass(geo_value)
+            setattr(instance, self._field.attname, geo_obj)
+        return geo_obj
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         """
-        This accessor sets the proxied geometry with the geometry class
-        specified during initialization.  Values of None, HEXEWKB, or WKT may
-        be used to set the geometry as well.
+        Retrieve the proxied geometry or raster with the corresponding class
+        specified during initialization.
+
+        To set geometries, use values of None, HEXEWKB, or WKT.
+        To set rasters, use JSON or dict values.
         """
-        # The OGC Geometry type of the field.
+        # The geographic type of the field.
         gtype = self._field.geom_type
 
-        # The geometry type must match that of the field -- unless the
-        # general GeometryField is used.
-        if isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
-            # Assigning the SRID to the geometry.
+        if gtype == 'RASTER' and (value is None or isinstance(value, (str, dict, self._klass))):
+            # For raster fields, assure input is None or a string, dict, or
+            # raster instance.
+            pass
+        elif isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
+            # The geometry type must match that of the field -- unless the
+            # general GeometryField is used.
             if value.srid is None:
+                # Assigning the field SRID if the geometry has no SRID.
                 value.srid = self._field.srid
-        elif value is None or isinstance(value, six.string_types + (six.memoryview,)):
-            # Set with None, WKT, HEX, or WKB
+        elif value is None or isinstance(value, (str, memoryview)):
+            # Set geometries with None, WKT, HEX, or WKB
             pass
         else:
-            raise TypeError('Cannot set %s GeometryProxy (%s) with value of type: %s' % (
-                obj.__class__.__name__, gtype, type(value)))
+            raise TypeError('Cannot set %s SpatialProxy (%s) with value of type: %s' % (
+                instance.__class__.__name__, gtype, type(value)))
 
         # Setting the objects dictionary with the value, and returning.
-        obj.__dict__[self._field.attname] = value
+        instance.__dict__[self._field.attname] = value
         return value

@@ -1,5 +1,6 @@
-import os
 import fnmatch
+import os
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -36,14 +37,12 @@ def get_files(storage, ignore_patterns=None, location=''):
             continue
         if location:
             dir = os.path.join(location, dir)
-        for fn in get_files(storage, ignore_patterns, dir):
-            yield fn
+        yield from get_files(storage, ignore_patterns, dir)
 
 
 def check_settings(base_url=None):
     """
-    Checks if the staticfiles settings have sane values.
-
+    Check if the staticfiles settings have sane values.
     """
     if base_url is None:
         base_url = settings.STATIC_URL

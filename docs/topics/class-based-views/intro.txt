@@ -1,5 +1,5 @@
 =================================
-Introduction to Class-based views
+Introduction to class-based views
 =================================
 
 Class-based views provide an alternative way to implement views as Python
@@ -7,7 +7,7 @@ objects instead of functions. They do not replace function-based views, but
 have certain differences and advantages when compared to function-based views:
 
 * Organization of code related to specific HTTP methods (``GET``, ``POST``,
-  etc) can be addressed by separate methods instead of conditional branching.
+  etc.) can be addressed by separate methods instead of conditional branching.
 
 * Object oriented techniques such as mixins (multiple inheritance) can be
   used to factor code into reusable components.
@@ -43,7 +43,7 @@ The toolkit of base classes and mixins that Django uses to build class-based
 generic views are built for maximum flexibility, and as such have many hooks in
 the form of default method implementations and attributes that you are unlikely
 to be concerned with in the simplest use cases. For example, instead of
-limiting you to a class based attribute for ``form_class``, the implementation
+limiting you to a class-based attribute for ``form_class``, the implementation
 uses a ``get_form`` method, which calls a ``get_form_class`` method, which in
 its default implementation just returns the ``form_class`` attribute of the
 class. This gives you several options for specifying what form to use, from a
@@ -71,7 +71,7 @@ something like::
 In a class-based view, this would become::
 
     from django.http import HttpResponse
-    from django.views.generic import View
+    from django.views import View
 
     class MyView(View):
         def get(self, request):
@@ -80,9 +80,9 @@ In a class-based view, this would become::
 
 Because Django's URL resolver expects to send the request and associated
 arguments to a callable function, not a class, class-based views have an
-:meth:`~django.views.generic.base.View.as_view` class method which serves as
-the callable entry point to your class. The ``as_view`` entry point creates an
-instance of your class and calls its
+:meth:`~django.views.generic.base.View.as_view` class method which returns a
+function that can be called when a request arrives for a URL matching the
+associated pattern. The function creates an instance of the class and calls its
 :meth:`~django.views.generic.base.View.dispatch` method. ``dispatch`` looks at
 the request to determine whether it is a ``GET``, ``POST``, etc, and relays the
 request to a matching method if one is defined, or raises
@@ -93,7 +93,7 @@ request to a matching method if one is defined, or raises
     from myapp.views import MyView
 
     urlpatterns = [
-        url(r'^about/', MyView.as_view()),
+        url(r'^about/$', MyView.as_view()),
     ]
 
 
@@ -113,7 +113,7 @@ and methods in the subclass. So that if your parent class had an attribute
 ``greeting`` like this::
 
     from django.http import HttpResponse
-    from django.views.generic import View
+    from django.views import View
 
     class GreetingView(View):
         greeting = "Good Day"
@@ -130,7 +130,7 @@ Another option is to configure class attributes as keyword arguments to the
 :meth:`~django.views.generic.base.View.as_view` call in the URLconf::
 
     urlpatterns = [
-        url(r'^about/', GreetingView.as_view(greeting="G'day")),
+        url(r'^about/$', GreetingView.as_view(greeting="G'day")),
     ]
 
 .. note::
@@ -173,29 +173,6 @@ that inherits from ``View`` - for example, trying to use a form at the top of a
 list and combining :class:`~django.views.generic.edit.ProcessFormView` and
 :class:`~django.views.generic.list.ListView` - won't work as expected.
 
-.. _mixins_that_wrap_as_view:
-
-Mixins that wrap ``as_view()``
-------------------------------
-
-One way to apply common behavior to many classes is to write a mixin that wraps
-the :meth:`~django.views.generic.base.View.as_view()` method.
-
-For example, if you have many generic views that should be decorated with
-:func:`~django.contrib.auth.decorators.login_required` you could implement a
-mixin like this::
-
-    from django.contrib.auth.decorators import login_required
-
-    class LoginRequiredMixin(object):
-        @classmethod
-        def as_view(cls, **initkwargs):
-            view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
-            return login_required(view)
-
-    class MyView(LoginRequiredMixin, ...):
-        # this is a generic view
-        ...
 
 Handling forms with class-based views
 =====================================
@@ -222,7 +199,7 @@ A similar class-based view might look like::
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
-    from django.views.generic import View
+    from django.views import View
 
     from .forms import MyForm
 
@@ -251,10 +228,9 @@ more of the methods (or both!).
 Decorating class-based views
 ============================
 
-The extension of class-based views isn't limited to using mixins. You
-can use also use decorators. Since class-based views aren't functions,
-decorating them works differently depending on if you're using ``as_view`` or
-creating a subclass.
+The extension of class-based views isn't limited to using mixins. You can also
+use decorators. Since class-based views aren't functions, decorating them works
+differently depending on if you're using ``as_view()`` or creating a subclass.
 
 Decorating in URLconf
 ---------------------
@@ -269,8 +245,8 @@ The easiest place to do this is in the URLconf where you deploy your view::
     from .views import VoteView
 
     urlpatterns = [
-        url(r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
-        url(r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
+        url(r'^about/$', login_required(TemplateView.as_view(template_name="secret.html"))),
+        url(r'^vote/$', permission_required('polls.can_vote')(VoteView.as_view())),
     ]
 
 This approach applies the decorator on a per-instance basis. If you
@@ -301,10 +277,35 @@ that it can be used on an instance method. For example::
 
         @method_decorator(login_required)
         def dispatch(self, *args, **kwargs):
-            return super(ProtectedView, self).dispatch(*args, **kwargs)
+            return super().dispatch(*args, **kwargs)
 
-In this example, every instance of ``ProtectedView`` will have
-login protection.
+Or, more succinctly, you can decorate the class instead and pass the name
+of the method to be decorated as the keyword argument ``name``::
+
+    @method_decorator(login_required, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+If you have a set of common decorators used in several places, you can define
+a list or tuple of decorators and use this instead of invoking
+``method_decorator()`` multiple times. These two classes are equivalent::
+
+    decorators = [never_cache, login_required]
+
+    @method_decorator(decorators, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+    @method_decorator(never_cache, name='dispatch')
+    @method_decorator(login_required, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+The decorators will process a request in the order they are passed to the
+decorator. In the example, ``never_cache()`` will process the request before
+``login_required()``.
+
+In this example, every instance of ``ProtectedView`` will have login protection.
 
 .. note::
 

@@ -1,7 +1,8 @@
 from unittest import TestCase
 
-from django.utils.baseconv import base2, base16, base36, base56, base62, base64, BaseConverter
-from django.utils.six.moves import range
+from django.utils.baseconv import (
+    BaseConverter, base2, base16, base36, base56, base62, base64,
+)
 
 
 class TestBaseConv(TestCase):
@@ -40,5 +41,10 @@ class TestBaseConv(TestCase):
         self.assertEqual(base7.decode('ghejd'), -1234)
 
     def test_exception(self):
-        self.assertRaises(ValueError, BaseConverter, 'abc', sign='a')
+        with self.assertRaises(ValueError):
+            BaseConverter('abc', sign='a')
         self.assertIsInstance(BaseConverter('abc', sign='d'), BaseConverter)
+
+    def test_repr(self):
+        base7 = BaseConverter('cjdhel3', sign='g')
+        self.assertEqual(repr(base7), '<BaseConverter: base7 (cjdhel3)>')

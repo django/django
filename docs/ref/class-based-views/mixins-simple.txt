@@ -2,8 +2,8 @@
 Simple mixins
 =============
 
-ContextMixin
-------------
+``ContextMixin``
+================
 
 .. class:: django.views.generic.base.ContextMixin
 
@@ -15,7 +15,7 @@ ContextMixin
         arguments provided will make up the returned context. Example usage::
 
             def get_context_data(self, **kwargs):
-                context = super(RandomNumberView, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['number'] = random.randrange(1, 100)
                 return context
 
@@ -31,8 +31,8 @@ ContextMixin
             the documentation on :ref:`rendering a template context
             <alters-data-description>`.
 
-TemplateResponseMixin
----------------------
+``TemplateResponseMixin``
+=========================
 
 .. class:: django.views.generic.base.TemplateResponseMixin
 
@@ -49,28 +49,20 @@ TemplateResponseMixin
         a ``template_name`` will raise a
         :class:`django.core.exceptions.ImproperlyConfigured` exception.
 
+    .. attribute:: template_engine
+
+        The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+        loading the template. ``template_engine`` is passed as the ``using``
+        keyword argument to ``response_class``. Default is ``None``, which
+        tells Django to search for the template in all configured engines.
+
     .. attribute:: response_class
 
         The response class to be returned by ``render_to_response`` method.
-        Default is
-        :class:`TemplateResponse <django.template.response.TemplateResponse>`.
-        The template and context of ``TemplateResponse`` instances can be
-        altered later (e.g. in
+        Default is :class:`TemplateResponse
+        <django.template.response.TemplateResponse>`. The template and context
+        of ``TemplateResponse`` instances can be altered later (e.g. in
         :ref:`template response middleware <template-response-middleware>`).
-
-        .. versionchanged:: 1.8
-
-            In older versions of Django, ``TemplateResponse`` used
-            :class:`~django.template.RequestContext` in such a way that
-            callables defined in :setting:`TEMPLATE_CONTEXT_PROCESSORS` would
-            override template variables defined in your views. For example, if
-            you subclassed :class:`DetailView
-            <django.views.generic.detail.DetailView>` and
-            set ``context_object_name`` to ``user``, the
-            ``django.contrib.auth.context_processors.auth`` context processor
-            would overwrite your variable with the current user. Now, for
-            consistency with the ``render()`` shortcut, values in the context
-            provided by the class override values from context processors.
 
         If you need custom template loading or custom context object
         instantiation, create a ``TemplateResponse`` subclass and assign it to
@@ -97,7 +89,7 @@ TemplateResponseMixin
     .. method:: get_template_names()
 
         Returns a list of template names to search for when rendering the
-        template.
+        template. The first template that is found will be used.
 
         If :attr:`template_name` is specified, the default implementation will
         return a list containing :attr:`template_name` (if it is specified).

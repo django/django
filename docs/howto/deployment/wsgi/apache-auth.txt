@@ -15,24 +15,24 @@ version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
 * Allow certain users to connect to a WebDAV share created with mod_dav_.
 
 .. note::
-    If you have installed a :ref:`custom User model <auth-custom-user>` and
+    If you have installed a :ref:`custom user model <auth-custom-user>` and
     want to use this default auth handler, it must support an ``is_active``
     attribute. If you want to use group based authorization, your custom user
     must have a relation named 'groups', referring to a related object that has
     a 'name' field. You can also specify your own custom mod_wsgi
     auth handler if your custom cannot conform to these requirements.
 
-.. _Subversion: http://subversion.tigris.org/
-.. _mod_dav: http://httpd.apache.org/docs/2.2/mod/mod_dav.html
+.. _Subversion: http://subversion.apache.org/
+.. _mod_dav: https://httpd.apache.org/docs/2.2/mod/mod_dav.html
 
-Authentication with mod_wsgi
-============================
+Authentication with ``mod_wsgi``
+================================
 
 .. note::
 
     The use of ``WSGIApplicationGroup %{GLOBAL}`` in the configurations below
     presumes that your Apache instance is running only one Django application.
-    If you are running more than Django application, please refer to the
+    If you are running more than one Django application, please refer to the
     `Defining Application Groups`_ section of the mod_wsgi docs for more
     information about this setting.
 
@@ -97,11 +97,11 @@ Requests beginning with ``/secret/`` will now require a user to authenticate.
 The mod_wsgi `access control mechanisms documentation`_ provides additional
 details and information about alternative methods of authentication.
 
-.. _Defining Application Groups: https://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Defining_Application_Groups
-.. _access control mechanisms documentation: http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms
+.. _Defining Application Groups: https://modwsgi.readthedocs.io/en/develop/user-guides/configuration-guidelines.html#defining-application-groups
+.. _access control mechanisms documentation: https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html
 
-Authorization with mod_wsgi and Django groups
----------------------------------------------
+Authorization with ``mod_wsgi`` and Django groups
+-------------------------------------------------
 
 mod_wsgi also provides functionality to restrict a particular location to
 members of a group.

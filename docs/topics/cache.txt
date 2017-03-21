@@ -2,7 +2,7 @@
 Django's cache framework
 ========================
 
-A fundamental trade-off in dynamic Web sites is, well, they're dynamic. Each
+A fundamental trade-off in dynamic websites is, well, they're dynamic. Each
 time a user requests a page, the Web server makes all sorts of calculations --
 from database queries to template rendering to business logic -- to create the
 page that your site's visitor sees. This is a lot more expensive, from a
@@ -79,8 +79,8 @@ After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
 two most common are `python-memcached`_ and `pylibmc`_.
 
-.. _`python-memcached`: ftp://ftp.tummy.com/pub/python-memcached/
-.. _`pylibmc`: http://sendapatch.se/projects/pylibmc/
+.. _`python-memcached`: https://pypi.python.org/pypi/python-memcached
+.. _`pylibmc`: https://pypi.python.org/pypi/pylibmc
 
 To use Memcached with Django:
 
@@ -114,13 +114,22 @@ In this example, Memcached is available through a local Unix socket file
         }
     }
 
+When using the ``pylibmc`` binding, do not include the ``unix:/`` prefix::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'LOCATION': '/tmp/memcached.sock',
+        }
+    }
+
 One excellent feature of Memcached is its ability to share a cache over
 multiple servers. This means you can run Memcached daemons on multiple
 machines, and the program will treat the group of machines as a *single*
 cache, without the need to duplicate cache values on each machine. To take
 advantage of this feature, include all server addresses in
-:setting:`LOCATION <CACHES-LOCATION>`, either separated by semicolons or as
-a list.
+:setting:`LOCATION <CACHES-LOCATION>`, either as a semicolon or comma
+delimited string, or as a list.
 
 In this example, the cache is shared over Memcached instances running on IP
 address 172.19.26.240 and 172.19.26.242, both on port 11211::
@@ -158,6 +167,11 @@ Without a doubt, *none* of the Django caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
+
+.. versionchanged:: 1.11
+
+    The :setting:`LOCATION <CACHES-LOCATION>` setting now supports defining
+    multiple servers as a comma-delimited string.
 
 .. _database-caching:
 
@@ -206,12 +220,8 @@ If you are using multiple databases, :djadmin:`createcachetable` observes the
 Like :djadmin:`migrate`, :djadmin:`createcachetable` won't touch an existing
 table. It will only create missing tables.
 
-.. versionchanged:: 1.7
-
-    Before Django 1.7, :djadmin:`createcachetable` created one table at a time.
-    You had to pass the name of the table you wanted to create, and if you were
-    using multiple databases, you had to use the :djadminopt:`--database`
-    option. For backwards compatibility, this is still possible.
+To print the SQL that would be run, rather than run it, use the
+:option:`createcachetable --dry-run` option.
 
 Multiple databases
 ~~~~~~~~~~~~~~~~~~
@@ -233,19 +243,19 @@ operations to ``cache_replica``, and all write operations to
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label == 'django_cache':
                 return 'cache_replica'
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label in ('django_cache',):
+            if model._meta.app_label == 'django_cache':
                 return 'cache_primary'
             return None
 
-        def allow_migrate(self, db, model):
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
             "Only install the cache model on primary"
-            if model._meta.app_label in ('django_cache',):
+            if app_label == 'django_cache':
                 return db == 'cache_primary'
             return None
 
@@ -292,6 +302,8 @@ above example, if your server runs as the user ``apache``, make sure the
 directory ``/var/tmp/django_cache`` exists and is readable and writable by the
 user ``apache``.
 
+.. _local-memory-caching:
+
 Local-memory caching
 --------------------
 
@@ -305,7 +317,7 @@ example::
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake'
+            'LOCATION': 'unique-snowflake',
         }
     }
 
@@ -359,6 +371,8 @@ Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
 been well-tested and are easy to use.
 
+.. _cache_arguments:
+
 Cache arguments
 ---------------
 
@@ -366,14 +380,11 @@ Each cache backend can be given additional arguments to control caching
 behavior. These arguments are provided as additional keys in the
 :setting:`CACHES` setting. Valid arguments are as follows:
 
-
 * :setting:`TIMEOUT <CACHES-TIMEOUT>`: The default timeout, in
   seconds, to use for the cache. This argument defaults to ``300`` seconds (5 minutes).
-
-  .. versionadded:: 1.7
-
   You can set ``TIMEOUT`` to ``None`` so that, by default, cache keys never
-  expire.
+  expire. A value of ``0`` causes keys to immediately expire (effectively
+  "don't cache").
 
 * :setting:`OPTIONS <CACHES-OPTIONS>`: Any options that should be
   passed to the cache backend. The list of valid options will vary
@@ -398,6 +409,10 @@ behavior. These arguments are provided as additional keys in the
     entire cache will be dumped when ``MAX_ENTRIES`` is reached.
     On some backends (``database`` in particular) this makes culling *much*
     faster at the expense of more cache misses.
+
+  Memcached backends pass the contents of :setting:`OPTIONS <CACHES-OPTIONS>`
+  as keyword arguments to the client constructors, allowing for more advanced
+  control of client behavior. For example usage, see below.
 
 * :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`: A string that will be
   automatically included (prepended by default) to all cache keys
@@ -433,8 +448,44 @@ of 60 seconds, and a maximum capacity of 1000 items::
         }
     }
 
-Invalid arguments are silently ignored, as are invalid values of known
-arguments.
+Here's an example configuration for a ``python-memcached`` based backend with
+an object size limit of 2MB::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'server_max_value_length': 1024 * 1024 * 2,
+            }
+        }
+    }
+
+Here's an example configuration for a ``pylibmc`` based backend that enables
+the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+            'LOCATION': '127.0.0.1:11211',
+            'OPTIONS': {
+                'binary': True,
+                'username': 'user',
+                'password': 'pass',
+                'behaviors': {
+                    'ketama': True,
+                }
+            }
+        }
+    }
+
+.. versionchanged:: 1.11
+
+    Memcached backends can now be configured using ``OPTIONS``.
+
+    In older versions, you could pass ``pylibmc`` behavior settings directly
+    inside ``OPTIONS``. This is deprecated in favor of setting them under a
+    ``behaviors`` key within ``OPTIONS`` instead.
 
 .. _the-per-site-cache:
 
@@ -445,19 +496,19 @@ Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
 ``'django.middleware.cache.UpdateCacheMiddleware'`` and
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
-:setting:`MIDDLEWARE_CLASSES` setting, as in this example::
+:setting:`MIDDLEWARE` setting, as in this example::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE = [
         'django.middleware.cache.UpdateCacheMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
-    )
+    ]
 
 .. note::
 
     No, that's not a typo: the "update" middleware must be first in the list,
     and the "fetch" middleware must be last. The details are a bit obscure, but
-    see `Order of MIDDLEWARE_CLASSES`_ below if you'd like the full story.
+    see `Order of MIDDLEWARE`_ below if you'd like the full story.
 
 Then, add the following required settings to your Django settings file:
 
@@ -479,14 +530,15 @@ return a cached GET response for HEAD request.
 Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
 :class:`~django.http.HttpResponse`:
 
-* Sets the ``Last-Modified`` header to the current date/time when a fresh
-  (not cached) version of the page is requested.
-
 * Sets the ``Expires`` header to the current date/time plus the defined
   :setting:`CACHE_MIDDLEWARE_SECONDS`.
 
 * Sets the ``Cache-Control`` header to give a max age for the page --
   again, from the :setting:`CACHE_MIDDLEWARE_SECONDS` setting.
+
+.. versionchanged:: 1.11
+
+    In older versions, the ``Last-Modified`` header was also set.
 
 See :doc:`/topics/http/middleware` for more on middleware.
 
@@ -494,9 +546,10 @@ If a view sets its own cache expiry time (i.e. it has a ``max-age`` section in
 its ``Cache-Control`` header) then the page will be cached until the expiry
 time, rather than :setting:`CACHE_MIDDLEWARE_SECONDS`. Using the decorators in
 ``django.views.decorators.cache`` you can easily set a view's expiry time
-(using the ``cache_control`` decorator) or disable caching for a view (using
-the ``never_cache`` decorator). See the `using other headers`__ section for
-more on these decorators.
+(using the :func:`~django.views.decorators.cache.cache_control` decorator) or
+disable caching for a view (using the
+:func:`~django.views.decorators.cache.never_cache` decorator). See the
+`using other headers`__ section for more on these decorators.
 
 .. _i18n-cache-key:
 
@@ -564,7 +617,7 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
-The ``key_prefix and ``cache`` arguments may be specified together. The
+The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
 
@@ -606,8 +659,9 @@ the ``cache`` template tag. To give your template access to this tag, put
 
 The ``{% cache %}`` template tag caches the contents of the block for a given
 amount of time. It takes at least two arguments: the cache timeout, in seconds,
-and the name to give the cache fragment. The name will be taken as is, do not
-use a variable. For example:
+and the name to give the cache fragment. The fragment is cached forever if
+timeout is ``None``. The name will be taken as is, do not use a variable. For
+example:
 
 .. code-block:: html+django
 
@@ -615,6 +669,10 @@ use a variable. For example:
     {% cache 500 sidebar %}
         .. sidebar ..
     {% endcache %}
+
+.. versionchanged:: 2.0
+
+    Older versions don't allow a ``None`` timeout.
 
 Sometimes you might want to cache multiple copies of a fragment depending on
 some dynamic data that appears inside the fragment. For example, you might want a
@@ -662,12 +720,10 @@ equivalent:
 This feature is useful in avoiding repetition in templates. You can set the
 timeout in a variable, in one place, and just reuse that value.
 
-.. versionadded:: 1.7
-
-    By default, the cache tag will try to use the cache called
-    "template_fragments". If no such cache exists, it will fall back to using
-    the default cache. You may select an alternate cache backend to use with
-    the ``using`` keyword argument, which must be the last argument to the tag.
+By default, the cache tag will try to use the cache called "template_fragments".
+If no such cache exists, it will fall back to using the default cache. You may
+select an alternate cache backend to use with the ``using`` keyword argument,
+which must be the last argument to the tag.
 
 .. code-block:: html+django
 
@@ -719,8 +775,6 @@ Accessing the cache
 
 .. data:: django.core.cache.caches
 
-    .. versionadded:: 1.7
-
     You can access the caches configured in the :setting:`CACHES` setting
     through a dict-like object: ``django.core.cache.caches``. Repeated
     requests for the same alias in the same thread will return the same
@@ -747,21 +801,6 @@ Accessing the cache
 
     This object is equivalent to ``caches['default']``.
 
-.. function:: django.core.cache.get_cache(backend, **kwargs)
-
-    .. deprecated:: 1.7
-        This function has been deprecated in favor of
-        :data:`~django.core.cache.caches`.
-
-    Before Django 1.7 this function was the canonical way to obtain a cache
-    instance. It could also be used to create a new cache instance with a
-    different configuration.
-
-        >>> from django.core.cache import get_cache
-        >>> get_cache('default')
-        >>> get_cache('django.core.cache.backends.memcached.MemcachedCache', LOCATION='127.0.0.2')
-        >>> get_cache('default', TIMEOUT=300)
-
 Basic usage
 -----------
 
@@ -771,15 +810,17 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     >>> cache.get('my_key')
     'hello, world!'
 
+``key`` should be a ``str``, and ``value`` can be any picklable Python object.
+
 The ``timeout`` argument is optional and defaults to the ``timeout`` argument
 of the appropriate backend in the :setting:`CACHES` setting (explained above).
 It's the number of seconds the value should be stored in the cache. Passing in
-``None`` for ``timeout`` will cache the value forever.
+``None`` for ``timeout`` will cache the value forever. A ``timeout`` of ``0``
+won't cache the value.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
-    # Wait 30 seconds for 'my_key' to expire...
-
+    >>> # Wait 30 seconds for 'my_key' to expire...
     >>> cache.get('my_key')
     None
 
@@ -805,6 +846,21 @@ update the cache if the key specified is already present::
 If you need to know whether ``add()`` stored a value in the cache, you can
 check the return value. It will return ``True`` if the value was stored,
 ``False`` otherwise.
+
+If you want to get a key's value or set a value if the key isn't in the cache,
+there is the ``get_or_set()`` method. It takes the same parameters as ``get()``
+but the default is set as the new cache value for that key, rather than simply
+returned::
+
+    >>> cache.get('my_new_key')  # returns None
+    >>> cache.get_or_set('my_new_key', 'my new value', 100)
+    'my new value'
+
+You can also pass any callable as a *default* value::
+
+    >>> import datetime
+    >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
+    datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
 
 There's also a ``get_many()`` interface that only hits the cache once.
 ``get_many()`` returns a dictionary with all the keys you asked for that
@@ -917,12 +973,12 @@ default cache key version. However, the primitive cache functions all
 include a ``version`` argument, so you can specify a particular cache
 key version to set or get. For example::
 
-    # Set version 2 of a cache key
+    >>> # Set version 2 of a cache key
     >>> cache.set('my_key', 'hello world!', version=2)
-    # Get the default version (assuming version=1)
+    >>> # Get the default version (assuming version=1)
     >>> cache.get('my_key')
     None
-    # Get version 2 of the same key
+    >>> # Get version 2 of the same key
     >>> cache.get('my_key', version=2)
     'hello world!'
 
@@ -931,15 +987,15 @@ the ``incr_version()`` and ``decr_version()`` methods. This
 enables specific keys to be bumped to a new version, leaving other
 keys unaffected. Continuing our previous example::
 
-    # Increment the version of 'my_key'
+    >>> # Increment the version of 'my_key'
     >>> cache.incr_version('my_key')
-    # The default version still isn't available
+    >>> # The default version still isn't available
     >>> cache.get('my_key')
     None
     # Version 2 isn't available, either
     >>> cache.get('my_key', version=2)
     None
-    # But version 3 *is* available
+    >>> # But version 3 *is* available
     >>> cache.get('my_key', version=3)
     'hello world!'
 
@@ -997,7 +1053,7 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
     class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
             """Custom validation, raising exceptions or warnings as needed."""
-            # ...
+            ...
 
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
@@ -1008,17 +1064,17 @@ Downstream caches
 So far, this document has focused on caching your *own* data. But another type
 of caching is relevant to Web development, too: caching performed by
 "downstream" caches. These are systems that cache pages for users even before
-the request reaches your Web site.
+the request reaches your website.
 
 Here are a few examples of downstream caches:
 
 * Your ISP may cache certain pages, so if you requested a page from
-  http://example.com/, your ISP would send you the page without having to
+  https://example.com/, your ISP would send you the page without having to
   access example.com directly. The maintainers of example.com have no
   knowledge of this caching; the ISP sits between example.com and your Web
   browser, handling all of the caching transparently.
 
-* Your Django Web site may sit behind a *proxy cache*, such as Squid Web
+* Your Django website may sit behind a *proxy cache*, such as Squid Web
   Proxy Cache (http://www.squid-cache.org/), that caches pages for
   performance. In this case, each request first would be handled by the
   proxy, and it would be passed to your application only if needed.
@@ -1046,8 +1102,8 @@ pages. We'll look at some of these headers in the sections that follow.
 
 .. _using-vary-headers:
 
-Using Vary headers
-==================
+Using ``Vary`` headers
+======================
 
 The ``Vary`` header defines which request headers a cache
 mechanism should take into account when building its cache key. For example, if
@@ -1056,17 +1112,12 @@ said to "vary on language."
 
 By default, Django's cache system creates its cache keys using the requested
 fully-qualified URL -- e.g.,
-``"http://www.example.com/stories/2005/?order_by=author"``. This means every
+``"https://www.example.com/stories/2005/?order_by=author"``. This means every
 request to that URL will use the same cached version, regardless of user-agent
 differences such as cookies or language preferences. However, if this page
 produces different content based on some difference in request headers -- such
 as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
-
-.. versionchanged:: 1.7
-
-    Cache keys use the request's fully-qualified URL rather than just the path
-    and query string.
 
 To do this in Django, use the convenient
 :func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
@@ -1075,7 +1126,7 @@ To do this in Django, use the convenient
 
     @vary_on_headers('User-Agent')
     def my_view(request):
-        # ...
+        ...
 
 In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
@@ -1090,7 +1141,7 @@ You can pass multiple headers to ``vary_on_headers()``::
 
     @vary_on_headers('User-Agent', 'Cookie')
     def my_view(request):
-        # ...
+        ...
 
 This tells downstream caches to vary on *both*, which means each combination of
 user-agent and cookie will get its own cache value. For example, a request with
@@ -1104,11 +1155,11 @@ are equivalent::
 
     @vary_on_cookie
     def my_view(request):
-        # ...
+        ...
 
     @vary_on_headers('Cookie')
     def my_view(request):
-        # ...
+        ...
 
 The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
@@ -1116,11 +1167,12 @@ The headers you pass to ``vary_on_headers`` are not case sensitive;
 You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
+    from django.shortcuts import render
     from django.utils.cache import patch_vary_headers
 
     def my_view(request):
-        # ...
-        response = render_to_response('template_name', context)
+        ...
+        response = render(request, 'template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
 
@@ -1128,9 +1180,8 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
 its first argument and a list/tuple of case-insensitive header names as its
 second argument.
 
-For more on Vary headers, see the `official Vary spec`_.
-
-.. _`official Vary spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44
+For more on Vary headers, see the :rfc:`official Vary spec
+<7231#section-7.1.4>`.
 
 Controlling cache: Using other headers
 ======================================
@@ -1146,13 +1197,14 @@ public cache. So Web applications need a way to tell caches which data is
 private and which is public.
 
 The solution is to indicate a page's cache should be "private." To do this in
-Django, use the ``cache_control`` view decorator. Example::
+Django, use the :func:`~django.views.decorators.cache.cache_control` view
+decorator. Example::
 
     from django.views.decorators.cache import cache_control
 
     @cache_control(private=True)
     def my_view(request):
-        # ...
+        ...
 
 This decorator takes care of sending out the appropriate HTTP header behind the
 scenes.
@@ -1162,16 +1214,16 @@ exclusive. The decorator ensures that the "public" directive is removed if
 "private" should be set (and vice versa). An example use of the two directives
 would be a blog site that offers both private and public entries. Public
 entries may be cached on any shared cache. The following code uses
-:func:`django.utils.cache.patch_cache_control`, the manual way to modify the
-cache control header (it is internally called by the ``cache_control``
-decorator)::
+:func:`~django.utils.cache.patch_cache_control`, the manual way to modify the
+cache control header (it is internally called by the
+:func:`~django.views.decorators.cache.cache_control` decorator)::
 
     from django.views.decorators.cache import patch_cache_control
     from django.views.decorators.vary import vary_on_cookie
 
     @vary_on_cookie
     def list_blog_entries_view(request):
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             response = render_only_public_entries()
             patch_cache_control(response, public=True)
         else:
@@ -1180,63 +1232,52 @@ decorator)::
 
         return response
 
-There are a few other ways to control cache parameters. For example, HTTP
-allows applications to do the following:
-
-* Define the maximum time a page should be cached.
-
-* Specify whether a cache should always check for newer versions, only
-  delivering the cached content when there are no changes. (Some caches
-  might deliver cached content even if the server page changed, simply
-  because the cache copy isn't yet expired.)
-
-In Django, use the ``cache_control`` view decorator to specify these cache
-parameters. In this example, ``cache_control`` tells caches to revalidate the
-cache on every access and to store cached versions for, at most, 3,600 seconds::
+You can control downstream caches in other ways as well (see :rfc:`7234` for
+details on HTTP caching). For example, even if you don't use Django's
+server-side cache framework, you can still tell clients to cache a view for a
+certain amount of time with the :rfc:`max-age <7234#section-5.2.2.8>`
+directive::
 
     from django.views.decorators.cache import cache_control
 
-    @cache_control(must_revalidate=True, max_age=3600)
+    @cache_control(max_age=3600)
     def my_view(request):
-        # ...
+        ...
 
-Any valid ``Cache-Control`` HTTP directive is valid in ``cache_control()``.
-Here's a full list:
-
-* ``public=True``
-* ``private=True``
-* ``no_cache=True``
-* ``no_transform=True``
-* ``must_revalidate=True``
-* ``proxy_revalidate=True``
-* ``max_age=num_seconds``
-* ``s_maxage=num_seconds``
-
-For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
-
-(Note that the caching middleware already sets the cache header's max-age with
-the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. If you use a custom
-``max_age`` in a ``cache_control`` decorator, the decorator will take
+(If you *do* use the caching middleware, it already sets the ``max-age`` with
+the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. In that case,
+the custom ``max_age`` from the
+:func:`~django.views.decorators.cache.cache_control` decorator will take
 precedence, and the header values will be merged correctly.)
 
+Any valid ``Cache-Control`` response directive is valid in ``cache_control()``.
+Here are some more examples:
+
+* ``no_transform=True``
+* ``must_revalidate=True``
+* ``stale_while_revalidate=num_seconds``
+
+The full list of known directives can be found in the `IANA registry`_
+(note that not all of them apply to responses).
+
+.. _IANA registry: http://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
+
 If you want to use headers to disable caching altogether,
-``django.views.decorators.cache.never_cache`` is a view decorator that adds
-headers to ensure the response won't be cached by browsers or other caches.
-Example::
+:func:`~django.views.decorators.cache.never_cache` is a view decorator that
+adds headers to ensure the response won't be cached by browsers or other
+caches. Example::
 
     from django.views.decorators.cache import never_cache
 
     @never_cache
     def myview(request):
-        # ...
+        ...
 
-.. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
-
-Order of MIDDLEWARE_CLASSES
-===========================
+Order of ``MIDDLEWARE``
+=======================
 
 If you use caching middleware, it's important to put each half in the right
-place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache
+place within the :setting:`MIDDLEWARE` setting. That's because the cache
 middleware needs to know which headers by which to vary the cache storage.
 Middleware always adds something to the ``Vary`` response header when it can.
 

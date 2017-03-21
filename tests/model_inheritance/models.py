@@ -11,17 +11,14 @@ Model inheritance exists in two varieties:
 
 Both styles are demonstrated here.
 """
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+
 
 #
 # Abstract base classes
 #
 
 
-@python_2_unicode_compatible
 class CommonInfo(models.Model):
     name = models.CharField(max_length=50)
     age = models.PositiveIntegerField()
@@ -53,9 +50,13 @@ class Post(models.Model):
     title = models.CharField(max_length=50)
 
 
-@python_2_unicode_compatible
 class Attachment(models.Model):
-    post = models.ForeignKey(Post, related_name='attached_%(class)s_set')
+    post = models.ForeignKey(
+        Post,
+        models.CASCADE,
+        related_name='attached_%(class)s_set',
+        related_query_name='attached_%(app_label)s_%(class)ss',
+    )
     content = models.TextField()
 
     class Meta:
@@ -77,7 +78,6 @@ class Link(Attachment):
 # Multi-table inheritance
 #
 
-@python_2_unicode_compatible
 class Chef(models.Model):
     name = models.CharField(max_length=50)
 
@@ -85,7 +85,6 @@ class Chef(models.Model):
         return "%s the chef" % self.name
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -102,11 +101,10 @@ class Rating(models.Model):
         ordering = ['-rating']
 
 
-@python_2_unicode_compatible
 class Restaurant(Place, Rating):
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
-    chef = models.ForeignKey(Chef, null=True, blank=True)
+    chef = models.ForeignKey(Chef, models.SET_NULL, null=True, blank=True)
 
     class Meta(Rating.Meta):
         db_table = 'my_restaurant'
@@ -115,7 +113,6 @@ class Restaurant(Place, Rating):
         return "%s the restaurant" % self.name
 
 
-@python_2_unicode_compatible
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
@@ -123,7 +120,6 @@ class ItalianRestaurant(Restaurant):
         return "%s the italian restaurant" % self.name
 
 
-@python_2_unicode_compatible
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name='provider')
 
@@ -131,11 +127,10 @@ class Supplier(Place):
         return "%s the supplier" % self.name
 
 
-@python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
-    main_site = models.ForeignKey(Place, related_name='lot')
+    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
+    main_site = models.ForeignKey(Place, models.CASCADE, related_name='lot')
 
     def __str__(self):
         return "%s the parking lot" % self.name
@@ -155,25 +150,17 @@ class Title(models.Model):
 
 
 class NamedURL(models.Model):
-    title = models.ForeignKey(Title, related_name='attached_%(app_label)s_%(class)s_set')
+    title = models.ForeignKey(Title, models.CASCADE, related_name='attached_%(app_label)s_%(class)s_set')
     url = models.URLField()
 
     class Meta:
         abstract = True
 
 
-@python_2_unicode_compatible
-class Copy(NamedURL):
-    content = models.TextField()
-
-    def __str__(self):
-        return self.content
-
-
-class Mixin(object):
+class Mixin:
     def __init__(self):
         self.other_attr = 1
-        super(Mixin, self).__init__()
+        super().__init__()
 
 
 class MixinModel(models.Model, Mixin):
@@ -186,3 +173,24 @@ class Base(models.Model):
 
 class SubBase(Base):
     sub_id = models.IntegerField(primary_key=True)
+
+
+class GrandParent(models.Model):
+    first_name = models.CharField(max_length=80)
+    last_name = models.CharField(max_length=80)
+    email = models.EmailField(unique=True)
+
+    class Meta:
+        unique_together = ('first_name', 'last_name')
+
+
+class Parent(GrandParent):
+    pass
+
+
+class Child(Parent):
+    pass
+
+
+class GrandChild(Child):
+    pass

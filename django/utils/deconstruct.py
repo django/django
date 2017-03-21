@@ -1,16 +1,15 @@
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
 from importlib import import_module
 
+from django.utils.version import get_docs_version
 
-def deconstructible(*args, **kwargs):
+
+def deconstructible(*args, path=None):
     """
-    Class decorator that allow the decorated class to be serialized
+    Class decorator that allows the decorated class to be serialized
     by the migrations subsystem.
 
-    Accepts an optional kwarg `path` to specify the import path.
+    The `path` kwarg specifies the import path.
     """
-    path = kwargs.pop('path', None)
-
     def decorator(klass):
         def __new__(cls, *args, **kwargs):
             # We capture the arguments to make returning them trivial
@@ -20,10 +19,10 @@ def deconstructible(*args, **kwargs):
 
         def deconstruct(obj):
             """
-            Returns a 3-tuple of class import path, positional arguments,
+            Return a 3-tuple of class import path, positional arguments,
             and keyword arguments.
             """
-            # Python 2/fallback version
+            # Fallback version
             if path:
                 module_name, _, name = path.rpartition('.')
             else:
@@ -38,8 +37,8 @@ def deconstructible(*args, **kwargs):
                     "classes. Please move the object into the main module "
                     "body to use migrations.\n"
                     "For more information, see "
-                    "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
-                    % (name, module_name))
+                    "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
+                    % (name, module_name, get_docs_version()))
             return (
                 path or '%s.%s' % (obj.__class__.__module__, name),
                 obj._constructor_args[0],
@@ -53,4 +52,4 @@ def deconstructible(*args, **kwargs):
 
     if not args:
         return decorator
-    return decorator(*args, **kwargs)
+    return decorator(*args)

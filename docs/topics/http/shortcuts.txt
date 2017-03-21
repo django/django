@@ -12,17 +12,13 @@ The package ``django.shortcuts`` collects helper functions and classes that
 "span" multiple levels of MVC. In other words, these functions/classes
 introduce controlled coupling for convenience's sake.
 
-``render``
-==========
+``render()``
+============
 
-.. function:: render(request, template_name[, dictionary][, context_instance][, content_type][, status][, current_app][, dirs])
+.. function:: render(request, template_name, context=None, content_type=None, status=None, using=None)
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
-
-   :func:`render()` is the same as a call to
-   :func:`render_to_response()` with a ``context_instance`` argument that
-   forces the use of a :class:`~django.template.RequestContext`.
 
    Django does not provide a shortcut function which returns a
    :class:`~django.template.response.TemplateResponse` because the constructor
@@ -36,20 +32,18 @@ Required arguments
     The request object used to generate this response.
 
 ``template_name``
-    The full name of a template to use or sequence of template names.
+    The full name of a template to use or sequence of template names. If a
+    sequence is given, the first template that exists will be used. See the
+    :ref:`template loading documentation <template-loading>` for more
+    information on how templates are found.
 
 Optional arguments
 ------------------
 
-``dictionary``
+``context``
     A dictionary of values to add to the template context. By default, this
     is an empty dictionary. If a value in the dictionary is callable, the
     view will call it just before rendering the template.
-
-``context_instance``
-    The context instance to render the template with. By default, the template
-    will be rendered with a ``RequestContext`` instance (filled with values from
-    ``request`` and ``dictionary``).
 
 ``content_type``
     The MIME type to use for the resulting document. Defaults to the value of
@@ -58,18 +52,9 @@ Optional arguments
 ``status``
     The status code for the response. Defaults to ``200``.
 
-``current_app``
-    A hint indicating which application contains the current view. See the
-    :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
-    for more information.
-
-.. versionchanged:: 1.7
-
-   The ``dirs`` parameter was added.
-
-.. versionchanged:: 1.8
-
-   The ``dirs`` parameter was deprecated.
+``using``
+    The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
+    loading the template.
 
 Example
 -------
@@ -81,99 +66,36 @@ MIME type :mimetype:`application/xhtml+xml`::
 
     def my_view(request):
         # View code here...
-        return render(request, 'myapp/index.html', {"foo": "bar"},
-            content_type="application/xhtml+xml")
+        return render(request, 'myapp/index.html', {
+            'foo': 'bar',
+        }, content_type='application/xhtml+xml')
 
 This example is equivalent to::
 
     from django.http import HttpResponse
-    from django.template import RequestContext, loader
+    from django.template import loader
 
     def my_view(request):
         # View code here...
         t = loader.get_template('myapp/index.html')
-        c = RequestContext(request, {'foo': 'bar'})
-        return HttpResponse(t.render(c),
-            content_type="application/xhtml+xml")
+        c = {'foo': 'bar'}
+        return HttpResponse(t.render(c, request), content_type='application/xhtml+xml')
 
-``render_to_response``
-======================
+``render_to_response()``
+========================
 
-.. function:: render_to_response(template_name[, dictionary][, context_instance][, content_type][, dirs])
+.. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
 
-   Renders a given template with a given context dictionary and returns an
-   :class:`~django.http.HttpResponse` object with that rendered text.
+   .. deprecated:: 2.0
 
-Required arguments
-------------------
+   This function preceded the introduction of :func:`render` and works
+   similarly except that it doesn't make the ``request`` available in the
+   response.
 
-``template_name``
-    The full name of a template to use or sequence of template names. If a
-    sequence is given, the first template that exists will be used. See the
-    :ref:`template loader documentation <ref-templates-api-the-python-api>`
-    for more information on how templates are found.
+``redirect()``
+==============
 
-Optional arguments
-------------------
-
-``dictionary``
-    A dictionary of values to add to the template context. By default, this
-    is an empty dictionary. If a value in the dictionary is callable, the
-    view will call it just before rendering the template.
-
-``context_instance``
-    The context instance to render the template with. By default, the template
-    will be rendered with a :class:`~django.template.Context` instance (filled
-    with values from ``dictionary``). If you need to use :ref:`context
-    processors <subclassing-context-requestcontext>`, render the template with
-    a :class:`~django.template.RequestContext` instance instead. Your code
-    might look something like this::
-
-        return render_to_response('my_template.html',
-                                  my_data_dictionary,
-                                  context_instance=RequestContext(request))
-
-``content_type``
-    The MIME type to use for the resulting document. Defaults to the value of
-    the :setting:`DEFAULT_CONTENT_TYPE` setting.
-
-.. versionchanged:: 1.7
-
-   The ``dirs`` parameter was added.
-
-.. versionchanged:: 1.8
-
-   The ``dirs`` parameter was deprecated.
-
-Example
--------
-
-The following example renders the template ``myapp/index.html`` with the
-MIME type :mimetype:`application/xhtml+xml`::
-
-    from django.shortcuts import render_to_response
-
-    def my_view(request):
-        # View code here...
-        return render_to_response('myapp/index.html', {"foo": "bar"},
-            content_type="application/xhtml+xml")
-
-This example is equivalent to::
-
-    from django.http import HttpResponse
-    from django.template import Context, loader
-
-    def my_view(request):
-        # View code here...
-        t = loader.get_template('myapp/index.html')
-        c = Context({'foo': 'bar'})
-        return HttpResponse(t.render(c),
-            content_type="application/xhtml+xml")
-
-``redirect``
-============
-
-.. function:: redirect(to[, permanent=False], *args, **kwargs)
+.. function:: redirect(to, permanent=False, *args, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
@@ -183,19 +105,14 @@ This example is equivalent to::
    * A model: the model's :meth:`~django.db.models.Model.get_absolute_url()`
      function will be called.
 
-   * A view name, possibly with arguments: :func:`urlresolvers.reverse
-     <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
-     name.
+   * A view name, possibly with arguments: :func:`~django.urls.reverse` will be
+     used to reverse-resolve the name.
 
    * An absolute or relative URL, which will be used as-is for the redirect
      location.
 
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
    permanent redirect.
-
-   .. versionchanged:: 1.7
-
-       The ability to use relative URLs was added.
 
 Examples
 --------
@@ -215,7 +132,7 @@ You can use the :func:`redirect` function in a number of ways.
 
 2. By passing the name of a view and optionally some positional or
    keyword arguments; the URL will be reverse resolved using the
-   :func:`~django.core.urlresolvers.reverse` method::
+   :func:`~django.urls.reverse` method::
 
         def my_view(request):
             ...
@@ -231,7 +148,7 @@ You can use the :func:`redirect` function in a number of ways.
 
         def my_view(request):
             ...
-            return redirect('http://example.com/')
+            return redirect('https://example.com/')
 
 By default, :func:`redirect` returns a temporary redirect. All of the above
 forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
@@ -242,14 +159,14 @@ will be returned::
         object = MyModel.objects.get(...)
         return redirect(object, permanent=True)
 
-``get_object_or_404``
-=====================
+``get_object_or_404()``
+=======================
 
 .. function:: get_object_or_404(klass, *args, **kwargs)
 
    Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
    but it raises :class:`~django.http.Http404` instead of the model's
-   :class:`~django.core.exceptions.DoesNotExist` exception.
+   :class:`~django.db.models.Model.DoesNotExist` exception.
 
 Required arguments
 ------------------
@@ -283,7 +200,7 @@ This example is equivalent to::
         try:
             my_object = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
-            raise Http404
+            raise Http404("No MyModel matches the given query.")
 
 The most common use case is to pass a :class:`~django.db.models.Model`, as
 shown above. However, you can also pass a
@@ -315,8 +232,8 @@ Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
-``get_list_or_404``
-===================
+``get_list_or_404()``
+=====================
 
 .. function:: get_list_or_404(klass, *args, **kwargs)
 
@@ -353,4 +270,4 @@ This example is equivalent to::
     def my_view(request):
         my_objects = list(MyModel.objects.filter(published=True))
         if not my_objects:
-            raise Http404
+            raise Http404("No MyModel matches the given query.")

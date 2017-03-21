@@ -1,6 +1,6 @@
-#########################
+=========================
 Many-to-one relationships
-#########################
+=========================
 
 To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`::
 
@@ -11,15 +11,15 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
         last_name = models.CharField(max_length=30)
         email = models.EmailField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s %s" % (self.first_name, self.last_name)
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
         pub_date = models.DateField()
-        reporter = models.ForeignKey(Reporter)
+        reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
         class Meta:
@@ -55,26 +55,14 @@ relationship. For example, creating an ``Article`` with unsaved ``Reporter``
 raises ``ValueError``::
 
     >>> r3 = Reporter(first_name='John', last_name='Smith', email='john@example.com')
-    >>> Article(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
+    >>> Article.objects.create(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
     Traceback (most recent call last):
     ...
-    ValueError: 'Cannot assign "<Reporter: John Smith>": "Reporter" instance isn't saved in the database.'
-
-.. versionchanged:: 1.8
-
-    Previously, assigning unsaved objects did not raise an error and could
-    result in silent data loss.
+    ValueError: save() prohibited to prevent data loss due to unsaved related object 'reporter'.
 
 Article objects have access to their related Reporter objects::
 
     >>> r = a.reporter
-
-On Python 2, these are strings of type ``str`` instead of unicode strings
-because that's what was used in the creation of this reporter (and we haven't
-refreshed the data from the database, which always returns unicode strings)::
-
-    >>> r.first_name, r.last_name
-    ('John', 'Smith')
 
 Create an Article via the Reporter object::
 
@@ -95,7 +83,7 @@ Create a new article, and add it to the article set::
     >>> new_article2.reporter.id
     1
     >>> r.article_set.all()
-    [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
 
 Add the same article to a different article set - check that it moves::
 
@@ -113,9 +101,9 @@ Adding an object of the wrong type raises TypeError::
     TypeError: 'Article' instance expected
 
     >>> r.article_set.all()
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
     >>> r2.article_set.all()
-    [<Article: Paul's story>]
+    <QuerySet [<Article: Paul's story>]>
 
     >>> r.article_set.count()
     2
@@ -131,56 +119,56 @@ Use double underscores to separate relationships.
 This works as many levels deep as you want. There's no limit. For example::
 
     >>> r.article_set.filter(headline__startswith='This')
-    [<Article: This is a test>]
+    <QuerySet [<Article: This is a test>]>
 
     # Find all Articles for any Reporter whose first name is "John".
     >>> Article.objects.filter(reporter__first_name='John')
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 Exact match is implied here::
 
     >>> Article.objects.filter(reporter__first_name='John')
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 Query twice over the related field. This translates to an AND condition in the
 WHERE clause::
 
     >>> Article.objects.filter(reporter__first_name='John', reporter__last_name='Smith')
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 For the related lookup you can supply a primary key value or pass the related
 object explicitly::
 
     >>> Article.objects.filter(reporter__pk=1)
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
     >>> Article.objects.filter(reporter=1)
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
     >>> Article.objects.filter(reporter=r)
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
     >>> Article.objects.filter(reporter__in=[1,2]).distinct()
-    [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
     >>> Article.objects.filter(reporter__in=[r,r2]).distinct()
-    [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
 
 You can also use a queryset instead of a literal list of instances::
 
     >>> Article.objects.filter(reporter__in=Reporter.objects.filter(first_name='John')).distinct()
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 Querying in the opposite direction::
 
     >>> Reporter.objects.filter(article__pk=1)
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
     >>> Reporter.objects.filter(article=1)
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
     >>> Reporter.objects.filter(article=a)
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
 
     >>> Reporter.objects.filter(article__headline__startswith='This')
-    [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]>
     >>> Reporter.objects.filter(article__headline__startswith='This').distinct()
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
 
 Counting in the opposite direction works in conjunction with distinct()::
 
@@ -192,30 +180,30 @@ Counting in the opposite direction works in conjunction with distinct()::
 Queries can go round in circles::
 
     >>> Reporter.objects.filter(article__reporter__first_name__startswith='John')
-    [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]>
     >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
     >>> Reporter.objects.filter(article__reporter=r).distinct()
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
 
 If you delete a reporter, his articles will be deleted (assuming that the
 ForeignKey was defined with :attr:`django.db.models.ForeignKey.on_delete` set to
 ``CASCADE``, which is the default)::
 
     >>> Article.objects.all()
-    [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
     >>> Reporter.objects.order_by('first_name')
-    [<Reporter: John Smith>, <Reporter: Paul Jones>]
+    <QuerySet [<Reporter: John Smith>, <Reporter: Paul Jones>]>
     >>> r2.delete()
     >>> Article.objects.all()
-    [<Article: John's second story>, <Article: This is a test>]
+    <QuerySet [<Article: John's second story>, <Article: This is a test>]>
     >>> Reporter.objects.order_by('first_name')
-    [<Reporter: John Smith>]
+    <QuerySet [<Reporter: John Smith>]>
 
 You can delete using a JOIN in the query::
 
     >>> Reporter.objects.filter(article__headline__startswith='This').delete()
     >>> Reporter.objects.all()
-    []
+    <QuerySet []>
     >>> Article.objects.all()
-    []
+    <QuerySet []>

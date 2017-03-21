@@ -1,0 +1,65 @@
+==========================
+Django 1.7.9 release notes
+==========================
+
+*July 8, 2015*
+
+Django 1.7.9 fixes several security issues and bugs in 1.7.8.
+
+Denial-of-service possibility by filling session store
+======================================================
+
+In previous versions of Django, the session backends created a new empty record
+in the session storage anytime ``request.session`` was accessed and there was a
+session key provided in the request cookies that didn't already have a session
+record. This could allow an attacker to easily create many new session records
+simply by sending repeated requests with unknown session keys, potentially
+filling up the session store or causing other users' session records to be
+evicted.
+
+The built-in session backends now create a session record only if the session
+is actually modified; empty session records are not created. Thus this
+potential DoS is now only possible if the site chooses to expose a
+session-modifying view to anonymous users.
+
+As each built-in session backend was fixed separately (rather than a fix in the
+core sessions framework), maintainers of third-party session backends should
+check whether the same vulnerability is present in their backend and correct
+it if so.
+
+Header injection possibility since validators accept newlines in input
+======================================================================
+
+Some of Django's built-in validators
+(:class:`~django.core.validators.EmailValidator`, most seriously) didn't
+prohibit newline characters (due to the usage of ``$`` instead of ``\Z`` in the
+regular expressions). If you use values with newlines in HTTP response or email
+headers, you can suffer from header injection attacks. Django itself isn't
+vulnerable because :class:`~django.http.HttpResponse` and the mail sending
+utilities in :mod:`django.core.mail` prohibit newlines in HTTP and SMTP
+headers, respectively. While the validators have been fixed in Django, if
+you're creating HTTP responses or email messages in other ways, it's a good
+idea to ensure that those methods prohibit newlines as well. You might also
+want to validate that any existing data in your application doesn't contain
+unexpected newlines.
+
+:func:`~django.core.validators.validate_ipv4_address`,
+:func:`~django.core.validators.validate_slug`, and
+:class:`~django.core.validators.URLValidator` are also affected, however, as
+of Django 1.6 the ``GenericIPAddresseField``, ``IPAddressField``, ``SlugField``,
+and ``URLField`` form fields which use these validators all strip the input, so
+the possibility of newlines entering your data only exists if you are using
+these validators outside of the form fields.
+
+The undocumented, internally unused ``validate_integer()`` function is now
+stricter as it validates using a regular expression instead of simply casting
+the value using ``int()`` and checking if an exception was raised.
+
+Bugfixes
+========
+
+* Prevented the loss of ``null``/``not null`` column properties during field
+  renaming of MySQL databases (:ticket:`24817`).
+
+* Fixed ``SimpleTestCase.assertRaisesMessage()`` on Python 2.7.10
+  (:ticket:`24903`).

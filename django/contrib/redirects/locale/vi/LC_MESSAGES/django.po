@@ -6,26 +6,26 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
-"language/vi/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-04-27 04:22+0000\n"
+"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
+"vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr ""
 
-#: contrib/redirects/models.py:10
+msgid "site"
+msgstr ""
+
 msgid "redirect from"
 msgstr "Chuyển hướng từ"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -33,21 +33,17 @@ msgstr ""
 "Đây phải là đường dẫn tuyệt đối, không bao gồm tên miền. Ví dụ: '/events/"
 "search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "Chuyển hướng tới"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
 "Đây có thể là đường dẫn tuyệt đối hoặc địa chỉ đầy đủ bắt đầu với 'http://'"
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "Chuyển hướng"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "Chuyển hướng"
