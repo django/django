@@ -30,8 +30,8 @@ def psycopg2_version():
 
 PSYCOPG2_VERSION = psycopg2_version()
 
-if PSYCOPG2_VERSION < (2, 4, 5):
-    raise ImproperlyConfigured("psycopg2_version 2.4.5 or newer is required; you have %s" % psycopg2.__version__)
+if PSYCOPG2_VERSION < (2, 5, 4):
+    raise ImproperlyConfigured("psycopg2_version 2.5.4 or newer is required; you have %s" % psycopg2.__version__)
 
 
 # Some of these import psycopg2, so import them after checking if it's installed.
