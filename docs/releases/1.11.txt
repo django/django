@@ -454,7 +454,9 @@ Backwards incompatible changes in 1.11
 * The OpenLayers-based form widgets now use OpenLayers 3, and the
   ``gis/openlayers.html`` and ``gis/openlayers-osm.html`` templates have been
   updated. Check your project if you subclass these widgets or extend the
-  templates.
+  templates. Also, the new widgets work a bit differently than the old ones.
+  Instead of using a toolbar in the widget, you click to draw, click and drag
+  to move the map, and click and drag a point/vertex/corner to move it.
 
 * Support for SpatiaLite < 4.0 is dropped.
 
