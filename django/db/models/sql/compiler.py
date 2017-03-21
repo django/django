@@ -1162,7 +1162,7 @@ class SQLUpdateCompiler(SQLCompiler):
             name = field.column
             if hasattr(val, 'as_sql'):
                 sql, params = self.compile(val)
-                values.append('%s = %s' % (qn(name), sql))
+                values.append('%s = %s' % (qn(name), placeholder % sql))
                 update_params.extend(params)
             elif val is not None:
                 values.append('%s = %s' % (qn(name), placeholder))

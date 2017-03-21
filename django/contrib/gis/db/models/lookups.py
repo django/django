@@ -68,6 +68,8 @@ class GISLookup(Lookup):
             if not hasattr(geo_fld, 'srid'):
                 raise ValueError('No geographic field found in expression.')
             self.rhs.srid = geo_fld.srid
+            sql, _ = compiler.compile(geom)
+            return connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler) % sql, []
         elif isinstance(self.rhs, Expression):
             raise ValueError('Complex expressions not supported for spatial fields.')
         elif isinstance(self.rhs, (list, tuple)):

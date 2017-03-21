@@ -152,32 +152,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
             dist_param = value
         return [dist_param]
 
-    def get_geom_placeholder(self, f, value, compiler):
-        """
-        Provide a proper substitution value for Geometries that are not in the
-        SRID of the field.  Specifically, this routine will substitute in the
-        Transform() and GeomFromText() function call(s).
-        """
-        tranform_func = self.spatial_function_name('Transform')
-
-        def transform_value(value, srid):
-            return not (value is None or value.srid == srid)
-        if hasattr(value, 'as_sql'):
-            if transform_value(value, f.srid):
-                placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
-            else:
-                placeholder = '%s'
-            # No geometry value used for F expression, substitute in
-            # the column name instead.
-            sql, _ = compiler.compile(value)
-            return placeholder % sql
-        else:
-            if transform_value(value, f.srid):
-                # Adding Transform() to the SQL placeholder.
-                return '%s(%s(%%s,%s), %s)' % (tranform_func, self.from_text, value.srid, f.srid)
-            else:
-                return '%s(%%s,%s)' % (self.from_text, f.srid)
-
     def _get_spatialite_func(self, func):
         """
         Helper routine for calling SpatiaLite functions and returning

@@ -101,3 +101,9 @@ class NonConcreteField(models.IntegerField):
 class NonConcreteModel(NamedModel):
     non_concrete = NonConcreteField()
     point = models.PointField(geography=True)
+
+
+class ManyPointModel(NamedModel):
+    point1 = models.PointField()
+    point2 = models.PointField()
+    point3 = models.PointField(srid=3857)

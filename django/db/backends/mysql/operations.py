@@ -233,7 +233,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return value
 
     def binary_placeholder_sql(self, value):
-        return '_binary %s' if value is not None else '%s'
+        return '_binary %s' if value is not None and not hasattr(value, 'as_sql') else '%s'
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
