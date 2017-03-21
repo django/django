@@ -172,6 +172,8 @@ Models
 
 * The new :class:`~django.db.models.functions.StrIndex` database function
   finds the starting index of a string inside another string.
+* A debug method ``_get_called_qs`` for getting the ``SQLCompiler`` instance
+  was added to :class:`~django.db.models.query.QuerySet`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

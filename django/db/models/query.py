@@ -165,6 +165,7 @@ class QuerySet:
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
+        self._ret_called_qs = False
 
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
@@ -622,9 +623,12 @@ class QuerySet:
         # Clear any annotations so that they won't be present in subqueries.
         query._annotations = None
         with transaction.atomic(using=self.db, savepoint=False):
-            rows = query.get_compiler(self.db).execute_sql(CURSOR)
+            if self._ret_called_qs:
+                ret = query.get_compiler(self.db)
+            else:
+                ret = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
-        return rows
+        return ret
     update.alters_data = True
 
     def _update(self, values):
@@ -652,6 +656,18 @@ class QuerySet:
         # This method can only be called once the result cache has been filled.
         prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
         self._prefetch_done = True
+
+    def _get_called_qs(self):
+        """
+        Calling this debug-helper method will give a queryset instead of
+        executing the query when calling a terminal queries. Usage example:
+        qs = qs._get_called_qs().update(foo='bar')
+        assertTrue('footable' in qs.query.alias_map)
+
+        The terminal method must be called directly after _get_called_qs().
+        """
+        self._ret_called_qs = True
+        return self
 
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
