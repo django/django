@@ -956,32 +956,23 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             constrained_target = self.constrained_target
             return constrained_target.count() if constrained_target else super().count()
 
-        def add(self, *objs):
-            if not rel.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot use add() on a ManyToManyField which specifies an "
-                    "intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
+        def add(self, *objs, through_defaults=None):
             self._remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
-                self._add_items(self.source_field_name, self.target_field_name, *objs)
-
-                # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
+                self._add_items(
+                    self.source_field_name, self.target_field_name, *objs,
+                    through_defaults=through_defaults,
+                )
+                # If this is a symmetrical m2m relation to self, add the mirror
+                # entry in the m2m table. `through_defaults` aren't used here
+                # because of the system check error fields.E332: Many-to-many
+                # fields with intermediate tables mus not be symmetrical.
                 if self.symmetrical:
                     self._add_items(self.target_field_name, self.source_field_name, *objs)
         add.alters_data = True
 
         def remove(self, *objs):
-            if not rel.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot use remove() on a ManyToManyField which specifies "
-                    "an intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
             self._remove_prefetched_objects()
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
         remove.alters_data = True
@@ -1005,15 +996,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 )
         clear.alters_data = True
 
-        def set(self, objs, *, clear=False):
-            if not rel.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot set values on a ManyToManyField which specifies an "
-                    "intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
-
+        def set(self, objs, *, clear=False, through_defaults=None):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
@@ -1022,7 +1005,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             with transaction.atomic(using=db, savepoint=False):
                 if clear:
                     self.clear()
-                    self.add(*objs)
+                    self.add(*objs, through_defaults=through_defaults)
                 else:
                     old_ids = set(self.using(db).values_list(self.target_field.target_field.attname, flat=True))
 
@@ -1038,49 +1021,41 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                             new_objs.append(obj)
 
                     self.remove(*old_ids)
-                    self.add(*new_objs)
+                    self.add(*new_objs, through_defaults=through_defaults)
         set.alters_data = True
 
-        def create(self, **kwargs):
-            # This check needs to be done here, since we can't later remove this
-            # from the method lookup table, as we do with add and remove.
-            if not self.through._meta.auto_created:
-                opts = self.through._meta
-                raise AttributeError(
-                    "Cannot use create() on a ManyToManyField which specifies "
-                    "an intermediary model. Use %s.%s's Manager instead." %
-                    (opts.app_label, opts.object_name)
-                )
+        def create(self, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             new_obj = super(ManyRelatedManager, self.db_manager(db)).create(**kwargs)
-            self.add(new_obj)
+            self.add(new_obj, through_defaults=through_defaults)
             return new_obj
         create.alters_data = True
 
-        def get_or_create(self, **kwargs):
+        def get_or_create(self, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             obj, created = super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
             # from get() then the relationship already exists.
             if created:
-                self.add(obj)
+                self.add(obj, through_defaults=through_defaults)
             return obj, created
         get_or_create.alters_data = True
 
-        def update_or_create(self, **kwargs):
+        def update_or_create(self, through_defaults=None, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
             obj, created = super(ManyRelatedManager, self.db_manager(db)).update_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
             # from get() then the relationship already exists.
             if created:
-                self.add(obj)
+                self.add(obj, through_defaults=through_defaults)
             return obj, created
         update_or_create.alters_data = True
 
-        def _add_items(self, source_field_name, target_field_name, *objs):
+        def _add_items(self, source_field_name, target_field_name, *objs, through_defaults=None):
             # source_field_name: the PK fieldname in join table for the source object
             # target_field_name: the PK fieldname in join table for the target object
             # *objs - objects to add. Either object instances, or primary keys of object instances.
+            through_defaults = through_defaults or {}
 
             # If there aren't any objects, there is nothing to do.
             from django.db.models import Model
@@ -1130,10 +1105,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
                     # Add the ones that aren't there already
                     self.through._default_manager.using(db).bulk_create([
-                        self.through(**{
+                        self.through(**dict(through_defaults, **{
                             '%s_id' % source_field_name: self.related_val[0],
                             '%s_id' % target_field_name: obj_id,
-                        })
+                        }))
                         for obj_id in new_ids
                     ])
 

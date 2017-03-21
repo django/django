@@ -47,42 +47,6 @@ class M2MThroughTestCase(TestCase):
             ]
         )
 
-    def test_cannot_use_setattr_on_reverse_m2m_with_intermediary_model(self):
-        msg = (
-            "Cannot set values on a ManyToManyField which specifies an "
-            "intermediary model. Use m2m_through_regress.Membership's Manager "
-            "instead."
-        )
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.bob.group_set.set([])
-
-    def test_cannot_use_setattr_on_forward_m2m_with_intermediary_model(self):
-        msg = (
-            "Cannot set values on a ManyToManyField which specifies an "
-            "intermediary model. Use m2m_through_regress.Membership's Manager "
-            "instead."
-        )
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.roll.members.set([])
-
-    def test_cannot_use_create_on_m2m_with_intermediary_model(self):
-        msg = (
-            "Cannot use create() on a ManyToManyField which specifies an "
-            "intermediary model. Use m2m_through_regress.Membership's "
-            "Manager instead."
-        )
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.rock.members.create(name="Anne")
-
-    def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
-        msg = (
-            "Cannot use create() on a ManyToManyField which specifies an "
-            "intermediary model. Use m2m_through_regress.Membership's "
-            "Manager instead."
-        )
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.bob.group_set.create(name="Funk")
-
     def test_retrieve_reverse_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(
             self.frank.group_set.all(), [

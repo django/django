@@ -256,6 +256,13 @@ Models
   specified on initialization to ensure that the aggregate function is only
   called for each distinct value of ``expressions``.
 
+* The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`,
+  :meth:`~.RelatedManager.remove`,  :meth:`~.RelatedManager.set`,
+  ``get_or_create()``, and ``update_or_create()`` methods are now allowed on
+  many-to-many relationships with intermediate models. The new
+  ``through_defaults`` argument is used to specify values for new intermediate
+  model instance(s).
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

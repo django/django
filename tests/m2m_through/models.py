@@ -66,7 +66,7 @@ class CustomMembership(models.Model):
 class TestNoDefaultsOrNulls(models.Model):
     person = models.ForeignKey(Person, models.CASCADE)
     group = models.ForeignKey(Group, models.CASCADE)
-    nodefaultnonull = models.CharField(max_length=5)
+    nodefaultnonull = models.IntegerField()
 
 
 class PersonSelfRefM2M(models.Model):
