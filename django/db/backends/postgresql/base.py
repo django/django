@@ -189,7 +189,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn_timezone_name = self.connection.get_parameter_status('TimeZone')
         timezone_name = self.timezone_name
         if timezone_name and conn_timezone_name != timezone_name:
-            with self.connection.cursor() as cursor:
+            with self.cursor() as cursor:
                 cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
             return True
         return False
@@ -207,9 +207,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if name:
             # In autocommit mode, the cursor will be used outside of a
             # transaction, hence use a holdable cursor.
-            cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
+            cursor = self.cursor(name, scrollable=False, withhold=self.connection.autocommit)
         else:
-            cursor = self.connection.cursor()
+            cursor = self.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
@@ -238,7 +238,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def is_usable(self):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
-            self.connection.cursor().execute("SELECT 1")
+            self.cursor().execute("SELECT 1")
         except Database.Error:
             return False
         else:
