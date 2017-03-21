@@ -21,7 +21,7 @@ const_string_output = partial(const_string_output, cpl=True)
 double_output = partial(double_output, cpl=True)
 
 # Raster Driver Routines
-register_all = void_output(std_call('GDALAllRegister'), [])
+register_all = void_output(std_call('GDALAllRegister'), [], errcheck=False)
 get_driver = voidptr_output(std_call('GDALGetDriver'), [c_int])
 get_driver_by_name = voidptr_output(std_call('GDALGetDriverByName'), [c_char_p], errcheck=False)
 get_driver_count = int_output(std_call('GDALGetDriverCount'), [])
