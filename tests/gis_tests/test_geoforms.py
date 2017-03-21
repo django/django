@@ -1,4 +1,3 @@
-import json
 import re
 
 from django.contrib.gis import forms
@@ -115,8 +114,9 @@ class GeometryFieldTest(SimpleTestCase):
         # The first point can't use assertInHTML() due to non-deterministic
         # ordering of the rendered dictionary.
         pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output).groups()[0]
-        pt1_json = json.loads(pt1_serialized.replace('&quot;', '"'))
-        self.assertEqual(pt1_json, {'coordinates': [812632.2827908975, 5465442.183322753], 'type': 'Point'})
+        pt1_json = pt1_serialized.replace('&quot;', '"')
+        pt1_expected = GEOSGeometry(form.data['pt1']).transform(3857, clone=True)
+        self.assertJSONEqual(pt1_json, pt1_expected.json)
 
         self.assertInHTML(
             '<textarea id="id_pt2" class="vSerializedField required" cols="150"'
