@@ -85,8 +85,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: regex
 
-        The regular expression pattern to search for the provided ``value``,
-        or a pre-compiled regular expression. By default, raises a
+        The regular expression pattern to search for within the provided
+        ``value``, or a pre-compiled regular expression. By default, raises a
         :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
         and :attr:`code` if a match is not found. That standard behavior can
         be reversed by setting :attr:`inverse_match` to ``True``, in which case

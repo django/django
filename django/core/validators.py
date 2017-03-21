@@ -54,8 +54,8 @@ class RegexValidator(object):
 
     def __call__(self, value):
         """
-        Validates that the input matches the regular expression
-        if inverse_match is False, otherwise raises ValidationError.
+        Validate that the input contains a match for the regular expression
+        if inverse_match is False, otherwise raise ValidationError.
         """
         if not (self.inverse_match is not bool(self.regex.search(
                 force_text(value)))):
