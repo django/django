@@ -164,6 +164,12 @@ Migrations
 Models
 ~~~~~~
 
+* The ``add()``, ``create()``, ``get_or_create()``, ``update_or_create()``,
+  ``set()``, and ``remove()`` methods are now allowed on many-to-many
+  relationships with custom intermediate models. There is a
+  ``through_defaults`` argument for specifying values for new intermediate
+  models.
+
 * Models can now use ``__init_subclass__()`` from :pep:`487`.
 
 * A ``BinaryField`` may now be set to ``editable=True`` if you wish to include

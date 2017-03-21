@@ -23,6 +23,7 @@ class Group(models.Model):
         through='TestNoDefaultsOrNulls',
         related_name="testnodefaultsnonulls",
     )
+    required_through = models.ManyToManyField(Person, through='RequiredThrough', related_name='required_through')
 
     class Meta:
         ordering = ('name',)
@@ -67,6 +68,12 @@ class TestNoDefaultsOrNulls(models.Model):
     person = models.ForeignKey(Person, models.CASCADE)
     group = models.ForeignKey(Group, models.CASCADE)
     nodefaultnonull = models.CharField(max_length=5)
+
+
+class RequiredThrough(models.Model):
+    person = models.ForeignKey(Person, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE)
+    required = models.IntegerField()
 
 
 class PersonSelfRefM2M(models.Model):
