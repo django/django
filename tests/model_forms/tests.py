@@ -1640,6 +1640,17 @@ class ModelChoiceFieldTests(TestCase):
         form2 = ModelChoiceForm()
         self.assertIsNone(form2.fields['category'].queryset._result_cache)
 
+    def test_modelchoicefield_queryset_none(self):
+        class ModelChoiceForm(forms.Form):
+            category = forms.ModelChoiceField(queryset=None)
+
+            def __init__(self, *args, **kwargs):
+                super(ModelChoiceForm, self).__init__(*args, **kwargs)
+                self.fields['category'].queryset = Category.objects.filter(slug__contains='test')
+
+        form = ModelChoiceForm()
+        self.assertCountEqual(form.fields['category'].queryset, [self.c2, self.c3])
+
     def test_modelchoicefield_22745(self):
         """
         #22745 -- Make sure that ModelChoiceField with RadioSelect widget
