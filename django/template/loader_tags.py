@@ -103,7 +103,7 @@ class ExtendsNode(Node):
         without extending the same template twice.
         """
         history = context.render_context.setdefault(
-            self.context_key, [context.template.origin],
+            self.context_key, [self.origin],
         )
         template, origin = context.template.engine.find_template(
             template_name, skip=history,
