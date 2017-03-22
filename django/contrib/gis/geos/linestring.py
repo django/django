@@ -8,6 +8,7 @@ from django.contrib.gis.shortcuts import numpy
 
 class LineString(LinearGeometryMixin, GEOSGeometry):
     _init_func = capi.create_linestring
+    _json_type = 'LineString'
     _minlength = 2
     has_cs = True
 
