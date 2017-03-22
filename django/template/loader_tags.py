@@ -151,7 +151,8 @@ class ExtendsNode(Node):
 
         # Call Template._render explicitly so the parser context stays
         # the same.
-        return compiled_parent._render(context)
+        with context.render_context.push_state(compiled_parent, isolated_context=False):
+            return compiled_parent._render(context)
 
 
 class IncludeNode(Node):
