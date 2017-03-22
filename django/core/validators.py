@@ -234,7 +234,7 @@ validate_email = EmailValidator()
 slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
-    _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+    _("Enter a valid 'slug' consisting of ASCII letters, numbers, underscores or hyphens."),
     'invalid'
 )
 

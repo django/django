@@ -1078,7 +1078,7 @@ class AutodetectorTests(TestCase):
             "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
                 RegexValidator(
                     re.compile('^[-a-zA-Z0-9_]+\\Z'),
-                    "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                    "Enter a valid 'slug' consisting of ASCII letters, numbers, underscores or hyphens.",
                     'invalid'
                 )
             ]))]
