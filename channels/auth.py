@@ -2,7 +2,7 @@ import functools
 
 from django.contrib import auth
 
-from .sessions import channel_session, http_session
+from .sessions import channel_and_http_session, channel_session, http_session
 
 
 def transfer_user(from_session, to_session):
@@ -82,6 +82,22 @@ def channel_session_user_from_http(func):
     """
     @http_session_user
     @channel_session
+    @functools.wraps(func)
+    def inner(message, *args, **kwargs):
+        if message.http_session is not None:
+            transfer_user(message.http_session, message.channel_session)
+        return func(message, *args, **kwargs)
+    return inner
+
+
+def channel_and_http_session_user_from_http(func):
+    """
+    Decorator that automatically transfers the user from HTTP sessions to
+    channel-based sessions, rehydrates the HTTP session, and returns the
+    user as message.user as well.
+    """
+    @http_session_user
+    @channel_and_http_session
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
         if message.http_session is not None:

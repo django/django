@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 
 from django.test import override_settings
+from django.contrib.auth import get_user_model
 
 from channels import route_class
 from channels.exceptions import SendNotAvailableOnDemultiplexer
@@ -86,6 +87,29 @@ class GenericTests(ChannelTestCase):
             client.consume('websocket.connect')
             self.assertEqual(client.consume('websocket.connect').order, 0)
             self.assertEqual(client.consume('websocket.connect').order, 1)
+
+    def test_websockets_http_session_and_channel_session(self):
+
+        class WebsocketConsumer(websockets.WebsocketConsumer):
+            http_user_and_session = True
+
+        user_model = get_user_model()
+        user = user_model.objects.create_user(username='test', email='test@test.com', password='123456')
+
+        client = HttpClient()
+        client.force_login(user)
+        with apply_routes([route_class(WebsocketConsumer, path='/path')]):
+            connect = client.send_and_consume('websocket.connect', {'path': '/path'})
+            receive = client.send_and_consume('websocket.receive', {'path': '/path'}, text={'key': 'value'})
+            disconnect = client.send_and_consume('websocket.disconnect', {'path': '/path'})
+        self.assertEqual(
+            connect.message.http_session.session_key,
+            receive.message.http_session.session_key
+        )
+        self.assertEqual(
+            connect.message.http_session.session_key,
+            disconnect.message.http_session.session_key
+        )
 
     def test_simple_as_route_method(self):
 

@@ -24,6 +24,7 @@ class HttpClient(Client):
         self._session = None
         self._headers = {}
         self._cookies = {}
+        self._session_cookie = True
 
     def set_cookie(self, key, value):
         """
@@ -42,7 +43,7 @@ class HttpClient(Client):
     def get_cookies(self):
         """Return cookies"""
         cookies = copy.copy(self._cookies)
-        if apps.is_installed('django.contrib.sessions'):
+        if self._session_cookie and apps.is_installed('django.contrib.sessions'):
             cookies[settings.SESSION_COOKIE_NAME] = self.session.session_key
         return cookies
 
@@ -86,6 +87,7 @@ class HttpClient(Client):
             else:
                 content['text'] = text
         self.channel_layer.send(to, content)
+        self._session_cookie = False
 
     def send_and_consume(self, channel, content={}, text=None, path='/', fail_on_none=True, check_accept=True):
         """

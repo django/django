@@ -1,6 +1,6 @@
 from django.core.serializers.json import DjangoJSONEncoder, json
 
-from ..auth import channel_session_user_from_http
+from ..auth import channel_and_http_session_user_from_http, channel_session_user_from_http
 from ..channel import Group
 from ..exceptions import SendNotAvailableOnDemultiplexer
 from ..sessions import enforce_ordering
@@ -23,6 +23,7 @@ class WebsocketConsumer(BaseConsumer):
     # Turning this on passes the user over from the HTTP session on connect,
     # implies channel_session_user
     http_user = False
+    http_user_and_session = False
 
     # Set to True if you want the class to enforce ordering for you
     strict_ordering = False
@@ -35,13 +36,15 @@ class WebsocketConsumer(BaseConsumer):
         adds the ordering decorator.
         """
         # HTTP user implies channel session user
-        if self.http_user:
+        if self.http_user or self.http_user_and_session:
             self.channel_session_user = True
         # Get super-handler
         self.path = message['path']
         handler = super(WebsocketConsumer, self).get_handler(message, **kwargs)
         # Optionally apply HTTP transfer
-        if self.http_user:
+        if self.http_user_and_session:
+            handler = channel_and_http_session_user_from_http(handler)
+        elif self.http_user:
             handler = channel_session_user_from_http(handler)
         # Ordering decorators
         if self.strict_ordering:
