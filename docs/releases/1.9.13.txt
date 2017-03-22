@@ -2,9 +2,10 @@
 Django 1.9.13 release notes
 ===========================
 
-*Under development*
+*April 4, 2017*
 
-Django 1.9.13 fixes a bug in 1.9.12.
+Django 1.9.13 fixes two security issues and a bug in 1.9.12. This is the final
+release of the 1.9.x series.
 
 Bugfixes
 ========
