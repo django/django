@@ -41,8 +41,10 @@ Measurement         Relationships             Operations              Editors   
 `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
-field as an :class:`~django.contrib.gis.measure.Area` measure. On MySQL, a raw
-float value is returned when the coordinates are geodetic.
+field as an :class:`~django.contrib.gis.measure.Area` measure.
+
+MySQL and SpatiaLite without LWGEOM don't support area calculations on
+geographic SRSes.
 
 .. versionchanged:: 1.11
 
