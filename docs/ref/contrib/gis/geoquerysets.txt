@@ -65,7 +65,8 @@ Spatial lookups with rasters are only supported for PostGIS backends
 ``bbcontains``
 --------------
 
-*Availability*: PostGIS, MySQL, SpatiaLite, PGRaster (Native)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Contain.html>`__,
+MySQL, SpatiaLite, PGRaster (Native)
 
 Tests if the geometry or raster field's bounding box completely contains the
 lookup geometry's bounding box.
@@ -87,7 +88,8 @@ SpatiaLite  ``MbrContains(poly, geom)``
 ``bboverlaps``
 --------------
 
-*Availability*: PostGIS, MySQL, SpatiaLite, PGRaster (Native)
+*Availability*: `PostGIS <https://postgis.net/docs/geometry_overlaps.html>`__,
+MySQL, SpatiaLite, PGRaster (Native)
 
 Tests if the geometry field's bounding box overlaps the lookup geometry's
 bounding box.
@@ -109,7 +111,8 @@ SpatiaLite  ``MbrOverlaps(poly, geom)``
 ``contained``
 -------------
 
-*Availability*: PostGIS, MySQL, SpatiaLite, PGRaster (Native)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Contained.html>`__,
+MySQL, SpatiaLite, PGRaster (Native)
 
 Tests if the geometry field's bounding box is completely contained by the
 lookup geometry's bounding box.
@@ -131,7 +134,8 @@ SpatiaLite  ``MbrWithin(poly, geom)``
 ``contains``
 ------------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Contains.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
 Tests if the geometry field spatially contains the lookup geometry.
 
@@ -153,10 +157,11 @@ SpatiaLite  ``Contains(poly, geom)``
 ``contains_properly``
 ---------------------
 
-*Availability*: PostGIS, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ContainsProperly.html>`__,
+PGRaster (Bilateral)
 
 Returns true if the lookup geometry intersects the interior of the
-geometry field, but not the boundary (or exterior). [#fncontainsproperly]_
+geometry field, but not the boundary (or exterior).
 
 Example::
 
@@ -173,7 +178,8 @@ PostGIS     ``ST_ContainsProperly(poly, geom)``
 ``coveredby``
 -------------
 
-*Availability*: PostGIS, Oracle, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_CoveredBy.html>`__,
+Oracle, PGRaster (Bilateral)
 
 Tests if no point in the geometry field is outside the lookup geometry.
 [#fncovers]_
@@ -194,7 +200,8 @@ Oracle      ``SDO_COVEREDBY(poly, geom)``
 ``covers``
 ----------
 
-*Availability*: PostGIS, Oracle, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Covers.html>`__,
+Oracle, PGRaster (Bilateral)
 
 Tests if no point in the lookup geometry is outside the geometry field.
 [#fncovers]_
@@ -215,7 +222,8 @@ Oracle      ``SDO_COVERS(poly, geom)``
 ``crosses``
 -----------
 
-*Availability*: PostGIS, SpatiaLite, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Crosses.html>`__,
+SpatiaLite, PGRaster (Conversion)
 
 Tests if the geometry field spatially crosses the lookup geometry.
 
@@ -235,7 +243,8 @@ SpatiaLite  ``Crosses(poly, geom)``
 ``disjoint``
 ------------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Disjoint.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
 Tests if the geometry field is spatially disjoint from the lookup geometry.
 
@@ -257,7 +266,8 @@ SpatiaLite  ``Disjoint(poly, geom)``
 ``equals``
 ----------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Equals.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Conversion)
 
 .. fieldlookup:: exact
 .. fieldlookup:: same_as
@@ -265,14 +275,16 @@ SpatiaLite  ``Disjoint(poly, geom)``
 ``exact``, ``same_as``
 ----------------------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Same.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
 .. fieldlookup:: intersects
 
 ``intersects``
 --------------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Intersects.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
 Tests if the geometry field spatially intersects the lookup geometry.
 
@@ -294,7 +306,7 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isvalid``
 -----------
 
-*Availability*: PostGIS
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__
 
 Tests if the geometry is valid.
 
@@ -311,14 +323,16 @@ PostGIS equivalent::
 ``overlaps``
 ------------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Overlaps.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
 .. fieldlookup:: relate
 
 ``relate``
 ----------
 
-*Availability*: PostGIS, Oracle, SpatiaLite, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Relate.html>`__,
+Oracle, SpatiaLite, PGRaster (Conversion)
 
 Tests if the geometry field is spatially related to the lookup geometry by
 the values given in the given pattern.  This lookup requires a tuple parameter,
@@ -380,7 +394,8 @@ Oracle SQL equivalent::
 ``touches``
 -----------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Touches.html>`__,
+Oracle, MySQL, SpatiaLite
 
 Tests if the geometry field spatially touches the lookup geometry.
 
@@ -402,7 +417,8 @@ SpatiaLite  ``Touches(poly, geom)``
 ``within``
 ----------
 
-*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Within.html>`__,
+Oracle, MySQL, SpatiaLite, PGRaster (Bilateral)
 
 Tests if the geometry field is spatially within the lookup geometry.
 
@@ -424,7 +440,8 @@ SpatiaLite  ``Within(poly, geom)``
 ``left``
 --------
 
-*Availability*: PostGIS, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Left.html>`__,
+PGRaster (Conversion)
 
 Tests if the geometry field's bounding box is strictly to the left of the
 lookup geometry's bounding box.
@@ -442,7 +459,8 @@ PostGIS equivalent::
 ``right``
 ---------
 
-*Availability*: PostGIS, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Right.html>`__,
+PGRaster (Conversion)
 
 Tests if the geometry field's bounding box is strictly to the right of the
 lookup geometry's bounding box.
@@ -460,7 +478,8 @@ PostGIS equivalent::
 ``overlaps_left``
 -----------------
 
-*Availability*: PostGIS, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overleft.html>`__,
+PGRaster (Bilateral)
 
 Tests if the geometry field's bounding box overlaps or is to the left of the lookup
 geometry's bounding box.
@@ -479,7 +498,8 @@ PostGIS equivalent::
 ``overlaps_right``
 ------------------
 
-*Availability*: PostGIS, PGRaster (Bilateral)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overright.html>`__,
+PGRaster (Bilateral)
 
 Tests if the geometry field's bounding box overlaps or is to the right of the lookup
 geometry's bounding box.
@@ -497,7 +517,8 @@ PostGIS equivalent::
 ``overlaps_above``
 ------------------
 
-*Availability*: PostGIS, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overabove.html>`__,
+PGRaster (Conversion)
 
 Tests if the geometry field's bounding box overlaps or is above the lookup
 geometry's bounding box.
@@ -515,7 +536,8 @@ PostGIS equivalent::
 ``overlaps_below``
 ------------------
 
-*Availability*: PostGIS, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Overbelow.html>`__,
+PGRaster (Conversion)
 
 Tests if the geometry field's bounding box overlaps or is below the lookup
 geometry's bounding box.
@@ -533,7 +555,8 @@ PostGIS equivalent::
 ``strictly_above``
 ------------------
 
-*Availability*: PostGIS, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Above.html>`__,
+PGRaster (Conversion)
 
 Tests if the geometry field's bounding box is strictly above the lookup
 geometry's bounding box.
@@ -551,7 +574,8 @@ PostGIS equivalent::
 ``strictly_below``
 ------------------
 
-*Availability*: PostGIS, PGRaster (Conversion)
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Geometry_Below.html>`__,
+PGRaster (Conversion)
 
 Tests if the geometry field's bounding box is strictly below the lookup
 geometry's bounding box.
@@ -592,10 +616,12 @@ On every distance lookup except :lookup:`dwithin`, an optional element,
 ``'spheroid'``, may be included to use the more accurate spheroid distance
 calculation functions on fields with a geodetic coordinate system.
 
-On PostgreSQL, the ``'spheroid'`` option uses ``ST_Distance_Spheroid`` instead
-of ``ST_Distance_Sphere``. The simpler ``ST_Distance`` function is used with
-projected coordinate systems. Rasters are converted to geometries for spheroid
-based lookups.
+On PostgreSQL, the ``'spheroid'`` option uses `ST_DistanceSpheroid
+<https://postgis.net/docs/ST_Distance_Spheroid.html>`__ instead of
+`ST_DistanceSphere <https://postgis.net/docs/ST_DistanceSphere.html>`__. The
+simpler `ST_Distance <https://postgis.net/docs/ST_Distance.html>`__ function is
+used with projected coordinate systems. Rasters are converted to geometries for
+spheroid based lookups.
 
 .. versionadded:: 1.11
 
@@ -736,7 +762,8 @@ Example::
 
 .. class:: Collect(geo_field)
 
-*Availability*: PostGIS, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
+SpatiaLite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
@@ -749,7 +776,8 @@ not caring about dissolving boundaries.
 
 .. class:: Extent(geo_field)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Extent.html>`__,
+Oracle, SpatiaLite
 
 Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
 comprising the lower left coordinate and the upper right coordinate.
@@ -765,7 +793,7 @@ Example::
 
 .. class:: Extent3D(geo_field)
 
-*Availability*: PostGIS
+*Availability*: `PostGIS <https://postgis.net/docs/ST_3DExtent.html>`__
 
 Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
 comprising the lower left coordinate and upper right coordinate (each with x, y,
@@ -782,7 +810,8 @@ Example::
 
 .. class:: MakeLine(geo_field)
 
-*Availability*: PostGIS, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_MakeLine.html>`__,
+SpatiaLite
 
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
@@ -798,7 +827,8 @@ Example::
 
 .. class:: Union(geo_field)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Union.html>`__,
+Oracle, SpatiaLite
 
 This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
 comprising the union of every geometry in the queryset. Please note that use of
@@ -819,4 +849,3 @@ Example::
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/database/121/SPATL/GUID-97C17C18-F05E-49B4-BE11-E89B972E2A02.htm#SPATL1039>`_, from the Oracle Spatial and Graph Developer's Guide.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
-.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <https://postgis.net/docs/ST_ContainsProperly.html>`_ for more details.
