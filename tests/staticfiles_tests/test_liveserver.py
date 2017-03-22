@@ -7,20 +7,29 @@ django.test.LiveServerTestCase.
 import os
 from urllib.request import urlopen
 
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
+from django.test import LiveServerTestCase
+
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
+    'DEBUG': True,
     'MEDIA_URL': '/media/',
     'STATIC_URL': '/static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
+    'INSTALLED_APPS': [
+        'django.contrib.whitenoise.runserver_nostatic',
+        'django.contrib.staticfiles',
+
+    ],
+    'MIDDLEWARE': [
+        'django.contrib.whitenoise.middleware.WhiteNoiseMiddleware'
+    ],
 }
 
 
-class LiveServerBase(StaticLiveServerTestCase):
+class LiveServerBase(LiveServerTestCase):
 
     available_apps = []
 
@@ -38,40 +47,6 @@ class LiveServerBase(StaticLiveServerTestCase):
         cls.settings_override.disable()
 
 
-class StaticLiveServerChecks(LiveServerBase):
-
-    @classmethod
-    def setUpClass(cls):
-        # If contrib.staticfiles isn't configured properly, the exception
-        # should bubble up to the main thread.
-        old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
-        TEST_SETTINGS['STATIC_URL'] = None
-        cls.raises_exception()
-        TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
-
-    @classmethod
-    def tearDownClass(cls):
-        # skip it, as setUpClass doesn't call its parent either
-        pass
-
-    @classmethod
-    def raises_exception(cls):
-        try:
-            super().setUpClass()
-            raise Exception("The line above should have raised an exception")
-        except ImproperlyConfigured:
-            # This raises ImproperlyConfigured("You're using the staticfiles
-            # app without having set the required STATIC_URL setting.")
-            pass
-        finally:
-            super().tearDownClass()
-
-    def test_test_test(self):
-        # Intentionally empty method so that the test is picked up by the
-        # test runner and the overridden setUpClass() method is executed.
-        pass
-
-
 class StaticLiveServerView(LiveServerBase):
 
     def urlopen(self, url):
@@ -81,7 +56,7 @@ class StaticLiveServerView(LiveServerBase):
     @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
     def test_collectstatic_emulation(self):
         """
-        StaticLiveServerTestCase use of staticfiles' serve() allows it
+        WhiteNoise and DEBUG=True allow it
         to discover app's static assets without having to collectstatic first.
         """
         with self.urlopen('/static/test/file.txt') as f:

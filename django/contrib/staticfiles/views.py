@@ -11,6 +11,9 @@ from django.contrib.staticfiles import finders
 from django.http import Http404
 from django.views import static
 
+from django.utils.deprecation import RemovedInDjango30Warning
+import warnings
+
 
 def serve(request, path, insecure=False, **kwargs):
     """
@@ -27,6 +30,12 @@ def serve(request, path, insecure=False, **kwargs):
 
     It uses the django.views.static.serve() view to serve the found files.
     """
+    warnings.warn(
+        "django.contrib.staticfiles.views.serve is deprecated",
+        RemovedInDjango30Warning,
+        stacklevel=2,
+    )
+
     if not settings.DEBUG and not insecure:
         raise Http404
     normalized_path = posixpath.normpath(path).lstrip('/')

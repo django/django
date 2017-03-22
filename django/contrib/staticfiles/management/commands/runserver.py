@@ -3,9 +3,20 @@ from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.core.management.commands.runserver import \
     Command as RunserverCommand
 
+from django.utils.deprecation import RemovedInDjango30Warning
+import warnings
+
 
 class Command(RunserverCommand):
     help = "Starts a lightweight Web server for development and also serves static files."
+
+    def __init__(self, stdout=None, stderr=None, no_color=False):
+        warnings.warn(
+            "django.contrib.staticfiles.runserver.Command is deprecated",
+            RemovedInDjango30Warning,
+            stacklevel=2,
+        )
+        super().__init__(stdout=stdout, stderr=stderr, no_color=no_color)
 
     def add_arguments(self, parser):
         super().add_arguments(parser)

@@ -6,6 +6,9 @@ from django.test import override_settings
 
 from .cases import StaticFilesTestCase, TestDefaults
 
+from django.test import ignore_warnings
+from django.utils.deprecation import RemovedInDjango30Warning
+
 
 @override_settings(ROOT_URLCONF='staticfiles_tests.urls.default')
 class TestServeStatic(StaticFilesTestCase):
@@ -22,15 +25,7 @@ class TestServeStatic(StaticFilesTestCase):
         self.assertEqual(self._response(filepath).status_code, 404)
 
 
-@override_settings(DEBUG=False)
-class TestServeDisabled(TestServeStatic):
-    """
-    Test serving static files disabled when DEBUG is False.
-    """
-    def test_disabled_serving(self):
-        self.assertFileNotFound('test.txt')
-
-
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(DEBUG=True)
 class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
@@ -38,6 +33,7 @@ class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(DEBUG=True, ROOT_URLCONF='staticfiles_tests.urls.helper')
 class TestServeStaticWithURLHelper(TestDefaults, TestServeStatic):
     """

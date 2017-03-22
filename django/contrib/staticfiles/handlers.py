@@ -6,6 +6,9 @@ from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 
+from django.utils.deprecation import RemovedInDjango30Warning
+import warnings
+
 
 class StaticFilesHandler(WSGIHandler):
     """
@@ -17,6 +20,11 @@ class StaticFilesHandler(WSGIHandler):
     handles_files = True
 
     def __init__(self, application):
+        warnings.warn(
+            "django.contrib.staticfiles.handlers.StaticFilesHandler is deprecated",
+            RemovedInDjango30Warning,
+            stacklevel=2,
+        )
         self.application = application
         self.base_url = urlparse(self.get_base_url())
         super().__init__()
