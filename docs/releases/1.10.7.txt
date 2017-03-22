@@ -2,9 +2,9 @@
 Django 1.10.7 release notes
 ===========================
 
-*Under development*
+*April 4, 2017*
 
-Django 1.10.7 fixes several bugs in 1.10.6.
+Django 1.10.7 fixes two security issues and a bug in 1.10.6.
 
 Bugfixes
 ========
