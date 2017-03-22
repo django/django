@@ -1165,7 +1165,8 @@ class ModelChoiceField(ChoiceField):
     def __deepcopy__(self, memo):
         result = super(ChoiceField, self).__deepcopy__(memo)
         # Need to force a new ModelChoiceIterator to be created, bug #11183
-        result.queryset = self.queryset.all()
+        if self.queryset is not None:
+            result.queryset = self.queryset.all()
         return result
 
     def _get_queryset(self):
