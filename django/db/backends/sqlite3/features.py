@@ -14,7 +14,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
-    supports_1000_query_parameters = False
+    max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
     supports_foreign_keys = False
