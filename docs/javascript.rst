@@ -30,10 +30,7 @@ To process messages::
 
 To send messages, use the `send` method::
 
-    ```
     webSocketBridge.send({prop1: 'value1', prop2: 'value1'});
-
-    ```
 
 To demultiplex specific streams::
 
