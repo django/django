@@ -16,6 +16,11 @@ describe('WebSocketBridge', () => {
     const webSocketBridge = new WebSocketBridge();
     webSocketBridge.connect('ws://localhost');
   });
+  it('Supports relative urls', () => {
+    const webSocketBridge = new WebSocketBridge();
+    webSocketBridge.connect('/somepath/');
+  });
+
   it('Processes messages', () => {
     const webSocketBridge = new WebSocketBridge();
     const myMock = jest.fn();

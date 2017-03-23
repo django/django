@@ -270,12 +270,18 @@ var WebSocketBridge = function () {
     key: 'connect',
     value: function connect(url, protocols, options) {
       var _url = void 0;
+      // Use wss:// if running on https://
+      var scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      var base_url = scheme + '://' + window.location.host;
       if (url === undefined) {
-        // Use wss:// if running on https://
-        var scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        _url = scheme + '://' + window.location.host + '/ws';
+        _url = base_url;
       } else {
-        _url = url;
+        // Support relative URLs
+        if (url[0] == '/') {
+          _url = '' + base_url + url;
+        } else {
+          _url = url;
+        }
       }
       this._socket = new _reconnectingWebsocket2.default(_url, protocols, options);
     }

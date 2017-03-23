@@ -36,12 +36,18 @@ export class WebSocketBridge {
    */
   connect(url, protocols, options) {
     let _url;
+    // Use wss:// if running on https://
+    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const base_url = `${scheme}://${window.location.host}`;
     if (url === undefined) {
-      // Use wss:// if running on https://
-      const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-      _url = `${scheme}://${window.location.host}/ws`;
+      _url = base_url;
     } else {
-      _url = url;
+      // Support relative URLs
+      if (url[0] == '/') {
+        _url = `${base_url}${url}`;
+      } else {
+        _url = url;
+      }
     }
     this._socket = new ReconnectingWebSocket(_url, protocols, options);
   }

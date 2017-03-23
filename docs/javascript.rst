@@ -23,7 +23,7 @@ specific integration on top of it.
 To process messages::
 
     const webSocketBridge = new channels.WebSocketBridge();
-    webSocketBridge.connect();
+    webSocketBridge.connect('/ws/');
     webSocketBridge.listen(function(action, stream) {
       console.log(action, stream);
     });
@@ -35,7 +35,7 @@ To send messages, use the `send` method::
 To demultiplex specific streams::
 
     webSocketBridge.connect();
-    webSocketBridge.listen();
+    webSocketBridge.listen('/ws/');
     webSocketBridge.demultiplex('mystream', function(action, stream) {
       console.log(action, stream);
     });
