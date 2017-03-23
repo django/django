@@ -222,11 +222,8 @@ class Substr(Func):
         if not hasattr(pos, 'resolve_expression'):
             if pos < 1:
                 raise ValueError("'pos' must be greater than 0")
-            pos = Value(pos)
         expressions = [expression, pos]
         if length is not None:
-            if not hasattr(length, 'resolve_expression'):
-                length = Value(length)
             expressions.append(length)
         super().__init__(*expressions, **extra)
 
