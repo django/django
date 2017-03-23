@@ -7,6 +7,9 @@ from django.core.management import CommandError, call_command
 from django.test import TestCase, mock
 from six import StringIO
 
+from channels.asgi import channel_layers, ChannelLayerWrapper
+from channels.binding.base import BindingMetaclass
+from channels.handler import ViewConsumer
 from channels.management.commands import runserver
 from channels.staticfiles import StaticFilesConsumer
 
@@ -25,6 +28,18 @@ class RunWorkerTests(TestCase):
         import channels.log
         self.stream = StringIO()
         channels.log.handler = logging.StreamHandler(self.stream)
+        BindingMetaclass.binding_classes = []
+        self._old_layer = channel_layers.set(
+            'fake_channel',
+            ChannelLayerWrapper(
+                FakeChannelLayer(),
+                'fake_channel',
+                channel_layers['fake_channel'].routing[:],
+            )
+        )
+
+    def tearDown(self):
+        channel_layers.set('fake_channel', self._old_layer)
 
     def test_runworker_no_local_only(self, mock_worker):
         """
@@ -37,7 +52,11 @@ class RunWorkerTests(TestCase):
         """
         Test that the StaticFilesConsumer is used in debug mode.
         """
-        with self.settings(DEBUG=True, STATIC_URL='/static/'):
+        with self.settings(
+            DEBUG=True,
+            STATIC_URL='/static/',
+            INSTALLED_APPS=['channels', 'django.contrib.staticfiles'],
+        ):
             # Use 'fake_channel' that bypasses the 'inmemory' check
             call_command('runworker', '--layer', 'fake_channel')
             mock_worker.assert_called_with(
@@ -50,6 +69,25 @@ class RunWorkerTests(TestCase):
             channel_layer = mock_worker.call_args[1]['channel_layer']
             static_consumer = channel_layer.router.root.routing[0].consumer
             self.assertIsInstance(static_consumer, StaticFilesConsumer)
+
+    def test_debug_without_staticfiles(self, mock_worker):
+        """
+        Test that the StaticFilesConsumer is not used in debug mode when staticfiles app is not configured.
+        """
+        with self.settings(DEBUG=True, STATIC_URL=None, INSTALLED_APPS=['channels']):
+            # Use 'fake_channel' that bypasses the 'inmemory' check
+            call_command('runworker', '--layer', 'fake_channel')
+            mock_worker.assert_called_with(
+                only_channels=None,
+                exclude_channels=None,
+                callback=None,
+                channel_layer=mock.ANY,
+            )
+
+            channel_layer = mock_worker.call_args[1]['channel_layer']
+            static_consumer = channel_layer.router.root.routing[0].consumer
+            self.assertNotIsInstance(static_consumer, StaticFilesConsumer)
+            self.assertIsInstance(static_consumer, ViewConsumer)
 
     def test_runworker(self, mock_worker):
         # Use 'fake_channel' that bypasses the 'inmemory' check

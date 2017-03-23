@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError
 
@@ -48,7 +49,7 @@ class Command(BaseCommand):
             )
         # Check a handler is registered for http reqs
         # Serve static files if Django in debug mode
-        if settings.DEBUG:
+        if settings.DEBUG and apps.is_installed('django.contrib.staticfiles'):
             self.channel_layer.router.check_default(http_consumer=StaticFilesConsumer())
         else:
             self.channel_layer.router.check_default()
