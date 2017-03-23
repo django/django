@@ -42,6 +42,41 @@ class FilteredRelationTests(TestCase):
         cls.author1.favourite_books.add(cls.book2)
         cls.author1.favourite_books.add(cls.book3)
 
+    def test_filtered_relation_select_related(self):
+        qs = Author.objects.filtered_relation(
+            'book', 'book_join', condition=Q()
+        ).select_related(
+            'book_join__editor'
+        ).order_by('pk', 'book_join__pk')
+        with self.assertNumQueries(1):
+            expected = [
+                (self.author1, self.book1, self.editor_a, self.author1),
+                (self.author1, self.book4, self.editor_a, self.author1),
+                (self.author2, self.book2, self.editor_b, self.author2),
+                (self.author2, self.book3, self.editor_b, self.author2)
+            ]
+            self.assertQuerysetEqual(
+                qs, expected, lambda x: (x, x.book_join, x.book_join.editor, x.book_join.author)
+            )
+
+    def test_filtered_relation_select_related_foreign_key(self):
+        # this doesn't make much sense, but let's have it anyways...
+        qs = Book.objects.filtered_relation(
+            'author', 'author_join', condition=Q()
+        ).select_related(
+            'author_join'
+        ).order_by('pk')
+        with self.assertNumQueries(1):
+            expected = [
+                (self.book1, self.author1),
+                (self.book2, self.author2),
+                (self.book3, self.author2),
+                (self.book4, self.author1),
+            ]
+            self.assertQuerysetEqual(
+                qs, expected, lambda x: (x, x.author_join)
+            )
+
     def test_filtered_relation_wo_join(self):
         self.assertQuerysetEqual(
             Author.objects
