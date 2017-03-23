@@ -306,7 +306,8 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isvalid``
 -----------
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
+Oracle, SpatiaLite
 
 Tests if the geometry is valid.
 
@@ -314,9 +315,16 @@ Example::
 
     Zipcode.objects.filter(poly__isvalid=True)
 
-PostGIS equivalent::
+===================  ================================================================
+Backend              SQL Equivalent
+===================  ================================================================
+PostGIS, SpatiaLite  ``ST_IsValid(poly)``
+Oracle               ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
+===================  ================================================================
 
-    SELECT ... WHERE ST_IsValid(poly)
+.. versionchanged:: 1.11
+
+    Oracle and SpatiaLite support was added.
 
 .. fieldlookup:: overlaps
 
