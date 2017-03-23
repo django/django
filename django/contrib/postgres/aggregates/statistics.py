@@ -11,16 +11,7 @@ class StatAggregate(Aggregate):
     def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')
-        super().__init__(y=y, x=x, output_field=output_field)
-        self.x = x
-        self.y = y
-        self.source_expressions = self._parse_expressions(self.y, self.x)
-
-    def get_source_expressions(self):
-        return self.y, self.x
-
-    def set_source_expressions(self, exprs):
-        self.y, self.x = exprs
+        super().__init__(y, x, output_field=output_field)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return super().resolve_expression(query, allow_joins, reuse, summarize)
