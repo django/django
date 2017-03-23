@@ -57,6 +57,7 @@ class ModelIterable(BaseIterable):
                                                   compiler.annotation_col_map)
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
+        attr_name = klass_info.get('attr_name', '')
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
         init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
@@ -1761,14 +1762,9 @@ class RelatedPopulator:
         self.related_populators = get_related_populators(klass_info, select, self.db)
         reverse = klass_info['reverse']
         field = klass_info['field']
-        self.remote_field = None
-        if reverse:
-            self.field = field.remote_field
-            self.remote_field = field
-        else:
-            self.field = field
-            if field.unique:
-                self.remote_field = field.remote_field
+        field = klass_info['field']
+        self.cache_name = klass_info['cache_name']
+        self.reverse_cache_name = klass_info['reverse_cache_name']
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:

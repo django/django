@@ -88,8 +88,9 @@ class Join:
             params.extend(extra_params)
         if self.filtered_relation:
             extra_sql, extra_params = compiler.compile(self.filtered_relation)
-            join_conditions.append('(%s)' % extra_sql)
-            params.extend(extra_params)
+            if extra_sql:
+                join_conditions.append('(%s)' % extra_sql)
+                params.extend(extra_params)
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
             declared_field = getattr(self.join_field, 'field', self.join_field)
