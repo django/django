@@ -118,8 +118,11 @@ class GISFunctionsTests(TestCase):
             City.objects.annotate(kml=functions.AsKML('name'))
 
         # Ensuring the KML is as expected.
-        ptown = City.objects.annotate(kml=functions.AsKML('point', precision=9)).get(name='Pueblo')
+        qs = City.objects.annotate(kml=functions.AsKML('point', precision=9))
+        ptown = qs.get(name='Pueblo')
         self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
+        # Same result if the queryset is evaluated again.
+        self.assertEqual(qs.get(name='Pueblo').kml, ptown.kml)
 
     @skipUnlessDBFeature("has_AsSVG_function")
     def test_assvg(self):

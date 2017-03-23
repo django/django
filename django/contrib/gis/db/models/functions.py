@@ -195,8 +195,9 @@ class AsGML(GeoFunc):
 class AsKML(AsGML):
     def as_sqlite(self, compiler, connection):
         # No version parameter
-        self.source_expressions.pop(0)
-        return super().as_sql(compiler, connection)
+        clone = self.copy()
+        clone.set_source_expressions(self.get_source_expressions()[1:])
+        return clone.as_sql(compiler, connection)
 
 
 class AsSVG(GeoFunc):
