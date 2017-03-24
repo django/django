@@ -1,21 +1,23 @@
-from email.utils import formatdate
 import os
-from posixpath import normpath
+from email.utils import formatdate
 from wsgiref.headers import Headers
 from wsgiref.util import FileWrapper
 
+from posixpath import normpath
+
 from .media_types import MediaTypes
 from .static_file import StaticFile
-from .utils import (decode_if_byte_string, decode_path_info,
-                    ensure_leading_trailing_slash, MissingFileError,
-                    stat_regular_file)
+from .utils import (
+    MissingFileError, decode_if_byte_string, decode_path_info,
+    ensure_leading_trailing_slash, stat_regular_file,
+)
 
 
 class WhiteNoise(object):
 
     # Ten years is what nginx sets a max age if you use 'expires max;'
     # so we'll follow its lead
-    FOREVER = 10*365*24*60*60
+    FOREVER = 10 * 365 * 24 * 60 * 60
 
     # Attributes that can be set by keyword args in the constructor
     config_attrs = ('autorefresh', 'max_age', 'allow_all_origins', 'charset',
@@ -143,10 +145,10 @@ class WhiteNoise(object):
     def add_cache_headers(self, headers, path, url):
         if self.is_immutable_file(path, url):
             headers['Cache-Control'] = \
-                    'max-age={0}, public, immutable'.format(self.FOREVER)
+                'max-age={0}, public, immutable'.format(self.FOREVER)
         elif self.max_age is not None:
             headers['Cache-Control'] = \
-                    'max-age={0}, public'.format(self.max_age)
+                'max-age={0}, public'.format(self.max_age)
 
     def is_immutable_file(self, path, url):
         """

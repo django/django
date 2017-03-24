@@ -4,15 +4,15 @@ development, and SHOULD NOT be used in a production setting.
 
 """
 import os
+import warnings
+
 import posixpath
 
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.http import Http404
-from django.views import static
-
 from django.utils.deprecation import RemovedInDjango30Warning
-import warnings
+from django.views import static
 
 
 def serve(request, path, insecure=False, **kwargs):

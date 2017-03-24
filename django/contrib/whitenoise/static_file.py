@@ -1,13 +1,15 @@
+import re
 from collections import namedtuple
 from email.utils import parsedate
+from wsgiref.headers import Headers
+
+from .utils import MissingFileError, stat_regular_file
+
 try:
     from http import HTTPStatus
 except ImportError:
     from .httpstatus_backport import HTTPStatus
-import re
-from wsgiref.headers import Headers
 
-from .utils import MissingFileError, stat_regular_file
 
 
 Response = namedtuple('Response', ('status', 'headers', 'file'))
@@ -24,7 +26,7 @@ ACCEPT_BROTLI_RE = re.compile(r'\bbr\b')
 NOT_MODIFIED_HEADERS = ('Cache-Control', 'Content-Location', 'Date', 'ETag',
                         'Expires', 'Vary')
 NOT_MODIFIED_HEADER_RE = re.compile('^({})$'.format(
-        '|'.join(map(re.escape, NOT_MODIFIED_HEADERS))), re.IGNORECASE)
+    '|'.join(map(re.escape, NOT_MODIFIED_HEADERS))), re.IGNORECASE)
 
 
 class StaticFile(object):
@@ -99,4 +101,4 @@ def get_not_modified_response(headers):
     not_modified_headers = tuple([
         item for item in headers
         if NOT_MODIFIED_HEADER_RE.match(item[0])])
-    return Response(HTTPStatus.NOT_MODIFIED,  not_modified_headers, None)
+    return Response(HTTPStatus.NOT_MODIFIED, not_modified_headers, None)

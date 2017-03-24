@@ -1,8 +1,9 @@
-from __future__ import print_function, division, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import gzip
 import os
 import re
+
 try:
     from io import BytesIO
 except ImportError:
@@ -89,8 +90,8 @@ class Compressor(object):
             return False
         else:
             self.log('{0} compressed {1} ({2}K -> {3}K)'.format(
-                    compression, path, orig_size // 1024,
-                    compressed_size // 1024))
+                compression, path, orig_size // 1024,
+                compressed_size // 1024))
             with open(path + suffix, 'wb') as f:
                 f.write(data)
             return True
@@ -115,10 +116,10 @@ def main(root, **kwargs):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
-            description="Search for all files inside <root> *not* matching "
-                        "<extensions> and produce compressed versions with "
-                        "'.gz' and '.br' suffixes (as long as this results in a "
-                        "smaller file)")
+        description="Search for all files inside <root> *not* matching "
+                    "<extensions> and produce compressed versions with "
+                    "'.gz' and '.br' suffixes (as long as this results in a "
+                    "smaller file)")
     parser.add_argument('-q', '--quiet', help="Don't produce log output",
                         action='store_true')
     parser.add_argument('--no-gzip', help="Don't produce gzip '.gz' files",

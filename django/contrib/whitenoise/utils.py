@@ -1,8 +1,8 @@
 import errno
 import os
-import stat
 import sys
 
+import stat
 
 if sys.version_info[0] >= 3:
     BINARY_TYPE = bytes

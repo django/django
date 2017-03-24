@@ -77,10 +77,10 @@ class HelpfulExceptionMixin(object):
             if match:
                 extension = os.path.splitext(name)[1].lstrip('.').upper()
                 message = self.ERROR_MSG.format(
-                        orig_message=message,
-                        filename=name,
-                        missing=match.group(1),
-                        ext=extension)
+                    orig_message=message,
+                    filename=name,
+                    missing=match.group(1),
+                    ext=extension)
                 exception = MissingFileError(message)
         return exception
 

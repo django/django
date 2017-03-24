@@ -3,25 +3,28 @@ from __future__ import absolute_import
 import os
 
 from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.six.moves.urllib.parse import urlparse
+
+from .base import WhiteNoise
+# Import here under an alias for backwards compatibility
+from .storage import \
+    CompressedManifestStaticFilesStorage as GzipManifestStaticFilesStorage
+from .utils import (
+    IsDirectoryError, decode_if_byte_string, ensure_leading_trailing_slash,
+)
+
 try:
     from django.contrib.staticfiles.storage import staticfiles_storage
 except ImproperlyConfigured:
     if not os.environ.get('DJANGO_SETTINGS_MODULE'):
         raise ImproperlyConfigured(
-                "'DJANGO_SETTINGS_MODULE' environment variable must be set "
-                "before importing 'whitenoise.django'")
+            "'DJANGO_SETTINGS_MODULE' environment variable must be set "
+            "before importing 'whitenoise.django'")
     else:
         raise
-from django.contrib.staticfiles import finders
-from django.utils.six.moves.urllib.parse import urlparse
 
-from .base import WhiteNoise
-# Import here under an alias for backwards compatibility
-from .storage import (CompressedManifestStaticFilesStorage as
-                      GzipManifestStaticFilesStorage)
-from .utils import (decode_if_byte_string, ensure_leading_trailing_slash,
-                    IsDirectoryError)
 
 
 __all__ = ['DjangoWhiteNoise', 'GzipManifestStaticFilesStorage']
@@ -30,7 +33,7 @@ __all__ = ['DjangoWhiteNoise', 'GzipManifestStaticFilesStorage']
 class DjangoWhiteNoise(WhiteNoise):
 
     config_attrs = WhiteNoise.config_attrs + (
-            'root', 'use_finders', 'static_prefix')
+        'root', 'use_finders', 'static_prefix')
     root = None
     use_finders = False
     static_prefix = None
