@@ -565,7 +565,17 @@ class QuerySet:
         if id_list is not None:
             if not id_list:
                 return {}
-            qs = self.filter(pk__in=id_list).order_by()
+            batch_size = connections[self.db].features.max_query_params
+            id_list = tuple(id_list)
+            # If the database has a limit on the number of query parameters
+            # (e.g. SQLite), retrieve objects in batches if necessary.
+            if batch_size and batch_size < len(id_list):
+                qs = ()
+                for offset in range(0, len(id_list), batch_size):
+                    batch = id_list[offset:offset + batch_size]
+                    qs += tuple(self.filter(pk__in=batch).order_by())
+            else:
+                qs = self.filter(pk__in=id_list).order_by()
         else:
             qs = self._clone()
         return {obj._get_pk_val(): obj for obj in qs}
