@@ -1,4 +1,5 @@
 import os
+import signal
 from unittest import mock
 
 from django.db.backends.postgresql.client import DatabaseClient
@@ -99,3 +100,17 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 pgpass_string,
             )
         )
+
+    def test_sigint_handler(self):
+        """SIGINT is ignored in Python and passed to psql to abort quries."""
+        def _mock_subprocess_call(*args):
+            handler = signal.getsignal(signal.SIGINT)
+            self.assertEqual(handler, signal.SIG_IGN)
+
+        sigint_handler = signal.getsignal(signal.SIGINT)
+        # The default handler isn't SIG_IGN.
+        self.assertNotEqual(sigint_handler, signal.SIG_IGN)
+        with mock.patch('subprocess.check_call', new=_mock_subprocess_call):
+            DatabaseClient.runshell_db({})
+        # dbshell restores the orignal handler.
+        self.assertEqual(sigint_handler, signal.getsignal(signal.SIGINT))
