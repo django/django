@@ -11,7 +11,6 @@ except ImportError:
     from .httpstatus_backport import HTTPStatus
 
 
-
 Response = namedtuple('Response', ('status', 'headers', 'file'))
 
 NOT_ALLOWED = Response(HTTPStatus.METHOD_NOT_ALLOWED,

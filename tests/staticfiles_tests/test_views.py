@@ -2,12 +2,10 @@ import posixpath
 from urllib.parse import quote
 
 from django.conf import settings
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .cases import StaticFilesTestCase, TestDefaults
-
-from django.test import ignore_warnings
-from django.utils.deprecation import RemovedInDjango30Warning
 
 
 @override_settings(ROOT_URLCONF='staticfiles_tests.urls.default')

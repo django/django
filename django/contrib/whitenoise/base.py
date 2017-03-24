@@ -1,9 +1,8 @@
 import os
 from email.utils import formatdate
+from posixpath import normpath
 from wsgiref.headers import Headers
 from wsgiref.util import FileWrapper
-
-from posixpath import normpath
 
 from .media_types import MediaTypes
 from .static_file import StaticFile

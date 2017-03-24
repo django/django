@@ -26,7 +26,6 @@ except ImproperlyConfigured:
         raise
 
 
-
 __all__ = ['DjangoWhiteNoise', 'GzipManifestStaticFilesStorage']
 
 

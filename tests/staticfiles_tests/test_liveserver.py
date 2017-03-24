@@ -7,8 +7,7 @@ django.test.LiveServerTestCase.
 import os
 from urllib.request import urlopen
 
-from django.test import modify_settings, override_settings
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, modify_settings, override_settings
 
 
 TEST_ROOT = os.path.dirname(__file__)

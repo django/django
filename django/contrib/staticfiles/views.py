@@ -4,9 +4,8 @@ development, and SHOULD NOT be used in a production setting.
 
 """
 import os
-import warnings
-
 import posixpath
+import warnings
 
 from django.conf import settings
 from django.contrib.staticfiles import finders
