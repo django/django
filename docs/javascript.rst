@@ -47,5 +47,12 @@ To send a message to a specific stream::
 
     webSocketBridge.stream('mystream').send({prop1: 'value1', prop2: 'value1'})
 
+The `WebSocketBridge` instance exposes the underlaying `ReconnectingWebSocket` as the `socket` property. You can use this property to add any custom behavior. For example::
+
+    webSocketBridge.socket.addEventListener('open', function() {
+        console.log("Connected to WebSocket");
+    })
+
+
 The library is also available as a npm module, under the name
 `django-channels <https://www.npmjs.com/package/django-channels>`_

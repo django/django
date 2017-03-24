@@ -20,7 +20,17 @@ describe('WebSocketBridge', () => {
     const webSocketBridge = new WebSocketBridge();
     webSocketBridge.connect('/somepath/');
   });
+  it('Can add event listeners to socket', () => {
+    const webSocketBridge = new WebSocketBridge();
+    const myMock = jest.fn();
 
+    webSocketBridge.connect('ws://localhost', {});
+    webSocketBridge.socket.addEventListener('message', myMock);
+    mockServer.send('{"type": "test", "payload": "message 1"}');
+
+    expect(myMock.mock.calls.length).toBe(1);
+
+  });
   it('Processes messages', () => {
     const webSocketBridge = new WebSocketBridge();
     const myMock = jest.fn();
