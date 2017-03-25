@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 from whitenoise.base import WhiteNoise
 # Import here under an alias for backwards compatibility
@@ -11,7 +12,7 @@ from whitenoise.utils import (
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.core.exceptions import ImproperlyConfigured
-from urllib.parse import urlparse
+
 
 try:
     from django.contrib.staticfiles.storage import staticfiles_storage
