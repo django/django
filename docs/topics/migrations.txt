@@ -458,7 +458,6 @@ Then, open up the file; it should look something like this::
     from django.db import migrations
 
     class Migration(migrations.Migration):
-        initial = True
 
         dependencies = [
             ('yourappname', '0001_initial'),
@@ -493,7 +492,6 @@ need to do is use the historical model and iterate over the rows::
             person.save()
 
     class Migration(migrations.Migration):
-        initial = True
 
         dependencies = [
             ('yourappname', '0001_initial'),
