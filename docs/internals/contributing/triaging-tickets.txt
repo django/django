@@ -404,8 +404,6 @@ the ticket database:
   but your input is still valuable.
 
 .. _Trac: https://code.djangoproject.com/
-.. _i18n branch: https://code.djangoproject.com/browser/django/branches/i18n
-.. _`tags/releases`: https://code.djangoproject.com/browser/django/tags/releases
 .. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
