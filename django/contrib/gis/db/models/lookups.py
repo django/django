@@ -1,7 +1,5 @@
 import re
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.sql.query import Query
@@ -24,46 +22,6 @@ class GISLookup(Lookup):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.template_params = {}
-
-    @classmethod
-    def _check_geo_field(cls, opts, lookup):
-        """
-        Check the given lookup with the given model options.
-        The lookup is a string either specifying the geographic field, e.g.
-        'point, 'the_geom', or a related lookup on a geographic field like
-        'address__point'.
-
-        Return a BaseSpatialField if one exists according to the given lookup
-        on the model options, otherwise return None.
-        """
-        from django.contrib.gis.db.models.fields import BaseSpatialField
-        # This takes into account the situation where the lookup is a
-        # lookup to a related geographic field, e.g., 'address__point'.
-        field_list = lookup.split(LOOKUP_SEP)
-
-        # Reversing so list operates like a queue of related lookups,
-        # and popping the top lookup.
-        field_list.reverse()
-        fld_name = field_list.pop()
-
-        try:
-            geo_fld = opts.get_field(fld_name)
-            # If the field list is still around, then it means that the
-            # lookup was for a geometry field across a relationship --
-            # thus we keep on getting the related model options and the
-            # model field associated with the next field in the list
-            # until there's no more left.
-            while len(field_list):
-                opts = geo_fld.remote_field.model._meta
-                geo_fld = opts.get_field(field_list.pop())
-        except (FieldDoesNotExist, AttributeError):
-            return False
-
-        # Finally, make sure we got a Geographic field and return.
-        if isinstance(geo_fld, BaseSpatialField):
-            return geo_fld
-        else:
-            return False
 
     def process_band_indices(self, only_lhs=False):
         """
