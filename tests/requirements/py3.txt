@@ -13,3 +13,4 @@ PyYAML
 selenium
 sqlparse
 tblib
+whitenoise
