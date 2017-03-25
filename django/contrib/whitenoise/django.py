@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import os
 
 from whitenoise.base import WhiteNoise
@@ -13,7 +11,7 @@ from whitenoise.utils import (
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 try:
     from django.contrib.staticfiles.storage import staticfiles_storage

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from django.contrib.whitenoise.django import DjangoWhiteNoise
 from django.http import FileResponse
 
