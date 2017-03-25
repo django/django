@@ -1,9 +1,6 @@
 from collections import defaultdict
 
 from django.contrib.gis import forms, gdal
-from django.contrib.gis.db.models.lookups import (
-    RasterBandTransform, gis_lookups,
-)
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
@@ -243,10 +240,6 @@ class BaseSpatialField(Field):
             return obj
 
 
-for klass in gis_lookups.values():
-    BaseSpatialField.register_lookup(klass)
-
-
 class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
     """
     The base Geometry field -- maps to the OpenGIS Specification Geometry type.
@@ -429,6 +422,7 @@ class RasterField(BaseSpatialField):
         setattr(cls, self.attname, SpatialProxy(gdal.GDALRaster, self))
 
     def get_transform(self, name):
+        from django.contrib.gis.db.models.lookups import RasterBandTransform
         try:
             band_index = int(name)
             return type(
