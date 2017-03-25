@@ -2,11 +2,6 @@ from __future__ import absolute_import
 
 import os
 
-from django.conf import settings
-from django.contrib.staticfiles import finders
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.six.moves.urllib.parse import urlparse
-
 from whitenoise.base import WhiteNoise
 # Import here under an alias for backwards compatibility
 from whitenoise.storage import \
@@ -14,6 +9,11 @@ from whitenoise.storage import \
 from whitenoise.utils import (
     IsDirectoryError, decode_if_byte_string, ensure_leading_trailing_slash,
 )
+
+from django.conf import settings
+from django.contrib.staticfiles import finders
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.six.moves.urllib.parse import urlparse
 
 try:
     from django.contrib.staticfiles.storage import staticfiles_storage
