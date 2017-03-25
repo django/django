@@ -271,8 +271,8 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_isvalid_lookup_with_raster_error(self):
         qs = RasterModel.objects.filter(rast__isvalid=True)
-        msg = 'The isvalid lookup is only available on geometry fields.'
-        with self.assertRaisesMessage(ValueError, msg):
+        msg = 'Geometry functions not supported for raster fields.'
+        with self.assertRaisesMessage(TypeError, msg):
             qs.count()
 
     def test_result_of_gis_lookup_with_rasters(self):

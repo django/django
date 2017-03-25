@@ -1,19 +1,23 @@
 from decimal import Decimal
 
-from django.contrib.gis.db.models.fields import GeometryField, RasterField
+from django.contrib.gis.db.models.fields import (
+    BaseSpatialField, GeometryField, RasterField,
+)
 from django.contrib.gis.db.models.sql import AreaField
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
 )
 from django.core.exceptions import FieldError
-from django.db.models import BooleanField, FloatField, IntegerField, TextField
+from django.db.models import (
+    BooleanField, FloatField, IntegerField, TextField, Transform,
+)
 from django.db.models.expressions import Func, Value
 
 NUMERIC_TYPES = (int, float, Decimal)
 
 
-class GeoFunc(Func):
+class GeoFuncMixin:
     function = None
     output_field_class = None
     geom_param_pos = 0
@@ -68,6 +72,10 @@ class GeoFunc(Func):
                         param_name, check_types)
                 )
         return value
+
+
+class GeoFunc(GeoFuncMixin, Func):
+    pass
 
 
 class GeomValue(Value):
@@ -319,8 +327,10 @@ class Intersection(OracleToleranceMixin, GeoFuncWithGeoParam):
     arity = 2
 
 
-class IsValid(OracleToleranceMixin, GeoFunc):
-    output_field_class = BooleanField
+@BaseSpatialField.register_lookup
+class IsValid(OracleToleranceMixin, GeoFuncMixin, Transform):
+    lookup_name = 'isvalid'
+    output_field = BooleanField()
 
     def as_oracle(self, compiler, connection, **extra_context):
         sql, params = super().as_oracle(compiler, connection, **extra_context)

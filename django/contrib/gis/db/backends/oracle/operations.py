@@ -51,10 +51,6 @@ class SDORelate(SpatialOperator):
         return super().as_sql(connection, lookup, template_params, sql_params)
 
 
-class SDOIsValid(SpatialOperator):
-    sql_template = "%%(func)s(%%(lhs)s, %s) = 'TRUE'" % DEFAULT_TOLERANCE
-
-
 class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     name = 'oracle'
@@ -100,7 +96,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'covers': SDOOperator(func='SDO_COVERS'),
         'disjoint': SDODisjoint(),
         'intersects': SDOOperator(func='SDO_OVERLAPBDYINTERSECT'),  # TODO: Is this really the same as ST_Intersects()?
-        'isvalid': SDOIsValid(func='SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT'),
         'equals': SDOOperator(func='SDO_EQUAL'),
         'exact': SDOOperator(func='SDO_EQUAL'),
         'overlaps': SDOOperator(func='SDO_OVERLAPS'),
