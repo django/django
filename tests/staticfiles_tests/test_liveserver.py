@@ -18,12 +18,12 @@ TEST_SETTINGS = {
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
     'INSTALLED_APPS': [
-        'django.contrib.whitenoise.runserver_nostatic',
+        'django.contrib.staticfiles.runserver_nostatic',
         'django.contrib.staticfiles',
 
     ],
     'MIDDLEWARE': [
-        'django.contrib.whitenoise.middleware.WhiteNoiseMiddleware'
+        'django.contrib.staticfiles.middleware.WhiteNoiseMiddleware'
     ],
 }
 
