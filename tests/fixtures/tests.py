@@ -680,6 +680,35 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('loaddata', 'fixture1', exclude=['fixtures.FooModel'], verbosity=0)
 
+    def test_stdin_without_format(self):
+        """Reading from stdin raises an error if format isn't specified."""
+        msg = '--format must be specified when reading from stdin.'
+        with self.assertRaisesMessage(management.CommandError, msg):
+            management.call_command('loaddata', '-', verbosity=0)
+
+    def test_loading_stdin(self):
+        """Loading fixtures from stdin with json and xml."""
+        tests_dir = os.path.dirname(__file__)
+        fixture_json = os.path.join(tests_dir, 'fixtures', 'fixture1.json')
+        fixture_xml = os.path.join(tests_dir, 'fixtures', 'fixture3.xml')
+
+        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json, 'r')):
+            management.call_command('loaddata', '--format=json', '-', verbosity=0)
+            self.assertEqual(Article.objects.count(), 2)
+            self.assertQuerysetEqual(Article.objects.all(), [
+                '<Article: Time to reform copyright>',
+                '<Article: Poker has no place on ESPN>',
+            ])
+
+        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml, 'r')):
+            management.call_command('loaddata', '--format=xml', '-', verbosity=0)
+            self.assertEqual(Article.objects.count(), 3)
+            self.assertQuerysetEqual(Article.objects.all(), [
+                '<Article: XML identified as leading cause of cancer>',
+                '<Article: Time to reform copyright>',
+                '<Article: Poker on TV is great!>',
+            ])
+
 
 class NonexistentFixtureTests(TestCase):
     """

@@ -416,6 +416,14 @@ originally generated.
 
 Specifies a single app to look for fixtures in rather than looking in all apps.
 
+.. django-admin-option:: --format FORMAT
+
+.. versionadded:: 2.0
+
+Specifies the :ref:`serialization format <serialization-formats>` (e.g.,
+``json`` or ``xml``) for fixtures :ref:`read from stdin
+<loading-fixtures-stdin>`.
+
 .. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
 
 .. versionadded:: 1.11
@@ -551,6 +559,27 @@ For example, if your :setting:`DATABASES` setting has a 'master' database
 defined, name the fixture ``mydata.master.json`` or
 ``mydata.master.json.gz`` and the fixture will only be loaded when you
 specify you want to load data into the ``master`` database.
+
+.. _loading-fixtures-stdin:
+
+Loading fixtures from ``stdin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.0
+
+You can use a dash as the fixture name to load input from ``sys.stdin``. For
+example::
+
+    django-admin loaddata --format=json -
+
+When reading from ``stdin``, the :option:`--format <loaddata --format>` option
+is required to specify the :ref:`serialization format <serialization-formats>`
+of the input (e.g., ``json`` or ``xml``).
+
+Loading from ``stdin`` is useful with standard input and output redirections.
+For example::
+
+    django-admin dumpdata --format=json --database=test app_label.ModelName | django-admin loaddata --format=json --database=prod -
 
 ``makemessages``
 ----------------
