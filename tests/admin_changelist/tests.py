@@ -1,5 +1,8 @@
 import datetime
 
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -899,3 +902,120 @@ class SeleniumTests(AdminSeleniumTestCase):
             '%s #result_list tbody tr:first-child .action-select' % form_id)
         row_selector.click()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
+
+    def test_form_submit_js_validation(self):
+        """
+        Check validation on JavaScript level before send an changelist action (#26543)
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))
+
+        form_id = '#changelist-form'
+
+        go_button = self.selenium.find_element_by_css_selector(
+            "%s button[type='submit']" % form_id
+        )
+
+        # Try to make submit without select anything
+        go_button.click()  # Try to submit form
+        messages = self.selenium.find_elements_by_css_selector(
+            'div#container ul.messagelist li'
+        )
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(messages[0].text, "No action selected.")
+        self.assertEqual(
+            messages[1].text,
+            "Items must be selected in order to perform actions on them. No items have been changed."
+        )
+
+        # Try to make submit selecting an action without any item selected
+        actions = self.selenium.find_elements_by_css_selector('select[name="action"] option')
+        self.assertEqual(len(actions), 2)
+        actions[1].click()  # Select delete action
+        go_button.click()  # Try to submit form
+        messages = self.selenium.find_elements_by_css_selector(
+            'div#container ul.messagelist li'
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0].text,
+            "Items must be selected in order to perform actions on them. No items have been changed."
+        )
+
+        # Try to make submit selecting an item without any action selected
+        actions[0].click()  # Select empty action
+        row_selector = self.selenium.find_element_by_css_selector(
+            '%s #result_list tbody tr:first-child .action-select' % form_id
+        )
+        row_selector.click()  # Select a row
+        go_button.click()  # Try to submit form
+        messages = self.selenium.find_elements_by_css_selector(
+            'div#container ul.messagelist li'
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].text, "No action selected.")
+
+    def test_cancel_action_after_form_validation_error(self):
+        """
+        Test the success cancel action after a form validation error (#26543)
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))
+
+        form_id = '#changelist-form'
+
+        go_button = self.selenium.find_element_by_css_selector(
+            "%s button[type='submit']" % form_id
+        )
+
+        # Try to make submit without select anything and generate warning messages
+        go_button.click()
+        messages = self.selenium.find_elements_by_css_selector(
+            'div#container ul.messagelist li'
+        )
+        self.assertEqual(len(messages), 2)
+
+        # Select an action
+        actions = self.selenium.find_elements_by_css_selector('select[name="action"] option')
+        self.assertEqual(len(actions), 2)
+        # Select delete action
+        actions[1].click()
+
+        # select items
+        row_selector = self.selenium.find_element_by_css_selector(
+            '%s #result_list tbody tr:first-child .action-select' % form_id
+        )
+        row_selector.click()  # Select items
+
+        # Test amount of rows in the Changelist before load confirmation page
+        rows = self.selenium.find_elements_by_css_selector(
+            '%s #result_list tbody tr' % form_id)
+        self.assertEqual(len(rows), 1)
+
+        # Submit form
+        go_button.click()
+
+        # Wait for confirmation page
+        wait = WebDriverWait(self.selenium, 10)
+        wait.until(EC.title_is('Are you sure? | Django site admin'))
+
+        # Check confirmation button exist
+        confirm_button = self.selenium.find_elements_by_css_selector(
+            '#content form div input[type="submit"]'
+        )
+        self.assertEqual(len(confirm_button), 1)
+
+        # Cancel confirmation and go back to the user change list page
+        cancel_button = self.selenium.find_element_by_css_selector(
+            '#content form div a.cancel-link'
+        )
+        cancel_button.click()  # Go back
+
+        # Wait for user change list page
+        wait = WebDriverWait(self.selenium, 10)
+        wait.until(EC.title_is('Select user to change | Django site admin'))
+
+        # Test amount of rows in the Changelist after delete action cancellation
+        rows = self.selenium.find_elements_by_css_selector(
+            '%s #result_list tbody tr' % form_id)
+        self.assertEqual(len(rows), 1)

@@ -113,6 +113,40 @@
             list_editable_changed = true;
         });
         $('form#changelist-form button[name="index"]').click(function(event) {
+            var actionSelected = $('select[name="action"]').val(),
+                itemSelected = $('table#result_list td.action-checkbox input:checked').length > 0,
+                messageList = $('div#container ul.messagelist'),  // admin base.html's message list
+                getMessageList = function() {
+                    return (messageList.length) ? messageList : function() {
+                        // insert in the original django admin position
+                        $('<ul class="messagelist"></ul>').insertBefore('div#content');
+                        messageList = $('div#container ul.messagelist');
+                        return messageList; // return the list (<ul></ul>) instance
+                    }();
+                },
+                skipChangeListFormSubmit = function(msg, type, replace) {
+                    event.preventDefault();  // skip submit
+                    if (replace) {
+                        // clean the message list, the new item list will replace the list content
+                        getMessageList().find('li').remove();
+                    }
+                    // add new item error to the message list
+                    $('<li></li>').attr('class', type).text(msg).appendTo(getMessageList());
+                    return;
+                };
+
+            if (!actionSelected) {
+                skipChangeListFormSubmit(gettext("No action selected."), 'warning', true);
+            }
+            if (!itemSelected) {
+                skipChangeListFormSubmit(
+                    gettext("Items must be selected in order to perform actions on them. No items have been changed."),
+                    'warning',
+                    // if `actionSelected` is false, the new item error will be appended to the message list,
+                    // keeping the previous item error
+                    actionSelected
+                );
+            }
             if (list_editable_changed) {
                 return confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
             }
