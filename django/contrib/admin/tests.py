@@ -1,4 +1,5 @@
-from django.test import LiveServerTestCase, modify_settings
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import modify_settings
 from django.test.selenium import SeleniumTestCase
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import gettext as _
@@ -12,7 +13,7 @@ class CSPMiddleware(MiddlewareMixin):
 
 
 @modify_settings(MIDDLEWARE={'append': 'django.contrib.admin.tests.CSPMiddleware'})
-class AdminSeleniumTestCase(SeleniumTestCase, LiveServerTestCase):
+class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     available_apps = [
         'django.contrib.admin',

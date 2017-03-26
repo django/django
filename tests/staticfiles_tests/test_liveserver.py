@@ -7,8 +7,8 @@ django.test.LiveServerTestCase.
 import os
 from urllib.request import urlopen
 
-from django.test import LiveServerTestCase, modify_settings, override_settings
-
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import modify_settings, override_settings
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
@@ -17,18 +17,10 @@ TEST_SETTINGS = {
     'STATIC_URL': '/static/',
     'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
-    'INSTALLED_APPS': [
-        'django.contrib.staticfiles.runserver_nostatic',
-        'django.contrib.staticfiles',
-
-    ],
-    'MIDDLEWARE': [
-        'django.contrib.staticfiles.middleware.WhiteNoiseMiddleware'
-    ],
 }
 
 
-class LiveServerBase(LiveServerTestCase):
+class LiveServerBase(StaticLiveServerTestCase):
 
     available_apps = []
 

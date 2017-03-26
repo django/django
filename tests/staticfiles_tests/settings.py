@@ -17,7 +17,6 @@ TEST_SETTINGS = {
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
     ],
     'INSTALLED_APPS': [
-        'django.contrib.staticfiles.runserver_nostatic',
         'django.contrib.staticfiles',
         'staticfiles_tests',
         'staticfiles_tests.apps.test',
@@ -25,7 +24,5 @@ TEST_SETTINGS = {
     ],
     # In particular, AuthenticationMiddleware can't be used because
     # contrib.auth isn't in INSTALLED_APPS.
-    'MIDDLEWARE': [
-        'django.contrib.staticfiles.middleware.WhiteNoiseMiddleware'
-    ],
+    'MIDDLEWARE': [],
 }
