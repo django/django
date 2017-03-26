@@ -49,3 +49,8 @@ class DTModel(models.Model):
 
     def __str__(self):
         return 'DTModel({0})'.format(self.name)
+
+
+class DecimalModel(models.Model):
+    n1 = models.DecimalField(decimal_places=2, max_digits=6)
+    n2 = models.DecimalField(decimal_places=2, max_digits=6)

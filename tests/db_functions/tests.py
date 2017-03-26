@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 from unittest import skipIf, skipUnless
 
 from django.db import connection
@@ -11,7 +12,7 @@ from django.db.models.functions import (
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import timezone
 
-from .models import Article, Author, Fan
+from .models import Article, Author, DecimalModel, Fan
 
 
 lorem_ipsum = """
@@ -202,6 +203,15 @@ class FunctionTests(TestCase):
         author.refresh_from_db()
         self.assertEqual(author.alias, 'Jim')
 
+    def test_greatest_decimal_filter(self):
+        obj = DecimalModel.objects.create(n1=Decimal('1.1'), n2=Decimal('1.2'))
+        self.assertCountEqual(
+            DecimalModel.objects.annotate(
+                greatest=Greatest('n1', 'n2'),
+            ).filter(greatest=Decimal('1.2')),
+            [obj],
+        )
+
     def test_least(self):
         now = timezone.now()
         before = now - timedelta(hours=1)
@@ -296,6 +306,15 @@ class FunctionTests(TestCase):
 
         author.refresh_from_db()
         self.assertEqual(author.alias, 'James Smith')
+
+    def test_least_decimal_filter(self):
+        obj = DecimalModel.objects.create(n1=Decimal('1.1'), n2=Decimal('1.2'))
+        self.assertCountEqual(
+            DecimalModel.objects.annotate(
+                least=Least('n1', 'n2'),
+            ).filter(least=Decimal('1.1')),
+            [obj],
+        )
 
     def test_concat(self):
         Author.objects.create(name='Jayden')
