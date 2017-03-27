@@ -168,13 +168,6 @@ class ViewDetailView(BaseAdminDocsView):
                 # the module and class.
                 mod, klass = get_mod_func(mod)
                 return getattr(getattr(import_module(mod), klass), func)
-            except AttributeError:
-                # PY2 generates incorrect paths for views that are methods,
-                # e.g. 'mymodule.views.ViewContainer.my_view' will be
-                # listed as 'mymodule.views.my_view' because the class name
-                # can't be detected. This causes an AttributeError when
-                # trying to resolve the view.
-                return None
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
