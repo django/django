@@ -356,6 +356,7 @@ message:
 
 * If ``bytes`` or ``text`` is present, accept the connection and send the data.
 * If ``accept`` is ``True``, accept the connection and do nothing else.
+* If ``accept`` is ``False``, reject the connection (with close code 1000) and do nothing else.
 * If ``close`` is ``True`` or a positive integer, reject the connection. If
   ``bytes`` or ``text`` is also set, it should accept the connection, send the
   frame, then immediately close the connection.
