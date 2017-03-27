@@ -919,6 +919,11 @@ Miscellaneous
   To adapt, move the fragment outside the template tag:
   ``{% static 'img.svg' %}#fragment``.
 
+* When :setting:`USE_L10N` is ``True``, localization is now applied for the
+  :tfilter:`date` and :tfilter:`time` filters when no format string is
+  specified. The ``DATE_FORMAT`` and ``TIME_FORMAT`` specifiers from the active
+  locale are used instead of the settings of the same name.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
