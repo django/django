@@ -354,13 +354,16 @@ and try again.
 If received while the connection is waiting for acceptance after a ``connect``
 message:
 
-* If ``bytes`` or ``text`` is present, accept the connection and send the data.
 * If ``accept`` is ``True``, accept the connection (and send any data provided).
 * If ``accept`` is ``False``, reject the connection and do nothing else.
+  If ``bytes`` or ``text`` were also present they must be ignored.
+* If ``bytes`` or ``text`` is present, accept the connection and send the data.
 * If ``close`` is ``True`` or a positive integer, reject the connection. If
   ``bytes`` or ``text`` is also set, it should accept the connection, send the
   frame, then immediately close the connection. Note that any close code integer
-  sent is ignored, as connections are rejected with HTTP's ``403 Forbidden``.
+  sent is ignored, as connections are rejected with HTTP's ``403 Forbidden``,
+  unless data is also sent, in which case a full WebSocket close is done with
+  the provided code.
 
 If received while the connection is established:
 
