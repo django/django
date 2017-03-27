@@ -355,11 +355,12 @@ If received while the connection is waiting for acceptance after a ``connect``
 message:
 
 * If ``bytes`` or ``text`` is present, accept the connection and send the data.
-* If ``accept`` is ``True``, accept the connection and do nothing else.
-* If ``accept`` is ``False``, reject the connection (with close code 1000) and do nothing else.
+* If ``accept`` is ``True``, accept the connection (and send any data provided).
+* If ``accept`` is ``False``, reject the connection and do nothing else.
 * If ``close`` is ``True`` or a positive integer, reject the connection. If
   ``bytes`` or ``text`` is also set, it should accept the connection, send the
-  frame, then immediately close the connection.
+  frame, then immediately close the connection. Note that any close code integer
+  sent is ignored, as connections are rejected with HTTP's ``403 Forbidden``.
 
 If received while the connection is established:
 
