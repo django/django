@@ -94,8 +94,8 @@ the respective field according to your needs.
   give them meaningful names in the examples below.
 
 * Copy the ``AddField`` operation from the auto-generated migration (the first
-  of the three new files) to the last migration and change ``AddField`` to
-  ``AlterField``. For example:
+  of the three new files) to the last migration, change ``AddField`` to
+  ``AlterField``, and add imports of ``uuid`` and ``models``. For example:
 
   .. snippet::
     :filename: 0006_remove_uuid_null.py
@@ -106,7 +106,6 @@ the respective field according to your needs.
 
     from django.db import migrations, models
     import uuid
-
 
     class Migration(migrations.Migration):
 
@@ -149,7 +148,8 @@ the respective field according to your needs.
 * In the first empty migration file, add a
   :class:`~django.db.migrations.operations.RunPython` or
   :class:`~django.db.migrations.operations.RunSQL` operation to generate a
-  unique value (UUID in the example) for each existing row. For example:
+  unique value (UUID in the example) for each existing row. Also add an import
+  of ``uuid``. For example:
 
   .. snippet::
     :filename: 0005_populate_uuid_values.py
@@ -165,7 +165,7 @@ the respective field according to your needs.
         MyModel = apps.get_model('myapp', 'MyModel')
         for row in MyModel.objects.all():
             row.uuid = uuid.uuid4()
-            row.save()
+            row.save(update_fields=['uuid'])
 
     class Migration(migrations.Migration):
 
