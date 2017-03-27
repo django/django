@@ -287,7 +287,7 @@
                 $(inlineOptions.name + "-group .inline-related").stackedFormset(inlineOptions.options);
                 break;
             case "tabular":
-                $(inlineOptions.name + "-group .tabular.inline-related tbody tr").tabularFormset(inlineOptions.options);
+                $(inlineOptions.name + "-group .tabular.inline-related tbody:first > tr").tabularFormset(inlineOptions.options);
                 break;
             }
         });
