@@ -1458,12 +1458,18 @@ for example, ``"es"``, then for::
 the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
 format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
 
-When used without a format string::
+When used without a format string, the ``DATE_FORMAT`` format specifier is
+used. Assuming the same settings as the previous example::
 
     {{ value|date }}
 
-...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
-used, without applying any localization.
+outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
+``es`` locale is ``r'j \d\e F \d\e Y'``.
+
+.. versionchanged:: 1.10
+
+    In older versions, the :setting:`DATE_FORMAT` setting (without
+    localization) is always used when a format string isn't given.
 
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
@@ -2168,12 +2174,19 @@ attached timezone information (a :ref:`time-zone-aware
 accept the timezone-related :ref:`format specifiers
 <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'`` and ``'Z'``.
 
-When used without a format string::
+When used without a format string, the ``TIME_FORMAT`` format specifier is
+used::
 
     {{ value|time }}
 
-...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
-used, without applying any localization.
+is the same as::
+
+    {{ value|time:"TIME_FORMAT" }}
+
+.. versionchanged:: 1.10
+
+    In older versions, the :setting:`TIME_FORMAT` setting (without
+    localization) is always used when a format string isn't given.
 
 .. templatefilter:: timesince
 
