@@ -157,7 +157,7 @@ For example::
                 username='test', email='test@test.com', password='123456')
             client.login(username='test', password='123456')
 
-            client.send_and_consume('websocket.connect', '/rooms/')
+            client.send_and_consume('websocket.connect', path='/rooms/')
             # check that there is nothing to receive
             self.assertIsNone(client.receive())
 
