@@ -309,6 +309,10 @@ for example, a web application trying to send a response body will likely
 wait until it empties out again, while a HTTP interface server trying to
 send in a request would drop the request and return a 503 error.
 
+Process-local channels must apply their capacity on the non-local part (that is,
+up to and including the ``!`` character), and so capacity is shared among all
+of the "virtual" channels inside it.
+
 Sending to a group never raises ChannelFull; instead, it must silently drop
 the message if it is over capacity, as per ASGI's at-most-once delivery
 policy.
