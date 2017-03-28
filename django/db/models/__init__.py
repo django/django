@@ -48,7 +48,8 @@ def permalink(func):
     warnings.warn(
         'permalink() is deprecated in favor of calling django.urls.reverse() '
         'in the decorated method.',
-        RemovedInDjango21Warning
+        RemovedInDjango21Warning,
+        stacklevel=2,
     )
 
     @wraps(func)
