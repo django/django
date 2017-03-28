@@ -387,7 +387,7 @@ class FormatStylePlaceholderCursor:
         self.cursor = connection.cursor()
         # Necessary to retrieve decimal values without rounding error.
         self.cursor.numbersAsStrings = True
-        # Default arraysize of 1 is highly sub-optimal.
+        # The default for cx_Oracle < 5.3 is 50.
         self.cursor.arraysize = 100
 
     def _format_params(self, params):
