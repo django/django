@@ -194,6 +194,27 @@ This is the base class for all GEOS geometry objects.  It initializes on the
 given ``geo_input`` argument, and then assumes the proper geometry subclass
 (e.g., ``GEOSGeometry('POINT(1 1)')`` will create a :class:`Point` object).
 
+The ``srid`` parameter, if given, is set as the SRID of the created geometry if
+``geo_input`` doesn't have an SRID. If different SRIDs are provided through the
+``geo_input`` and ``srid`` parameters, ``ValueError`` is raised::
+
+    >>> from django.contrib.gis.geos import GEOSGeometry
+    >>> GEOSGeometry('POINT EMPTY', srid=4326).ewkt
+    'SRID=4326;POINT EMPTY'
+    >>> GEOSGeometry('SRID=4326;POINT EMPTY', srid=4326).ewkt
+    'SRID=4326;POINT EMPTY'
+    >>> GEOSGeometry('SRID=1;POINT EMPTY', srid=4326)
+    Traceback (most recent call last):
+    ...
+    ValueError: Input geometry already has SRID: 1.
+
+.. versionchanged:: 2.0
+
+    In older versions, the ``srid`` parameter is handled differently for WKT
+    and WKB input. For WKT, ``srid`` is used only if the input geometry doesn't
+    have an SRID. For WKB, ``srid`` (if given) replaces the SRID of the input
+    geometry.
+
 The following input formats, along with their corresponding Python types,
 are accepted:
 
