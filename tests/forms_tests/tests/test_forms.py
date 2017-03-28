@@ -164,6 +164,13 @@ class FormsTestCase(SimpleTestCase):
 <input type="text" name="birthday" id="id_birthday" required /></p>"""
         )
 
+    def test_empty_querydict_args(self):
+        data = QueryDict()
+        files = QueryDict()
+        p = Person(data, files)
+        self.assertIs(p.data, data)
+        self.assertIs(p.files, files)
+
     def test_unbound_form(self):
         # If you don't pass any values to the Form's __init__(), or if you pass None,
         # the Form will be considered unbound and won't do any validation. Form.errors

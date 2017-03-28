@@ -76,8 +76,8 @@ class BaseForm:
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, field_order=None, use_required_attribute=None, renderer=None):
         self.is_bound = data is not None or files is not None
-        self.data = data or {}
-        self.files = files or {}
+        self.data = {} if data is None else data
+        self.files = {} if files is None else files
         self.auto_id = auto_id
         if prefix is not None:
             self.prefix = prefix
