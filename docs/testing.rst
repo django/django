@@ -191,10 +191,10 @@ so if you need to pass decoding use ``receive(json=False)``, like in the example
 Applying routes
 ---------------
 
-When you need to testing you consumers without routes in settings or you
-want to testing your consumers in more isolate and atomic way, it will be
+When you need to test your consumers without routes in settings or you
+want to test your consumers in a more isolate and atomic way, it will be
 simpler with ``apply_routes`` contextmanager and decorator for your ``ChannelTestCase``.
-It takes list of routes that you want to use and overwrite existing routes::
+It takes a list of routes that you want to use and overwrites existing routes::
 
     from channels.test import ChannelTestCase, HttpClient, apply_routes
 
