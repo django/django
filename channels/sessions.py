@@ -18,7 +18,7 @@ def session_for_reply_channel(reply_channel):
     """
     # We hash the whole reply channel name and add a prefix, to fit inside 32B
     reply_name = reply_channel
-    hashed = hashlib.md5(reply_name.encode("utf8")).hexdigest()
+    hashed = hashlib.sha1(reply_name.encode("utf8")).hexdigest()
     session_key = "chn" + hashed[:29]
     # Make a session storage
     session_engine = import_module(getattr(settings, "CHANNEL_SESSION_ENGINE", settings.SESSION_ENGINE))
