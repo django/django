@@ -3,7 +3,7 @@ docutils
 jinja2 >= 2.7
 # move to py2.txt when dropping Python 3.2
 mock
-numpy
+numpy < 1.12
 Pillow
 PyYAML
 pytz > dev
