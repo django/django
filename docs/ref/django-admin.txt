@@ -1582,7 +1582,7 @@ Example usage::
 
     django-admin migrate --traceback
 
-.. django-admin-option:: --verbosity {0,1,2,3}, --v {0,1,2,3}
+.. django-admin-option:: --verbosity {0,1,2,3}, -v {0,1,2,3}
 
 Specifies the amount of notification and debug information that a command
 should print to the console.
