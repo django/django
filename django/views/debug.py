@@ -530,7 +530,7 @@ r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
     body * * { padding:0; }
-    body { font:small sans-serif; }
+    body { font:small sans-serif; background-color:#fff; color:#000; }
     body>div { border-bottom:1px solid #ddd; }
     h1 { font-weight:normal; }
     h2 { margin-bottom:.8em; }
