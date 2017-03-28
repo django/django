@@ -560,16 +560,19 @@ class QuerySet:
             return objects[0]
         return None
 
-    def in_bulk(self, id_list=None):
+    def in_bulk(self, id_list=None, *, field_name='pk'):
         """
         Return a dictionary mapping each of the given IDs to the object with
         that ID. If `id_list` isn't provided, evaluate the entire QuerySet.
         """
         assert self.query.can_filter(), \
             "Cannot use 'limit' or 'offset' with in_bulk"
+        if field_name != 'pk' and not self.model._meta.get_field(field_name).unique:
+            raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
         if id_list is not None:
             if not id_list:
                 return {}
+            filter_key = '{}__in'.format(field_name)
             batch_size = connections[self.db].features.max_query_params
             id_list = tuple(id_list)
             # If the database has a limit on the number of query parameters
@@ -578,12 +581,12 @@ class QuerySet:
                 qs = ()
                 for offset in range(0, len(id_list), batch_size):
                     batch = id_list[offset:offset + batch_size]
-                    qs += tuple(self.filter(pk__in=batch).order_by())
+                    qs += tuple(self.filter(**{filter_key: batch}).order_by())
             else:
-                qs = self.filter(pk__in=id_list).order_by()
+                qs = self.filter(**{filter_key: id_list}).order_by()
         else:
             qs = self._clone()
-        return {obj.pk: obj for obj in qs}
+        return {getattr(obj, field_name): obj for obj in qs}
 
     def delete(self):
         """Delete the records in the current QuerySet."""

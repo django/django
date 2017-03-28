@@ -259,6 +259,9 @@ Models
   :meth:`~.QuerySet.select_for_update()` is used in conjunction with
   :meth:`~.QuerySet.select_related()`.
 
+* The new ``field_name`` parameter of :meth:`.QuerySet.in_bulk` allows fetching
+  results based on any unique model field.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

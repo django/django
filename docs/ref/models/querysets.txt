@@ -1997,11 +1997,13 @@ database query like ``count()`` would.
 ``in_bulk()``
 ~~~~~~~~~~~~~
 
-.. method:: in_bulk(id_list=None)
+.. method:: in_bulk(id_list=None, field_name='pk')
 
-Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID. If a list
-isn't provided, all objects in the queryset are returned.
+Takes a list of field values (``id_list``) and the ``field_name`` for those
+values, and returns a dictionary mapping each value to an instance of the
+object with the given field value. If ``id_list`` isn't provided, all objects
+in the queryset are returned. ``field_name`` must be a unique field, and it
+defaults to the primary key.
 
 Example::
 
@@ -2013,8 +2015,14 @@ Example::
     {}
     >>> Blog.objects.in_bulk()
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
+    >>> Blog.objects.in_bulk(['beatles_blog'], field_name='slug')
+    {'beatles_blog': <Blog: Beatles Blog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 2.0
+
+    The ``field_name`` parameter was added.
 
 ``iterator()``
 ~~~~~~~~~~~~~~
