@@ -148,6 +148,9 @@ class AsgiRequest(http.HttpRequest):
     def GET(self):
         return http.QueryDict(self.message.get('query_string', ''))
 
+    def _get_scheme(self):
+        return self.message.get("scheme", "http")
+
     def _get_post(self):
         if not hasattr(self, '_post'):
             self._read_started = False
