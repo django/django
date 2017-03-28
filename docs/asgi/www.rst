@@ -128,7 +128,7 @@ Send after any server pushes, and before any response chunks. If ``ChannelFull``
 is encountered, wait and try again later, optionally giving up after a
 predetermined timeout.
 
-Channel: ``http.response!``
+Channel: Defined by server, suggested ``http.response.RANDOMPART!CLIENTID``
 
 Keys:
 
@@ -154,7 +154,7 @@ Response Chunk
 Must be sent after an initial Response. If ``ChannelFull``
 is encountered, wait and try again later.
 
-Channel: ``http.response!``
+Channel: Defined by server, suggested ``http.response.RANDOMPART!CLIENTID``
 
 Keys:
 
@@ -194,7 +194,7 @@ If the remote peer does not support server push, either because it's not a
 HTTP/2 peer or because SETTINGS_ENABLE_PUSH is set to 0, the server must do
 nothing in response to this message.
 
-Channel: ``http.response!``
+Channel: Defined by server, suggested ``http.response.RANDOMPART!CLIENTID``
 
 Keys:
 
@@ -372,7 +372,7 @@ If received while the connection is established:
   any send.
 * ``accept`` is ignored.
 
-Channel: ``websocket.send!``
+Channel: Defined by server, suggested ``websocket.send.RANDOMPART!CLIENTID``
 
 Keys:
 
