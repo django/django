@@ -165,3 +165,38 @@ directly, but there are two useful ways you can call it:
 * ``encode_response(response)`` is a classmethod that can be called with a
   Django ``HttpResponse`` and will yield one or more ASGI messages that are
   the encoded response.
+
+
+.. _ref-decorators:
+
+Decorators
+----------
+
+Channels provides decorators to assist with persisting data.
+
+* ``channel_session``: Provides a session-like object called "channel_session" to consumers
+    as a message attribute that will auto-persist across consumers with
+    the same incoming "reply_channel" value.
+
+    Use this to persist data across the lifetime of a connection.
+
+* ``http_session``: Wraps a HTTP or WebSocket connect consumer (or any consumer of messages
+    that provides a "cookies" or "get" attribute) to provide a "http_session"
+    attribute that behaves like request.session; that is, it's hung off of
+    a per-user session key that is saved in a cookie or passed as the
+    "session_key" GET parameter.
+
+    It won't automatically create and set a session cookie for users who
+    don't have one - that's what SessionMiddleware is for, this is a simpler
+    read-only version for more low-level code.
+
+    If a message does not have a session we can inflate, the "session" attribute
+    will be None, rather than an empty session you can write to.
+
+    Does not allow a new session to be set; that must be done via a view. This
+    is only an accessor for any existing session.
+
+* ``channel_and_http_session``: Enables both the channel_session and http_session.
+
+    Stores the http session key in the channel_session on websocket.connect messages.
+    It will then hydrate the http_session from that same key on subsequent messages.
