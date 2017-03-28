@@ -1,9 +1,8 @@
 import json
 
+from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.db.models.lookups import (
-    DistanceLookupBase, gis_lookups,
-)
+from django.contrib.gis.db.models.lookups import DistanceLookupBase, GISLookup
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
@@ -130,7 +129,9 @@ class RasterFieldTest(TransactionTestCase):
         stx_pnt.transform(3086)
 
         # Loop through all the GIS lookups.
-        for name, lookup in gis_lookups.items():
+        for name, lookup in BaseSpatialField.get_lookups().items():
+            if not isinstance(lookup, GISLookup):
+                continue
             # Construct lookup filter strings.
             combo_keys = [
                 field + name for field in [
