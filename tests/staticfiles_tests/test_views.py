@@ -24,6 +24,16 @@ class TestServeStatic(StaticFilesTestCase):
 
 
 @ignore_warnings(category=RemovedInDjango30Warning)
+@override_settings(DEBUG=False)
+class TestServeDisabled(TestServeStatic):
+    """
+    Test serving static files disabled when DEBUG is False.
+    """
+    def test_disabled_serving(self):
+        self.assertFileNotFound('test.txt')
+
+
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(DEBUG=True)
 class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
