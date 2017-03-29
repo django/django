@@ -135,9 +135,7 @@ class SQLCompiler:
         # include the primary key of every table, but for MySQL it is enough to
         # have the main table's primary key.
         if self.connection.features.allows_group_by_pk:
-            # The logic here is: if the main model's primary key is in the
-            # query, then set new_expressions to that field. If that happens,
-            # then also add having expressions to group by.
+            # Determine if the main model's primary key is in the query.
             pk = None
             for expr in expressions:
                 # Is this a reference to query's base table primary key? If the
@@ -146,9 +144,18 @@ class SQLCompiler:
                         getattr(expr, 'alias', None) == self.query.tables[0]):
                     pk = expr
                     break
+            # If the main model's primary key is in the query, group by that
+            # field, HAVING expressions, and expressions associated with tables
+            # that don't have a primary key included in the grouped columns.
             if pk:
-                # MySQLism: Columns in HAVING clause must be added to the GROUP BY.
-                expressions = [pk] + [expr for expr in expressions if expr in having]
+                pk_aliases = {
+                    expr.alias for expr in expressions
+                    if hasattr(expr, 'target') and expr.target.primary_key
+                }
+                expressions = [pk] + [
+                    expr for expr in expressions
+                    if expr in having or getattr(expr, 'alias', None) not in pk_aliases
+                ]
         elif self.connection.features.allows_group_by_selected_pks:
             # Filter out all expressions associated with a table's primary key
             # present in the grouped columns. This is done by identifying all
