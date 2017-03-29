@@ -372,6 +372,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 1.'):
                 LinearRing(numpy.array([(0, 0)]))
 
+    def test_linearring_json(self):
+        self.assertJSONEqual(
+            LinearRing((0, 0), (0, 1), (1, 1), (0, 0)).json,
+            '{"coordinates": [[0, 0], [0, 1], [1, 1], [0, 0]], "type": "LineString"}',
+        )
+
     def test_polygons_from_bbox(self):
         "Testing `from_bbox` class method."
         bbox = (-180, -90, 180, 90)
@@ -1269,6 +1275,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(type(ext_poly), ExtendedPolygon)
         # ExtendedPolygon.__str__ should be called (instead of Polygon.__str__).
         self.assertEqual(str(ext_poly), "EXT_POLYGON - data: 3 - POLYGON ((0 0, 0 1, 1 1, 0 0))")
+        self.assertJSONEqual(
+            ext_poly.json,
+            '{"coordinates": [[[0, 0], [0, 1], [1, 1], [0, 0]]], "type": "Polygon"}',
+        )
 
     def test_geos_version(self):
         """Testing the GEOS version regular expression."""

@@ -415,7 +415,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         Return GeoJSON representation of this Geometry.
         """
-        return json.dumps({'type': self.__class__.__name__, 'coordinates': self.coords})
+        return json.dumps({'type': self._json_type, 'coordinates': self.coords})
     geojson = json
 
     @property

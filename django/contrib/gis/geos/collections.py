@@ -15,6 +15,7 @@ from django.contrib.gis.geos.polygon import Polygon
 
 
 class GeometryCollection(GEOSGeometry):
+    _json_type = 'GeometryCollection'
     _typeid = 7
 
     def __init__(self, *args, **kwargs):
@@ -106,11 +107,13 @@ class GeometryCollection(GEOSGeometry):
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
 class MultiPoint(GeometryCollection):
     _allowed = Point
+    _json_type = 'MultiPoint'
     _typeid = 4
 
 
 class MultiLineString(LinearGeometryMixin, GeometryCollection):
     _allowed = (LineString, LinearRing)
+    _json_type = 'MultiLineString'
     _typeid = 5
 
     @property
@@ -122,6 +125,7 @@ class MultiLineString(LinearGeometryMixin, GeometryCollection):
 
 class MultiPolygon(GeometryCollection):
     _allowed = Polygon
+    _json_type = 'MultiPolygon'
     _typeid = 6
 
 
