@@ -137,7 +137,7 @@ class Greatest(Func):
 
     def as_sqlite(self, compiler, connection):
         """Use the MAX function on SQLite."""
-        return super(Greatest, self).as_sql(compiler, connection, function='MAX')
+        return super(Greatest, self).as_sqlite(compiler, connection, function='MAX')
 
 
 class Least(Func):
@@ -157,7 +157,7 @@ class Least(Func):
 
     def as_sqlite(self, compiler, connection):
         """Use the MIN function on SQLite."""
-        return super(Least, self).as_sql(compiler, connection, function='MIN')
+        return super(Least, self).as_sqlite(compiler, connection, function='MIN')
 
 
 class Length(Transform):
