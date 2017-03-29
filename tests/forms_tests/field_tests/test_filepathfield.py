@@ -34,6 +34,7 @@ class FilePathFieldTest(SimpleTestCase):
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
             ('/django/forms/renderers.py', 'renderers.py'),
+            ('/django/forms/signals.py', 'signals.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]
@@ -57,6 +58,7 @@ class FilePathFieldTest(SimpleTestCase):
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
             ('/django/forms/renderers.py', 'renderers.py'),
+            ('/django/forms/signals.py', 'signals.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]
@@ -76,6 +78,7 @@ class FilePathFieldTest(SimpleTestCase):
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
             ('/django/forms/renderers.py', 'renderers.py'),
+            ('/django/forms/signals.py', 'signals.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]
