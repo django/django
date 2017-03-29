@@ -550,6 +550,16 @@ class TestValidation(PostgreSQLTestCase):
             field.clean([1, 2, 3, 4], None)
         self.assertEqual(cm.exception.messages[0], 'List contains 4 items, it should contain no more than 3.')
 
+    def test_with_choices(self):
+        field = ArrayField(models.CharField(max_length=2, choices=(('a1', 'A1'), ('b1', 'B1'))))
+        field.clean(['a1', 'b1'], None)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(['b1', 'c1'], None)
+        self.assertEqual(
+            cm.exception.messages[0],
+            "Item 1 in the array did not validate: Value 'c1' is not a valid choice."
+        )
+
     def test_nested_array_mismatch(self):
         field = ArrayField(ArrayField(models.IntegerField()))
         field.clean([[1, 2], [3, 4]], None)
