@@ -20,26 +20,14 @@ TEST_SETTINGS = {
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
 }
 
+TEST_SETTINGS_USE_FINDERS = dict(TEST_SETTINGS)
+TEST_SETTINGS_USE_FINDERS['WHITENOISE_USE_FINDERS'] = True
+TEST_SETTINGS_USE_FINDERS['WHITENOISE_AUTOREFRESH'] = True
 
-class LiveServerBase(StaticLiveServerTestCase):
 
+@override_settings(**TEST_SETTINGS)
+class StaticLiveServerView(StaticLiveServerTestCase):
     available_apps = []
-
-    @classmethod
-    def setUpClass(cls):
-        # Override settings
-        cls.settings_override = override_settings(**TEST_SETTINGS)
-        cls.settings_override.enable()
-        super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        # Restore original settings
-        cls.settings_override.disable()
-
-
-class StaticLiveServerView(LiveServerBase):
 
     def urlopen(self, url, *args, **kwargs):
         url = self.live_server_url + url
@@ -50,7 +38,7 @@ class StaticLiveServerView(LiveServerBase):
     @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
     def test_collectstatic_emulation(self):
         """
-        DjangoWhiteNoise and WHITENOISE_USE_FINDERS=True allow it
+        DjangoWhiteNoise and WHITENOISE_USE_FINDERS=False, WHITENOISE_AUTOREFRESH=False disallow it
         to discover app's static assets without having to collectstatic first.
         """
         try:
@@ -58,20 +46,12 @@ class StaticLiveServerView(LiveServerBase):
         except HTTPError as e:
             self.assertEqual(e.code, 404)
 
-        with self.settings(WHITENOISE_USE_FINDERS=True):
-            with self.urlopen('/static/test/file.txt') as f:
-                self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')
-
     def test_get_file(self):
         """
         DjangoWhiteNoise serves static files in STATIC_ROOT.
         """
         with self.urlopen('/static/testfile.txt') as f:
             self.assertEqual(f.read().rstrip(b'\r\n'), b'Test!')
-
-        with self.settings(WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True):
-            with self.urlopen('/static/testfile.txt') as f:
-                self.assertEqual(f.read().rstrip(b'\r\n'), b'Test!')
 
     def test_unversioned_file_not_cached_forever(self):
         with self.urlopen('/static/styles.css') as f:
@@ -91,14 +71,39 @@ class StaticLiveServerView(LiveServerBase):
         with self.urlopen('/static/nonascii%E2%9C%93.txt') as f:
             self.assertEqual(f.read().rstrip(b'\r\n'), b'hi')
 
-    @override_settings(WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True)
+
+@override_settings(**TEST_SETTINGS_USE_FINDERS)
+class StaticLiveServerViewUseFinders(StaticLiveServerTestCase):
+    available_apps = []
+
+    def urlopen(self, url, *args, **kwargs):
+        url = self.live_server_url + url
+        request = Request(url, *args, **kwargs)
+        return urlopen(request)
+
+    # The test is going to access a static file stored in this application.
+    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
+    def test_collectstatic_emulation(self):
+        """
+        DjangoWhiteNoise and WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True allow it
+        to discover app's static assets without having to collectstatic first.
+        """
+        with self.urlopen('/static/test/file.txt') as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')
+
+    def test_get_file(self):
+        """
+        DjangoWhiteNoise serves static files in STATIC_ROOT.
+        """
+        with self.urlopen('/static/testfile.txt') as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'Test!')
+
     def test_non_ascii_requests_safely_ignored(self):
         try:
             self.urlopen('/%E2%9C%93')
         except HTTPError as e:
             self.assertEqual(e.code, 404)
 
-    @override_settings(WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True)
     def test_requests_for_directory_safely_ignored(self):
         try:
             self.urlopen('/static/test')
