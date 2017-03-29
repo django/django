@@ -134,7 +134,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'disjoint': PostGISOperator(func='ST_Disjoint', raster=BILATERAL),
         'equals': PostGISOperator(func='ST_Equals'),
         'intersects': PostGISOperator(func='ST_Intersects', geography=True, raster=BILATERAL),
-        'isvalid': PostGISOperator(func='ST_IsValid'),
         'overlaps': PostGISOperator(func='ST_Overlaps', raster=BILATERAL),
         'relate': PostGISOperator(func='ST_Relate'),
         'touches': PostGISOperator(func='ST_Touches', raster=BILATERAL),

@@ -68,7 +68,7 @@ class BaseSpatialFeatures:
 
     @property
     def supports_isvalid_lookup(self):
-        return 'isvalid' in self.connection.ops.gis_operators
+        return self.has_IsValid_function
 
     # Is the aggregate supported by the database?
     @property

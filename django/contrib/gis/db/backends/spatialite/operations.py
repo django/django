@@ -48,8 +48,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     select = 'AsText(%s)'
 
     gis_operators = {
-        # Unary predicates
-        'isvalid': SpatialOperator(func='IsValid'),
         # Binary predicates
         'equals': SpatialOperator(func='Equals'),
         'disjoint': SpatialOperator(func='Disjoint'),

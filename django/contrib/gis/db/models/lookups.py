@@ -262,22 +262,6 @@ class IntersectsLookup(GISLookup):
 
 
 @BaseSpatialField.register_lookup
-class IsValidLookup(GISLookup):
-    lookup_name = 'isvalid'
-    sql_template = '%(func)s(%(lhs)s)'
-
-    def as_sql(self, compiler, connection):
-        if self.lhs.field.geom_type == 'RASTER':
-            raise ValueError('The isvalid lookup is only available on geometry fields.')
-        gis_op = connection.ops.gis_operators[self.lookup_name]
-        sql, params = self.process_lhs(compiler, connection)
-        sql, params = gis_op.as_sql(connection, self, {'func': gis_op.func, 'lhs': sql}, params)
-        if not self.rhs:
-            sql = 'NOT ' + sql
-        return sql, params
-
-
-@BaseSpatialField.register_lookup
 class OverlapsLookup(GISLookup):
     lookup_name = 'overlaps'
 
