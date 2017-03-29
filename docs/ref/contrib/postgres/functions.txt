@@ -7,6 +7,26 @@ All of these functions are available from the
 
 .. currentmodule:: django.contrib.postgres.functions
 
+``RandomUUID``
+==============
+
+.. class:: RandomUUID()
+
+.. versionadded:: 2.0
+
+Returns a version 4 UUID.
+
+The `pgcrypto extension`_ must be installed. You can use the
+:class:`~django.contrib.postgres.operations.CryptoExtension` migration
+operation to install it.
+
+.. _pgcrypto extension: https://www.postgresql.org/docs/current/static/pgcrypto.html
+
+Usage example::
+
+    >>> from django.contrib.postgres.functions import RandomUUID
+    >>> Article.objects.update(uuid=RandomUUID())
+
 ``TransactionNow``
 ==================
 

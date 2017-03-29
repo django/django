@@ -87,6 +87,12 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
   concatenated values will be distinct.
 
+* The new :class:`~django.contrib.postgres.functions.RandomUUID` database
+  function returns a version 4 UUID. It requires use of PostgreSQL's
+  ``pgcrypto`` extension which can be activated using the new
+  :class:`~django.contrib.postgres.operations.CryptoExtension` migration
+  operation.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

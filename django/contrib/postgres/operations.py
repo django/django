@@ -35,6 +35,12 @@ class CITextExtension(CreateExtension):
         self.name = 'citext'
 
 
+class CryptoExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'pgcrypto'
+
+
 class HStoreExtension(CreateExtension):
 
     def __init__(self):

@@ -171,3 +171,7 @@ class StatTestModel(models.Model):
 
 class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
+
+
+class UUIDTestModel(models.Model):
+    uuid = models.UUIDField(default=None, null=True)

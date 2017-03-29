@@ -67,6 +67,15 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
     Installs the ``citext`` extension.
 
+``CryptoExtension``
+===================
+
+.. class:: CryptoExtension()
+
+    .. versionadded:: 2.0
+
+    Installs the ``pgcrypto`` extension.
+
 ``HStoreExtension``
 ===================
 
