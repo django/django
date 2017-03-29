@@ -19,6 +19,7 @@ from django.forms.widgets import (
 from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
+from django.forms.signals import pre_save, post_save
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
@@ -434,6 +435,8 @@ class BaseModelForm(BaseForm):
         a save_m2m() method to the form which can be called after the instance
         is saved manually at a later time. Return the model instance.
         """
+        pre_save.send(sender=self.__class__, instance=self.instance)
+
         if self.errors:
             raise ValueError(
                 "The %s could not be %s because the data didn't validate." % (
@@ -449,6 +452,8 @@ class BaseModelForm(BaseForm):
             # If not committing, add a method to the form to allow deferred
             # saving of m2m data.
             self.save_m2m = self._save_m2m
+
+        post_save.send(sender=self.__class__, instance=self.instance)
         return self.instance
 
     save.alters_data = True

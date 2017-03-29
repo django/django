@@ -17,6 +17,7 @@ from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
+from django.forms.signals import pre_init, post_init, pre_clean, post_clean
 
 from .renderers import get_default_renderer
 
@@ -75,6 +76,12 @@ class BaseForm:
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, field_order=None, use_required_attribute=None, renderer=None):
+        # Alias self.__class__ as local to avoid repeat global lookups
+        self._cls = self.__class__
+
+        pre_init.send(sender=self._cls, data=data, files=files, initial=initial,
+                      prefix=prefix, label_suffix=label_suffix, empty_permitted=empty_permitted)
+
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -110,6 +117,8 @@ class BaseForm:
                 if isinstance(self.default_renderer, type):
                     renderer = renderer()
         self.renderer = renderer
+
+        post_init.send(sender=self._cls, instance=self)
 
     def order_fields(self, field_order):
         """
@@ -365,6 +374,8 @@ class BaseForm:
         """
         Clean all of self.data and populate self._errors and self.cleaned_data.
         """
+        pre_clean.send(sender=self._cls, data=self.data)
+
         self._errors = ErrorDict()
         if not self.is_bound:  # Stop further processing.
             return
@@ -377,6 +388,8 @@ class BaseForm:
         self._clean_fields()
         self._clean_form()
         self._post_clean()
+
+        post_clean.send(sender=self._cls, cleaned_data=self.cleaned_data)
 
     def _clean_fields(self):
         for name, field in self.fields.items():
