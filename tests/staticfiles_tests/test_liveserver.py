@@ -58,7 +58,7 @@ class StaticLiveServerView(LiveServerBase):
         except HTTPError as e:
             self.assertEqual(e.code, 404)
 
-        with self.settings(WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True):
+        with self.settings(WHITENOISE_USE_FINDERS=True):
             with self.urlopen('/static/test/file.txt') as f:
                 self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')
 
