@@ -35,7 +35,7 @@ class BaseGeometryWidget(Widget):
 
     def deserialize(self, value):
         try:
-            return GEOSGeometry(value, self.map_srid)
+            return GEOSGeometry(value)
         except (GEOSException, ValueError) as err:
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
@@ -48,7 +48,7 @@ class BaseGeometryWidget(Widget):
 
         if value:
             # Check that srid of value and map match
-            if value.srid != self.map_srid:
+            if value.srid and value.srid != self.map_srid:
                 try:
                     ogr = value.ogr
                     ogr.transform(self.map_srid)

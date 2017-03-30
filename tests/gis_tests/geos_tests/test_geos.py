@@ -708,6 +708,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         pnt_wo_srid = Point(1, 1)
         pnt_wo_srid.srid = pnt_wo_srid.srid
 
+        # Input geometries that have an SRID.
+        self.assertEqual(GEOSGeometry(pnt.ewkt, srid=pnt.srid).srid, pnt.srid)
+        self.assertEqual(GEOSGeometry(pnt.ewkb, srid=pnt.srid).srid, pnt.srid)
+        with self.assertRaisesMessage(ValueError, 'Input geometry already has SRID: %d.' % pnt.srid):
+            GEOSGeometry(pnt.ewkt, srid=1)
+        with self.assertRaisesMessage(ValueError, 'Input geometry already has SRID: %d.' % pnt.srid):
+            GEOSGeometry(pnt.ewkb, srid=1)
+
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_custom_srid(self):
         """Test with a null srid and a srid unknown to GDAL."""
