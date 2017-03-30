@@ -3258,6 +3258,178 @@ setting.
 Static file finders are currently considered a private interface, and this
 interface is thus undocumented.
 
+.. setting:: WHITENOISE_ROOT
+
+``WHITENOISE_ROOT``
+-------------------
+
+Default:: ``None``
+
+Absolute path to a directory of files which will be served at the root of
+your application (ignored if not set).
+
+Do not use this for the bulk of your static files because you will not
+benefit from cache versioning, but i can be convenient for files like
+``robot.txt`` or ``favicon.ico`` which you want to serve at a specific URL.
+
+.. setting:: WHITENOISE_AUTOREFRESH
+
+``WHITENOISE_AUTOREFRESH``
+--------------------------
+
+Default: ``settings.DEBUG``
+
+Recheck the filesystem to see if any files have changed before responding.
+This is designed to be used in development where it can be convenient to pick
+up changes to static files without restarting the server. For both
+performance and security reasons, this setting should not be used in
+production.
+
+.. setting:: WHITENOISE_USE_FINDERS
+
+``WHITENOISE_USE_FINDERS``
+--------------------------
+
+Default: ``settings.DEBUG``
+
+Instead of only picking up files collected into STATIC_ROOT, find and
+serve files in their original directories using Django’s "finders" API.
+This is the same behavior as runserver provides by default, and is only
+useful if you don’t want to use the default runserver configuration in
+development.
+
+.. setting:: WHITENOISE_MAX_AGE
+
+``WHITENOISE_MAX_AGE``
+----------------------
+
+Default: ``60 if  not settings.DEBUG else 0``
+
+Time (in seconds) for which browsers and proxies should cache
+``non-versioned`` files.
+
+Versioned files (i.e. files which have been given a unique name like
+``base.a4ef2389.css`` by including a hash of their contents in the name) are
+detected automatically and set to be cached forever.
+
+The default is chosen to be short enough not to cause problems with stale
+versions but long enough that, if you’re running WhiteNoise behind a CDN,
+the CDN will still take the majority of the strain during times of heavy load
+
+
+.. setting:: WHITENOISE_MIMETYPES
+
+``WHITENOISE_MIMETYPES``
+------------------------
+
+Default: ``None``
+
+A dictionary mapping file extensions (lowercase) to the mimetype for that
+extension. For example: ``{'.foo': 'application/x-foo'}``
+
+Note that WhiteNoise ships with its own default set of mimetypes and does
+not use the system-supplied ones(e.g. /etc/mime.types).
+This ensures that it behaves consistently regardless of the environment
+in which it’s run. View the defaults in the `media_types.py <https://github.com/
+evansd/whitenoise/blob/v3.3.0/whitenoise/media_types.py>`_
+file.
+
+In addition to file extensions, mimetypes can be specified by supplying the
+entire filename, for example:
+``{'some-special-file': 'application/x-custom-type'}``
+
+.. setting:: WHITENOISE_CHARSET
+
+``WHITENOISE_CHARSET``
+----------------------
+
+Default: ``settings.FILE_CHARSET`` (UTF-8)
+
+Charset to add as part of the ``Content-Type`` header for all files whose
+mimetype allows a charset.
+
+.. setting:: WHITENOISE_ALLOW_ALL_ORIGINS
+
+``WHITENOISE_ALLOW_ALL_ORIGINS``
+--------------------------------
+
+Default: ``True``
+
+Toggles whether to send an ``Access-Control-Allow-Origin: *`` header for all
+static files.
+
+This allows cross-origin requests for static files which means your static
+files will continue to work as expected even if they are served via a CDN
+and therefore on a different domain. Without this your static files will
+mostly work, but you may have problems with fonts loading in Firefox, or
+accessing images in canvas elements, or other mysterious things.
+
+The W3C `explicitly state <https://www.w3.org/TR/cors/#security>`_
+that this behavior is safe for publicly accessible files.
+
+.. setting:: WHITENOISE_SKIP_COMPRESS_EXTENSIONS
+
+``WHITENOISE_SKIP_COMPRESS_EXTENSIONS``
+---------------------------------------
+
+Default: ``('jpg', 'jpeg', 'png', 'gif', 'webp','zip', 'gz', 'tgz', 'bz2',
+'tbz', 'swf', 'flv', 'woff')``
+
+File extensions to skip when compressing.
+
+Because the compression process will only create compressed files where this
+results in an actual size saving, it would be safe to leave this list empty
+and attempt to compress all files. However, for files which we’re confident
+won’t benefit from compression, it speeds up the process if we just skip
+over them.
+
+.. setting:: WHITENOISE_ADD_HEADERS_FUNCTION
+
+``WHITENOISE_ADD_HEADERS_FUNCTION``
+-----------------------------------
+
+Default: ``None``
+
+Reference to a function which is passed the headers object for each static
+file, allowing it to modify them.
+
+For example::
+
+    def force_download_pdfs(headers, path, url):
+        if path.endswith('.pdf'):
+            headers['Content-Disposition'] = 'attachment'
+
+    WHITENOISE_ADD_HEADERS_FUNCTION = force_download_pdfs
+
+This function is passed:
+
+``headers`` - `A wsgiref.headers <https://docs.python.org/3/library/wsgiref
+.html#module-wsgiref.headers>`_ instance (which you can treat just as a dict)
+containing the headers for the current file
+
+``path`` - The absolute path to the local file
+
+``url`` - The host-relative URL of the file e.g. ``/static/styles/app.css``
+
+The function should not return anything; changes should be made by modifying
+the headers dictionary directly.
+
+.. setting:: WHITENOISE_STATIC_PREFIX
+
+``WHITENOISE_STATIC_PREFIX``
+----------------------------
+
+Default: Path component of ``settings.STATIC_URL``
+
+The URL prefix under which static files will be served.
+
+Usually this can be determined automatically by using the path component of
+``STATIC_URL``. So if ``STATIC_URL`` is ``https://example.com/static/`` then
+``WHITENOISE_STATIC_PREFIX`` will be ``/static/``. However there are cases
+where it is useful to set these independently, for instance if the
+application is not running at the root of the domain or if your CDN is doing
+path rewriting.
+
 Core Settings Topical Index
 ===========================
 
