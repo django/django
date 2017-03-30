@@ -3,17 +3,17 @@ import warnings
 from urllib.parse import urlparse
 from urllib.request import url2pathname
 
+from whitenoise.base import WhiteNoise
+from whitenoise.utils import (
+    IsDirectoryError, decode_if_byte_string, ensure_leading_trailing_slash,
+)
+
 from django.conf import settings
 from django.contrib.staticfiles import finders, utils
 from django.contrib.staticfiles.views import serve
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.utils.deprecation import RemovedInDjango30Warning
-
-from whitenoise.base import WhiteNoise
-from whitenoise.utils import (
-    IsDirectoryError, decode_if_byte_string, ensure_leading_trailing_slash,
-)
 
 try:
     from django.contrib.staticfiles.storage import staticfiles_storage
@@ -179,4 +179,3 @@ class DjangoWhiteNoise(WhiteNoise):
             return decode_if_byte_string(staticfiles_storage.url(name))
         except ValueError:
             return None
-
