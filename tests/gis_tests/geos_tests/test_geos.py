@@ -143,7 +143,21 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 # Loading jsons to prevent decimal differences
                 self.assertEqual(json.loads(g.json), json.loads(geom.json))
                 self.assertEqual(json.loads(g.json), json.loads(geom.geojson))
-            self.assertEqual(GEOSGeometry(g.wkt), GEOSGeometry(geom.json))
+            self.assertEqual(GEOSGeometry(g.wkt, 4326), GEOSGeometry(geom.json))
+
+    @skipUnless(HAS_GDAL, "GDAL is required.")
+    def test_json_srid(self):
+        geojson_data = {
+            "type": "Point",
+            "coordinates": [2, 49],
+            "crs": {
+                "type": "name",
+                "properties": {
+                    "name": "urn:ogc:def:crs:EPSG::4322"
+                }
+            }
+        }
+        self.assertEqual(GEOSGeometry(json.dumps(geojson_data)), Point(2, 49, srid=4322))
 
     def test_fromfile(self):
         "Testing the fromfile() factory."

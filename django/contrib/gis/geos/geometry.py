@@ -61,7 +61,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
                 g = wkb_r().read(force_bytes(geo_input))
             elif json_regex.match(geo_input):
                 # Handling GeoJSON input.
-                g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
+                ogr = gdal.OGRGeometry.from_json(geo_input)
+                g = ogr._geos_ptr()
+                input_srid = ogr.srid
             else:
                 raise ValueError('String input unrecognized as WKT EWKT, and HEXEWKB.')
         elif isinstance(geo_input, GEOM_PTR):

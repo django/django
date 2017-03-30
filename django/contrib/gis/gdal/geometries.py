@@ -48,6 +48,7 @@ from django.contrib.gis.gdal.error import (
     GDALException, OGRIndexError, SRSException,
 )
 from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
@@ -87,7 +88,7 @@ class OGRGeometry(GDALBase):
                 else:
                     g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt').encode())), None, byref(c_void_p()))
             elif json_m:
-                g = capi.from_json(geom_input.encode())
+                g = self._from_json(geom_input.encode())
             else:
                 # Seeing if the input is a valid short-hand string
                 # (e.g., 'Point', 'POLYGON').
@@ -139,12 +140,30 @@ class OGRGeometry(GDALBase):
     def _from_wkb(cls, geom_input):
         return capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
 
+    @staticmethod
+    def _from_json(geom_input):
+        ptr = capi.from_json(geom_input)
+        if GDAL_VERSION < (2, 0):
+            has_srs = True
+            try:
+                capi.get_geom_srs(ptr)
+            except SRSException:
+                has_srs = False
+            if not has_srs:
+                srs = SpatialReference(4326)
+                capi.assign_srs(ptr, srs.ptr)
+        return ptr
+
     @classmethod
     def from_bbox(cls, bbox):
         "Construct a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
             x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+
+    @staticmethod
+    def from_json(geom_input):
+        return OGRGeometry(OGRGeometry._from_json(force_bytes(geom_input)))
 
     @classmethod
     def from_gml(cls, gml_string):

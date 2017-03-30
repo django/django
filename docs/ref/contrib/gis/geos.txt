@@ -224,8 +224,17 @@ Format                   Input Type
 WKT / EWKT               ``str``
 HEX / HEXEWKB            ``str``
 WKB / EWKB               ``buffer``
-GeoJSON                  ``str``
+GeoJSON_                 ``str``
 =======================  ==========
+
+For the GeoJSON format, the SRID is set based on the ``crs`` member. If ``crs``
+isn't provided, the SRID defaults to 4326.
+
+.. versionchanged:: 2.0
+
+    In older versions, SRID isn't set for geometries initialized from GeoJSON.
+
+.. _GeoJSON: https://tools.ietf.org/html/rfc7946
 
 .. classmethod:: GEOSGeometry.from_gml(gml_string)
 

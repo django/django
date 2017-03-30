@@ -71,6 +71,9 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.LineLocatePoint`
   function, supported on PostGIS and SpatiaLite.
 
+* Any :class:`~django.contrib.gis.geos.GEOSGeometry` imported from GeoJSON now
+  has its SRID set.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
