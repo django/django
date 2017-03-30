@@ -12,7 +12,7 @@ from django.urls import reverse
 from .admin import SubscriberAdmin
 from .forms import MediaActionForm
 from .models import (
-    Actor, Answer, ExternalSubscriber, Question, Subscriber,
+    Actor, Answer, Book, ExternalSubscriber, Question, Subscriber,
     UnchangeableObject,
 )
 
@@ -152,6 +152,18 @@ class AdminActionsTest(TestCase):
         # SubscriberAdmin.delete_queryset() sets overridden to True.
         self.assertIs(SubscriberAdmin.overridden, True)
         self.assertEqual(Subscriber.objects.all().count(), 0)
+
+    def test_delete_selected_uses_get_deleted_objects(self):
+        """The delete_selected action uses ModelAdmin.get_deleted_objects()."""
+        book = Book.objects.create(name='Test Book')
+        data = {
+            ACTION_CHECKBOX_NAME: [book.pk],
+            'action': 'delete_selected',
+            'index': 0,
+        }
+        response = self.client.post(reverse('admin2:admin_views_book_changelist'), data)
+        # BookAdmin.get_deleted_objects() returns custom text.
+        self.assertContains(response, 'a deletable object')
 
     def test_custom_function_mail_action(self):
         """A custom action may be defined in a function."""

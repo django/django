@@ -1998,6 +1998,36 @@ templates used by the :class:`ModelAdmin` views:
         def get_changeform_initial_data(self, request):
             return {'name': 'custom_initial_value'}
 
+.. method:: ModelAdmin.get_deleted_objects(objs, request)
+
+    .. versionadded:: 2.1
+
+    A hook for customizing the deletion process of the :meth:`delete_view` and
+    the "delete selected" :doc:`action <actions>`.
+
+    The ``objs`` argument is a homogeneous iterable of objects (a ``QuerySet``
+    or a list of model instances) to be deleted, and ``request`` is the
+    :class:`~django.http.HttpRequest`.
+
+    This method must return a 4-tuple of
+    ``(deleted_objects, model_count, perms_needed, protected)``.
+
+    ``deleted_objects`` is a list of strings representing all the objects that
+    will be deleted. If there are any related objects to be deleted, the list
+    is nested and includes those related objects. The list is formatted in the
+    template using the :tfilter:`unordered_list` filter.
+
+    ``model_count`` is a dictionary mapping each model's
+    :attr:`~django.db.models.Options.verbose_name_plural` to the number of
+    objects that will be deleted.
+
+    ``perms_needed`` is a set of :attr:`~django.db.models.Options.verbose_name`\s
+    of the models that the user doesn't have permission to delete.
+
+    ``protected`` is a list of strings representing of all the protected
+    related objects that can't be deleted. The list is displayed in the
+    template.
+
 Other methods
 ~~~~~~~~~~~~~
 

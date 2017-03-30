@@ -50,6 +50,9 @@ Minor features
 * The ``admin_order_field`` attribute for elements in
   :attr:`.ModelAdmin.list_display` may now be a query expression.
 
+* The new :meth:`.ModelAdmin.get_deleted_objects()` method allows customizing
+  the deletion process of the delete view and the "delete selected" action.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

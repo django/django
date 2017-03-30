@@ -4,7 +4,7 @@ Built-in, globally-available admin actions.
 
 from django.contrib import messages
 from django.contrib.admin import helpers
-from django.contrib.admin.utils import get_deleted_objects, model_ngettext
+from django.contrib.admin.utils import model_ngettext
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext as _, gettext_lazy
@@ -29,9 +29,7 @@ def delete_selected(modeladmin, request, queryset):
 
     # Populate deletable_objects, a data structure of all related objects that
     # will also be deleted.
-    deletable_objects, model_count, perms_needed, protected = get_deleted_objects(
-        queryset, request.user, modeladmin.admin_site,
-    )
+    deletable_objects, model_count, perms_needed, protected = modeladmin.get_deleted_objects(queryset, request)
 
     # The user has already confirmed the deletion.
     # Do the deletion and return None to display the change list view again.
