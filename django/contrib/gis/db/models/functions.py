@@ -301,7 +301,7 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
                 # DistanceSpheroid is more accurate and resource intensive than DistanceSphere
                 function = connection.ops.spatial_function_name('DistanceSpheroid')
                 # Replace boolean param by the real spheroid of the base field
-                self.source_expressions[2] = Value(geo_field._spheroid)
+                self.source_expressions[2] = Value(geo_field.spheroid(connection))
             else:
                 function = connection.ops.spatial_function_name('DistanceSphere')
         return super().as_sql(compiler, connection, function=function)
@@ -380,7 +380,7 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
         elif geo_field.geodetic(connection):
             # Geometry fields with geodetic (lon/lat) coordinates need length_spheroid
             function = connection.ops.spatial_function_name('LengthSpheroid')
-            self.source_expressions.append(Value(geo_field._spheroid))
+            self.source_expressions.append(Value(geo_field.spheroid(connection)))
         else:
             dim = min(f.dim for f in self.get_source_fields() if f)
             if dim > 2:

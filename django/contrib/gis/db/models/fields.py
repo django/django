@@ -115,26 +115,14 @@ class BaseSpatialField(Field):
     def db_type(self, connection):
         return connection.ops.geo_db_type(self)
 
-    # The following functions are used to get the units, their name, and
-    # the spheroid corresponding to the SRID of the BaseSpatialField.
-    def _get_srid_info(self, connection):
-        # Get attributes from `get_srid_info`.
-        self._units, self._units_name, self._spheroid = get_srid_info(self.srid, connection)
-
     def spheroid(self, connection):
-        if not hasattr(self, '_spheroid'):
-            self._get_srid_info(connection)
-        return self._spheroid
+        return get_srid_info(self.srid, connection)[2]
 
     def units(self, connection):
-        if not hasattr(self, '_units'):
-            self._get_srid_info(connection)
-        return self._units
+        return get_srid_info(self.srid, connection)[0]
 
     def units_name(self, connection):
-        if not hasattr(self, '_units_name'):
-            self._get_srid_info(connection)
-        return self._units_name
+        return get_srid_info(self.srid, connection)[1]
 
     def geodetic(self, connection):
         """

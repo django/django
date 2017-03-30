@@ -96,7 +96,7 @@ class PostGISDistanceOperator(PostGISOperator):
                 sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s) %(op)s %(value)s'
                 # Using DistanceSpheroid requires the spheroid of the field as
                 # a parameter.
-                sql_params.insert(1, lookup.lhs.output_field._spheroid)
+                sql_params.insert(1, lookup.lhs.output_field.spheroid(connection))
             else:
                 template_params.update({'op': self.op, 'func': connection.ops.spatial_function_name('DistanceSphere')})
             return sql_template % template_params, sql_params
