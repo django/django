@@ -8,7 +8,7 @@ import os
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from django.contrib.staticfiles.django import DjangoWhiteNoise
+from django.contrib.staticfiles.handlers import DjangoWhiteNoise
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase, modify_settings, override_settings
 

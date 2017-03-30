@@ -1,4 +1,4 @@
-from django.contrib.staticfiles.django import DjangoWhiteNoise
+from django.contrib.staticfiles.handlers import DjangoWhiteNoise
 from django.http import FileResponse
 
 
