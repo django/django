@@ -452,7 +452,7 @@ Arguments sent with this signal:
 .. data:: django.forms.signals.pre_save
    :module:
 
-This is sent at the beginning of a model's :meth:`~django.forms.models.ModelForm.save`
+This is sent at the beginning of a ModelForm's :meth:`~django.forms.models.ModelForm.save`
 method.
 
 Arguments sent with this signal:
