@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 _srid_cache = defaultdict(dict)
 
 
-SRIDCacheEntry = namedtuple('SRIDCacheEntry', ['units', 'units_name', 'spheroid'])
+SRIDCacheEntry = namedtuple('SRIDCacheEntry', ['units', 'units_name', 'spheroid', 'geodetic'])
 
 
 def get_srid_info(srid, connection):
@@ -45,6 +45,7 @@ def get_srid_info(srid, connection):
             units=units,
             units_name=units_name,
             spheroid='SPHEROID["%s",%s,%s]' % (srs['spheroid'], srs.semi_major, srs.inverse_flattening),
+            geodetic=srs.geographic,
         )
 
     return _srid_cache[alias][srid]
@@ -77,8 +78,6 @@ class BaseSpatialField(Field):
     """
     description = _("The base GIS field.")
     empty_strings_allowed = False
-    # Geodetic units.
-    geodetic_units = ('decimal degree', 'degree')
 
     def __init__(self, verbose_name=None, srid=4326, spatial_index=True, **kwargs):
         """
@@ -134,8 +133,7 @@ class BaseSpatialField(Field):
         Return true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        units_name = self.units_name(connection)
-        return units_name.lower() in self.geodetic_units if units_name else self.srid == 4326
+        return get_srid_info(self.srid, connection).geodetic
 
     def get_placeholder(self, value, compiler, connection):
         """
