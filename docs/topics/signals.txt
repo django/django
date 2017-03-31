@@ -32,6 +32,18 @@ notifications:
 
   Sent when a :class:`~django.db.models.ManyToManyField` on a model is changed.
 
+* :data:`django.forms.signals.pre_clean` &
+  :data:`django.forms.signals.post_clean`
+
+  Sent before or after a form's :meth:`~django.forms.forms.BaseForm.full_clean` method
+  is called.
+
+* :data:`django.forms.signals.pre_save` &
+  :data:`django.forms.signals.post_save`
+
+  Sent before or after a ModelForm's :meth:`~django.db.models.Model.save` method
+  is called.
+
 * :data:`django.core.signals.request_started` &
   :data:`django.core.signals.request_finished`
 

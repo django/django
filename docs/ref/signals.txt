@@ -365,6 +365,121 @@ Arguments that are sent with this signal:
 ``sender``
     The model class which was just prepared.
 
+Form signals
+=============
+
+.. module:: django.forms.signals
+   :synopsis: Signals sent by the form system.
+
+The :mod:`django.forms.signals` module defines a set of signals sent by the
+form system.
+
+``pre_init``
+------------
+
+.. attribute:: django.forms.signals.pre_init
+   :module:
+
+.. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
+
+Whenever you instantiate a Django form, this signal is sent at the beginning
+of the form's ``__init__()`` method.
+
+Arguments sent with this signal:
+
+``sender``
+    The form class that just had an instance created.
+
+``data``
+    A dictionary represents data binded to the form.
+
+``initial``
+    A dictionary represents the initial value of form fields.
+
+``post_init``
+-------------
+
+.. data:: django.forms.signals.post_init
+   :module:
+
+Like pre_init, but this one is sent when the ``__init__()`` method finishes.
+
+Arguments sent with this signal:
+
+``sender``
+    As above: the form class that just had an instance created.
+
+``instance``
+    The actual instance of the form that's just been created.
+
+``pre_clean``
+--------------
+
+.. data:: django.forms.signals.pre_clean
+   :module:
+
+This is sent at the beginning of a form's :meth:`~django.forms.forms.BaseForm.full_clean`
+method.
+
+Arguments sent with this signal:
+
+``sender``
+    The form class.
+
+``data``
+    A dictionary represents the form data:
+
+``post_clean``
+---------------
+
+.. data:: django.forms.signals.post_clean
+   :module:
+
+Like :data:`pre_clean`, but sent at the end of the
+:meth:`~django.forms.forms.BaseForm.full_clean` method.
+
+Arguments sent with this signal:
+
+``sender``
+    The form class.
+
+``cleaned_data``
+    The form data survived after being cleaned.
+
+``pre_save``
+------------
+
+.. data:: django.forms.signals.pre_save
+   :module:
+
+This is sent at the beginning of a model's :meth:`~django.forms.models.ModelForm.save`
+method.
+
+Arguments sent with this signal:
+
+``sender``
+    The form class.
+
+``instance``
+    The actual instance being saved.
+
+``post_save``
+-------------
+
+.. data:: django.forms.signals.post_save
+   :module:
+
+Like :data:`pre_save`, but sent at the end of the
+:meth:`~django.forms.models.ModelForm.save` method.
+
+Arguments sent with this signal:
+
+``sender``
+    The form class.
+
+``instance``
+    The actual instance being saved.
+
 Management signals
 ==================
 
