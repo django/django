@@ -196,15 +196,12 @@ class StrIndex(Func):
     function = 'INSTR'
     arity = 2
 
-    def __init__(self, expression, substring, **extra):
+    def __init__(self, string, substring, **extra):
         """
-        expression: the name of a field, or an expression returning a string
-        substring: a string to find inside expression
+        string: the name of a field, or an expression returning a string
+        substring: the name of a field, or an expression returning a string
         """
-        if not hasattr(substring, 'resolve_expression'):
-            substring = Value(substring)
-        expressions = [expression, substring]
-        super().__init__(*expressions, output_field=fields.IntegerField(), **extra)
+        super().__init__(string, substring, output_field=fields.IntegerField(), **extra)
 
     def as_postgresql(self, compiler, connection):
         return super().as_sql(compiler, connection, function='STRPOS')

@@ -1,3 +1,4 @@
+from django.db.models import Value
 from django.db.models.functions import StrIndex
 from django.test import TestCase
 from django.utils import timezone
@@ -10,13 +11,13 @@ class StrIndexTests(TestCase):
         Author.objects.create(name='George. R. R. Martin')
         Author.objects.create(name='J. R. R. Tolkien')
         Author.objects.create(name='Terry Pratchett')
-        authors = Author.objects.annotate(fullstop=StrIndex('name', 'R.'))
+        authors = Author.objects.annotate(fullstop=StrIndex('name', Value('R.')))
         self.assertQuerysetEqual(authors.order_by('name'), [9, 4, 0], lambda a: a.fullstop)
 
     def test_annotate_textfield(self):
         Article.objects.create(
             title='How to Django',
-            text='Lorem ipsum dolor sit amet.',
+            text='This is about How to Django.',
             written=timezone.now(),
         )
         Article.objects.create(
@@ -24,15 +25,15 @@ class StrIndexTests(TestCase):
             text="Won't find anything here.",
             written=timezone.now(),
         )
-        articles = Article.objects.annotate(ipsum_index=StrIndex('text', 'ipsum'))
-        self.assertQuerysetEqual(articles.order_by('title'), [7, 0], lambda a: a.ipsum_index)
+        articles = Article.objects.annotate(title_pos=StrIndex('text', 'title'))
+        self.assertQuerysetEqual(articles.order_by('title'), [15, 0], lambda a: a.title_pos)
 
     def test_order_by(self):
         Author.objects.create(name='Terry Pratchett')
         Author.objects.create(name='J. R. R. Tolkien')
         Author.objects.create(name='George. R. R. Martin')
         self.assertQuerysetEqual(
-            Author.objects.order_by(StrIndex('name', 'R.').asc()), [
+            Author.objects.order_by(StrIndex('name', Value('R.')).asc()), [
                 'Terry Pratchett',
                 'J. R. R. Tolkien',
                 'George. R. R. Martin',
@@ -40,7 +41,7 @@ class StrIndexTests(TestCase):
             lambda a: a.name
         )
         self.assertQuerysetEqual(
-            Author.objects.order_by(StrIndex('name', 'R.').desc()), [
+            Author.objects.order_by(StrIndex('name', Value('R.')).desc()), [
                 'George. R. R. Martin',
                 'J. R. R. Tolkien',
                 'Terry Pratchett',
@@ -52,14 +53,14 @@ class StrIndexTests(TestCase):
         Author.objects.create(name='ツリー')
         Author.objects.create(name='皇帝')
         Author.objects.create(name='皇帝 ツリー')
-        authors = Author.objects.annotate(sb=StrIndex('name', 'リ'))
+        authors = Author.objects.annotate(sb=StrIndex('name', Value('リ')))
         self.assertQuerysetEqual(authors.order_by('name'), [2, 0, 5], lambda a: a.sb)
 
     def test_filtering(self):
         Author.objects.create(name='George. R. R. Martin')
         Author.objects.create(name='Terry Pratchett')
         self.assertQuerysetEqual(
-            Author.objects.annotate(middle_name=StrIndex('name', 'R.')).filter(middle_name__gt=0),
+            Author.objects.annotate(middle_name=StrIndex('name', Value('R.'))).filter(middle_name__gt=0),
             ['George. R. R. Martin'],
             lambda a: a.name
         )
