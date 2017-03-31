@@ -11,3 +11,6 @@ Bugfixes
 
 * Made admin's ``RelatedFieldWidgetWrapper`` use the wrapped widget's
   ``value_omitted_from_data()`` method (:ticket:`27905`).
+
+* Fixed model form ``default`` fallback for ``SelectMultiple``
+  (:ticket:`27993`).
