@@ -119,14 +119,56 @@ class TestWhitenoiseMiddleware(TestCase):
     @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
     def test_collectstatic_emulation(self):
         """
-        WHITENOISE_USE_FINDERS=True ignored in WhiteNoiseMiddleware
+        WhiteNoiseMiddleware and WHITENOISE_USE_FINDERS=False, WHITENOISE_AUTOREFRESH=False disallow it
+        to discover app's static assets without having to collectstatic first.
         """
-        response = self.client.get('/static/test/testfile.txt')
+        response = self.client.get('/static/test/file.txt')
         self.assertEqual(response.status_code, 404)
 
-        with self.settings(WHITENOISE_USE_FINDERS=True):
-            response = self.client.get('/static/test/testfile.txt')
-            self.assertEqual(response.status_code, 404)
+    def test_get_file(self):
+        """
+        WhiteNoiseMiddleware serves static files in STATIC_ROOT.
+        """
+        response = self.client.get('/static/testfile.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'Test!')
+
+    def test_unversioned_file_not_cached_forever(self):
+        response = self.client.get('/static/styles.css')
+        self.assertEqual(response['Cache-Control'], 'max-age={}, public'.format(DjangoWhiteNoise.max_age))
+
+    def test_no_content_type_when_not_modified(self):
+        last_mod = 'Fri, 11 Apr 2100 11:47:06 GMT'
+        response = self.client.get('/static/styles.css', HTTP_IF_MODIFIED_SINCE=last_mod)
+        self.assertEqual(response.status_code, 304)
+        self.assertRaises(KeyError, response.__getitem__, 'Content-Type')
+
+    def test_get_nonascii_file(self):
+        response = self.client.get('/static/nonascii%E2%9C%93.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'hi')
+
+
+@override_settings(MIDDLEWARE=['django.contrib.staticfiles.middleware.WhiteNoiseMiddleware'])
+@override_settings(**TEST_SETTINGS_USE_FINDERS)
+class TestWhitenoiseMiddlewareUseFinders(TestCase):
+
+    # The test is going to access a static file stored in this application.
+    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
+    def test_collectstatic_emulation(self):
+        """
+        WhiteNoiseMiddleware and WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True allow it
+        to discover app's static assets without having to collectstatic first.
+        """
+        response = self.client.get('/static/test/file.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'In static directory.')
 
     def test_get_file(self):
         """
