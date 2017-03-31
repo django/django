@@ -1,6 +1,6 @@
 from django.dispatch import Signal
 
-pre_init = Signal(providing_args=["data", "files", "initial", "prefix", "label_suffix", "empty_permitted"])
+pre_init = Signal(providing_args=["data", "initial"])
 post_init = Signal(providing_args=["instance"])
 
 pre_clean = Signal(providing_args=["data"])

@@ -79,8 +79,7 @@ class BaseForm:
         # Alias self.__class__ as local to avoid repeat global lookups
         self._cls = self.__class__
 
-        pre_init.send(sender=self._cls, data=data, files=files, initial=initial,
-                      prefix=prefix, label_suffix=label_suffix, empty_permitted=empty_permitted)
+        pre_init.send(sender=self._cls, data=data, initial=initial)
 
         self.is_bound = data is not None or files is not None
         self.data = data or {}
