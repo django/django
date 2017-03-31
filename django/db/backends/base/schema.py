@@ -578,6 +578,8 @@ class BaseDatabaseSchemaEditor:
         old_default = self.effective_default(old_field)
         new_default = self.effective_default(new_field)
         needs_database_default = (
+            old_field.null and
+            not new_field.null and
             old_default != new_default and
             new_default is not None and
             not self.skip_default(new_field)
