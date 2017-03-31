@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
@@ -13,6 +13,9 @@ from django.utils.translation import gettext_lazy as _
 # spatial database alias. This cache exists so that the database isn't queried
 # for SRID info each time a distance query is constructed.
 _srid_cache = defaultdict(dict)
+
+
+SRIDCacheEntry = namedtuple('SRIDCacheEntry', ['units', 'units_name', 'spheroid'])
 
 
 def get_srid_info(srid, connection):
@@ -38,9 +41,11 @@ def get_srid_info(srid, connection):
     if srid not in _srid_cache[alias]:
         srs = get_srs(srid)
         units, units_name = srs.units
-        sphere_name = srs['spheroid']
-        spheroid = 'SPHEROID["%s",%s,%s]' % (sphere_name, srs.semi_major, srs.inverse_flattening)
-        _srid_cache[alias][srid] = (units, units_name, spheroid)
+        _srid_cache[alias][srid] = SRIDCacheEntry(
+            units=units,
+            units_name=units_name,
+            spheroid='SPHEROID["%s",%s,%s]' % (srs['spheroid'], srs.semi_major, srs.inverse_flattening),
+        )
 
     return _srid_cache[alias][srid]
 
@@ -116,13 +121,13 @@ class BaseSpatialField(Field):
         return connection.ops.geo_db_type(self)
 
     def spheroid(self, connection):
-        return get_srid_info(self.srid, connection)[2]
+        return get_srid_info(self.srid, connection).spheroid
 
     def units(self, connection):
-        return get_srid_info(self.srid, connection)[0]
+        return get_srid_info(self.srid, connection).units
 
     def units_name(self, connection):
-        return get_srid_info(self.srid, connection)[1]
+        return get_srid_info(self.srid, connection).units_name
 
     def geodetic(self, connection):
         """
