@@ -1,8 +1,9 @@
 import os
 
+from django.core.exceptions import ImproperlyConfigured
 from django.template import Context
 from django.template.engine import Engine
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 from .utils import ROOT, TEMPLATE_DIR
 
@@ -19,6 +20,35 @@ class RenderToStringTest(SimpleTestCase):
             self.engine.render_to_string('test_context.html', {'obj': 'test'}),
             'obj:test\n',
         )
+
+
+class GetDefaultTests(SimpleTestCase):
+
+    @override_settings(TEMPLATES=[])
+    def test_no_engines_configured(self):
+        msg = 'No DjangoTemplates backend is configured.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            Engine.get_default()
+
+    @override_settings(TEMPLATES=[{
+        'NAME': 'default',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {'file_charset': 'abc'},
+    }])
+    def test_single_engine_configured(self):
+        self.assertEqual(Engine.get_default().file_charset, 'abc')
+
+    @override_settings(TEMPLATES=[{
+        'NAME': 'default',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    }, {
+        'NAME': 'other',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    }])
+    def test_multiple_engines_configured(self):
+        msg = 'Several DjangoTemplates backends are configured. You must select one explicitly.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            Engine.get_default()
 
 
 class LoaderTests(SimpleTestCase):
