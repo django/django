@@ -671,6 +671,9 @@ Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
 of a ``ForeignKey``, for example).
 
+To add migrations to an app that doesn't have a ``migrations`` directory, run
+``makemigrations`` with the app's ``app_label``.
+
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts. If a suppressed prompt cannot be resolved
