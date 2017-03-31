@@ -341,7 +341,7 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`equals`                   X          X         X            X          C
 :lookup:`exact`                    X          X         X            X          B
 :lookup:`intersects`               X          X         X            X          B
-:lookup:`isvalid`                  X          X                      X (LWGEOM)
+:lookup:`isvalid`                  X          X         X (≥ 5.7.5)  X (LWGEOM)
 :lookup:`overlaps`                 X          X         X            X          B
 :lookup:`relate`                   X          X                      X          C
 :lookup:`same_as`                  X          X         X            X          B
@@ -372,7 +372,7 @@ functions are available on each spatial backend.
 Function                              PostGIS  Oracle          MySQL        SpatiaLite
 ====================================  =======  ==============  ===========  ==========
 :class:`Area`                         X        X               X            X
-:class:`AsGeoJSON`                    X                                     X
+:class:`AsGeoJSON`                    X                        X (≥ 5.7.5)  X
 :class:`AsGML`                        X        X                            X
 :class:`AsKML`                        X                                     X
 :class:`AsSVG`                        X                                     X
@@ -382,9 +382,9 @@ Function                              PostGIS  Oracle          MySQL        Spat
 :class:`Distance`                     X        X               X (≥ 5.6.1)  X
 :class:`Envelope`                     X                        X            X
 :class:`ForceRHR`                     X
-:class:`GeoHash`                      X                                     X (LWGEOM)
+:class:`GeoHash`                      X                        X (≥ 5.7.5)  X (LWGEOM)
 :class:`Intersection`                 X        X               X (≥ 5.6.1)  X
-:class:`IsValid`                      X        X                            X (LWGEOM)
+:class:`IsValid`                      X        X               X (≥ 5.7.5)  X (LWGEOM)
 :class:`Length`                       X        X               X            X
 :class:`MakeValid`                    X                                     X (LWGEOM)
 :class:`MemSize`                      X

@@ -56,8 +56,8 @@ geographic SRSes.
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__,
-SpatiaLite
+*Availability*: MySQL (≥ 5.7.5), `PostGIS
+<https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
 <http://geojson.org/>`_ representation of the geometry. Note that the result is
@@ -77,12 +77,16 @@ Keyword Argument       Description
 
 ``crs``                Set this to ``True`` if you want the coordinate
                        reference system to be included in the returned
-                       GeoJSON.
+                       GeoJSON. Ignored on MySQL.
 
 ``precision``          It may be used to specify the number of significant
                        digits for the coordinates in the GeoJSON
                        representation -- the default value is 8.
 =====================  =====================================================
+
+.. versionchanged:: 2.0
+
+    MySQL support was added.
 
 ``AsGML``
 =========
@@ -286,14 +290,18 @@ right-hand rule.
 
 .. class:: GeoHash(expression, precision=None, **extra)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__,
-SpatiaLite (LWGEOM)
+*Availability*: MySQL (≥ 5.7.5), `PostGIS
+<https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite (LWGEOM)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
 
 The ``precision`` keyword argument controls the number of characters in the
 result.
+
+.. versionchanged:: 2.0
+
+    MySQL support was added.
 
 __ https://en.wikipedia.org/wiki/Geohash
 
@@ -313,8 +321,8 @@ intersection between them.
 
 .. class:: IsValid(expr)
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
-Oracle, SpatiaLite (LWGEOM)
+*Availability*: MySQL (≥ 5.7.5), `PostGIS
+<https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite (LWGEOM)
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
@@ -322,6 +330,10 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 .. versionchanged:: 1.11
 
     SpatiaLite and Oracle support was added.
+
+.. versionchanged:: 2.0
+
+    MySQL support was added.
 
 ``Length``
 ==========

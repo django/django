@@ -11,7 +11,9 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
+from ..utils import (
+    mysql, no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite,
+)
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
@@ -302,9 +304,10 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
         qs = State.objects.all()
-        if oracle:
+        if oracle or mysql:
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
+            # It's invalid on MySQL too.
             qs = qs.exclude(name='Kansas')
             self.assertEqual(State.objects.filter(name='Kansas', poly__isvalid=False).count(), 1)
         self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)

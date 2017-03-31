@@ -1,3 +1,4 @@
+import json
 import re
 from decimal import Decimal
 
@@ -44,6 +45,12 @@ class GISFunctionsTests(TestCase):
             '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
             '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
         )
+        # MySQL ignores the crs option.
+        if mysql:
+            houston_json = json.loads(houston_json)
+            del houston_json['crs']
+            chicago_json = json.loads(chicago_json)
+            del chicago_json['crs']
 
         # Precision argument should only be an integer
         with self.assertRaises(TypeError):
@@ -61,8 +68,8 @@ class GISFunctionsTests(TestCase):
         # WHERE "geoapp_city"."name" = 'Houston';
         # This time we want to include the CRS by using the `crs` keyword.
         self.assertJSONEqual(
+            City.objects.annotate(json=functions.AsGeoJSON('point', crs=True)).get(name='Houston').json,
             houston_json,
-            City.objects.annotate(json=functions.AsGeoJSON('point', crs=True)).get(name='Houston').json
         )
 
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city"
@@ -79,10 +86,10 @@ class GISFunctionsTests(TestCase):
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
         self.assertJSONEqual(
-            chicago_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
-            ).get(name='Chicago').geojson
+            ).get(name='Chicago').geojson,
+            chicago_json,
         )
 
     @skipUnlessDBFeature("has_AsGML_function")
@@ -224,7 +231,7 @@ class GISFunctionsTests(TestCase):
         ref_hash = '9vk1mfq8jx0c8e0386z6'
         h1 = City.objects.annotate(geohash=functions.GeoHash('point')).get(name='Houston')
         h2 = City.objects.annotate(geohash=functions.GeoHash('point', precision=5)).get(name='Houston')
-        self.assertEqual(ref_hash, h1.geohash)
+        self.assertEqual(ref_hash, h1.geohash[:len(ref_hash)])
         self.assertEqual(ref_hash[:5], h2.geohash)
 
     @skipUnlessDBFeature("has_Intersection_function")

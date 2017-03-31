@@ -330,6 +330,13 @@ class GeoHash(GeoFunc):
             expressions.append(self._handle_param(precision, 'precision', int))
         super().__init__(*expressions, **extra)
 
+    def as_mysql(self, compiler, connection):
+        clone = self.copy()
+        # If no precision is provided, set it to the maximum.
+        if len(clone.source_expressions) < 2:
+            clone.source_expressions.append(Value(100))
+        return clone.as_sql(compiler, connection)
+
 
 class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 2

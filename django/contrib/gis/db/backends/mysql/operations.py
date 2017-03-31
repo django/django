@@ -72,11 +72,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def unsupported_functions(self):
         unsupported = {
-            'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
-            'ForceRHR', 'GeoHash', 'IsValid', 'MakeValid', 'MemSize',
-            'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
-            'Transform', 'Translate',
+            'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle', 'ForceRHR',
+            'MakeValid', 'MemSize', 'Perimeter', 'PointOnSurface', 'Reverse',
+            'Scale', 'SnapToGrid', 'Transform', 'Translate',
         }
+        if self.connection.mysql_version < (5, 7, 5):
+            unsupported.update({'AsGeoJSON', 'GeoHash', 'IsValid'})
         if self.is_mysql_5_5:
             unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
         return unsupported
