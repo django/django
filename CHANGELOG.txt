@@ -1,6 +1,18 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+1.1.2 (2017-04-01)
+------------------
+
+* Session name hash changed to SHA-1 to satisfy FIPS-140-2. Due to this,
+  please force all WebSockets to reconnect after the upgrade.
+
+* `scheme` key in ASGI-HTTP messages now translates into `request.is_secure()`
+  correctly.
+
+* WebsocketBridge now exposes the underlying WebSocket as `.socket`
+
+
 1.1.1 (2017-03-19)
 ------------------
 

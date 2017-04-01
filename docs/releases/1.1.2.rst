@@ -1,0 +1,29 @@
+1.1.2 Release Notes
+===================
+
+Channels 1.1.2 is a bugfix release for the 1.1 series, released on
+April 1st, 2017.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Minor Changes & Bugfixes
+------------------------
+
+* Session name hash changed to SHA-1 to satisfy FIPS-140-2.
+
+* `scheme` key in ASGI-HTTP messages now translates into `request.is_secure()`
+  correctly.
+
+* WebsocketBridge now exposes the underlying WebSocket as `.socket`.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+* When you upgrade all current channel sessions will be invalidated; you
+  should make sure you disconnect all WebSockets during upgrade.
