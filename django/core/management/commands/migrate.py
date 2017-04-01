@@ -30,8 +30,7 @@ class Command(BaseCommand):
                  'migration. Use the name "zero" to unapply all migrations.',
         )
         parser.add_argument(
-            '--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
@@ -40,11 +39,11 @@ class Command(BaseCommand):
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--fake', action='store_true', dest='fake', default=False,
+            '--fake', action='store_true', dest='fake',
             help='Mark migrations as run without actually running them.',
         )
         parser.add_argument(
-            '--fake-initial', action='store_true', dest='fake_initial', default=False,
+            '--fake-initial', action='store_true', dest='fake_initial',
             help='Detect if tables already exist and fake-apply initial migrations if so. Make sure '
                  'that the current database schema matches your initial migration before using this '
                  'flag. Django will only check for an existing table name.',

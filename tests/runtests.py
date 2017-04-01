@@ -388,15 +388,15 @@ if __name__ == "__main__":
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output',
     )
     parser.add_argument(
-        '--noinput', action='store_false', dest='interactive', default=True,
+        '--noinput', action='store_false', dest='interactive',
         help='Tells Django to NOT prompt the user for input of any kind.',
     )
     parser.add_argument(
-        '--failfast', action='store_true', dest='failfast', default=False,
+        '--failfast', action='store_true', dest='failfast',
         help='Tells Django to stop running the test suite after first failed test.',
     )
     parser.add_argument(
-        '-k', '--keepdb', action='store_true', dest='keepdb', default=False,
+        '-k', '--keepdb', action='store_true', dest='keepdb',
         help='Tells Django to preserve the test database between runs.',
     )
     parser.add_argument(
@@ -415,7 +415,7 @@ if __name__ == "__main__":
         help='Run the test suite in pairs with the named test to find problem pairs.',
     )
     parser.add_argument(
-        '--reverse', action='store_true', default=False,
+        '--reverse', action='store_true',
         help='Sort test suites and test cases in opposite order to debug '
              'test side effects not apparent with normal execution lineup.',
     )
@@ -424,7 +424,7 @@ if __name__ == "__main__":
         help='A comma-separated list of browsers to run the Selenium tests against.',
     )
     parser.add_argument(
-        '--debug-sql', action='store_true', dest='debug_sql', default=False,
+        '--debug-sql', action='store_true', dest='debug_sql',
         help='Turn on the SQL query logger within tests.',
     )
     parser.add_argument(

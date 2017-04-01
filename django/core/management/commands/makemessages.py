@@ -227,7 +227,7 @@ class Command(BaseCommand):
             help='The domain of the message files (default: "django").',
         )
         parser.add_argument(
-            '--all', '-a', action='store_true', dest='all', default=False,
+            '--all', '-a', action='store_true', dest='all',
             help='Updates the message files for all existing locales.',
         )
         parser.add_argument(
@@ -237,7 +237,7 @@ class Command(BaseCommand):
                  'commas, or use -e multiple times.',
         )
         parser.add_argument(
-            '--symlinks', '-s', action='store_true', dest='symlinks', default=False,
+            '--symlinks', '-s', action='store_true', dest='symlinks',
             help='Follows symlinks to directories when examining source code '
                  'and templates for translation strings.',
         )
@@ -249,23 +249,23 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
-            default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'.",
+            help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'.",
         )
         parser.add_argument(
             '--no-wrap', action='store_true', dest='no_wrap',
-            default=False, help="Don't break long message lines into several lines.",
+            help="Don't break long message lines into several lines.",
         )
         parser.add_argument(
             '--no-location', action='store_true', dest='no_location',
-            default=False, help="Don't write '#: filename:line' lines.",
+            help="Don't write '#: filename:line' lines.",
         )
         parser.add_argument(
             '--no-obsolete', action='store_true', dest='no_obsolete',
-            default=False, help="Remove obsolete message strings.",
+            help="Remove obsolete message strings.",
         )
         parser.add_argument(
             '--keep-pot', action='store_true', dest='keep_pot',
-            default=False, help="Keep .pot file after making messages. Useful when debugging.",
+            help="Keep .pot file after making messages. Useful when debugging.",
         )
 
     def handle(self, *args, **options):

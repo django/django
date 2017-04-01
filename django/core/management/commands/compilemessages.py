@@ -43,7 +43,7 @@ class Command(BaseCommand):
             help='Locales to exclude. Default is none. Can be used multiple times.',
         )
         parser.add_argument(
-            '--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+            '--use-fuzzy', '-f', dest='fuzzy', action='store_true',
             help='Use fuzzy translations.',
         )
 

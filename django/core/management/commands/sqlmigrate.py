@@ -18,7 +18,6 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--backwards', action='store_true', dest='backwards',
-            default=False,
             help='Creates SQL to unapply the migration, rather than to apply it',
         )
 

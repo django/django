@@ -106,7 +106,6 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
                 '--delete',
                 action='store_true',
                 dest='delete',
-                default=False,
                 help='Delete poll instead of closing it',
             )
 

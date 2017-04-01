@@ -12,7 +12,6 @@ class Command(LabelCommand):
         super().add_arguments(parser)
         parser.add_argument(
             '--first', action='store_false', dest='all',
-            default=True,
             help="Only return the first match for each static file.",
         )
 

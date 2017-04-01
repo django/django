@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--all', action='store_true', dest='all', default=False,
+            '--all', action='store_true', dest='all',
             help='Display all settings, regardless of their value. Default values are prefixed by "###".',
         )
         parser.add_argument(

@@ -424,19 +424,19 @@ class DiscoverRunner:
             help='The test matching pattern. Defaults to test*.py.',
         )
         parser.add_argument(
-            '-k', '--keepdb', action='store_true', dest='keepdb', default=False,
+            '-k', '--keepdb', action='store_true', dest='keepdb',
             help='Preserves the test DB between runs.'
         )
         parser.add_argument(
-            '-r', '--reverse', action='store_true', dest='reverse', default=False,
+            '-r', '--reverse', action='store_true', dest='reverse',
             help='Reverses test cases order.',
         )
         parser.add_argument(
-            '--debug-mode', action='store_true', dest='debug_mode', default=False,
+            '--debug-mode', action='store_true', dest='debug_mode',
             help='Sets settings.DEBUG to True.',
         )
         parser.add_argument(
-            '-d', '--debug-sql', action='store_true', dest='debug_sql', default=False,
+            '-d', '--debug-sql', action='store_true', dest='debug_sql',
             help='Prints logged SQL queries on failure.',
         )
         parser.add_argument(

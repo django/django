@@ -34,11 +34,11 @@ class Command(BaseCommand):
             help='Module paths to test; can be modulename, modulename.TestCase or modulename.TestCase.test_method'
         )
         parser.add_argument(
-            '--noinput', '--no-input', action='store_false', dest='interactive', default=True,
+            '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--failfast', action='store_true', dest='failfast', default=False,
+            '--failfast', action='store_true', dest='failfast',
             help='Tells Django to stop running the test suite after first failed test.',
         )
         parser.add_argument(

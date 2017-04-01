@@ -43,15 +43,15 @@ class Command(BaseCommand):
                  '(use multiple --exclude to exclude multiple apps/models).',
         )
         parser.add_argument(
-            '--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
+            '--natural-foreign', action='store_true', dest='use_natural_foreign_keys',
             help='Use natural foreign keys if they are available.',
         )
         parser.add_argument(
-            '--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
+            '--natural-primary', action='store_true', dest='use_natural_primary_keys',
             help='Use natural primary keys if they are available.',
         )
         parser.add_argument(
-            '-a', '--all', action='store_true', dest='use_base_manager', default=False,
+            '-a', '--all', action='store_true', dest='use_base_manager',
             help="Use Django's base manager to dump all models stored in the database, "
                  "including those that would otherwise be filtered or modified by a custom manager.",
         )
