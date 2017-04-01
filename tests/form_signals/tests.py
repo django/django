@@ -1,7 +1,7 @@
-from django.test import TestCase
 from django.forms import signals
+from django.test import TestCase
 
-from .forms import PersonForm, DogForm
+from .forms import DogForm, PersonForm
 
 
 class SignalTest(TestCase):

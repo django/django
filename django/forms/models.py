@@ -12,6 +12,7 @@ from django.core.exceptions import (
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms.signals import post_save, pre_save
 from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
@@ -19,7 +20,6 @@ from django.forms.widgets import (
 from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
-from django.forms.signals import pre_save, post_save
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',

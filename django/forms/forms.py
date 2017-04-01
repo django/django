@@ -9,6 +9,7 @@ from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 # BoundField is imported for backwards compatibility in Django 1.9
 from django.forms.boundfield import BoundField  # NOQA
 from django.forms.fields import Field, FileField
+from django.forms.signals import post_clean, post_init, pre_clean, pre_init
 # pretty_name is imported for backwards compatibility in Django 1.9
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.forms.widgets import Media, MediaDefiningClass
@@ -17,7 +18,6 @@ from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
-from django.forms.signals import pre_init, post_init, pre_clean, post_clean
 
 from .renderers import get_default_renderer
 
