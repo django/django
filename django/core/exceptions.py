@@ -2,6 +2,7 @@
 Global Django exception and warning classes.
 """
 from django.utils.encoding import force_text
+from django.utils.safestring import SafeData, mark_safe
 
 
 class FieldDoesNotExist(Exception):
@@ -174,6 +175,10 @@ class ValidationError(Exception):
                 message = error.message
                 if error.params:
                     message %= error.params
+                    if (isinstance(error.message, SafeData) and
+                            all(isinstance(v, SafeData)
+                                for v in error.params.values())):
+                        message = mark_safe(message)
                 yield force_text(message)
 
     def __str__(self):
