@@ -5,11 +5,13 @@ import re
 import sys
 import tempfile
 from io import StringIO
+from pathlib import Path
 
 from django.conf.urls import url
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
+from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
@@ -604,6 +606,26 @@ class PlainTextReportTests(SimpleTestCase):
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
         reporter.get_traceback_text()
+
+    @override_settings(DEBUG=True)
+    def test_template_exception(self):
+        request = self.rf.get('/test_view/')
+        try:
+            render(request, 'debug/template_error.html')
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        text = reporter.get_traceback_text()
+        templ_path = Path(Path(__file__).parent.parent, 'templates', 'debug', 'template_error.html')
+        self.assertIn(
+            'Template error:\n'
+            'In template %(path)s, error at line 2\n'
+            '   \'cycle\' tag requires at least two arguments\n'
+            '   1 : Template with error:\n'
+            '   2 :  {%% cycle %%} \n'
+            '   3 : ' % {'path': templ_path},
+            text
+        )
 
     def test_request_with_items_key(self):
         """
