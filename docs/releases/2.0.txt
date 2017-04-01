@@ -321,6 +321,9 @@ backends.
 * The first argument of ``SchemaEditor._alter_column_type_sql()`` is now
   ``model`` rather than ``table``.
 
+* The first argument of ``SchemaEditor._create_index_name()`` is now
+  ``table_name`` rather than ``model``.
+
 Dropped support for Oracle 11.2
 -------------------------------
 

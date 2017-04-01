@@ -111,7 +111,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             (old_type.startswith('varchar') and not new_type.startswith('varchar')) or
             (old_type.startswith('text') and not new_type.startswith('text'))
         ):
-            index_name = self._create_index_name(model, [old_field.column], suffix='_like')
+            index_name = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
             self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
 
         super()._alter_field(
@@ -127,5 +127,5 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
         if old_field.unique and not (new_field.db_index or new_field.unique):
-            index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
+            index_to_remove = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
             self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_to_remove))

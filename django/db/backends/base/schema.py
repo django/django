@@ -674,7 +674,9 @@ class BaseDatabaseSchemaEditor:
             self.execute(
                 self.sql_create_pk % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_pk")),
+                    "name": self.quote_name(
+                        self._create_index_name(model._meta.db_table, [new_field.column], suffix="_pk")
+                    ),
                     "columns": self.quote_name(new_field.column),
                 }
             )
@@ -711,7 +713,9 @@ class BaseDatabaseSchemaEditor:
             self.execute(
                 self.sql_create_check % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_check")),
+                    "name": self.quote_name(
+                        self._create_index_name(model._meta.db_table, [new_field.column], suffix="_check")
+                    ),
                     "column": self.quote_name(new_field.column),
                     "check": new_db_params['check'],
                 }
@@ -824,14 +828,14 @@ class BaseDatabaseSchemaEditor:
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
 
-    def _create_index_name(self, model, column_names, suffix=""):
+    def _create_index_name(self, table_name, column_names, suffix=""):
         """
         Generate a unique name for an index/unique constraint.
 
         The name is divided into 3 parts: the table name, the column names,
         and a unique digest and suffix.
         """
-        table_name = strip_quotes(model._meta.db_table)
+        table_name = strip_quotes(table_name)
         hash_data = [table_name] + list(column_names)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
@@ -876,7 +880,7 @@ class BaseDatabaseSchemaEditor:
         sql_create_index = sql or self.sql_create_index
         return sql_create_index % {
             "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(self._create_index_name(model, columns, suffix=suffix)),
+            "name": self.quote_name(self._create_index_name(model._meta.db_table, columns, suffix=suffix)),
             "using": "",
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": tablespace_sql,
@@ -933,7 +937,7 @@ class BaseDatabaseSchemaEditor:
 
         return self.sql_create_fk % {
             "table": self.quote_name(from_table),
-            "name": self.quote_name(self._create_index_name(model, [from_column], suffix=suffix)),
+            "name": self.quote_name(self._create_index_name(model._meta.db_table, [from_column], suffix=suffix)),
             "column": self.quote_name(from_column),
             "to_table": self.quote_name(to_table),
             "to_column": self.quote_name(to_column),
@@ -943,7 +947,7 @@ class BaseDatabaseSchemaEditor:
     def _create_unique_sql(self, model, columns):
         return self.sql_create_unique % {
             "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(self._create_index_name(model, columns, suffix="_uniq")),
+            "name": self.quote_name(self._create_index_name(model._meta.db_table, columns, suffix="_uniq")),
             "columns": ", ".join(self.quote_name(column) for column in columns),
         }
 

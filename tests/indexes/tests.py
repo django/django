@@ -19,7 +19,7 @@ class SchemaIndexesTests(TestCase):
         """
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
-                model=Article,
+                table_name=Article._meta.db_table,
                 column_names=("c1",),
                 suffix="123",
             )
@@ -35,7 +35,7 @@ class SchemaIndexesTests(TestCase):
         long_name = 'l%sng' % ('o' * 100)
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
-                model=Article,
+                table_name=Article._meta.db_table,
                 column_names=('c1', 'c2', long_name),
                 suffix='ix',
             )
@@ -56,7 +56,7 @@ class SchemaIndexesTests(TestCase):
         # Ensure the index name is properly quoted
         self.assertIn(
             connection.ops.quote_name(
-                editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
+                editor._create_index_name(Article._meta.db_table, ['headline', 'pub_date'], suffix='_idx')
             ),
             index_sql[0]
         )

@@ -1640,7 +1640,7 @@ class SchemaTests(TransactionTestCase):
         author_index_name = index.name
         with connection.schema_editor() as editor:
             db_index_name = editor._create_index_name(
-                model=AuthorWithIndexedName,
+                table_name=AuthorWithIndexedName._meta.db_table,
                 column_names=('name',),
             )
         if connection.features.uppercases_column_names:
