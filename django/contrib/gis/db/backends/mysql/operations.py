@@ -73,8 +73,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     def unsupported_functions(self):
         unsupported = {
             'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle', 'ForceRHR',
-            'MakeValid', 'MemSize', 'Perimeter', 'PointOnSurface', 'Reverse',
-            'Scale', 'SnapToGrid', 'Transform', 'Translate',
+            'LineLocatePoint', 'MakeValid', 'MemSize', 'Perimeter',
+            'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid', 'Transform',
+            'Translate',
         }
         if self.connection.mysql_version < (5, 7, 5):
             unsupported.update({'AsGeoJSON', 'GeoHash', 'IsValid'})

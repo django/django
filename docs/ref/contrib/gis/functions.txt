@@ -358,6 +358,19 @@ resource-intensive) with the ``spheroid`` keyword argument.
     In older versions, a raw value was returned on MySQL when used on
     projected SRS.
 
+``LineLocatePoint``
+===================
+
+.. class:: LineLocatePoint(linestring, point, **extra)
+
+.. versionadded:: 2.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_LineLocatePoint.html>`__,
+SpatiaLite
+
+Returns a float between 0 and 1 representing the location of the closest point on
+``linestring`` to the given ``point``, as a fraction of the 2D line length.
+
 ``MakeValid``
 =============
 
