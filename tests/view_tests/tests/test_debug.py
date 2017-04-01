@@ -279,7 +279,7 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>ValueError at /test_view/</h1>', html)
+        self.assertInHTML('<h1>ValueError at /test_view/</h1>', html)
         self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
@@ -299,7 +299,7 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>ValueError</h1>', html)
+        self.assertInHTML('<h1>ValueError</h1>', html)
         self.assertIn('<pre class="exception_value">Can&#39;t find my keys</pre>', html)
         self.assertNotIn('<th>Request Method:</th>', html)
         self.assertNotIn('<th>Request URL:</th>', html)
@@ -333,7 +333,7 @@ class ExceptionReporterTests(SimpleTestCase):
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>Report at /test_view/</h1>', html)
+        self.assertInHTML('<h1>Report at /test_view/</h1>', html)
         self.assertIn('<pre class="exception_value">No exception message supplied</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
@@ -376,7 +376,7 @@ class ExceptionReporterTests(SimpleTestCase):
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>Report at /test_view/</h1>', html)
+        self.assertInHTML('<h1>Report at /test_view/</h1>', html)
         self.assertIn('<pre class="exception_value">I&#39;m a little teapot</pre>', html)
         self.assertIn('<th>Request Method:</th>', html)
         self.assertIn('<th>Request URL:</th>', html)
@@ -389,7 +389,7 @@ class ExceptionReporterTests(SimpleTestCase):
     def test_message_only(self):
         reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>Report</h1>', html)
+        self.assertInHTML('<h1>Report</h1>', html)
         self.assertIn('<pre class="exception_value">I&#39;m a little teapot</pre>', html)
         self.assertNotIn('<th>Request Method:</th>', html)
         self.assertNotIn('<th>Request URL:</th>', html)
@@ -457,7 +457,7 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>%sError at /test_view/</h1>' % 'ModuleNotFound' if PY36 else 'Import', html)
+        self.assertInHTML('<h1>%sError at /test_view/</h1>' % ('ModuleNotFound' if PY36 else 'Import'), html)
 
     def test_ignore_traceback_evaluation_exceptions(self):
         """
@@ -544,7 +544,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>ValueError at /test_view/</h1>', html)
+        self.assertInHTML('<h1>ValueError at /test_view/</h1>', html)
         self.assertIn('<pre class="exception_value">Oops</pre>', html)
         self.assertIn('<h3 id="user-info">USER</h3>', html)
         self.assertIn('<p>[unable to retrieve the current user]</p>', html)
