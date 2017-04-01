@@ -76,6 +76,8 @@ class Lookup:
 
     def process_lhs(self, compiler, connection, lhs=None):
         lhs = lhs or self.lhs
+        if hasattr(lhs, 'resolve_expression'):
+            lhs = lhs.resolve_expression(compiler.query)
         return compiler.compile(lhs)
 
     def process_rhs(self, compiler, connection):

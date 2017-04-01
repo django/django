@@ -271,7 +271,7 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_isvalid_lookup_with_raster_error(self):
         qs = RasterModel.objects.filter(rast__isvalid=True)
-        msg = 'Geometry functions not supported for raster fields.'
+        msg = 'IsValid function requires a GeometryField in position 1, got RasterField.'
         with self.assertRaisesMessage(TypeError, msg):
             qs.count()
 
@@ -336,11 +336,11 @@ class RasterFieldTest(TransactionTestCase):
         """
         point = GEOSGeometry("SRID=3086;POINT (-697024.9213808845 683729.1705516104)")
         rast = GDALRaster(json.loads(JSON_RASTER))
-        msg = "Please provide a geometry object."
+        msg = "Distance function requires a geometric argument in position 2."
         with self.assertRaisesMessage(TypeError, msg):
             RasterModel.objects.annotate(distance_from_point=Distance("geom", rast))
         with self.assertRaisesMessage(TypeError, msg):
             RasterModel.objects.annotate(distance_from_point=Distance("rastprojected", rast))
-        msg = "Geometry functions not supported for raster fields."
+        msg = "Distance function requires a GeometryField in position 1, got RasterField."
         with self.assertRaisesMessage(TypeError, msg):
             RasterModel.objects.annotate(distance_from_point=Distance("rastprojected", point)).count()

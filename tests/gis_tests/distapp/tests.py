@@ -429,6 +429,9 @@ class DistanceFunctionsTests(TestCase):
         self.assertTrue(
             SouthTexasInterstate.objects.annotate(length=Length('path')).filter(length__gt=4000).exists()
         )
+        # Length with an explicit geometry value.
+        qs = Interstate.objects.annotate(length=Length(i10.path))
+        self.assertAlmostEqual(qs.first().length.m, len_m2, 2)
 
     @skipUnlessDBFeature("has_Perimeter_function")
     def test_perimeter(self):
