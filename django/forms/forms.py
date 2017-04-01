@@ -17,6 +17,7 @@ from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
+from django.http import QueryDict
 
 from .renderers import get_default_renderer
 
@@ -76,8 +77,8 @@ class BaseForm:
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, field_order=None, use_required_attribute=None, renderer=None):
         self.is_bound = data is not None or files is not None
-        self.data = data or {}
-        self.files = files or {}
+        self.data = data or QueryDict()
+        self.files = files or QueryDict()
         self.auto_id = auto_id
         if prefix is not None:
             self.prefix = prefix
