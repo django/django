@@ -381,7 +381,7 @@ class EmailMessage:
             elif not isinstance(content, Message):
                 # For compatibility with existing code, parse the message
                 # into an email.Message object if it is not one already.
-                content = message_from_string(content)
+                content = message_from_string(force_text(content))
 
             attachment = SafeMIMEMessage(content, subtype)
         else:

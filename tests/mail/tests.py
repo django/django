@@ -401,6 +401,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ('file_png', None),
             ('file_txt.png', 'image/png'),
             ('file_png.txt', 'text/plain'),
+            ('file.eml', 'message/rfc822'),
         )
         test_mimetypes = ['text/plain', 'image/png', None]
 
