@@ -286,6 +286,11 @@ class GISFunctionsTests(TestCase):
         with self.assertRaisesMessage(ValueError, 'AreaField only accepts Area measurement objects.'):
             qs.get(area__lt=500000)
 
+    @skipUnlessDBFeature("has_LineLocatePoint_function")
+    def test_line_locate_point(self):
+        pos_expr = functions.LineLocatePoint(LineString((0, 0), (0, 3), srid=4326), Point(0, 1, srid=4326))
+        self.assertAlmostEqual(State.objects.annotate(pos=pos_expr).first().pos, 0.3333333)
+
     @skipUnlessDBFeature("has_MakeValid_function")
     def test_make_valid(self):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')

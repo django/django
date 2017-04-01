@@ -68,6 +68,9 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
   :lookup:`isvalid` lookup.
 
+* Added the :class:`~django.contrib.gis.db.models.functions.LineLocatePoint`
+  function, supported on PostGIS and SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

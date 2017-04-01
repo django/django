@@ -389,6 +389,12 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
         return super().as_sql(compiler, connection, function=function)
 
 
+class LineLocatePoint(GeoFunc):
+    output_field_class = FloatField
+    arity = 2
+    geom_param_pos = (0, 1)
+
+
 class MakeValid(GeoFunc):
     pass
 
