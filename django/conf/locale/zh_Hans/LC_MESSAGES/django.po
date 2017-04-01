@@ -1044,7 +1044,7 @@ msgid "Forbidden"
 msgstr "禁止访问"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF验证失败. 相应中断."
+msgstr "CSRF验证失败，请求中断。"
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
