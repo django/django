@@ -650,7 +650,7 @@ class ChoiceWidget(Widget):
         """Return selected values as a list."""
         if not isinstance(value, (tuple, list)):
             value = [value]
-        return [str(v) if v is not None else '' for v in value]
+        return [force_text(v) if v is not None else '' for v in value]
 
 
 class Select(ChoiceWidget):
