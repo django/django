@@ -62,7 +62,11 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added MySQL support for the
+  :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` function,
+  :class:`~django.contrib.gis.db.models.functions.GeoHash` function,
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
+  :lookup:`isvalid` lookup.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
