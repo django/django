@@ -162,6 +162,12 @@ class Area(OracleToleranceMixin, GeoFunc):
         return self.as_sql(compiler, connection, **extra_context)
 
 
+class Azimuth(GeoFunc):
+    output_field_class = FloatField
+    arity = 2
+    geom_param_pos = (0, 1)
+
+
 class AsGeoJSON(GeoFunc):
     output_field_class = TextField
 

@@ -111,9 +111,9 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     unsupported_functions = {
-        'AsGeoJSON', 'AsKML', 'AsSVG', 'Envelope', 'ForceRHR', 'GeoHash',
-        'LineLocatePoint', 'MakeValid', 'MemSize', 'Scale', 'SnapToGrid',
-        'Translate',
+        'AsGeoJSON', 'AsKML', 'AsSVG', 'Azimuth', 'Envelope', 'ForceRHR',
+        'GeoHash', 'LineLocatePoint', 'MakeValid', 'MemSize', 'Scale',
+        'SnapToGrid', 'Translate',
     }
 
     def geo_quote_name(self, name):

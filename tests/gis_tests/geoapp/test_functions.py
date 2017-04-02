@@ -1,4 +1,5 @@
 import json
+import math
 import re
 from decimal import Decimal
 
@@ -144,6 +145,15 @@ class GISFunctionsTests(TestCase):
         svg2 = svg1.replace('c', '')
         self.assertEqual(svg1, City.objects.annotate(svg=functions.AsSVG('point')).get(name='Pueblo').svg)
         self.assertEqual(svg2, City.objects.annotate(svg=functions.AsSVG('point', relative=5)).get(name='Pueblo').svg)
+
+    @skipUnlessDBFeature("has_Azimuth_function")
+    def test_azimuth(self):
+        # Returns the azimuth in radians.
+        azimuth_expr = functions.Azimuth(Point(0, 0, srid=4326), Point(1, 1, srid=4326))
+        self.assertAlmostEqual(City.objects.annotate(azimuth=azimuth_expr).first().azimuth, math.pi / 4)
+        # Returns None if the two points are coincident.
+        azimuth_expr = functions.Azimuth(Point(0, 0, srid=4326), Point(0, 0, srid=4326))
+        self.assertIsNone(City.objects.annotate(azimuth=azimuth_expr).first().azimuth)
 
     @skipUnlessDBFeature("has_BoundingCircle_function")
     def test_bounding_circle(self):

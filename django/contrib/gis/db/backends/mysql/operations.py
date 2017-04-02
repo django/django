@@ -72,7 +72,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def unsupported_functions(self):
         unsupported = {
-            'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle', 'ForceRHR',
+            'AsGML', 'AsKML', 'AsSVG', 'Azimuth', 'BoundingCircle', 'ForceRHR',
             'LineLocatePoint', 'MakeValid', 'MemSize', 'Perimeter',
             'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid', 'Transform',
             'Translate',
