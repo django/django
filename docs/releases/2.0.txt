@@ -420,6 +420,10 @@ Miscellaneous
 
       Book.objects.iterator(chunk_size=100)
 
+* Providing unknown package names in the ``packages`` argument of the
+  :class:`~django.views.i18n.JavaScriptCatalog` view now raises ``ValueError``
+  instead of passing silently.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

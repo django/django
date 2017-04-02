@@ -4,14 +4,15 @@ from os import path
 
 from django.conf import settings
 from django.test import (
-    SimpleTestCase, TestCase, modify_settings, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, modify_settings,
+    override_settings,
 )
 from django.test.selenium import SeleniumTestCase
 from django.urls import reverse
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
-from django.views.i18n import get_formats
+from django.views.i18n import JavaScriptCatalog, get_formats
 
 from ..urls import locale_dir
 
@@ -396,6 +397,16 @@ class I18NViewTests(SimpleTestCase):
             with override('es-ar'):
                 response = self.client.get('/jsi18n/')
                 self.assertContains(response, 'este texto de app3 debe ser traducido')
+
+    def test_i18n_unknown_package_error(self):
+        view = JavaScriptCatalog.as_view()
+        request = RequestFactory().get('/')
+        msg = 'Invalid package(s) provided to JavaScriptCatalog: unknown_package'
+        with self.assertRaisesMessage(ValueError, msg):
+            view(request, packages='unknown_package')
+        msg += ',unknown_package2'
+        with self.assertRaisesMessage(ValueError, msg):
+            view(request, packages='unknown_package+unknown_package2')
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
