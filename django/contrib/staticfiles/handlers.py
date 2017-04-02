@@ -10,8 +10,8 @@ from whitenoise.utils import (
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, utils
-from django.contrib.staticfiles.views import serve
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.contrib.staticfiles.views import serve
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.utils.deprecation import RemovedInDjango30Warning
@@ -28,7 +28,8 @@ class StaticFilesHandler(WSGIHandler):
 
     def __init__(self, application):
         warnings.warn(
-            "django.contrib.staticfiles.handlers.StaticFilesHandler is deprecated",
+            "django.contrib.staticfiles.handlers.StaticFilesHandler is deprecated"
+            "in favor of DjangoWhiteNoise for serving static files as WSGI middleware",
             RemovedInDjango30Warning,
             stacklevel=2,
         )

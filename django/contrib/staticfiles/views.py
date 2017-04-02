@@ -30,7 +30,8 @@ def serve(request, path, insecure=False, **kwargs):
     It uses the django.views.static.serve() view to serve the found files.
     """
     warnings.warn(
-        "django.contrib.staticfiles.views.serve is deprecated",
+        "django.contrib.staticfiles.views.serve is deprecated"
+        "in favor of WhiteNoiseMiddleware for serving static files.",
         RemovedInDjango30Warning,
         stacklevel=2,
     )
