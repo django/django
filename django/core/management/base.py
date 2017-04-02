@@ -240,7 +240,7 @@ class BaseCommand:
         )
         parser.add_argument('--traceback', action='store_true', help='Raise on CommandError exceptions')
         parser.add_argument(
-            '--no-color', action='store_true', dest='no_color', default=False,
+            '--no-color', action='store_true', dest='no_color',
             help="Don't colorize the command output.",
         )
         self.add_arguments(parser)

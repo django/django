@@ -44,7 +44,7 @@ class Command(BaseCommand):
             help='Only look for fixtures in the specified app.',
         )
         parser.add_argument(
-            '--ignorenonexistent', '-i', action='store_true', dest='ignore', default=False,
+            '--ignorenonexistent', '-i', action='store_true', dest='ignore',
             help='Ignores entries in the serialized data for fields that do not '
                  'currently exist on the model.',
         )

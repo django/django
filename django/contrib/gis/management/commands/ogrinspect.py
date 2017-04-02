@@ -68,8 +68,7 @@ class Command(BaseCommand):
                  'an integer or a string identifier for the layer.',
         )
         parser.add_argument(
-            '--multi-geom', action='store_true',
-            dest='multi_geom', default=False,
+            '--multi-geom', action='store_true', dest='multi_geom',
             help='Treat the geometry in the data source as a geometry collection.',
         )
         parser.add_argument(
@@ -77,7 +76,7 @@ class Command(BaseCommand):
             help='Specifies a field name to return for the __str__() method.',
         )
         parser.add_argument(
-            '--no-imports', action='store_false', dest='imports', default=True,
+            '--no-imports', action='store_false', dest='imports',
             help='Do not include `from django.contrib.gis.db import models` statement.',
         )
         parser.add_argument(

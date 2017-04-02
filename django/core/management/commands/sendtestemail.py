@@ -15,11 +15,11 @@ class Command(BaseCommand):
             help='One or more email addresses to send a test email to.',
         )
         parser.add_argument(
-            '--managers', action='store_true', dest='managers', default=False,
+            '--managers', action='store_true', dest='managers',
             help='Send a test email to the addresses specified in settings.MANAGERS.',
         )
         parser.add_argument(
-            '--admins', action='store_true', dest='admins', default=False,
+            '--admins', action='store_true', dest='admins',
             help='Send a test email to the addresses specified in settings.ADMINS.',
         )
 
