@@ -12,46 +12,6 @@ base_dir = path.dirname(path.abspath(__file__))
 media_dir = path.join(base_dir, 'media')
 locale_dir = path.join(base_dir, 'locale')
 
-js_info_dict = {
-    'domain': 'djangojs',
-    'packages': ('view_tests',),
-}
-
-js_info_dict_english_translation = {
-    'domain': 'djangojs',
-    'packages': ('view_tests.app0',),
-}
-
-js_info_dict_multi_packages1 = {
-    'domain': 'djangojs',
-    'packages': ('view_tests.app1', 'view_tests.app2'),
-}
-
-js_info_dict_multi_packages2 = {
-    'domain': 'djangojs',
-    'packages': ('view_tests.app3', 'view_tests.app4'),
-}
-
-js_info_dict_admin = {
-    'domain': 'djangojs',
-    'packages': ('django.contrib.admin', 'view_tests'),
-}
-
-js_info_dict_app1 = {
-    'domain': 'djangojs',
-    'packages': ('view_tests.app1',),
-}
-
-js_info_dict_app2 = {
-    'domain': 'djangojs',
-    'packages': ('view_tests.app2',),
-}
-
-js_info_dict_app5 = {
-    'domain': 'djangojs',
-    'packages': ('view_tests.app5',),
-}
-
 urlpatterns = [
     url(r'^$', views.index_page),
 

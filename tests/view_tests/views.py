@@ -76,16 +76,8 @@ def jsi18n(request):
     return render(request, 'jsi18n.html')
 
 
-def old_jsi18n(request):
-    return render(request, 'old_jsi18n.html')
-
-
 def jsi18n_multi_catalogs(request):
     return render(request, 'jsi18n-multi-catalogs.html')
-
-
-def old_jsi18n_multi_catalogs(request):
-    return render(request, 'old_jsi18n-multi-catalogs.html')
 
 
 def raises_template_does_not_exist(request, path='i_dont_exist.html'):
