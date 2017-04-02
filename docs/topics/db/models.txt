@@ -1074,6 +1074,18 @@ created directly as a ``Place`` object or was the parent of some other class),
 referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
 exception.
 
+The automatically-created :class:`~django.db.models.OneToOneField` on
+``Restaurant`` that links it to ``Place`` looks like this::
+
+    place_ptr = models.OneToOneField(
+        Place, on_delete=models.CASCADE,
+        parent_link=True,
+    )
+
+You can override that field by declaring your own
+:class:`~django.db.models.OneToOneField` with :attr:`parent_link=True
+<django.db.models.OneToOneField.parent_link>` on ``Restaurant``.
+
 .. _meta-and-multi-table-inheritance:
 
 ``Meta`` and multi-table inheritance
