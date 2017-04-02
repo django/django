@@ -11,19 +11,10 @@ from whitenoise.utils import (
 from django.conf import settings
 from django.contrib.staticfiles import finders, utils
 from django.contrib.staticfiles.views import serve
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.utils.deprecation import RemovedInDjango30Warning
-
-try:
-    from django.contrib.staticfiles.storage import staticfiles_storage
-except ImproperlyConfigured:
-    if not os.environ.get('DJANGO_SETTINGS_MODULE'):
-        raise ImproperlyConfigured(
-            "'DJANGO_SETTINGS_MODULE' environment variable must be set "
-            "before importing 'handlers'")
-    else:
-        raise
 
 
 class StaticFilesHandler(WSGIHandler):
