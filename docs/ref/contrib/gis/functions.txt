@@ -23,11 +23,11 @@ Function's summary:
 ==================  =======================   ======================  ===================  ==================  =====================
 Measurement         Relationships             Operations              Editors              Output format       Miscellaneous
 ==================  =======================   ======================  ===================  ==================  =====================
-:class:`Area`       :class:`BoundingCircle`   :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`   :class:`Centroid`         :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
-:class:`Length`     :class:`Envelope`         :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
-:class:`Perimeter`  :class:`PointOnSurface`   :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
-..                                                                    :class:`SnapToGrid`  :class:`GeoHash`
+:class:`Area`       :class:`Azimuth`          :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`   :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
+:class:`Length`     :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
+:class:`Perimeter`  :class:`Envelope`         :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
+..                  :class:`PointOnSurface`                           :class:`SnapToGrid`  :class:`GeoHash`
 ..                                                                    :class:`Transform`
 ..                                                                    :class:`Translate`
 ==================  =======================   ======================  ===================  ==================  =====================
@@ -172,6 +172,21 @@ Keyword Argument       Description
 =====================  =====================================================
 
 __ http://www.w3.org/Graphics/SVG/
+
+``Azimuth``
+===========
+
+.. class:: Azimuth(point_a, point_b, **extra)
+
+.. versionadded:: 2.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
+SpatiaLite (LWGEOM)
+
+Returns the azimuth in radians of the segment defined by the given point
+geometries, or ``None`` if the two points are coincident. The azimuth is angle
+referenced from north and is positive clockwise: north = ``0``; east = ``π/2``;
+south = ``π``; west = ``3π/2``.
 
 ``BoundingCircle``
 ==================

@@ -93,7 +93,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def unsupported_functions(self):
         unsupported = {'BoundingCircle', 'ForceRHR', 'MemSize'}
         if not self.lwgeom_version():
-            unsupported |= {'GeoHash', 'IsValid', 'MakeValid'}
+            unsupported |= {'Azimuth', 'GeoHash', 'IsValid', 'MakeValid'}
         return unsupported
 
     @cached_property
