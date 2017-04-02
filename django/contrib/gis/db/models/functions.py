@@ -253,15 +253,13 @@ class DistanceResultMixin:
     def convert_value(self, value, expression, connection, context):
         if value is None:
             return None
+        dist_att = None
         geo_field = self.geo_field
         if geo_field.geodetic(connection):
-            dist_att = 'm'
+            if connection.features.supports_distance_geodetic:
+                dist_att = 'm'
         else:
-            units = geo_field.units_name(connection)
-            if units:
-                dist_att = DistanceMeasure.unit_attname(units)
-            else:
-                dist_att = None
+            dist_att = geo_field.units_name(connection)
         if dist_att:
             return DistanceMeasure(**{dist_att: value})
         return value
