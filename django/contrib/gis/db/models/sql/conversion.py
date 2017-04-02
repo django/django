@@ -49,15 +49,27 @@ class AreaField(models.FloatField):
         return 'AreaField'
 
 
-class DistanceField(BaseField):
+class DistanceField(models.FloatField):
     "Wrapper for Distance values."
-    def __init__(self, distance_att):
+    def __init__(self, distance_att=None):
         self.distance_att = distance_att
 
+    def get_prep_value(self, value):
+        if isinstance(value, Distance):
+            return value
+        return super().get_prep_value(value)
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if not isinstance(value, Distance):
+            return value
+        if not self.distance_att:
+            raise ValueError('Distance measure is supplied, but units are unknown for result.')
+        return getattr(value, self.distance_att)
+
     def from_db_value(self, value, expression, connection, context):
-        if value is not None:
-            value = Distance(**{self.distance_att: value})
-        return value
+        if value is None or not self.distance_att:
+            return value
+        return Distance(**{self.distance_att: value})
 
     def get_internal_type(self):
         return 'DistanceField'

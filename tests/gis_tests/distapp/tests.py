@@ -368,6 +368,23 @@ class DistanceFunctionsTests(TestCase):
         ).first().d
         self.assertEqual(distance, 1)
 
+    @skipUnlessDBFeature("has_Distance_function")
+    def test_distance_function_d_lookup(self):
+        qs = Interstate.objects.annotate(
+            d=Distance(Point(0, 0, srid=3857), Point(0, 1, srid=3857)),
+        ).filter(d=D(m=1))
+        self.assertTrue(qs.exists())
+
+    @skipIfDBFeature("supports_distance_geodetic")
+    @skipUnlessDBFeature("has_Distance_function")
+    def test_distance_function_raw_result_d_lookup(self):
+        qs = Interstate.objects.annotate(
+            d=Distance(Point(0, 0, srid=4326), Point(0, 1, srid=4326)),
+        ).filter(d=D(m=1))
+        msg = 'Distance measure is supplied, but units are unknown for result.'
+        with self.assertRaisesMessage(ValueError, msg):
+            list(qs)
+
     @no_oracle  # Oracle already handles geographic distance calculation.
     @skipUnlessDBFeature("has_Distance_function", 'has_Transform_function')
     def test_distance_transform(self):
