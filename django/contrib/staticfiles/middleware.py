@@ -6,14 +6,10 @@ class WhiteNoiseMiddleware(DjangoWhiteNoise):
     """
     Wrap DjangoWhiteNoise to allow it to function as Django middleware, rather
     than WSGI middleware
-
-    This functions as both old- and new-style middleware, so can be included in
-    either MIDDLEWARE or MIDDLEWARE_CLASSES.
     """
-
     def __init__(self, get_response=None):
         self.get_response = get_response
-        # We pass None for `application`
+        # Pass None for `application`
         super(WhiteNoiseMiddleware, self).__init__(None)
 
     def __call__(self, request):
