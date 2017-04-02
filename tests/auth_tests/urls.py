@@ -62,7 +62,7 @@ def userpage(request):
     pass
 
 
-uid_token = '(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})'
+uid_token = r'(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})'
 
 # special urls for auth test cases
 urlpatterns = auth_urlpatterns + [
