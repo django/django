@@ -5,7 +5,7 @@ from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import F, Q
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from ..utils import no_oracle, oracle, postgis, spatialite
 from .models import (
@@ -359,6 +359,14 @@ class DistanceFunctionsTests(TestCase):
             ).order_by('id')
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
+
+    @skipIfDBFeature("supports_distance_geodetic")
+    @skipUnlessDBFeature("has_Distance_function")
+    def test_distance_function_raw_result(self):
+        distance = Interstate.objects.annotate(
+            d=Distance(Point(0, 0, srid=4326), Point(0, 1, srid=4326)),
+        ).first().d
+        self.assertEqual(distance, 1)
 
     @no_oracle  # Oracle already handles geographic distance calculation.
     @skipUnlessDBFeature("has_Distance_function", 'has_Transform_function')
