@@ -473,6 +473,11 @@ following settings.
 * :setting:`WHITENOISE_ADD_HEADERS_FUNCTION`
 * :setting:`WHITENOISE_STATIC_PREFIX`
 
+.. versionadded:: 2.0
+
+    :class:`~django.contrib.staticfiles.middleware.WhiteNoiseMiddleware` was added
+    to enable Django to serve static files suitable for production.
+
 .. _middleware-ordering:
 
 Middleware ordering

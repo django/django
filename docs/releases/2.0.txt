@@ -316,11 +316,15 @@ Miscellaneous
   well with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
 
-* The ``django.contrib.staticfiles.handlers.StaticFilesHandler`` class,
-  ``django.contrib.staticfiles.management.commands.runserver.Command`` and
-  ``django.contrib.staticfiles.views.serve()`` view is deprecated in favor of
-  ``django.contrib.staticfiles.handlers.DjangoWhiteNoise`` and
-  ``django.contrib.staticfiles.middleware.WhiteNoiseMiddleware``.
+* The ``django.contrib.staticfiles.handlers.StaticFilesHandler`` WSGI
+  middleware is deprecated in favor of
+  ``django.contrib.staticfiles.handlers.DjangoWhiteNoise``.
+  The ``django.contrib.staticfiles.management.commands.runserver.Command``
+  command and ``django.contrib.staticfiles.views.serve()`` view
+  is deprecated in favor of using the core runserver command
+  ``django.core.management.commands.runserver.Command`` and
+  ``django.contrib.staticfiles.middleware.WhiteNoiseMiddleware``
+
 
 .. _removed-features-2.0:
 
