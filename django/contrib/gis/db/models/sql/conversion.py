@@ -36,8 +36,6 @@ class AreaField(models.FloatField):
         return getattr(value, self.area_att)
 
     def from_db_value(self, value, expression, connection, context):
-        if connection.features.interprets_empty_strings_as_nulls and value == '':
-            value = None
         # If the database returns a Decimal, convert it to a float as expected
         # by the Python geometric objects.
         if isinstance(value, Decimal):
