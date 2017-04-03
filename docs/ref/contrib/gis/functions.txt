@@ -20,17 +20,17 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-==================  =======================   ======================  ===================  ==================  =====================
-Measurement         Relationships             Operations              Editors              Output format       Miscellaneous
-==================  =======================   ======================  ===================  ==================  =====================
-:class:`Area`       :class:`Azimuth`          :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`   :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
-:class:`Length`     :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
-:class:`Perimeter`  :class:`Envelope`         :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
-..                  :class:`PointOnSurface`                           :class:`SnapToGrid`  :class:`GeoHash`
-..                                                                    :class:`Transform`
-..                                                                    :class:`Translate`
-==================  =======================   ======================  ===================  ==================  =====================
+==================  ========================   ======================  ===================  ==================  =====================
+Measurement         Relationships              Operations              Editors              Output format       Miscellaneous
+==================  ========================   ======================  ===================  ==================  =====================
+:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
+:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
+:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
+..                  :class:`LineLocatePoint`                           :class:`SnapToGrid`  :class:`GeoHash`
+..                  :class:`PointOnSurface`                            :class:`Transform`
+..                                                                     :class:`Translate`
+==================  ========================   ======================  ===================  ==================  =====================
 
 ``Area``
 ========
