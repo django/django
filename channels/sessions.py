@@ -83,12 +83,21 @@ def channel_session(func):
     return inner
 
 
+def wait_channel_name(reply_channel):
+    """
+    Given a reply_channel, returns a wait channel for it.
+    Replaces any ! with ? so process-specific channels become single-reader
+    channels.
+    """
+    return "__wait__.%s" % (reply_channel.replace("!", "?"), )
+
+
 def requeue_messages(message):
     """
     Requeue any pending wait channel messages for this socket connection back onto it's original channel
     """
     while True:
-        wait_channel = "__wait__.%s" % message.reply_channel.name
+        wait_channel = wait_channel_name(message.reply_channel.name)
         channel, content = message.channel_layer.receive_many([wait_channel], block=False)
         if channel:
             original_channel = content.pop("original_channel")
@@ -137,7 +146,7 @@ def enforce_ordering(func=None, slight=False):
                 requeue_messages(message)
             else:
                 # Since out of order, enqueue message temporarily to wait channel for this socket connection
-                wait_channel = "__wait__.%s" % message.reply_channel.name
+                wait_channel = wait_channel_name(message.reply_channel.name)
                 message.content["original_channel"] = message.channel.name
                 try:
                     message.channel_layer.send(wait_channel, message.content)

@@ -256,17 +256,17 @@ class SessionTests(ChannelTestCase):
         """
         # Construct messages to send
         message0 = Message(
-            {"reply_channel": "test-reply-b", "order": 0},
+            {"reply_channel": "test-reply!b", "order": 0},
             "websocket.connect",
             channel_layers[DEFAULT_CHANNEL_LAYER]
         )
         message1 = Message(
-            {"reply_channel": "test-reply-b", "order": 1},
+            {"reply_channel": "test-reply!b", "order": 1},
             "websocket.receive",
             channel_layers[DEFAULT_CHANNEL_LAYER]
         )
         message2 = Message(
-            {"reply_channel": "test-reply-b", "order": 2},
+            {"reply_channel": "test-reply!b", "order": 2},
             "websocket.receive",
             channel_layers[DEFAULT_CHANNEL_LAYER]
         )
@@ -281,7 +281,7 @@ class SessionTests(ChannelTestCase):
         inner(message2)
 
         # Ensure wait channel is empty
-        wait_channel = "__wait__.%s" % "test-reply-b"
+        wait_channel = "__wait__.test-reply?b"
         next_message = self.get_next_message(wait_channel)
         self.assertEqual(next_message, None)
 
