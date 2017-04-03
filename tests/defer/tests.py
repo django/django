@@ -25,6 +25,8 @@ class DeferTests(AssertionMixin, TestCase):
 
     def test_defer(self):
         qs = Primary.objects.all()
+        self.assert_delayed(qs.defer("id")[0], 0)
+        self.assert_delayed(qs.defer("pk")[0], 0)
         self.assert_delayed(qs.defer("name")[0], 1)
         self.assert_delayed(qs.defer("name").get(pk=self.p1.pk), 1)
         self.assert_delayed(qs.defer("related__first")[0], 0)
@@ -39,6 +41,7 @@ class DeferTests(AssertionMixin, TestCase):
         # Using 'pk' with only() should result in 3 deferred fields, namely all
         # of them except the model's primary key see #15494
         self.assert_delayed(qs.only("pk")[0], 3)
+        self.assert_delayed(qs.only("pk", "id")[0], 3)
         # You can use 'pk' with reverse foreign key lookups.
         # The related_id is alawys set even if it's not fetched from the DB,
         # so pk and related_id are not deferred.
