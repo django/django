@@ -240,26 +240,29 @@ Usage example::
 ``StrIndex``
 ============
 
-.. class:: StrIndex(expression, substring, **extra)
+.. class:: StrIndex(string, substring, **extra)
 
 .. versionadded:: 2.0
 
-Returns a positive integer corresponding to the 1-indexed position of the
-first occurrence of ``substring`` inside another string, or 0 if the substring
-is not found.
+Returns a positive integer corresponding to the 1-indexed position of the first
+occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
+found.
 
 Usage example::
 
+    >>> from django.db.models import Value as V
     >>> from django.db.models.functions import StrIndex
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.create(name='Smith, Margaret')
     >>> Author.objects.create(name='Margaret Jackson')
     >>> authors = Author.objects.annotate(
-    ...     smith_index=StrIndex('name', 'Smith')).order_by('smith_index')
+    ...     smith_index=StrIndex('name', V('Smith'))
+    ... ).order_by('smith_index')
     >>> authors.first().smith_index
     0
     >>> authors = Author.objects.annotate(
-    ...    smith_index=StrIndex('name', 'Smith')).filter(smith_index__gt=0)
+    ...    smith_index=StrIndex('name', V('Smith'))
+    ... ).filter(smith_index__gt=0)
     <QuerySet [<Author: Margaret Smith>, <Author: Smith, Margaret>]>
 
 .. warning::
