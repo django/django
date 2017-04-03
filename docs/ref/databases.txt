@@ -629,9 +629,9 @@ both MySQL and Django will attempt to convert the values from UTC to local time.
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
-MySQL does not support the ``NOWAIT`` and ``SKIP LOCKED`` options to the
-``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used with
-``nowait=True`` or ``skip_locked=True``, then a
+MySQL does not support the ``NOWAIT``, ``SKIP LOCKED``, and ``OF`` options to
+the ``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used
+with ``nowait=True``, ``skip_locked=True``, or ``of`` then a
 :exc:`~django.db.NotSupportedError` is raised.
 
 Automatic typecasting can cause unexpected results

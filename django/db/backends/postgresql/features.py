@@ -13,6 +13,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_defer_constraint_checks = True
     has_select_for_update = True
     has_select_for_update_nowait = True
+    has_select_for_update_of = True
     has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = True

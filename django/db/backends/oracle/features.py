@@ -9,6 +9,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_skip_locked = True
+    has_select_for_update_of = True
+    select_for_update_of_column = True
     can_return_id_from_insert = True
     allow_sliced_subqueries = False
     can_introspect_autofield = True

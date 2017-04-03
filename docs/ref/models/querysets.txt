@@ -1611,7 +1611,7 @@ For example::
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: select_for_update(nowait=False, skip_locked=False)
+.. method:: select_for_update(nowait=False, skip_locked=False, of=())
 
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
@@ -1635,14 +1635,21 @@ queryset is evaluated. You can also ignore locked rows by using
 ``select_for_update()`` with both options enabled will result in a
 :exc:`ValueError`.
 
+By default, ``select_for_update()`` locks all rows that are selected by the
+query. For example, rows of related objects specified in :meth:`select_related`
+are locked in addition to rows of the queryset's model. If this isn't desired,
+specify the related objects you want to lock in ``select_for_update(of=(...))``
+using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
+to refer to the queryset's model.
+
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL doesn't support the
-``nowait`` and ``skip_locked`` arguments.
+``nowait``, ``skip_locked``, and ``of`` arguments.
 
-Passing ``nowait=True`` or ``skip_locked=True`` to ``select_for_update()``
-using database backends that do not support these options, such as MySQL,
-raises a :exc:`~django.db.NotSupportedError`. This prevents code from
-unexpectedly blocking.
+Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
+``select_for_update()`` using database backends that do not support these
+options, such as MySQL, raises a :exc:`~django.db.NotSupportedError`. This
+prevents code from unexpectedly blocking.
 
 Evaluating a queryset with ``select_for_update()`` in autocommit mode on
 backends which support ``SELECT ... FOR UPDATE`` is a
@@ -1669,6 +1676,10 @@ raised if ``select_for_update()`` is used in autocommit mode.
 .. versionchanged:: 1.11
 
     The ``skip_locked`` argument was added.
+
+.. versionchanged:: 2.0
+
+    The ``of`` argument was added.
 
 ``raw()``
 ~~~~~~~~~

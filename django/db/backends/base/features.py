@@ -36,6 +36,10 @@ class BaseDatabaseFeatures:
     has_select_for_update = False
     has_select_for_update_nowait = False
     has_select_for_update_skip_locked = False
+    has_select_for_update_of = False
+    # Does the database's SELECT FOR UPDATE OF syntax require a column rather
+    # than a table?
+    select_for_update_of_column = False
 
     supports_select_related = True
 

@@ -252,6 +252,12 @@ Models
   :class:`~django.db.models.functions.datetime.Extract` now works with
   :class:`~django.db.models.DurationField`.
 
+* Added the ``of`` argument to :meth:`.QuerySet.select_for_update()`, supported
+  on PostgreSQL and Oracle, to lock only rows from specific tables rather than
+  all selected tables. It may be helpful particularly when
+  :meth:`~.QuerySet.select_for_update()` is used in conjunction with
+  :meth:`~.QuerySet.select_related()`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -330,6 +336,11 @@ backends.
 
 * The first argument of ``SchemaEditor._create_index_name()`` is now
   ``table_name`` rather than ``model``.
+
+* To enable ``FOR UPDATE OF`` support, set
+  ``DatabaseFeatures.has_select_for_update_of = True``. If the database
+  requires that the arguments to ``OF`` be columns rather than tables, set
+  ``DatabaseFeatures.select_for_update_of_column = True``.
 
 Dropped support for Oracle 11.2
 -------------------------------
