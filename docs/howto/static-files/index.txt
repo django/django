@@ -84,7 +84,7 @@ If you use :mod:`django.contrib.staticfiles` as explained above,
 :djadmin:`runserver` will do this automatically when :setting:`DEBUG` is set
 to ``True``. If you don't have ``django.contrib.staticfiles`` in
 :setting:`INSTALLED_APPS`, you can still manually serve static files using the
-:func:`django.contrib.staticfiles.views.serve` view.
+:func:`django.views.static.serve` view.
 
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
@@ -115,8 +115,7 @@ Serving files uploaded by a user during development
 ===================================================
 
 During development, you can serve user-uploaded media files from
-:setting:`MEDIA_ROOT` using the :func:`django.contrib.staticfiles.views.serve`
-view.
+:setting:`MEDIA_ROOT` using the :func:`django.views.static.serve` view.
 
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
