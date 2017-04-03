@@ -100,7 +100,7 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Added optional dependency to WhiteNoise which enables Django to serve
+* Added WhiteNoise as dependency which enables Django to serve
   static files on its own ready for production.
   ``django.contrib.staticfiles.handlers.DjangoWhiteNoise``
   can be used as WSGI middleware which intercept requests for static files and serves
