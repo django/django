@@ -153,8 +153,8 @@ passed. It uses the SQL operator ``<@``. For example::
 ``overlap``
 ~~~~~~~~~~~
 
-Returns objects where the data shares any results with the values passed. Uses
-the SQL operator ``&&``. For example::
+Returns objects where the data shares any results with the values passed,
+which can also be a queryset. Uses the SQL operator ``&&``. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -165,6 +165,9 @@ the SQL operator ``&&``. For example::
 
     >>> Post.objects.filter(tags__overlap=['thoughts', 'tutorial'])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
+
+    >>> Post.objects.filter(name='First post', tags__overlap=Post.objects.values_list('tags'))
+    <Queryset: [<Post: First post>, <Post: Second post>]>
 
 .. fieldlookup:: arrayfield.len
 

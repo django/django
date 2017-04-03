@@ -213,8 +213,23 @@ class ArrayExact(Exact):
 
 @ArrayField.register_lookup
 class ArrayOverlap(lookups.Overlap):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
+    def as_sql(self, compiler, connection):
+        if not self.rhs_is_direct_value():
+            from django.db.models.sql.where import WhereNode, AND
+            from django.db.models.query_utils import QueryWrapper
+
+            root_constraint = WhereNode(connector=AND)
+            qn = compiler.quote_name_unless_alias
+            qn2 = connection.ops.quote_name
+
+            for col in compiler.query.select:
+                lhs = '%s.%s' % (qn(col.alias), qn2(col.target.column))
+                rhs_sql, rhs_params = self.rhs.sql_with_params()
+                root_constraint.add(
+                    QueryWrapper('%s && ANY(%s)' % (lhs, rhs_sql), rhs_params), AND)
+            sql, params = root_constraint.as_sql(compiler, connection)
+            return sql, params
+        sql, params = super().as_sql(compiler, connection)
         sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
