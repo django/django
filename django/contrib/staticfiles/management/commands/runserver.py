@@ -12,11 +12,12 @@ class Command(RunserverCommand):
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
         warnings.warn(
-            "django.contrib.staticfiles.runserver.Command is deprecated"
-            "in favor of WhiteNoiseMiddleware for serving static files."
+            "django.contrib.staticfiles.runserver.Command is deprecated in favor of"
+            "django.contrib.staticfiles.middleware.WhiteNoiseMiddleware and core runserver"
+            "django.core.management.commands.runserver.Command for serving static files."
             "Add django.contrib.staticfiles.runserver_nostatic above"
             "django.contrib.staticfiles app in INSTALLED_APPS to"
-            "recover original runserver command",
+            "recover the core runserver command",
             RemovedInDjango30Warning,
             stacklevel=2,
         )

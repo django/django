@@ -29,7 +29,8 @@ class StaticFilesHandler(WSGIHandler):
     def __init__(self, application):
         warnings.warn(
             "django.contrib.staticfiles.handlers.StaticFilesHandler is deprecated"
-            "in favor of DjangoWhiteNoise for serving static files as WSGI middleware",
+            "in favor of django.contrib.staticfiles.handlers.DjangoWhiteNoise"
+            "for serving static files as WSGI middleware",
             RemovedInDjango30Warning,
             stacklevel=2,
         )

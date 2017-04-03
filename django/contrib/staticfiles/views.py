@@ -31,7 +31,8 @@ def serve(request, path, insecure=False, **kwargs):
     """
     warnings.warn(
         "django.contrib.staticfiles.views.serve is deprecated"
-        "in favor of WhiteNoiseMiddleware for serving static files.",
+        "in favor of django.contrib.staticfiles.middleware.WhiteNoiseMiddleware"
+        "for serving static files.",
         RemovedInDjango30Warning,
         stacklevel=2,
     )
