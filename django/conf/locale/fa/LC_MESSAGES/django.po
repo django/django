@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-01 20:23+0000\n"
-"Last-Translator: Pouya Abbassi\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -301,6 +301,15 @@ msgstr "پرونده‌های استاتیک"
 msgid "Syndication"
 msgstr "پیوند"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "یک مقدار معتبر وارد کنید."
 
@@ -384,6 +393,12 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "و"
@@ -726,14 +741,14 @@ msgstr ""
 "%(datetime)s نمیتواند در %(current_timezone)s معنی شود.شاید این زمان مبهم "
 "است و یا وجود ندارد."
 
+msgid "Clear"
+msgstr "پاک کردن"
+
 msgid "Currently"
 msgstr "در حال حاضر"
 
 msgid "Change"
 msgstr "تغییر"
-
-msgid "Clear"
-msgstr "پاک کردن"
 
 msgid "Unknown"
 msgstr "ناشناخته"
@@ -1102,11 +1117,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "تبریک فراوان بابت اولین صفحهٔ Djangoای‌تان."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"مطمئنا شما هنوز کاری انجام نداده اید. اولین اپلیکیشن خود را با اجرای دستور "
-"<code>python manage.py startapp [app_label]</code> شروع کنید."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

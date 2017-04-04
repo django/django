@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Wognsen <r4mses@gmail.com>, 2013-2016
+# Erik Wognsen <r4mses@gmail.com>, 2013-2017
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jonaskoelker <jonaskoelker@gnu.org>, 2012
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 19:27+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 22:58+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -299,6 +299,15 @@ msgstr "Static Files"
 msgid "Syndication"
 msgstr "Syndication"
 
+msgid "That page number is not an integer"
+msgstr "Det sidetal er ikke et heltal"
+
+msgid "That page number is less than 1"
+msgstr "Det sidetal er mindre end 1"
+
+msgid "That page contains no results"
+msgstr "Den side indeholder ingen resultater"
+
 msgid "Enter a valid value."
 msgstr "Indtast en gyldig værdi."
 
@@ -391,6 +400,14 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Der må maksimalt være %(max)s ciffer før kommaet."
 msgstr[1] "Der må maksimalt være %(max)s cifre før kommaet."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Filendelse '%(extension)s' er ikke tilladt. Tilladte filendelser er: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "og"
@@ -742,14 +759,14 @@ msgstr ""
 "%(datetime)s kunne ikke fortolkes i tidszonen %(current_timezone)s; den kan "
 "være tvetydig eller den eksisterer måske ikke."
 
+msgid "Clear"
+msgstr "Afmarkér"
+
 msgid "Currently"
 msgstr "Aktuelt"
 
 msgid "Change"
 msgstr "Ret"
-
-msgid "Clear"
-msgstr "Afmarkér"
 
 msgid "Unknown"
 msgstr "Ukendt"
@@ -1126,11 +1143,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Tillykke med din første Django-drevne side."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Du har dog ikke gjort noget endnu. Start din første app ved at køre  "
-"<code>python manage.py startapp [app_label]</code>."
+"Start derefter din første app ved at køre <code>python manage.py startapp "
+"[app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

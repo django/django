@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Eduardo <edos21@gmail.com>, 2017
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2016
 # Sebastián Ramírez Magrí <sebasmagri@gmail.com>, 2011
+# Yoel Acevedo, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-14 12:14+0000\n"
+"Last-Translator: Eduardo <edos21@gmail.com>\n"
 "Language-Team: Spanish (Venezuela) (http://www.transifex.com/django/django/"
 "language/es_VE/)\n"
 "MIME-Version: 1.0\n"
@@ -61,7 +63,7 @@ msgid "German"
 msgstr "Alemán"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Sorbio Inferior"
 
 msgid "Greek"
 msgstr "Griego"
@@ -133,7 +135,7 @@ msgid "Croatian"
 msgstr "Croata"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Sorbio Superior"
 
 msgid "Hungarian"
 msgstr "Húngaro"
@@ -196,7 +198,7 @@ msgid "Burmese"
 msgstr "Birmano"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Noruego"
 
 msgid "Nepali"
 msgstr "Nepalí"
@@ -293,6 +295,15 @@ msgstr "Archivos estáticos"
 
 msgid "Syndication"
 msgstr "Sindicación"
+
+msgid "That page number is not an integer"
+msgstr "Ese número de página no es un número entero"
+
+msgid "That page number is less than 1"
+msgstr "Ese número de página es menor que 1"
+
+msgid "That page contains no results"
+msgstr "Esa página no contiene resultados"
 
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
@@ -392,6 +403,14 @@ msgstr[0] ""
 "Asegúrese de que no hayan más de %(max)s dígito antes del punto decimal."
 msgstr[1] ""
 "Asegúrese de que no hayan más de %(max)s dígitos antes del punto decimal."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"La extensión de archivo  '%(extension)s' no está permitida. Las extensiones "
+"permitidas son ' %(allowed_extensions)s'."
 
 msgid "and"
 msgstr "y"
@@ -595,11 +614,11 @@ msgstr "Relación uno a uno"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relación %(from)s - %(to)s "
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relaciones  %(from)s - %(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relación muchos a muchos"
@@ -746,14 +765,14 @@ msgstr ""
 "%(datetime)s no puede interpretarse en la zona horaria %(current_timezone)s; "
 "puede ser ambiguo o puede no existir."
 
+msgid "Clear"
+msgstr "Limpiar"
+
 msgid "Currently"
 msgstr "Actualmente"
 
 msgid "Change"
 msgstr "Cambiar"
-
-msgid "Clear"
-msgstr "Limpiar"
 
 msgid "Unknown"
 msgstr "Desconocido"
@@ -1130,12 +1149,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Felicitaciones por su primera página con Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Por supuesto, todavía no has hecho ningún trabajo. Para continuar, inicia tu "
-"primera aplicación ejecutando <code>python manage.py startapp [app_label]</"
-"code>."
+"Luego, inicia tu primera app corriendo <code>python manage.py startapp "
+"[app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

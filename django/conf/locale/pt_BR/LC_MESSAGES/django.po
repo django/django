@@ -5,15 +5,16 @@
 # andrewsmedina <andrewsmedina@gmail.com>, 2014-2015
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Carlos E C Leite <caduado@gmail.com>, 2016
-# FilipeCifali <cifali.filipe@gmail.com>, 2016
+# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2014-2015
 # Felipe Rodrigues <bidu.pub@gmail.com>, 2016
 # Gladson <gladsonbrito@gmail.com>, 2013
-# Guilherme Gondim, 2011-2014
+# semente, 2011-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Sandro <sandrossv@hotmail.com>, 2011
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 # Wiliam Souza <wiliamsouza83@gmail.com>, 2015
@@ -21,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-04 00:25+0000\n"
-"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-06 02:33+0000\n"
+"Last-Translator: Luiz Boaretto <lboaretto@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -308,6 +309,15 @@ msgstr "Arquivos Estáticos"
 msgid "Syndication"
 msgstr "Syndication"
 
+msgid "That page number is not an integer"
+msgstr "Esse número de página não é um número inteiro"
+
+msgid "That page number is less than 1"
+msgstr "Esse número de página é menor que 1"
+
+msgid "That page contains no results"
+msgstr "Essa página não contém resultados"
+
 msgid "Enter a valid value."
 msgstr "Informe um valor válido."
 
@@ -407,6 +417,14 @@ msgstr[0] ""
 msgstr[1] ""
 "Certifique-se de que não tenha mais de %(max)s dígitos antes do ponto "
 "decimal."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"A extensão de arquivo '%(extension)s' não é permitida. As extensões "
+"permitidas são: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "e"
@@ -758,14 +776,14 @@ msgstr ""
 " %(datetime)s não pôde ser interpretado no fuso horário "
 "%(current_timezone)s; pode estar ambíguo ou pode não existir."
 
+msgid "Clear"
+msgstr "Limpar"
+
 msgid "Currently"
 msgstr "Atualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Limpar"
 
 msgid "Unknown"
 msgstr "Desconhecido"
@@ -1143,12 +1161,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Parabéns pela sua primeira página feita com Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"É claro que você realmente não fez qualquer trabalho ainda. O próximo passo "
-"é iniciar o seu primeiro app rodando <code>python manage.py startapp "
-"[app_label]</code> ."
+"Em seguida, inicie o seu primeiro aplicativo executando <code>python manage."
+"py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

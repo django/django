@@ -1,9 +1,10 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada <abraham.estrada@gmail.com>, 2013
+# Abraham Estrada, 2013
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
-# Antoni Aloy <aaloy@apsl.net>, 2011-2014
+# Amanda Copete, 2017
+# Antoni Aloy <aaloy@apsl.net>, 2011-2014,2017
 # Diego Andres Sanabria Martin <diegueus9@gmail.com>, 2012
 # Diego Schulz <dschulz@gmail.com>, 2012
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
@@ -25,9 +26,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-08-03 15:35+0000\n"
-"Last-Translator: Ernesto Avilés Vázquez <whippiii@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 14:20+0000\n"
+"Last-Translator: Amanda Copete\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -37,7 +38,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Afrikaans"
-msgstr "Afrikaans"
+msgstr "Africano"
 
 msgid "Arabic"
 msgstr "Árabe"
@@ -312,8 +313,17 @@ msgstr "Archivos estáticos"
 msgid "Syndication"
 msgstr "Sindicación"
 
+msgid "That page number is not an integer"
+msgstr "Este número de página no es un entero"
+
+msgid "That page number is less than 1"
+msgstr "Este número de página es menor que 1"
+
+msgid "That page contains no results"
+msgstr "Esa página no contiene resultados"
+
 msgid "Enter a valid value."
-msgstr "Introduzca un valor correcto."
+msgstr "Introduzca un valor válido."
 
 msgid "Enter a valid URL."
 msgstr "Introduzca una URL válida."
@@ -334,8 +344,7 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Ingrese un 'slug' consistente en letras, números, subrayados o guiones "
-"Unicodes."
+"Introduzca un 'slug' consistente en letras, números, subrayados o guiones."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Introduzca una dirección IPv4 válida."
@@ -412,6 +421,14 @@ msgstr[0] ""
 "Asegúrese de que no haya más de %(max)s dígito antes del punto decimal"
 msgstr[1] ""
 "Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"La extensión de fichero '%(extension)s' no está permitida.  Únicamente se "
+"permiten: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "y"
@@ -608,7 +625,7 @@ msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr "La instancia de %(model)s con %(field)s %(value)r no existe."
 
 msgid "Foreign Key (type determined by related field)"
-msgstr "Llave foránea (tipo determinado por el campo relacionado)"
+msgstr "Clave foránea (tipo determinado por el campo relacionado)"
 
 msgid "One-to-one relationship"
 msgstr "Relación uno-a-uno"
@@ -704,7 +721,7 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr "(Compo oculto %(name)s) *%(error)s"
+msgstr "(Campo oculto %(name)s) *%(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Los datos de ManagementForm faltan o han sido manipulados"
@@ -712,14 +729,14 @@ msgstr "Los datos de ManagementForm faltan o han sido manipulados"
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] "Por favor, envíe %d o menos formas."
-msgstr[1] "Por favor, envíe %d o menos formas."
+msgstr[0] "Por favor, envíe %d formulario o menos."
+msgstr[1] "Por favor, envíe %d formularios o menos"
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] "Por favor, envíe %d o más formas."
-msgstr[1] "Por favor, envíe %d o más formas."
+msgstr[0] "Por favor, envíe %d formulario o más."
+msgstr[1] "Por favor, envíe %d formularios o más."
 
 msgid "Order"
 msgstr "Orden"
@@ -767,14 +784,14 @@ msgstr ""
 "%(datetime)s no puede interpretarse en la zona temporal "
 "%(current_timezone)s; puede ser ambiguo o puede no existir."
 
+msgid "Clear"
+msgstr "Limpiar"
+
 msgid "Currently"
 msgstr "Actualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Limpiar"
 
 msgid "Unknown"
 msgstr "Desconocido"
@@ -920,7 +937,7 @@ msgid "mar"
 msgstr "mar"
 
 msgid "apr"
-msgstr "apr"
+msgstr "abr"
 
 msgid "may"
 msgstr "may"
@@ -1151,12 +1168,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Enhorabuena por tu primer página hecha en Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Por supuesto, todavía no has hecho ningún trabajo. Para continuar, inicia tu "
-"primera aplicación ejecutando <code>python manage.py startapp [app_label]</"
-"code>."
+"Seguidamente, inicie su primera aplicación ejecutando <code>python manage.py "
+"startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

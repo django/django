@@ -2,9 +2,9 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2016
+# BouRock, 2015-2017
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@gmail.com>, 2013
+# Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013-2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 09:50+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 17:47+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -303,6 +303,15 @@ msgstr "Sabit Dosyalar"
 msgid "Syndication"
 msgstr "Dağıtım"
 
+msgid "That page number is not an integer"
+msgstr "Bu sayfa numarası bir tamsayı değil"
+
+msgid "That page number is less than 1"
+msgstr "Bu sayfa numarası 1'den az"
+
+msgid "That page contains no results"
+msgstr "Bu sayfa hiç sonuç içermiyor"
+
 msgid "Enter a valid value."
 msgstr "Geçerli bir değer girin."
 
@@ -402,6 +411,14 @@ msgstr[0] ""
 "Ondalık noktasından önce %(max)s rakamdan daha fazla olmadığından emin olun."
 msgstr[1] ""
 "Ondalık noktasından önce %(max)s rakamdan daha fazla olmadığından emin olun."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"'%(extension)s' dosya uzantısına izin verilmiyor. İzin verilen uzantılar: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "ve"
@@ -755,14 +772,14 @@ msgstr ""
 " %(datetime)s, %(current_timezone)s saat dilimi olarak yorumlanamadı; bu "
 "belirsiz olabilir ya da mevcut olmayabilir."
 
+msgid "Clear"
+msgstr "Temizle"
+
 msgid "Currently"
 msgstr "Şu anki"
 
 msgid "Change"
 msgstr "Değiştir"
-
-msgid "Clear"
-msgstr "Temizle"
 
 msgid "Unknown"
 msgstr "Bilinmiyor"
@@ -1141,12 +1158,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "İlk Django-destekli sayfanız için tebrikler."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Tabii ki, aslında henüz herhangi bir çalışma yapmadınız. Sonrasında, "
-"<code>python manage.py startapp [app_label]</code> komutunu çalıştırarak ilk "
-"uygulamanızı başlatın."
+"Sonra, <code>python manage.py startapp [app_label]</code> komutunu "
+"çalıştırarak ilk uygulamanızı başlatın."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

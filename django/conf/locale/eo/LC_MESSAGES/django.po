@@ -2,17 +2,18 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2016
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2017
 # batisteo <bapdarth@yahoo·fr>, 2011
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
+# Nikolay Korotkiy <sikmir@gmail.com>, 2017
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-09-29 18:22+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 00:08+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -298,6 +299,15 @@ msgstr "Statikaj dosieroj"
 msgid "Syndication"
 msgstr "Abonrilato"
 
+msgid "That page number is not an integer"
+msgstr "Tuo paĝnumero ne estas entjero"
+
+msgid "That page number is less than 1"
+msgstr "Tuo paĝnumero estas malpli ol 1"
+
+msgid "That page contains no results"
+msgstr "Tiu paĝo ne enhavas rezultojn"
+
 msgid "Enter a valid value."
 msgstr "Enigu validan valoron."
 
@@ -394,6 +404,14 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Certigu ke ne estas pli ol %(max)s ciferoj antaŭ la dekuma punkto."
 msgstr[1] "Certigu ke ne estas pli ol %(max)s ciferoj antaŭ la dekuma punkto."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"dosiersufikso '%(extension)s' ne estas permesita. Permesitaj dosiersufiksoj "
+"estas: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "kaj"
@@ -746,14 +764,14 @@ msgstr ""
 "%(datetime)s ne povus esti interpretita en horzono %(current_timezone)s; ĝi "
 "povas esti plursenca aŭ ne ekzistas."
 
+msgid "Clear"
+msgstr "Vakigi"
+
 msgid "Currently"
 msgstr "Nuntempe"
 
 msgid "Change"
 msgstr "Ŝanĝi"
-
-msgid "Clear"
-msgstr "Vakigi"
 
 msgid "Unknown"
 msgstr "Nekonate"
@@ -1130,12 +1148,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Gratulojn por via unua Dĵanga paĝo."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Kompreneble, vi ankoraŭ ne reale faris ajnan laboron. Poste, komencu vian "
-"unuan aplikaĵon lanĉante <code>python manage.py startapp [aplikaĵo_etikedo]</"
-"code>."
+"Poste, komencu vian unuan aplikaĵon rulante <code>python manage.py startapp "
+"[app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

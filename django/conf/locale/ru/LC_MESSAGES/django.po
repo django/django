@@ -2,6 +2,7 @@
 #
 # Translators:
 # Mingun <Alexander_Sergey@mail.ru>, 2014
+# Anton Bazhanov <bazanton@yandex.ru>, 2017
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # eigrad <andrew@ei-grad.ru>, 2012
@@ -11,15 +12,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
+# Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
 # Алексей Борискин <sun.void@gmail.com>, 2013-2016
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-20 09:53+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-25 05:25+0000\n"
+"Last-Translator: Vasiliy Anikin <anikin.vasya@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -306,6 +308,15 @@ msgstr "Статические файлы"
 msgid "Syndication"
 msgstr "Ленты новостей"
 
+msgid "That page number is not an integer"
+msgstr "Номер страницы не является натуральным числом"
+
+msgid "That page number is less than 1"
+msgstr "Номер страницы меньше 1"
+
+msgid "That page contains no results"
+msgstr "Страница не содержит результатов"
+
 msgid "Enter a valid value."
 msgstr "Введите правильное значение."
 
@@ -421,6 +432,14 @@ msgstr[0] "Убедитесь, что вы ввели не более %(max)s ц
 msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
 msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
 msgstr[3] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Формат файлов '%(extension)s' не поддерживается. Поддерживаемые форматы "
+"файлов: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "и"
@@ -788,14 +807,14 @@ msgstr ""
 "%(current_timezone)s; дата может быть неоднозначной или оказаться "
 "несуществующей."
 
+msgid "Clear"
+msgstr "Очистить"
+
 msgid "Currently"
 msgstr "На данный момент"
 
 msgid "Change"
 msgstr "Изменить"
-
-msgid "Clear"
-msgstr "Очистить"
 
 msgid "Unknown"
 msgstr "Неизвестно"
@@ -1194,12 +1213,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Поздравляем вас с вашей первой страницей, работающей на Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Конечно, это только начало. Сейчас вы можете создать ваше первое приложение. "
-"Чтобы сделать это, запустите команду <code>python manage.py startapp "
+"Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
+msgstr ""
+"Сейчас вы можете создать ваше первое приложение, запустив команду "
+"<code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

@@ -6,6 +6,7 @@
 # Bouke Haarsma <bouke@webatoom.nl>, 2013
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Erik Romijn <transifex@solidlinks.nl>, 2013
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Harro van der Klauw <hvdklauw@gmail.com>, 2011-2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -17,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -70,7 +71,7 @@ msgid "German"
 msgstr "Duits"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Nedersorbisch"
 
 msgid "Greek"
 msgstr "Grieks"
@@ -142,7 +143,7 @@ msgid "Croatian"
 msgstr "Kroatisch"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Oppersorbisch"
 
 msgid "Hungarian"
 msgstr "Hongaars"
@@ -205,7 +206,7 @@ msgid "Burmese"
 msgstr "Birmaans"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Noorse Bokmål"
 
 msgid "Nepali"
 msgstr "Nepalees"
@@ -302,6 +303,15 @@ msgstr "Statische bestanden"
 
 msgid "Syndication"
 msgstr "Syndicatie"
+
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
 
 msgid "Enter a valid value."
 msgstr "Geef een geldige waarde."
@@ -401,6 +411,12 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Zorg dat er niet meer dan %(max)s cijfer voor de komma staat."
 msgstr[1] "Zorg dat er niet meer dan %(max)s cijfers voor de komma staan."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "en"
@@ -604,11 +620,11 @@ msgstr "Één-op-één relatie"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s relatie"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s relaties"
 
 msgid "Many-to-many relationship"
 msgstr "Veel-op-veel relatie"
@@ -753,14 +769,14 @@ msgstr ""
 "%(datetime)s kon niet worden geïnterpreteerd in tijdzone "
 "%(current_timezone)s. Waarschijnlijk is deze ambigu of bestaat niet."
 
+msgid "Clear"
+msgstr "Verwijder"
+
 msgid "Currently"
 msgstr "Huidige"
 
 msgid "Change"
 msgstr "Wijzigen"
-
-msgid "Clear"
-msgstr "Verwijder"
 
 msgid "Unknown"
 msgstr "Onbekend"
@@ -1139,12 +1155,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Gefeliciteerd met uw eerste Django-aangedreven pagina."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"U heeft natuurlijk nog geen echt werk gedaan. Om verder te gaan start u uw "
-"eerste app door <code>python manage.py startapp [app_label]</code> uit te "
-"voeren."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

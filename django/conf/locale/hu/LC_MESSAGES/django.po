@@ -3,6 +3,7 @@
 # Translators:
 # András Veres-Szentkirályi, 2016
 # Attila Nagy <>, 2012
+# Dóra Szendrei <szendrgigi@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János Péter Ronkay <transifex2@hangya.net>, 2011-2012,2014
 # Máté Őry <orymate@iit.bme.hu>, 2013
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-19 07:35+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-24 11:22+0000\n"
+"Last-Translator: Dóra Szendrei <szendrgigi@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -298,6 +299,15 @@ msgstr "Statikus fájlok"
 msgid "Syndication"
 msgstr "Szindikáció"
 
+msgid "That page number is not an integer"
+msgstr "Az oldalszám nem egész szám."
+
+msgid "That page number is less than 1"
+msgstr "Az oldalszám kisebb, mint 1"
+
+msgid "That page contains no results"
+msgstr "Az oldal nem tartalmaz találatokat"
+
 msgid "Enter a valid value."
 msgstr "Adjon meg egy érvényes értéket."
 
@@ -402,6 +412,14 @@ msgstr[0] ""
 msgstr[1] ""
 "Bizonyosodjon meg arról, hogy legfeljebb %(max)s számjegy van a "
 "tizedesvessző előtt."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"'%(extension)s' kiterjesztés nem engedélyezett. Az engedélyezett "
+"kiterjesztések a következők: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "és"
@@ -761,14 +779,14 @@ msgstr ""
 "%(datetime)s értelmezhetetlen a megadott %(current_timezone)s időzónában; "
 "vagy félreérthető, vagy nem létezik."
 
+msgid "Clear"
+msgstr "Törlés"
+
 msgid "Currently"
 msgstr "Jelenleg"
 
 msgid "Change"
 msgstr "Módosítás"
-
-msgid "Clear"
-msgstr "Törlés"
 
 msgid "Unknown"
 msgstr "Ismeretlen"
@@ -1145,12 +1163,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Gratulálunk az első Django alapú oldalhoz!"
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Természetesen még hátra van a munka nagy része. Következő lépésként indítsa "
-"el az első appot a <code>python manage.py startapp [app_label]</code> "
-"paranccsal."
+"Következő lépésként indítsa el az első appot a <code>python manage.py "
+"startapp [app_label]</code> paranccsal."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

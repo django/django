@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-01 21:52+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-08 20:42+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -294,6 +294,15 @@ msgstr "Statiske dataje"
 msgid "Syndication"
 msgstr "Syndikacija"
 
+msgid "That page number is not an integer"
+msgstr "Toś ten numer boka njejo ceła licba"
+
+msgid "That page number is less than 1"
+msgstr "Numer boka jo mjeńšy ako 1"
+
+msgid "That page contains no results"
+msgstr "Toś ten bok njewopśimujo wuslědki"
+
 msgid "Enter a valid value."
 msgstr "Zapódajśo płaśiwu gódnotu."
 
@@ -410,6 +419,14 @@ msgstr[0] "Zawěsććo, až njejo wěcej ako %(max)s cyfry pśed decimalneju kom
 msgstr[1] "Zawěsććo, až njejo wěcej ako %(max)s cyfrowu pśed decimalneju komu."
 msgstr[2] "Zawěsććo, až njejo wěcej ako %(max)s cyfrow pśed decimalneju komu."
 msgstr[3] "Zawěsććo, až njejo wěcej ako %(max)s cyfrow pśed decimalneju komu."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Datajowy sufiks ' %(extension)s' njejo dowólony. Dowólone sufikse su: ' "
+"%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "a"
@@ -777,14 +794,14 @@ msgstr ""
 "%(datetime)s njedajo se w casowej conje %(current_timezone)s "
 "interpretěrowaś; jo dwójozmysłowy abo snaź njeeksistěrujo."
 
+msgid "Clear"
+msgstr "Lašowaś"
+
 msgid "Currently"
 msgstr "Tuchylu"
 
 msgid "Change"
 msgstr "Změniś"
-
-msgid "Clear"
-msgstr "Lašowaś"
 
 msgid "Unknown"
 msgstr "Njeznaty"
@@ -1176,12 +1193,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Glukužycenje za waš prědny bok, kótaryž spěchujo se wót Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Zawěsće, pópšawem hyšći njejsćo žedno źěło gótował. Wuwjeźćo ako pśiduce "
-"<code>python manage.py startapp [app_label]</code>, aby swójo prědne "
-"nałoženje startował."
+"Wuwjeźćo ako pśiduce <code>python manage.py startapp [app_label]</code>, aby "
+"swójo prědne nałoženje startował."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

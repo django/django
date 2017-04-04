@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-08 09:35+0000\n"
-"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -297,6 +297,15 @@ msgstr "Статички датотеки"
 msgid "Syndication"
 msgstr "Синдикација"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Внесете правилна вредност."
 
@@ -399,6 +408,12 @@ msgstr[0] ""
 "Осигурајте се дека нема повеќе одs %(max)s цифра пред децималната запирка."
 msgstr[1] ""
 "Осигурајте се дека нема повеќе од %(max)s цифри пред децималната запирка."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "и"
@@ -753,14 +768,14 @@ msgstr ""
 "%(datetime)s не може да се толкува во временска зона %(current_timezone)s;  "
 "можеби е двосмислена или не постои."
 
+msgid "Clear"
+msgstr "Исчисти"
+
 msgid "Currently"
 msgstr "Моментално"
 
 msgid "Change"
 msgstr "Измени"
-
-msgid "Clear"
-msgstr "Исчисти"
 
 msgid "Unknown"
 msgstr "Непознато"
@@ -1140,12 +1155,9 @@ msgstr ""
 "Ви честитаме на поставување на вашата прва страница подржана од Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Се разбира, сеуште немате направено ништо. Наредно, направете ја вашата прва "
-"апликација со повикување на командата <code>python manage.py startapp "
+"Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
+msgstr ""
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

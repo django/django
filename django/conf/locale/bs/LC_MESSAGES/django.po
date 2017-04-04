@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bosnian (http://www.transifex.com/django/django/language/"
 "bs/)\n"
@@ -295,6 +295,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Unesite ispravnu vrijednost."
 
@@ -388,6 +397,12 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "i"
@@ -721,14 +736,14 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 
+msgid "Clear"
+msgstr "Očisti"
+
 msgid "Currently"
 msgstr "Trenutno"
 
 msgid "Change"
 msgstr "Izmjeni"
-
-msgid "Clear"
-msgstr "Očisti"
 
 msgid "Unknown"
 msgstr "Nepoznato"
@@ -1100,8 +1115,8 @@ msgid "Congratulations on your first Django-powered page."
 msgstr ""
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 msgid ""

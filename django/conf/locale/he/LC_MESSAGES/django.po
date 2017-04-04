@@ -3,14 +3,14 @@
 # Translators:
 # Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2011-2015
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-04-01 14:41+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,7 +61,7 @@ msgid "German"
 msgstr "גרמנית"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "סורבית תחתונה"
 
 msgid "Greek"
 msgstr "יוונית"
@@ -133,7 +133,7 @@ msgid "Croatian"
 msgstr "קרואטית"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "סורבית עילית"
 
 msgid "Hungarian"
 msgstr "הונגרית"
@@ -196,7 +196,7 @@ msgid "Burmese"
 msgstr "בּוּרְמֶזִית"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "נורבגית ספרותית"
 
 msgid "Nepali"
 msgstr "נפאלית"
@@ -294,6 +294,15 @@ msgstr "קבצים סטטיים"
 msgid "Syndication"
 msgstr "הפצת תכנים"
 
+msgid "That page number is not an integer"
+msgstr "מספר העמוד אינו מספר שלם"
+
+msgid "That page number is less than 1"
+msgstr "מספר העמוד קטן מ־1"
+
+msgid "That page contains no results"
+msgstr "עמוד זה אינו מכיל תוצאות"
+
 msgid "Enter a valid value."
 msgstr "יש להזין ערך חוקי."
 
@@ -383,6 +392,14 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "נא לוודא שאין יותר מספרה %(max)s לפני הנקודה העשרונית"
 msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות לפני הנקודה העשרונית"
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"סיומת הקובץ '%(extension)s' אסורה. הסיומות המותרות הן: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "ו"
@@ -581,11 +598,11 @@ msgstr "יחס של אחד לאחד"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "קשר %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "קשרי %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "יחס של רבים לרבים"
@@ -721,14 +738,14 @@ msgstr ""
 "לא ניתן לפרש את %(datetime)s באזור זמן  %(current_timezone)s; הוא עשוי להיות "
 "דו-משמעי או לא קיים."
 
+msgid "Clear"
+msgstr "לסלק"
+
 msgid "Currently"
 msgstr "עכשיו"
 
 msgid "Change"
 msgstr "שינוי"
-
-msgid "Clear"
-msgstr "לסלק"
 
 msgid "Unknown"
 msgstr "לא ידוע"
@@ -1102,11 +1119,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "ברכות על העמוד מבוסס Django הראשון שלך."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"ברור שלא עשית עדיין כלום. בשלב הבא יש להתחיל את היישום הראשון שלך ע\"י הרצת "
-"<code>python manage.py startapp [app_label]</code>."
+"בשלב הבא יש להתחיל את היישום הראשון שלך ע\"י הרצת <code>python manage.py "
+"startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Michael Bauer, 2014
-# GunChleoc, 2015-2016
+# GunChleoc, 2015-2017
 # GunChleoc, 2015
 # GunChleoc, 2014-2015
 # Michael Bauer, 2014
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-03 09:57+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 11:03+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -298,6 +298,15 @@ msgstr "Faidhlichean stadastaireachd"
 msgid "Syndication"
 msgstr "Siondacaideadh"
 
+msgid "That page number is not an integer"
+msgstr "Chan eil àireamh na duilleige seo 'na àireamh slàn"
+
+msgid "That page number is less than 1"
+msgstr "Tha àireamh na duilleige seo nas lugha na 1"
+
+msgid "That page contains no results"
+msgstr "Chan eil toradh aig an duilleag seo"
+
 msgid "Enter a valid value."
 msgstr "Cuir a-steach luach dligheach."
 
@@ -430,6 +439,14 @@ msgstr[2] ""
 msgstr[3] ""
 "Dèan cinnteach nach eil barrachd air %(max)s àireamh ann ron phuing "
 "dheicheach."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Chan eil an leudachan faidhle \"%(extension)s\" ceadaichte. Seo na "
+"leudachain a tha ceadaichte: \"%(allowed_extensions)s\"."
 
 msgid "and"
 msgstr "agus"
@@ -799,14 +816,14 @@ msgstr ""
 "Cha chiall dha %(datetime)s san roinn-tìde %(current_timezone)s; dh’fhaoidte "
 "gu bheil e dà-sheaghach no nach eil e ann."
 
+msgid "Clear"
+msgstr "Falamhaich"
+
 msgid "Currently"
 msgstr "An-dràsta"
 
 msgid "Change"
 msgstr "Atharraich"
-
-msgid "Clear"
-msgstr "Falamhaich"
 
 msgid "Unknown"
 msgstr "Chan eil fhios"
@@ -1200,12 +1217,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Meal do naidheachd gu bheil a’ chiad duilleag le cumhachd Django agad."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Gu nàdarra, cha do rinn thu obair dha-rìribh fhathast. Nise, tòisich a’ "
-"chiad aplacaid agad ’s tu a’ ruith <code>python manage.py aplacaid_toisich "
-"[leubail_aplacaid]</code>."
+"An uairsin, tòisich a' chiad aplacaid agad 's tu a' ruith <code>python "
+"manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

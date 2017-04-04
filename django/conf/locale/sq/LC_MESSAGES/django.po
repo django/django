@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -295,6 +295,15 @@ msgstr "Kartela Statike"
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Jepni vlerë të vlefshme."
 
@@ -395,6 +404,12 @@ msgstr[0] ""
 "Sigurohuni që nuk ka më tepër se %(max)s shifër para presjes dhjetore."
 msgstr[1] ""
 "Sigurohuni që nuk ka më tepër se %(max)s shifra para presjes dhjetore."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr " dhe "
@@ -753,14 +768,14 @@ msgstr ""
 "%(datetime)s nuk u interpretua dot brenda zonë kohore %(current_timezone)s; "
 "mund të jetë e dykuptimtë ose mund të mos ekzistojë."
 
+msgid "Clear"
+msgstr "Pastroje"
+
 msgid "Currently"
 msgstr "Tani"
 
 msgid "Change"
 msgstr "Ndryshoje"
-
-msgid "Clear"
-msgstr "Pastroje"
 
 msgid "Unknown"
 msgstr "E panjohur"
@@ -1137,11 +1152,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Urime për faqen tuaj të parë me Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Kuptohet, që s’keni bërë ende ndonjë punë. Në vazhdim, filloni aplikacionin "
-"tuaj të parë duke xhiruar <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

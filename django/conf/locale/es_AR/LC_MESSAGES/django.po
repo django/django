@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2016
+# Ramiro Morales, 2013-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-30 23:44+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-23 14:26+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -296,6 +296,15 @@ msgstr "Archivos estáticos"
 msgid "Syndication"
 msgstr "Sindicación"
 
+msgid "That page number is not an integer"
+msgstr "El número de página no es un entero"
+
+msgid "That page number is less than 1"
+msgstr "El número de página es menor a 1"
+
+msgid "That page contains no results"
+msgstr "Esa página no contiene resultados"
+
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
 
@@ -396,6 +405,14 @@ msgstr[0] ""
 "Asegúrese de que no exista mas de %(max)s dígito antes del punto decimal."
 msgstr[1] ""
 "Asegúrese de que no existan mas de %(max)s dígitos antes del punto decimal."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"La extensión de archivo '%(extension)s' no está permitida. Las extensiones "
+"aceptadas son: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "y"
@@ -755,14 +772,14 @@ msgstr ""
 "%(datetime)s no puede ser interpretado en la zona horaria "
 "%(current_timezone)s; ya que podría ser ambiguo o podría no existir."
 
+msgid "Clear"
+msgstr "Eliminar"
+
 msgid "Currently"
 msgstr "Actualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Eliminar"
 
 msgid "Unknown"
 msgstr "Desconocido"
@@ -1142,11 +1159,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Felicitationes por tu primera página Django-powered."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Obviamente en realidad todavia no has hecho nada. Ahora crea tu primera "
-"aplicación ejecutando <code>python manage.py startapp [app_label]</code>."
+"A continuación cree su primera aplicación ejecutando <code>python manage.py "
+"startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
