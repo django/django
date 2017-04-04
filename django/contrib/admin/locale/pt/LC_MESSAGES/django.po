@@ -6,13 +6,14 @@
 # Nuno Mariz <nmariz@gmail.com>, 2013,2015
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
+# Rui Dinis Silva, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-10 16:58+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -67,10 +68,10 @@ msgid "This year"
 msgstr "Este ano"
 
 msgid "No date"
-msgstr ""
+msgstr "Sem  data"
 
 msgid "Has date"
-msgstr ""
+msgstr "Tem data"
 
 #, python-format
 msgid ""
@@ -136,7 +137,7 @@ msgstr "Objeto LogEntry"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Foi adicionado {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Adicionado."
@@ -146,7 +147,7 @@ msgstr "e"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Foram modificados os {fields} para {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
@@ -213,8 +214,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "O(A) %(name)s \"%(obj)s\" foi removido(a) com sucesso."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "O object %(name)s com a chave primária %(key)r não existe."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"

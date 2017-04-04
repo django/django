@@ -4,7 +4,7 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # andrewsmedina <andrewsmedina@gmail.com>, 2016
 # Eduardo Cereto Carvalho, 2011
-# Guilherme Gondim, 2012
+# semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Renata Barbosa Almeida <renata-rj000@hotmail.com>, 2016

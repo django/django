@@ -5,7 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
-# Liping Wang <lynn.config@gmail.com>, 2016
+# Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-20 02:14+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-14 10:21+0000\n"
 "Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
@@ -216,8 +216,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "ID为“%(key)s”的%(name)s不存在。也许它被删除了？ "
 
 #, python-format
 msgid "Add %s"

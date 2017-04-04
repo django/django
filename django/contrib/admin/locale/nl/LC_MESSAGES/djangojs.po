@@ -2,6 +2,7 @@
 #
 # Translators:
 # Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-10-12 17:32+0000\n"
+"Last-Translator: Evelijn Saaltink <evelijnsaaltink@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -154,68 +155,68 @@ msgid "Tomorrow"
 msgstr "Morgen"
 
 msgid "January"
-msgstr ""
+msgstr "januari"
 
 msgid "February"
-msgstr ""
+msgstr "februari"
 
 msgid "March"
-msgstr ""
+msgstr "maart"
 
 msgid "April"
-msgstr ""
+msgstr "april"
 
 msgid "May"
-msgstr ""
+msgstr "mei"
 
 msgid "June"
-msgstr ""
+msgstr "juni"
 
 msgid "July"
-msgstr ""
+msgstr "juli"
 
 msgid "August"
-msgstr ""
+msgstr "augustus"
 
 msgid "September"
-msgstr ""
+msgstr "september"
 
 msgid "October"
-msgstr ""
+msgstr "oktober"
 
 msgid "November"
-msgstr ""
+msgstr "november"
 
 msgid "December"
-msgstr ""
+msgstr "december"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Tonen"

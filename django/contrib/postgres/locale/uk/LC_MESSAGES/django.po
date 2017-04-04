@@ -2,15 +2,17 @@
 #
 # Translators:
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
-# Denis Podlesniy <haos616@gmail.com>, 2016
-# Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
+# Денис Подлесный <haos616@gmail.com>, 2016
+# Igor Melnyk, 2017
+# Kirill Gagarski <gagarin.gtn@gmail.com>, 2015-2016
+# Zoriana Zaiats, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-17 16:56+0000\n"
+"Last-Translator: Zoriana Zaiats\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -30,12 +32,12 @@ msgstr "Елемент масиву №%(nth)s не пройшов переві�
 msgid "Nested arrays must have the same length."
 msgstr "Вкладени масиви мусять бути однакової довжини."
 
-msgid "Map of strings to strings"
-msgstr "Карта строк в строках"
+msgid "Map of strings to strings/nulls"
+msgstr "Асоціативний масив із рядків у рядки/обнулення"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Значення \"%(key)s\" не є рядком."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Значення від \"%(key)s\" не є стрічкою чи null."
 
 msgid "A JSON object"
 msgstr "Об'єкт JSON"
@@ -47,7 +49,7 @@ msgid "Could not load JSON data."
 msgstr "Не вдалося завантажити JSON-дані."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Значення повинне бути JSON-словником."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
@@ -82,10 +84,10 @@ msgstr[0] ""
 "Список містить %(show_value)d елемент, кількість яких не має перевищувати "
 "%(limit_value)d."
 msgstr[1] ""
-"Список містить %(show_value)d елементів, кількість яких не має перевищувати "
+"Список містить %(show_value)d елементи, кількість яких не має перевищувати "
 "%(limit_value)d."
 msgstr[2] ""
-"Список містить %(show_value)d елемента, кількість яких не має перевищувати "
+"Список містить %(show_value)d елементів, кількість яких не має перевищувати "
 "%(limit_value)d."
 
 #, python-format

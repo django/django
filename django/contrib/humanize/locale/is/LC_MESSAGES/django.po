@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# gudmundur <gudmundur.bjarni@gmail.com>, 2012
+# gudmundur <inactive+gudmundur@transifex.com>, 2012
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Thordur Sigurdsson <thordur@ja.is>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-10-07 19:42+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -197,10 +198,10 @@ msgid "today"
 msgstr "í dag"
 
 msgid "tomorrow"
-msgstr "morgundagur"
+msgstr "á morgun"
 
 msgid "yesterday"
-msgstr "gærdagur"
+msgstr "í gær"
 
 #, python-format
 msgctxt "naturaltime"

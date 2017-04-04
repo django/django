@@ -4,13 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # rodin <romihardiyanto@gmail.com>, 2011-2012
+# rodin <romihardiyanto@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-12-15 22:45+0000\n"
-"Last-Translator: M Asep Indrayana <me@drayanaindra.com>\n"
+"PO-Revision-Date: 2016-11-01 13:48+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Content Types"
-msgstr "Tipe Konten"
+msgstr "Jenis Konten"
 
 msgid "python model class name"
 msgstr "nama kelas model python"

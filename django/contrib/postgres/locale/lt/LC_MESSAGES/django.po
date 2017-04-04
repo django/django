@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Matas Dailyda <matas@dailyda.com>, 2015-2016
+# Matas Dailyda <matas@dailyda.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-18 09:08+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-30 14:07+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -28,12 +28,12 @@ msgstr "Masyve nevalidus %(nth)s elementas: "
 msgid "Nested arrays must have the same length."
 msgstr "Iterpti vienas į kitą masyvai turi būti vienodo ilgio."
 
-msgid "Map of strings to strings"
-msgstr "Teksto eilučių \"string\" į teksto eilutes sąsaja"
+msgid "Map of strings to strings/nulls"
+msgstr "Susietos tekstinės reikšmės su tekstinėmis reikšmėmis/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "\"%(key)s\" reikšmė nėra teksto eilutė \"string\"."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" reikšmė nėra tekstinė arba null."
 
 msgid "A JSON object"
 msgstr "JSON objektas"

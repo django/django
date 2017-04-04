@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Eduardo <edos21@gmail.com>, 2017
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2016
+# Yoel Acevedo, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-02-15 14:13+0000\n"
+"Last-Translator: Eduardo <edos21@gmail.com>\n"
 "Language-Team: Spanish (Venezuela) (http://www.transifex.com/django/django/"
 "language/es_VE/)\n"
 "MIME-Version: 1.0\n"
@@ -115,19 +117,19 @@ msgid "hash"
 msgstr "función resumen"
 
 msgid "variety"
-msgstr ""
+msgstr "variedad"
 
 msgid "version"
-msgstr ""
+msgstr "versión"
 
 msgid "memory cost"
-msgstr ""
+msgstr "costo de memoria"
 
 msgid "time cost"
-msgstr ""
+msgstr "costo de tiempo"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelismo"
 
 msgid "work factor"
 msgstr "factor trabajo"
@@ -184,6 +186,7 @@ msgstr "nombre de usuario"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Requerido. 150 caracteres o menos. Letras, dígitos y @/./+/-/_ solamente. "
 
 msgid "A user with that username already exists."
 msgstr "Ya existe un usuario con este nombre."
@@ -270,11 +273,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Introduzca un nombre de usuario válido. Este solo puede contener letras del "
+"alfabeto en ingles, números y los caracteres @/./+/-/_"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Introduzca un nombre de usuario válido. Este solo puede contener letras, "
+"números y los caracteres @/./+/-/_"
 
 msgid "Logged out"
 msgstr "Sesión terminada"

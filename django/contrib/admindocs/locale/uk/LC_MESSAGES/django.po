@@ -3,17 +3,18 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
-# Denis Podlesniy <haos616@gmail.com>, 2016
+# Денис Подлесный <haos616@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kirill Gagarski <gagarin.gtn@gmail.com>, 2016
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Sergey Lysach <sergikoff88@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-07 22:52+0000\n"
-"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -54,8 +55,8 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Перекидає вас з будь-якої сторінки в документацію для функції, що "
-"сгенерувала цю сторінку."
+"Перекидає вас з будь-якої сторінки в документацію для відображення, що "
+"сгенерувало цю сторінку."
 
 msgid "Tags"
 msgstr "Теги"
@@ -93,9 +94,9 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
-"Кожна сторінка для відкритого сайту створена за допомогою вигляду. Вигляд "
-"визначає, який шаблон використовується для генерації сторінки та об'єкти, "
-"які доступні для цього шаблону."
+"Кожна сторінка для відкритого сайту створена за допомогою відображення."
+"Відображення визначає, який шаблон використовується для генерації сторінки "
+"та об'єкти, які доступні для цього шаблону."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
@@ -234,10 +235,10 @@ msgstr "Порожня іменована зона"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Відображення у просторі імен %(name)s"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Відображення у глобальному просторі імен "
 
 #, python-format
 msgid ""
@@ -245,13 +246,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
-
-msgid "Boolean (Either True or False)"
-msgstr "Булеве значення (True або False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Тип поля: %(field_type)s"
+"\n"
+"Функція відображення: <code>%(full_name)s</code>. Им'я: <code>%(url_name)s</"
+"code>.\n"
 
 msgid "tag:"
 msgstr "тег:"

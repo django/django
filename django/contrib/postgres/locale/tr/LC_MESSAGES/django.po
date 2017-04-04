@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2016
+# BouRock, 2015-2017
 # BouRock, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 11:02+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 18:05+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -28,12 +28,12 @@ msgstr "Dizilimdeki %(nth)s öğesi doğrulanmadı: "
 msgid "Nested arrays must have the same length."
 msgstr "İç içe dizilimler aynı uzunlukta olmak zorunda."
 
-msgid "Map of strings to strings"
-msgstr "Dizgilerden dizgilere eşleme"
+msgid "Map of strings to strings/nulls"
+msgstr "Dizgiler/boşlar olarak dizgilerin eşlemesi"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "\"%(key)s\" değeri bir dizgi değil."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" değeri bir dizgi ya da boş değil."
 
 msgid "A JSON object"
 msgstr "JSON nesnesi"

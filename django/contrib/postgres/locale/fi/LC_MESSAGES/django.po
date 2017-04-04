@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-08 12:03+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,12 @@ msgstr "Taulukon %(nth)s alkio ei ole kelvollinen:"
 msgid "Nested arrays must have the same length."
 msgstr "Sisäkkäisillä taulukoilla tulee olla sama pituus."
 
-msgid "Map of strings to strings"
-msgstr "Kartta merkkijonoista merkkijonoihin"
+msgid "Map of strings to strings/nulls"
+msgstr "Kartta merkkijonoista merkkijonoihin tai tyhjiin (null)"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Avain \"%(key)s\" ei ole merkkijono."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Avaimen \"%(key)s\" arvo ei ole merkkijono tai tyhjä (null)."
 
 msgid "A JSON object"
 msgstr "JSON-tietue"
@@ -44,7 +44,7 @@ msgid "Could not load JSON data."
 msgstr "JSON-dataa ei voitu ladata."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Syötteen tulee olla JSON-sanakirja."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

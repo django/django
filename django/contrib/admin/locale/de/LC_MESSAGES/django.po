@@ -5,15 +5,15 @@
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
 # Jannis, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2016
+# Jannis Leidel <jannis@leidel.info>, 2013-2017
 # Jannis, 2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-26 11:53+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 09:17+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -78,8 +78,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Bitte einen gültigen %(username)s und ein Passwort für einen Staff-Account "
-"eingeben. Beide Felder berücksichtigen die Groß-/Kleinschreibung."
+"Bitte %(username)s und Passwort für einen Staff-Account eingeben. Beide "
+"Felder berücksichtigen die Groß-/Kleinschreibung."
 
 msgid "Action:"
 msgstr "Aktion:"
@@ -221,9 +221,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-"Das %(name)s-Objekt mit dem Primärschlüssel %(key)r ist nicht vorhanden."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s mit ID \"%(key)s\" existiert nicht. Eventuell gelöscht?"
 
 #, python-format
 msgid "Add %s"

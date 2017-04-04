@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ramiro Morales, 2015-2016
+# Ramiro Morales, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-30 23:46+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-23 14:23+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -27,12 +27,12 @@ msgstr "La validación del ítem %(nth)s del arreglo falló:"
 msgid "Nested arrays must have the same length."
 msgstr "Los arreglos anidados deben ser de la misma longitud."
 
-msgid "Map of strings to strings"
-msgstr "Mapeo de cadenas a cadenas"
+msgid "Map of strings to strings/nulls"
+msgstr "Mapa de cadenas a cadenas/nulos"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "El valor de \"%(key)s\" no es una cadena."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "El valor de \"%(key)s\" no es una cadena o nulo."
 
 msgid "A JSON object"
 msgstr "Un objeto JSON"

@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-12 16:37+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-08 20:36+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -214,8 +214,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" jo se wuspěšnje wulašował."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Objekt %(name)s z primarnym klucom %(key)r njeeksistěrujo."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s z ID \" %(key)s\" njeeksistěrujo. Jo se snaź wulašowało?"
 
 #, python-format
 msgid "Add %s"

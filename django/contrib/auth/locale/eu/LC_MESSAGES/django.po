@@ -2,6 +2,7 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013
+# Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen <julenx@gmail.com>, 2015
 # Urtzi Odriozola <urtzi.odriozola@gmail.com>, 2016
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-03-22 15:07+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -84,7 +85,7 @@ msgid "This account is inactive."
 msgstr "Kontu hau az dago aktibo."
 
 msgid "Email"
-msgstr "Eposta"
+msgstr "Emaila"
 
 msgid "New password"
 msgstr "Pasahitz berria"
@@ -105,7 +106,7 @@ msgid "algorithm"
 msgstr "algoritmoak"
 
 msgid "iterations"
-msgstr "begiztak"
+msgstr "iterazioak"
 
 msgid "salt"
 msgstr "salt"
@@ -117,7 +118,7 @@ msgid "variety"
 msgstr ""
 
 msgid "version"
-msgstr ""
+msgstr "bertsioa"
 
 msgid "memory cost"
 msgstr ""
@@ -138,7 +139,7 @@ msgid "name"
 msgstr "izena"
 
 msgid "content type"
-msgstr ""
+msgstr "eduki mota"
 
 msgid "codename"
 msgstr "kode izena"
@@ -192,7 +193,7 @@ msgid "last name"
 msgstr "abizena"
 
 msgid "email address"
-msgstr "e-mail helbidea"
+msgstr "helbide elektronikoa"
 
 msgid "staff status"
 msgstr "Arduradun egoera"
@@ -229,7 +230,10 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Pasahitz hau laburregia da. Gutxienez karaktere %(min_length)d izan behar du."
 msgstr[1] ""
+"Pasahitz hau laburregia da. Gutxienez %(min_length)d karaktere izan behar "
+"ditu."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -245,7 +249,7 @@ msgid "Your password can't be too similar to your other personal information."
 msgstr ""
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Pasahitz hau arruntegia da."
 
 msgid "Your password can't be a commonly used password."
 msgstr ""
@@ -264,11 +268,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Idatzi baleko erabiltzaile izen bat. Eremu honetan hizki, zenbaki eta @/./"
+"+/-/_ karaktereak bakarrik erabili daitezke."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Idatzi baleko erabiltzaile izen bat. Eremu honetan hizki, zenbaki eta @/./"
+"+/-/_ karaktereak bakarrik erabili daitezke."
 
 msgid "Logged out"
 msgstr "Sesiotik kanpo"

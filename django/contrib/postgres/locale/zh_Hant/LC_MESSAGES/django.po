@@ -2,13 +2,13 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-08-30 09:32+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 16:29+0000\n"
 "Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -28,12 +28,12 @@ msgstr "陣列中第 %(nth)s 個物件驗證失敗："
 msgid "Nested arrays must have the same length."
 msgstr "各嵌套陣列長度必須相同。"
 
-msgid "Map of strings to strings"
-msgstr "字串與字串值的對應"
+msgid "Map of strings to strings/nulls"
+msgstr "字串與字串/空值的對應"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "「%(key)s」並非字串。"
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "「%(key)s」並非字串或空值。"
 
 msgid "A JSON object"
 msgstr "一個 JSON 物件"

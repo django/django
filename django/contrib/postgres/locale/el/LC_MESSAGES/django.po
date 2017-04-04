@@ -2,14 +2,15 @@
 #
 # Translators:
 # Giannis Meletakis <meletakis@gmail.com>, 2015
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2017
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 14:11+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 11:00+0000\n"
 "Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -28,12 +29,12 @@ msgstr "To στοιχείο %(nth)s στον πίνακα δεν είναι έγ
 msgid "Nested arrays must have the same length."
 msgstr "Οι ένθετοι πίνακες πρέπει να έχουν το ίδιο μήκος."
 
-msgid "Map of strings to strings"
-msgstr "Αντιστοίχιση strings σε strings"
+msgid "Map of strings to strings/nulls"
+msgstr "Αντιστοίχιση strings σε strings/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Η τιμή του \"%(key)s\" δεν είναι string."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Η τιμή του \"%(key)s\" δεν είναι string ή null."
 
 msgid "A JSON object"
 msgstr "Ένα αντικείμενο JSON"

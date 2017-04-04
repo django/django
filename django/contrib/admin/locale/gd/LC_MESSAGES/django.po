@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015-2016
+# GunChleoc, 2015-2017
 # GunChleoc, 2015
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:24+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 11:01+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -219,8 +219,10 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Chaidh %(name)s “%(obj)s” a sguabadh às gu soirbheachail."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Chan eil oibseact %(name)s air a bheil prìomh-iuchair %(key)r ann."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+"Chan eil %(name)s leis an ID \"%(key)s\" ann. 'S dòcha gun deach a sguabadh "
+"às?"
 
 #, python-format
 msgid "Add %s"

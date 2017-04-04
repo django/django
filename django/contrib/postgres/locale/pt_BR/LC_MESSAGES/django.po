@@ -6,14 +6,15 @@
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Luiz Boaretto <lboaretto@gmail.com>, 2017
 # rafaelribeiroo <pereiraribeirorafael@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-08-02 11:55+0000\n"
-"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-06 02:30+0000\n"
+"Last-Translator: Luiz Boaretto <lboaretto@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -32,12 +33,12 @@ msgstr "O item %(nth)s no array não pode ser validado:"
 msgid "Nested arrays must have the same length."
 msgstr "Matrizes aninhadas devem ter o mesmo comprimento."
 
-msgid "Map of strings to strings"
-msgstr "Mapa de strings para strings"
+msgid "Map of strings to strings/nulls"
+msgstr "Mapa de strings para strings/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "O valor de \"%(key)s\" não é uma string."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "O valor de \"%(key)s\" não é uma string ou null."
 
 msgid "A JSON object"
 msgstr "Um objeto JSON"

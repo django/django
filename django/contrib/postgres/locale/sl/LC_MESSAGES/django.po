@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
 # zejn <zejn@kiberpipa.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-09-27 19:25+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-02 08:27+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -28,12 +29,12 @@ msgstr "Element št. %(nth)s v seznamu ni veljaven:"
 msgid "Nested arrays must have the same length."
 msgstr "Gnezdeni seznami morajo imeti enako dolžino."
 
-msgid "Map of strings to strings"
-msgstr "Preslikava nizev v nize "
+msgid "Map of strings to strings/nulls"
+msgstr "Preslikava nizev v nize/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Vrednost \"%(key)s\" ni niz."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Vrednost \"%(key)s\" ni niz ali null."
 
 msgid "A JSON object"
 msgstr "JSON objekt"

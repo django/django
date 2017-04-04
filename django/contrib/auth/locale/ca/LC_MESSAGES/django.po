@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2015
+# Antoni Aloy <aaloy@apsl.net>, 2015,2017
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014-2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-02-14 07:30+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -119,19 +119,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "varietat"
 
 msgid "version"
-msgstr ""
+msgstr "versió"
 
 msgid "memory cost"
-msgstr ""
+msgstr "cost de memòria"
 
 msgid "time cost"
-msgstr ""
+msgstr "cost de temps"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelisme"
 
 msgid "work factor"
 msgstr "factor de treball"
@@ -187,7 +187,7 @@ msgid "username"
 msgstr "nom d'usuari"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Obligatori. 150 o menys caràcters. Només lletres, dígits i @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Ja existeix un usuari amb aquest nom."
@@ -274,11 +274,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Introdueixi un nom d'usuari vàlid. Aquest valor pot contenir sols lletres, "
+"números i els caràcters @/./+/-/_ "
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Introdueixi un nom d'usuari vàlid. Aquest valor pot contenir sols lletres, "
+"números i els caràcters @/./+/-/_ "
 
 msgid "Logged out"
 msgstr "Sessió finalitzada"

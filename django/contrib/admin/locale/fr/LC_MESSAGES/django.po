@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2016
+# Claude Paroz <claude@2xlibre.net>, 2013-2017
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 16:32+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 14:44+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -119,22 +119,22 @@ msgstr "entrées d'historique"
 
 #, python-format
 msgid "Added \"%(object)s\"."
-msgstr "%(object)s ajouté(e)s."
+msgstr "Ajout de « %(object)s »."
 
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "%(object)s modifié(e)s - %(changes)s"
+msgstr "Modification de « %(object)s » - %(changes)s"
 
 #, python-format
 msgid "Deleted \"%(object)s.\""
-msgstr "%(object)s supprimé(e)s"
+msgstr "Suppression de « %(object)s »."
 
 msgid "LogEntry Object"
 msgstr "Objet de journal"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr "{name} « {object} » ajouté."
+msgstr "Ajout de {name} « {object} »."
 
 msgid "Added."
 msgstr "Ajout."
@@ -144,15 +144,15 @@ msgstr "et"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{fields} modifié(s) pour l'objet {name} « {object} »."
+msgstr "Modification de {fields} pour l'objet {name} « {object} »."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "{fields} modifié(s)."
+msgstr "Modification de {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr "{name} « {object} » supprimé."
+msgstr "Suppression de {name} « {object} »."
 
 msgid "No fields changed."
 msgstr "Aucun champ modifié."
@@ -219,8 +219,10 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "L'objet %(name)s « %(obj)s » a été supprimé avec succès."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "L'objet %(name)s avec la clef primaire %(key)r n'existe pas."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+"%(name)s avec l'identifiant  « %(key)s » n'existe pas. Peut-être a-t-il été "
+"supprimé ?"
 
 #, python-format
 msgid "Add %s"

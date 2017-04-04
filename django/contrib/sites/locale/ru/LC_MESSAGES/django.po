@@ -2,6 +2,7 @@
 #
 # Translators:
 # Eugene MechanisM <eugene@mechanism.pro>, 2013
+# Eugene MechanisM <eugene@mechanism.pro>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2014
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-10-22 13:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-11-05 23:49+0000\n"
+"Last-Translator: Eugene MechanisM <eugene@mechanism.pro>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +32,7 @@ msgid "domain name"
 msgstr "доменное имя"
 
 msgid "display name"
-msgstr "выводимое имя"
+msgstr "отображаемое имя"
 
 msgid "site"
 msgstr "сайт"

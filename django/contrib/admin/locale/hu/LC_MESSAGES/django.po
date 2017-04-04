@@ -4,6 +4,7 @@
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
 # András Veres-Szentkirályi, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
+# János Péter Ronkay <transifex2@hangya.net>, 2017
 # János Péter Ronkay <transifex2@hangya.net>, 2014
 # Kristóf Gruber <>, 2012
 # slink <gabor@20y.hu>, 2011
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-19 07:39+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 00:43+0000\n"
+"Last-Translator: János Péter Ronkay <transifex2@hangya.net>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -217,8 +218,9 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen törölve."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+"Nem létezik %(name)s ezzel az azonosítóval: \"%(key)s\". Netán törölve lett?"
 
 #, python-format
 msgid "Add %s"

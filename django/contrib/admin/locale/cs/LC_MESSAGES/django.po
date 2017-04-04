@@ -5,14 +5,14 @@
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2013-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2016
+# Vláďa Macek <macek@sandbox.cz>, 2015-2017
 # yedpodtrzitko <yed@vanyli.net>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-16 22:14+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-21 09:43+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -221,8 +221,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně odstraněna."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Položka \"%(name)s\" s primárním klíčem \"%(key)r\" neexistuje."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "Objekt %(name)s s klíčem \"%(key)s\" neexistuje. Možná byl odstraněn."
 
 #, python-format
 msgid "Add %s"

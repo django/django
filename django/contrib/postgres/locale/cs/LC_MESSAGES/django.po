@@ -2,13 +2,13 @@
 #
 # Translators:
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
-# Vláďa Macek <macek@sandbox.cz>, 2015-2016
+# Vláďa Macek <macek@sandbox.cz>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-09-16 22:28+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-21 09:48+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,12 @@ msgstr "%(nth)s. položka pole je neplatná:"
 msgid "Nested arrays must have the same length."
 msgstr "Vnořená pole musejí mít stejnou délku."
 
-msgid "Map of strings to strings"
-msgstr "Asociativní pole řetězcových klíčů na řetězcové hodnoty"
+msgid "Map of strings to strings/nulls"
+msgstr "Mapování řetězců na řetězce či hodnoty NULL"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Hodnota klíče \"%(key)s\" není řetězec."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Hodnota s klíčem \"%(key)s\" není řetězec ani NULL."
 
 msgid "A JSON object"
 msgstr "Objekt typu JSON"

@@ -2,15 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
 # zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-27 19:24+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-02 08:35+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -216,8 +217,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" je bil uspešno izbrisan."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Objekt %(name)s z glavnim ključem %(key)r ne obstaja."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s s ključem \"%(key)s\" ne obstaja. Morda je bil izbrisan?"
 
 #, python-format
 msgid "Add %s"
@@ -243,8 +244,8 @@ msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s izbran"
 msgstr[1] "%(total_count)s izbrana"
-msgstr[2] "%(total_count)s izbrani"
-msgstr[3] "%(total_count)s izbranih"
+msgstr[2] "Vsi %(total_count)s izbrani"
+msgstr[3] "Vseh %(total_count)s izbranih"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -470,7 +471,7 @@ msgid "Add"
 msgstr "Dodaj"
 
 msgid "You don't have permission to edit anything."
-msgstr "Nimate dovoljenja za urejanje."
+msgstr "Nimate dovoljenja za urejanje česarkoli."
 
 msgid "Recent actions"
 msgstr "Nedavna dejanja"

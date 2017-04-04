@@ -9,15 +9,15 @@
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
-# sorl <mikko@aino.se>, 2011
+# Mikko Hellsing <mikko@aino.se>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-07 19:24+0000\n"
-"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 08:14+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -175,32 +175,35 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" lades till. Du kan redigera objektet igen nedanför."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" lades till. Du kan lägga till ytterligare {name} nedan."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" lades till."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" ändrades. Du kan ändra det igen nedan."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" ändrades."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -216,8 +219,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" togs bort."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -471,10 +474,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Du har inte rättigheter att redigera något."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Senaste Händelser"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mina händelser"
 
 msgid "None available"
 msgstr "Inga tillgängliga"

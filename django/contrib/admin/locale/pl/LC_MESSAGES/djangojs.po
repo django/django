@@ -7,20 +7,22 @@
 # konryd <inactive+konryd@transifex.com>, 2011
 # m_aciek <maciej.olko@gmail.com>, 2016
 # Roman Barczyński <rombar@gmail.com>, 2012
+# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-09 13:22+0000\n"
-"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"PO-Revision-Date: 2016-11-12 12:15+0000\n"
+"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>=14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -31,12 +33,12 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"To jest lista dostępnych %s. Aby wybrać pozycje zaznacz je i kliknij "
-"strzałkę „Wybierz” pomiędzy listami."
+"To lista dostępnych %s. Aby wybrać pozycje, zaznacz je i kliknij strzałkę "
+"„Wybierz” pomiędzy listami."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Pisz tutaj aby wyfiltrować listę dostępnych %s."
+msgstr "Wpisz coś tutaj, aby wyfiltrować listę dostępnych %s."
 
 msgid "Filter"
 msgstr "Filtr"
@@ -46,7 +48,7 @@ msgstr "Wybierz wszystkie"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr "Kliknij aby wybrać wszystkie %s na raz."
+msgstr "Kliknij, aby wybrać jednocześnie wszystkie %s."
 
 msgid "Choose"
 msgstr "Wybierz"
@@ -63,21 +65,22 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"To jest lista wybranych %s. Aby usunąć zaznacz pozycje wybrane do usunięcia "
-"i kliknij strzałkę „Usuń” pomiędzy listami."
+"To lista wybranych %s. Aby usunąć, zaznacz pozycje wybrane do usunięcia i "
+"kliknij strzałkę „Usuń” pomiędzy listami."
 
 msgid "Remove all"
 msgstr "Usuń wszystkie"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Kliknij aby usunąć wszystkie wybrane %s na raz."
+msgstr "Kliknij, aby usunąć jednocześnie wszystkie wybrane %s."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "Zaznaczono %(sel)s z %(cnt)s"
 msgstr[1] "Zaznaczono %(sel)s z %(cnt)s"
 msgstr[2] "Zaznaczono %(sel)s z %(cnt)s"
+msgstr[3] "Zaznaczono %(sel)s z %(cnt)s"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -106,29 +109,39 @@ msgstr ""
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] ""
-"Uwaga: Czas lokalny jest przesunięty %s godzinę w stosunku do czasu serwera."
+"Uwaga: Czas lokalny jest przesunięty o %s godzinę do przodu w stosunku do "
+"czasu serwera."
 msgstr[1] ""
-"Uwaga: Czas lokalny jest przesunięty %s godziny w stosunku do czasu serwera."
+"Uwaga: Czas lokalny jest przesunięty o %s godziny do przodu w stosunku do "
+"czasu serwera."
 msgstr[2] ""
-"Uwaga: Czas lokalny jest przesunięty %s godzin w stosunku do czasu serwera."
+"Uwaga: Czas lokalny jest przesunięty o %s godzin do przodu w stosunku do "
+"czasu serwera."
+msgstr[3] ""
+"Uwaga: Czas lokalny jest przesunięty o %s godzin do przodu w stosunku do "
+"czasu serwera."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
-"Uwaga: Czas lokalny jest przesunięty o %s godzinę w stosunku do czasu "
-"serwera."
+"Uwaga: Czas lokalny jest przesunięty o %s godzinę do tyłu w stosunku do "
+"czasu serwera."
 msgstr[1] ""
-"Uwaga: Czas lokalny jest przesunięty o %s godziny w stosunku do czasu "
-"serwera."
+"Uwaga: Czas lokalny jest przesunięty o %s godziny do tyłu w stosunku do "
+"czasu serwera."
 msgstr[2] ""
-"Uwaga: Czas lokalny jest przesunięty o %s godzin w stosunku do czasu serwera."
+"Uwaga: Czas lokalny jest przesunięty o %s godzin do tyłu w stosunku do czasu "
+"serwera."
+msgstr[3] ""
+"Uwaga: Czas lokalny jest przesunięty o %s godzin do tyłu w stosunku do czasu "
+"serwera."
 
 msgid "Now"
 msgstr "Teraz"
 
 msgid "Choose a Time"
-msgstr "Wybierz czas"
+msgstr "Wybierz Czas"
 
 msgid "Choose a time"
 msgstr "Wybierz czas"
@@ -152,7 +165,7 @@ msgid "Today"
 msgstr "Dzisiaj"
 
 msgid "Choose a Date"
-msgstr "Wybierz datę"
+msgstr "Wybierz Datę"
 
 msgid "Yesterday"
 msgstr "Wczoraj"
@@ -161,68 +174,68 @@ msgid "Tomorrow"
 msgstr "Jutro"
 
 msgid "January"
-msgstr "styczeń"
+msgstr "Styczeń"
 
 msgid "February"
-msgstr "luty"
+msgstr "Luty"
 
 msgid "March"
-msgstr "marzec"
+msgstr "Marzec"
 
 msgid "April"
-msgstr "kwiecień"
+msgstr "Kwiecień"
 
 msgid "May"
-msgstr "maj"
+msgstr "Maj"
 
 msgid "June"
-msgstr "czerwiec"
+msgstr "Czerwiec"
 
 msgid "July"
-msgstr "lipiec"
+msgstr "Lipiec"
 
 msgid "August"
-msgstr "sierpień"
+msgstr "Sierpień"
 
 msgid "September"
-msgstr "wrzesień"
+msgstr "Wrzesień"
 
 msgid "October"
-msgstr "październik"
+msgstr "Październik"
 
 msgid "November"
-msgstr "listopad"
+msgstr "Listopad"
 
 msgid "December"
-msgstr "grudzień"
+msgstr "Grudzień"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "n"
+msgstr "N"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "pn"
+msgstr "P"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "w"
+msgstr "W"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr "ś"
+msgstr "Ś"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "c"
+msgstr "C"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "pt"
+msgstr "P"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "s"
+msgstr "S"
 
 msgid "Show"
 msgstr "Pokaż"
