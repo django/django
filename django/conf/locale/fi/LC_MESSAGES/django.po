@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2017
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lasse Liehu <larso@gmx.com>, 2015
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-08 12:03+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgid "German"
 msgstr "saksa"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Alasorbi"
 
 msgid "Greek"
 msgstr "kreikka"
@@ -136,7 +136,7 @@ msgid "Croatian"
 msgstr "kroatia"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Yläsorbi"
 
 msgid "Hungarian"
 msgstr "unkari"
@@ -199,7 +199,7 @@ msgid "Burmese"
 msgstr "burman kieli"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "norja (bokmål)"
 
 msgid "Nepali"
 msgstr "nepalin kieli"
@@ -296,6 +296,15 @@ msgstr "Staattiset tiedostot"
 
 msgid "Syndication"
 msgstr "Syndikointi"
+
+msgid "That page number is not an integer"
+msgstr "Annettu sivunumero ei ole kokonaisluku"
+
+msgid "That page number is less than 1"
+msgstr "Annettu sivunumero on alle 1"
+
+msgid "That page contains no results"
+msgstr "Annetulla sivulla ei ole tuloksia"
 
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
@@ -395,6 +404,14 @@ msgstr[0] ""
 "Tässä luvussa saa olla enintään %(max)s numero ennen desimaalipilkkua."
 msgstr[1] ""
 "Tässä luvussa saa olla enintään %(max)s numeroa ennen desimaalipilkkua."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Pääte \"%(extension)s\" ei ole sallittu. Sallittuja päätteitä ovat "
+"\"%(allowed_extensions)s\"."
 
 msgid "and"
 msgstr "ja"
@@ -595,11 +612,11 @@ msgstr "Yksi-yhteen relaatio"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s -suhde"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s -suhteet"
 
 msgid "Many-to-many relationship"
 msgstr "Moni-moneen relaatio"
@@ -739,14 +756,14 @@ msgstr ""
 "%(datetime)s -arvoa ei pystytty lukemaan aikavyöhykkeellä "
 "%(current_timezone)s; se saattaa olla moniarvoinen tai määrittämätön."
 
+msgid "Clear"
+msgstr "Poista"
+
 msgid "Currently"
 msgstr "Tällä hetkellä"
 
 msgid "Change"
 msgstr "Muokkaa"
-
-msgid "Clear"
-msgstr "Poista"
 
 msgid "Unknown"
 msgstr "Tuntematon"
@@ -1124,12 +1141,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Onnittelut ensimmäisestä Django-sivustasi!"
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Et toki ole vielä tehnyt yhtään oikeaa työtä. Seuraavaksi voit aloittaa "
-"ensimmäisen sovelluksesi ajamalla <code>python manage.py startapp "
-"[sovelluksen_nimike]</code>."
+"Seuraavaksi voit aloittaa ensimmäisen sovelluksesi ajamalla <code>python "
+"manage.py startapp [sovelluksen_nimike]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

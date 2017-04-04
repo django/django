@@ -5,15 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2013-2015
-# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2017
 # vestimir <vestimir@gmail.com>, 2014
 # Alexander Atanasov <aatanasov@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 17:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-25 23:04+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -299,6 +299,15 @@ msgstr "Статични файлове"
 msgid "Syndication"
 msgstr "Syndication"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Въведете валидна стойност.  "
 
@@ -355,10 +364,10 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Уверете се, тази стойност е най-малко %(limit_value)d знака (тя има "
+"Уверете се, че тази стойност е най-малко %(limit_value)d знака (тя има "
 "%(show_value)d )."
 msgstr[1] ""
-"Уверете се, тази стойност е най-малко %(limit_value)d знака (тя има "
+"Уверете се, че тази стойност е най-малко %(limit_value)d знака (тя има "
 "%(show_value)d)."
 
 #, python-format
@@ -372,7 +381,7 @@ msgstr[0] ""
 "Уверете се, тази стойност има най-много %(limit_value)d знака (тя има "
 "%(show_value)d)."
 msgstr[1] ""
-"Уверете се, тази стойност има най-много %(limit_value)d знака (тя има "
+"Уверете се, че тази стойност има най-много %(limit_value)d знака (тя има "
 "%(show_value)d)."
 
 #, python-format
@@ -398,6 +407,14 @@ msgstr[0] ""
 "Уверете се, че има не повече от %(max)s цифри преди десетичната запетая."
 msgstr[1] ""
 "Уверете се, че има не повече от %(max)s цифри преди десетичната запетая."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Не са разрешени файлове с раширение '%(extension)s'. Позволените разширения "
+"са:  '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "и"
@@ -654,7 +671,8 @@ msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] "Уверете се, това име е най-много %(max)d знака (то има %(length)d)."
 msgstr[1] ""
-"Уверете се, това файлово име има най-много  %(max)d знаци (има %(length)d)."
+"Уверете се, че това файлово име има най-много  %(max)d знаци (има "
+"%(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -748,14 +766,14 @@ msgstr ""
 "%(datetime)s не може да бъде разчетено в  %(current_timezone)s; може да е "
 "двусмислен или да не съществува"
 
+msgid "Clear"
+msgstr "Изчисти"
+
 msgid "Currently"
 msgstr "Сега"
 
 msgid "Change"
 msgstr "Промени"
-
-msgid "Clear"
-msgstr "Изчисти"
 
 msgid "Unknown"
 msgstr "Неизвестно"
@@ -1133,8 +1151,8 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Поздравления за първата си Django страница."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 msgid ""

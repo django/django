@@ -8,15 +8,15 @@
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # ming hsien tzang <tzangms@gmail.com>, 2011
 # tcc <tcchou@tcchou.org>, 2011
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # Yeh-Yung <yyc1217@gmail.com>, 2013
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-08-30 09:04+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 16:32+0000\n"
 "Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -302,6 +302,15 @@ msgstr "靜態文件"
 msgid "Syndication"
 msgstr "聯播"
 
+msgid "That page number is not an integer"
+msgstr "該頁碼並非整數"
+
+msgid "That page number is less than 1"
+msgstr "該頁碼小於 1"
+
+msgid "That page contains no results"
+msgstr "該頁未包含任何內容"
+
 msgid "Enter a valid value."
 msgstr "請輸入有效的值。"
 
@@ -383,6 +392,13 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "請確認小數點前不多於 %(max)s 位。"
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"副檔名「%(extension)s」不被允許。允許的副檔名包含：%(allowed_extensions)s。"
 
 msgid "and"
 msgstr "和"
@@ -708,14 +724,14 @@ msgstr ""
 "%(datetime)s 無法被轉換成 %(current_timezone)s 時區格式; 可能是不符格式或不存"
 "在。"
 
+msgid "Clear"
+msgstr "清除"
+
 msgid "Currently"
 msgstr "目前"
 
 msgid "Change"
 msgstr "變更"
-
-msgid "Clear"
-msgstr "清除"
 
 msgid "Unknown"
 msgstr "未知"
@@ -1081,11 +1097,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "觀迎來到你的第一個 Django 頁面。"
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"當然，你什麼都還沒做。馬上用 <code>python manage.py startapp [app_label]</"
-"code> 建立你的第一個 app 吧。"
+"馬上用 <code>python manage.py startapp [app_label]</code> 建立你的第一個 app "
+"吧。"
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

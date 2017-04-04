@@ -4,6 +4,7 @@
 # fasouto <fsoutomoure@gmail.com>, 2011-2012
 # fonso <fonzzo@gmail.com>, 2011,2013
 # fonso <fonzzo@gmail.com>, 2013
+# fasouto <fsoutomoure@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 # Oscar Carballal <oscar.carballal@gmail.com>, 2012
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-28 16:23+0000\n"
+"Last-Translator: fasouto <fsoutomoure@gmail.com>\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +30,7 @@ msgid "Arabic"
 msgstr "Árabe"
 
 msgid "Asturian"
-msgstr ""
+msgstr "Asturiano"
 
 msgid "Azerbaijani"
 msgstr "azerí"
@@ -59,7 +60,7 @@ msgid "Welsh"
 msgstr "Galés"
 
 msgid "Danish"
-msgstr "dinamarqués"
+msgstr "Dinamarqués"
 
 msgid "German"
 msgstr "Alemán"
@@ -74,7 +75,7 @@ msgid "English"
 msgstr "Inglés"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Inglés australiano"
 
 msgid "British English"
 msgstr "inglés británico"
@@ -116,7 +117,7 @@ msgid "French"
 msgstr "Francés"
 
 msgid "Frisian"
-msgstr "frisón"
+msgstr "Frisón"
 
 msgid "Irish"
 msgstr "irlandés"
@@ -155,7 +156,7 @@ msgid "Icelandic"
 msgstr "islandés"
 
 msgid "Italian"
-msgstr "italiano"
+msgstr "Italiano"
 
 msgid "Japanese"
 msgstr "xaponés"
@@ -173,7 +174,7 @@ msgid "Kannada"
 msgstr "canará"
 
 msgid "Korean"
-msgstr "coreano"
+msgstr "Coreano"
 
 msgid "Luxembourgish"
 msgstr "luxemburgués"
@@ -298,6 +299,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Insira un valor válido."
 
@@ -369,8 +379,8 @@ msgstr[1] ""
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Asegure que non hai mais de %(max)s díxito en total."
+msgstr[1] "Asegure que non hai mais de %(max)s díxitos en total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -386,6 +396,12 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
 msgid "and"
 msgstr "e"
 
@@ -395,7 +411,7 @@ msgstr ""
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "O valor %(value)r non é unha opción válida."
 
 msgid "This field cannot be null."
 msgstr "Este campo non pode ser nulo."
@@ -652,7 +668,7 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Insira un UUID válido."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -723,14 +739,14 @@ msgstr ""
 "%(datetime)s non se puido interpretar na zona hora horaria "
 "%(current_timezone)s; pode ser ambiguo ou non existir."
 
+msgid "Clear"
+msgstr "Limpar"
+
 msgid "Currently"
 msgstr "Actualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Limpar"
 
 msgid "Unknown"
 msgstr "Descoñecido"
@@ -1083,20 +1099,20 @@ msgid ""
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Pode ver máis información se establece DEBUG=True."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Benvido a Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "¡Funcionou!"
 
 msgid "Congratulations on your first Django-powered page."
 msgstr ""
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 msgid ""

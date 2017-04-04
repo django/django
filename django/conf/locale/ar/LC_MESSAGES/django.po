@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-18 08:41+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -297,6 +297,15 @@ msgstr "الملفات الثابتة"
 msgid "Syndication"
 msgstr "توظيف النشر"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "أدخل قيمة صحيحة."
 
@@ -425,6 +434,12 @@ msgstr[2] "تحقق من أن تدخل %(max)s رقمين قبل الفاصل ا
 msgstr[3] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
 msgstr[4] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
 msgstr[5] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "و"
@@ -790,14 +805,14 @@ msgstr ""
 "%(datetime)s لا يمكن تفسيرها في المنطقة الزمنية %(current_timezone)s; قد "
 "تكون غامضة أو أنها غير موجودة."
 
+msgid "Clear"
+msgstr "تفريغ"
+
 msgid "Currently"
 msgstr "حالياً"
 
 msgid "Change"
 msgstr "عدّل"
-
-msgid "Clear"
-msgstr "تفريغ"
 
 msgid "Unknown"
 msgstr "مجهول"
@@ -1201,12 +1216,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "تهانينا على صفحتك الأولى بدعم من جانغو."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"وبطبيعة الحال، لم يتم عمل أي عمل فعلي حتى الآن. الخطوة التالية هي تشغيل أول "
-"تطبيق لك عبر الأمر التالي\n"
-" <code>python manage.py startapp [app_label]</code> ."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

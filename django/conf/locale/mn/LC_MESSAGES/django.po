@@ -8,15 +8,15 @@
 # jargalan <jargalanch@gmail.com>, 2011
 # Tsolmon <mnts26@gmail.com>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2015
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
@@ -69,7 +69,7 @@ msgid "German"
 msgstr "Герман"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Доод Сорбин"
 
 msgid "Greek"
 msgstr "Грек"
@@ -141,7 +141,7 @@ msgid "Croatian"
 msgstr "Хорват"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Дээд Сорбин"
 
 msgid "Hungarian"
 msgstr "Унгар"
@@ -204,7 +204,7 @@ msgid "Burmese"
 msgstr "Бирм"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Норвеги Бокмал"
 
 msgid "Nepali"
 msgstr "Непал"
@@ -302,6 +302,15 @@ msgstr "Статик файлууд"
 msgid "Syndication"
 msgstr "Нэгтгэл"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Зөв утга оруулна уу."
 
@@ -398,6 +407,12 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
 msgstr[1] "Энд бутархайн таслалаас өмнө %(max)s-аас олонгүй цифр байх ёстой."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "ба"
@@ -598,11 +613,11 @@ msgstr "Нэг-нэг холбоос"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s холбоос"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s холбоосууд"
 
 msgid "Many-to-many relationship"
 msgstr "Олон-олон холбоос"
@@ -746,14 +761,14 @@ msgstr ""
 "%(datetime)s цагийн бүсийг хөрвүүлэж чадахгүй байна. %(current_timezone)s; "
 "цагийн бүс буруу эсвэл байхгүй байж магадгүй."
 
+msgid "Clear"
+msgstr "Цэвэрлэх"
+
 msgid "Currently"
 msgstr "Одоогийн"
 
 msgid "Change"
 msgstr "Засах"
-
-msgid "Clear"
-msgstr "Цэвэрлэх"
 
 msgid "Unknown"
 msgstr "Тодорхойгүй"
@@ -1128,11 +1143,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Баяр хүргэе!. Таний эхний Django-оор хийсэн хуудас."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Мэдээж таны ажил дөнгөж эхлэж байна. Үүний дараа дараах коммандыг ажиллуулаж "
-"эхний app аа үүсгэнэ. <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

@@ -6,13 +6,13 @@
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2016
+# Vláďa Macek <macek@sandbox.cz>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-09-16 22:28+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-21 09:47+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -297,6 +297,15 @@ msgstr "Statické soubory"
 msgid "Syndication"
 msgstr "Syndikace"
 
+msgid "That page number is not an integer"
+msgstr "Číslo stránky není celé číslo."
+
+msgid "That page number is less than 1"
+msgstr "Číslo stránky je menší než 1"
+
+msgid "That page contains no results"
+msgstr "Stránka je bez výsledků"
+
 msgid "Enter a valid value."
 msgstr "Zadejte platnou hodnotu."
 
@@ -402,6 +411,14 @@ msgstr[1] ""
 msgstr[2] ""
 "Ujistěte se, že hodnota neobsahuje více než %(max)s míst před desetinnou "
 "čárkou (tečkou)."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Přípona souboru '%(extension)s' není povolena. Povolené jsou tyto: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "a"
@@ -755,14 +772,14 @@ msgstr ""
 "Hodnotu %(datetime)s nelze interpretovat v časové zóně %(current_timezone)s; "
 "může to být nejednoznačné nebo nemusí existovat."
 
+msgid "Clear"
+msgstr "Zrušit"
+
 msgid "Currently"
 msgstr "Aktuálně"
 
 msgid "Change"
 msgstr "Změnit"
-
-msgid "Clear"
-msgstr "Zrušit"
 
 msgid "Unknown"
 msgstr "Neznámé"
@@ -1146,12 +1163,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Gratulujeme, toto je vaše první stránka generována v prostředí Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Samozřejmě máte před sebou ještě spoustu práce. Začněte vytvořením Vaší "
-"první aplikace pomocí příkazu <code>python manage.py startapp [app_label]</"
-"code>. "
+"Nyní můžete začít práce na své první aplikaci spuštěním příkazu <code>python "
+"manage.py startapp [identifikátor_aplikace]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

@@ -2,7 +2,7 @@
 #
 # Translators:
 # charettes <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2016
+# Claude Paroz <claude@2xlibre.net>, 2013-2017
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-05 14:01+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 14:47+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -298,6 +298,15 @@ msgstr "Fichiers statiques"
 msgid "Syndication"
 msgstr "Syndication"
 
+msgid "That page number is not an integer"
+msgstr "Ce numéro de page n'est pas un nombre entier"
+
+msgid "That page number is less than 1"
+msgstr "Ce numéro de page est plus petit que 1"
+
+msgid "That page contains no results"
+msgstr "Cette page ne contient aucun résultat"
+
 msgid "Enter a valid value."
 msgstr "Saisissez une valeur valide."
 
@@ -402,6 +411,14 @@ msgstr[0] ""
 "Assurez-vous qu'il n'y a pas plus de %(max)s chiffre avant la virgule."
 msgstr[1] ""
 "Assurez-vous qu'il n'y a pas plus de %(max)s chiffres avant la virgule."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"L'extension de fichier « %(extension)s » n'est pas autorisée. Les extensions "
+"autorisées sont :  %(allowed_extensions)s."
 
 msgid "and"
 msgstr "et"
@@ -762,14 +779,14 @@ msgstr ""
 "La valeur %(datetime)s n'a pas pu être interprétée dans le fuseau horaire "
 "%(current_timezone)s ; elle est peut-être ambigüe ou elle n'existe pas."
 
+msgid "Clear"
+msgstr "Effacer"
+
 msgid "Currently"
 msgstr "Actuellement"
 
 msgid "Change"
 msgstr "Modifier"
-
-msgid "Clear"
-msgstr "Effacer"
 
 msgid "Unknown"
 msgstr "Inconnu"
@@ -1151,11 +1168,10 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Félicitations pour votre première page produite par Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Naturellement, il ne s'agit pas encore d'un résultat utilisable. La "
-"prochaine étape est de créer une application en exécutant <code>python "
+"La prochaine étape est de créer une application en exécutant <code>python "
 "manage.py startapp [nom_app]</code>."
 
 msgid ""

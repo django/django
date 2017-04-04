@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -295,6 +295,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Zadajte platnú hodnotu."
 
@@ -404,6 +413,12 @@ msgstr[1] ""
 msgstr[2] ""
 "Uistite sa, že nie je zadaných viac ako %(max)s číslic pred desatinnou "
 "čiarkou."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "a"
@@ -743,14 +758,14 @@ msgstr ""
 "Hodnota %(datetime)s v časovej zóne %(current_timezone)s sa nedá "
 "interpretovať; môže byť nejednoznačná alebo nemusí existovať."
 
+msgid "Clear"
+msgstr "Vymazať"
+
 msgid "Currently"
 msgstr "Súčasne"
 
 msgid "Change"
 msgstr "Zmeniť"
-
-msgid "Clear"
-msgstr "Vymazať"
 
 msgid "Unknown"
 msgstr "Neznámy"
@@ -1122,8 +1137,8 @@ msgid "Congratulations on your first Django-powered page."
 msgstr ""
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 msgid ""

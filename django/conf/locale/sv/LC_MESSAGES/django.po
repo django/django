@@ -8,7 +8,7 @@
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
-# Mattias Jansson <mattias@colourandcode.se>, 2011
+# Mattias Benjaminsson <mattias@colourandcode.se>, 2011
 # Rasmus Précenth <prillan91@gmail.com>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-07 19:03+0000\n"
-"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -303,6 +303,15 @@ msgstr "Statiska filer"
 msgid "Syndication"
 msgstr "Syndikering"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Fyll i ett giltigt värde."
 
@@ -404,6 +413,12 @@ msgstr[0] ""
 "Säkerställ att det inte är mer än %(max)s siffra före decimalavskiljaren."
 msgstr[1] ""
 "Säkerställ att det inte är mer än %(max)s siffror före decimalavskiljaren."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "och"
@@ -758,14 +773,14 @@ msgstr ""
 "%(datetime)s kunde inte tolkas i tidszonen %(current_timezone)s; det kan "
 "vara en ogiltig eller tvetydigt tidpunkt"
 
+msgid "Clear"
+msgstr "Rensa"
+
 msgid "Currently"
 msgstr "Nuvarande"
 
 msgid "Change"
 msgstr "Ändra"
-
-msgid "Clear"
-msgstr "Rensa"
 
 msgid "Unknown"
 msgstr "Okänt"
@@ -1141,11 +1156,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Grattis till din nya Django-drivna sida."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Självklart har du inte hunnit jobba något med sidan än. Starta din första "
-"app genom att köra <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

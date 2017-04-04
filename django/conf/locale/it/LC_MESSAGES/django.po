@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# bbstuntman <Bbstuntman@gmail.com>, 2017
 # Carlo Miron <C8E@miron.it>, 2011
 # Carlo Miron <C8E@miron.it>, 2014
 # Denis Darii <denis.darii@gmail.com>, 2011
@@ -10,16 +11,17 @@
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2013
-# palmux <palmux@gmail.com>, 2014-2015
+# palmux <palmux@gmail.com>, 2014-2015,2017
 # Mattia Procopio <promat85@gmail.com>, 2015
+# Riccardo Magliocchetti <riccardo.magliocchetti@gmail.com>, 2017
 # Stefano Brentegani <sbrentegani@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-09-28 11:39+0000\n"
-"Last-Translator: Stefano Brentegani <sbrentegani@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-31 10:55+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -304,6 +306,15 @@ msgstr "File statici"
 msgid "Syndication"
 msgstr "Aggregazione"
 
+msgid "That page number is not an integer"
+msgstr "Quel numero di pagina non è un integer"
+
+msgid "That page number is less than 1"
+msgstr "Quel numero di pagina è minore di 1"
+
+msgid "That page contains no results"
+msgstr "Quella pagina non presenta alcun risultato"
+
 msgid "Enter a valid value."
 msgstr "Inserisci un valore valido."
 
@@ -403,6 +414,14 @@ msgstr[0] "Assicurati che non vi sia più di %(max)s cifra prima della virgola."
 msgstr[1] ""
 "Assicurati che non vi siano più di %(max)s cifre prima della virgola."
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Il file con estensione '%(extension)s' non e' permesso. Le estensioni "
+"permesse sono: '%(allowed_extensions)s'."
+
 msgid "and"
 msgstr "e"
 
@@ -441,14 +460,14 @@ msgstr "Intero"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "Il valore di '%(value)s' deve essere un intero."
+msgstr "Il valore '%(value)s' deve essere un intero."
 
 msgid "Big (8 byte) integer"
 msgstr "Intero grande (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "Il valore dir '%(value)s' deve essere Vero oppure Falso."
+msgstr "Il valore '%(value)s' deve essere True oppure False."
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Vero o Falso)"
@@ -465,7 +484,7 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Il valore di '%(value)s' ha un formato di data non valido. Deve essere nel "
+"Il valore '%(value)s' ha un formato di data invalido. Deve essere nel "
 "formato AAAA-MM-GG."
 
 #, python-format
@@ -484,8 +503,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Il valore di '%(value)s' ha un formato non valido. Deve essere nel formato "
-"AAAA-MM-GG HH:MM[:ss[.uuuuuu]][TZ]"
+"Il valore '%(value)s' ha un formato non valido. Deve essere nel formato AAAA-"
+"MM-GG HH:MM[:ss[.uuuuuu]][TZ]"
 
 #, python-format
 msgid ""
@@ -500,7 +519,7 @@ msgstr "Data (con ora)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "Il valore di '%(value)s' deve essere un numero decimale."
+msgstr "Il valore '%(value)s' deve essere un numero decimale."
 
 msgid "Decimal number"
 msgstr "Numero decimale"
@@ -510,8 +529,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
-"Il valore di '%(value)s' ha un formato non valido. Deve essere nel formato "
-"[GG][HH:[MM:]]ss[.uuuuuu]"
+"Il valore '%(value)s' ha un formato non valido. Deve essere nel formato [GG]"
+"[HH:[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Durata"
@@ -524,7 +543,7 @@ msgstr "Percorso file"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "Il valore di '%(value)s' deve essere un numero a virgola mobile."
+msgstr "Il valore '%(value)s' deve essere un numero a virgola mobile."
 
 msgid "Floating point number"
 msgstr "Numero in virgola mobile"
@@ -537,7 +556,7 @@ msgstr "Indirizzo IP"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr "Il valore di '%(value)s' deve essere None, True oppure False."
+msgstr "Il valore '%(value)s' deve essere None, True oppure False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleano (True, False o None)"
@@ -563,8 +582,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Il valore di '%(value)s' ha un formato non valido. Deve essere nel formato "
-"HH:MM[:ss[.uuuuuu]]."
+"Il valore '%(value)s' ha un formato non valido. Deve essere nel formato HH:"
+"MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
@@ -756,14 +775,14 @@ msgstr ""
 " %(datetime)s non può essere interpretato nel fuso orario "
 "%(current_timezone)s: potrebbe essere ambiguo o non esistere."
 
+msgid "Clear"
+msgstr "Svuota"
+
 msgid "Currently"
 msgstr "Attualmente"
 
 msgid "Change"
 msgstr "Cambia"
-
-msgid "Clear"
-msgstr "Svuota"
 
 msgid "Unknown"
 msgstr "Sconosciuto"
@@ -1140,11 +1159,10 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Congratulazioni per la tua prima pagina Django-powered."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Naturalmente non hai ancora svolto alcun lavoro. Il prossimo passo è creare "
-"la tua prima app inserendo il comando <code>python manage.py startapp "
+"Ora, crea la tua prima app eseguendo <code>python manage.py startapp "
 "[nome_app]</code>"
 
 msgid ""

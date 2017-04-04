@@ -4,15 +4,15 @@
 # xiu1 <d84ea@hotmail.co.jp>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kentaro Hori <kentaro0919@gmail.com>, 2015
-# Shinya Okano <tokibito@gmail.com>, 2012-2016
+# Shinya Okano <tokibito@gmail.com>, 2012-2017
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-10 13:16+0000\n"
-"Last-Translator: xiu1 <d84ea@hotmail.co.jp>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-25 09:49+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -297,6 +297,15 @@ msgstr "静的ファイル"
 msgid "Syndication"
 msgstr "シンジケーション"
 
+msgid "That page number is not an integer"
+msgstr "このページ番号は整数ではありません。"
+
+msgid "That page number is less than 1"
+msgstr "ページ番号が 1 よりも小さいです。"
+
+msgid "That page contains no results"
+msgstr "このページには結果が含まれていません。"
+
 msgid "Enter a valid value."
 msgstr "値を正しく入力してください。"
 
@@ -384,6 +393,14 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "この値は小数点より前が合計 %(max)s 桁以内でなければなりません。"
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"ファイル拡張子 '%(extension)s' は許可されていません。許可されている拡張子は "
+"'%(allowed_extensions)s' です。"
 
 msgid "and"
 msgstr "と"
@@ -728,14 +745,14 @@ msgstr ""
 "%(datetime)s は%(current_timezone)sのタイムゾーンでは解釈できませんでした。そ"
 "れは曖昧であるか、存在しない可能性があります。"
 
+msgid "Clear"
+msgstr "クリア"
+
 msgid "Currently"
 msgstr "現在"
 
 msgid "Change"
 msgstr "変更"
-
-msgid "Clear"
-msgstr "クリア"
 
 msgid "Unknown"
 msgstr "不明"
@@ -1104,11 +1121,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "おめでとうございます、Djangoで出力された最初のページです。"
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"もちろん、実際にはまだ少しも作業をしていません。次は、 <code>python manage."
-"py startapp [app_label]</code> を実行して、最初のアプリを開始します。"
+"次は、 <code>python manage.py startapp [app_label]</code> を実行して、最初の"
+"アプリを開始します。"
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

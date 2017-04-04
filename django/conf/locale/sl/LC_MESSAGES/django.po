@@ -4,15 +4,17 @@
 # iElectric <domen@dev.si>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2012-2013
+# Marko Zabreznik <marko@zabreznik.net>, 2016
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
 # zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-09-27 19:12+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-02 08:26+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -296,7 +298,16 @@ msgid "Static Files"
 msgstr "Statične datoteke"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Sindiciranje"
+
+msgid "That page number is not an integer"
+msgstr "Število te strani ni naravno število"
+
+msgid "That page number is less than 1"
+msgstr "Število te strani je manj kot 1"
+
+msgid "That page contains no results"
+msgstr "Ta stran nima zadetkov"
 
 msgid "Enter a valid value."
 msgstr "Vnesite veljavno vrednost."
@@ -417,6 +428,14 @@ msgstr[2] ""
 "Poskrbite, da skupno ne bo več kot %(max)s števk pred decimalno vejico."
 msgstr[3] ""
 "Poskrbite, da skupno ne bo več kot %(max)s števk pred decimalno vejico."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Končnica datoteke '%(extension)s' ni dovoljena. Dovoljene končnice so: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "in"
@@ -777,14 +796,14 @@ msgstr ""
 "Vrednosti %(datetime)s ni bilo možno razumeti v časovnem pasu "
 "%(current_timezone)s; ali je izraz dvoumen ali pa ne obstaja."
 
+msgid "Clear"
+msgstr "Počisti"
+
 msgid "Currently"
 msgstr "Trenutno"
 
 msgid "Change"
 msgstr "Spremeni"
-
-msgid "Clear"
-msgstr "Počisti"
 
 msgid "Unknown"
 msgstr "Neznano"
@@ -1175,11 +1194,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Dobrodošli na vaši prvi spletni strani, zgrajeni na Django platformi."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Seveda se tu resno delo šele prične. Ustvarite prvo aplikacijo tako, da "
-"poženete <code>python manage.py startapp [ime_aplikacije]</code>."
+"Nato ustvarite svojo prvo aplikacijo tako, da poženete <code>python manage."
+"py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

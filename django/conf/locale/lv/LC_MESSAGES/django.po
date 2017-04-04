@@ -4,12 +4,14 @@
 # edgars <edgars.jekabsons@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # krikulis <kristaps.kulis@gmail.com>, 2014
+# Māris Nartišs <maris.gis@gmail.com>, 2016
+# peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -72,7 +74,7 @@ msgid "English"
 msgstr "angļu"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Austrālijas angļu"
 
 msgid "British English"
 msgstr "Lielbritānijas angļu"
@@ -120,7 +122,7 @@ msgid "Irish"
 msgstr "īru"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "skotu gēlu"
 
 msgid "Galician"
 msgstr "galīciešu"
@@ -273,7 +275,7 @@ msgid "Ukrainian"
 msgstr "ukraiņu"
 
 msgid "Urdu"
-msgstr ""
+msgstr "urdu"
 
 msgid "Vietnamese"
 msgstr "vjetnamiešu"
@@ -285,7 +287,7 @@ msgid "Traditional Chinese"
 msgstr "tradicionālā ķīniešu"
 
 msgid "Messages"
-msgstr ""
+msgstr "Ziņojumi"
 
 msgid "Site Maps"
 msgstr "Lapas kartes"
@@ -295,6 +297,15 @@ msgstr "Statiski faili"
 
 msgid "Syndication"
 msgstr "Sindikācija"
+
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
 
 msgid "Enter a valid value."
 msgstr "Ievadiet korektu vērtību."
@@ -318,6 +329,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Ievadiet korektu 'vienkāršā teksta' vērtību, kas satur tikai burtus, "
+"numurus, apakšsvītras vai šķērssvītras."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Ievadiet korektu IPv4 adresi."
@@ -394,16 +407,22 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
 msgid "and"
 msgstr "un"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s ar šiem %(field_labels)s jau eksistē."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Vērtība %(value)r ir nederīga izvēle."
 
 msgid "This field cannot be null."
 msgstr "Šis lauks nevar neksistēt (būt null)."
@@ -431,14 +450,14 @@ msgstr "Vesels skaitlis"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' vērtībai ir jābūt veselam skaitlim."
 
 msgid "Big (8 byte) integer"
 msgstr "Liels (8 baitu) vesels skaitlis"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' vērtībai ir jābūt vai nu True vai False."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (True vai False)"
@@ -455,12 +474,15 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' vērtība ir nepareizā datuma formātā. Pareizs formāts ir GGGG-MM-"
+"DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' vērtība ir pareizā formātā (GGGG-MM-DD), bet ir nederīgs datums."
 
 msgid "Date (without time)"
 msgstr "Datums (bez laika)"
@@ -494,7 +516,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "Ilgums"
 
 msgid "Email address"
 msgstr "E-pasta adrese"
@@ -504,7 +526,7 @@ msgstr "Faila ceļš"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' vērtībai ir jābūt daļskaitlim."
 
 msgid "Floating point number"
 msgstr "Plūstošā punkta skaitlis"
@@ -561,7 +583,7 @@ msgstr "Bināri dati"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' ir nederīgs UUID."
 
 msgid "File"
 msgstr "Fails"
@@ -615,7 +637,7 @@ msgid "Enter a valid date/time."
 msgstr "Ievadiet korektu datumu/laiku."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Ievadiet korektu ilgumu."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nav nosūtīts fails. Pārbaudiet formas kodējuma tipu."
@@ -655,7 +677,7 @@ msgid "Enter a complete value."
 msgstr "Ievadiet pilnu vērtību."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Ievadi derīgu UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -663,7 +685,7 @@ msgstr ""
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Slēpts lauks %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Trūkst ManagementForm dati vai arī tie ir bojāti"
@@ -724,14 +746,14 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 
+msgid "Clear"
+msgstr "Notīrīt"
+
 msgid "Currently"
-msgstr ""
+msgstr "Pašlaik"
 
 msgid "Change"
 msgstr "Izmainīt"
-
-msgid "Clear"
-msgstr ""
 
 msgid "Unknown"
 msgstr "Nezināms"
@@ -906,11 +928,11 @@ msgstr "dec"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr ""
+msgstr "Jan."
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr ""
+msgstr "Feb."
 
 msgctxt "abbrev. month"
 msgid "March"
@@ -934,23 +956,23 @@ msgstr "jūlijs"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr ""
+msgstr "Aug."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr ""
+msgstr "Okt."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr ""
+msgstr "Nov."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr ""
+msgstr "Dec."
 
 msgctxt "alt. month"
 msgid "January"
@@ -1058,7 +1080,7 @@ msgstr[1] ""
 msgstr[2] ""
 
 msgid "0 minutes"
-msgstr ""
+msgstr "0 minūšu"
 
 msgid "Forbidden"
 msgstr "Aizliegts"
@@ -1094,17 +1116,17 @@ msgid "More information is available with DEBUG=True."
 msgstr "Vairāk informācijas ir pieejams ar DEBUG=True"
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "Esi sveicināts Django"
 
 msgid "It worked!"
-msgstr ""
+msgstr "Nostrādāja!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "Apsveicam, tava pirmā Django darbinātā lapa."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 msgid ""

@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011
-# rodin <romihardiyanto@gmail.com>, 2013-2015
+# rodin <romihardiyanto@gmail.com>, 2013-2016
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-08-23 04:48+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-05 13:15+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -66,7 +66,7 @@ msgid "German"
 msgstr "Jerman"
 
 msgid "Lower Sorbian"
-msgstr "Lower Sorbian"
+msgstr "Sorbian Bawah"
 
 msgid "Greek"
 msgstr "Yunani"
@@ -75,7 +75,7 @@ msgid "English"
 msgstr "Inggris"
 
 msgid "Australian English"
-msgstr "Australia Inggris"
+msgstr "Inggris Australia"
 
 msgid "British English"
 msgstr "Inggris Britania"
@@ -90,7 +90,7 @@ msgid "Argentinian Spanish"
 msgstr "Spanyol Argentina"
 
 msgid "Colombian Spanish"
-msgstr "Kolombia Spanyol"
+msgstr "Spanyol Kolombia"
 
 msgid "Mexican Spanish"
 msgstr "Spanyol Meksiko"
@@ -123,7 +123,7 @@ msgid "Irish"
 msgstr "Irlandia"
 
 msgid "Scottish Gaelic"
-msgstr "Gaelik Skotlandia"
+msgstr "Skolandia Gaelik"
 
 msgid "Galician"
 msgstr "Galicia"
@@ -138,7 +138,7 @@ msgid "Croatian"
 msgstr "Kroasia"
 
 msgid "Upper Sorbian"
-msgstr "Upper Sorbian"
+msgstr "Sorbian Atas"
 
 msgid "Hungarian"
 msgstr "Hungaria"
@@ -150,7 +150,7 @@ msgid "Indonesian"
 msgstr "Indonesia"
 
 msgid "Ido"
-msgstr "ido"
+msgstr "Ido"
 
 msgid "Icelandic"
 msgstr "Islandia"
@@ -201,7 +201,7 @@ msgid "Burmese"
 msgstr "Burma"
 
 msgid "Norwegian Bokmål"
-msgstr "Bokmål Norwegian"
+msgstr "Norwegia Bokmål"
 
 msgid "Nepali"
 msgstr "Nepal"
@@ -297,7 +297,16 @@ msgid "Static Files"
 msgstr "Bidang Tetap"
 
 msgid "Syndication"
-msgstr "Kongsi"
+msgstr "Sindikasi"
+
+msgid "That page number is not an integer"
+msgstr "Nomor halaman itu bukan sebuah integer"
+
+msgid "That page number is less than 1"
+msgstr "Nomor halaman itu kurang dari 1"
+
+msgid "That page contains no results"
+msgstr "Halaman itu mengandung tidak ada hasil"
 
 msgid "Enter a valid value."
 msgstr "Masukkan nilai yang valid."
@@ -321,8 +330,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Masukkan 'slug' yang terdiri dari huruf, bilangan, garis bawah, atau tanda "
-"minus."
+"Masukkan 'slug' valid yang terdiri dari karakter, bilangan, garis bawah, "
+"atau tanda minus."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Masukkan alamat IPv4 yang valid."
@@ -389,6 +398,14 @@ msgstr[0] ""
 "Pastikan jumlah angka sebelum desimal pada bilangan tidak memiliki lebih "
 "dari %(max)s angka."
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Tambahan berkas '%(extension)s' tidak diizinkan. Tambahan diizinkan adalah: "
+"'%(allowed_extensions)s'. "
+
 msgid "and"
 msgstr "dan"
 
@@ -398,7 +415,7 @@ msgstr "%(model_name)s dengan %(field_labels)s ini tidak ada."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr "Nilai %(value)r bukan pilihan yang sah."
+msgstr "Nilai %(value)r bukan pilihan yang valid."
 
 msgid "This field cannot be null."
 msgstr "Field ini tidak boleh null."
@@ -427,14 +444,14 @@ msgstr "Bilangan Asli"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "%(value)s' nilai harus lah sebuah bilangan bulat"
+msgstr "%(value)s' nilai harus merupakan bilangan bulat."
 
 msgid "Big (8 byte) integer"
 msgstr "Bilangan asli raksasa (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "nilai '%(value)s' haruslah berupa Benar atau Salah"
+msgstr "Nilai '%(value)s' haruslah bernilai Benar atau Salah."
 
 msgid "Boolean (Either True or False)"
 msgstr "Nilai Boolean (Salah satu dari True atau False)"
@@ -451,16 +468,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"nilai '%(value)s' tidak sesuai format penanggalan. Formatnya harus dalam "
-"YYYY-MM-DD."
+"Nilai '%(value)s' tidak sesuai format penanggalan. Formatnya harus dalam "
+"TTTT-BB-HH."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"nilai '%(value)s' memiliki format yang sesuai (YYYY-MM-DD) tetap tanggalnya "
-"tidak benar."
+"Nilai '%(value)s' memiliki format yang sesuai (TTTT-BB-HH) tetap tanggalnya "
+"tidak valid."
 
 msgid "Date (without time)"
 msgstr "Tanggal (tanpa waktu)"
@@ -470,8 +487,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Nilai '%(value)s' mempunyai bentuk tidak sah. Itu harus dalam bentuk YYYY-MM-"
-"DD HH:MM[:ss[.uuuuuu]][TZ]."
+"Format nilai '%(value)s' tidak valid. Formatnya harus dalam TTTT-BB-HH JJ:"
+"MM[:dd[.mmmmmm]][TZ]."
 
 #, python-format
 msgid ""
@@ -486,7 +503,7 @@ msgstr "Tanggal (dengan waktu)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "Nilai '%(value)s' haruslah sebuah bilangan desimal"
+msgstr "Nilai '%(value)s' haruslah berupa bilangan desimal."
 
 msgid "Decimal number"
 msgstr "Bilangan desimal"
@@ -625,7 +642,7 @@ msgid "Enter a valid date/time."
 msgstr "Masukkan tanggal/waktu yang valid."
 
 msgid "Enter a valid duration."
-msgstr "Masukan sebuah durasi waktu yang benar"
+msgstr "Masukan durasi waktu yang benar."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tidak ada berkas yang dikirimkan. Periksa tipe pengaksaraan formulir."
@@ -669,7 +686,7 @@ msgid "Enter a complete value."
 msgstr "Masukan sebuah nilai dengan komplit"
 
 msgid "Enter a valid UUID."
-msgstr "Masukan sebuah UUID yang benar"
+msgstr "Masukan UUID yang benar."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -738,14 +755,14 @@ msgstr ""
 "%(datetime)s tidak dapat diinterpretasikan pada zona waktu "
 "%(current_timezone)s; mungkin nilainya ambigu atau mungkin tidak ada."
 
+msgid "Clear"
+msgstr "Hapus"
+
 msgid "Currently"
 msgstr "Saat ini"
 
 msgid "Change"
 msgstr "Ubah"
-
-msgid "Clear"
-msgstr "Hapus"
 
 msgid "Unknown"
 msgstr "Tidak diketahui"
@@ -1064,7 +1081,7 @@ msgid "Forbidden"
 msgstr "Terlarang"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "verifikasi CSRF gagal, permintann di batalkan"
+msgstr "Verifikasi CSRF gagal, Permintaan dibatalkan."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1115,12 +1132,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Selamat untuk halaman Django pertama Anda."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Tentu saja, anda belum menyelesaikan pekerjaan apapun. Selanjutnya, mulai "
-"aplikasi pertama anda dengan ekseskusi <code>python manage.py startapp "
+"Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
+msgstr ""
+"Selanjutnya, mulai aplikasi pertama anda dengan menjalankan <code>python "
+"manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

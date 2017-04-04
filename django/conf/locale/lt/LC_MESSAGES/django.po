@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2016
+# Matas Dailyda <matas@dailyda.com>, 2015-2017
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011-2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-18 09:11+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-30 14:06+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -302,6 +302,15 @@ msgstr "Statiniai failai"
 msgid "Syndication"
 msgstr "Sindikacija"
 
+msgid "That page number is not an integer"
+msgstr "To puslapio numeris nėra sveikasis skaičius."
+
+msgid "That page number is less than 1"
+msgstr "To numerio puslapis yra mažesnis už 1"
+
+msgid "That page contains no results"
+msgstr "Tas puslapis neturi jokių rezultatų"
+
 msgid "Enter a valid value."
 msgstr "Įveskite tinkamą reikšmę."
 
@@ -411,6 +420,14 @@ msgstr[1] ""
 "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys prieš kablelį."
 msgstr[2] ""
 "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Bylos tipas '%(extension)s' negalimas. Galimi tipai yra: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "ir"
@@ -766,14 +783,14 @@ msgstr ""
 "Nepavyko interpretuoti %(datetime)s %(current_timezone)s laiko juostoje; "
 "Data gali turėti keletą reikšmių arba neegzistuoti."
 
+msgid "Clear"
+msgstr "Išvalyti"
+
 msgid "Currently"
 msgstr "Šiuo metu"
 
 msgid "Change"
 msgstr "Pakeisti"
-
-msgid "Clear"
-msgstr "Išvalyti"
 
 msgid "Unknown"
 msgstr "Nežinomas"
@@ -1157,11 +1174,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Sveikiname Jus su Jūsų pirmuoju Django tinklalapiu."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Kolkas Jūs neatlikote jokių darbų. Paleiskite savo pirmąją aplikaciją "
-"suvesdami <code>python manage.py startapp [app_label]</code>."
+"Toliau, pradėkite pirmą savo aplikaciją paleisdami <code>python manage.py "
+"startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

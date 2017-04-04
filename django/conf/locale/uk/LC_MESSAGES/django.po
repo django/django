@@ -3,8 +3,8 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Denis Podlesniy <haos616@gmail.com>, 2016
-# Igor Melnyk, 2014-2015
+# Денис Подлесный <haos616@gmail.com>, 2016
+# Igor Melnyk, 2014-2015,2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -18,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-07 22:24+0000\n"
-"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-22 13:44+0000\n"
+"Last-Translator: Igor Melnyk\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -306,6 +306,15 @@ msgstr "Статичні файли"
 msgid "Syndication"
 msgstr "Об'єднання"
 
+msgid "That page number is not an integer"
+msgstr "Номер сторінки не є цілим числом"
+
+msgid "That page number is less than 1"
+msgstr "Номер сторінки менше 1"
+
+msgid "That page contains no results"
+msgstr "Сторінка не містить результатів"
+
 msgid "Enter a valid value."
 msgstr "Введіть коректне значення."
 
@@ -419,6 +428,14 @@ msgstr[1] ""
 "Переконайтеся, що тут не більше ніж %(max)s цифри до десяткової коми."
 msgstr[2] ""
 "Переконайтеся, що тут не більше ніж %(max)s цифер до десяткової коми."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Розширення файлу '%(extension)s' не дозволено. Дозволені розширення: ' "
+"%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "та"
@@ -776,14 +793,14 @@ msgstr ""
 "%(datetime)s не може бути інтерпретована в часовому поясі "
 "%(current_timezone)s; дата може бути неодзначною або виявитись неіснуючою."
 
+msgid "Clear"
+msgstr "Очистити"
+
 msgid "Currently"
 msgstr "Наразі"
 
 msgid "Change"
 msgstr "Змінити"
-
-msgid "Clear"
-msgstr "Очистити"
 
 msgid "Unknown"
 msgstr "Невідомо"
@@ -1169,12 +1186,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Вітаємо Вас на першій сторінці яка створена за допомогою Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Звичайно, Ви ще, насправді, нічого не зробили. Наступним кроком, розпочніть "
-"створення Вашого першого додатку, виконавши <code>python manage.py startapp "
+"Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
+msgstr ""
+"Наступним кроком, розпочніть створення Вашого першого додатку, виконавши "
+"<code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

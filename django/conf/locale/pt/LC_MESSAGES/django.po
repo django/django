@@ -7,15 +7,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Durães <jdmduraes@gmail.com>, 2014
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2014-2015
-# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015-2016
+# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015-2017
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
@@ -301,6 +301,15 @@ msgstr "Ficheiros Estáticos"
 msgid "Syndication"
 msgstr "Syndication"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Introduza um valor válido."
 
@@ -396,6 +405,12 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Garanta que não tem mais de %(max)s dígito antes do ponto decimal."
 msgstr[1] "Garanta que não tem mais de %(max)s dígitos antes do ponto decimal."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "e"
@@ -599,11 +614,11 @@ msgstr "Relação de um-para-um"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relação de %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relações de %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relação de muitos-para-muitos"
@@ -751,14 +766,14 @@ msgstr ""
 "%(datetime)s não pode ser interpretada de fuso horário %(current_timezone)s; "
 "pode ser ambígua ou não podem existir."
 
+msgid "Clear"
+msgstr "Limpar"
+
 msgid "Currently"
 msgstr "Atualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Limpar"
 
 msgid "Unknown"
 msgstr "Desconhecido"
@@ -1135,11 +1150,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Parabéns pela sua primeira página em Django."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Claro que ainda não fizeste qualquer trabalho. Cria a tua primeira aplicação "
-"correndo <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

@@ -5,19 +5,19 @@
 # Eirik Krogstad <eirikkr@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014-2015
-# Jon <jon@funkbit.no>, 2015-2016
-# Jon <jon@funkbit.no>, 2014
-# Jon <jon@funkbit.no>, 2013
-# Jon <jon@funkbit.no>, 2011
+# Jon <jon@kolonial.no>, 2015-2016
+# Jon <jon@kolonial.no>, 2014
+# Jon <jon@kolonial.no>, 2013
+# Jon <jon@kolonial.no>, 2011
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 # Tommy Strand <transifex@ireality.no>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-27 08:59+0000\n"
-"Last-Translator: Jon <jon@funkbit.no>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -302,6 +302,15 @@ msgstr "Statiske filer"
 msgid "Syndication"
 msgstr "Syndikering"
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Oppgi en gyldig verdi."
 
@@ -397,6 +406,12 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Sørg for at det kun %(max)s tall før desimalpunkt."
 msgstr[1] "Sørg for at det er %(max)s eller færre tall før desimalpunkt."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "og"
@@ -740,14 +755,14 @@ msgstr ""
 "%(datetime)s kunne ikke tolkes i tidssonen %(current_timezone)s, det kan "
 "være tvetydig eller ikke eksistere."
 
+msgid "Clear"
+msgstr "Fjern"
+
 msgid "Currently"
 msgstr "Nåværende"
 
 msgid "Change"
 msgstr "Endre"
-
-msgid "Clear"
-msgstr "Fjern"
 
 msgid "Unknown"
 msgstr "Ukjent"
@@ -1126,11 +1141,9 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Gratulerer med din første Django-drevne side."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Selvfølgelig, du har ikke gjort noe faktisk arbeid enda. Nå kan du lage din "
-"første app ved å kjøre <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

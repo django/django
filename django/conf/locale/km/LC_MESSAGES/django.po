@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:03+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
 "MIME-Version: 1.0\n"
@@ -292,6 +292,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr ""
 
@@ -371,6 +380,12 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
 
 msgid "and"
 msgstr "និង"
@@ -691,14 +706,14 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 
+msgid "Clear"
+msgstr ""
+
 msgid "Currently"
 msgstr ""
 
 msgid "Change"
 msgstr "ផ្លាស់ប្តូរ"
-
-msgid "Clear"
-msgstr ""
 
 msgid "Unknown"
 msgstr "មិន​ដឹង"
@@ -1056,8 +1071,8 @@ msgid "Congratulations on your first Django-powered page."
 msgstr ""
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
 
 msgid ""

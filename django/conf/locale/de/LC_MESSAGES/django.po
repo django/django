@@ -4,17 +4,17 @@
 # André Hagenbruch, 2011-2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dunedan <dunedan@phoenitydawn.de>, 2016
-# Jannis Vajen, 2011,2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2016
-# Jannis Vajen, 2016
+# Jannis, 2011,2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2017
+# Jannis, 2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-26 11:37+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 10:43+0000\n"
+"Last-Translator: Markus Holtermann <inyoka@markusholtermann.eu>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -206,7 +206,7 @@ msgid "Nepali"
 msgstr "Nepali"
 
 msgid "Dutch"
-msgstr "Holländisch"
+msgstr "Niederländisch"
 
 msgid "Norwegian Nynorsk"
 msgstr "Norwegisch (Nynorsk)"
@@ -297,6 +297,15 @@ msgstr "Statische Dateien"
 
 msgid "Syndication"
 msgstr "Syndication"
+
+msgid "That page number is not an integer"
+msgstr "Diese Seitennummer ist keine Ganzzahl"
+
+msgid "That page number is less than 1"
+msgstr "Diese Seitennummer ist kleiner als 1"
+
+msgid "That page contains no results"
+msgstr "Diese Seite enthält keine Ergebnisse"
 
 msgid "Enter a valid value."
 msgstr "Bitte einen gültigen Wert eingeben."
@@ -405,6 +414,14 @@ msgstr[1] ""
 "Bitte sicherstellen, dass der Wert höchstens %(max)s Ziffern vor dem Komma "
 "enthält."
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Dateiendung „%(extension)s“ ist nicht erlaubt. Erlaubte Dateiendungen: sind: "
+"„%(allowed_extensions)s“."
+
 msgid "and"
 msgstr "und"
 
@@ -443,14 +460,14 @@ msgstr "Ganzzahl"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "‚%(value)s‛ Wert muss eine Ganzzahl sein."
+msgstr "„%(value)s“ Wert muss eine Ganzzahl sein."
 
 msgid "Big (8 byte) integer"
 msgstr "Große Ganzzahl (8 Byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "‚%(value)s‛ Wert muss entweder True oder False sein."
+msgstr "„%(value)s“ Wert muss entweder True oder False sein."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolescher Wert (True oder False)"
@@ -467,7 +484,7 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"‚%(value)s‛ Wert hat ein ungültiges Datumsformat. Es muss YYYY-MM-DD "
+"„%(value)s“ Wert hat ein ungültiges Datumsformat. Es muss YYYY-MM-DD "
 "entsprechen."
 
 #, python-format
@@ -475,7 +492,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"‚%(value)s‛ hat das korrekte Format (YYYY-MM-DD) aber ein ungültiges Datum."
+"„%(value)s“ hat das korrekte Format (YYYY-MM-DD) aber ein ungültiges Datum."
 
 msgid "Date (without time)"
 msgstr "Datum (ohne Uhrzeit)"
@@ -485,7 +502,7 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"‚%(value)s‛ Wert hat ein ungültiges Format. Es muss YYYY-MM-DD HH:MM[:ss[."
+"„%(value)s“ Wert hat ein ungültiges Format. Es muss YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] entsprechen."
 
 #, python-format
@@ -493,7 +510,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"‚%(value)s‛ Wert hat das korrekte Format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"„%(value)s“ Wert hat das korrekte Format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) aber eine ungültige Zeit-/Datumsangabe."
 
 msgid "Date (with time)"
@@ -501,7 +518,7 @@ msgstr "Datum (mit Uhrzeit)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "‚%(value)s‛ Wert muss eine Dezimalzahl sein."
+msgstr "„%(value)s“ Wert muss eine Dezimalzahl sein."
 
 msgid "Decimal number"
 msgstr "Dezimalzahl"
@@ -511,7 +528,7 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' Wert hat ein ungültiges Format. Es muss der Form [DD] [HH:"
+"„%(value)s“ Wert hat ein ungültiges Format. Es muss der Form [DD] [HH:"
 "[MM:]]ss[.uuuuuu] entsprechen."
 
 msgid "Duration"
@@ -525,7 +542,7 @@ msgstr "Dateipfad"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "‚%(value)s‛ Wert muss eine Fließkommazahl sein."
+msgstr "„%(value)s“ Wert muss eine Fließkommazahl sein."
 
 msgid "Floating point number"
 msgstr "Gleitkommazahl"
@@ -538,7 +555,7 @@ msgstr "IP-Adresse"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr "‚%(value)s‛ Wert muss entweder None, True oder False sein."
+msgstr "„%(value)s“ Wert muss entweder None, True oder False sein."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolescher Wert (True, False oder None)"
@@ -564,7 +581,7 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"‚%(value)s‛ Wert hat ein ungültiges Format. Es muss HH:MM[:ss[.uuuuuu]] "
+"„%(value)s“ Wert hat ein ungültiges Format. Es muss HH:MM[:ss[.uuuuuu]] "
 "entsprechen."
 
 #, python-format
@@ -572,7 +589,7 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"‚%(value)s‛ Wert hat das korrekte Format (HH:MM[:ss[.uuuuuu]]) aber ist eine "
+"„%(value)s“ Wert hat das korrekte Format (HH:MM[:ss[.uuuuuu]]) aber ist eine "
 "ungültige Zeitangabe."
 
 msgid "Time"
@@ -586,7 +603,7 @@ msgstr "Binärdaten"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr "Wert '%(value)s' ist keine gültige UUID."
+msgstr "Wert „%(value)s“ ist keine gültige UUID."
 
 msgid "File"
 msgstr "Datei"
@@ -748,7 +765,7 @@ msgstr "Bitte eine gültige Auswahl treffen. Dies ist keine gültige Auswahl."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" ist kein gültiger Wert für einen Primärschlüssel."
+msgstr "„%(pk)s“ ist kein gültiger Wert für einen Primärschlüssel."
 
 #, python-format
 msgid ""
@@ -758,14 +775,14 @@ msgstr ""
 "%(datetime)s konnte mit der Zeitzone %(current_timezone)s nicht eindeutig "
 "interpretiert werden, da es doppeldeutig oder eventuell inkorrekt ist."
 
+msgid "Clear"
+msgstr "Zurücksetzen"
+
 msgid "Currently"
 msgstr "Derzeit"
 
 msgid "Change"
 msgstr "Ändern"
-
-msgid "Clear"
-msgstr "Zurücksetzen"
 
 msgid "Unknown"
 msgstr "Unbekannt"
@@ -1144,12 +1161,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Herzlichen Glückwunsch zur ersten Django-basierten Seite."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Natürlich ist hier noch nichts weiter zu sehen. Bitte als Nächstes eine neue "
-"Anwendung durch Ausführen von <code>python manage.py startapp [app_label]</"
-"code> anlegen."
+"Bitte als Nächstes eine neue Anwendung durch Ausführen von <code>python "
+"manage.py startapp [app_label]</code> anlegen."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
@@ -1184,7 +1200,7 @@ msgstr ""
 
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Ungültiges Datum '%(datestr)s' für das Format '%(format)s'"
+msgstr "Ungültiges Datum „%(datestr)s“ für das Format „%(format)s“"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
@@ -1192,7 +1208,7 @@ msgstr "Konnte keine %(verbose_name)s mit diesen Parametern finden."
 
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr ""
-"Weder ist dies die letzte Seite ('last') noch konnte sie in einen "
+"Weder ist dies die letzte Seite („last“) noch konnte sie in einen "
 "ganzzahligen Wert umgewandelt werden."
 
 #, python-format
@@ -1201,14 +1217,14 @@ msgstr "Ungültige Seite (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Leere Liste und '%(class_name)s.allow_empty' ist False."
+msgstr "Leere Liste und „%(class_name)s.allow_empty“ ist False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Dateilisten sind untersagt."
 
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" ist nicht vorhanden"
+msgstr "„%(path)s“ ist nicht vorhanden"
 
 #, python-format
 msgid "Index of %(directory)s"

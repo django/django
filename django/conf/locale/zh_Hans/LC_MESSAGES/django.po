@@ -4,8 +4,8 @@
 # Daniel Duan <DaNmarner@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
-# Lele Long <schemacs@gmail.com>, 2011,2015
-# Liping Wang <lynn.config@gmail.com>, 2016
+# Lele Long <schemacs@gmail.com>, 2011,2015,2017
+# Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2014
 # pylemon <leeway1985@gmail.com>, 2013
@@ -20,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-09-20 02:26+0000\n"
-"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-14 11:34+0000\n"
+"Last-Translator: Lele Long <schemacs@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -307,6 +307,15 @@ msgstr "静态文件"
 msgid "Syndication"
 msgstr "联合"
 
+msgid "That page number is not an integer"
+msgstr "页号不是整数"
+
+msgid "That page number is less than 1"
+msgstr "页号少于1"
+
+msgid "That page contains no results"
+msgstr "本页结果未空"
+
 msgid "Enter a valid value."
 msgstr "输入一个有效的值。"
 
@@ -388,6 +397,14 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "确认小数点前不超过 %(max)s 位。"
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"文件后缀名 '%(extension)s' 不被允许.。可用的文件后缀"
+"名：'%(allowed_extensions)s'。"
 
 msgid "and"
 msgstr "和"
@@ -718,14 +735,14 @@ msgstr ""
 "%(datetime)s 不能在时区 %(current_timezone)s正确解读; 可能时间有歧义或者不存"
 "在."
 
+msgid "Clear"
+msgstr "清除"
+
 msgid "Currently"
 msgstr "目前"
 
 msgid "Change"
 msgstr "修改"
-
-msgid "Clear"
-msgstr "清除"
 
 msgid "Unknown"
 msgstr "未知"
@@ -1044,7 +1061,7 @@ msgid "Forbidden"
 msgstr "禁止访问"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF验证失败. 相应中断."
+msgstr "CSRF验证失败. 请求被中断."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1091,11 +1108,10 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "祝贺你的第一个由Django驱动的页面。"
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"当然，您还没有真正开始工作。接下来，请执行 <code>python manage.py startapp "
-"[app_label]</code> 来创建您的第一个应用。"
+"接下来运行你的第一个程序 <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

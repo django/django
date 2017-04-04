@@ -5,6 +5,7 @@
 # Dimitris Glezos <glezos@transifex.com>, 2011,2013
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2017
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
@@ -16,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-14 16:48+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 10:58+0000\n"
 "Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -302,6 +303,15 @@ msgstr "Στατικά Αρχεία"
 msgid "Syndication"
 msgstr "Syndication"
 
+msgid "That page number is not an integer"
+msgstr "Ο αριθμός αυτής της σελίδας δεν είναι ακέραιος"
+
+msgid "That page number is less than 1"
+msgstr "Ο αριθμός αυτής της σελίδας είναι μικρότερος του 1"
+
+msgid "That page contains no results"
+msgstr "Η σελίδα αυτή δεν περιέχει αποτελέσματα"
+
 msgid "Enter a valid value."
 msgstr "Εισάγετε μια έγκυρη τιμή."
 
@@ -364,8 +374,8 @@ msgstr[0] ""
 "Βεβαιωθείται πως η τιμή αυτή έχει τουλάχιστον %(limit_value)d χαρακτήρες "
 "(έχει %(show_value)d)."
 msgstr[1] ""
-"Βεβαιωθείται πως η τιμή αυτή έχει τουλάχιστον %(limit_value)d χαρακτήρες "
-"(έχει %(show_value)d)."
+"Βεβαιωθείτε πως η τιμή έχει τουλάχιστον %(limit_value)d χαρακτήρες (έχει "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -378,8 +388,8 @@ msgstr[0] ""
 "Βεβαιωθείται πως η τιμή αυτή έχει τοπολύ %(limit_value)d χαρακτήρες (έχει "
 "%(show_value)d)."
 msgstr[1] ""
-"Βεβαιωθείται πως η τιμή αυτή έχει τουλάχιστον %(limit_value)d χαρακτήρες "
-"(έχει %(show_value)d)."
+"Βεβαιωθείτε πως η τιμή έχει το πολύ %(limit_value)d χαρακτήρες (έχει "
+"%(show_value)d)."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -404,6 +414,14 @@ msgstr[0] ""
 "Βεβαιωθείτε ότι δεν υπάρχουν πάνω από %(max)s ψηφία πριν την υποδιαστολή."
 msgstr[1] ""
 "Βεβαιωθείτε ότι δεν υπάρχουν πάνω από %(max)s ψηφία πριν την υποδιαστολή."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Η επέκταση '%(extension)s' του αρχείου δεν επιτρέπεται. Οι επιτρεπόμενες "
+"επεκτάσεις είναι: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "και"
@@ -766,14 +784,14 @@ msgstr ""
 "Η ημερομηνία %(datetime)s δεν μπόρεσε να μετατραπεί στην ζώνη ώρας "
 "%(current_timezone)s; ίσως να είναι ασαφής ή να μην υπάρχει."
 
+msgid "Clear"
+msgstr "Εκκαθάριση"
+
 msgid "Currently"
 msgstr "Τώρα"
 
 msgid "Change"
 msgstr "Επεξεργασία"
-
-msgid "Clear"
-msgstr "Εκκαθάριση"
 
 msgid "Unknown"
 msgstr "Άγνωστο"
@@ -1151,11 +1169,11 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Συγχαρητήρια στην πρώτη Django-τροφοδοτούμενη σελίδα σας."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
+"Next, start your first app by running <code>python manage.py startapp "
+"[app_label]</code>."
 msgstr ""
-"Φυσίκα, δεν έχετε κάνει καμία δουλειά ακόμα. Ξεκινήστε την πρώτη σας "
-"εφαρμογή εκτελώντας <code>python manage.py startapp [app_label]</code>."
+"Επόμενο βήμα, είναι να ξεκινήσετε την πρώτη σας εφαρμογή εκτελώντας την "
+"εντολή <code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
