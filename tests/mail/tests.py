@@ -217,6 +217,17 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ('date', 'Fri, 09 Nov 2001 01:08:47 -0000'),
         })
 
+    def test_default_extra_headers(self):
+        """
+        Default extra headers from settings.
+        """
+        with self.settings(DEFAULT_EXTRA_HEADERS={'X-Test-Extra-Header': 'Example'}):
+            email = EmailMessage('subject', 'content', 'from@example.com', ['to@example.com'])
+
+        self.assertMessageHasHeaders(email.message(), {
+            ('X-Test-Extra-Header', 'Example')
+        })
+
     def test_from_header(self):
         """
         Make sure we can manually set the From header (#9214)

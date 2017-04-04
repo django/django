@@ -221,6 +221,10 @@ FORM_RENDERER = 'django.forms.renderers.DjangoTemplates'
 # the site managers.
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
+# Default extra headers to use for various automated correspondence from the
+# site managers.
+DEFAULT_EXTRA_HEADERS = {}
+
 # Subject-line prefix for email messages send with django.core.mail.mail_admins
 # or ...mail_managers.  Make sure to include the trailing space.
 EMAIL_SUBJECT_PREFIX = '[Django] '

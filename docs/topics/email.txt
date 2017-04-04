@@ -278,7 +278,8 @@ All parameters are optional and can be set at any time prior to calling the
 * ``headers``: A dictionary of extra headers to put on the message. The
   keys are the header name, values are the header values. It's up to the
   caller to ensure header names and values are in the correct format for
-  an email message. The corresponding attribute is ``extra_headers``.
+  an email message. The corresponding attribute is ``extra_headers``. If
+  omitted, the :setting:`DEFAULT_EXTRA_HEADERS` setting is used.
 
 * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
   when sending the email.

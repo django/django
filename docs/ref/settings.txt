@@ -1161,6 +1161,16 @@ Default exception reporter filter class to be used if none has been assigned to
 the :class:`~django.http.HttpRequest` instance yet.
 See :ref:`Filtering error reports<filtering-error-reports>`.
 
+.. setting:: DEFAULT_EXTRA_HEADERS
+
+``DEFAULT_EXTRA_HEADERS``
+-------------------------
+
+Default: ``{}``
+
+Default extra headers to use for various automated email correspondence from the
+site manager(s).
+
 .. setting:: DEFAULT_FILE_STORAGE
 
 ``DEFAULT_FILE_STORAGE``
@@ -3284,6 +3294,7 @@ Email
 -----
 * :setting:`ADMINS`
 * :setting:`DEFAULT_CHARSET`
+* :setting:`DEFAULT_EXTRA_HEADERS`
 * :setting:`DEFAULT_FROM_EMAIL`
 * :setting:`EMAIL_BACKEND`
 * :setting:`EMAIL_FILE_PATH`
