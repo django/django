@@ -2,15 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
 # zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-27 19:34+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-02 08:38+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -40,9 +41,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
-"Aplete zaznamkov je mogoče namestiti z vleko\n"
-"povezave v orodno vrstico z zaznamki, ali pa z desnim klikom na povezavo.\n"
-"Zaznamek je mogoče izbrati s katerekoli strani tega spletnega mesta."
+"Aplete zaznamkov je mogoče namestiti z vleko povezave v orodno vrstico z "
+"zaznamki, ali pa z desnim klikom na povezavo. Zaznamek je mogoče izbrati s "
+"katerekoli strani tega spletnega mesta."
 
 msgid "Documentation for this page"
 msgstr "Dokumentacija te strani"
@@ -243,13 +244,6 @@ msgstr ""
 "    Funkcija pogleda: <code>%(full_name)s</code>. Ime: <code>%(url_name)s</"
 "code>.\n"
 
-msgid "Boolean (Either True or False)"
-msgstr "Boolova vrednost (PRAV ali NAPAK)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Polje vrste: %(field_type)s"
-
 msgid "tag:"
 msgstr "oznaka:"
 
@@ -261,7 +255,7 @@ msgstr "pogled:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr "Applikacija %(app_label)r ni najdena"
+msgstr "Applikacije %(app_label)r ni bilo mogoče najti"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

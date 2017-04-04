@@ -4,14 +4,14 @@
 # Fery Setiawan <gembelweb@gmail.com>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
-# rodin <romihardiyanto@gmail.com>, 2014
+# rodin <romihardiyanto@gmail.com>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-25 02:21+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2016-11-01 13:44+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -130,7 +130,7 @@ msgid "Noon"
 msgstr "Siang"
 
 msgid "6 p.m."
-msgstr "6 p.m"
+msgstr "18.00"
 
 msgid "Cancel"
 msgstr "Batal"
@@ -185,27 +185,27 @@ msgstr "Desember"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "S"
+msgstr "M"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "M"
+msgstr "S"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "T"
+msgstr "S"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr "W"
+msgstr "R"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "T"
+msgstr "K"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "F"
+msgstr "J"
 
 msgctxt "one letter Saturday"
 msgid "S"

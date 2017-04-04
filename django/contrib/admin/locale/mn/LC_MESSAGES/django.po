@@ -5,14 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2016
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2015
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 08:14+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
@@ -68,10 +68,10 @@ msgid "This year"
 msgstr "Энэ жил"
 
 msgid "No date"
-msgstr ""
+msgstr "Огноогүй"
 
 msgid "Has date"
-msgstr ""
+msgstr "Огноотой"
 
 #, python-format
 msgid ""
@@ -137,7 +137,7 @@ msgstr "Лог бүртгэлийн обект"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Нэмэгдсэн {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Нэмэгдсэн."
@@ -151,11 +151,11 @@ msgstr ""
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Өөрчлөгдсөн {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Устгасан {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Өөрчилсөн талбар алга байна."
@@ -182,7 +182,7 @@ msgstr ""
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr " {name} \"{obj}\" амжилттай нэмэгдлээ."
 
 #, python-brace-format
 msgid ""
@@ -197,7 +197,7 @@ msgstr ""
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" амжилттай засагдлаа."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -213,8 +213,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr " %(name)s \"%(obj)s\" амжилттай устгагдлаа."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s обектийн үндсэн түлхүүр %(key)r олдохгүй байна."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -465,10 +465,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Та ямар нэг зүйл засварлах зөвшөөрөлгүй байна."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Сүүлд хийсэн үйлдлүүд"
 
 msgid "My actions"
-msgstr ""
+msgstr "Миний үйлдлүүд"
 
 msgid "None available"
 msgstr "Үйлдэл алга"

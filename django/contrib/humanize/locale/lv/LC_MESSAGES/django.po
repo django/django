@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-10-13 06:57+0000\n"
+"Last-Translator: peterisb <pb@sungis.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 "2);\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "Padarīt cilvēcīgu"
 
 msgid "th"
 msgstr "th"
@@ -43,9 +44,9 @@ msgstr[2] "%(value).1f miljonu"
 #, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s miljonu"
+msgstr[1] "%(value)s miljons"
+msgstr[2] "%(value)s miljonu"
 
 #, python-format
 msgid "%(value).1f billion"
@@ -57,9 +58,9 @@ msgstr[2] "%(value).1f miljardu"
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(value)s miljardu"
+msgstr[1] "%(value)s miljards"
+msgstr[2] "%(value)s miljardu"
 
 #, python-format
 msgid "%(value).1f trillion"
@@ -226,10 +227,10 @@ msgstr "vakar"
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr ""
+msgstr "%(delta)s atpakaļ"
 
 msgid "now"
-msgstr ""
+msgstr "tagad"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -237,7 +238,7 @@ msgstr ""
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] ""
-msgstr[1] ""
+msgstr[1] "sekundi atpakaļ"
 msgstr[2] ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
@@ -246,7 +247,7 @@ msgstr[2] ""
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] ""
-msgstr[1] ""
+msgstr[1] "minūti atpakaļ"
 msgstr[2] ""
 
 #. Translators: please keep a non-breaking space (U+00A0)
@@ -261,7 +262,7 @@ msgstr[2] ""
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
-msgstr ""
+msgstr "%(delta)s no šī brīža"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.

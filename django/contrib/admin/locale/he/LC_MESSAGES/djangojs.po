@@ -3,14 +3,14 @@
 # Translators:
 # Alex Gaynor <inactive+Alex@transifex.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2011-2012,2014-2015
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2012,2014-2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-04-01 14:55+0000\n"
+"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Available %s"
-msgstr "%s זמינות"
+msgstr "אפשרויות %s זמינות"
 
 #, javascript-format
 msgid ""
@@ -146,68 +146,68 @@ msgid "Tomorrow"
 msgstr "מחר"
 
 msgid "January"
-msgstr ""
+msgstr "ינואר"
 
 msgid "February"
-msgstr ""
+msgstr "פברואר"
 
 msgid "March"
-msgstr ""
+msgstr "מרץ"
 
 msgid "April"
-msgstr ""
+msgstr "אפריל"
 
 msgid "May"
-msgstr ""
+msgstr "מאי"
 
 msgid "June"
-msgstr ""
+msgstr "יוני"
 
 msgid "July"
-msgstr ""
+msgstr "יולי"
 
 msgid "August"
-msgstr ""
+msgstr "אוגוסט"
 
 msgid "September"
-msgstr ""
+msgstr "ספטמבר"
 
 msgid "October"
-msgstr ""
+msgstr "אוקטובר"
 
 msgid "November"
-msgstr ""
+msgstr "נובמבר"
 
 msgid "December"
-msgstr ""
+msgstr "דצמבר"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "ר"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "ש"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "ש"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "ר"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "ח"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "ש"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "ש"
 
 msgid "Show"
 msgstr "הצג"

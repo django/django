@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Thordur Sigurdsson <thordur@ja.is>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-10-07 17:32+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -18,10 +19,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 msgid "Sites"
-msgstr ""
+msgstr "Vefir"
 
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr ""
+msgstr "Lénið má ekki innihalda bil eða dálkastafi (tab characters)."
 
 msgid "domain name"
 msgstr "lén"

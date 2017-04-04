@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Eduardo <edos21@gmail.com>, 2017
 # Hotellook, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2016
+# Yoel Acevedo, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-14 12:07+0000\n"
+"Last-Translator: Eduardo <edos21@gmail.com>\n"
 "Language-Team: Spanish (Venezuela) (http://www.transifex.com/django/django/"
 "language/es_VE/)\n"
 "MIME-Version: 1.0\n"
@@ -64,10 +66,10 @@ msgid "This year"
 msgstr "Este año"
 
 msgid "No date"
-msgstr ""
+msgstr "Sin fecha"
 
 msgid "Has date"
-msgstr ""
+msgstr "Tiene fecha"
 
 #, python-format
 msgid ""
@@ -133,7 +135,7 @@ msgstr "Objeto LogEntry"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Agregado {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Añadido."
@@ -143,15 +145,15 @@ msgstr "y"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Modificado {fields} por {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Modificado {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Eliminado {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "No ha cambiado ningún campo."
@@ -169,31 +171,39 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"El {name} \"{obj}\" fue agregado satisfactoriamente. Puede editarlo "
+"nuevamente a continuación. "
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"El {name} \"{obj}\" fue agregado satisfactoriamente. Puede agregar otro "
+"{name} a continuación. "
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "El {name} \"{obj}\" fue cambiado satisfactoriamente."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"El {name} \"{obj}\" fue cambiado satisfactoriamente. Puede editarlo "
+"nuevamente a continuación. "
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"El {name} \"{obj}\" fue cambiado satisfactoriamente. Puede agregar otro "
+"{name} a continuación."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "El {name} \"{obj}\" fue cambiado satisfactoriamente."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -210,8 +220,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Se eliminó con éxito el %(name)s \"%(obj)s\"."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "No existe ningún objeto %(name)s con la clave primaria %(key)r."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s con ID \"%(key)s\" no existe. ¿Tal vez fue eliminada?"
 
 #, python-format
 msgid "Add %s"
@@ -466,10 +476,10 @@ msgid "You don't have permission to edit anything."
 msgstr "No tiene permiso para editar nada."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Acciones recientes"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mis acciones"
 
 msgid "None available"
 msgstr "Ninguno disponible"

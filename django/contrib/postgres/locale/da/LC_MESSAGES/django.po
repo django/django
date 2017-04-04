@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Erik Wognsen <r4mses@gmail.com>, 2015-2016
+# Erik Wognsen <r4mses@gmail.com>, 2015-2017
 # valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-23 00:15+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 22:45+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,12 @@ msgstr "Element %(nth)s i array'et blev ikke valideret."
 msgid "Nested arrays must have the same length."
 msgstr "Indlejrede arrays skal have den samme længde."
 
-msgid "Map of strings to strings"
-msgstr "Map af strenge til strenge."
+msgid "Map of strings to strings/nulls"
+msgstr "Afbildning fra strenge til strenge/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Værdien af \"%(key)s\" er ikke en streng."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Værdien af \"%(key)s\" er ikke en streng eller null."
 
 msgid "A JSON object"
 msgstr "Et JSON-objekt."

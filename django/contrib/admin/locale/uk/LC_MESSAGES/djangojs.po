@@ -3,9 +3,9 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Denis Podlesniy <haos616@gmail.com>, 2016
+# Денис Подлесный <haos616@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Panasoft <cc072aa3@opayq.com>, 2016
+# panasoft <cc072aa3@opayq.com>, 2016
 # Sergey Lysach <sergikoff88@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
 "PO-Revision-Date: 2016-07-07 22:59+0000\n"
-"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
+"Last-Translator: Денис Подлесный <haos616@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"

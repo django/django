@@ -2,14 +2,15 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011-2013
+# Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 14:29+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -113,7 +114,7 @@ msgid "Model: %(name)s"
 msgstr "Modeloa: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Eremuak"
 
 msgid "Field"
 msgstr "Eremua"
@@ -234,13 +235,6 @@ msgid ""
 "code>.\n"
 msgstr ""
 
-msgid "Boolean (Either True or False)"
-msgstr "Boolearra (egia ala gezurra)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Eremuaren mota: %(field_type)s"
-
 msgid "tag:"
 msgstr "etiketa:"
 
@@ -252,7 +246,7 @@ msgstr "bista:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "%(app_label)r aplikazioa ez da aurkitu"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

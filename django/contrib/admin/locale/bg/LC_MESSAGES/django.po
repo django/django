@@ -6,13 +6,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2014-2015
-# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-30 17:44+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-25 23:02+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -221,8 +221,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Обектът %(name)s \"%(obj)s\" бе успешно изтрит.  "
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s обект с първичен ключ %(key)r не съществува."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s с ИД \"%(key)s\" несъществува. Може би е изтрито?"
 
 #, python-format
 msgid "Add %s"

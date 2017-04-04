@@ -4,8 +4,8 @@
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Denis Podlesniy <haos616@gmail.com>, 2016
-# Igor Melnyk, 2014
+# Денис Подлесный <haos616@gmail.com>, 2016
+# Igor Melnyk, 2014,2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-07 22:38+0000\n"
-"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-22 13:46+0000\n"
+"Last-Translator: Igor Melnyk\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -224,8 +224,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" був видалений успішно."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s з ID \"%(key)s\" не існує. Можливо воно було видалене?"
 
 #, python-format
 msgid "Add %s"

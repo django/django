@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
-# Liping Wang <lynn.config@gmail.com>, 2016
+# Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # pylemon <leeway1985@gmail.com>, 2012-2013
 # hizyn <zhangyanan5552@gmail.com>, 2016
@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-20 02:01+0000\n"
+"PO-Revision-Date: 2017-03-14 10:30+0000\n"
 "Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
@@ -249,7 +249,7 @@ msgid "Your password can't be a commonly used password."
 msgstr "你的密码不能是大家都爱用的常见密码。"
 
 msgid "This password is entirely numeric."
-msgstr "密码必须全部为数字。"
+msgstr "这个密码全部是数字的。"
 
 msgid "Your password can't be entirely numeric."
 msgstr "你的密码不能全部为数字。"

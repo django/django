@@ -3,13 +3,13 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leonardo José Guzmán <ljguzman@gmail.com>, 2013
-# Ramiro Morales, 2013-2016
+# Ramiro Morales, 2013-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-02 03:26+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 10:57+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -149,7 +149,7 @@ msgstr "Se modifican {fields} en {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "Se modifican {fields}."
+msgstr "Modificación de {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
@@ -170,32 +170,35 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "Se agregó con éxito {name} \"{obj}\". Puede modificarlo/a abajo."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"Se agregó con éxito {name} \"{obj}\". Puede agregar otro/a {name} abajo."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "Se agregó con éxito {name} \"{obj}\"."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"Se modificó con éxito {name} \"{obj}\". Puede modificarlo/a nuevamente abajo."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"Se modificó con éxito {name} \"{obj}\". Puede agregar otro {name} abajo."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "Se modificó con éxito {name} \"{obj}\"."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -212,8 +215,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Se eliminó con éxito %(name)s \"%(obj)s\"."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "No existe un objeto %(name)s con una clave primaria %(key)r."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "No existe %(name)s con ID \"%(key)s\". ¿Quizá fue eliminado/a?"
 
 #, python-format
 msgid "Add %s"

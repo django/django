@@ -3,16 +3,16 @@
 # Translators:
 # Fery Setiawan <gembelweb@gmail.com>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
-# rodin <romihardiyanto@gmail.com>, 2013-2015
+# rodin <romihardiyanto@gmail.com>, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-24 05:00+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2016-11-01 14:54+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "Tanggal penting"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s objek dengan primary key %(key)r tidak ditemukan."
+msgstr "Objek %(name)s dengan primary key %(key)r tidak ditemukan."
 
 msgid "Password changed successfully."
 msgstr "Sandi berhasil diubah."
@@ -73,8 +73,8 @@ msgid ""
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
-"Sandi mentah tidak disimpan, jadi tidak ada jalan untuk melihat sandi "
-"pengguna ini, tetapi anda dapat merubah sandi menggunakan <a href=\"../"
+"Sandi mentah tidak disimpan, jadi tidak ada cara untuk melihat sandi "
+"pengguna ini, tetapi Anda dapat mengubah sandi menggunakan <a href=\"../"
 "password/\">formulir ini</a>. "
 
 #, python-format
@@ -143,7 +143,7 @@ msgid "name"
 msgstr "nama"
 
 msgid "content type"
-msgstr "jenis isijenis isi"
+msgstr "jenis isi"
 
 msgid "codename"
 msgstr "namasandi"
@@ -187,8 +187,7 @@ msgid "username"
 msgstr "nama pengguna"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Dibutuhkan. 150 karakter atau sedikit. Hanya huruf, angka dan @/./+/-/_."
+msgstr "Wajib. 150 karakter atau sedikit. Hanya huruf, angka, dan @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Seorang pengguna dengan nama pengguna tersebut sudah ada."
@@ -236,31 +235,31 @@ msgid_plural ""
 "characters."
 msgstr[0] ""
 "Kata sandi terlalu singkat. Kata sandi harus memuat setidaknya "
-"%(min_length)d huruf."
+"%(min_length)d karakter."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Kata sandi anda harus memuat setidaknya %(min_length)d huruf."
+msgstr[0] "Kata sandi Anda harus memuat setidaknya %(min_length)d karakter."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Kata sandi terlalu mirip dengan %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr "Kata sandi tidak boleh terlalu mirip dengan informasi personal lainnya"
+msgstr "Kata sandi tidak boleh terlalu mirip dengan informasi pribadi lainnya."
 
 msgid "This password is too common."
 msgstr "Kata sandi ini terlalu umum."
 
 msgid "Your password can't be a commonly used password."
-msgstr "Kata sandi ana tidak dapat kata sandi yang umum digunakan."
+msgstr "Kata sandi Anda tidak boleh kata sandi yang umum digunakan."
 
 msgid "This password is entirely numeric."
-msgstr "Kata sandi ini seluruhnya numerik/"
+msgstr "Kata sandi ini seluruhnya terdiri dari angka."
 
 msgid "Your password can't be entirely numeric."
-msgstr "Kata sandi anda tidak dapat seluruhnya numerik."
+msgstr "Kata sandi Anda tidak dapat seluruhnya numerik."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -270,15 +269,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
-"Masukkan nama pengguna sah. Nilai ini mungkin mengandung hanya huruf "
-"Enggris, angka dan karakter @/./+/-/_."
+"Masukkan nama pengguna valid. Nilai ini mungkin mengandung hanya karakter "
+"dalam bahasa Inggris, angka dan karakter @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
-"Masukkan nama pengguna sah. Nilai ini hanya boleh mengandung huruf, angka "
-"dan karakter @/./+/-/_."
+"Masukkan nama pengguna valid. Nilai ini hanya boleh mengandung karakter, "
+"angka, dan karakter @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Keluar"
@@ -287,7 +286,7 @@ msgid "Password reset"
 msgstr "Setel ulang sandi"
 
 msgid "Password reset sent"
-msgstr "Reset kata sandi terkirim"
+msgstr "Penyetelan ulang kata sandi telah dikirim"
 
 msgid "Enter new password"
 msgstr "Masukkan sandi baru"

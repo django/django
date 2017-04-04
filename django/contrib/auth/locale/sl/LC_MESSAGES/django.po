@@ -3,6 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2012
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
 # zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-27 19:32+0000\n"
-"Last-Translator: zejn <zejn@kiberpipa.org>\n"
+"PO-Revision-Date: 2017-03-02 08:21+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +67,7 @@ msgid "Password confirmation"
 msgstr "Potrditev gesla"
 
 msgid "Enter the same password as before, for verification."
-msgstr "Vnesite isto geslo kot prej, za preverjanje"
+msgstr "Vnesite isto geslo kot prej, za preverjanje."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
@@ -74,7 +75,7 @@ msgid ""
 "\">this form</a>."
 msgstr ""
 "Gesla se ne shranjujejo v berljivi obliki, zato gesla tega uporabnika ni "
-"mogoče videti, lahko pa geslo spremenite s pomočjo <a href=\"password/"
+"mogoče videti, lahko pa geslo spremenite s pomočjo <a href=\"../password/"
 "\">tega obrazca</a>."
 
 #, python-format
@@ -166,7 +167,9 @@ msgstr "stanje skrbnika"
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "Uporabnik bo imel skrbniška dovoljenja."
+msgstr ""
+"Določi, da bo uporabnik imel vsa dovoljenja, ne da bi mu jih posebej "
+"dodelili."
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "

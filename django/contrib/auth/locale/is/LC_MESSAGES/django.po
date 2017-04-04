@@ -4,13 +4,14 @@
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Logi Ragnarsson <logi@belgingur.is>, 2012
+# Thordur Sigurdsson <thordur@ja.is>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-10-08 00:36+0000\n"
+"Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +31,7 @@ msgstr "Mikilvægar dagsetningar"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s hlutur með lykilinn %(key)r er ekki til."
 
 msgid "Password changed successfully."
 msgstr "Breyting á lykilorði tókst."
@@ -40,7 +41,7 @@ msgid "Change password: %s"
 msgstr "Breyta lykilorði: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Auðkenning og réttindi"
 
 msgid "password"
 msgstr "lykilorð"
@@ -49,10 +50,10 @@ msgid "last login"
 msgstr "síðasta innskráning"
 
 msgid "No password set."
-msgstr ""
+msgstr "Ekkert lykilorð skráð."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Ógilt snið á lykilorði eða óþekkt hökkunaralgrím."
 
 msgid "The two password fields didn't match."
 msgstr "Lykilorðin tvö pössuðu ekki saman."
@@ -64,25 +65,30 @@ msgid "Password confirmation"
 msgstr "Staðfesting lykilorðs"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Settu inn sama lykilorð og áður til staðfestingar."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Lykilorð eru aðeins geymd dulkóðuð, svo ekki er hægt að sjá lykilorð þessa "
+"notanda, en þú getur breytt lykilorðinu með <a href=\"../password/\">þessu "
+"eyðublaði</a> ."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Vinsamlegast sláðu inn rétt %(username)s og lykilorð. Takið eftir að í báðum "
+"reitum skipta há- og lágstafir máli."
 
 msgid "This account is inactive."
 msgstr "Þessi reikningur er óvirkur."
 
 msgid "Email"
-msgstr ""
+msgstr "Netfang"
 
 msgid "New password"
 msgstr "Nýtt lykilorð"
@@ -115,16 +121,16 @@ msgid "variety"
 msgstr ""
 
 msgid "version"
-msgstr ""
+msgstr "útgáfa"
 
 msgid "memory cost"
-msgstr ""
+msgstr "minnisnotkun"
 
 msgid "time cost"
-msgstr ""
+msgstr "tímalengd"
 
 msgid "parallelism"
-msgstr ""
+msgstr "samhliða vinnsla"
 
 msgid "work factor"
 msgstr "vinnustuðull"
@@ -136,7 +142,7 @@ msgid "name"
 msgstr "nafn"
 
 msgid "content type"
-msgstr ""
+msgstr "efnistag"
 
 msgid "codename"
 msgstr "vinnuheiti"
@@ -167,18 +173,22 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Hópar sem þessi notandi tilheyrir. Notandi fær allan aðgangsrétt sem fylgir "
+"hverjum hóp sem hann/hún er skráð(ur) í."
 
 msgid "user permissions"
 msgstr "réttindi"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Sértæk réttindi fyrir þennan notanda."
 
 msgid "username"
 msgstr "notandanafn"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Nauðsynlegt að fylla út. 150 stafir eða færri. Bókstafir (ekki broddstafir), "
+"tölustafir og @/./+/-/_ aðeins leyft."
 
 msgid "A user with that username already exists."
 msgstr "Notandi með þetta notendanafn er nú þegar til."
@@ -190,7 +200,7 @@ msgid "last name"
 msgstr "eftirnafn"
 
 msgid "email address"
-msgstr ""
+msgstr "netfang"
 
 msgid "staff status"
 msgstr "staða starfsmanns"
@@ -206,7 +216,7 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Til marks um að notandinn sé virku. Taktu hakið úr þessum möguleika til að "
+"Til marks um að notandinn sé virkur. Taktu hakið úr þessum möguleika til að "
 "eyða aðgangi."
 
 msgid "date joined"
@@ -226,32 +236,34 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Þetta lykilorð er of stutt. Það verður að vera minnst %(min_length)d stafur."
 msgstr[1] ""
+"Þetta lykilorð er of stutt. Það verður að vera minnst %(min_length)d stafir."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lykilorðið verður að vera minnst %(min_length)d stafur."
+msgstr[1] "Lykilorðið verður að vera minnst %(min_length)d stafir."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Lykilorðið er of líkt %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Lykilorðið má ekki vera of líkt þínum persónuupplýsingum."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Þetta lykilorð er of algengt."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Lykilorðið má ekki vera algengt lykilorð."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Þetta lykilorð er eingöngu tölustafir."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Lykilorðið má ekki vera eingöngu tölustafir."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -261,32 +273,36 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Sláðu inn gilt notandanafn. Þessi reitur má aðeins innihalda bókstafi (ekki "
+"broddstafi), tölustafi og @/./+/-/_ táknin"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Sláðu inn gilt notandanafn. Þessi reitur má aðeins innihalda bókstafi, "
+"tölustafi og @/./+/-/_ táknin"
 
 msgid "Logged out"
 msgstr "Útskráð(ur)"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Lykilorð endursett"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Endurstilling lykilorðs send"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Sláðu inn nýtt lykilorð"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Endurstilling á lykilorði mistókst"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Endurstilling lykilorðs tókst"
 
 msgid "Password change"
-msgstr ""
+msgstr "Breyta lykilorði"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Breyting á lykilorði tókst"

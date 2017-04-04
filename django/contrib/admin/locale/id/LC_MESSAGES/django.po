@@ -2,19 +2,19 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011-2013
-# rodin <romihardiyanto@gmail.com>, 2013-2015
+# rodin <romihardiyanto@gmail.com>, 2013-2016
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-24 04:56+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-05 13:15+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -174,8 +174,8 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat menyuntingnya "
-"kembali dibawah."
+"{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat mengeditnya kembali "
+"di bawah."
 
 #, python-brace-format
 msgid ""
@@ -183,7 +183,7 @@ msgid ""
 "below."
 msgstr ""
 "{name} \"{obj}\" telah berhasil ditambahkan. Anda dapat menambahkan {name} "
-"lain dibawah."
+"lain di bawah."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
@@ -193,20 +193,20 @@ msgstr "{name} \"{obj}\" telah berhasil ditambahkan."
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-" {name} \"{obj}\" telah berhasil dirubah. Anda dapat menyuntingnya kembali "
-"dibawah."
+" {name} \"{obj}\" telah berhasil diubah. Anda dapat mengeditnya kembali di "
+"bawah."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
-"{name} \"{obj}\" telah berhasil dirubah. Anda dapat menambahkan {name} lain "
-"dibawah."
+"{name} \"{obj}\" telah berhasil diubah. Anda dapat menambahkan {name} lain "
+"di bawah."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" telah berhasil dirubah."
+msgstr "{name} \"{obj}\" telah berhasil diubah."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -222,8 +222,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" berhasil dihapus."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Objek %(name)s dengan kunci utama %(key)r tidak ada."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s dengan ID \"%(key)s\" tidak ada. Mungkin itu telah dihapus?"
 
 #, python-format
 msgid "Add %s"
@@ -474,7 +474,7 @@ msgid "You don't have permission to edit anything."
 msgstr "Anda tidak memiliki izin untuk mengubah apapun."
 
 msgid "Recent actions"
-msgstr "Tindakah terbaru"
+msgstr "Tindakan terbaru"
 
 msgid "My actions"
 msgstr "Tindakan saya"
@@ -498,8 +498,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"Anda dikenali sebagai %(username)s, tapi tidak diperbolehkan untuk mengakses "
-"halaman ini. Anda ingin mencoba mengakses menggunakan akun yang lain?"
+"Anda diautentikasi sebagai %(username)s, tapi tidak diperbolehkan untuk "
+"mengakses halaman ini. Ingin mencoba mengakses menggunakan akun yang lain?"
 
 msgid "Forgotten your password or username?"
 msgstr "Lupa nama pengguna atau sandi?"
@@ -527,7 +527,7 @@ msgid "Save"
 msgstr "Simpan"
 
 msgid "Popup closing..."
-msgstr "Menutup popup..."
+msgstr "Menutup jendela sembulan..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -618,8 +618,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Kami mengirimi anda instruksi untuk pengubahan kata sandi, jika ada akun "
-"dengan alamat email yang sesuai. Anda seharusnya menerimanya sesaat lagi."
+"Kami mengirimi Anda petunjuk untuk mengubah kata sandi. Jika ada akun dengan "
+"alamat email yang sesuai. Anda seharusnya menerimanya sesaat lagi."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "

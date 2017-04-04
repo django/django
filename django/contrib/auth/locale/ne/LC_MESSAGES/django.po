@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-15 15:52+0000\n"
+"PO-Revision-Date: 2016-12-03 04:45+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +109,7 @@ msgid "hash"
 msgstr "ह्यास"
 
 msgid "variety"
-msgstr ""
+msgstr "विविध"
 
 msgid "version"
 msgstr "भर्जन"
@@ -118,7 +118,7 @@ msgid "memory cost"
 msgstr ""
 
 msgid "time cost"
-msgstr ""
+msgstr "समय"
 
 msgid "parallelism"
 msgstr ""
@@ -173,7 +173,7 @@ msgid "username"
 msgstr "प्रयोगकर्ता नाम"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "आवश्यक । बढिमा १५० वटा (अक्षर, अंक तथा '@/./+/-/_ ' मात्र)"
 
 msgid "A user with that username already exists."
 msgstr "त्यो प्रयोगकर्ता नाम भएका व्यक्ति पहिले नै छन् ।"
@@ -217,8 +217,8 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "पासवर्ड छोटो भयो । कम्तीमा %(min_length)d लम्बाई हुनु पर्दछ ।"
+msgstr[1] "पासवर्ड छोटो भयो । कम्तीमा %(min_length)d लम्बाई हुनु पर्दछ ।"
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -228,7 +228,7 @@ msgstr[1] ""
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "%(verbose_name)s संग मिल्दो पासवर्ड भयो ।"
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
@@ -240,10 +240,10 @@ msgid "Your password can't be a commonly used password."
 msgstr ""
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "यो पासवर्डमा अंक मात्र छ ।"
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "पासवर्डमा अंक मात्र नराख्नु होस ।"
 
 #, python-format
 msgid "Password reset on %(site_name)s"

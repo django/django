@@ -2,12 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 08:20+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -19,14 +20,14 @@ msgstr ""
 "2);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "ĢIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "ĢIS bāzes lauks."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "Bāzes ĢIS lauks -- atbilst OpenGIS specifikācijas Geometry tipam."
 
 msgid "Point"
 msgstr "Punkts"
@@ -50,10 +51,10 @@ msgid "Geometry collection"
 msgstr "Ģeometrijas kolekcija"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Apjoma agregācijas lauks"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rastra lauks"
 
 msgid "No geometry value provided."
 msgstr "Nav norādīta ģeometrijas vērtība."
@@ -71,20 +72,17 @@ msgstr ""
 "Sastapta kļūda, pārveidojot ģeometriju uz ģeometriskās formas lauka SRID."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Dzēst visus objektus"
 
 msgid "WKT debugging window:"
-msgstr ""
-
-msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "WKT atkļūdošanas logs:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Atkļūdošanas logs (serializēta vērtība)"
 
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Nav reģistrētu barotņu."
 
 #, python-format
 msgid "Slug %r isn't registered."
-msgstr ""
+msgstr "Vienkāršotais nosaukums %r nav reģistrēts."

@@ -3,13 +3,14 @@
 # Translators:
 # berislavlopac <berislav.lopac@gmail.com>, 2012
 # Davor Lučić <r.dav.lc@gmail.com>, 2012
+# Filip Cuk <filipcuk2@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 08:20+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
@@ -74,12 +75,9 @@ msgstr ""
 "forme."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Izbriši sve značajke"
 
 msgid "WKT debugging window:"
-msgstr ""
-
-msgid "Google Maps via GeoDjango"
 msgstr ""
 
 msgid "Debugging window (serialized value)"

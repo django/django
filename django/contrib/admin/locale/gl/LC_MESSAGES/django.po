@@ -3,6 +3,7 @@
 # Translators:
 # fasouto <fsoutomoure@gmail.com>, 2011-2012
 # fonso <fonzzo@gmail.com>, 2011,2013
+# fasouto <fsoutomoure@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
 # Oscar Carballal <oscar.carballal@gmail.com>, 2011-2012
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-28 16:25+0000\n"
+"Last-Translator: fasouto <fsoutomoure@gmail.com>\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -68,10 +69,10 @@ msgid "This year"
 msgstr "Este ano"
 
 msgid "No date"
-msgstr ""
+msgstr "Sen data"
 
 msgid "Has date"
-msgstr ""
+msgstr "Ten data"
 
 #, python-format
 msgid ""
@@ -95,7 +96,7 @@ msgid "action time"
 msgstr "hora da acción"
 
 msgid "user"
-msgstr ""
+msgstr "usuario"
 
 msgid "content type"
 msgstr ""
@@ -140,7 +141,7 @@ msgid "Added {name} \"{object}\"."
 msgstr ""
 
 msgid "Added."
-msgstr ""
+msgstr "Engadido"
 
 msgid "and"
 msgstr "e"
@@ -212,8 +213,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Eliminouse correctamente o/a %(name)s \"%(obj)s\"."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "O obxecto %(name)s con primary key %(key)r non existe."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -272,7 +273,7 @@ msgstr "Iniciar sesión"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "administración de %(app)s "
 
 msgid "Page not found"
 msgstr "Páxina non atopada"
@@ -343,7 +344,7 @@ msgid "Welcome,"
 msgstr "Benvido,"
 
 msgid "View site"
-msgstr ""
+msgstr "Ver sitio"
 
 msgid "Documentation"
 msgstr "Documentación"
@@ -466,10 +467,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Non ten permiso para editar nada."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Accións recentes"
 
 msgid "My actions"
-msgstr ""
+msgstr "As miñas accións"
 
 msgid "None available"
 msgstr "Ningunha dispoñíbel"

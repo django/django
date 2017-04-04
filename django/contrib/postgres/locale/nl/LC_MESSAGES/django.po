@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Sander Steffann <sander@steffann.nl>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:32+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +28,12 @@ msgstr "Item %(nth)s in de lijst werd niet gevalideerd:"
 msgid "Nested arrays must have the same length."
 msgstr "Lijsten met meerdere lagen moeten allemaal dezelfde lengte hebben."
 
-msgid "Map of strings to strings"
-msgstr "Vertaling van strings naar strings"
+msgid "Map of strings to strings/nulls"
+msgstr ""
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "De waarde van \"%(key)s\" is geen string."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr ""
 
 msgid "A JSON object"
 msgstr "Een JSON object"
@@ -44,7 +45,7 @@ msgid "Could not load JSON data."
 msgstr "Kon de JSON gegevens niet inlezen."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Invoer moet een JSON-bibliotheek zijn."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

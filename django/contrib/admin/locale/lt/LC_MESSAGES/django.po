@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2016
+# Matas Dailyda <matas@dailyda.com>, 2015-2017
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 # sirex <sirexas@gmail.com>, 2011
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-23 12:04+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-30 14:04+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -218,8 +218,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" sėkmingai ištrintas."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Įrašas %(name)s su pirminiu raktu %(key)r neegzistuoja."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s su ID \"%(key)s\" neegzistuoja. Gal tai buvo ištrinta?"
 
 #, python-format
 msgid "Add %s"

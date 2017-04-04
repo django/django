@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2015-2016
+# Claude Paroz <claude@2xlibre.net>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 15:46+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-21 14:48+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -26,12 +26,12 @@ msgstr "L'élément n°%(nth)s du tableau n'est pas valide :"
 msgid "Nested arrays must have the same length."
 msgstr "Les tableaux imbriqués doivent être de même longueur."
 
-msgid "Map of strings to strings"
-msgstr "Correspondances clé/valeur (chaînes)"
+msgid "Map of strings to strings/nulls"
+msgstr "Correspondances clé/valeur (chaînes ou valeurs nulles)"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "La valeur de « %(key)s » n'est pas une chaîne."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "La valeur de « %(key)s » n'est pas une chaîne, ni une valeur nulle."
 
 msgid "A JSON object"
 msgstr "Un objet JSON"

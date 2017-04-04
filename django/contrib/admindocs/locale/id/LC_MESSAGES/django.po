@@ -4,14 +4,14 @@
 # Fery Setiawan <gembelweb@gmail.com>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
-# rodin <romihardiyanto@gmail.com>, 2013-2014
+# rodin <romihardiyanto@gmail.com>, 2013-2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-23 04:54+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 09:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -40,9 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
-"Untuk memasang bookmarklet, tarik tautan ke alat batang penunjuk halaman "
-"buku anda, atau klik-kanan tautan dan tambakan itu ke penunjuk halaman buku "
-"anda. Sekarang anda dapat memilih bookmarklet dari tiap halaman di situs."
+"Untuk memasang bookmarklet, tarik tautan ke bilah markah, atau klik kanan "
+"tautan dan tambahkan ke markah Anda. Sekarang Anda dapat memilih bookmarklet "
+"dari semua halaman di situs."
 
 msgid "Documentation for this page"
 msgstr "Dokumentasi untuk laman ini"
@@ -133,16 +133,16 @@ msgid "Description"
 msgstr "Deskripsi"
 
 msgid "Methods with arguments"
-msgstr "Cara dengan penjelasan"
+msgstr "Metode dengan argumen"
 
 msgid "Method"
-msgstr "Cara"
+msgstr "Metode"
 
 msgid "Arguments"
-msgstr "Penjelasan"
+msgstr "Argumen"
 
 msgid "Back to Model documentation"
-msgstr "Kembali ke Model Dokumentasi"
+msgstr "Kembali ke Dokumentasi Model"
 
 msgid "Model documentation"
 msgstr "Dokumentasi model"
@@ -217,7 +217,7 @@ msgid "Templates:"
 msgstr "Templat:"
 
 msgid "Back to View documentation"
-msgstr "Kembali ke Tampilan dokumentasi"
+msgstr "Kembali ke dokumentasi Tampilan"
 
 msgid "View documentation"
 msgstr "Dokumentasi view"
@@ -244,13 +244,6 @@ msgstr ""
 "\n"
 "    Fungsi view: <code>%(full_name)s</code>. Nama: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (nilai True atau False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Jenis bidang: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

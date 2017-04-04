@@ -2,7 +2,7 @@
 #
 # Translators:
 # abraham.martin <abraham.martin@gmail.com>, 2014
-# Antoni Aloy <aaloy@apsl.net>, 2014
+# Antoni Aloy <aaloy@apsl.net>, 2014,2017
 # Carles Barrobés <carles@barrobes.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-14 07:29+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -143,7 +143,7 @@ msgid "Arguments"
 msgstr "Arguments"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "Tornar a la documentació del Model"
 
 msgid "Model documentation"
 msgstr "Documentació del model"
@@ -218,7 +218,7 @@ msgid "Templates:"
 msgstr "Plantilles:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "Tornar a la documentació de les Vistes"
 
 msgid "View documentation"
 msgstr "Veure documentació"
@@ -245,13 +245,6 @@ msgstr ""
 "\n"
 "Funció de la vista: <code>%(full_name)s</code> . Nom: <code>%(url_name)s</"
 "code> .\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleà (Cert o Fals)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Camp del tipus: %(field_type)s"
 
 msgid "tag:"
 msgstr "etiqueta:"

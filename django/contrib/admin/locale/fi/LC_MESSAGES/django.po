@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2017
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-08 11:56+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -66,10 +66,10 @@ msgid "This year"
 msgstr "Tänä vuonna"
 
 msgid "No date"
-msgstr ""
+msgstr "Ei päivämäärää"
 
 msgid "Has date"
-msgstr ""
+msgstr "On päivämäärä"
 
 #, python-format
 msgid ""
@@ -135,7 +135,7 @@ msgstr "Lokimerkintätietue"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Lisätty {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Lisätty."
@@ -145,15 +145,15 @@ msgstr "ja"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Muutettu {fields} {name}-kohteelle \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Muutettu {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Poistettu {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Ei muutoksia kenttiin."
@@ -170,32 +170,32 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" on lisätty. Voit muokata sitä uudelleen alla."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" on lisätty. Voit lisätä toisen {name} alla."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" on lisätty."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" on muokattu. Voit muokata sitä edelleen alla."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" on muokattu. Voit lisätä toisen alla."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" on muokattu."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -212,8 +212,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" on poistettu."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s perusavaimella %(key)r ei ole olemassa."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s tunnisteella %(key)s puuttuu. Se on voitu poistaa."
 
 #, python-format
 msgid "Add %s"
@@ -466,10 +466,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Sinulla ei ole oikeutta muokata mitään."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Viimeisimmät tapahtumat"
 
 msgid "My actions"
-msgstr ""
+msgstr "Omat tapahtumat"
 
 msgid "None available"
 msgstr "Ei yhtään"

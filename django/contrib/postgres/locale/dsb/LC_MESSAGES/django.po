@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-18 22:33+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-08 20:54+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -28,12 +28,12 @@ msgstr "Element %(nth)s w pólnej wariabli njejo se wobkšuśił:"
 msgid "Nested arrays must have the same length."
 msgstr "Zakašćikowane pólne wariable muse tu samsku dłujkosć měś."
 
-msgid "Map of strings to strings"
-msgstr "Pśirědowanje znamuškowych rjeśazkow k znamuškowym rjeśazkam"
+msgid "Map of strings to strings/nulls"
+msgstr "Konwertěrowanje znamuškowych rjeśazkow do znamuškowych rjeśazkow/nulow"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Gódnota „%(key)s“ njejo znamuškowy rjeśazk."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Gódnota \" %(key)s\" njejo znamuškowy rjeśazk abo null."
 
 msgid "A JSON object"
 msgstr "JSON-objekt"

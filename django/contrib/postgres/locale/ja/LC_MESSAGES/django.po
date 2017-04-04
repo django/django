@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Shinya Okano <tokibito@gmail.com>, 2015-2016
+# Shinya Okano <tokibito@gmail.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-21 13:53+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-25 09:55+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
@@ -27,12 +27,12 @@ msgstr "配列内のアイテム %(nth)s は検証できませんでした:"
 msgid "Nested arrays must have the same length."
 msgstr "ネストした配列は同じ長さにしなければなりません。"
 
-msgid "Map of strings to strings"
-msgstr "文字列と文字列のマップ"
+msgid "Map of strings to strings/nulls"
+msgstr "文字列と文字列/NULLのマップ"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "\"%(key)s\" の値は文字列ではありません。"
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" の値は文字列または NULL ではありません。"
 
 msgid "A JSON object"
 msgstr "JSONオブジェクト"

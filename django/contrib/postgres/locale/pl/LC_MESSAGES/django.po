@@ -4,73 +4,75 @@
 # Dariusz Paluch <taxido0@gmail.com>, 2015
 # Janusz Harkot <jh@blueice.pl>, 2015
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
-# m_aciek <maciej.olko@gmail.com>, 2016
+# m_aciek <maciej.olko@gmail.com>, 2016-2017
 # m_aciek <maciej.olko@gmail.com>, 2015
+# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-20 21:29+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 11:07+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>=14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "Rozszerzenia PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate: "
-msgstr "Element %(nth)s tablicy jest nieprawidłowy:"
+msgstr "Element %(nth)s w tablicy nie przeszedł walidacji:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Zagnieżdżone tablice muszą mieć tę samą długość."
 
-msgid "Map of strings to strings"
-msgstr "Mapowanie ciągów znaków na ciąg znaków"
+msgid "Map of strings to strings/nulls"
+msgstr "Mapowanie ciągów znaków na ciągi znaków/nulle"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Wartość \"%(key)s\" nie jest ciągiem znaków."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Wartość „%(key)s” nie jest ciągiem znaków ani nullem."
 
 msgid "A JSON object"
 msgstr "Obiekt JSON"
 
 msgid "Value must be valid JSON."
-msgstr "Wartość musi być poprawnie zakodowana w JSON."
+msgstr "Wartość musi być poprawnym JSON-em."
 
 msgid "Could not load JSON data."
 msgstr "Nie można załadować danych JSON."
 
 msgid "Input must be a JSON dictionary."
-msgstr "Dane wejściowe muszą być słownikiem JSON."
+msgstr "Wejście musi być słownikiem JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr "Wartość '%(value)s' musi być poprawnie zakodowana w JSON."
+msgstr "Wartość '%(value)s' musi być poprawnym JSON-em."
 
 msgid "Enter two valid values."
-msgstr "Wpisz dwie poprawne wartości."
+msgstr "Podaj dwie poprawne wartości."
 
 msgid "The start of the range must not exceed the end of the range."
 msgstr "Początek zakresu nie może przekroczyć jego końca."
 
 msgid "Enter two whole numbers."
-msgstr "Wpisz dwie liczby całkowite."
+msgstr "Podaj dwie liczby całkowite."
 
 msgid "Enter two numbers."
-msgstr "Wpisz dwie liczby."
+msgstr "Podaj dwie liczby."
 
 msgid "Enter two valid date/times."
-msgstr "Wpisz dwie poprawne daty/godziny."
+msgstr "Podaj dwie poprawne daty/godziny."
 
 msgid "Enter two valid dates."
-msgstr "Wpisz dwie poprawne daty."
+msgstr "Podaj dwie poprawne daty."
 
 #, python-format
 msgid ""
@@ -86,6 +88,9 @@ msgstr[1] ""
 "Lista zawiera %(show_value)d elementów, a nie powinna zawierać więcej niż "
 "%(limit_value)d."
 msgstr[2] ""
+"Lista zawiera %(show_value)d elementów, a nie powinna zawierać więcej niż "
+"%(limit_value)d."
+msgstr[3] ""
 "Lista zawiera %(show_value)d elementów, a nie powinna zawierać więcej niż "
 "%(limit_value)d."
 
@@ -105,10 +110,13 @@ msgstr[1] ""
 msgstr[2] ""
 "Lista zawiera %(show_value)d elementów, a powinna zawierać nie mniej niż "
 "%(limit_value)d."
+msgstr[3] ""
+"Lista zawiera %(show_value)d elementów, a powinna zawierać nie mniej niż "
+"%(limit_value)d."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr "Brakuje części kluczy: %(keys)s"
+msgstr "Brak części kluczy: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"

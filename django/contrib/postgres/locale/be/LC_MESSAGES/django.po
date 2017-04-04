@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-09-15 09:30+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-15 07:17+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -30,12 +30,12 @@ msgstr "Элемент масіву нумар %(nth)s не прайшоў пр�
 msgid "Nested arrays must have the same length."
 msgstr "Укладзенныя масівы павінны мець аднолькавую даўжыню."
 
-msgid "Map of strings to strings"
-msgstr "Адпаведнасць радкоў у радкі."
+msgid "Map of strings to strings/nulls"
+msgstr "Адпаведнасць радкоў у радкі/нулі"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Значэнне \"%(key)s\" не з'яўляецца радком."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Значэнне \"%(key)s\" не з'яўляецца радком ці нулём."
 
 msgid "A JSON object"
 msgstr "JSON аб’ект"

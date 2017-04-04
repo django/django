@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aitzol Naberan <anaberan@codesyntax.com>, 2013
+# Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
+# Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen <julenx@gmail.com>, 2012-2013
 # julen <julenx@gmail.com>, 2013
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-22 15:10+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,14 +29,14 @@ msgid "Cannot delete %(name)s"
 msgstr "Ezin da %(name)s ezabatu"
 
 msgid "Are you sure?"
-msgstr "Ziur zaude?"
+msgstr "Ziur al zaude?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Ezabatu aukeratutako %(verbose_name_plural)s"
 
 msgid "Administration"
-msgstr ""
+msgstr "Kudeaketa"
 
 msgid "All"
 msgstr "Dena"
@@ -65,10 +66,10 @@ msgid "This year"
 msgstr "Urte hau"
 
 msgid "No date"
-msgstr ""
+msgstr "Datarik ez"
 
 msgid "Has date"
-msgstr ""
+msgstr "Data dauka"
 
 #, python-format
 msgid ""
@@ -92,18 +93,18 @@ msgid "action time"
 msgstr "Ekintza hordua"
 
 msgid "user"
-msgstr ""
+msgstr "erabiltzailea"
 
 msgid "content type"
 msgstr ""
 
 msgid "object id"
-msgstr "Objetuaren id-a"
+msgstr "objetuaren id-a"
 
 #. Translators: 'repr' means representation
 #. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
-msgstr "Objeturaren aurkezpena"
+msgstr "objeturaren adierazpena"
 
 msgid "action flag"
 msgstr "Ekintza botoia"
@@ -130,14 +131,14 @@ msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" ezabatuta."
 
 msgid "LogEntry Object"
-msgstr "LogEntry objektua"
+msgstr "LogEntry objetua"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" gehitu."
 
 msgid "Added."
-msgstr ""
+msgstr "Gehituta"
 
 msgid "and"
 msgstr "eta"
@@ -209,8 +210,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" ondo ezabatu da."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Ez dago %(key)r gakodun %(name)s objekturik."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -221,7 +222,7 @@ msgid "Change %s"
 msgstr "Aldatu %s"
 
 msgid "Database error"
-msgstr "Datu-basearen errorea"
+msgstr "Errorea datu-basean"
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
@@ -297,7 +298,7 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Errore bat gertatu da. Errorea guneko kudeatzaileari jakinarazi zaio email "
-"bidez eta laister egon beharko luke konponduta. Barkatu eragozpenak."
+"bidez eta laster egon beharko luke konponduta. Barkatu eragozpenak."
 
 msgid "Run the selected action"
 msgstr "Burutu hautatutako ekintza"
@@ -323,7 +324,7 @@ msgstr ""
 "gehiago aldatu ahal izango dituzu."
 
 msgid "Enter a username and password."
-msgstr "Idatzi erabiltzaile-izen eta pasahitza."
+msgstr "Sartu erabiltzaile izen eta pasahitz bat."
 
 msgid "Change password"
 msgstr "Aldatu pasahitza"
@@ -343,7 +344,7 @@ msgid "Welcome,"
 msgstr "Ongi etorri,"
 
 msgid "View site"
-msgstr ""
+msgstr "Webgunea ikusi"
 
 msgid "Documentation"
 msgstr "Dokumentazioa"
@@ -403,7 +404,7 @@ msgstr ""
 "Erlazionaturik dauden hurrengo elementuak ere ezabatuko dira:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Objetuak"
 
 msgid "Yes, I'm sure"
 msgstr "Bai, ziur nago"
@@ -451,7 +452,7 @@ msgid " By %(filter_title)s "
 msgstr "Irizpidea: %(filter_title)s"
 
 msgid "Summary"
-msgstr ""
+msgstr "Laburpena"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -464,10 +465,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Ez daukazu ezer aldatzeko baimenik."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Azken ekintzak"
 
 msgid "My actions"
-msgstr ""
+msgstr "Nire ekintzak"
 
 msgid "None available"
 msgstr "Ez dago ezer"
@@ -480,8 +481,8 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Zerbait gaizki dago zure datu-basearekin. Ziurtatu datu-baseko taulak sortu "
-"direla eta erabiltzaile egokiak irakurtzeko baimena duela."
+"Zerbait gaizki dago zure datu-basearen instalazioan. Ziurtatu datu-baseko "
+"taulak sortu direla eta dagokion erabiltzaileak irakurtzeko baimena duela."
 
 #, python-format
 msgid ""
@@ -604,6 +605,9 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Zure pasahitza ezartzeko jarraibideak bidali dizkizugu email bidez, sartu "
+"duzun helbide elektronikoa kontu bati lotuta badago. Laster jaso beharko "
+"zenituzke."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -618,7 +622,7 @@ msgid ""
 "user account at %(site_name)s."
 msgstr ""
 "Mezu hau %(site_name)s webgunean pasahitza berrezartzea eskatu duzulako jaso "
-"duzu"
+"duzu."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Zoaz hurrengo orrira eta aukeratu pasahitz berria:"

@@ -5,7 +5,7 @@
 # Hoseok Lee <ihooi77@gmail.com>, 2016
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeong Seongtae <magno79@gmail.com>, 2014
+# Le Tartuffe <magno79@gmail.com>, 2014
 # minsung kang, 2015
 msgid ""
 msgstr ""

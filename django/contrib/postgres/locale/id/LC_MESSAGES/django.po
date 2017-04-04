@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2017
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
+# rodin <romihardiyanto@gmail.com>, 2016
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-08-23 04:54+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-03-05 13:13+0000\n"
 "Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
@@ -25,23 +26,23 @@ msgstr "Ekstensi PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate: "
-msgstr "butir %(nth)s di dalam susunan tidak disahkan:"
+msgstr "Item %(nth)s di dalam array tidak divalidasi:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Array bersarang harus mempunyai panjang sama."
+msgstr "Array bersaran harus mempunyai panjang yang sama."
 
-msgid "Map of strings to strings"
-msgstr "Pemetaan dari strings ke strings"
+msgid "Map of strings to strings/nulls"
+msgstr "Pemetaan dari strings ke string/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Sebuah nilai dari \"%(key)s\" bukan sebuah untaian."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Nilai dari \"%(key)s\" adalah bukan sebuah string atau null."
 
 msgid "A JSON object"
-msgstr "Sebuah obyek JSON"
+msgstr "Obyek JSON"
 
 msgid "Value must be valid JSON."
-msgstr "Nilai harus JSON sah."
+msgstr "Nilai harus berupa JSON yang valid."
 
 msgid "Could not load JSON data."
 msgstr "Tidak dapat memuat data JSON."
@@ -51,10 +52,10 @@ msgstr "Masukan harus kamus JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr "Nilai '%(value)s' harus JSON sah."
+msgstr "Nilai '%(value)s' harus berupa JSON yang valid."
 
 msgid "Enter two valid values."
-msgstr "Masukkan dua nilai yang benar"
+msgstr "Masukkan dua nilai yang valid."
 
 msgid "The start of the range must not exceed the end of the range."
 msgstr "Awal jangkauan harus tidak melebihi akhir dari jangkauan."
@@ -66,10 +67,10 @@ msgid "Enter two numbers."
 msgstr "Masukkan dua buah bilangan."
 
 msgid "Enter two valid date/times."
-msgstr "Masukan dua buah tanggal/waktu"
+msgstr "Masukan dua buah tanggal/waktu."
 
 msgid "Enter two valid dates."
-msgstr "Masukan dua buah tanggal yang benar"
+msgstr "Masukan dua buah tanggal yang benar."
 
 #, python-format
 msgid ""
@@ -79,8 +80,8 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"Daftar mengandung barang %(show_value)d, dia harus mengandung tidak lebih "
-"dari %(limit_value)d."
+"Daftar mengandung %(show_value)d item, dia harus mengandung tidak lebih dari "
+"%(limit_value)d."
 
 #, python-format
 msgid ""

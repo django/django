@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-10-13 09:26+0000\n"
+"Last-Translator: peterisb <pb@sungis.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -27,10 +28,14 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Šis ir saraksts ar pieejamajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
+"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izvēlēties"
+"\", lai pārvietotu starp izvēļu sarakstiem."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
+"Raksti šajā logā, lai filtrētu zemāk esošo sarakstu ar pieejamajiem %s."
 
 msgid "Filter"
 msgstr "Filtrs"
@@ -40,10 +45,10 @@ msgstr "Izvēlēties visu"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Izvēlies, lai pievienotu visas %s izvēles vienā reizē."
 
 msgid "Choose"
-msgstr ""
+msgstr "Izvēlies"
 
 msgid "Remove"
 msgstr "Izņemt"
@@ -57,13 +62,16 @@ msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Šis ir saraksts ar izvēlētajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
+"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izņemt\", "
+"lai izņemtu no izvēlēto ierakstu saraksta."
 
 msgid "Remove all"
-msgstr ""
+msgstr "Izņemt visu"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Izvēlies, lai izņemtu visas %s izvēles vienā reizē."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -97,22 +105,22 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Piezīme: Tavs laiks ir %s stundas pirms servera laika."
+msgstr[1] "Piezīme: Tavs laiks ir %s stundu pirms servera laika."
+msgstr[2] "Piezīme: Tavs laiks ir %s stundas pirms servera laika."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Piezīme: Tavs laiks ir %s stundas pēc servera laika."
+msgstr[1] "Piezīme: Tavs laiks ir %s stundu pēc servera laika."
+msgstr[2] "Piezīme: Tavs laiks ir %s stundas pēc servera laika."
 
 msgid "Now"
 msgstr "Tagad"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Izvēlies laiku"
 
 msgid "Choose a time"
 msgstr "Izvēlieties laiku"
@@ -127,7 +135,7 @@ msgid "Noon"
 msgstr "Pusdienas laiks"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6:00"
 
 msgid "Cancel"
 msgstr "Atcelt"
@@ -136,7 +144,7 @@ msgid "Today"
 msgstr "Šodien"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Izvēlies datumu"
 
 msgid "Yesterday"
 msgstr "Vakar"
@@ -145,68 +153,68 @@ msgid "Tomorrow"
 msgstr "Rīt"
 
 msgid "January"
-msgstr ""
+msgstr "janvāris"
 
 msgid "February"
-msgstr ""
+msgstr "februāris"
 
 msgid "March"
-msgstr ""
+msgstr "marts"
 
 msgid "April"
-msgstr ""
+msgstr "aprīlis"
 
 msgid "May"
-msgstr ""
+msgstr "maijs"
 
 msgid "June"
-msgstr ""
+msgstr "jūnijs"
 
 msgid "July"
-msgstr ""
+msgstr "jūlijs"
 
 msgid "August"
-msgstr ""
+msgstr "augusts"
 
 msgid "September"
-msgstr ""
+msgstr "septembris"
 
 msgid "October"
-msgstr ""
+msgstr "oktobris"
 
 msgid "November"
-msgstr ""
+msgstr "novembris"
 
 msgid "December"
-msgstr ""
+msgstr "decembris"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "Sv"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "P"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "O"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "C"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "Pk"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgid "Show"
 msgstr "Parādīt"

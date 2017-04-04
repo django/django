@@ -3,16 +3,17 @@
 # Translators:
 # aljosa <aljosa.mohorovic@gmail.com>, 2011,2013
 # Bojan Mihelač <bmihelac@mihelac.org>, 2012
+# Filip Cuk <filipcuk2@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013,2015
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013,2015-2016
 # Ylodi <stjepan@gmail.com>, 2015
 # Ylodi <stjepan@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-01-20 08:14+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
@@ -69,10 +70,10 @@ msgid "This year"
 msgstr "Ova godina"
 
 msgid "No date"
-msgstr ""
+msgstr "Nema datuma"
 
 msgid "Has date"
-msgstr ""
+msgstr "Ima datum"
 
 #, python-format
 msgid ""
@@ -215,8 +216,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" uspješno izbrisan."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Unos %(name)s sa primarnim ključem %(key)r ne postoji."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -470,10 +471,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Nemate privilegije za promjenu podataka."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Nedavne promjene"
 
 msgid "My actions"
-msgstr ""
+msgstr "Moje promjene"
 
 msgid "None available"
 msgstr "Nije dostupno"

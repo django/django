@@ -8,27 +8,29 @@
 # m_aciek <maciej.olko@gmail.com>, 2014
 # m_aciek <maciej.olko@gmail.com>, 2016
 # m_aciek <maciej.olko@gmail.com>, 2014-2015
-# Michał Muszalski <m.muszalski@gmail.com>, 2016
+# muszalski <m.muszalski@gmail.com>, 2016
 # p <inactive+poczciwiec@transifex.com>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
 # Roman Barczyński <rombar@gmail.com>, 2012
+# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-01 12:46+0000\n"
-"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"PO-Revision-Date: 2016-11-11 22:31+0000\n"
+"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>=14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 msgid "Personal info"
-msgstr "Dane osobowe"
+msgstr "Informacje osobiste"
 
 msgid "Permissions"
 msgstr "Uprawnienia"
@@ -38,7 +40,7 @@ msgstr "Ważne daty"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
+msgstr "Obiekt %(name)s o kluczu podstawowym %(key)r nie istnieje."
 
 msgid "Password changed successfully."
 msgstr "Hasło zostało zmienione pomyślnie."
@@ -54,7 +56,7 @@ msgid "password"
 msgstr "hasło"
 
 msgid "last login"
-msgstr "ostatnio zalogowany"
+msgstr "ostatnie logowanie"
 
 msgid "No password set."
 msgstr "Hasło nie zostało ustawione."
@@ -65,7 +67,7 @@ msgstr ""
 "skrótu (hash)."
 
 msgid "The two password fields didn't match."
-msgstr "Hasła się nie zgadzają."
+msgstr "Hasła nie są zgodne."
 
 msgid "Password"
 msgstr "Hasło"
@@ -82,7 +84,7 @@ msgid ""
 "\">this form</a>."
 msgstr ""
 "Czyste hasła nie są zapisywane, więc nie ma możliwości, aby zobaczyć hasło "
-"tego użytkownika, ale możesz zmienić hasło używając <a href=\"../password/"
+"tego użytkownika, ale możesz je zmienić używając <a href=\"../password/"
 "\">tego formularza</a>."
 
 #, python-format
@@ -90,8 +92,8 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Wprowadź poprawną %(username)s oraz hasło. Uwaga: wielkość liter ma "
-"znaczenie."
+"Wprowadź poprawne wartości pól %(username)s oraz hasło. Uwaga: wielkość "
+"liter ma znaczenie."
 
 msgid "This account is inactive."
 msgstr "To konto jest nieaktywne."
@@ -169,7 +171,7 @@ msgid "groups"
 msgstr "grupy"
 
 msgid "superuser status"
-msgstr "status administratora"
+msgstr "status superużytkownika"
 
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
@@ -226,7 +228,7 @@ msgstr ""
 "konto."
 
 msgid "date joined"
-msgstr "data przyłączenia"
+msgstr "data dołączenia"
 
 msgid "user"
 msgstr "użytkownik"
@@ -247,6 +249,8 @@ msgstr[1] ""
 "To hasło jest za krótkie. Musi zawierać co najmniej %(min_length)d znaki."
 msgstr[2] ""
 "To hasło jest za krótkie. Musi zawierać co najmniej %(min_length)d znaków."
+msgstr[3] ""
+"To hasło jest za krótkie. Musi zawierać co najmniej %(min_length)d znaków."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -254,6 +258,7 @@ msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Twoje hasło musi zawierać co najmniej %(min_length)d znak."
 msgstr[1] "Twoje hasło musi zawierać co najmniej %(min_length)d znaki."
 msgstr[2] "Twoje hasło musi zawierać co najmniej %(min_length)d znaków."
+msgstr[3] "Twoje hasło musi zawierać co najmniej %(min_length)d znaków."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -309,7 +314,7 @@ msgid "Password reset unsuccessful"
 msgstr "Zresetowanie hasła nie powiodło się"
 
 msgid "Password reset complete"
-msgstr "Procedura zresetowania hasła została zakonczona"
+msgstr "Zresetowanie hasła powiodło się"
 
 msgid "Password change"
 msgstr "Zmiana hasła"

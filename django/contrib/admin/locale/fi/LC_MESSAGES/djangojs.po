@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2017
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-02-06 21:20+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -150,68 +150,68 @@ msgid "Tomorrow"
 msgstr "Huomenna"
 
 msgid "January"
-msgstr ""
+msgstr "tammikuu"
 
 msgid "February"
-msgstr ""
+msgstr "helmikuu"
 
 msgid "March"
-msgstr ""
+msgstr "maaliskuu"
 
 msgid "April"
-msgstr ""
+msgstr "huhtikuu"
 
 msgid "May"
-msgstr ""
+msgstr "toukokuu"
 
 msgid "June"
-msgstr ""
+msgstr "kesäkuu"
 
 msgid "July"
-msgstr ""
+msgstr "heinäkuu"
 
 msgid "August"
-msgstr ""
+msgstr "elokuu"
 
 msgid "September"
-msgstr ""
+msgstr "syyskuu"
 
 msgid "October"
-msgstr ""
+msgstr "lokakuu"
 
 msgid "November"
-msgstr ""
+msgstr "marraskuu"
 
 msgid "December"
-msgstr ""
+msgstr "joulukuu"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "Su"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "Ma"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "Ti"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "Ke"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "To"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "Pe"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "La"
 
 msgid "Show"
 msgstr "Näytä"

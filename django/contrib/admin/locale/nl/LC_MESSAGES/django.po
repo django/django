@@ -2,6 +2,8 @@
 #
 # Translators:
 # Bas Peschier <bas.peschier@gmail.com>, 2013
+# Claude Paroz <claude@2xlibre.net>, 2017
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-04-04 08:54+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -69,10 +71,10 @@ msgid "This year"
 msgstr "Dit jaar"
 
 msgid "No date"
-msgstr ""
+msgstr "Geen datum"
 
 msgid "Has date"
-msgstr ""
+msgstr "Heeft datum"
 
 #, python-format
 msgid ""
@@ -138,7 +140,7 @@ msgstr "LogEntry Object"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" toegevoegd."
 
 msgid "Added."
 msgstr "Toegevoegd."
@@ -148,15 +150,15 @@ msgstr "en"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "{fields} voor {name} \"{object}\" gewijzigd."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "{fields} gewijzigd."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" verwijderd."
 
 msgid "No fields changed."
 msgstr "Geen velden gewijzigd."
@@ -174,31 +176,39 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"De {name} \"{obj}\" is succesvol toegevoegd. Je kunt het hieronder nog eens "
+"wijzigen."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"De {name} \"{obj}\" is succesvol toegevoegd. Je kunt hieronder nog een "
+"{name} toevoegen."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "De {name} \"{obj}\" is succesvol toegevoegd."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"De {name} \"{obj}\" is succesvol gewijzigd. Je kunt het hieronder nog eens "
+"wijzigen."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"De {name} \"{obj}\" is succesvol gewijzigd. Je kunt hieronder nog een {name} "
+"toevoegen."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "De {name} \"{obj}\" is succesvol gewijzigd."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -215,8 +225,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" van type %(name)s is verwijderd."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s object met primaire sleutel %(key)r bestaat niet."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -471,10 +481,10 @@ msgid "You don't have permission to edit anything."
 msgstr "U heeft geen rechten om iets te wijzigen."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Recente acties"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mijn acties"
 
 msgid "None available"
 msgstr "Geen beschikbaar"

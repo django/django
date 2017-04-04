@@ -6,6 +6,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
+# Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # nip3o <n@niclasolofsson.se>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-11-22 19:24+0000\n"
+"Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -122,19 +123,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "variation"
 
 msgid "version"
-msgstr ""
+msgstr "version"
 
 msgid "memory cost"
-msgstr ""
+msgstr "minneskostnad"
 
 msgid "time cost"
-msgstr ""
+msgstr "tidskostnad"
 
 msgid "parallelism"
-msgstr ""
+msgstr "parallellism"
 
 msgid "work factor"
 msgstr "arbetsfaktor"
@@ -191,6 +192,8 @@ msgstr "användarnamn"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Obligatoriskt. 150 tecken eller färre. Endast bokstäver, siffror och @/./+/-/"
+"_."
 
 msgid "A user with that username already exists."
 msgstr "En användare med det användarnamnet finns redan."
@@ -274,11 +277,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Fyll i ett giltigt användarnamn. Detta värde får endast innehålla bokstäver "
+"a-z, siffror och @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Fyll i ett giltigt användarnamn. Detta värde får endast innehålla bokstäver, "
+"siffror och @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Utloggad"

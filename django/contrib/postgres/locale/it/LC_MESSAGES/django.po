@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# bbstuntman <Bbstuntman@gmail.com>, 2017
 # Flavio Curella <flavio.curella@gmail.com>, 2016
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-09-28 11:37+0000\n"
-"Last-Translator: Stefano Brentegani <sbrentegani@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-02-19 07:22+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -30,12 +31,12 @@ msgstr "L'elemento %(nth)s dell'array non ha superato la validazione:"
 msgid "Nested arrays must have the same length."
 msgstr "Gli array annidati devono avere la stessa lunghezza."
 
-msgid "Map of strings to strings"
-msgstr "Mappa di stringhe a stringhe"
+msgid "Map of strings to strings/nulls"
+msgstr "Mappa di stringhe a stringhe/null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Il valore di \"%(key)s\" non corrisponde a una stringa."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Il valore di \"%(key)s\" non è una stringa o nullo."
 
 msgid "A JSON object"
 msgstr "Un oggetto JSON"
