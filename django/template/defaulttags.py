@@ -211,11 +211,9 @@ class ForNode(Node):
                     nodelist.append(node.render_annotated(context))
 
                 if pop_context:
-                    # The loop variables were pushed on to the context so pop them
-                    # off again. This is necessary because the tag lets the length
-                    # of loopvars differ to the length of each set of items and we
-                    # don't want to leave any vars from the previous loop on the
-                    # context.
+                    # Pop the loop variables pushed on to the context to avoid
+                    # the context ending up in an inconsistent state when other
+                    # tags (e.g., include and with) push data to context.
                     context.pop()
         return mark_safe(''.join(nodelist))
 
