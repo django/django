@@ -94,6 +94,15 @@ class Command(BaseCommand):
                 if hasattr(self.stdin, 'isatty') and not self.stdin.isatty():
                     raise NotRunningInTTYException("Not running in a TTY")
 
+                # Validate username provided by --username parameter
+                self.validate_data(field_name=self.UserModel.USERNAME_FIELD, field_value=username, database=database)
+
+                # Validate data inputted by --< field_name >
+                for field_name in self.UserModel.REQUIRED_FIELDS:
+                    user_data[field_name] = self.validate_data(field_name=field_name,
+                                                               field_value=options[field_name],
+                                                               database=database)
+
                 # Get a username
                 verbose_field_name = self.username_field.verbose_name
                 while username is None:
@@ -122,7 +131,6 @@ class Command(BaseCommand):
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
-                    user_data[field_name] = options[field_name]
                     while user_data[field_name] is None:
                         message = '%s%s: ' % (
                             capfirst(field.verbose_name),
@@ -194,3 +202,20 @@ class Command(BaseCommand):
             val = None
 
         return val
+
+    def validate_data(self, field_name, field_value, database):
+        field = self.UserModel._meta.get_field(field_name)
+        value = None
+        if field_value:
+            try:
+                value = field.clean(field_value, None)
+                if field.unique:
+                    try:
+                        self.UserModel._default_manager.db_manager(database).get(**{field_name: field_value})
+                    except self.UserModel.DoesNotExist:
+                        pass
+                    else:
+                        raise CommandError("Error: That %s is already taken." % field.verbose_name)
+            except exceptions.ValidationError as e:
+                raise CommandError('; '.join(e.messages))
+        return value
