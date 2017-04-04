@@ -234,4 +234,4 @@ class TestUtilsText(SimpleTestCase):
             name='article', object='My first try',
         )
         with override('fr'):
-            self.assertEqual('article «\xa0My first try\xa0» ajouté.', s)
+            self.assertEqual('Ajout de article «\xa0My first try\xa0».', s)
