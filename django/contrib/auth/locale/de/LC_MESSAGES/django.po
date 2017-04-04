@@ -83,7 +83,7 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Bitte einen gültigen %(username)s und ein Passwort eingeben. Beide Felder "
+"Bitte einen gültigen %(username)sn und ein Passwort eingeben. Beide Felder "
 "berücksichtigen die Groß-/Kleinschreibung."
 
 msgid "This account is inactive."
