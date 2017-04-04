@@ -184,3 +184,18 @@ with warnings.catch_warnings():
         """Expected assignment_tag_without_context_parameter __doc__"""
         return "Expected result"
     assignment_tag_without_context_parameter.anything = "Expected assignment_tag_without_context_parameter __dict__"
+
+
+@register.tag('counter')
+def counter(parser, token):
+    return CounterNode()
+
+
+class CounterNode(template.Node):
+    def __init__(self):
+        self.count = 0
+
+    def render(self, context):
+        count = self.count
+        self.count = count + 1
+        return count
