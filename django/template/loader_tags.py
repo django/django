@@ -176,7 +176,7 @@ class IncludeNode(Node):
             if not callable(getattr(template, 'render', None)):
                 # If not, we'll try our cache, and get_template()
                 template_name = template
-                cache = context.render_context.setdefault(self.context_key, {})
+                cache = context.render_context.dicts[0].setdefault(self, {})
                 template = cache.get(template_name)
                 if template is None:
                     template = context.template.engine.get_template(template_name)
