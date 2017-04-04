@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "January 17, 2017" "1.11" "Django"
+.TH "DJANGO-ADMIN" "1" "April 04, 2017" "1.11" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -931,6 +931,9 @@ the migrations documentation\&.
 Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
 of a \fBForeignKey\fP, for example).
+.sp
+To add migrations to an app that doesn\(aqt have a \fBmigrations\fP directory, run
+\fBmakemigrations\fP with the app\(aqs \fBapp_label\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-noinput, \-\-no\-input
@@ -2160,7 +2163,7 @@ django\-admin migrate \-\-traceback
 .UNINDENT
 .INDENT 0.0
 .TP
-.B \-\-verbosity {0,1,2,3}, \-\-v {0,1,2,3}
+.B \-\-verbosity {0,1,2,3}, \-v {0,1,2,3}
 .UNINDENT
 .sp
 Specifies the amount of notification and debug information that a command
@@ -2451,6 +2454,13 @@ management.call_command(\(aqdumpdata\(aq, use_natural_foreign_keys=True)
 .fi
 .UNINDENT
 .UNINDENT
+.sp
+Some command options have different names when using \fBcall_command()\fP instead
+of \fBdjango\-admin\fP or \fBmanage.py\fP\&. For example, \fBdjango\-admin
+createsuperuser \-\-no\-input\fP translates to \fBcall_command(\(aqcreatesuperuser\(aq,
+interactive=False)\fP\&. To find what keyword argument name to use for
+\fBcall_command()\fP, check the command\(aqs source code for the \fBdest\fP argument
+passed to \fBparser.add_argument()\fP\&.
 .sp
 Command options which take multiple options are passed a list:
 .INDENT 0.0
