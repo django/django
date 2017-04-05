@@ -407,6 +407,13 @@ Here are some tips for working with inheritance:
   not be automatically escaped (see the `next section`_), since it was
   already escaped, if necessary, in the parent template.
 
+* Variables created outside of a :ttag:`{% block %}<block>` using the template
+  tag ``as`` syntax can't be used inside the block. For example, this template
+  doesn't render anything::
+
+      {% trans "Title" as title %}
+      {% block content %}{{ title }}{% endblock %}
+
 * For extra readability, you can optionally give a *name* to your
   ``{% endblock %}`` tag. For example::
 
