@@ -807,3 +807,29 @@ Versions affected
 * Django 1.10 `(patch) <https://github.com/django/django/commit/884e113838e5a72b4b0ec9e5e87aa480f6aa4472>`__
 * Django 1.9 `(patch) <https://github.com/django/django/commit/45acd6d836895a4c36575f48b3fb36a3dae98d19>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/c401ae9a7dfb1a94a8a61927ed541d6f93089587>`__
+
+April 4, 2017 - :cve:`2017-7233`
+--------------------------------
+
+Open redirect and possible XSS attack via user-supplied numeric redirect URLs.
+`Full description <https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/f824655bc2c50b19d2f202d7640785caabc82787>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/254326cb3682389f55f886804d2c43f7b9f23e4f>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/8339277518c7d8ec280070a780915304654e3b66>`__
+
+April 4, 2017 - :cve:`2017-7234`
+--------------------------------
+
+Open redirect vulnerability in ``django.views.static.serve()``. `Full
+description <https://www.djangoproject.com/weblog/2017/apr/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/2a9f6ef71b8e23fd267ee2be1be26dde8ab67037>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/5f1ffb07afc1e59729ce2b283124116d6c0659e4>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/4a6b945dffe8d10e7cec107d93e6efaebfbded29>`__
