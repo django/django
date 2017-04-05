@@ -630,6 +630,23 @@ class FormsTestCase(SimpleTestCase):
 <input id="id_language_1" name="language" type="radio" value="J" /> Java</label></div>"""
         )
 
+        # Test manual templating of radio
+        t = Template("""
+            <label for="{{ form.language.id_for_label }}">{{ form.language.label }}:</label>
+            <ul id="{{ form.language.composite_id }}">
+                {% for choice in form.language %} <li>
+                    <label for="{{ choice.id_for_label }}">{{ choice.tag }}{{ choice.choice_label }}</label>
+                </li>{% endfor %}
+            </ul>""")
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            """<label for="id_language_0">Language:</label>
+            <ul id="id_language">
+<li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+</ul>"""
+        )
+
     def test_form_with_iterable_boundfield(self):
         class BeatleForm(Form):
             name = ChoiceField(
