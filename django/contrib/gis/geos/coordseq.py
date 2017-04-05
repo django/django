@@ -39,10 +39,8 @@ class GEOSCoordSeq(GEOSBase):
 
     def __getitem__(self, index):
         "Return the coordinate sequence value at the given index."
-        coords = [self.getX(index), self.getY(index)]
-        if self.dims == 3 and self._z:
-            coords.append(self.getZ(index))
-        return tuple(coords)
+        self._checkindex(index)
+        return self._point_getter(index)
 
     def __setitem__(self, index, value):
         "Set the coordinate sequence value at the given index."
