@@ -1,0 +1,12 @@
+===========================
+Django 1.11.1 release notes
+===========================
+
+*Under development*
+
+Django 1.11.1 fixes several bugs in 1.11.
+
+Bugfixes
+========
+
+* ...
