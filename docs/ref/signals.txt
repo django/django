@@ -531,14 +531,6 @@ Arguments sent with this signal:
 
 Sent when Django finishes delivering an HTTP response to the client.
 
-.. note::
-
-    Some WSGI servers and middleware do not always call ``close`` on the
-    response object after handling a request, most notably uWSGI prior to 1.2.6
-    and Sentry's error reporting middleware up to 2.0.7. In those cases this
-    signal isn't sent at all. This can result in idle connections to database
-    and memcache servers.
-
 Arguments sent with this signal:
 
 ``sender``
