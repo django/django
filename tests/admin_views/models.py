@@ -575,6 +575,13 @@ class Pizza(models.Model):
     toppings = models.ManyToManyField('Topping', related_name='pizzas')
 
 
+# Pizza's ModelAdmin has readonly_fields = ['toppings'].
+# toppings is editable for this model's admin.
+class ReadablePizza(Pizza):
+    class Meta:
+        proxy = True
+
+
 class Album(models.Model):
     owner = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=30)

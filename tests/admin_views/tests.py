@@ -54,12 +54,13 @@ from .models import (
     ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
     ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
     Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, Promo, Question, Recommendation, Recommender,
-    RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Restaurant,
-    RowLevelChangePermissionModel, SecretHideout, Section, ShortMessage,
-    Simple, State, Story, Subscriber, SuperSecretHideout, SuperVillain,
-    Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
-    UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    PrePopulatedPost, Promo, Question, ReadablePizza, Recommendation,
+    Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
+    Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
+    ShortMessage, Simple, State, Story, Subscriber, SuperSecretHideout,
+    SuperVillain, Telegram, TitleTranslation, Topping, UnchangeableObject,
+    UndeletableObject, UnorderedObject, Villain, Vodcast, Whatsit, Widget,
+    Worker, WorkHour,
 )
 
 
@@ -875,6 +876,17 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         instance = UndeletableObject.objects.create(name='foo')
         response = self.client.get(reverse('admin:admin_views_undeletableobject_change', args=(instance.pk,)))
         self.assertNotContains(response, 'deletelink')
+
+    def test_change_view_logs_m2m_field_changes(self):
+        """Changes to ManyToManyFields are included in the object's history."""
+        pizza = ReadablePizza.objects.create(name='Cheese')
+        cheese = Topping.objects.create(name='cheese')
+        post_data = {'name': pizza.name, 'toppings': [cheese.pk]}
+        response = self.client.post(reverse('admin:admin_views_readablepizza_change', args=(pizza.pk,)), post_data)
+        self.assertRedirects(response, reverse('admin:admin_views_readablepizza_changelist'))
+        pizza_ctype = ContentType.objects.get_for_model(ReadablePizza, for_concrete_model=False)
+        log = LogEntry.objects.filter(content_type=pizza_ctype, object_id=pizza.pk).first()
+        self.assertEqual(log.get_change_message(), 'Changed toppings.')
 
     def test_allows_attributeerror_to_bubble_up(self):
         """
