@@ -1176,7 +1176,7 @@ class QuerySet(object):
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
-        return instance.query.is_empty()
+        return isinstance(instance, QuerySet) and instance.query.is_empty()
 
 
 class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
