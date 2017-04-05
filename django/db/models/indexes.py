@@ -1,8 +1,18 @@
 import hashlib
 
+from django.db.models.expressions import Ref
 from django.utils.encoding import force_bytes
 
 __all__ = ['FuncIndex', 'Index']
+
+
+class Query:
+
+    def __init__(self, model):
+        self.model = model
+
+    def resolve_ref(self, name, *args, **kwargs):
+        return Ref(name, None)
 
 
 class Index:
@@ -142,8 +152,10 @@ class FuncIndex(Index):
 
     def create_sql(self, model, schema_editor):
         connection = schema_editor.connection
-        compiler = connection.ops.compiler('SQLCompiler')(None, connection, 'default')
-        func_sql, params = compiler.compile(self.expression)
+        query = Query(model)
+        compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
+        expr = self.expression.resolve_expression(query)
+        func_sql, params = compiler.compile(expr)
         params = tuple(map(schema_editor.quote_value, params))
         columns = func_sql % params
         quote_name = schema_editor.quote_name

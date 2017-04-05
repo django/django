@@ -17,7 +17,8 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.db.models.indexes import Index
+from django.db.models.functions import Lower
+from django.db.models.indexes import FuncIndex, Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -1790,6 +1791,15 @@ class SchemaTests(TransactionTestCase):
         # The text_field index is present if the database supports it.
         assertion = self.assertIn if connection.features.supports_index_on_text_field else self.assertNotIn
         assertion('text_field', self.get_indexes(AuthorTextFieldWithIndex._meta.db_table))
+
+    def test_func_index(self):
+        func_index = FuncIndex(expression=Lower('title'), name='title_lower_idx')
+        with connection.schema_editor() as editor:
+            sql = func_index.create_sql(Book, editor)
+
+        sql = sql.upper()
+        self.assertIn('LOWER', sql)
+        self.assertIn('TITLE', sql)
 
     def test_primary_key(self):
         """
