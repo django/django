@@ -625,6 +625,8 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         # Save room in session and add us to the group
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
+        # Accept the connection request
+        message.reply_channel.send({"accept": True})
 
     # Connected to websocket.receive
     @channel_session
@@ -639,6 +641,19 @@ have a ChatMessage model with ``message`` and ``room`` fields::
     @channel_session
     def ws_disconnect(message):
         Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
+
+Update ``routing.py`` as well::
+
+    # in routing.py
+    from channels.routing import route
+    from myapp.consumers import ws_connect, ws_message, ws_disconnect, msg_consumer
+
+    channel_routing = [
+        route("websocket.connect", ws_connect),
+        route("websocket.receive", ws_message),
+        route("websocket.disconnect", ws_disconnect),
+        route("chat-messages", msg_consumer),
+    ]
 
 Note that we could add messages onto the ``chat-messages`` channel from anywhere;
 inside a View, inside another model's ``post_save`` signal, inside a management
