@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.core.exceptions import ImproperlyConfigured
 
 from .binding.base import BindingMetaclass
 from .package_checks import check_all
