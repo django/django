@@ -837,7 +837,7 @@ queries.
 Uses SQL's ``INTERSECT`` operator to return the shared elements of two or more
 ``QuerySet``\s. For example:
 
-    >>> qs1.itersect(qs2, qs3)
+    >>> qs1.intersection(qs2, qs3)
 
 See :meth:`union` for some restrictions.
 
