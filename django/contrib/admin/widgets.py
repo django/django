@@ -83,6 +83,17 @@ class AdminTimeWidget(forms.TimeInput):
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
+
+    Must be used with forms.SplitDateTimeField.
+
+    Example::
+
+    formfield_overrides = {
+        models.DateTimeField: {
+            'form_class': forms.SplitDateTimeField,
+            'widget': widgets.AdminSplitDateTime
+        },
+    }
     """
     def __init__(self, attrs=None):
         widgets = [AdminDateWidget, AdminTimeWidget]
