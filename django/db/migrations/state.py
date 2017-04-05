@@ -563,25 +563,51 @@ class ModelState(object):
         meta_contents.update(self.options)
         meta = type(str("Meta"), tuple(), meta_contents)
         # Then, work out our bases
-        try:
-            bases = tuple(
-                (apps.get_model(base) if isinstance(base, six.string_types) else base)
-                for base in self.bases
-            )
-        except LookupError:
-            raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
+        bases = list()
+        meta_class_bases = list()
+        meta_class_seen_supertypes = set()
+        for base in self.bases:
+            if isinstance(base, six.string_types):
+                try:
+                    base = apps.get_model(base)
+                except LookupError:
+                    raise InvalidBasesError(
+                        "Cannot resolve one or more bases from %r" % (
+                            self.bases,
+                        )
+                    )
+            bases.append(base)
+            base_type = type(base)
+            # make a list in left-to-right order of the needed base types
+            if base_type not in meta_class_seen_supertypes:
+                for leftward_base_type in meta_class_bases:
+                    if issubclass(base_type, leftward_base_type):
+                        # leftward_base_type is unnecessary
+                        meta_class_bases.remove(leftward_base_type)
+                meta_class_bases.append(base_type)
+                # any super-type of this base type is already entended
+                # by this base type and so will never be needed
+                meta_class_seen_supertypes.update(base_type.__mro__)
         # Turn fields into a dict for the body, add other bits
         body = {name: field.clone() for name, field in self.fields}
         body['Meta'] = meta
         body['__module__'] = "__fake__"
-
+        # In most cases, there's only one type, 
+        # so, for performance reasons, simply re-use it.
+        if len(meta_class_bases) == 1:
+            MetaClass = meta_class_bases[0]
+        else:
+            MetaClass = type(
+                str(self.name + 'Metaclass'),
+                tuple(meta_class_bases),
+                {}
+            )
         # Restore managers
         body.update(self.construct_managers())
-
         # Then, make a Model object (apps.register_model is called in __new__)
-        return type(
+        return MetaClass(
             str(self.name),
-            bases,
+            tuple(bases),
             body,
         )
 
