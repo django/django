@@ -1026,6 +1026,35 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'name': "Pony", 'table': "test_almota_pony_2"})
 
+    def test_alter_model_table_none(self):
+        """
+        Tests the AlterModelTable operation if the table name is set to None
+        """
+        project_state = self.set_up_test_model("test_almota")
+        # Test the state alteration
+        operation = migrations.AlterModelTable("Pony", None)
+        self.assertEqual(operation.describe(), "Rename table for Pony to (default)")
+        new_state = project_state.clone()
+        operation.state_forwards("test_almota", new_state)
+        self.assertEqual(new_state.models["test_almota", "pony"].options["db_table"], None)
+        # Test the database alteration
+        self.assertTableExists("test_almota_pony")
+        self.assertTableNotExists("test_almota_none")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_almota", editor, project_state, new_state)
+        self.assertTableNotExists("test_almota_none")
+        self.assertTableExists("test_almota_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_almota", editor, new_state, project_state)
+        self.assertTableExists("test_almota_pony")
+        self.assertTableNotExists("test_almota_none")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AlterModelTable")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'name': "Pony", 'table': None})
+
     def test_alter_model_table_noop(self):
         """
         Tests the AlterModelTable operation if the table name is not changed.

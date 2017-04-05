@@ -314,7 +314,10 @@ class AlterModelTable(Operation):
         return name.lower() == self.name_lower
 
     def describe(self):
-        return "Rename table for %s to %s" % (self.name, self.table)
+        if self.table is None:
+            return "Rename table for %s to (default)" % (self.name)
+        else:
+            return "Rename table for %s to %s" % (self.name, self.table)
 
 
 class AlterUniqueTogether(Operation):
