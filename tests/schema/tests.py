@@ -1801,6 +1801,12 @@ class SchemaTests(TransactionTestCase):
         self.assertIn('LOWER', sql)
         self.assertIn('TITLE', sql)
 
+        func_index = FuncIndex(expression=Lower('blub'), name='title_lower_idx')
+        with self.assertRaisesMessage(ValueError, "Invalid reference to field 'blub' on model 'schema.Book'"):
+            with connection.schema_editor() as editor:
+                sql = func_index.create_sql(Book, editor)
+
+
     def test_primary_key(self):
         """
         Tests altering of the primary key
