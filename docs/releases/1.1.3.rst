@@ -1,0 +1,26 @@
+1.1.3 Release Notes
+===================
+
+Channels 1.1.3 is a bugfix release for the 1.1 series, released on
+April 5th, 2017.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Minor Changes & Bugfixes
+------------------------
+
+* ``enforce_ordering`` now works correctly with the new-style process-specific
+  channels
+
+* ASGI channel layer versions are now explicitly checked for version compatability
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
