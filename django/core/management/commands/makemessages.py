@@ -182,7 +182,7 @@ def write_pot_file(potfile, msgs):
         msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
     else:
         msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
-    with io.open(potfile, 'a', encoding='utf-8') as fp:
+    with io.open(potfile, 'a', encoding='utf-8', newline='\n') as fp:
         fp.write(msgs)
 
 
@@ -369,7 +369,7 @@ class Command(BaseCommand):
                         "errors happened while running msguniq\n%s" % errors)
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
-            with io.open(potfile, 'w', encoding='utf-8') as fp:
+            with io.open(potfile, 'w', encoding='utf-8', newline='\n') as fp:
                 fp.write(msgs)
             potfiles.append(potfile)
         return potfiles
@@ -572,7 +572,7 @@ class Command(BaseCommand):
                 msgs = self.copy_plural_forms(msgs, locale)
         msgs = msgs.replace(
             "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain, "")
-        with io.open(pofile, 'w', encoding='utf-8') as fp:
+        with io.open(pofile, 'w', encoding='utf-8', newline='\n') as fp:
             fp.write(msgs)
 
         if self.no_obsolete:
