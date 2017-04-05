@@ -54,17 +54,14 @@ class GEOSCoordSeq(GEOSBase):
         # Checking the dims of the input
         if self.dims == 3 and self._z:
             n_args = 3
-            set_3d = True
+            point_setter = self._set_point_3d
         else:
             n_args = 2
-            set_3d = False
+            point_setter = self._set_point_2d
         if len(value) != n_args:
             raise TypeError('Dimension of value does not match.')
-        # Setting the X, Y, Z
-        self.setX(index, value[0])
-        self.setY(index, value[1])
-        if set_3d:
-            self.setZ(index, value[2])
+        self._checkindex(index)
+        point_setter(index, value)
 
     # #### Internal Routines ####
     def _checkindex(self, index):
@@ -87,6 +84,15 @@ class GEOSCoordSeq(GEOSBase):
     def _get_z(self, index):
         return capi.cs_getz(self.ptr, index, byref(c_double()))
 
+    def _set_x(self, index, value):
+        capi.cs_setx(self.ptr, index, value)
+
+    def _set_y(self, index, value):
+        capi.cs_sety(self.ptr, index, value)
+
+    def _set_z(self, index, value):
+        capi.cs_setz(self.ptr, index, value)
+
     @property
     def _point_getter(self):
         return self._get_point_3d if self.dims == 3 and self._z else self._get_point_2d
@@ -96,6 +102,17 @@ class GEOSCoordSeq(GEOSBase):
 
     def _get_point_3d(self, index):
         return (self._get_x(index), self._get_y(index), self._get_z(index))
+
+    def _set_point_2d(self, index, value):
+        x, y = value
+        self._set_x(index, x)
+        self._set_y(index, y)
+
+    def _set_point_3d(self, index, value):
+        x, y, z = value
+        self._set_x(index, x)
+        self._set_y(index, y)
+        self._set_z(index, z)
 
     # #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
