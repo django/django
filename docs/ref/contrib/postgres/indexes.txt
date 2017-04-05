@@ -34,3 +34,11 @@ available from the ``django.contrib.postgres.indexes`` module.
     PostgreSQL. You can install it using the
     :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
     operation.
+
+``GinIndex``
+============
+
+.. class:: GinIndex()
+
+    Creates a `gist index
+    <https://www.postgresql.org/docs/current/static/gist.html>`_.

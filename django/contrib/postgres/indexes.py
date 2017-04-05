@@ -45,3 +45,10 @@ class GinIndex(Index):
 
     def create_sql(self, model, schema_editor):
         return super().create_sql(model, schema_editor, using=' USING gin')
+
+
+class GistIndex(Index):
+    suffix = 'gist'
+
+    def create_sql(self, model, schema_editor):
+        return super().create_sql(model, schema_editor, using=' USING gist')
