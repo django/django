@@ -80,6 +80,25 @@ class GEOSCoordSeq(GEOSBase):
         if dim < 0 or dim > 2:
             raise GEOSException('invalid ordinate dimension "%d"' % dim)
 
+    def _get_x(self, index):
+        return capi.cs_getx(self.ptr, index, byref(c_double()))
+
+    def _get_y(self, index):
+        return capi.cs_gety(self.ptr, index, byref(c_double()))
+
+    def _get_z(self, index):
+        return capi.cs_getz(self.ptr, index, byref(c_double()))
+
+    @property
+    def _point_getter(self):
+        return self._get_point_3d if self.dims == 3 and self._z else self._get_point_2d
+
+    def _get_point_2d(self, index):
+        return (self._get_x(index), self._get_y(index))
+
+    def _get_point_3d(self, index):
+        return (self._get_x(index), self._get_y(index), self._get_z(index))
+
     # #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
         "Return the value for the given dimension and index."
@@ -157,7 +176,7 @@ class GEOSCoordSeq(GEOSBase):
     def tuple(self):
         "Return a tuple version of this coordinate sequence."
         n = self.size
+        get_point = self._point_getter
         if n == 1:
-            return self[0]
-        else:
-            return tuple(self[i] for i in range(n))
+            return get_point(0)
+        return tuple(get_point(i) for i in range(n))
