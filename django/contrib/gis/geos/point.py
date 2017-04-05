@@ -7,7 +7,6 @@ from django.contrib.gis.geos.geometry import GEOSGeometry
 
 
 class Point(GEOSGeometry):
-    _json_type = 'Point'
     _minlength = 2
     _maxlength = 3
     has_cs = True

@@ -2,7 +2,6 @@
  This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
  inherit from this object.
 """
-import json
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
@@ -421,7 +420,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         Return GeoJSON representation of this Geometry.
         """
-        return json.dumps({'type': self._json_type, 'coordinates': self.coords})
+        return self.ogr.json
     geojson = json
 
     @property
