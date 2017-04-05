@@ -7,7 +7,6 @@ from django.contrib.gis.geos.linestring import LinearRing
 
 
 class Polygon(GEOSGeometry):
-    _json_type = 'Polygon'
     _minlength = 1
 
     def __init__(self, *args, **kwargs):
