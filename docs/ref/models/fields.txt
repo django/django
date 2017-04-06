@@ -254,6 +254,9 @@ Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
 ``unique``, and ``unique_for_date``. Additional error message keys are
 specified for each field in the `Field types`_ section below.
 
+These error messages often don't propagate to forms. See
+:ref:`considerations-regarding-model-errormessages`.
+
 ``help_text``
 -------------
 
