@@ -1,6 +1,7 @@
 import datetime
 
 from django.conf import settings
+from django.contrib.admin.utils import get_fields_from_path
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
@@ -254,7 +255,7 @@ class DateMixin:
         if it's a `DateField`.
         """
         model = self.get_queryset().model if self.model is None else self.model
-        field = model._meta.get_field(self.get_date_field())
+        field = get_fields_from_path(model, self.get_date_field())[-1]
         return isinstance(field, models.DateTimeField)
 
     def _make_date_lookup_arg(self, value):

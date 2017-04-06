@@ -142,7 +142,6 @@ urlpatterns = [
     url(r'^dates/books/sortedbynamedec/$',
         views.BookArchive.as_view(ordering='-name')),
 
-
     # ListView
     url(r'^list/dict/$',
         views.DictList.as_view()),
@@ -222,6 +221,8 @@ urlpatterns = [
         views.BookMonthArchive.as_view(paginate_by=30)),
     url(r'^dates/books/(?P<year>[0-9]{4})/no_month/$',
         views.BookMonthArchive.as_view()),
+    url(r'^dates/books/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/related_field/$',
+        views.BookMonthArchive.as_view(date_field='series__pubdate')),
     url(r'^dates/booksignings/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/$',
         views.BookSigningMonthArchive.as_view()),
 

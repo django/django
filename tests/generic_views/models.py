@@ -30,6 +30,14 @@ class Author(models.Model):
         return self.name
 
 
+class Series(models.Model):
+    name = models.CharField(max_length=100)
+    pubdate = models.DateField()
+
+    def __str__(self):
+        return self.name
+
+
 class DoesNotExistQuerySet(QuerySet):
     def get(self, *args, **kwargs):
         raise Author.DoesNotExist
@@ -43,6 +51,7 @@ class Book(models.Model):
     slug = models.SlugField()
     pages = models.IntegerField()
     authors = models.ManyToManyField(Author)
+    series = models.ForeignKey(Series, null=True, on_delete=models.CASCADE)
     pubdate = models.DateField()
 
     objects = models.Manager()
