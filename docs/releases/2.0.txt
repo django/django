@@ -87,6 +87,8 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
   concatenated values will be distinct.
 
+* Added :class:`~django.contrib.postgres.indexes.GistIndex`.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

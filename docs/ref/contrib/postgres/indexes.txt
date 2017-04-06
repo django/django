@@ -38,6 +38,8 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``GistIndex``
 ============
 
+.. versionadded:: 2.0
+
 .. class:: GistIndex()
 
     Creates a `GiST index
