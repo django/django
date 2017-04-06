@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
-from django.contrib.gis.db.models.sql import AreaField
+from django.contrib.gis.db.models.sql import AreaField, DistanceField
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
@@ -126,7 +126,7 @@ class OracleToleranceMixin:
 
     def as_oracle(self, compiler, connection):
         tol = self.extra.get('tolerance', self.tolerance)
-        return super().as_sql(compiler, connection, template="%%(function)s(%%(expressions)s, %s)" % tol)
+        return self.as_sql(compiler, connection, template="%%(function)s(%%(expressions)s, %s)" % tol)
 
 
 class Area(OracleToleranceMixin, GeoFunc):
@@ -247,27 +247,31 @@ class Difference(OracleToleranceMixin, GeomOutputGeoFunc):
 
 
 class DistanceResultMixin:
+    output_field_class = DistanceField
+
     def source_is_geography(self):
         return self.get_source_fields()[0].geography and self.srid == 4326
 
-    def convert_value(self, value, expression, connection, context):
-        if value is None:
-            return None
+    def distance_att(self, connection):
         dist_att = None
         geo_field = self.geo_field
         if geo_field.geodetic(connection):
             if connection.features.supports_distance_geodetic:
                 dist_att = 'm'
         else:
-            dist_att = geo_field.units_name(connection)
-        if dist_att:
-            return DistanceMeasure(**{dist_att: value})
-        return value
+            units = geo_field.units_name(connection)
+            if units:
+                dist_att = DistanceMeasure.unit_attname(units)
+        return dist_att
+
+    def as_sql(self, compiler, connection, **extra_context):
+        clone = self.copy()
+        clone.output_field.distance_att = self.distance_att(connection)
+        return super(DistanceResultMixin, clone).as_sql(compiler, connection, **extra_context)
 
 
 class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     geom_param_pos = (0, 1)
-    output_field_class = FloatField
     spheroid = None
 
     def __init__(self, expr1, expr2, spheroid=None, **extra):
@@ -358,17 +362,15 @@ class IsValid(OracleToleranceMixin, GeoFuncMixin, Transform):
 
 
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
-    output_field_class = FloatField
-
     def __init__(self, expr1, spheroid=True, **extra):
         self.spheroid = spheroid
         super().__init__(expr1, **extra)
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **extra_context):
         geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
         if geo_field.geodetic(connection) and not connection.features.supports_length_geodetic:
             raise NotImplementedError("This backend doesn't support Length on geodetic fields")
-        return super().as_sql(compiler, connection)
+        return super().as_sql(compiler, connection, **extra_context)
 
     def as_postgresql(self, compiler, connection):
         function = None
@@ -425,7 +427,6 @@ class NumPoints(GeoFunc):
 
 
 class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
-    output_field_class = FloatField
     arity = 1
 
     def as_postgresql(self, compiler, connection):
