@@ -11,7 +11,7 @@ from django.core.files.base import ContentFile
 from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import (
-    InMemoryUploadedFile, SimpleUploadedFile, UploadedFile
+    InMemoryUploadedFile, SimpleUploadedFile, UploadedFile,
 )
 
 try:
