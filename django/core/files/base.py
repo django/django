@@ -125,6 +125,7 @@ class File(FileProxyMixin):
             self.file = open(self.name, mode or self.mode)
         else:
             raise ValueError("The file cannot be reopened.")
+        return self
 
     def close(self):
         self.file.close()
@@ -147,6 +148,7 @@ class ContentFile(File):
 
     def open(self, mode=None):
         self.seek(0)
+        return self
 
     def close(self):
         pass

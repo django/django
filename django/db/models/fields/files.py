@@ -75,6 +75,7 @@ class FieldFile(File):
             self.file.open(mode)
         else:
             self.file = self.storage.open(self.name, mode)
+        return self
     # open() doesn't alter the file's contents, but it does reset the pointer
     open.alters_data = True
 

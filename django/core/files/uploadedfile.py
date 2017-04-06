@@ -85,6 +85,7 @@ class InMemoryUploadedFile(UploadedFile):
 
     def open(self, mode=None):
         self.file.seek(0)
+        return self
 
     def chunks(self, chunk_size=None):
         self.file.seek(0)
