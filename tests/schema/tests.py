@@ -18,7 +18,7 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.models.functions import Lower
-from django.db.models.indexes import FuncIndex, Index
+from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -1793,7 +1793,7 @@ class SchemaTests(TransactionTestCase):
         assertion('text_field', self.get_indexes(AuthorTextFieldWithIndex._meta.db_table))
 
     def test_func_index(self):
-        func_index = FuncIndex(expression=Lower('title'), name='title_lower_idx')
+        func_index = Index(fields=[Lower('title').desc()], name='title_lower_idx')
         with connection.schema_editor() as editor:
             sql = func_index.create_sql(Book, editor)
 
@@ -1801,11 +1801,10 @@ class SchemaTests(TransactionTestCase):
         self.assertIn('LOWER', sql)
         self.assertIn('TITLE', sql)
 
-        func_index = FuncIndex(expression=Lower('blub'), name='title_lower_idx')
+        func_index = Index(fields=[Lower('blub')], name='title_lower_idx')
         with self.assertRaisesMessage(ValueError, "Invalid reference to field 'blub' on model 'schema.Book'"):
             with connection.schema_editor() as editor:
                 sql = func_index.create_sql(Book, editor)
-
 
     def test_primary_key(self):
         """

@@ -1,9 +1,10 @@
 import hashlib
 
-from django.db.models.sql.query import FunctionalIndexQuery
+from django.db.models import F
+from django.db.models.sql.query import ExpressionIndexQuery
 from django.utils.encoding import force_bytes
 
-__all__ = ['FuncIndex', 'Index']
+__all__ = ['Index']
 
 
 class Index:
@@ -18,11 +19,15 @@ class Index:
         if not fields:
             raise ValueError('At least one field is required to define an index.')
         self.fields = fields
-        # A list of 2-tuple with the field name and ordering ('' or 'DESC').
-        self.fields_orders = [
-            (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
-            for field_name in self.fields
-        ]
+        self.fields_names = [field_name.lstrip('-') for field_name in self.fields if isinstance(field_name, str)]
+        self.expressions = []
+        for field in self.fields:
+            if isinstance(field, str):
+                expression = F(field[1:]).desc() if field.startswith('-') else F(field)
+                self.expressions.append(expression)
+            else:
+                self.expressions.append(field)
+
         self.name = name or ''
         if self.name:
             errors = self.check_name()
@@ -45,13 +50,22 @@ class Index:
         return errors
 
     def get_sql_create_template_values(self, model, schema_editor, using):
-        fields = [model._meta.get_field(field_name) for field_name, order in self.fields_orders]
-        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields, self.db_tablespace)
+        connection = schema_editor.connection
+        query = ExpressionIndexQuery(model)
+        compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
+
+        columns = []
+        for column_expression in self.expressions:
+            expression = column_expression.resolve_expression(query)
+            column_sql, params = compiler.compile(expression)
+            params = tuple(map(schema_editor.quote_value, params))
+            columns.append(column_sql % params)
+
+        fields_for_tablespace = [model._meta.get_field(field_name) for field_name in self.fields_names]
+        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields_for_tablespace)
+
         quote_name = schema_editor.quote_name
-        columns = [
-            ('%s %s' % (quote_name(field.column), order)).strip()
-            for field, (field_name, order) in zip(fields, self.fields_orders)
-        ]
+
         return {
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
@@ -105,10 +119,10 @@ class Index:
         fit its size by truncating the excess length.
         """
         table_name = model._meta.db_table
-        column_names = [model._meta.get_field(field_name).column for field_name, order in self.fields_orders]
+        column_names = [model._meta.get_field(field_name).column for field_name in self.fields_names]
         column_names_with_order = [
-            (('-%s' if order else '%s') % column_name)
-            for column_name, (field_name, order) in zip(column_names, self.fields_orders)
+            (('-%s' if field_name.startswith('-') else '%s') % column_name)
+            for column_name, field_name in zip(column_names, self.fields)
         ]
         # The length of the parts of the name is based on the default max
         # length of 30 characters.
@@ -129,39 +143,3 @@ class Index:
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
-
-
-class FuncIndex(Index):
-    suffix = 'func'
-
-    def __init__(self, expression, name=None):
-        self.expression, self.name = expression, name
-
-    @property
-    def fields(self):
-        return [repr(self.expression)]
-
-    def create_sql(self, model, schema_editor):
-        connection = schema_editor.connection
-        query = FunctionalIndexQuery(model)
-        compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
-        expr = self.expression.resolve_expression(query)
-        func_sql, params = compiler.compile(expr)
-        params = tuple(map(schema_editor.quote_value, params))
-        columns = func_sql % params
-        quote_name = schema_editor.quote_name
-        return schema_editor.sql_create_index % {
-            'table': quote_name(model._meta.db_table),
-            'name': quote_name(self.name),
-            'columns': columns,
-            'using': '',
-            'extra': '',
-        }
-
-    def deconstruct(self):
-        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
-        path = path.replace('django.db.models.indexes', 'django.db.models')
-        return (path, (), {'expression': self.expression, 'name': self.name})
-
-    def __repr__(self):
-        return "<%s: expression='%r'>" % (self.__class__.__name__, self.expression)

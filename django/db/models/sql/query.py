@@ -34,7 +34,7 @@ from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.tree import Node
 
-__all__ = ['FunctionalIndexQuery', 'Query', 'RawQuery']
+__all__ = ['ExpressionIndexQuery', 'Query', 'RawQuery']
 
 
 def get_field_names_from_opts(opts):
@@ -2080,7 +2080,7 @@ class JoinPromoter:
         return to_demote
 
 
-class FunctionalIndexQuery:
+class ExpressionIndexQuery:
 
     def __init__(self, model):
         self.model = model
