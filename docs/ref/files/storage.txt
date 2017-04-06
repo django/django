@@ -62,6 +62,13 @@ The ``FileSystemStorage`` class
         The ``FileSystemStorage.delete()`` method will not raise
         an exception if the given file name does not exist.
 
+    .. method:: get_created_time(name)
+
+        Returns a :class:`~datetime.datetime` of the system's ctime, i.e.
+        :func:`os.path.getctime`. On some systems (like Unix), this is the
+        time of the last metadata change, and on others (like Windows), it's
+        the creation time of the file.
+
 The ``Storage`` class
 =====================
 
