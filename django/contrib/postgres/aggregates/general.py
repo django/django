@@ -1,12 +1,12 @@
+from django.contrib.postgres.aggregates import PostgresAggregate
 from django.contrib.postgres.fields import JSONField
-from django.db.models.aggregates import Aggregate
 
 __all__ = [
     'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
 ]
 
 
-class ArrayAgg(Aggregate):
+class ArrayAgg(PostgresAggregate):
     function = 'ARRAY_AGG'
     template = '%(function)s(%(distinct)s%(expressions)s)'
 
@@ -19,23 +19,23 @@ class ArrayAgg(Aggregate):
         return value
 
 
-class BitAnd(Aggregate):
+class BitAnd(PostgresAggregate):
     function = 'BIT_AND'
 
 
-class BitOr(Aggregate):
+class BitOr(PostgresAggregate):
     function = 'BIT_OR'
 
 
-class BoolAnd(Aggregate):
+class BoolAnd(PostgresAggregate):
     function = 'BOOL_AND'
 
 
-class BoolOr(Aggregate):
+class BoolOr(PostgresAggregate):
     function = 'BOOL_OR'
 
 
-class JSONBAgg(Aggregate):
+class JSONBAgg(PostgresAggregate):
     function = 'JSONB_AGG'
     _output_field = JSONField()
 
@@ -45,7 +45,7 @@ class JSONBAgg(Aggregate):
         return value
 
 
-class StringAgg(Aggregate):
+class StringAgg(PostgresAggregate):
     function = 'STRING_AGG'
     template = "%(function)s(%(distinct)s%(expressions)s, '%(delimiter)s')"
 
