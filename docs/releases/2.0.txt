@@ -157,6 +157,10 @@ Forms
   HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
   subwidgets.
 
+* :class:`~django.forms.FloatField` and :class:`~django.forms.DecimalField`
+  now handle :setting:`DECIMAL_SEPARATOR` and :setting:`THOUSAND_SEPARATOR`
+  correctly when :setting:`USE_L10N` is off.
+
 Generic Views
 ~~~~~~~~~~~~~
 
