@@ -180,3 +180,20 @@ class ForTagTests(SimpleTestCase):
     def test_for_tag_unpack14(self):
         with self.assertRaisesMessage(ValueError, 'Need 2 values to unpack in for loop; got 1.'):
             self.engine.render_to_string('for-tag-unpack14', {'items': (1, 2)})
+
+    @setup({
+        'main': '{% with alpha=alpha.values %}{% include "base" %}{% endwith %}_'
+                '{% with alpha=alpha.extra %}{% include "base" %}{% endwith %}',
+        'base': '{% for x, y in alpha %}{{ x }}:{{ y }},{% endfor %}'
+    })
+    def test_for_tag_context(self):
+        """
+        ForNode.render() pops the values it pushes to the context (#28001).
+        """
+        output = self.engine.render_to_string('main', {
+            'alpha': {
+                'values': [('two', 2), ('four', 4)],
+                'extra': [('six', 6), ('eight', 8)],
+            },
+        })
+        self.assertEqual(output, 'two:2,four:4,_six:6,eight:8,')
