@@ -36,7 +36,7 @@ available from the ``django.contrib.postgres.indexes`` module.
     operation.
 
 ``GistIndex``
-============
+=============
 
 .. versionadded:: 2.0
 
