@@ -240,7 +240,7 @@ def sanitize_separators(value):
     Sanitize a value according to the current decimal and
     thousand separator setting. Used with form field input.
     """
-    if settings.USE_L10N and isinstance(value, str):
+    if isinstance(value, str):
         parts = []
         decimal_separator = get_format('DECIMAL_SEPARATOR')
         if decimal_separator in value:

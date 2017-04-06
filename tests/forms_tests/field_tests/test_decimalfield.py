@@ -1,7 +1,7 @@
 import decimal
 
 from django.forms import DecimalField, NumberInput, ValidationError, Widget
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 from django.utils import formats, translation
 
 from . import FormFieldAssertionsMixin
@@ -156,3 +156,18 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f = DecimalField(max_digits=2, decimal_places=2, localize=True)
             localized_d = formats.localize_input(d)  # -> '0,1' in French
             self.assertFalse(f.has_changed(d, localized_d))
+
+    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=',')
+    def test_decimalfield_support_decimal_separator(self):
+        f = DecimalField(localize=True)
+        self.assertEqual(f.clean('1001,10'), decimal.Decimal("1001.10"))
+        self.assertEqual(f.clean('1001.10'), decimal.Decimal("1001.10"))
+
+    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
+                       THOUSAND_SEPARATOR='.')
+    def test_decimalfield_support_thousands_separator(self):
+        f = DecimalField(localize=True)
+        self.assertEqual(f.clean('1.001,10'), decimal.Decimal("1001.10"))
+        msg = "'Enter a number.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('1,001.1')

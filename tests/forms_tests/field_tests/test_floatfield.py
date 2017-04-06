@@ -1,5 +1,6 @@
 from django.forms import FloatField, NumberInput, ValidationError
 from django.test import SimpleTestCase
+from django.test.utils import override_settings
 from django.utils import formats, translation
 
 from . import FormFieldAssertionsMixin
@@ -83,3 +84,18 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f = FloatField(localize=True)
             localized_n = formats.localize_input(n)  # -> '4,35' in French
             self.assertFalse(f.has_changed(n, localized_n))
+
+    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=',')
+    def test_decimalfield_support_decimal_separator(self):
+        f = FloatField(localize=True)
+        self.assertEqual(f.clean('1001,10'), 1001.10)
+        self.assertEqual(f.clean('1001.10'), 1001.10)
+
+    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
+                       THOUSAND_SEPARATOR='.')
+    def test_decimalfield_support_thousands_separator(self):
+        f = FloatField(localize=True)
+        self.assertEqual(f.clean('1.001,10'), 1001.10)
+        msg = "'Enter a number.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('1,001.1')
