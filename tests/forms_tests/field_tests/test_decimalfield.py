@@ -156,3 +156,9 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f = DecimalField(max_digits=2, decimal_places=2, localize=True)
             localized_d = formats.localize_input(d)  # -> '0,1' in French
             self.assertFalse(f.has_changed(d, localized_d))
+
+    def test_ticket21729(self):
+        f = DecimalField(localize=True)
+        msg = "'Enter a number.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('1\xac23')
