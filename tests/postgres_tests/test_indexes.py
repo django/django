@@ -101,7 +101,7 @@ class GistIndexTests(PostgreSQLTestCase):
     def test_name_auto_generation(self):
         index = GistIndex(fields=['field'])
         index.set_name_with_model(IntegerArrayModel)
-        self.assertEqual(index.name, 'postgres_te_field_def2f8_gist')
+        self.assertEqual(index.name, 'postgres_te_field_57c7d8_gist')
 
     def test_deconstruction(self):
         index = GistIndex(fields=['title'], name='test_title_gist')
