@@ -35,10 +35,14 @@ available from the ``django.contrib.postgres.indexes`` module.
     :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
     operation.
 
-``GinIndex``
+``GistIndex``
 ============
 
-.. class:: GinIndex()
+.. class:: GistIndex()
 
-    Creates a `gist index
-    <https://www.postgresql.org/docs/current/static/gist.html>`_.
+    Creates a `GiST index
+    <https://www.postgresql.org/docs/current/static/gist.html>`_. These indexes
+    are also created on spatial fields with the
+    :attr:`~django.contrib.gis.db.models.BaseSpatialField.spatial_index` when
+    using postgis, but are also useful on some other types such as
+    :class:`~django.contrib.postgres.fields.HStoreField`.
