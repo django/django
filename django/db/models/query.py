@@ -3,6 +3,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 import copy
+import itertools
 import sys
 import warnings
 from collections import OrderedDict, deque
@@ -1523,20 +1524,43 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     Return the prefetched objects along with any additional prefetches that
     must be done due to prefetch_related lookups found from default managers.
     """
-    # prefetcher must have a method get_prefetch_queryset() which takes a list
-    # of instances, and returns a tuple:
 
-    # (queryset of instances of self.model that are related to passed in instances,
-    #  callable that gets value to be matched for returned instances,
-    #  callable that gets value to be matched for passed in instances,
-    #  boolean that is True for singly related objects,
-    #  cache name to assign to).
+    # On some databases (e.g. SQLite) the maximum number of variables in a query
+    # limits the maximum number of instances we can prefetch at once. In this case,
+    # do the query in batches.
+    connection = connections[instances[0]._state.db]
+    if connection.features.max_query_params is None:
+        batch_size = len(instances)
+    else:
+        # Subtract a safety margin because the queryset might contain custom filtering
+        # expressions that also use variables.
+        batch_size = connection.features.max_query_params - 25
 
-    # The 'values to be matched' must be hashable as they will be used
-    # in a dictionary.
+    batches = [instances[i:i + batch_size] for i in range(0, len(instances), batch_size)]
 
-    rel_qs, rel_obj_attr, instance_attr, single, cache_name = (
-        prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level)))
+    batch_querysets = []
+
+    for batch in batches:
+        # We assume that get_prefetch_queryset() returns the same values for
+        # rel_obj_attr, instance_attr, single and cache_name on all calls, since
+        # we call it with homogeneous values. Therefore, we only look at those
+        # values as they are returned by the last call.
+
+        # prefetcher must have a method get_prefetch_queryset() which takes a list
+        # of instances, and returns a tuple:
+
+        # (queryset of instances of self.model that are related to passed in instances,
+        #  callable that gets value to be matched for returned instances,
+        #  callable that gets value to be matched for passed in instances,
+        #  boolean that is True for singly related objects,
+        #  cache name to assign to).
+
+        # The 'values to be matched' must be hashable as they will be used
+        # in a dictionary.
+        rel_qs, rel_obj_attr, instance_attr, single, cache_name = (
+            prefetcher.get_prefetch_queryset(batch, lookup.get_current_queryset(level)))
+        batch_querysets.append(rel_qs)
+
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need
@@ -1545,15 +1569,16 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # later (happens in nested prefetch_related).
     additional_lookups = [
         copy.copy(additional_lookup) for additional_lookup
-        in getattr(rel_qs, '_prefetch_related_lookups', ())
+        in getattr(batch_querysets[0], '_prefetch_related_lookups', ())
     ]
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh
         # instance, so we access an internal instead of using public interface
         # for performance reasons.
-        rel_qs._prefetch_related_lookups = ()
+        for rel_qs in batch_querysets:
+            rel_qs._prefetch_related_lookups = ()
 
-    all_related_objects = list(rel_qs)
+    all_related_objects = list(itertools.chain.from_iterable(batch_querysets))
 
     rel_obj_cache = {}
     for rel_obj in all_related_objects:
