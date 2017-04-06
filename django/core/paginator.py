@@ -47,6 +47,19 @@ class Paginator:
                 raise EmptyPage(_('That page contains no results'))
         return number
 
+    def get_page(self, number):
+        """
+        Return a valid page, even if the page argument isn't a number or isn't
+        in range.
+        """
+        try:
+            number = self.validate_number(number)
+        except PageNotAnInteger:
+            number = 1
+        except EmptyPage:
+            number = self.num_pages
+        return self.page(number)
+
     def page(self, number):
         """Return a Page object for the given 1-based page number."""
         number = self.validate_number(number)

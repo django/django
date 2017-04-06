@@ -290,6 +290,12 @@ Models
 * Added support for expressions in :attr:`Meta.ordering
   <django.db.models.Options.ordering>`.
 
+Pagination
+~~~~~~~~~~
+
+* Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
+  to provide the documented pattern of handling invalid page numbers.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
