@@ -1,20 +1,9 @@
 import hashlib
 
-from django.db.models.expressions import Ref
+from django.db.models.sql.query import FunctionalIndexQuery
 from django.utils.encoding import force_bytes
 
 __all__ = ['FuncIndex', 'Index']
-
-
-class Query:
-
-    def __init__(self, model):
-        self.model = model
-
-    def resolve_ref(self, name, *args, **kwargs):
-        if not any(f.name == name for f in self.model._meta.concrete_fields):
-            raise ValueError("Invalid reference to field '%s' on model '%s'" % (name, self.model._meta.label))
-        return Ref(name, None)
 
 
 class Index:
@@ -154,7 +143,7 @@ class FuncIndex(Index):
 
     def create_sql(self, model, schema_editor):
         connection = schema_editor.connection
-        query = Query(model)
+        query = FunctionalIndexQuery(model)
         compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
         expr = self.expression.resolve_expression(query)
         func_sql, params = compiler.compile(expr)
