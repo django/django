@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 
 from django.db.backends.utils import strip_quotes
+from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -893,11 +894,18 @@ class BaseDatabaseSchemaEditor:
         Return a list of all index SQL statements for the specified field.
         """
         output = []
-        if self._field_should_be_indexed(model, field):
+        index = self._field_should_be_indexed(model, field)
+        if isinstance(index, Index):
+            output.append(index.create_sql(model, self))
+        elif index:
             output.append(self._create_index_sql(model, [field]))
         return output
 
     def _field_should_be_indexed(self, model, field):
+        if isinstance(field.db_index, type) and issubclass(field.db_index, Index):
+            index = field.db_index(fields=[field.name])
+            index.set_name_with_model(model)
+            return index
         return field.db_index and not field.unique
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):

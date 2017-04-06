@@ -18,6 +18,7 @@ from django.core import checks, exceptions, validators
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.indexes import Index
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
 from django.utils.datastructures import DictWrapper
@@ -267,10 +268,10 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_db_index(self):
-        if self.db_index not in (None, True, False):
+        if self.db_index not in (None, True, False) and not (isinstance(self.db_index, type) and issubclass(self.db_index, Index)):
             return [
                 checks.Error(
-                    "'db_index' must be None, True or False.",
+                    "'db_index' must be None, True or False, or a subclass of Index",
                     obj=self,
                     id='fields.E006',
                 )
