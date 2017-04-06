@@ -171,3 +171,12 @@ class StatTestModel(models.Model):
 
 class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
+
+if connection.vendor == 'postgresql' and connection.pg_version >= 90400:
+
+    class FilterAggTestModel(models.Model):
+        parent = models.ForeignKey('FilterAggParentModel', on_delete=models.CASCADE)
+        integer_field = models.IntegerField(default=0)
+
+    class FilterAggParentModel(models.Model):
+        pass

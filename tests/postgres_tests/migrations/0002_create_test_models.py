@@ -237,4 +237,28 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        migrations.CreateModel(
+            name='FilterAggParentModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='FilterAggTestModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('integer_field', models.IntegerField(default=0)),
+                ('parent', models.ForeignKey(
+                    'postgres_tests.FilterAggParentModel',
+                    on_delete=models.CASCADE,
+                )),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+
     ]

@@ -31,6 +31,7 @@ a number of PostgreSQL specific data types.
     aggregates
     fields
     forms
+    expressions
     functions
     indexes
     lookups
