@@ -8,6 +8,7 @@ from django.core import exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
+from django.db.models import Max
 from django.test import TransactionTestCase, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -251,6 +252,13 @@ class TestQuerying(PostgreSQLTestCase):
         instance = NestedIntegerArrayModel.objects.create(field=[[1, 2], [3, 4]])
         self.assertSequenceEqual(
             NestedIntegerArrayModel.objects.filter(field__0__0=1),
+            [instance]
+        )
+
+    def test_index_on_annotated_function(self):
+        instance = NestedIntegerArrayModel.objects.create(field=[[1], [2]])
+        self.assertSequenceEqual(
+            NestedIntegerArrayModel.objects.annotate(annotation=Max('field')).filter(annotation__0=1),
             [instance]
         )
 
