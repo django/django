@@ -617,7 +617,6 @@ class ModelAdminTests(TestCase):
 
 
 class ModelAdminPermissionTests(SimpleTestCase):
-
     class MockUser:
         def has_module_perms(self, app_label):
             if app_label == "modeladmin":
@@ -641,6 +640,9 @@ class ModelAdminPermissionTests(SimpleTestCase):
             if perm == "modeladmin.delete_band":
                 return True
             return False
+
+    def setUp(self):
+        self.site = AdminSite()
 
     def test_has_add_permission(self):
         """
@@ -709,3 +711,25 @@ class ModelAdminPermissionTests(SimpleTestCase):
             self.assertFalse(ma.has_module_permission(request))
         finally:
             ma.opts.app_label = original_app_label
+
+    def test_inline_has_add_permission(self):
+        class InlineBandAdmin(TabularInline):
+            model = Concert
+            fk_name = 'main_band'
+            can_delete = False
+
+            def has_add_permission(self, request, obj=None):
+                return obj.name == 'The Doors'
+
+        ma = InlineBandAdmin(Band, self.site)
+        self.assertTrue(ma.has_add_permission(request, Band(
+            name='The Doors',
+            bio='',
+            sign_date=date(1965, 1, 1),
+        )))
+
+        self.assertFalse(ma.has_add_permission(request, Band(
+            name='The Beatles',
+            bio='',
+            sign_date=date(1965, 1, 1),
+        )))
