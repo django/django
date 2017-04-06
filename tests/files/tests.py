@@ -47,12 +47,15 @@ class FileTests(unittest.TestCase):
             self.assertEqual(f.read(), b'content')
 
     def test_open_reopens_closed_file_and_returns_context_manager(self):
-        file = File(tempfile.NamedTemporaryFile(delete=False))
-        file.close()
-        with file.open() as f:
-            self.assertFalse(f.closed)
-        # remove temporary file
-        os.unlink(file.name)
+        temporary_file = tempfile.NamedTemporaryFile(delete=False)
+        file = File(temporary_file)
+        try:
+            file.close()
+            with file.open() as f:
+                self.assertFalse(f.closed)
+        finally:
+            # remove temporary file
+            os.unlink(file.name)
 
     def test_namedtemporaryfile_closes(self):
         """
@@ -204,7 +207,7 @@ class ContentFileTestCase(unittest.TestCase):
 
 class InMemoryUploadedFileTests(unittest.TestCase):
     def test_open_resets_file_to_start_and_returns_context_manager(self):
-        uf = InMemoryUploadedFile(six.StringIO('1'), '', 'test', 'text/plain', 1, 'utf8')
+        uf = InMemoryUploadedFile(StringIO('1'), '', 'test', 'text/plain', 1, 'utf8')
         uf.read()
         with uf.open() as f:
             self.assertEqual(f.read(), '1')
