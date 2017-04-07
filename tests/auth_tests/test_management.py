@@ -7,7 +7,9 @@ from unittest import mock
 
 from django.apps import apps
 from django.contrib.auth import management
-from django.contrib.auth.management import create_permissions
+from django.contrib.auth.management import (
+    create_permissions, get_default_username,
+)
 from django.contrib.auth.management.commands import (
     changepassword, createsuperuser,
 )
@@ -43,7 +45,10 @@ def mock_inputs(inputs):
                 response = ''
                 for key, val in inputs.items():
                     if key in prompt.lower():
-                        response = val
+                        if callable(val):
+                            response = val()
+                        else:
+                            response = val
                         break
                 return response
 
@@ -460,6 +465,30 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_default_username(self):
+        """createsuperuser uses a default username when one isn't provided."""
+        # Get the default username before creating a user.
+        default_username = get_default_username()
+        new_io = StringIO()
+        entered_passwords = ['password', 'password']
+
+        def return_passwords():
+            return entered_passwords.pop(0)
+
+        @mock_inputs({'password': return_passwords, 'username': ''})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(new_io.getvalue().strip(), 'Superuser created successfully.')
+            self.assertTrue(User.objects.filter(username=default_username).exists())
+
+        test(self)
+
     def test_password_validation(self):
         """
         Creation should fail if the password fails validation.
@@ -490,6 +519,69 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 new_io.getvalue().strip(),
                 "This password is entirely numeric.\n"
                 "Superuser created successfully."
+            )
+
+        test(self)
+
+    def test_invalid_username(self):
+        """Creation fails if the username fails validation."""
+        user_field = User._meta.get_field(User.USERNAME_FIELD)
+        new_io = StringIO()
+        entered_passwords = ['password', 'password']
+        # Enter an invalid (too long) username first and then a valid one.
+        invalid_username = ('x' * user_field.max_length) + 'y'
+        entered_usernames = [invalid_username, 'janet']
+
+        def return_passwords():
+            return entered_passwords.pop(0)
+
+        def return_usernames():
+            return entered_usernames.pop(0)
+
+        @mock_inputs({'password': return_passwords, 'username': return_usernames})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                'Error: Ensure this value has at most %s characters (it has %s).\n'
+                'Superuser created successfully.' % (user_field.max_length, len(invalid_username))
+            )
+
+        test(self)
+
+    def test_existing_username(self):
+        """Creation fails if the username already exists."""
+        user = User.objects.create(username='janet')
+        new_io = StringIO()
+        entered_passwords = ['password', 'password']
+        # Enter the existing username first and then a new one.
+        entered_usernames = [user.username, 'joe']
+
+        def return_passwords():
+            return entered_passwords.pop(0)
+
+        def return_usernames():
+            return entered_usernames.pop(0)
+
+        @mock_inputs({'password': return_passwords, 'username': return_usernames})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                'Error: That username is already taken.\n'
+                'Superuser created successfully.'
             )
 
         test(self)
