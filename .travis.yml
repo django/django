@@ -12,6 +12,7 @@ env:
   - DJANGO="Django>=1.8,<1.9"
   - DJANGO="Django>=1.9,<1.10"
   - DJANGO="Django>=1.10,<1.11"
+  - DJANGO="Django>=1.11,<2.0"
 
 cache:
   directories:
