@@ -67,7 +67,6 @@ class Avg(Aggregate):
 class Count(DistinctAggregate):
     function = 'COUNT'
     name = 'Count'
-    template = '%(function)s(%(distinct)s%(expressions)s)'
 
     def __init__(self, expression, **extra):
         if expression == '*':
