@@ -92,6 +92,12 @@ class BaseDatabaseWrapper:
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
 
+        # A stack of wrappers to be invoked around execute()/executemany()
+        # calls. Each entry is a function taking five arguments: execute, sql,
+        # params, many, and context. It's the function's responsibility to
+        # call execute(sql, params, many, context).
+        self.execute_wrappers = []
+
         self.client = self.client_class(self)
         self.creation = self.creation_class(self)
         self.features = self.features_class(self)
@@ -628,6 +634,18 @@ class BaseDatabaseWrapper:
         while current_run_on_commit:
             sids, func = current_run_on_commit.pop(0)
             func()
+
+    @contextmanager
+    def execute_wrapper(self, wrapper):
+        """
+        Return a context manager under which the wrapper is applied to suitable
+        database query executions.
+        """
+        self.execute_wrappers.append(wrapper)
+        try:
+            yield
+        finally:
+            self.execute_wrappers.pop()
 
     def copy(self, alias=None, allow_thread_sharing=None):
         """
