@@ -546,12 +546,14 @@ class BaseDatabaseSchemaEditor:
             # The old index may have a different name
             if index.name in existing_index_names:
                 self.execute(index.remove_sql(model, self))
-        legacy_index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
-        for name in legacy_index_names:
-            # Also delete any other btree indexes which affect just this field
-            # This handles indexes with other names created by older versions
-            # of Django
-            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, name))
+        if old_field.db_index and not old_field.unique and (not new_field.db_index or new_field.unique):
+            legacy_index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
+            for name in legacy_index_names:
+                # Also delete any other btree indexes which affect just this field
+                # This handles indexes with other names created by older versions
+                # of Django. Don't delete them if they're in the meta.indexes.
+                if name not in [index.name for index in model._meta.indexes]:
+                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -689,8 +691,10 @@ class BaseDatabaseSchemaEditor:
         ):
             self.execute(self._create_unique_sql(model, [new_field.column]))
         # Added an index?
-        for index in new_indexes - old_indexes:
-            self.execute(index.create_sql(model, self))
+        # Exclude FKs here as they create their own indexes
+        if not new_field.remote_field:
+            for index in new_indexes - old_indexes:
+                self.execute(index.create_sql(model, self))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
