@@ -760,7 +760,10 @@ class AddIndex(IndexOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.model_name_lower]
-        model_state.options[self.option_name].append(self.index)
+        indexes = list(model_state.options[self.option_name])
+        indexes.append(self.index.clone())
+        model_state.options[self.option_name] = indexes
+        state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.model_name)
@@ -802,6 +805,7 @@ class RemoveIndex(IndexOperation):
         model_state = state.models[app_label, self.model_name_lower]
         indexes = model_state.options[self.option_name]
         model_state.options[self.option_name] = [idx for idx in indexes if idx.name != self.name]
+        state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)
