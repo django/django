@@ -3,6 +3,7 @@ import decimal
 import hashlib
 import logging
 import re
+from contextlib import ExitStack
 from time import time
 
 from django.conf import settings
@@ -66,16 +67,26 @@ class CursorWrapper:
 
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
-        with self.db.wrap_database_errors:
-            if params is None:
-                return self.cursor.execute(sql)
-            else:
-                return self.cursor.execute(sql, params)
+        with ExitStack() as stack:
+            for hook in self.db.get_execute_hooks(for_many=False):
+                if callable(hook):
+                    hook = hook(connection=self.db, cursor=self, sql=sql, params=params)
+                stack.enter_context(hook)
+            with self.db.wrap_database_errors:
+                if params is None:
+                    return self.cursor.execute(sql)
+                else:
+                    return self.cursor.execute(sql, params)
 
     def executemany(self, sql, param_list):
         self.db.validate_no_broken_transaction()
-        with self.db.wrap_database_errors:
-            return self.cursor.executemany(sql, param_list)
+        with ExitStack() as stack:
+            for hook in self.db.get_execute_hooks(for_many=True):
+                if callable(hook):
+                    hook = hook(connection=self.db, cursor=self, sql=sql, param_list=param_list)
+                stack.enter_context(hook)
+            with self.db.wrap_database_errors:
+                return self.cursor.executemany(sql, param_list)
 
 
 class CursorDebugWrapper(CursorWrapper):
