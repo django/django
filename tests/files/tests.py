@@ -10,7 +10,9 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from django.core.files.uploadedfile import (
+    InMemoryUploadedFile, SimpleUploadedFile, UploadedFile,
+)
 
 try:
     from PIL import Image
@@ -37,6 +39,23 @@ class FileTests(unittest.TestCase):
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
         self.assertTrue(orig_file.closed)
+
+    def test_open_resets_opened_file_to_start_and_returns_context_manager(self):
+        file = File(BytesIO(b'content'))
+        file.read()
+        with file.open() as f:
+            self.assertEqual(f.read(), b'content')
+
+    def test_open_reopens_closed_file_and_returns_context_manager(self):
+        temporary_file = tempfile.NamedTemporaryFile(delete=False)
+        file = File(temporary_file)
+        try:
+            file.close()
+            with file.open() as f:
+                self.assertFalse(f.closed)
+        finally:
+            # remove temporary file
+            os.unlink(file.name)
 
     def test_namedtemporaryfile_closes(self):
         """
@@ -177,6 +196,21 @@ class ContentFileTestCase(unittest.TestCase):
         """
         self.assertIsInstance(ContentFile(b"content").read(), bytes)
         self.assertIsInstance(ContentFile("español").read(), str)
+
+    def test_open_resets_file_to_start_and_returns_context_manager(self):
+        file = ContentFile(b'content')
+        with file.open() as f:
+            self.assertEqual(f.read(), b'content')
+        with file.open() as f:
+            self.assertEqual(f.read(), b'content')
+
+
+class InMemoryUploadedFileTests(unittest.TestCase):
+    def test_open_resets_file_to_start_and_returns_context_manager(self):
+        uf = InMemoryUploadedFile(StringIO('1'), '', 'test', 'text/plain', 1, 'utf8')
+        uf.read()
+        with uf.open() as f:
+            self.assertEqual(f.read(), '1')
 
 
 class DimensionClosingBug(unittest.TestCase):
