@@ -56,8 +56,11 @@ The ``File`` class
         was originally opened with; ``None`` means to reopen with the original
         mode.
 
-        Returns ``self``, so that it can be used similar to Python's
-        built-in :func:`python:open()` with the ``with`` statement.
+        It can be used as a context manager, e.g. ``with file.open() as f:``.
+
+        .. versionchanged:: 2.0
+
+            Context manager support was added.
 
     .. method:: __iter__()
 

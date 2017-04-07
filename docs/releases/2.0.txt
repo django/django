@@ -150,7 +150,8 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* :meth:`File.open() <django.core.files.File.open>` can be used as a context
+  manager, e.g. ``with file.open() as f:``.
 
 File Uploads
 ~~~~~~~~~~~~
