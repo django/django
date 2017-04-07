@@ -18,8 +18,8 @@ class Index:
         self.name = name or ''
         if self.name:
             errors = self.check_name()
-            # if len(self.name) > self.max_name_length:
-            #     errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
+            if len(self.name) > self.max_name_length:
+                errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
             if errors:
                 raise ValueError(errors)
 
