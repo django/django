@@ -2232,6 +2232,28 @@ The ``InlineModelAdmin`` class adds:
     The ``has_delete_permission`` method is given the HttpRequest and the parent ``obj``.
     Should return ``True`` if deleting an instance is permitted, ``False`` otherwise.
 
+.. method:: InlineModelAdmin.has_add_permission(self, request, obj=None)
+
+    The ``has_add_permission`` method is given the HttpRequest and
+    the parent ``obj``. Should return ``True`` if adding an instance
+    is permitted, ``False`` otherwise.
+
+    .. versionchanged:: 2.0
+
+        The ``obj`` argument was added.
+
+.. method:: InlineModelAdmin.has_change_permission(self, request, obj=None)
+
+    The ``has_change_permission`` method is given the HttpRequest and
+    the parent ``obj``. Should return ``True`` if editing an instance
+    is permitted, ``False`` otherwise.
+
+.. method:: InlineModelAdmin.has_delete_permission(self, request, obj=None)
+
+    The ``has_delete_permission`` method is given the HttpRequest and
+    the parent ``obj``. Should return ``True`` if deleting an instance
+    is permitted, ``False`` otherwise.
+
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
 

@@ -41,7 +41,13 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`~InlineModelAdmin.has_add_permission()
+  <~django.contrib.admin.options.InlineModelAdmin.has_add_permission>`
+  now takes a ``obj`` argument representing the parent object
+  to implement specific logic to define whether an user can change
+  inline objects depending on the parent object. See the :ref:`deprecation
+  note <inline-model-admin-has-add-permission-obj-update>` about adding this
+  argument to your custom classes.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -323,6 +329,10 @@ Miscellaneous
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
   well with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
+
+* The backwards compatibility shims to allow
+  ``InlineModelAdmin.has_add_permission()`` to be defined without a ``obj``
+  argument will be removed.
 
 .. _removed-features-2.0:
 

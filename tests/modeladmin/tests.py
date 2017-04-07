@@ -1,3 +1,4 @@
+import warnings
 from datetime import date
 
 from django import forms
@@ -615,6 +616,33 @@ class ModelAdminTests(TestCase):
         self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('id'))
         self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
 
+    def test_get_inline_instances_generates_deprecation_warning(self):
+        class ConcertInline(TabularInline):
+            model = Concert
+            fk_name = 'main_band'
+
+            def has_add_permission(self, request):
+                return True
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        Concert.objects.create(main_band=self.band, opening_band=self.band, day=1)
+        ma = BandAdmin(Band, self.site)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            ma.get_inline_instances(request)
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            'Backwards compatibility for inline models without '
+            'support for the `obj` argument in '
+            'InlineModelAdmin.has_add_permission() will be removed in '
+            'Django 2.2.'
+        )
+
 
 class ModelAdminPermissionTests(SimpleTestCase):
     class MockUser:
@@ -711,6 +739,44 @@ class ModelAdminPermissionTests(SimpleTestCase):
             self.assertFalse(ma.has_module_permission(request))
         finally:
             ma.opts.app_label = original_app_label
+
+    def test_inline_has_add_permission(self):
+
+        class InlineBandAdmin(TabularInline):
+            model = Concert
+            fk_name = 'main_band'
+            can_delete = False
+
+            def has_add_permission(self, request, obj=None):
+                return obj.name == 'The Doors'
+
+        ma = InlineBandAdmin(Band, self.site)
+
+        self.assertTrue(ma.has_add_permission(request, Band(
+            name='The Doors',
+            bio='',
+            sign_date=date(1965, 1, 1),
+        )))
+
+        self.assertFalse(ma.has_add_permission(request, Band(
+            name='The Beatles',
+            bio='',
+            sign_date=date(1965, 1, 1),
+        )))
+
+    def test_old_style_inline_has_add_permission(self):
+
+        class InlineBandAdmin(TabularInline):
+            model = Concert
+            fk_name = 'main_band'
+            can_delete = False
+
+            def has_add_permission(self, request):
+                return True
+
+        ma = InlineBandAdmin(Band, self.site)
+
+        self.assertTrue(ma.has_add_permission(request))
 
     def test_inline_has_add_permission(self):
         class InlineBandAdmin(TabularInline):
