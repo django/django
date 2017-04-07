@@ -361,6 +361,14 @@ class BaseDatabaseSchemaEditor:
             ))
         self.execute(self._delete_constraint_sql(sql, model, constraint_names[0]))
 
+    def _get_db_specific_indexes(self, model, field):
+        """DB specific hook for additional indexes.
+
+        Examples include Postgres making varchar_pattern_ops indexes on
+        CharField.
+        """
+        pass
+
     def alter_db_table(self, model, old_db_table, new_db_table):
         """Rename the table a model points to."""
         if (old_db_table == new_db_table or

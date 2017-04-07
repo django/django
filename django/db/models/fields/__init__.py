@@ -684,8 +684,7 @@ class Field(RegisterLookupMixin):
             name = schema._create_index_name(model, [self.column])
             index.name = name
             indexes.append(index)
-        if hasattr(schema, '_get_like_indexes'):
-            indexes.extend(schema._get_like_indexes(model, self))
+        indexes.extend(schema._get_db_specific_indexes(model, self))
         return indexes
 
     def get_db_converters(self, connection):

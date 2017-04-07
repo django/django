@@ -13,8 +13,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s"
-    sql_create_varchar_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s varchar_pattern_ops)%(extra)s"
-    sql_create_text_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s text_pattern_ops)%(extra)s"
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
 
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
@@ -24,38 +22,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         return psycopg2.extensions.adapt(value)
 
-    def _get_like_indexes(self, model, field):
+    def _get_db_specific_indexes(self, model, field):
         db_type = field.db_type(connection=self.connection)
         if db_type is not None and (field.db_index or field.unique):
+            if '[' in db_type:
+                return []
             if db_type.startswith('varchar') or db_type.startswith('text'):
-                # TODO: make this accept the ops class somehow, currently creates a normal index
+                # TODO: make this accept the ops class somehow, currently
+                # creates a normal index. It will also need to swap the ops
+                # depending on the underlying type:
+                # varchar: varchar_pattern_ops
+                # text: text_pattern_ops
                 index = Index(fields=[field.name])
                 name = self._create_index_name(model, [field.column], suffix='_like')
                 index.name = name
                 return [index]
         return []
-
-    def _create_like_index_sql(self, model, field):
-        """
-        Return the statement to create an index with varchar operator pattern
-        when the column type is 'varchar' or 'text', otherwise return None.
-        """
-        db_type = field.db_type(connection=self.connection)
-        if db_type is not None and (field.db_index or field.unique):
-            # Fields with database column types of `varchar` and `text` need
-            # a second index that specifies their operator class, which is
-            # needed when performing correct LIKE queries outside the
-            # C locale. See #12234.
-            #
-            # The same doesn't apply to array fields such as varchar[size]
-            # and text[size], so skip them.
-            if '[' in db_type:
-                return None
-            if db_type.startswith('varchar'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_varchar_index)
-            elif db_type.startswith('text'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
-        return None
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         """Make ALTER TYPE with SERIAL make sense."""
