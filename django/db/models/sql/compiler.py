@@ -10,7 +10,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, NotSupportedError
 
 FORCE = object()
 
@@ -460,6 +460,11 @@ class SQLCompiler:
                     if self.connection.get_autocommit():
                         raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
 
+                    if with_limits and not self.connection.features.supports_select_for_update_with_limit:
+                        raise NotSupportedError(
+                            'LIMIT/OFFSET not supported with select_for_update'
+                            ' on this database backend.'
+                        )
                     nowait = self.query.select_for_update_nowait
                     skip_locked = self.query.select_for_update_skip_locked
                     # If it's a NOWAIT/SKIP LOCKED query but the backend
