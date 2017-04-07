@@ -804,7 +804,7 @@ class BaseDatabaseSchemaEditor:
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
 
-    def _create_index_name(self, model, column_names, suffix="", max_length=None):
+    def _create_index_name(self, model, column_names, suffix=""):
         """
         Generate a unique name for an index/unique constraint.
 
@@ -814,8 +814,7 @@ class BaseDatabaseSchemaEditor:
         table_name = strip_quotes(model._meta.db_table)
         hash_data = [table_name] + list(column_names)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
-        if max_length is None:
-            max_length = self.connection.ops.max_name_length() or 200
+        max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
         index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
         if len(index_name) <= max_length:
