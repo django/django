@@ -44,8 +44,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             }
         )
 
-    def add_field(self, model, field):
-        super().add_field(model, field)
+    def add_field(self, model, field, to_model):
+        super().add_field(model, field, to_model)
 
         # Simulate the effect of a one-off default.
         # field.default may be unhashable, so a set isn't used for "in" check.

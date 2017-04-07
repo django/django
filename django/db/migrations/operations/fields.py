@@ -80,6 +80,7 @@ class AddField(FieldOperation):
             schema_editor.add_field(
                 from_model,
                 field,
+                to_model,
             )
             if not self.preserve_default:
                 field.default = NOT_PROVIDED
@@ -151,7 +152,7 @@ class RemoveField(FieldOperation):
         to_model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
-            schema_editor.add_field(from_model, to_model._meta.get_field(self.name))
+            schema_editor.add_field(from_model, to_model._meta.get_field(self.name), to_model)
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)

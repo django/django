@@ -100,7 +100,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 pass
         super().delete_model(model, **kwargs)
 
-    def add_field(self, model, field):
+    def add_field(self, model, field, to_model):
         from django.contrib.gis.db.models.fields import GeometryField
         if isinstance(field, GeometryField):
             # Populate self.geometry_sql
@@ -109,7 +109,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 self.execute(sql)
             self.geometry_sql = []
         else:
-            super().add_field(model, field)
+            super().add_field(model, field, to_model)
 
     def remove_field(self, model, field):
         from django.contrib.gis.db.models.fields import GeometryField

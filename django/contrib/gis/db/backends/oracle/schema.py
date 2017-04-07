@@ -67,8 +67,8 @@ class OracleGISSchemaEditor(DatabaseSchemaEditor):
             'table': self.geo_quote_name(model._meta.db_table),
         })
 
-    def add_field(self, model, field):
-        super().add_field(model, field)
+    def add_field(self, model, field, to_model):
+        super().add_field(model, field, to_model)
         self.run_geometry_sql()
 
     def remove_field(self, model, field):

@@ -379,7 +379,7 @@ class BaseDatabaseSchemaEditor:
             "new_tablespace": self.quote_name(new_db_tablespace),
         })
 
-    def add_field(self, model, field):
+    def add_field(self, model, field, to_model):
         """
         Create a field on a model. Usually involves adding a column, but may
         involve adding a table instead (for M2M fields).
@@ -414,8 +414,8 @@ class BaseDatabaseSchemaEditor:
             }
             self.execute(sql)
         # Add an index, if required
-        indexes = field.get_indexes(self, model=model)
-        self.deferred_sql.extend([index.create_sql(model, self) for index in indexes])
+        indexes = field.get_indexes(self, model=to_model)
+        self.deferred_sql.extend([index.create_sql(to_model, self) for index in indexes])
         # Add any FK constraints later
         if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
             self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))

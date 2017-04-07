@@ -223,7 +223,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 "table": self.quote_name(model._meta.db_table),
             })
 
-    def add_field(self, model, field):
+    def add_field(self, model, field, to_model):
         """
         Create a field on a model. Usually involves adding a column, but may
         involve adding a table instead (for M2M fields).

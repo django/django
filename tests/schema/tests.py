@@ -1,5 +1,6 @@
 import datetime
 import itertools
+import uuid
 import unittest
 from copy import copy
 from unittest import mock
@@ -105,6 +106,14 @@ class SchemaTests(TransactionTestCase):
             raise DatabaseError("Table does not exist (empty pragma)")
         return columns
 
+    def clone_model(self, model):
+        class to_model(model):
+            class Meta:
+                app_label = uuid.uuid4().hex
+                db_table = model._meta.db_table
+                apps = new_apps
+        return to_model
+
     def get_primary_key(self, table):
         with connection.cursor() as cursor:
             return connection.introspection.get_primary_key_column(cursor, table)
@@ -138,7 +147,9 @@ class SchemaTests(TransactionTestCase):
     def check_added_field_default(self, schema_editor, model, field, field_name, expected_default,
                                   cast_function=None):
         with connection.cursor() as cursor:
-            schema_editor.add_field(model, field)
+            to_model = self.clone_model(model)
+            field.contribute_to_class(to_model, field.name)
+            schema_editor.add_field(model, field, to_model)
             cursor.execute("SELECT {} FROM {};".format(field_name, model._meta.db_table))
             database_default = cursor.fetchall()[0][0]
             if cast_function and not type(database_default) == type(expected_default):
@@ -272,7 +283,9 @@ class SchemaTests(TransactionTestCase):
         new_field = ForeignKey(Tag, CASCADE, db_constraint=False)
         new_field.set_attributes_from_name("tag")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # No FK constraint is present
         constraints = self.get_constraints(Author._meta.db_table)
         for name, details in constraints.items():
@@ -324,7 +337,9 @@ class SchemaTests(TransactionTestCase):
         new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
         # Add the field
         with connection.schema_editor() as editor:
-            editor.add_field(LocalAuthorWithM2M, new_field)
+            to_model = self.clone_model(LocalAuthorWithM2M)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(LocalAuthorWithM2M, new_field, to_model)
         # No FK constraint is present
         constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         for name, details in constraints.items():
@@ -357,7 +372,9 @@ class SchemaTests(TransactionTestCase):
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
         with CaptureQueriesContext(connection) as ctx, connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         drop_default_sql = editor.sql_alter_column_no_default % {
             'column': editor.quote_name(new_field.name),
         }
@@ -384,7 +401,9 @@ class SchemaTests(TransactionTestCase):
         new_field = CharField(max_length=30, default="Godwin")
         new_field.set_attributes_from_name("surname")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['surname'][0], "CharField")
@@ -409,7 +428,9 @@ class SchemaTests(TransactionTestCase):
         new_field = BooleanField(default=False)
         new_field.set_attributes_from_name("awesome")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         # BooleanField are stored as TINYINT(1) on MySQL.
@@ -446,7 +467,9 @@ class SchemaTests(TransactionTestCase):
         new_field = TestTransformField(default={1: 2})
         new_field.set_attributes_from_name("thing")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # Ensure the field is there
         columns = self.column_classes(Author)
         field_type, field_info = columns['thing']
@@ -465,7 +488,9 @@ class SchemaTests(TransactionTestCase):
         new_field = BinaryField(blank=True)
         new_field.set_attributes_from_name("bits")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         # MySQL annoyingly uses the same backend, so it'll come back as one of
@@ -484,7 +509,9 @@ class SchemaTests(TransactionTestCase):
         new_field = MediumBlobField(blank=True, default=b'123')
         new_field.set_attributes_from_name('bits')
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         columns = self.column_classes(Author)
         # Introspection treats BLOBs as TextFields
         self.assertEqual(columns['bits'][0], "TextField")
@@ -1218,7 +1245,9 @@ class SchemaTests(TransactionTestCase):
             self.column_classes(new_field.remote_field.through)
         # Add the field
         with connection.schema_editor() as editor:
-            editor.add_field(LocalAuthorWithM2M, new_field)
+            to_model = self.clone_model(LocalAuthorWithM2M)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(LocalAuthorWithM2M, new_field, to_model)
         # Ensure there is now an m2m table there
         columns = self.column_classes(new_field.remote_field.through)
         self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
@@ -1501,7 +1530,9 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(BookWithoutAuthor)
             new_field = ForeignKey(Author, CASCADE)
             new_field.set_attributes_from_name('author')
-            editor.add_field(BookWithoutAuthor, new_field)
+            to_model = self.clone_model(BookWithoutAuthor)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(BookWithoutAuthor, new_field, to_model)
         # Ensure the fields aren't unique to begin with
         self.assertEqual(Book._meta.unique_together, ())
         # Add the unique_together constraint
@@ -1687,7 +1718,9 @@ class SchemaTests(TransactionTestCase):
         # Add a unique column, verify that creates an implicit index
         new_field3 = BookWithSlug._meta.get_field("slug")
         with connection.schema_editor() as editor:
-            editor.add_field(Book, new_field3)
+            to_model = self.clone_model(Book)
+            new_field3.contribute_to_class(to_model, new_field3.name)
+            editor.add_field(Book, new_field3, to_model)
         self.assertIn(
             "slug",
             self.get_indexes(Book._meta.db_table),
@@ -1783,7 +1816,9 @@ class SchemaTests(TransactionTestCase):
         new_field = ForeignKey(AuthorWithEvenLongerName, CASCADE, related_name="something")
         new_field.set_attributes_from_name("author_other_really_long_named_i_mean_so_long_fk")
         with connection.schema_editor() as editor:
-            editor.add_field(BookWithLongName, new_field)
+            to_model = self.clone_model(BookWithLongName)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(BookWithLongName, new_field, to_model)
 
     def test_add_foreign_object(self):
         with connection.schema_editor() as editor:
@@ -1792,7 +1827,9 @@ class SchemaTests(TransactionTestCase):
         new_field = ForeignObject(Author, on_delete=CASCADE, from_fields=['author_id'], to_fields=['id'])
         new_field.set_attributes_from_name('author')
         with connection.schema_editor() as editor:
-            editor.add_field(BookForeignObj, new_field)
+            to_model = self.clone_model(BookForeignObj)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(BookForeignObj, new_field, to_model)
 
     def test_creation_deletion_reserved_names(self):
         """
@@ -1832,7 +1869,9 @@ class SchemaTests(TransactionTestCase):
 
         with connection.schema_editor() as editor:
             editor.create_model(model)
-            editor.add_field(model, field)
+            to_model = self.clone_model(model)
+            field.contribute_to_class(to_model, field.name)
+            editor.add_field(model, field, to_model)
 
             constraint_name = "CamelCaseIndex"
             editor.execute(
@@ -1899,7 +1938,9 @@ class SchemaTests(TransactionTestCase):
         new_field = CharField(max_length=15, blank=True)
         new_field.set_attributes_from_name("surname")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # Ensure field was added with the right default
         with connection.cursor() as cursor:
             cursor.execute("SELECT surname FROM schema_author;")
@@ -1919,7 +1960,9 @@ class SchemaTests(TransactionTestCase):
         new_field = CharField(max_length=15, blank=True, default='surname default')
         new_field.set_attributes_from_name("surname")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
         # Ensure field was added with the right default
         with connection.cursor() as cursor:
             cursor.execute("SELECT surname FROM schema_author;")
@@ -1981,7 +2024,9 @@ class SchemaTests(TransactionTestCase):
         new_field = TextField(default={})
         new_field.set_attributes_from_name("info")
         with connection.schema_editor() as editor:
-            editor.add_field(Author, new_field)
+            to_model = self.clone_model(Author)
+            new_field.contribute_to_class(to_model, new_field.name)
+            editor.add_field(Author, new_field, to_model)
 
     @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
     def test_add_indexed_charfield(self):
@@ -1989,7 +2034,9 @@ class SchemaTests(TransactionTestCase):
         field.set_attributes_from_name('nom_de_plume')
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-            editor.add_field(Author, field)
+            to_model = self.clone_model(Author)
+            field.contribute_to_class(to_model, field.name)
+            editor.add_field(Author, field, to_model)
         # Should create two indexes; one for like operator.
         self.assertEqual(
             self.get_constraints_for_column(Author, 'nom_de_plume'),
@@ -2002,7 +2049,9 @@ class SchemaTests(TransactionTestCase):
         field.set_attributes_from_name('nom_de_plume')
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-            editor.add_field(Author, field)
+            to_model = self.clone_model(Author)
+            field.contribute_to_class(to_model, field.name)
+            editor.add_field(Author, field, to_model)
         # Should create two indexes; one for like operator.
         self.assertEqual(
             self.get_constraints_for_column(Author, 'nom_de_plume'),
