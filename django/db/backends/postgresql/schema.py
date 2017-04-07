@@ -1,5 +1,6 @@
 import psycopg2
 
+from django.db.models.indexes import Index
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 
 
@@ -23,12 +24,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         return psycopg2.extensions.adapt(value)
 
-    def _field_indexes_sql(self, model, field):
-        output = super()._field_indexes_sql(model, field)
-        like_index_statement = self._create_like_index_sql(model, field)
-        if like_index_statement is not None:
-            output.append(like_index_statement)
-        return output
+    def _get_like_indexes(self, model, field):
+        # TODO HACKY HACK
+        db_type = field.db_type(connection=self.connection)
+        if db_type is not None and (field.db_index or field.unique):
+            if db_type.startswith('varchar') or db_type.startswith('text'):
+                name = self._create_index_name(model, [field.column], suffix='_like', max_length=200)
+                index = Index(fields=[field.name], name=name)  # TODO: make this accept the ops somehow
+                return [index]
+        return []
 
     def _create_like_index_sql(self, model, field):
         """
@@ -102,20 +106,21 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             return super()._alter_column_type_sql(table, old_field, new_field, new_type)
 
-    def _alter_field(self, model, old_field, new_field, old_type, new_type,
-                     old_db_params, new_db_params, strict=False):
-        super()._alter_field(
-            model, old_field, new_field, old_type, new_type, old_db_params,
-            new_db_params, strict,
-        )
-        # Added an index? Create any PostgreSQL-specific indexes.
-        if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
-                (not old_field.unique and new_field.unique)):
-            like_index_statement = self._create_like_index_sql(model, new_field)
-            if like_index_statement is not None:
-                self.execute(like_index_statement)
+    # TODO: Work out whether I need any of this any more
+    # def _alter_field(self, model, old_field, new_field, old_type, new_type,
+    #                  old_db_params, new_db_params, strict=False):
+    #     super()._alter_field(
+    #         model, old_field, new_field, old_type, new_type, old_db_params,
+    #         new_db_params, strict,
+    #     )
+    #     # Added an index? Create any PostgreSQL-specific indexes.
+    #     if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
+    #             (not old_field.unique and new_field.unique)):
+    #         like_index_statement = self._create_like_index_sql(model, new_field)
+    #         if like_index_statement is not None:
+    #             self.execute(like_index_statement)
 
-        # Removed an index? Drop any PostgreSQL-specific indexes.
-        if old_field.unique and not (new_field.db_index or new_field.unique):
-            index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
-            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_to_remove))
+    #     # Removed an index? Drop any PostgreSQL-specific indexes.
+    #     if old_field.unique and not (new_field.db_index or new_field.unique):
+    #         index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
+    #         self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_to_remove))

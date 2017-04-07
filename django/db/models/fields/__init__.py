@@ -268,10 +268,10 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_db_index(self):
-        if self.db_index not in (None, True, False) and not (isinstance(self.db_index, type) and issubclass(self.db_index, Index)):
+        if self.db_index not in (None, True, False) and not isinstance(self.db_index, Index):
             return [
                 checks.Error(
-                    "'db_index' must be None, True or False, or a subclass of Index",
+                    "'db_index' must be None, True or False, or an instance of Index",
                     obj=self,
                     id='fields.E006',
                 )
@@ -665,6 +665,28 @@ class Field(RegisterLookupMixin):
 
     def db_type_suffix(self, connection):
         return connection.data_types_suffix.get(self.get_internal_type())
+
+    def get_indexes(self, schema, model=None):
+        """
+        Return a list of all index SQL statements for the specified field.
+        """
+        indexes = []
+        if model is None:
+            model = self.model
+        if isinstance(self.db_index, Index):
+            index = self.db_index.clone()
+            if not index.name:
+                name = schema._create_index_name(model, [self.column], suffix=index.suffix, max_length=index.max_name_length)
+                index.name = name
+            index.fields = [self.name]
+            indexes.append(index)
+        elif self.db_index and not self.unique:
+            name = schema._create_index_name(model, [self.column], max_length=Index.max_name_length)
+            index = Index(fields=[self.name], name=name)
+            indexes.append(index)
+        if hasattr(schema, '_get_like_indexes'):
+            indexes.extend(schema._get_like_indexes(model, self))
+        return indexes
 
     def get_db_converters(self, connection):
         if hasattr(self, 'from_db_value'):
