@@ -142,6 +142,7 @@ urlpatterns = [
     url(r'^dates/books/sortedbynamedec/$',
         views.BookArchive.as_view(ordering='-name')),
 
+
     # ListView
     url(r'^list/dict/$',
         views.DictList.as_view()),

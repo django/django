@@ -22,14 +22,14 @@ class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
         cls.series1 = Series.objects.create(
-            name='Django books', pubdate=datetime.date(2003, 10, 1)
+            name='Django books', pubdate=datetime.date(2003, 10, 1),
         )
         cls.artist1 = Artist.objects.create(name='Rene Magritte')
         cls.author1 = Author.objects.create(name='Roberto Bolaño', slug='roberto-bolano')
         cls.author2 = Author.objects.create(name='Scott Rosenberg', slug='scott-rosenberg')
         cls.book1 = Book.objects.create(
             name='2066', slug='2066', pages=800, series=cls.series1,
-            pubdate=datetime.date(2008, 10, 1)
+            pubdate=datetime.date(2008, 10, 1),
         )
         cls.book1.authors.add(cls.author1)
         cls.book2 = Book.objects.create(
