@@ -41,13 +41,11 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :meth:`~InlineModelAdmin.has_add_permission()
-  <~django.contrib.admin.options.InlineModelAdmin.has_add_permission>`
+* :meth:`InlineModelAdmin.has_add_permission()
+  <.InlineModelAdmin.has_add_permission>`
   now takes a ``obj`` argument representing the parent object
   to implement specific logic to define whether an user can change
-  inline objects depending on the parent object. See the :ref:`deprecation
-  note <inline-model-admin-has-add-permission-obj-update>` about adding this
-  argument to your custom classes.
+  inline objects depending on the parent object.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

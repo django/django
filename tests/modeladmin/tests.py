@@ -777,25 +777,3 @@ class ModelAdminPermissionTests(SimpleTestCase):
         ma = InlineBandAdmin(Band, self.site)
 
         self.assertTrue(ma.has_add_permission(request))
-
-    def test_inline_has_add_permission(self):
-        class InlineBandAdmin(TabularInline):
-            model = Concert
-            fk_name = 'main_band'
-            can_delete = False
-
-            def has_add_permission(self, request, obj=None):
-                return obj.name == 'The Doors'
-
-        ma = InlineBandAdmin(Band, self.site)
-        self.assertTrue(ma.has_add_permission(request, Band(
-            name='The Doors',
-            bio='',
-            sign_date=date(1965, 1, 1),
-        )))
-
-        self.assertFalse(ma.has_add_permission(request, Band(
-            name='The Beatles',
-            bio='',
-            sign_date=date(1965, 1, 1),
-        )))
