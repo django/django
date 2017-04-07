@@ -91,9 +91,7 @@ class MultiValueDict(dict):
             for k, v in self.lists()
         ])
 
-    def __deepcopy__(self, memo=None):
-        if memo is None:
-            memo = {}
+    def __deepcopy__(self, memo):
         result = self.__class__()
         memo[id(self)] = result
         for key, value in dict.items(self):
