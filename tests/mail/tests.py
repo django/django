@@ -387,6 +387,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(payload[0].get_content_type(), 'multipart/alternative')
         self.assertEqual(payload[1].get_content_type(), 'application/pdf')
 
+    def test_attachments_two_tuple(self):
+        msg = EmailMessage(attachments=[('filename1', 'content1')])
+        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
+        self.assertEqual(filename, 'filename1')
+        self.assertEqual(content, b'content1')
+        self.assertEqual(mimetype, 'application/octet-stream')
+
     def test_attachments_MIMEText(self):
         txt = MIMEText('content1')
         msg = EmailMessage(attachments=[txt])

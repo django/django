@@ -286,7 +286,13 @@ class EmailMessage(object):
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
-        self.attachments = attachments or []
+        self.attachments = []
+        if attachments:
+            for attachment in attachments:
+                if isinstance(attachment, MIMEBase):
+                    self.attach(attachment)
+                else:
+                    self.attach(*attachment)
         self.extra_headers = headers or {}
         self.connection = connection
 
