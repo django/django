@@ -31,7 +31,7 @@ class BoolOr(Aggregate):
     function = 'BOOL_OR'
 
 
-class JSONBAgg(Aggregate):
+class JSONBAgg(DistinctAggregate):
     function = 'JSONB_AGG'
     _output_field = JSONField()
 

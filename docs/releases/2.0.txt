@@ -84,7 +84,8 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``distinct`` argument for
-  :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.JSONBAgg` determines determines if
   concatenated values will be distinct.
 
 :mod:`django.contrib.redirects`

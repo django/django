@@ -68,11 +68,18 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, **extra)
+.. class:: JSONBAgg(expressions, distinct=False, **extra)
 
     .. versionadded:: 1.11
 
     Returns the input values as a ``JSON`` array. Requires PostgreSQL ≥ 9.5.
+
+    .. attribute:: distinct
+
+        .. versionadded:: 2.0
+
+        An optional boolean argument that determines if concatenated values
+        will be distinct. Defaults to ``False``.
 
 ``StringAgg``
 -------------
