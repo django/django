@@ -216,6 +216,14 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[1:3]
         )
 
+    def test_icontains(self):
+        # Using the __icontains lookup with ArrayField is inefficient.
+        instance = CharArrayModel.objects.create(field=['FoO'])
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__icontains='foo'),
+            [instance]
+        )
+
     def test_contains_charfield(self):
         # Regression for #22907
         self.assertSequenceEqual(
