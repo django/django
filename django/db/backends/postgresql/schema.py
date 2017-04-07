@@ -28,10 +28,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         db_type = field.db_type(connection=self.connection)
         if db_type is not None and (field.db_index or field.unique):
             if db_type.startswith('varchar') or db_type.startswith('text'):
-                # TODO: Name length problems - old version makes longer names depending on DB, Index() hates this
-                name = self._create_index_name(model, [field.column], suffix='_like', max_length=30)
                 # TODO: make this accept the ops class somehow, currently creates a normal index
-                index = Index(fields=[field.name], name=name)
+                index = Index(fields=[field.name])
+                name = self._create_index_name(model, [field.column], suffix='_like')
+                index.name = name
                 return [index]
         return []
 

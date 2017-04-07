@@ -675,19 +675,14 @@ class Field(RegisterLookupMixin):
             model = self.model
         if isinstance(self.db_index, Index):
             index = self.db_index.clone()
-            if not index.name:
-                name = schema._create_index_name(
-                    model,
-                    [self.column],
-                    suffix=index.suffix,
-                    max_length=index.max_name_length,
-                )
-                index.name = name
             index.fields = [self.name]
+            if not index.name:
+                index.set_name_with_model(model)
             indexes.append(index)
         elif self.db_index and not self.unique:
-            name = schema._create_index_name(model, [self.column], max_length=Index.max_name_length)
-            index = Index(fields=[self.name], name=name)
+            index = Index(fields=[self.name])
+            name = schema._create_index_name(model, [self.column])
+            index.name = name
             indexes.append(index)
         if hasattr(schema, '_get_like_indexes'):
             indexes.extend(schema._get_like_indexes(model, self))
