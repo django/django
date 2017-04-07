@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed a crash when using a ``__icontains`` lookup on a ``ArrayField``
   (:ticket:`28038`).
+
+* Fixed a crash when using a two-tuple in ``EmailMessage``’s ``attachments``
+  argument (:ticket:`28042`).
