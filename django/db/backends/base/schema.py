@@ -3,6 +3,7 @@ import logging
 from datetime import datetime
 
 from django.db.backends.utils import strip_quotes
+from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -532,8 +533,17 @@ class BaseDatabaseSchemaEditor:
         # Removed an index?
         old_indexes = set(old_field.get_indexes(self, model))
         new_indexes = set(new_field.get_indexes(self, model))
+        existing_index_names = self._constraint_names(model, [old_field.column], index=True)
         for index in old_indexes - new_indexes:
-            self.execute(index.remove_sql(model, self))
+            # The old index may have a different name
+            if index.name in existing_index_names:
+                self.execute(index.remove_sql(model, self))
+        legacy_index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
+        for name in legacy_index_names:
+            # Also delete any other btree indexes which affect just this field
+            # This handles indexes with other names created by older versions
+            # of Django
+            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -915,7 +925,7 @@ class BaseDatabaseSchemaEditor:
 
     def _constraint_names(self, model, column_names=None, unique=None,
                           primary_key=None, index=None, foreign_key=None,
-                          check=None):
+                          check=None, type_=None):
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
@@ -936,6 +946,8 @@ class BaseDatabaseSchemaEditor:
                 if check is not None and infodict['check'] != check:
                     continue
                 if foreign_key is not None and not infodict['foreign_key']:
+                    continue
+                if type_ is not None and infodict['type'] != type_:
                     continue
                 result.append(name)
         return result
