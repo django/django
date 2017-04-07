@@ -473,19 +473,21 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.items()
 
     Like :meth:`dict.items`, except this uses the same last-value logic as
-    :meth:`__getitem__`. For example::
+    :meth:`__getitem__` and returns an iterator object instead of a view object.
+    For example::
 
         >>> q = QueryDict('a=1&a=2&a=3')
-        >>> q.items()
+        >>> list(q.items())
         [('a', '3')]
 
 .. method:: QueryDict.values()
 
     Like :meth:`dict.values`, except this uses the same last-value logic as
-    :meth:`__getitem__`. For example::
+    :meth:`__getitem__` and returns an iterator instead of a view object. For
+    example::
 
         >>> q = QueryDict('a=1&a=2&a=3')
-        >>> q.values()
+        >>> list(q.values())
         ['3']
 
 In addition, ``QueryDict`` has the following methods:
