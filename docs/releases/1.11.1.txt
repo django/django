@@ -69,3 +69,6 @@ Bugfixes
 
 * Fixed crash in ``BaseGeometryWidget.get_context()`` when overriding existing
   ``attrs`` (:ticket:`28105`).
+
+* Prevented ``AddIndex`` and ``RemoveIndex`` from mutating model state
+  (:ticket:`28043`).
