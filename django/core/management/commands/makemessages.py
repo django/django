@@ -260,6 +260,17 @@ class Command(BaseCommand):
             help="Don't write '#: filename:line' lines.",
         )
         parser.add_argument(
+            '--add-location', dest='add_location',
+            choices=('full', 'file', 'never'), const='full', nargs='?',
+            help=(
+                "Controls '#: filename:line' lines. If the option is 'full' "
+                "(the default if not given), the lines  include both file name "
+                "and line number. If it's 'file', the line number is omitted. If "
+                "it's 'never', the lines are suppressed (same as --no-location). "
+                "--add-location requires gettext 0.19 or newer."
+            ),
+        )
+        parser.add_argument(
             '--no-obsolete', action='store_true', dest='no_obsolete',
             help="Remove obsolete message strings.",
         )
@@ -293,6 +304,17 @@ class Command(BaseCommand):
             self.msguniq_options = self.msguniq_options[:] + ['--no-location']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-location']
             self.xgettext_options = self.xgettext_options[:] + ['--no-location']
+        if options['add_location']:
+            if self.gettext_version < (0, 19):
+                raise CommandError(
+                    "The --add-location option requires gettext 0.19 or later. "
+                    "You have %s." % '.'.join(str(x) for x in self.gettext_version)
+                )
+            arg_add_location = "--add-location=%s" % options['add_location']
+            self.msgmerge_options = self.msgmerge_options[:] + [arg_add_location]
+            self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
+            self.msgattrib_options = self.msgattrib_options[:] + [arg_add_location]
+            self.xgettext_options = self.xgettext_options[:] + [arg_add_location]
 
         self.no_obsolete = options['no_obsolete']
         self.keep_pot = options['keep_pot']

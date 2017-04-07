@@ -647,6 +647,20 @@ Suppresses writing '``#: filename:line``’ comment lines in language files.
 Using this option makes it harder for technically skilled translators to
 understand each message's context.
 
+.. django-admin-option:: --add-location [{full,file,never}]
+
+.. versionadded:: 2.0
+
+Controls ``#: filename:line`` comment lines in language files. If the option
+is:
+
+* ``full`` (the default if not given): the lines include both file name and
+  line number.
+* ``file``: the line number is omitted.
+* ``never``: the lines are suppressed (same as :option:`--no-location`).
+
+Requires ``gettext`` 0.19 or newer.
+
 .. django-admin-option:: --keep-pot
 
 Prevents deleting the temporary ``.pot`` files generated before creating the

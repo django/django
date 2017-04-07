@@ -182,6 +182,9 @@ Management Commands
 * :djadmin:`inspectdb` now translates MySQL's unsigned integer columns to
   ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
+* The new :option:`makemessages --add-location` option controls the comment
+  format in PO files.
+
 Migrations
 ~~~~~~~~~~
 
