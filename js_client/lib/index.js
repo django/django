@@ -17,8 +17,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var noop = function noop() {};
-
 /**
  * Bridge between Channels and plain javascript.
  *
@@ -29,17 +27,19 @@ var noop = function noop() {};
  *   console.log(action, stream);
  * });
  */
-
 var WebSocketBridge = function () {
   function WebSocketBridge(options) {
     _classCallCheck(this, WebSocketBridge);
 
-    this._socket = null;
+    /**
+     * The underlaying `ReconnectingWebSocket` instance.
+     * 
+     * @type {ReconnectingWebSocket}
+     */
+    this.socket = null;
     this.streams = {};
     this.default_cb = null;
-    this.options = _extends({}, {
-      onopen: noop
-    }, options);
+    this.options = _extends({}, options);
   }
 
   /**
@@ -59,14 +59,20 @@ var WebSocketBridge = function () {
     key: 'connect',
     value: function connect(url, protocols, options) {
       var _url = void 0;
+      // Use wss:// if running on https://
+      var scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      var base_url = scheme + '://' + window.location.host;
       if (url === undefined) {
-        // Use wss:// if running on https://
-        var scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        _url = scheme + '://' + window.location.host + '/ws';
+        _url = base_url;
       } else {
-        _url = url;
+        // Support relative URLs
+        if (url[0] == '/') {
+          _url = '' + base_url + url;
+        } else {
+          _url = url;
+        }
       }
-      this._socket = new _reconnectingWebsocket2.default(_url, protocols, options);
+      this.socket = new _reconnectingWebsocket2.default(_url, protocols, options);
     }
 
     /**
@@ -89,7 +95,7 @@ var WebSocketBridge = function () {
       var _this = this;
 
       this.default_cb = cb;
-      this._socket.onmessage = function (event) {
+      this.socket.onmessage = function (event) {
         var msg = JSON.parse(event.data);
         var action = void 0;
         var stream = void 0;
@@ -105,8 +111,6 @@ var WebSocketBridge = function () {
           _this.default_cb ? _this.default_cb(action, stream) : null;
         }
       };
-
-      this._socket.onopen = this.options.onopen;
     }
 
     /**
@@ -146,7 +150,7 @@ var WebSocketBridge = function () {
   }, {
     key: 'send',
     value: function send(msg) {
-      this._socket.send(JSON.stringify(msg));
+      this.socket.send(JSON.stringify(msg));
     }
 
     /**
@@ -169,7 +173,7 @@ var WebSocketBridge = function () {
             stream: _stream,
             payload: action
           };
-          _this2._socket.send(JSON.stringify(msg));
+          _this2.socket.send(JSON.stringify(msg));
         }
       };
     }
