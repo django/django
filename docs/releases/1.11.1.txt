@@ -72,3 +72,6 @@ Bugfixes
 
 * Prevented ``AddIndex`` and ``RemoveIndex`` from mutating model state
   (:ticket:`28043`).
+
+* Prevented migrations from dropping database indexes from ``Meta.indexes``
+  when changing ``Field.db_index`` to ``False`` (:ticket:`28052`).
