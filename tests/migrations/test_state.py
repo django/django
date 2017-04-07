@@ -1071,6 +1071,19 @@ class ModelStateTests(SimpleTestCase):
         child1_state.options['indexes'][0].name = 'bar'
         self.assertEqual(Child1._meta.indexes[0].name, 'migrations__name_b0afd7_idx')
 
+    @isolate_apps('migrations')
+    def test_explicit_index_name(self):
+        class TestModel(models.Model):
+            name = models.CharField(max_length=50)
+
+            class Meta:
+                app_label = 'migrations'
+                indexes = [models.indexes.Index(fields=['name'], name='foo_idx')]
+
+        model_state = ModelState.from_model(TestModel)
+        index_names = [index.name for index in model_state.options['indexes']]
+        self.assertEqual(index_names, ['foo_idx'])
+
 
 class RelatedModelsTests(SimpleTestCase):
 

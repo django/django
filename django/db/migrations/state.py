@@ -463,7 +463,8 @@ class ModelState(object):
                 elif name == "indexes":
                     indexes = [idx.clone() for idx in model._meta.indexes]
                     for index in indexes:
-                        index.set_name_with_model(model)
+                        if not index.name:
+                            index.set_name_with_model(model)
                     options['indexes'] = indexes
                 else:
                     options[name] = model._meta.original_attrs[name]
