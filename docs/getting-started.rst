@@ -518,6 +518,51 @@ responses can set cookies, it needs a backend it can write to to separately
 store state.
 
 
+Security
+--------
+
+Unlike AJAX requests, WebSocket requests are not limited by the Same-Origin
+policy. This means you don't have to take any extra steps when you have an HTML
+page served by host A containing JavaScript code wanting to connect to a
+WebSocket on Host B.
+
+While this can be convenient, it also implies that by default any third-party
+site can connect to your WebSocket application. When you are using the
+``http_session_user`` or the ``channel_session_user_from_http`` decorator, this
+connection would be authenticated.
+
+The WebSocket specification requires browsers to send the origin of a WebSocket
+request in the HTTP header named ``Origin``, but validating that header is left
+to the server.
+
+You can use the decorator ``channels.security.websockets.allowed_hosts_only``
+on a ``websocket.connect`` consumer to only allow requests originating
+from hosts listed in the ``ALLOWED_HOSTS`` setting::
+
+    # In consumers.py
+    from channels import Channel, Group
+    from channels.sessions import channel_session
+    from channels.auth import channel_session_user, channel_session_user_from_http
+    from channels.security.websockets import allowed_hosts_only.
+
+    # Connected to websocket.connect
+    @allowed_hosts_only
+    @channel_session_user_from_http
+    def ws_add(message):
+        # Accept connection
+        ...
+
+Requests from other hosts or requests with missing or invalid origin header
+are now rejected.
+
+The name ``allowed_hosts_only`` is an alias for the class-based decorator
+``AllowedHostsOnlyOriginValidator``, which inherits from
+``BaseOriginValidator``. If you have custom requirements for origin validation,
+create a subclass and overwrite the method
+``validate_origin(self, message, origin)``. It must return True when a message
+should be accepted, False otherwise.
+
+
 Routing
 -------
 

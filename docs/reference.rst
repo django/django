@@ -172,7 +172,7 @@ directly, but there are two useful ways you can call it:
 Decorators
 ----------
 
-Channels provides decorators to assist with persisting data.
+Channels provides decorators to assist with persisting data and security.
 
 * ``channel_session``: Provides a session-like object called "channel_session" to consumers
     as a message attribute that will auto-persist across consumers with
@@ -200,3 +200,10 @@ Channels provides decorators to assist with persisting data.
 
     Stores the http session key in the channel_session on websocket.connect messages.
     It will then hydrate the http_session from that same key on subsequent messages.
+
+* ``allowed_hosts_only``: Wraps a WebSocket connect consumer and ensures the
+    request originates from an allowed host.
+
+    Reads the Origin header and only passes request originating from a host
+    listed in ``ALLOWED_HOSTS`` to the consumer. Requests from other hosts or
+    with a missing or invalid Origin headers are rejected.
