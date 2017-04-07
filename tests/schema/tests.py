@@ -1,7 +1,7 @@
 import datetime
 import itertools
-import uuid
 import unittest
+import uuid
 from copy import copy
 from unittest import mock
 

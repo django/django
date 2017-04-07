@@ -1,7 +1,7 @@
 import psycopg2
 
-from django.db.models.indexes import Index
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.models.indexes import Index
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):

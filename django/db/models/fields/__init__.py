@@ -271,7 +271,7 @@ class Field(RegisterLookupMixin):
         if self.db_index not in (None, True, False) and not isinstance(self.db_index, Index):
             return [
                 checks.Error(
-                    "'db_index' must be None, True or False, or an instance of Index",
+                    "'db_index' must be None, True or False, or an instance of Index.",
                     obj=self,
                     id='fields.E006',
                 )
@@ -676,7 +676,12 @@ class Field(RegisterLookupMixin):
         if isinstance(self.db_index, Index):
             index = self.db_index.clone()
             if not index.name:
-                name = schema._create_index_name(model, [self.column], suffix=index.suffix, max_length=index.max_name_length)
+                name = schema._create_index_name(
+                    model,
+                    [self.column],
+                    suffix=index.suffix,
+                    max_length=index.max_name_length,
+                )
                 index.name = name
             index.fields = [self.name]
             indexes.append(index)

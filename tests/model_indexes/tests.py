@@ -31,8 +31,9 @@ class IndexesTests(SimpleTestCase):
 
     def test_raises_error_without_field(self):
         msg = 'At least one field is required to define an index.'
+        index = models.Index()
         with self.assertRaisesMessage(ValueError, msg):
-            models.Index()
+            index.get_sql_create_template_values(None, None, None)
 
     def test_max_name_length(self):
         msg = 'Index names cannot be longer than 30 characters.'
