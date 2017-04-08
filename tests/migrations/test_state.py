@@ -1017,6 +1017,10 @@ class ModelStateTests(SimpleTestCase):
         class SearchableLocation(models.Model):
             keywords = models.CharField(max_length=256)
 
+            class Meta:
+                app_label = 'migrations'
+                apps = new_apps
+
         class Station(SearchableLocation):
             name = models.CharField(max_length=128)
 
