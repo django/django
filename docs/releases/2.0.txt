@@ -441,6 +441,9 @@ Miscellaneous
   :class:`~django.views.i18n.JavaScriptCatalog` view now raises ``ValueError``
   instead of passing silently.
 
+* A model instance's primary key now appears in the default ``Model.__str__()``
+  method, e.g. ``Question object (1)``.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

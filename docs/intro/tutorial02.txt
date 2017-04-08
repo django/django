@@ -437,11 +437,11 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
     # objects.all() displays all the questions in the database.
     >>> Question.objects.all()
-    <QuerySet [<Question: Question object>]>
+    <QuerySet [<Question: Question object (1)>]>
 
-Wait a minute. ``<Question: Question object>`` is, utterly, an unhelpful representation
-of this object. Let's fix that by editing the ``Question`` model (in the
-``polls/models.py`` file) and adding a
+Wait a minute. ``<Question: Question object (1)>`` isn't a helpful
+representation of this object. Let's fix that by editing the ``Question`` model
+(in the ``polls/models.py`` file) and adding a
 :meth:`~django.db.models.Model.__str__` method to both ``Question`` and
 ``Choice``:
 

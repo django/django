@@ -505,7 +505,7 @@ class Model(metaclass=ModelBase):
         return '<%s: %s>' % (self.__class__.__name__, u)
 
     def __str__(self):
-        return '%s object' % self.__class__.__name__
+        return '%s object (%s)' % (self.__class__.__name__, self.pk)
 
     def __eq__(self, other):
         if not isinstance(other, Model):
