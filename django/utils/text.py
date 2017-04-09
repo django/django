@@ -412,9 +412,8 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-        return mark_safe(re.sub(r'[-\s]+', '-', value))
-    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    else:
+        value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub(r'[-\s]+', '-', value))
 
