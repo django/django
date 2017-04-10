@@ -18,3 +18,6 @@ Bugfixes
 
 * Fixed a crash when using a two-tuple in ``EmailMessage``’s ``attachments``
   argument (:ticket:`28042`).
+
+* Fixed ``QuerySet.filter()`` crash when it references the name of a
+  ``OneToOneField`` primary key (:ticket:`28047`).

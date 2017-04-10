@@ -479,6 +479,10 @@ class OneToOneTests(TestCase):
             pk__in=Restaurant.objects.filter(place__id=r.place.pk)
         )
         self.assertSequenceEqual(q2, [r])
+        q3 = Restaurant.objects.filter(place__in=Place.objects.all())
+        self.assertSequenceEqual(q3, [r])
+        q4 = Restaurant.objects.filter(place__in=Place.objects.filter(id=r.pk))
+        self.assertSequenceEqual(q4, [r])
 
     def test_rel_pk_exact(self):
         r = Restaurant.objects.first()
