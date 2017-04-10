@@ -11,8 +11,10 @@ import warnings
 
 import django
 from django.apps import apps
+from django.apps.registry import Apps
 from django.conf import settings
 from django.db import connection, connections
+from django.db.models.options import Options
 from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
@@ -76,6 +78,11 @@ CONTRIB_TESTS_TO_APPS = {
     'flatpages_tests': 'django.contrib.flatpages',
     'redirects_tests': 'django.contrib.redirects',
 }
+
+
+class PreventRegistrationApps(Apps):
+    def register_model(self, app_label, model):
+        raise Exception('Not Allowed.')
 
 
 def get_test_modules():
@@ -209,6 +216,8 @@ def setup(verbosity, test_labels, parallel):
         settings.INSTALLED_APPS.append(gis)
 
     apps.set_installed_apps(settings.INSTALLED_APPS)
+
+    Options.default_apps = PreventRegistrationApps()
 
     return state
 
