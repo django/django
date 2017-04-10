@@ -177,8 +177,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def init_connection_state(self):
         pass
 
-    def create_cursor(self, name=None):
-        return self.connection.cursor(factory=SQLiteCursorWrapper)
+    def create_cursor(self, name=None, *args, **kwargs):
+        kwargs.setdefault('factory', SQLiteCursorWrapper)
+        return self.connection.cursor(*args, **kwargs)
 
     def close(self):
         self.validate_thread_sharing()

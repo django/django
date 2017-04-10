@@ -254,24 +254,11 @@ class OneToOneTests(TestCase):
         misbehaving. We test both (primary_key=True & False) cases here to
         prevent any reappearance of the problem.
         """
-        Target.objects.create()
-
-        self.assertQuerysetEqual(
-            Target.objects.filter(pointer=None),
-            ['<Target: Target object>']
-        )
-        self.assertQuerysetEqual(
-            Target.objects.exclude(pointer=None),
-            []
-        )
-        self.assertQuerysetEqual(
-            Target.objects.filter(second_pointer=None),
-            ['<Target: Target object>']
-        )
-        self.assertQuerysetEqual(
-            Target.objects.exclude(second_pointer=None),
-            []
-        )
+        target = Target.objects.create()
+        self.assertSequenceEqual(Target.objects.filter(pointer=None), [target])
+        self.assertSequenceEqual(Target.objects.exclude(pointer=None), [])
+        self.assertSequenceEqual(Target.objects.filter(second_pointer=None), [target])
+        self.assertSequenceEqual(Target.objects.exclude(second_pointer=None), [])
 
     def test_o2o_primary_key_delete(self):
         t = Target.objects.create(name='name')
@@ -424,16 +411,10 @@ class OneToOneTests(TestCase):
         private_director = Director.objects.create(school=private_school, is_temp=True)
 
         # Only one school is available via all() due to the custom default manager.
-        self.assertQuerysetEqual(
-            School.objects.all(),
-            ["<School: School object>"]
-        )
+        self.assertSequenceEqual(School.objects.all(), [public_school])
 
         # Only one director is available via all() due to the custom default manager.
-        self.assertQuerysetEqual(
-            Director.objects.all(),
-            ["<Director: Director object>"]
-        )
+        self.assertSequenceEqual(Director.objects.all(), [public_director])
 
         self.assertEqual(public_director.school, public_school)
         self.assertEqual(public_school.director, public_director)

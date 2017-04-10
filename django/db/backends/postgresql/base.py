@@ -203,13 +203,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if not self.get_autocommit():
                 self.connection.commit()
 
-    def create_cursor(self, name=None):
+    def create_cursor(self, name=None, *args, **kwargs):
         if name:
             # In autocommit mode, the cursor will be used outside of a
             # transaction, hence use a holdable cursor.
-            cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
+            kwargs.setdefault('scrollable', False)
+            kwargs.setdefault('withhold', self.connection.autocommit)
+            cursor = self.connection.cursor(name, *args, **kwargs)
         else:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor(*args, **kwargs)
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 

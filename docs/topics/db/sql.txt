@@ -334,6 +334,9 @@ Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
 placeholder, which is used by the SQLite Python bindings. This is for the sake
 of consistency and sanity.
 
+DatabaseWrapper can also pass any argument for the cursor() calls to the underlying database adapter. This makes it possible to use the adapter fully at the low level.
+
+
 Using a cursor as a context manager::
 
     with connection.cursor() as c:
