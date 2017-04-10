@@ -20,7 +20,7 @@ class SQLCompiler(compiler.SQLCompiler):
             sql, params = super().as_sql(with_limits=False, with_col_aliases=with_col_aliases)
         elif not self.connection.features.supports_select_for_update_with_limit and self.query.select_for_update:
             raise NotSupportedError(
-                'LIMIT/OFFSET not supported with select_for_update on this '
+                'LIMIT/OFFSET is not supported with select_for_update on this '
                 'database backend.'
             )
         else:
