@@ -4,6 +4,7 @@ import unittest
 
 from django.db import connection, transaction
 from django.db.models import Avg, StdDev, Sum, Variance
+from django.db.models.aggregates import Aggregate
 from django.db.models.fields import CharField
 from django.db.utils import NotSupportedError
 from django.test import (
@@ -33,6 +34,17 @@ class Tests(TestCase):
                 Item.objects.all().aggregate(
                     **{'complex': aggregate('last_modified') + aggregate('last_modified')}
                 )
+
+    def test_distinct_aggregation(self):
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+        aggregate = DistinctAggregate('first', 'second', distinct=True)
+        msg = (
+            "SQLite doesn't support DISTINCT on aggregate functions accepting "
+            "multiple arguments."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.ops.check_expression_support(aggregate)
 
     def test_memory_db_test_name(self):
         """A named in-memory db should be allowed where supported."""

@@ -239,6 +239,13 @@ Models
 * Added SQLite support for the :class:`~django.db.models.StdDev` and
   :class:`~django.db.models.Variance` functions.
 
+* The handling of ``DISTINCT`` aggregation is added to the
+  :class:`~django.db.models.Aggregate` class. Adding :attr:`allow_distinct =
+  True <django.db.models.Aggregate.allow_distinct>` as a class attribute on
+  ``Aggregate`` subclasses allows a ``distinct`` keyword argument to be
+  specified on initialization to ensure that the aggregate function is only
+  called for each distinct value of ``expressions``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
