@@ -48,8 +48,9 @@ class MultiValueDictTests(SimpleTestCase):
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
 
-        with self.assertRaisesMessage(MultiValueDictKeyError, 'lastname'):
+        with self.assertRaises(MultiValueDictKeyError) as cm:
             d.__getitem__('lastname')
+        self.assertEqual(str(cm.exception), "'lastname'")
 
         self.assertIsNone(d.get('lastname'))
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')

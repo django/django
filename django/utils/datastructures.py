@@ -76,7 +76,7 @@ class MultiValueDict(dict):
         try:
             list_ = super().__getitem__(key)
         except KeyError:
-            raise MultiValueDictKeyError(repr(key))
+            raise MultiValueDictKeyError(key)
         try:
             return list_[-1]
         except IndexError:
