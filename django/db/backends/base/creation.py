@@ -148,21 +148,22 @@ class BaseDatabaseCreation:
             return self.connection.settings_dict['TEST']['NAME']
         return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
 
+    def _execute_create_test_db(self, cursor, parameters, keepdb=False):
+        cursor.execute('CREATE DATABASE %(dbname)s %(suffix)s' % parameters)
+
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         """
         Internal implementation - create the test db tables.
         """
-        suffix = self.sql_table_creation_suffix()
-
         test_database_name = self._get_test_db_name()
-
-        qn = self.connection.ops.quote_name
-
+        test_db_params = {
+            'dbname': self.connection.ops.quote_name(test_database_name),
+            'suffix': self.sql_table_creation_suffix(),
+        }
         # Create the test database and connect to it.
         with self._nodb_connection.cursor() as cursor:
             try:
-                cursor.execute(
-                    "CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
+                self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception as e:
                 # if we want to keep the db, then no need to do any of the below,
                 # just return and skip it all.
@@ -181,11 +182,8 @@ class BaseDatabaseCreation:
                             print("Destroying old test database for alias %s..." % (
                                 self._get_database_display_str(verbosity, test_database_name),
                             ))
-                        cursor.execute(
-                            "DROP DATABASE %s" % qn(test_database_name))
-                        cursor.execute(
-                            "CREATE DATABASE %s %s" % (qn(test_database_name),
-                                                       suffix))
+                        cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
+                        self._execute_create_test_db(cursor, test_db_params, keepdb)
                     except Exception as e:
                         sys.stderr.write(
                             "Got an error recreating the test database: %s\n" % e)
