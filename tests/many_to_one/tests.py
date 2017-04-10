@@ -581,7 +581,7 @@ class ManyToOneTests(TestCase):
         private_student = Student.objects.create(school=private_school)
 
         # Only one school is available via all() due to the custom default manager.
-        self.assertQuerysetEqual(School.objects.all(), ["<School: School object>"])
+        self.assertSequenceEqual(School.objects.all(), [public_school])
 
         self.assertEqual(public_student.school, public_school)
 
