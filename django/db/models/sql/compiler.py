@@ -430,7 +430,7 @@ class SQLCompiler:
             features = self.connection.features
             if combinator:
                 if not getattr(features, 'supports_select_{}'.format(combinator)):
-                    raise DatabaseError('{} not supported on this database backend.'.format(combinator))
+                    raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
                 result = ['SELECT']
@@ -462,8 +462,8 @@ class SQLCompiler:
 
                     if with_limits and not self.connection.features.supports_select_for_update_with_limit:
                         raise NotSupportedError(
-                            'LIMIT/OFFSET not supported with select_for_update'
-                            ' on this database backend.'
+                            'LIMIT/OFFSET is not supported with '
+                            'select_for_update on this database backend.'
                         )
                     nowait = self.query.select_for_update_nowait
                     skip_locked = self.query.select_for_update_skip_locked
@@ -471,9 +471,9 @@ class SQLCompiler:
                     # doesn't support it, raise a DatabaseError to prevent a
                     # possible deadlock.
                     if nowait and not self.connection.features.has_select_for_update_nowait:
-                        raise DatabaseError('NOWAIT is not supported on this database backend.')
+                        raise NotSupportedError('NOWAIT is not supported on this database backend.')
                     elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
-                        raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
+                        raise NotSupportedError('SKIP LOCKED is not supported on this database backend.')
                     for_update_part = self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked)
 
                 if for_update_part and self.connection.features.for_update_after_from:

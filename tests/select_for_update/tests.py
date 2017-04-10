@@ -137,7 +137,7 @@ class SelectForUpdateTests(TransactionTestCase):
         DatabaseError is raised if a SELECT...FOR UPDATE NOWAIT is run on
         a database backend that supports FOR UPDATE but not NOWAIT.
         """
-        with self.assertRaisesMessage(DatabaseError, 'NOWAIT is not supported on this database backend.'):
+        with self.assertRaisesMessage(NotSupportedError, 'NOWAIT is not supported on this database backend.'):
             with transaction.atomic():
                 Person.objects.select_for_update(nowait=True).get()
 
@@ -148,7 +148,7 @@ class SelectForUpdateTests(TransactionTestCase):
         DatabaseError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run on
         a database backend that supports FOR UPDATE but not SKIP LOCKED.
         """
-        with self.assertRaisesMessage(DatabaseError, 'SKIP LOCKED is not supported on this database backend.'):
+        with self.assertRaisesMessage(NotSupportedError, 'SKIP LOCKED is not supported on this database backend.'):
             with transaction.atomic():
                 Person.objects.select_for_update(skip_locked=True).get()
 

@@ -1,5 +1,5 @@
 from django.db.models import F, IntegerField, Value
-from django.db.utils import DatabaseError
+from django.db.utils import DatabaseError, NotSupportedError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Number, ReservedName
@@ -73,8 +73,8 @@ class QuerySetSetOperationTests(TestCase):
     def test_unsupported_intersection_raises_db_error(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.all()
-        msg = 'intersection not supported on this database backend'
-        with self.assertRaisesMessage(DatabaseError, msg):
+        msg = 'intersection is not supported on this database backend'
+        with self.assertRaisesMessage(NotSupportedError, msg):
             list(qs1.intersection(qs2))
 
     def test_combining_multiple_models(self):
