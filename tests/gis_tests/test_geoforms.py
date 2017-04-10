@@ -351,7 +351,27 @@ class OSMWidgetTest(SimpleTestCase):
 
 
 @skipUnlessDBFeature("gis_enabled")
-class CustomGeometryWidgetTest(SimpleTestCase):
+class GeometryWidgetTests(SimpleTestCase):
+
+    def test_subwidgets(self):
+        widget = forms.BaseGeometryWidget()
+        self.assertEqual(
+            list(widget.subwidgets('name', 'value')),
+            [{
+                'is_hidden': False,
+                'attrs': {
+                    'map_srid': 4326,
+                    'map_width': 600,
+                    'geom_type': 'GEOMETRY',
+                    'map_height': 400,
+                    'display_raw': False,
+                },
+                'name': 'name',
+                'template_name': '',
+                'value': 'value',
+                'required': False,
+            }]
+        )
 
     def test_custom_serialization_widget(self):
         class CustomGeometryWidget(forms.BaseGeometryWidget):

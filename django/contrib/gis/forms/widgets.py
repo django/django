@@ -41,6 +41,7 @@ class BaseGeometryWidget(Widget):
         return None
 
     def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
         if value and isinstance(value, str):
@@ -62,7 +63,7 @@ class BaseGeometryWidget(Widget):
         if attrs is None:
             attrs = {}
 
-        context = self.build_attrs(self.attrs, dict(
+        context.update(self.build_attrs(self.attrs, dict(
             name=name,
             module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
@@ -70,7 +71,7 @@ class BaseGeometryWidget(Widget):
             STATIC_URL=settings.STATIC_URL,
             LANGUAGE_BIDI=translation.get_language_bidi(),
             **attrs
-        ))
+        )))
         return context
 
 
