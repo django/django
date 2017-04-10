@@ -71,7 +71,29 @@ class BaseSpatialOperations:
         stored procedure call to the transformation function of the spatial
         backend.
         """
-        raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_placeholder() method')
+        def transform_value(value, field):
+            return (
+                not (value is None or value.srid == field.srid) and
+                self.connection.features.supports_transform
+            )
+
+        if hasattr(value, 'as_sql'):
+            return (
+                '%s(%%s, %s)' % (self.spatial_function_name('Transform'), f.srid)
+                if transform_value(value.output_field, f)
+                else '%s'
+            )
+        if transform_value(value, f):
+            # Add Transform() to the SQL placeholder.
+            return '%s(%s(%%s,%s), %s)' % (
+                self.spatial_function_name('Transform'),
+                self.from_text, value.srid, f.srid,
+            )
+        elif self.connection.features.has_spatialrefsys_table:
+            return '%s(%%s,%s)' % (self.from_text, f.srid)
+        else:
+            # For backwards compatibility on MySQL (#27464).
+            return '%s(%%s)' % self.from_text
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):

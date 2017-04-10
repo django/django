@@ -187,33 +187,9 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         return [dist_param]
 
     def get_geom_placeholder(self, f, value, compiler):
-        """
-        Provide a proper substitution value for Geometries that are not in the
-        SRID of the field.  Specifically, this routine will substitute in the
-        SDO_CS.TRANSFORM() function call.
-        """
-        tranform_func = self.spatial_function_name('Transform')
-
         if value is None:
             return 'NULL'
-
-        def transform_value(val, srid):
-            return val.srid != srid
-
-        if hasattr(value, 'as_sql'):
-            if transform_value(value, f.srid):
-                placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
-            else:
-                placeholder = '%s'
-            # No geometry value used for F expression, substitute in
-            # the column name instead.
-            sql, _ = compiler.compile(value)
-            return placeholder % sql
-        else:
-            if transform_value(value, f.srid):
-                return '%s(SDO_GEOMETRY(%%s, %s), %s)' % (tranform_func, value.srid, f.srid)
-            else:
-                return 'SDO_GEOMETRY(%%s, %s)' % f.srid
+        return super().get_geom_placeholder(f, value, compiler)
 
     def spatial_aggregate_name(self, agg_name):
         """
