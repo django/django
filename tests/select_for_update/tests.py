@@ -134,7 +134,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_unsupported_nowait_raises_error(self):
         """
-        DatabaseError is raised if a SELECT...FOR UPDATE NOWAIT is run on
+        NotSupportedError is raised if a SELECT...FOR UPDATE NOWAIT is run on
         a database backend that supports FOR UPDATE but not NOWAIT.
         """
         with self.assertRaisesMessage(NotSupportedError, 'NOWAIT is not supported on this database backend.'):
@@ -145,8 +145,8 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_unsupported_skip_locked_raises_error(self):
         """
-        DatabaseError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run on
-        a database backend that supports FOR UPDATE but not SKIP LOCKED.
+        NotSupportedError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run
+        on a database backend that supports FOR UPDATE but not SKIP LOCKED.
         """
         with self.assertRaisesMessage(NotSupportedError, 'SKIP LOCKED is not supported on this database backend.'):
             with transaction.atomic():
@@ -189,7 +189,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
     @skipIfDBFeature('supports_select_for_update_with_limit')
     def test_unsupported_select_for_update_with_limit(self):
-        msg = 'LIMIT/OFFSET not supported with select_for_update on this database backend.'
+        msg = 'LIMIT/OFFSET is not supported with select_for_update on this database backend.'
         with self.assertRaisesMessage(NotSupportedError, msg):
             with transaction.atomic():
                 list(Person.objects.all().order_by('pk').select_for_update()[1:2])

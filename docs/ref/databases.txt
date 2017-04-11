@@ -569,7 +569,8 @@ Row locking with ``QuerySet.select_for_update()``
 
 MySQL does not support the ``NOWAIT`` and ``SKIP LOCKED`` options to the
 ``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used with
-``nowait=True`` or ``skip_locked=True`` then a ``DatabaseError`` will be raised.
+``nowait=True`` or ``skip_locked=True``, then a
+:exc:`~django.db.NotSupportedError` is raised.
 
 Automatic typecasting can cause unexpected results
 --------------------------------------------------
