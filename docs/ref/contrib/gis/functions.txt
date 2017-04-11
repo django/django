@@ -359,7 +359,7 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 <https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
 
 Accepts a single geographic linestring or multilinestring field or expression
-and returns its length as an :class:`~django.contrib.gis.measure.Distance`
+and returns its length as a :class:`~django.contrib.gis.measure.Distance`
 measure. On MySQL, a raw float value is returned when the coordinates
 are geodetic.
 
