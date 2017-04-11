@@ -361,7 +361,9 @@ With that ready, we can ask the client to do some work for us::
 
     >>> # get a response from '/'
     >>> response = client.get('/')
-    >>> # we should expect a 404 from that address
+    >>> # we should expect a 404 from that address; if you instead see an
+    >>> # "Invalid HTTP_HOST header" error and a 400 response, you probably
+    >>> # omitted the setup_test_environment() call described earlier.
     >>> response.status_code
     404
     >>> # on the other hand we should expect to find something at '/polls/'
@@ -372,8 +374,6 @@ With that ready, we can ask the client to do some work for us::
     200
     >>> response.content
     b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#39;s up?</a></li>\n    \n    </ul>\n\n'
-    >>> # If the following doesn't work, you probably omitted the call to
-    >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
     <QuerySet [<Question: What's up?>]>
 
