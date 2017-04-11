@@ -2160,8 +2160,8 @@ for example, ``"de"``, then for::
 
     {{ value|time:"TIME_FORMAT" }}
 
-the output will be the string ``"01:23:00"`` (The ``"TIME_FORMAT"`` format
-specifier for the ``de`` locale as shipped with Django is ``"H:i:s"``).
+the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
+specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date (for obvious reasons). If you need to
