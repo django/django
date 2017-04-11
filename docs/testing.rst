@@ -294,3 +294,34 @@ mocked.
 
 You can pass an ``alias`` argument to ``get_next_message``, ``Client`` and ``Channel``
 to use a different layer too.
+
+Live Server Test Case
+---------------------
+
+You can use browser automation libraries like Selenium or Splinter to
+check your application against real layer installation.  Use
+``ChannelLiveServerTestCase`` for your acceptance tests.
+
+.. code:: python
+
+    from channels.test import ChannelLiveServerTestCase
+    from splinter import Browser
+
+    class IntegrationTest(ChannelLiveServerTestCase):
+
+        def test_browse_site_index(self):
+
+            with Browser() as browser:
+
+                browser.visit(self.live_server_url)
+                # the rest of your integration test...
+
+In the test above Daphne and Channels worker processes were fired up.
+These processes run your project against the test database and the
+default channel layer you spacify in the settings.  If channel layer
+support ``flush`` extension, initial cleanup will be done.  So do not
+run this code against your production environment.  When channels
+infrastructure is ready default web browser will be also started.  You
+can open your website in the real browser which can execute JavaScript
+and operate on WebSockets.  ``live_server_ws_url`` property is also
+provided if you decide to run messaging directly from Python.

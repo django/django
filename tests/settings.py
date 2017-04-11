@@ -24,7 +24,7 @@ CHANNEL_LAYERS = {
     'fake_channel': {
         'BACKEND': 'tests.test_management.FakeChannelLayer',
         'ROUTING': [],
-    }
+    },
 }
 
 MIDDLEWARE_CLASSES = []

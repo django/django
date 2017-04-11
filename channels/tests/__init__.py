@@ -5,5 +5,4 @@ warnings.warn(
     DeprecationWarning,
 )
 
-from channels.test.base import TransactionChannelTestCase, ChannelTestCase, Client, apply_routes  # NOQA isort:skip
-from channels.test.http import HttpClient  # NOQA isort:skip
+from channels.test import *  # NOQA isort:skip

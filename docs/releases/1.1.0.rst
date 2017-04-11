@@ -18,7 +18,6 @@ Major Changes
   work but will trigger a deprecation warning, and ``channels.tests`` will be
   removed completely in version 1.3.
 
-
 Minor Changes & Bugfixes
 ------------------------
 

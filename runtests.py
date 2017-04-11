@@ -10,6 +10,7 @@ if __name__ == "__main__":
     os.environ['DJANGO_SETTINGS_MODULE'] = "tests.settings"
     django.setup()
     TestRunner = get_runner(settings)
+    tests = sys.argv[1:] or ["tests"]
     test_runner = TestRunner()
-    failures = test_runner.run_tests(["tests"])
+    failures = test_runner.run_tests(tests)
     sys.exit(bool(failures))

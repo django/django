@@ -22,7 +22,7 @@ setup(
             'mock ; python_version < "3.0"',
             'flake8>=2.0,<3.0',
             'isort',
-        ]
+        ],
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
