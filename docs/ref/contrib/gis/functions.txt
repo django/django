@@ -359,19 +359,19 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 <https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
 
 Accepts a single geographic linestring or multilinestring field or expression
-and returns its length as an :class:`~django.contrib.gis.measure.Distance`
-measure. On MySQL, a raw float value is returned when the coordinates
-are geodetic.
+and returns its length as a :class:`~django.contrib.gis.measure.Distance`
+measure.
 
 On PostGIS and SpatiaLite, when the coordinates are geodetic (angular), you can
 specify if the calculation should be based on a simple sphere (less
 accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive) with the ``spheroid`` keyword argument.
 
+MySQL doesn't support length calculations on geographic SRSes.
+
 .. versionchanged:: 1.11
 
-    In older versions, a raw value was returned on MySQL when used on
-    projected SRS.
+    In older versions, a raw value was returned on MySQL.
 
 ``LineLocatePoint``
 ===================
