@@ -71,6 +71,41 @@ class WorkerTests(ChannelTestCase):
         message = self.get_next_message('test', require=True)
         self.assertEqual(message.content, {'test': 'value'})
 
+    def test_channel_full(self):
+        """
+        Tests that when channel capacity is hit when processing due messages,
+        message is requeued instead of dropped
+        """
+        for i in range(10):
+            Channel('asgi.delay').send({
+                'channel': 'test',
+                'delay': 1000,
+                'content': {'test': 'value'}
+            }, immediately=True)
+
+        worker = PatchedWorker(channel_layers[DEFAULT_CHANNEL_LAYER])
+        worker.termed = 10
+        worker.run()
+
+        for i in range(1):
+            Channel('asgi.delay').send({
+                'channel': 'test',
+                'delay': 1000,
+                'content': {'test': 'value'}
+            }, immediately=True)
+
+        worker = PatchedWorker(channel_layers[DEFAULT_CHANNEL_LAYER])
+        worker.termed = 1
+        worker.run()
+
+        self.assertEqual(DelayedMessage.objects.count(), 11)
+
+        with mock.patch('django.utils.timezone.now', return_value=timezone.now() + timedelta(milliseconds=2000)):
+            worker.termed = 1
+            worker.run()
+
+        self.assertEqual(DelayedMessage.objects.count(), 1)
+
 
 class DelayedMessageTests(ChannelTestCase):
 

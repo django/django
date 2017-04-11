@@ -30,15 +30,20 @@ class DelayedMessage(models.Model):
         self._delay = milliseconds
         self.due_date = timezone.now() + timedelta(milliseconds=milliseconds)
 
-    def send(self, channel_layer=None):
+    def send(self, channel_layer=None, requeue_delay=1000):
         """
         Sends the message on the configured channel with the stored content.
 
-        Deletes the DelayedMessage record.
+        Deletes the DelayedMessage record if successfully sent.
 
         Args:
             channel_layer: optional channel_layer to use
+            requeue_delay: if the channel is full, milliseconds to wait before requeue
         """
         channel_layer = channel_layer or channel_layers[DEFAULT_CHANNEL_LAYER]
-        Channel(self.channel_name, channel_layer=channel_layer).send(json.loads(self.content), immediately=True)
-        self.delete()
+        try:
+            Channel(self.channel_name, channel_layer=channel_layer).send(json.loads(self.content), immediately=True)
+            self.delete()
+        except channel_layer.ChannelFull:
+            self.delay = requeue_delay
+            self.save()
