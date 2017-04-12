@@ -74,9 +74,8 @@ class SessionStore(SessionBase):
         generate a secure url-safe Base64-encoded string of data as our
         session key.
         """
-        session_cache = getattr(self, '_session_cache', {})
         return signing.dumps(
-            session_cache, compress=True,
+            self._session, compress=True,
             salt='django.contrib.sessions.backends.signed_cookies',
             serializer=self.serializer,
         )

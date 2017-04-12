@@ -306,10 +306,7 @@ class SessionBase(object):
         """
         Creates a new session key, while retaining the current session data.
         """
-        try:
-            data = self._session_cache
-        except AttributeError:
-            data = {}
+        data = self._session
         key = self.session_key
         self.create()
         self._session_cache = data
