@@ -84,19 +84,19 @@ class WorkerProcess(ProcessSetup):
         try:
             self.common_setup()
             channel_layers = ChannelLayerManager()
-            check_default = channel_layers[DEFAULT_CHANNEL_LAYER].router.check_default
+            channel_layer = channel_layers.make_test_backend(DEFAULT_CHANNEL_LAYER)
             if self.serve_static and apps.is_installed('django.contrib.staticfiles'):
-                check_default(http_consumer=StaticFilesConsumer())
+                channel_layer.router.check_default(http_consumer=StaticFilesConsumer())
             else:
-                check_default()
+                channel_layer.router.check_default()
             if self.n_threads == 1:
                 self.worker = Worker(
-                    channel_layer=channel_layers[DEFAULT_CHANNEL_LAYER],
+                    channel_layer=channel_layer,
                     signal_handlers=False,
                 )
             else:
                 self.worker = WorkerGroup(
-                    channel_layer=channel_layers[DEFAULT_CHANNEL_LAYER],
+                    channel_layer=channel_layer,
                     signal_handlers=False,
                     n_threads=self.n_threads,
                 )
@@ -127,8 +127,9 @@ class DaphneProcess(ProcessSetup):
         try:
             self.common_setup()
             channel_layers = ChannelLayerManager()
+            channel_layer = channel_layers.make_test_backend(DEFAULT_CHANNEL_LAYER)
             self.server = Server(
-                channel_layer=channel_layers[DEFAULT_CHANNEL_LAYER],
+                channel_layer=channel_layer,
                 endpoints=['tcp:interface=%s:port=0' % (self.host)],
                 signal_handlers=False,
             )
@@ -183,7 +184,7 @@ class ChannelLiveServerTestCase(TransactionTestCase):
                 'ChannelLiveServerTestCase does not support multiple CHANNEL_LAYERS at this time'
             )
 
-        channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
+        channel_layer = channel_layers.make_test_backend(DEFAULT_CHANNEL_LAYER)
         if 'flush' in channel_layer.extensions:
             channel_layer.flush()
 

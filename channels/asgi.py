@@ -26,6 +26,23 @@ class ChannelLayerManager(object):
         return getattr(settings, "CHANNEL_LAYERS", {})
 
     def make_backend(self, name):
+        """
+        Instantiate channel layer.
+        """
+        config = self.configs[name].get("CONFIG", {})
+        return self._make_backend(name, config)
+
+    def make_test_backend(self, name):
+        """
+        Instantiate channel layer using its test config.
+        """
+        try:
+            config = self.configs[name]["TEST_CONFIG"]
+        except KeyError:
+            raise InvalidChannelLayerError("No TEST_CONFIG specified for %s" % name)
+        return self._make_backend(name, config)
+
+    def _make_backend(self, name, config):
         # Load the backend class
         try:
             backend_class = import_string(self.configs[name]['BACKEND'])
@@ -41,7 +58,7 @@ class ChannelLayerManager(object):
         except KeyError:
             raise InvalidChannelLayerError("No ROUTING specified for %s" % name)
         # Initialise and pass config
-        asgi_layer = backend_class(**self.configs[name].get("CONFIG", {}))
+        asgi_layer = backend_class(**config)
         return ChannelLayerWrapper(
             channel_layer=asgi_layer,
             alias=name,

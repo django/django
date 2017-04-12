@@ -299,8 +299,26 @@ Live Server Test Case
 ---------------------
 
 You can use browser automation libraries like Selenium or Splinter to
-check your application against real layer installation.  Use
-``ChannelLiveServerTestCase`` for your acceptance tests.
+check your application against real layer installation.  First of all
+provide ``TEST_CONFIG`` setting to prevent overlapping with running
+dev environment.
+
+.. code:: python
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgi_redis.RedisChannelLayer",
+            "ROUTING": "my_project.routing.channel_routing",
+            "CONFIG": {
+                "hosts": [("redis-server-name", 6379)],
+            },
+            "TEST_CONFIG": {
+                "hosts": [("localhost", 6379)],
+            },
+        },
+    }
+
+Now use ``ChannelLiveServerTestCase`` for your acceptance tests.
 
 .. code:: python
 
