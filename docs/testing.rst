@@ -325,3 +325,16 @@ infrastructure is ready default web browser will be also started.  You
 can open your website in the real browser which can execute JavaScript
 and operate on WebSockets.  ``live_server_ws_url`` property is also
 provided if you decide to run messaging directly from Python.
+
+By default live server test case will serve static files.  To disable
+this feature override `serve_static` class attribute.
+
+.. code:: python
+
+    class IntegrationTest(ChannelLiveServerTestCase):
+
+        serve_static = False
+
+        def test_websocket_message(self):
+            # JS and CSS are not available in this test.
+            ...

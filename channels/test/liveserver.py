@@ -2,6 +2,7 @@ import multiprocessing
 
 import django
 from daphne.server import Server
+from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections
 from django.db.utils import load_backend
@@ -67,13 +68,14 @@ class ProcessSetup(multiprocessing.Process):
 class WorkerProcess(ProcessSetup):
 
     def __init__(self, is_ready, n_threads, overridden_settings,
-                 modified_settings, databases):
+                 modified_settings, databases, serve_static):
 
         self.is_ready = is_ready
         self.n_threads = n_threads
         self.overridden_settings = overridden_settings
         self.modified_settings = modified_settings
         self.databases = databases
+        self.serve_static = serve_static
         super(WorkerProcess, self).__init__()
         self.daemon = True
 
@@ -82,9 +84,11 @@ class WorkerProcess(ProcessSetup):
         try:
             self.common_setup()
             channel_layers = ChannelLayerManager()
-            channel_layers[DEFAULT_CHANNEL_LAYER].router.check_default(
-                http_consumer=StaticFilesConsumer(),
-            )
+            check_default = channel_layers[DEFAULT_CHANNEL_LAYER].router.check_default
+            if self.serve_static and apps.is_installed('django.contrib.staticfiles'):
+                check_default(http_consumer=StaticFilesConsumer())
+            else:
+                check_default()
             if self.n_threads == 1:
                 self.worker = Worker(
                     channel_layer=channel_layers[DEFAULT_CHANNEL_LAYER],
@@ -153,6 +157,7 @@ class ChannelLiveServerTestCase(TransactionTestCase):
     ProtocolServerProcess = DaphneProcess
     WorkerProcess = WorkerProcess
     worker_threads = 1
+    serve_static = True
 
     @property
     def live_server_url(self):
@@ -204,6 +209,7 @@ class ChannelLiveServerTestCase(TransactionTestCase):
             self._overridden_settings,
             self._modified_settings,
             connections.databases,
+            self.serve_static,
         )
         self._worker_process.start()
         worker_ready.wait()
