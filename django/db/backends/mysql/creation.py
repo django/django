@@ -17,24 +17,45 @@ class DatabaseCreation(BaseDatabaseCreation):
             suffix.append('COLLATE %s' % test_settings['COLLATION'])
         return ' '.join(suffix)
 
+    def _execute_create_test_db(self, cursor, parameters, keepdb=False):
+        try:
+            if keepdb:
+                # If the database should be kept, add "IF NOT EXISTS" to avoid
+                # "database exists" error, also temporarily disable "database
+                # exists" warning.
+                cursor.execute('''
+                    SET @_tmp_sql_notes := @@sql_notes, sql_notes = 0;
+                    CREATE DATABASE IF NOT EXISTS %(dbname)s %(suffix)s;
+                    SET sql_notes = @_tmp_sql_notes;
+                ''' % parameters)
+            else:
+                super()._execute_create_test_db(cursor, parameters, keepdb)
+        except Exception as e:
+            if len(e.args) < 1 or e.args[0] != 1007:
+                # All errors except "database exists" (1007) cancel tests.
+                sys.stderr.write('Got an error creating the test database: %s\n' % e)
+                sys.exit(2)
+            else:
+                raise e
+
     def _clone_test_db(self, number, verbosity, keepdb=False):
-        qn = self.connection.ops.quote_name
         source_database_name = self.connection.settings_dict['NAME']
         target_database_name = self.get_test_db_clone_settings(number)['NAME']
-
+        test_db_params = {
+            'dbname': self.connection.ops.quote_name(target_database_name),
+            'suffix': self.sql_table_creation_suffix(),
+        }
         with self._nodb_connection.cursor() as cursor:
             try:
-                cursor.execute("CREATE DATABASE %s" % qn(target_database_name))
+                self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception:
-                if keepdb:
-                    return
                 try:
                     if verbosity >= 1:
                         print("Destroying old test database for alias %s..." % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
-                    cursor.execute("DROP DATABASE %s" % qn(target_database_name))
-                    cursor.execute("CREATE DATABASE %s" % qn(target_database_name))
+                    cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
+                    self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)

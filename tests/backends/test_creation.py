@@ -8,6 +8,8 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
+from django.db.backends.mysql.creation import \
+    DatabaseCreation as MySQLDatabaseCreation
 from django.db.backends.oracle.creation import \
     DatabaseCreation as OracleDatabaseCreation
 from django.db.backends.postgresql.creation import \
@@ -191,3 +193,39 @@ class OracleDatabaseCreationTests(TestCase):
                     creation._create_test_db(verbosity=0, keepdb=False)
                 with self.assertRaises(SystemExit):
                     creation._create_test_db(verbosity=0, keepdb=True)
+
+
+@unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific tests")
+class MySQLDatabaseCreationTests(SimpleTestCase):
+
+    def _execute_raise_database_exists(self, cursor, parameters, keepdb=False):
+        raise DatabaseError(1007, "Can't create database '%s'; database exists" % parameters['dbname'])
+
+    def _execute_raise_access_denied(self, cursor, parameters, keepdb=False):
+        raise DatabaseError(1044, "Access denied for user")
+
+    def patch_test_db_creation(self, execute_create_test_db):
+        return mock.patch.object(BaseDatabaseCreation, '_execute_create_test_db', execute_create_test_db)
+
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    @mock.patch('sys.stderr', new_callable=StringIO)
+    def test_create_test_db_database_exists(self, *mocked_objects):
+        # Simulate test database creation raising "database exists"
+        creation = MySQLDatabaseCreation(connection)
+        with self.patch_test_db_creation(self._execute_raise_database_exists):
+            with mock.patch('builtins.input', return_value='no'):
+                with self.assertRaises(SystemExit):
+                    # SystemExit is raised if the user answers "no" to the
+                    # prompt asking if it's okay to delete the test database.
+                    creation._create_test_db(verbosity=0, autoclobber=False, keepdb=False)
+            # "Database exists" shouldn't appear when keepdb is on
+            creation._create_test_db(verbosity=0, autoclobber=False, keepdb=True)
+
+    @mock.patch('sys.stdout', new_callable=StringIO)
+    @mock.patch('sys.stderr', new_callable=StringIO)
+    def test_create_test_db_unexpected_error(self, *mocked_objects):
+        # Simulate test database creation raising unexpected error
+        creation = MySQLDatabaseCreation(connection)
+        with self.patch_test_db_creation(self._execute_raise_access_denied):
+            with self.assertRaises(SystemExit):
+                creation._create_test_db(verbosity=0, autoclobber=False, keepdb=False)
