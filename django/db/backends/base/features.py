@@ -107,6 +107,10 @@ class BaseDatabaseFeatures:
     # in the SQL standard.
     supports_tablespaces = False
 
+    # Does the backend support schemas?
+    # Default to False for backwards compatibility
+    supports_schemas = False
+
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
 
