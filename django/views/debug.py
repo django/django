@@ -299,7 +299,7 @@ class ExceptionReporter:
             'frames': frames,
             'request': self.request,
             'user_str': user_str,
-            'filtered_POST_items': self.filter.get_post_parameters(self.request).items(),
+            'filtered_POST_items': list(self.filter.get_post_parameters(self.request).items()),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
