@@ -199,7 +199,8 @@ The functions defined in this module share the following properties:
     Python 2. Under Python 3 it does nothing.
 
     To support Python 2 and 3 with a single code base, define a ``__str__``
-    method returning text and apply this decorator to the class.
+    method returning text (use ``six.text_type()`` if you're doing some
+    casting) and apply this decorator to the class.
 
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
