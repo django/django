@@ -516,7 +516,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'password'``
     * ``template_name``: ``'django/forms/widgets/password.html'``
-    * Renders as: ``<input type='password' ...>``
+    * Renders as: ``<input type="password" ...>``
 
     Takes one optional argument:
 
@@ -532,7 +532,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'hidden'``
     * ``template_name``: ``'django/forms/widgets/hidden.html'``
-    * Renders as: ``<input type='hidden' ...>``
+    * Renders as: ``<input type="hidden" ...>``
 
     Note that there also is a :class:`MultipleHiddenInput` widget that
     encapsulates a set of hidden input elements.
@@ -544,7 +544,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'text'``
     * ``template_name``: ``'django/forms/widgets/date.html'``
-    * Renders as: ``<input type='text' ...>``
+    * Renders as: ``<input type="text" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
 
@@ -563,7 +563,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'text'``
     * ``template_name``: ``'django/forms/widgets/datetime.html'``
-    * Renders as: ``<input type='text' ...>``
+    * Renders as: ``<input type="text" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
 
@@ -586,7 +586,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     * ``input_type``: ``'text'``
     * ``template_name``: ``'django/forms/widgets/time.html'``
-    * Renders as: ``<input type='text' ...>``
+    * Renders as: ``<input type="text" ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
 
@@ -614,7 +614,7 @@ Selector and checkbox widgets
 -----------------------------
 
 These widgets make use of the HTML elements ``<select>``,
-``<input type='checkbox'>``, and ``<input type='radio'>``.
+``<input type="checkbox">``, and ``<input type="radio">``.
 
 Widgets that render multiple choices have an ``option_template_name`` attribute
 that specifies the template used to render each choice. For example, for the
@@ -628,7 +628,7 @@ that specifies the template used to render each choice. For example, for the
 
     * ``input_type``: ``'checkbox'``
     * ``template_name``: ``'django/forms/widgets/checkbox.html'``
-    * Renders as: ``<input type='checkbox' ...>``
+    * Renders as: ``<input type="checkbox" ...>``
 
     Takes one optional argument:
 
@@ -671,7 +671,7 @@ that specifies the template used to render each choice. For example, for the
     * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
 
     Similar to :class:`Select`, but allows multiple selection:
-    ``<select multiple='multiple'>...</select>``
+    ``<select multiple="multiple">...</select>``
 
 ``RadioSelect``
 ~~~~~~~~~~~~~~~
@@ -687,7 +687,7 @@ that specifies the template used to render each choice. For example, for the
     .. code-block:: html
 
         <ul>
-          <li><input type='radio' name='...'></li>
+          <li><input type="radio" name="..."></li>
           ...
         </ul>
 
@@ -782,7 +782,7 @@ that specifies the template used to render each choice. For example, for the
     .. code-block:: html
 
         <ul>
-          <li><input type='checkbox' name='...' ></li>
+          <li><input type="checkbox" name="..." ></li>
           ...
         </ul>
 
@@ -809,7 +809,7 @@ File upload widgets
 .. class:: FileInput
 
     * ``template_name``: ``'django/forms/widgets/file.html'``
-    * Renders as: ``<input type='file' ...>``
+    * Renders as: ``<input type="file" ...>``
 
 ``ClearableFileInput``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -817,7 +817,7 @@ File upload widgets
 .. class:: ClearableFileInput
 
     * ``template_name``: ``'django/forms/widgets/clearable_file_input.html'``
-    * Renders as: ``<input type='file' ...>`` with an additional checkbox
+    * Renders as: ``<input type="file" ...>`` with an additional checkbox
       input to clear the field's value, if the field is not required and has
       initial data.
 
@@ -832,7 +832,7 @@ Composite widgets
 .. class:: MultipleHiddenInput
 
     * ``template_name``: ``'django/forms/widgets/multiple_hidden.html'``
-    * Renders as: multiple ``<input type='hidden' ...>`` tags
+    * Renders as: multiple ``<input type="hidden" ...>`` tags
 
     A widget that handles multiple hidden widgets for fields that have a list
     of values.
