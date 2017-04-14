@@ -65,32 +65,16 @@
   </style>
   {% if not is_email %}
   <script type="text/javascript">
-    function getElementsByClassName(oElm, strTagName, strClassName){
-        // Written by Jonathan Snook, http://www.snook.ca/jon; Add-ons by Robert Nyman, http://www.robertnyman.com
-        var arrElements = (strTagName == "*" && document.all)? document.all :
-        oElm.getElementsByTagName(strTagName);
-        var arrReturnElements = new Array();
-        strClassName = strClassName.replace(/\-/g, "\\-");
-        var oRegExp = new RegExp("(^|\\s)" + strClassName + "(\\s|$)");
-        var oElement;
-        for(var i=0; i<arrElements.length; i++){
-            oElement = arrElements[i];
-            if(oRegExp.test(oElement.className)){
-                arrReturnElements.push(oElement);
-            }
-        }
-        return (arrReturnElements)
-    }
     function hideAll(elems) {
       for (var e = 0; e < elems.length; e++) {
         elems[e].style.display = 'none';
       }
     }
     window.onload = function() {
-      hideAll(getElementsByClassName(document, 'table', 'vars'));
-      hideAll(getElementsByClassName(document, 'ol', 'pre-context'));
-      hideAll(getElementsByClassName(document, 'ol', 'post-context'));
-      hideAll(getElementsByClassName(document, 'div', 'pastebin'));
+      hideAll(document.querySelectorAll('table.vars'));
+      hideAll(document.querySelectorAll('ol.pre-context'));
+      hideAll(document.querySelectorAll('ol.post-context'));
+      hideAll(document.querySelectorAll('div.pastebin'));
     }
     function toggle() {
       for (var i = 0; i < arguments.length; i++) {
