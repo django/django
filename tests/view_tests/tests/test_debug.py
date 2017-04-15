@@ -290,6 +290,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<h2>Traceback ', html)
         self.assertIn('<h2>Request information</h2>', html)
         self.assertNotIn('<p>Request data not supplied</p>', html)
+        self.assertIn('<p>No POST data</p>', html)
 
     def test_no_request(self):
         "An exception report can be generated without request"
