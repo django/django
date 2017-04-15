@@ -338,6 +338,12 @@ Now you're ready to actually put the release out there. To do this:
    database (this will automatically flip it to ``False`` for all
    others); you can do this using the site's admin.
 
+   Create new ``DocumentRelease`` objects for each language that has an entry
+   for the previous release. Update djangoproject.com's `robots.docs.txt`__
+   file by copying entries from the previous release.
+
+   __ https://github.com/django/djangoproject.com/blob/master/djangoproject/static/robots.docs.txt
+
 #. Post the release announcement to the |django-announce|, |django-developers|,
    and |django-users| mailing lists. This should include a link to the
    announcement blog post. If this is a security release, also include
