@@ -21,3 +21,6 @@ Bugfixes
 
 * Fixed ``QuerySet.filter()`` crash when it references the name of a
   ``OneToOneField`` primary key (:ticket:`28047`).
+
+* Fixed empty POST data table appearing instead of "No POST data" in HTML debug
+  page (:ticket:`28079`).
