@@ -22,6 +22,7 @@ of the Channels sub-projects:
  * `Daphne issues <https://github.com/django/daphne/issues/>`_, for the HTTP and Websocket termination
  * `asgiref issues <https://github.com/django/asgiref/issues/>`_, for the base ASGI library/memory backend
  * `asgi_redis issues <https://github.com/django/asgi_redis/issues/>`_, for the Redis channel backend
+ * `asgi_rabbitmq <https://github.com/proofit404/asgi_rabbitmq/>`_, for the RabbitMQ channel backend
  * `asgi_ipc issues <https://github.com/django/asgi_ipc/issues/>`_, for the POSIX IPC channel backend
 
 Issues are categorized by difficulty level:

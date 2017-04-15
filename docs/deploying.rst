@@ -79,6 +79,19 @@ Make sure the same settings file is used across all your workers and interface
 servers; without it, they won't be able to talk to each other and things
 will just fail to work.
 
+If you prefer to use RabbitMQ layer, please refer to its
+`documentation <http://asgi-rabbitmq.readthedocs.io/en/latest/>`_.
+Usually your config will end up like this::
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgi_rabbitmq.RabbitmqChannelLayer",
+            "ROUTING": "my_project.routing.channel_routing",
+            "CONFIG": {
+                "url": "amqp://guest:guest@rabbitmq:5672/%2F",
+            },
+        },
+    }
 
 Run worker servers
 ------------------

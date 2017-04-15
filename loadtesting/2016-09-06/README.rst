@@ -1,5 +1,5 @@
 Django Channels Load Testing Results for (2016-09-06)
-===============
+=====================================================
 
 The goal of these load tests is to see how Channels performs with normal HTTP traffic under heavy load.
 
@@ -11,7 +11,7 @@ comparison to a WSGI HTTP server. Gunincorn was chosen as its configuration was 
 
 
 Summary of Results
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 Daphne is not as efficient as its WSGI counterpart. When considering only latency, Daphne can have 10 times the latency
 when under the same traffic load as gunincorn. When considering only throughput, Daphne can have 40-50% of the total
@@ -29,7 +29,7 @@ Some additional things that should be tested:
 
 
 Methodology
-~~~~~~~~~~~~
+~~~~~~~~~~~
 
 In order to control for variances, several measures were taken:
 
@@ -42,7 +42,7 @@ In order to control for variances, several measures were taken:
 
 
 Setups
-~~~~~~~~~~~~
+~~~~~~
 
 3 setups were used for this set of tests:
 
@@ -52,7 +52,7 @@ Setups
 
 
 Latency
-~~~~~~~~~~~~
+~~~~~~~
 
 All target and sources machines were identical ec2 instances m3.2xlarge running Ubuntu 16.04.
 
@@ -63,7 +63,7 @@ In order to ensure that the same number of requests were sent, the rps flag was 
 
 
 Throughput
-~~~~~~~~~~~~
+~~~~~~~~~~
 
 The same source machine was used for all tests: ec2 instance m3.large running Ubuntu 16.04.
 All target machines were identical ec2 instances m3.2xlarge running Ubuntu 16.04.
@@ -77,7 +77,7 @@ Gunicorn had a latency of 6 ms; daphne and Redis, 12 ms; daphne and IPC,  35 ms.
 
 
 Supervisor Configs
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 **Gunicorn (19.6.0)**
 
@@ -89,7 +89,7 @@ This is the non-channels config. It's a standard Django environment on one machi
   command = gunicorn testproject.wsgi_no_channels -b 0.0.0.0:80
   directory = /srv/channels/testproject/
   user = root
-  
+
   [group:django_http]
   programs=gunicorn
   priority=999
@@ -107,13 +107,13 @@ Also, it's a single worker, not multiple, as that's the default config.
   command = daphne -b 0.0.0.0 -p 80 testproject.asgi:channel_layer
   directory = /srv/channels/testproject/
   user = root
-  
+
   [program:worker]
   command = python manage.py runworker
   directory = /srv/channels/testproject/
   user = django-channels
-  
-  
+
+
   [group:django_channels]
   programs=daphne,worker
   priority=999
@@ -130,13 +130,13 @@ This is the channels config using IPC (Inter Process Communication). It's only p
   command = daphne -b 0.0.0.0 -p 80 testproject.asgi_for_ipc:channel_layer
   directory = /srv/channels/testproject/
   user = root
-  
+
   [program:worker]
   command = python manage.py runworker --settings=testproject.settings.channels_ipc
   directory = /srv/channels/testproject/
   user = root
-  
-  
+
+
   [group:django_channels]
   programs=daphne,worker
   priority=999

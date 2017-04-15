@@ -29,7 +29,8 @@ Support can be obtained either here via issues, or in the ``#django-channels``
 channel on Freenode.
 
 You can install channels from PyPI as the ``channels`` package.
-You'll likely also want to ``asgi_redis`` to provide the Redis channel layer.
+You'll likely also want to install ``asgi_redis`` or ``asgi_rabbitmq``
+to provide the Redis/RabbitMQ channel layer correspondingly.
 See our `installation <https://channels.readthedocs.io/en/latest/installation.html>`_
 and `getting started <https://channels.readthedocs.io/en/latest/getting-started.html>`_ docs for more.
 
@@ -78,4 +79,5 @@ The Channels project is made up of several packages; the others are:
 * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
 * `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library/memory backend
 * `asgi_redis <https://github.com/django/asgi_redis/>`_, the Redis channel backend
+* `asgi_rabbitmq <https://github.com/proofit404/asgi_rabbitmq/>`_, the RabbitMQ channel backend
 * `asgi_ipc <https://github.com/django/asgi_ipc/>`_, the POSIX IPC channel backend

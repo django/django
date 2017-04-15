@@ -54,6 +54,31 @@ the consistent hashing model relies on all running clients having the same
 settings. Any misconfigured interface server or worker will drop some or all
 messages.
 
+RabbitMQ
+--------
+
+RabbitMQ layer is comparable to Redis in terms of latency and
+throughput.  It can work with single RabbitMQ node and with Erlang
+cluster.
+
+You need to install layer package from PyPI::
+
+    pip install -U asgi_rabbitmq
+
+To use it you also need provide link to the virtual host with granted
+permissions::
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgi_rabbitmq.RabbitmqChannelLayer",
+            "ROUTING": "???",
+            "CONFIG": {
+                "url": "amqp://guest:guest@rabbitmq:5672/%2F",
+            },
+        },
+    }
+
+This layer has complete `documentation <http://asgi-rabbitmq.readthedocs.io/en/latest/>`_ on its own.
 
 IPC
 ---
