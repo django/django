@@ -24,3 +24,6 @@ Bugfixes
 
 * Fixed empty POST data table appearing instead of "No POST data" in HTML debug
   page (:ticket:`28079`).
+
+* Restored ``BoundField``\s without any ``choices`` evaluating to ``True``
+  (:ticket:`28058`).

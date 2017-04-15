@@ -746,6 +746,13 @@ Java</label></li>
             [str(bf[1]), str(bf[2]), str(bf[3])],
         )
 
+    def test_boundfield_bool(self):
+        """BoundField without any choices (subwidgets) evaluates to True."""
+        class TestForm(Form):
+            name = ChoiceField(choices=[])
+
+        self.assertIs(bool(TestForm()['name']), True)
+
     def test_forms_with_multiple_choice(self):
         # MultipleChoiceField is a special case, as its data is required to be a list:
         class SongForm(Form):

@@ -53,6 +53,10 @@ class BoundField:
             for widget in self.field.widget.subwidgets(self.html_name, self.value(), attrs=attrs)
         )
 
+    def __bool__(self):
+        # BoundField evaluates to True even if it doesn't have subwidgets.
+        return True
+
     def __iter__(self):
         return iter(self.subwidgets)
 
