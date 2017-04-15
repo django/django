@@ -36,3 +36,7 @@ Bugfixes
 
 * Allowed prefetch calls on managers with custom ``ModelIterable`` subclasses
   (:ticket:`28096`).
+
+* Restored the output of the ``class`` attribute in the ``<ul>`` of widgets
+  that use the ``multiple_input.html`` template. This fixes
+  ``ModelAdmin.radio_fields`` with ``admin.HORIZONTAL`` (:ticket:`28059`).
