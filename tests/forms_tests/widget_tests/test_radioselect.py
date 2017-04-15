@@ -84,3 +84,18 @@ class RadioSelectTest(WidgetTest):
         </ul>
         """
         self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', attrs={'id': 'bar'}, html=html)
+
+    def test_class_attrs(self):
+        """
+        The <ul> in the multiple_input.html widget template include the class
+        attribute.
+        """
+        html = """
+        <ul class="bar">
+        <li><label><input checked type="radio" class="bar" value="J" name="beatle" /> John</label></li>
+        <li><label><input type="radio" class="bar" value="P" name="beatle" /> Paul</label></li>
+        <li><label><input type="radio" class="bar" value="G" name="beatle" /> George</label></li>
+        <li><label><input type="radio" class="bar" value="R" name="beatle" /> Ringo</label></li>
+        </ul>
+        """
+        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', attrs={'class': 'bar'}, html=html)
