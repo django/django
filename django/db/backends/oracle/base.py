@@ -451,7 +451,7 @@ class FormatStylePlaceholderCursor:
             # Handle params as sequence
             args = [(':arg%d' % i) for i in range(len(params))]
             query = query % tuple(args)
-        return force_text(query, self.charset), self._format_params(params)
+        return query, self._format_params(params)
 
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params, unify_by_values=True)
