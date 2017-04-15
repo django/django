@@ -31,7 +31,7 @@ from .fields import (
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
     BookForeignObj, BookWeak, BookWithLongName, BookWithO2O, BookWithoutAuthor,
-    BookWithSlug, IntegerPK, Node, Note, NoteInfoIndexed, NoteRename, Tag, TagIndexed,
+    BookWithSlug, IntegerPK, Node, Note, NoteRename, Tag, TagIndexed,
     TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
@@ -1656,6 +1656,12 @@ class SchemaTests(TransactionTestCase):
         """
         MySQL do not support indexing of blob/text/json fields
         """
+        class NoteInfoIndexed(Model):
+            info = TextField(db_index=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(NoteInfoIndexed)
@@ -2310,8 +2316,8 @@ class SchemaTests(TransactionTestCase):
         student = Student.objects.create(name='Some man')
         doc.students.add(student)
 
-    @skipIfDBFeature('supports_index_on_textfield')
-    def test_db_feature_supports_index_on_textfield(self):
+    @skipIfDBFeature('supports_index_on_text_field')
+    def test_db_feature_supports_index_on_text_field(self):
         class NoteInfoTextFieldIndexed(Model):
             info = TextField(db_index=True)
 

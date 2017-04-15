@@ -124,13 +124,6 @@ class NoteRename(models.Model):
         db_table = "schema_note"
 
 
-class NoteInfoIndexed(models.Model):
-    info = models.TextField(db_index=True)
-
-    class Meta:
-        apps = new_apps
-
-
 class Tag(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)

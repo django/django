@@ -44,6 +44,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             }
         )
 
+    def index_not_supported(self, field):
+        """
+        MySQL doesn't support index on following fields
+        """
+        db_type = field.db_type(self.connection)
+        return (
+            db_type is not None and
+            db_type.lower() in {
+                'tinyblob', 'blob', 'mediumblob', 'longblob',
+                'tinytext', 'text', 'mediumtext', 'longtext',
+                'json',
+            }
+        )
+
     def add_field(self, model, field):
         super().add_field(model, field)
 
@@ -70,8 +84,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field.db_constraint):
             return False
         # MySQL's blob/text/json fields do not support indexing of whole field
-        # https://code.djangoproject.com/ticket/27859
-        if field.get_internal_type() == 'TextField':
+        if self.index_not_supported(field):
             return False
         return create_index
 
