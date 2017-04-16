@@ -233,7 +233,6 @@ with creating::
             # create target entity
             value = IntegerValue.objects.create(name='fifty', value=50)
 
-            consumer_finished.send(sender=None)
             received = client.receive()  # receive outbound binding message
             self.assertIsNotNone(received)
 
