@@ -112,8 +112,7 @@ class WebsocketBinding(Binding):
                 "fields": data,
             }
         ]
-        # TODO: Avoid the JSON roundtrip by using encoder directly?
-        return list(serializers.deserialize("json", json.dumps(s_data)))[0]
+        return list(serializers.deserialize("python", s_data))[0]
 
     def create(self, data):
         self._hydrate(None, data).save()
