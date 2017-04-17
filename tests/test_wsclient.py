@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 from django.http.cookie import parse_cookie
 
-from channels.test import ChannelTestCase, HttpClient
+from channels.test import ChannelTestCase, WSClient
 
 
-class HttpClientTests(ChannelTestCase):
+class WSClientTests(ChannelTestCase):
     def test_cookies(self):
-        client = HttpClient()
+        client = WSClient()
         client.set_cookie('foo', 'not-bar')
         client.set_cookie('foo', 'bar')
         client.set_cookie('qux', 'qu;x')

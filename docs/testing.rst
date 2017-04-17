@@ -128,7 +128,7 @@ purpose use ``send_and_consume`` method::
             self.assertEqual(client.receive(), {'all is': 'done'})
 
 
-You can use ``HttpClient`` for websocket related consumers. It automatically serializes JSON content,
+You can use ``WSClient`` for websocket related consumers. It automatically serializes JSON content,
 manage cookies and headers, give easy access to the session and add ability to authorize your requests.
 For example::
 
@@ -146,13 +146,13 @@ For example::
 
     # tests.py
     from channels import Group
-    from channels.test import ChannelTestCase, HttpClient
+    from channels.test import ChannelTestCase, WSClient
 
 
     class RoomsTests(ChannelTestCase):
 
         def test_rooms(self):
-            client = HttpClient()
+            client = WSClient()
             user = User.objects.create_user(
                 username='test', email='test@test.com', password='123456')
             client.login(username='test', password='123456')
@@ -181,8 +181,8 @@ For example::
             self.assertIsNone(client.receive())
 
 
-Instead of ``HttpClient.login`` method with credentials at arguments you
-may call ``HttpClient.force_login`` (like at django client) with the user object.
+Instead of ``WSClient.login`` method with credentials at arguments you
+may call ``WSClient.force_login`` (like at django client) with the user object.
 
 ``receive`` method by default trying to deserialize json text content of a message,
 so if you need to pass decoding use ``receive(json=False)``, like in the example.
@@ -196,23 +196,23 @@ want to test your consumers in a more isolate and atomic way, it will be
 simpler with ``apply_routes`` contextmanager and decorator for your ``ChannelTestCase``.
 It takes a list of routes that you want to use and overwrites existing routes::
 
-    from channels.test import ChannelTestCase, HttpClient, apply_routes
+    from channels.test import ChannelTestCase, WSClient, apply_routes
 
     class MyTests(ChannelTestCase):
 
         def test_myconsumer(self):
-            client = HttpClient()
+            client = WSClient()
 
             with apply_routes([MyConsumer.as_route(path='/new')]):
                 client.send_and_consume('websocket.connect', '/new')
                 self.assertEqual(client.receive(), {'key': 'value'})
 
 
-Test Data binding with ``HttpClient``
+Test Data binding with ``WSClient``
 -------------------------------------
 
 As you know data binding in channels works in outbound and inbound ways,
-so that ways tests in different ways and ``HttpClient`` and ``apply_routes``
+so that ways tests in different ways and ``WSClient`` and ``apply_routes``
 will help to do this.
 When you testing outbound consumers you need just import your ``Binding``
 subclass with specified ``group_names``. At test you can  join to one of them,
@@ -220,14 +220,14 @@ make some changes with target model and check received message.
 Lets test ``IntegerValueBinding`` from :doc:`data binding <binding>`
 with creating::
 
-    from channels.test import ChannelTestCase, HttpClient
+    from channels.test import ChannelTestCase, WSClient
     from channels.signals import consumer_finished
 
     class TestIntegerValueBinding(ChannelTestCase):
 
         def test_outbound_create(self):
-            # We use HttpClient because of json encoding messages
-            client = HttpClient()
+            # We use WSClient because of json encoding messages
+            client = WSClient()
             client.join_group("intval-updates")  # join outbound binding
 
             # create target entity
@@ -266,7 +266,7 @@ For example::
 
             with apply_routes([Demultiplexer.as_route(path='/'),
                               route("binding.intval", IntegerValueBinding.consumer)]):
-                client = HttpClient()
+                client = WSClient()
                 client.send_and_consume('websocket.connect', path='/')
                 client.send_and_consume('websocket.receive', path='/', text={
                     'stream': 'intval',

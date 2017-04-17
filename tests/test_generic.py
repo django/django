@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from channels import route_class
 from channels.exceptions import SendNotAvailableOnDemultiplexer
 from channels.generic import BaseConsumer, websockets
-from channels.test import ChannelTestCase, Client, HttpClient, apply_routes
+from channels.test import ChannelTestCase, Client, WSClient, apply_routes
 
 
 @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.cache")
@@ -96,7 +96,7 @@ class GenericTests(ChannelTestCase):
         user_model = get_user_model()
         user = user_model.objects.create_user(username='test', email='test@test.com', password='123456')
 
-        client = HttpClient()
+        client = WSClient()
         client.force_login(user)
         with apply_routes([route_class(WebsocketConsumer, path='/path')]):
             connect = client.send_and_consume('websocket.connect', {'path': '/path'})
@@ -128,7 +128,7 @@ class GenericTests(ChannelTestCase):
         self.assertIs(routes[1].consumer, WebsocketConsumer)
 
         with apply_routes(routes):
-            client = HttpClient()
+            client = WSClient()
 
             client.send('websocket.connect', {'path': '/path', 'order': 1})
             client.send('websocket.connect', {'path': '/path', 'order': 0})
@@ -180,7 +180,7 @@ class GenericTests(ChannelTestCase):
             }
 
         with apply_routes([route_class(Demultiplexer, path='/path/(?P<id>\d+)')]):
-            client = HttpClient()
+            client = WSClient()
 
             client.send_and_consume('websocket.connect', path='/path/1')
             self.assertEqual(client.receive(), {
@@ -216,7 +216,7 @@ class GenericTests(ChannelTestCase):
             }
 
         with apply_routes([route_class(Demultiplexer, path='/path/(?P<id>\d+)')]):
-            client = HttpClient()
+            client = WSClient()
 
             with self.assertRaises(SendNotAvailableOnDemultiplexer):
                 client.send_and_consume('websocket.receive', path='/path/1', text={
@@ -250,7 +250,7 @@ class GenericTests(ChannelTestCase):
                 return json.dumps(lowered)
 
         with apply_routes([route_class(WebsocketConsumer, path='/path')]):
-            client = HttpClient()
+            client = WSClient()
 
             consumer = client.send_and_consume('websocket.receive', path='/path', text={"key": "value"})
             self.assertEqual(consumer.content_received, {"KEY": "value"})
@@ -284,7 +284,7 @@ class GenericTests(ChannelTestCase):
             }
 
         with apply_routes([route_class(Demultiplexer, path='/path/(?P<ID>\d+)')]):
-            client = HttpClient()
+            client = WSClient()
 
             client.send_and_consume('websocket.connect', path='/path/1')
             self.assertEqual(client.receive(), {

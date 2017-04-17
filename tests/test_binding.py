@@ -6,7 +6,7 @@ from channels import route
 from channels.binding.base import CREATE, DELETE, UPDATE
 from channels.binding.websockets import WebsocketBinding
 from channels.generic.websockets import WebsocketDemultiplexer
-from channels.test import ChannelTestCase, HttpClient, apply_routes
+from channels.test import ChannelTestCase, WSClient, apply_routes
 from tests import models
 
 User = get_user_model()
@@ -28,7 +28,7 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
-        client = HttpClient()
+        client = WSClient()
         client.join_group('users')
 
         user = User.objects.create(username='test', email='test@test.com')
@@ -70,7 +70,7 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
-        client = HttpClient()
+        client = WSClient()
         client.join_group('testuuidmodels')
 
         instance = models.TestUUIDModel.objects.create(name='testname')
@@ -106,7 +106,7 @@ class TestsBinding(ChannelTestCase):
                 return True
 
         with apply_routes([route('test', TestBinding.consumer)]):
-            client = HttpClient()
+            client = WSClient()
             client.join_group('users_exclude')
 
             user = User.objects.create(username='test', email='test@test.com')
@@ -165,7 +165,7 @@ class TestsBinding(ChannelTestCase):
         # Make model and clear out pending sends
         user = User.objects.create(username='test', email='test@test.com')
 
-        client = HttpClient()
+        client = WSClient()
         client.join_group('users2')
 
         user.username = 'test_new'
@@ -210,7 +210,7 @@ class TestsBinding(ChannelTestCase):
         # Make model and clear out pending sends
         user = User.objects.create(username='test', email='test@test.com')
 
-        client = HttpClient()
+        client = WSClient()
         client.join_group('users3')
 
         user.delete()
@@ -254,7 +254,7 @@ class TestsBinding(ChannelTestCase):
             groups = ['inbound']
 
         with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
+            client = WSClient()
             client.send_and_consume('websocket.connect', path='/')
             client.send_and_consume('websocket.receive', path='/', text={
                 'stream': 'users',
@@ -294,7 +294,7 @@ class TestsBinding(ChannelTestCase):
             groups = ['inbound']
 
         with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
+            client = WSClient()
             client.send_and_consume('websocket.connect', path='/')
             client.send_and_consume('websocket.receive', path='/', text={
                 'stream': 'users',
@@ -340,7 +340,7 @@ class TestsBinding(ChannelTestCase):
             groups = ['inbound']
 
         with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
+            client = WSClient()
             client.send_and_consume('websocket.connect', path='/')
             client.send_and_consume('websocket.receive', path='/', text={
                 'stream': 'users',
@@ -372,6 +372,6 @@ class TestsBinding(ChannelTestCase):
             groups = ['inbound']
 
         with apply_routes([Demultiplexer.as_route(path='/path/(?P<id>\d+)')]):
-            client = HttpClient()
+            client = WSClient()
             consumer = client.send_and_consume('websocket.connect', path='/path/789')
             self.assertEqual(consumer.kwargs['id'], '789')
