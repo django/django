@@ -163,10 +163,6 @@ Forms
   HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
   subwidgets.
 
-* :class:`~django.forms.FloatField` and :class:`~django.forms.DecimalField`
-  now handle :setting:`DECIMAL_SEPARATOR` and :setting:`THOUSAND_SEPARATOR`
-  correctly when :setting:`USE_L10N` is off.
-
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -310,6 +306,18 @@ Miscellaneous
 
 * :class:`~django.views.generic.base.RedirectView` no longer silences
   ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
+
+* When :setting:`USE_L10N` is off, :class:`~django.forms.FloatField` and
+  :class:`~django.forms.DecimalField` now respect :setting:`DECIMAL_SEPARATOR`
+  and :setting:`THOUSAND_SEPARATOR` during validation. For example, with the
+  settings::
+
+     USE_L10N = False
+     USE_THOUSAND_SEPARATOR = True
+     DECIMAL_SEPARATOR = ','
+     THOUSAND_SEPARATOR = '.'
+
+  an input of ``"1.345"`` is now converted to ``1345`` instead of ``1.345``.
 
 .. _deprecated-features-2.0:
 
