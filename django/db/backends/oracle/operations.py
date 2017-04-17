@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
 from django.utils import timezone
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 
 from .base import Database
 from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
@@ -182,7 +182,7 @@ WHEN (new.%(col_name)s IS NULL)
 
     def convert_textfield_value(self, value, expression, connection, context):
         if isinstance(value, Database.LOB):
-            value = force_text(value.read())
+            value = value.read()
         return value
 
     def convert_binaryfield_value(self, value, expression, connection, context):
@@ -277,7 +277,7 @@ WHEN (new.%(col_name)s IS NULL)
     def process_clob(self, value):
         if value is None:
             return ''
-        return force_text(value.read())
+        return value.read()
 
     def quote_name(self, name):
         # SQL92 requires delimited (quoted) names to be case-sensitive.  When
