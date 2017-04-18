@@ -82,8 +82,10 @@ class Serializer:
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
             concrete_model = obj._meta.concrete_model
+            pk = self.use_natural_primary_keys and concrete_model._meta.pk
+            pk_parent = pk and pk.remote_field and pk.remote_field.parent_link and pk
             for field in concrete_model._meta.local_fields:
-                if field.serialize:
+                if field.serialize or field is pk_parent:
                     if field.remote_field is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)

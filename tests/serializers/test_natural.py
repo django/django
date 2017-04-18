@@ -2,7 +2,10 @@ from django.core import serializers
 from django.db import connection
 from django.test import TestCase
 
-from .models import FKDataNaturalKey, NaturalKeyAnchor
+from .models import (
+    Customer, Employee, FKDataNaturalKey, NaturalKeyAnchor, Person,
+    PremiumCustomer,
+)
 from .tests import register_tests
 
 
@@ -67,6 +70,88 @@ def natural_key_test(format, self):
     self.assertIsNone(books[1].object.pk)
 
 
+def natural_pk_mti_test(format, self):
+    x1 = Person.objects.create(firstname="alphonse", lastname="allais")
+    x2 = Customer.objects.create(firstname="alban", lastname="berg", cnum=1885)
+    x3 = PremiumCustomer.objects.create(firstname="vladimir", lastname="jankelevitch", cnum=1903, level=81)
+    x4 = Employee.objects.create(firstname="daksiputra", lastname="panini", enum=-400)
+
+    self.assertEqual(len(Person.objects.all()), 4)
+    self.assertEqual(len(Customer.objects.all()), 2)
+    self.assertEqual(len(PremiumCustomer.objects.all()), 1)
+    self.assertEqual(len(Employee.objects.all()), 1)
+
+    # test with 2 different serialization order to ensure that we are not
+    # unknowningly relying on order
+
+    objs1 = []
+    objs1.extend(Person.objects.all())
+    objs1.extend(Customer.objects.all())
+    objs1.extend(PremiumCustomer.objects.all())
+    objs1.extend(Employee.objects.all())
+
+    objs2 = []
+    objs2.extend(reversed(Person.objects.all()))
+    objs2.extend(Employee.objects.all())
+    objs2.extend(Customer.objects.all())
+    objs2.extend(PremiumCustomer.objects.all())
+
+    # we will also check that we indeed get back the same data
+    def get_data():
+        objs = []
+        objs.extend(reversed(Person.objects.all()))
+        objs.extend(Employee.objects.all())
+        objs.extend(Customer.objects.all())
+        objs.extend(PremiumCustomer.objects.all())
+        return sorted(x.data() for x in objs)
+
+    data = get_data()
+
+    string_data1 = serializers.serialize(
+        format, objs1,
+        use_natural_foreign_keys=True, use_natural_primary_keys=True,
+    )
+
+    string_data2 = serializers.serialize(
+        format, objs2,
+        use_natural_foreign_keys=True, use_natural_primary_keys=True,
+    )
+
+    x1.delete()
+    x2.delete()
+    x3.delete()
+    x4.delete()
+
+    self.assertEqual(len(Person.objects.all()), 0)
+    self.assertEqual(len(Customer.objects.all()), 0)
+    self.assertEqual(len(PremiumCustomer.objects.all()), 0)
+    self.assertEqual(len(Employee.objects.all()), 0)
+
+    for obj in serializers.deserialize(format, string_data1):
+        obj.save()
+
+    self.assertEqual(len(Person.objects.all()), 4)
+    self.assertEqual(len(Customer.objects.all()), 2)
+    self.assertEqual(len(PremiumCustomer.objects.all()), 1)
+    self.assertEqual(len(Employee.objects.all()), 1)
+    self.assertEqual(data, get_data())
+
+    Employee.objects.all().delete()
+    PremiumCustomer.objects.all().delete()
+    Customer.objects.all().delete()
+    Person.objects.all().delete()
+
+    for obj in serializers.deserialize(format, string_data2):
+        obj.save()
+
+    self.assertEqual(len(Person.objects.all()), 4)
+    self.assertEqual(len(Customer.objects.all()), 2)
+    self.assertEqual(len(PremiumCustomer.objects.all()), 1)
+    self.assertEqual(len(Employee.objects.all()), 1)
+    self.assertEqual(data, get_data())
+
+
 # Dynamically register tests for each serializer
 register_tests(NaturalKeySerializerTests, 'test_%s_natural_key_serializer', natural_key_serializer_test)
 register_tests(NaturalKeySerializerTests, 'test_%s_serializer_natural_keys', natural_key_test)
+register_tests(NaturalKeySerializerTests, 'test_%s_serializer_natural_pks_mti', natural_pk_mti_test)
