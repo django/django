@@ -180,11 +180,11 @@ class SessionTestsMixin:
     def test_cycle_with_no_session_cache(self):
         self.session['a'], self.session['b'] = 'c', 'd'
         self.session.save()
-        prev_data = list(self.session.items())
+        prev_data = self.session.items()
         self.session = self.backend(self.session.session_key)
         self.assertFalse(hasattr(self.session, '_session_cache'))
         self.session.cycle_key()
-        self.assertEqual(list(self.session.items()), prev_data)
+        self.assertCountEqual(self.session.items(), prev_data)
 
     def test_save_doesnt_clear_data(self):
         self.session['a'] = 'b'
