@@ -90,13 +90,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Table name comparison is case insensitive under Oracle."""
         return name.lower()
 
-    def _name_to_index(self, cursor, table_name):
-        """
-        Return a dictionary of {field_name: field_index} for the given table.
-        Indexes are 0-based.
-        """
-        return {d[0]: i for i, d in enumerate(self.get_table_description(cursor, table_name))}
-
     def get_relations(self, cursor, table_name):
         """
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
