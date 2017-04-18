@@ -30,3 +30,7 @@ Bugfixes
 
 * Prevented ``SessionBase.cycle_key()`` from losing session data if
   ``_session_cache`` isn't populated (:ticket:`28066`).
+
+* Re-raised the original exception when ``cursor.execute()`` fails and the
+  cleanup code ``cursor.close()`` fails as well, instead of raising the cleanup
+  code failure (:ticket:28091).
