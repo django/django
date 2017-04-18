@@ -682,6 +682,25 @@ class BackendTestCase(TransactionTestCase):
             self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(Square.objects.count(), 9)
 
+    def test_cursor_close_failure_does_not_mask_original_exception(self):
+        persons = Person.objects.iterator()
+
+        def raise_original_exception(*args, **kwargs):
+            raise Exception('Real exception raised by the database on cursor.execute')
+
+        def raise_close_exception():
+            raise Exception(
+                'Error when attempting to close the cursor, this exception should not mask the original exception'
+            )
+
+        mock_cursor = connection.chunked_cursor()
+        mock_cursor.execute = mock.MagicMock(side_effect=raise_original_exception)
+        mock_cursor.close = mock.MagicMock(side_effect=raise_close_exception)
+
+        with self.assertRaisesMessage(Exception, 'Real exception raised by the database on cursor.execute'):
+            with mock.patch('django.db.connection.create_cursor', return_value=mock_cursor):
+                list(persons)
+
     def test_unicode_fetches(self):
         # fetchone, fetchmany, fetchall return strings as unicode objects #6254
         qn = connection.ops.quote_name
