@@ -57,7 +57,7 @@ class FormsI18nTests(SimpleTestCase):
         self.assertHTMLEqual(
             f.as_p(),
             '<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label>'
-            '<ul id="id_somechoice">\n'
+            '<ul id="id_somechoice" data-wrap-label="true" data-multiple="false">\n'
             '<li><label for="id_somechoice_0">'
             '<input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" required /> '
             'En tied\xe4</label></li>\n'
@@ -77,7 +77,8 @@ class FormsI18nTests(SimpleTestCase):
                 '\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c'
                 '\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n'
                 '<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label>'
-                ' <ul id="id_somechoice">\n<li><label for="id_somechoice_0">'
+                ' <ul id="id_somechoice" data-wrap-label="true" data-multiple="false">\n'
+                '<li><label for="id_somechoice_0">'
                 '<input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" required /> '
                 'En tied\xe4</label></li>\n'
                 '<li><label for="id_somechoice_1">'

@@ -584,17 +584,17 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<ul>
+        self.assertHTMLEqual(str(f['language']), """<ul data-wrap-label="true" data-multiple="false">
 <li><label><input type="radio" name="language" value="P" required /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" required /> Java</label></li>
 </ul>""")
         self.assertHTMLEqual(f.as_table(), """<tr><th>Name:</th><td><input type="text" name="name" required /></td></tr>
-<tr><th>Language:</th><td><ul>
+<tr><th>Language:</th><td><ul data-wrap-label="true" data-multiple="false">
 <li><label><input type="radio" name="language" value="P" required /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" required /> Java</label></li>
 </ul></td></tr>""")
         self.assertHTMLEqual(f.as_ul(), """<li>Name: <input type="text" name="name" required /></li>
-<li>Language: <ul>
+<li>Language: <ul data-wrap-label="true" data-multiple="false">
 <li><label><input type="radio" name="language" value="P" required /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" required /> Java</label></li>
 </ul></li>""")
@@ -605,7 +605,7 @@ class FormsTestCase(SimpleTestCase):
         f = FrameworkForm(auto_id='id_%s')
         self.assertHTMLEqual(
             str(f['language']),
-            """<ul id="id_language">
+            """<ul id="id_language" data-wrap-label="true" data-multiple="false">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required />
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required />
@@ -618,8 +618,10 @@ Java</label></li>
         # ID of the *first* radio button.
         self.assertHTMLEqual(
             f.as_table(),
-            """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" required /></td></tr>
-<tr><th><label for="id_language_0">Language:</label></th><td><ul id="id_language">
+            """<tr><th><label for="id_name">Name:</label></th>
+<td><input type="text" name="name" id="id_name" required /></td></tr>
+<tr><th><label for="id_language_0">Language:</label></th><td>
+<ul id="id_language" data-wrap-label="true" data-multiple="false">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required />
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required />
@@ -629,7 +631,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_ul(),
             """<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required /></li>
-<li><label for="id_language_0">Language:</label> <ul id="id_language">
+<li><label for="id_language_0">Language:</label> <ul id="id_language" data-wrap-label="true" data-multiple="false">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required />
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required />
@@ -639,7 +641,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_p(),
             """<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" required /></p>
-<p><label for="id_language_0">Language:</label> <ul id="id_language">
+<p><label for="id_language_0">Language:</label> <ul id="id_language" data-wrap-label="true" data-multiple="false">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required />
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required />
@@ -859,17 +861,17 @@ Java</label></li>
             )
 
         f = SongForm(auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul data-wrap-label="true" data-multiple="true">
 <li><label><input type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J']}, auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul data-wrap-label="true" data-multiple="true">
 <li><label><input checked type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J', 'P']}, auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<ul>
+        self.assertHTMLEqual(str(f['composers']), """<ul data-wrap-label="true" data-multiple="true">
 <li><label><input checked type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input checked type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
@@ -894,7 +896,7 @@ Java</label></li>
         f = SongForm(auto_id='%s_id')
         self.assertHTMLEqual(
             str(f['composers']),
-            """<ul id="composers_id">
+            """<ul id="composers_id" data-wrap-label="true" data-multiple="true">
 <li><label for="composers_id_0">
 <input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
 <li><label for="composers_id_1">

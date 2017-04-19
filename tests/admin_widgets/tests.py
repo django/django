@@ -20,8 +20,8 @@ from django.urls import reverse
 from django.utils import translation
 
 from .models import (
-    Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
-    Inventory, Member, MyFileField, Profile, School, Student,
+    Advisor, Album, Band, Bee, Car, City, Company, Event, Fan, Honeycomb, Individual,
+    Inventory, Manager, Member, MyFileField, Player, Profile, School, Student, Team,
 )
 from .widgetadmin import site as widget_admin_site
 
@@ -1316,3 +1316,210 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
+
+    def test_ForeignKey_as_Select(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_team_add'))
+
+        main_window = self.selenium.current_window_handle
+        # Only an empty option in the Select
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_team_manager option')), 1)
+
+        # Click the Add Manager button to add new
+        self.selenium.find_element_by_id('add_id_team_manager').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_team_manager')
+
+        manager_name_field = self.selenium.find_element_by_id('id_name')
+        manager_name_field.send_keys('Martin')
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_team_manager option')), 2)
+        new_manager = Manager.objects.get(pk=1)
+        self.assertEqual(new_manager.name, 'Martin')
+        new_option_selector = '#id_team_manager option[value="%d"]' % new_manager.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_option_selector).get_attribute('selected'))
+
+        # Click the Add Manager button to add other
+        self.selenium.find_element_by_id('add_id_team_manager').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_team_manager')
+
+        manager_name_field = self.selenium.find_element_by_id('id_name')
+        manager_name_field.send_keys('Joe')
+
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_team_manager option')), 3)
+        new_manager = Manager.objects.get(pk=2)
+        self.assertEqual(new_manager.name, 'Joe')
+        new_option_selector = '#id_team_manager option[value="%d"]' % new_manager.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_option_selector).get_attribute('selected'))
+
+        # Go ahead and submit the form to make sure it works
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('Blue Jays')
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.wait_for_text('li.success', 'The team "Blue Jays" was added successfully.')
+        teams = Team.objects.all()
+        self.assertEqual(len(teams), 1)
+        # 'Joe' match because was the last selected Manager
+        self.assertEqual(teams[0].team_manager.name, 'Joe')
+
+    def test_ManyToMany_as_SelectMultiple(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_city_add'))
+
+        main_window = self.selenium.current_window_handle
+
+        # Click the Add Team button to add new
+        self.selenium.find_element_by_id('add_id_teams').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_teams')
+
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('Cubs')
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_teams option')), 1)
+        new_team = Team.objects.get(name='Cubs')
+        new_option_selector = '#id_teams option[value="%d"]' % new_team.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_option_selector).get_attribute('selected'))
+
+        # Click the Add Team button to add other
+        self.selenium.find_element_by_id('add_id_teams').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_teams')
+
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('White Sox')
+
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_teams option')), 2)
+        new_team = Team.objects.get(name='White Sox')
+        new_option_selector = '#id_teams option[value="%d"]' % new_team.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_option_selector).get_attribute('selected'))
+
+        # Go ahead and submit the form to make sure it works
+        city_name_field = self.selenium.find_element_by_id('id_name')
+        city_name_field.send_keys('Chicago')
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.wait_for_text('li.success', 'The city "Chicago" was added successfully.')
+        cities = City.objects.all()
+        self.assertEqual(len(cities), 1)
+        self.assertEqual(cities[0].name, 'Chicago')
+        teams = cities[0].teams.all()
+        self.assertEqual(len(teams), 2)
+        self.assertListEqual([t.name for t in teams], ['Cubs', 'White Sox'])
+
+    def test_ForeignKey_as_RadioSelect(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_player_add'))
+
+        main_window = self.selenium.current_window_handle
+        # Only an empty option in the RadioSelect
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_team li')), 1)
+
+        # Click the Add Team button to add new
+        self.selenium.find_element_by_id('add_id_team').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_team')
+
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('Cardinals')
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_team li')), 2)
+        new_team = Team.objects.get(name='Cardinals')
+        new_input_selector = '#id_team li input[value="%d"]' % new_team.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_input_selector).get_attribute('checked'))
+
+        # Click the Add Team button to add other
+        self.selenium.find_element_by_id('add_id_team').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_team')
+
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('Red Sox')
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_team li')), 3)
+        new_team = Team.objects.get(name='Red Sox')
+        new_input_selector = '#id_team li input[value="%d"]' % new_team.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_input_selector).get_attribute('checked'))
+
+        # Go ahead and submit the form to make sure it works
+        player_name_field = self.selenium.find_element_by_id('id_name')
+        player_name_field.send_keys('David')
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.wait_for_text('li.success', 'The player "David" was added successfully.')
+        player = Player.objects.all()
+        self.assertEqual(len(player), 1)
+        # 'Red Sox' match because was the last selected Team
+        self.assertEqual(player[0].team.name, 'Red Sox')
+
+    def test_ManyToMany_as_CheckboxSelectMultiple(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_fan_add'))
+
+        main_window = self.selenium.current_window_handle
+
+        # Click the Add Team button to add new
+        self.selenium.find_element_by_id('add_id_teams').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_teams')
+
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('Cubs')
+
+        save_button_css_selector = '.submit-row > input[type=submit]'
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_teams li')), 1)
+        new_team = Team.objects.get(name='Cubs')
+        new_input_selector = '#id_teams li input[value="%d"]' % new_team.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_input_selector).get_attribute('checked'))
+
+        # Click the Add Team button to add other
+        self.selenium.find_element_by_id('add_id_teams').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window('id_teams')
+
+        team_name_field = self.selenium.find_element_by_id('id_name')
+        team_name_field.send_keys('White Sox')
+
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.selenium.switch_to.window(main_window)
+
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_teams li')), 2)
+        new_team = Team.objects.get(name='White Sox')
+        new_input_selector = '#id_teams li input[value="%d"]' % new_team.pk
+        self.assertTrue(self.selenium.find_element_by_css_selector(new_input_selector).get_attribute('checked'))
+
+        # Go ahead and submit the form to make sure it works
+        fan_name_field = self.selenium.find_element_by_id('id_name')
+        fan_name_field.send_keys('John')
+        self.selenium.find_element_by_css_selector(save_button_css_selector).click()
+        self.wait_for_text('li.success', 'The fan "John" was added successfully.')
+        fans = Fan.objects.all()
+        self.assertEqual(len(fans), 1)
+        self.assertEqual(fans[0].name, 'John')
+        teams = fans[0].teams.all()
+        self.assertEqual(len(teams), 2)
+        self.assertListEqual([t.name for t in teams], ['Cubs', 'White Sox'])

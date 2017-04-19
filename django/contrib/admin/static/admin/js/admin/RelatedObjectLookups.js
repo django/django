@@ -86,6 +86,68 @@
                 } else {
                     elem.value = newId;
                 }
+            } else if (elemName === 'UL') {
+                var numberOfItems = elem.children.length,
+                    // If the input field is wrapped into a label.
+                    wrapLabel = (String(elem.getAttribute('data-wrap-label')).toLowerCase() === "true"),
+                    // Multiple selection or not.
+                    multiple = (String(elem.getAttribute('data-multiple')).toLowerCase() === "true"),
+                    newItem = null, newItemInput = null, newItemLabel = null;
+
+                if (numberOfItems > 0) {
+                    if (!multiple) {
+                        // Remove previous input checked, the new item will marked as checked.
+                        elem.querySelector('input:checked').checked = false;
+                    }
+                    // Clone an item and include this as the final item of the UL list.
+                    // The clone will be the new item and their information will be
+                    // replaced with the received data.
+                    elem.appendChild(elem.lastElementChild.cloneNode(true));
+                    // newItem's var is the new copy, is necessary to get a new instance to work
+                    // with it in order to avoid to modify the cloned item.
+                    newItem = elem.lastElementChild;
+                    newItemInput = newItem.getElementsByTagName('input')[0];
+
+                    newItemInput.value = newId;
+                    newItemInput.setAttribute('id', elem.id + '_' + numberOfItems);
+                    // Mark the new item's input as checked.
+                    newItemInput.checked = true;
+
+                    if (wrapLabel) {
+                        newItemLabel = newItem.getElementsByTagName('label')[0];
+                        newItemLabel.lastChild.textContent = ' ' + newRepr;
+                        newItemLabel.setAttribute('for', elem.id + '_' + numberOfItems);
+                    }
+                } else {
+                    // The UL list is empty, then is necessary to build the new item.
+                    newItem = document.createElement('li');
+                    newItemInput = document.createElement('input');
+
+                    newItemInput.setAttribute('type', (multiple) ? 'checkbox' : 'radio');
+                    // The elem.id is composed by 'id_' and the name of the related field.
+                    // Example: 'id_books', is only necessary to remove 'id_' to get the
+                    // name of the field.
+                    newItemInput.setAttribute('name', elem.id.replace('id_', ''));
+                    newItemInput.setAttribute('id', elem.id + '_0');
+                    // Mark the new item's input as checked.
+                    newItemInput.checked = true;
+                    newItemInput.value = newId;
+
+                    if (wrapLabel) {
+                        newItemLabel = document.createElement('label');
+                        newItemLabel.textContent = ' ' + newRepr;
+                        newItemLabel.setAttribute('for', elem.id + '_0');
+                        // Insert input into label.
+                        newItemLabel.insertBefore(newItemInput, newItemLabel.firstChild);
+                        // Append input wrapped into new item.
+                        newItem.appendChild(newItemLabel);
+                    } else {
+                        // Append input no wrapped into new item.
+                        newItem.appendChild(newItemInput);
+                    }
+                    // Append new item into UL list.
+                    elem.appendChild(newItem);
+                }
             }
             // Trigger a change event to update related links if required.
             $(elem).trigger('change');

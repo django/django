@@ -607,6 +607,7 @@ class ChoiceWidget(Widget):
         context = super().get_context(name, value, attrs)
         context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
         context['wrap_label'] = True
+        context['multiple'] = self.allow_multiple_selected
         return context
 
     def id_for_label(self, id_, index='0'):
