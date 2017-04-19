@@ -760,10 +760,9 @@ the result of the :attr:`Storage.open()<django.core.files.storage.Storage.open>`
 method, which may be a :class:`~django.core.files.File` object, or it may be a
 custom storage's implementation of the :class:`~django.core.files.File` API.
 
-In addition to the API inherited from
-:class:`~django.core.files.File` such as :meth:`~django.core.files.File.read`
-and :meth:`~django.core.files.File.write`, :class:`FieldFile` includes several
-methods that can be used to interact with the underlying file:
+In addition to the API inherited from :class:`~django.core.files.File` such as
+``read()`` and ``write()``, :class:`FieldFile` includes several methods that
+can be used to interact with the underlying file:
 
 .. warning::
 
