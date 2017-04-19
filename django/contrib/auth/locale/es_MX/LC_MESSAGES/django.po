@@ -72,7 +72,7 @@ msgid ""
 msgstr ""
 "Las contraseñas no se almacenan en texto plano, así que no hay manera de ver "
 "la contraseña del usuario, pero se puede cambiar la contraseña mediante <a "
-"href=\"password/\">este formulario</a>."
+"href=\"../password/\">este formulario</a>."
 
 #, python-format
 msgid ""

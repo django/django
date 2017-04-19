@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Não são guardadas palavras-passe sem encriptação, portanto não é possível "
 "visualizar a password deste utilizador, mas poderá modificar a palavra-passe "
-"através <a href=\"password/\">deste formulário</a>."
+"através <a href=\"../password/\">deste formulário</a>."
 
 #, python-format
 msgid ""
