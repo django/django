@@ -874,7 +874,7 @@ class SQLCompiler(object):
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as original_exception:
             try:
                 # Might fail for server-side cursors (e.g. connection closed)
                 cursor.close()
@@ -883,7 +883,7 @@ class SQLCompiler(object):
                 # Python 2 doesn't chain exceptions. Remove this error
                 # silencing when dropping Python 2 compatibility.
                 pass
-            raise
+            raise original_exception
 
         if result_type == CURSOR:
             # Caller didn't specify a result_type, so just give them back the
