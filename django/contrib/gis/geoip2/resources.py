@@ -8,6 +8,7 @@ def City(response):
         'longitude': response.location.longitude,
         'postal_code': response.postal.code,
         'region': response.subdivisions[0].iso_code if len(response.subdivisions) else None,
+        'time_zone': response.location.time_zone,
     }
 
 
