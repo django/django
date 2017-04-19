@@ -319,6 +319,13 @@ Miscellaneous
 
   an input of ``"1.345"`` is now converted to ``1345`` instead of ``1.345``.
 
+* Subclasses of :class:`~django.contrib.auth.models.AbstractBaseUser` are no
+  longer required to implement ``get_short_name()`` and ``get_full_name()``.
+  (The base implementations that raise ``NotImplementedError`` are removed.)
+  ``django.contrib.admin`` uses these methods if implemented but doesn't
+  require them. Third-party apps that use these methods may want to adopt a
+  similar approach.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

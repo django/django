@@ -119,12 +119,6 @@ class AbstractBaseUser(models.Model):
     def has_usable_password(self):
         return is_password_usable(self.password)
 
-    def get_full_name(self):
-        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_full_name() method')
-
-    def get_short_name(self):
-        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')
-
     def get_session_auth_hash(self):
         """
         Return an HMAC of the password field.

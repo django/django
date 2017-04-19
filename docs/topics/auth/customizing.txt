@@ -536,18 +536,11 @@ Specifying a custom user model
 
 Django expects your custom user model to meet some minimum requirements.
 
-#. If you use the default authentication backend, then your model must have a
-   single unique field that can be used for identification purposes. This can
-   be a username, an email address, or any other unique attribute. A non-unique
-   username field is allowed if you use a custom authentication backend that
-   can support it.
-
-#. Your model must provide a way to address the user in a "short" and
-   "long" form. The most common interpretation of this would be to use
-   the user's given name as the "short" identifier, and the user's full
-   name as the "long" identifier. However, there are no constraints on
-   what these two methods return - if you want, they can return exactly
-   the same value.
+If you use the default authentication backend, then your model must have a
+single unique field that can be used for identification purposes. This can
+be a username, an email address, or any other unique attribute. A non-unique
+username field is allowed if you use a custom authentication backend that
+can support it.
 
 The easiest way to construct a compliant custom user model is to inherit from
 :class:`~django.contrib.auth.models.AbstractBaseUser`.
@@ -636,16 +629,21 @@ password resets. You must then provide some key implementation details:
 
     .. method:: get_full_name()
 
-        A longer formal identifier for the user. A common interpretation
-        would be the full name of the user, but it can be any string that
-        identifies the user.
+        Optional. A longer formal identifier for the user such as their full
+        name. If implemented, this appears alongside the username in an
+        object's history in :mod:`django.contrib.admin`.
 
     .. method:: get_short_name()
 
-        A short, informal identifier for the user. A common interpretation
-        would be the first name of the user, but it can be any string that
-        identifies the user in an informal way. It may also return the same
-        value as :meth:`django.contrib.auth.models.User.get_full_name()`.
+        Optional. A short, informal identifier for the user such as their
+        first name. If implemented, this replaces the username in the greeting
+        to the user in the header of :mod:`django.contrib.admin`.
+
+    .. versionchanged:: 2.0
+
+        In older versions, subclasses are required to implement
+        ``get_short_name()`` and ``get_full_name()`` as ``AbstractBaseUser``
+        has implementations that raise ``NotImplementedError``.
 
     .. admonition:: Importing ``AbstractBaseUser``
 
@@ -1059,14 +1057,6 @@ authentication app::
 
         USERNAME_FIELD = 'email'
         REQUIRED_FIELDS = ['date_of_birth']
-
-        def get_full_name(self):
-            # The user is identified by their email address
-            return self.email
-
-        def get_short_name(self):
-            # The user is identified by their email address
-            return self.email
 
         def __str__(self):
             return self.email
