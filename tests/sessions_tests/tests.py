@@ -28,7 +28,8 @@ from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import (
-    RequestFactory, TestCase, ignore_warnings, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.test.utils import patch_logger
 from django.utils import six, timezone
@@ -512,8 +513,8 @@ class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
     pass
 
 
-# Don't need DB flushing for these tests, so can use unittest.TestCase as base class
-class FileSessionTests(SessionTestsMixin, unittest.TestCase):
+# Don't need DB flushing for these tests, so use SimpleTestCase as base class
+class FileSessionTests(SessionTestsMixin, SimpleTestCase):
 
     backend = FileSession
 
@@ -596,7 +597,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertEqual(1, count_sessions())
 
 
-class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
+class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
 
     backend = CacheSession
 
@@ -837,8 +838,8 @@ class SessionMiddlewareTests(TestCase):
         self.assertEqual(response['Vary'], 'Cookie')
 
 
-# Don't need DB flushing for these tests, so can use unittest.TestCase as base class
-class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
+# Don't need DB flushing for these tests, so use SimpleTestCase as base class
+class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
 
     backend = CookieSession
 
