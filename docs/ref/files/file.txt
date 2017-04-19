@@ -56,11 +56,6 @@ The ``File`` class
         was originally opened with; ``None`` means to reopen with the original
         mode.
 
-    .. method:: read(num_bytes=None)
-
-        Read content from the file. The optional ``size`` is the number of
-        bytes to read; if not specified, the file will be read to the end.
-
     .. method:: __iter__()
 
         Iterate over the file yielding one line at a time.
@@ -78,22 +73,16 @@ The ``File`` class
         Returns ``True`` if the file is large enough to require multiple chunks
         to access all of its content give some ``chunk_size``.
 
-    .. method:: write(content)
-
-        Writes the specified content string to the file. Depending on the
-        storage system behind the scenes, this content might not be fully
-        committed until :func:`close()` is called on the file.
-
     .. method:: close()
 
         Close the file.
 
     In addition to the listed methods, :class:`~django.core.files.File` exposes
     the following attributes and methods of its ``file`` object:
-    ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``,
-    ``read``, ``readinto``, ``readlines``, ``seek``, ``softspace``, ``tell``,
-    ``truncate``, ``writelines``, ``xreadlines``, ``readable()``,
-    ``writable()``, and ``seekable()``.
+    ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``, ``read``,
+    ``readinto``, ``readline``, ``readlines``, ``seek``, ``softspace``,
+    ``tell``, ``truncate``, ``write``, ``writelines``, ``xreadlines``,
+    ``readable()``, ``writable()``, and ``seekable()``.
 
     .. versionchanged:: 1.11
 
