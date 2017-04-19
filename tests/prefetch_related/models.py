@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.query import ModelIterable, QuerySet
 from django.utils.functional import cached_property
 
 
@@ -95,6 +96,16 @@ class Qualification(models.Model):
         ordering = ['id']
 
 
+class ModelIterableSubclass(ModelIterable):
+    pass
+
+
+class TeacherQuerySet(QuerySet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._iterable_class = ModelIterableSubclass
+
+
 class TeacherManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().prefetch_related('qualifications')
@@ -105,6 +116,7 @@ class Teacher(models.Model):
     qualifications = models.ManyToManyField(Qualification)
 
     objects = TeacherManager()
+    objects_custom = TeacherQuerySet.as_manager()
 
     def __str__(self):
         return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))

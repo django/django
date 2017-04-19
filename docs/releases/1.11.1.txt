@@ -33,3 +33,6 @@ Bugfixes
 
 * Fixed layout of ``ReadOnlyPasswordHashWidget`` (used in the admin's user
   change page) (:ticket:`28097`).
+
+* Allowed prefetch calls on managers with custom ``ModelIterable`` subclasses
+  (:ticket:`28096`).

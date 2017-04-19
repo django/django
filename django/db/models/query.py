@@ -1260,7 +1260,7 @@ class Prefetch:
         self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
         self.prefetch_to = lookup
-        if queryset is not None and queryset._iterable_class is not ModelIterable:
+        if queryset is not None and not issubclass(queryset._iterable_class, ModelIterable):
             raise ValueError('Prefetch querysets cannot use values().')
         if to_attr:
             self.prefetch_to = LOOKUP_SEP.join(lookup.split(LOOKUP_SEP)[:-1] + [to_attr])

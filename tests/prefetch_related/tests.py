@@ -9,8 +9,8 @@ from django.test.utils import CaptureQueriesContext
 from .models import (
     Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
     BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
-    House, LessonEntry, Person, Qualification, Reader, Room, TaggedItem,
-    Teacher, WordEntry,
+    House, LessonEntry, ModelIterableSubclass, Person, Qualification, Reader,
+    Room, TaggedItem, Teacher, WordEntry,
 )
 
 
@@ -708,6 +708,9 @@ class CustomPrefetchTests(TestCase):
     def test_values_queryset(self):
         with self.assertRaisesMessage(ValueError, 'Prefetch querysets cannot use values().'):
             Prefetch('houses', House.objects.values('pk'))
+        # That error doesn't affect managers with custom ModelIterable subclasses
+        self.assertIs(Teacher.objects_custom.all()._iterable_class, ModelIterableSubclass)
+        Prefetch('teachers', Teacher.objects_custom.all())
 
     def test_to_attr_doesnt_cache_through_attr_as_list(self):
         house = House.objects.prefetch_related(
