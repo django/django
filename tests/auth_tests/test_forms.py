@@ -825,6 +825,22 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
         html = widget.render(name='password', value=None, attrs={})
         self.assertIn(_("No password set."), html)
 
+    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.PBKDF2PasswordHasher'])
+    def test_render(self):
+        widget = ReadOnlyPasswordHashWidget()
+        value = 'pbkdf2_sha256$100000$a6Pucb1qSFcD$WmCkn9Hqidj48NVe5x0FEM6A9YiOqQcl/83m2Z5udm0='
+        self.assertHTMLEqual(
+            widget.render('name', value, {'id': 'id_password'}),
+            """
+            <div id="id_password">
+                <strong>algorithm</strong>: pbkdf2_sha256
+                <strong>iterations</strong>: 100000
+                <strong>salt</strong>: a6Pucb******
+                <strong>hash</strong>: WmCkn9**************************************
+            </div>
+            """
+        )
+
     def test_readonly_field_has_changed(self):
         field = ReadOnlyPasswordHashField()
         self.assertFalse(field.has_changed('aaa', 'bbb'))
