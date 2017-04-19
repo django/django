@@ -30,3 +30,6 @@ Bugfixes
 
 * Prevented ``SessionBase.cycle_key()`` from losing session data if
   ``_session_cache`` isn't populated (:ticket:`28066`).
+
+* Fixed layout of ``ReadOnlyPasswordHashWidget`` (used in the admin's user
+  change page) (:ticket:`28097`).
