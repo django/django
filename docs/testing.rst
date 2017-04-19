@@ -187,6 +187,26 @@ may call ``WSClient.force_login`` (like at django client) with the user object.
 ``receive`` method by default trying to deserialize json text content of a message,
 so if you need to pass decoding use ``receive(json=False)``, like in the example.
 
+For testing consumers with ``enforce_ordering`` initialize ``HttpClient`` with ``ordered``
+flag, but if you wanna use your own order don't use it, use content::
+
+    client = HttpClient(ordered=True)
+    client.send_and_consume('websocket.receive', text='1', path='/ws')  # order = 0
+    client.send_and_consume('websocket.receive', text='2', path='/ws')  # order = 1
+    client.send_and_consume('websocket.receive', text='3', path='/ws')  # order = 2
+
+    # manually
+    client = HttpClient()
+    client.send('websocket.receive', content={'order': 0}, text='1')
+    client.send('websocket.receive', content={'order': 2}, text='2')
+    client.send('websocket.receive', content={'order': 1}, text='3')
+
+    # calling consume 4 time for `waiting` message with order 1
+    client.consume('websocket.receive')
+    client.consume('websocket.receive')
+    client.consume('websocket.receive')
+    client.consume('websocket.receive')
+
 
 Applying routes
 ---------------

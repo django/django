@@ -20,11 +20,13 @@ class WSClient(Client):
     """
 
     def __init__(self, **kwargs):
+        self._ordered = kwargs.pop('ordered', False)
         super(WSClient, self).__init__(**kwargs)
         self._session = None
         self._headers = {}
         self._cookies = {}
         self._session_cookie = True
+        self.order = 0
 
     def set_cookie(self, key, value):
         """
@@ -76,18 +78,38 @@ class WSClient(Client):
         Send a message to a channel.
         Adds reply_channel name and channel_session to the message.
         """
+        if to != 'websocket.connect' and '?' in path:
+            path = path.split('?')[0]
+        self.channel_layer.send(to, self._get_content(content, text, path))
+        self._session_cookie = False
+
+    def _get_content(self, content={}, text=None, path='/'):
         content = copy.deepcopy(content)
         content.setdefault('reply_channel', self.reply_channel)
-        content.setdefault('path', path)
+
+        if '?' in path:
+            path, query_string = path.split('?')
+            content.setdefault('path', path)
+            content.setdefault('query_string', query_string)
+        else:
+            content.setdefault('path', path)
+
         content.setdefault('headers', self.headers)
+
+        if self._ordered:
+            if 'order' in content:
+                raise ValueError('Do not use "order" manually with "ordered=True"')
+            content['order'] = self.order
+            self.order += 1
+
         text = text or content.get('text', None)
+
         if text is not None:
             if not isinstance(text, six.string_types):
                 content['text'] = json.dumps(text)
             else:
                 content['text'] = text
-        self.channel_layer.send(to, content)
-        self._session_cookie = False
+        return content
 
     def send_and_consume(self, channel, content={}, text=None, path='/', fail_on_none=True, check_accept=True):
         """
