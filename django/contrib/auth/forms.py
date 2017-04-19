@@ -118,7 +118,7 @@ class UserChangeForm(forms.ModelForm):
         help_text=_(
             "Raw passwords are not stored, so there is no way to see this "
             "user's password, but you can change the password using "
-            "<a href=\"../password/\">this form</a>."
+            "<a href=\"{}\">this form</a>."
         ),
     )
 
@@ -129,6 +129,7 @@ class UserChangeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['password'].help_text = self.fields['password'].help_text.format('../password/')
         f = self.fields.get('user_permissions')
         if f is not None:
             f.queryset = f.queryset.select_related('content_type')
