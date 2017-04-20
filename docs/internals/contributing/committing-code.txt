@@ -131,7 +131,9 @@ Django's Git repository:
   The commit message should be in lines of 72 chars maximum. There should be
   a subject line, separated by a blank line and then paragraphs of 72 char
   lines. The limits are soft. For the subject line, shorter is better. In the
-  body of the commit message more detail is better than less::
+  body of the commit message more detail is better than less:
+
+  .. code-block:: none
 
       Fixed #18307 -- Added git workflow guidelines
 
@@ -183,13 +185,17 @@ Django's Git repository:
   is the number of the ticket your commit references. This will automatically
   post a comment to the appropriate ticket.
 
-* Write commit messages for backports using this pattern::
+* Write commit messages for backports using this pattern:
+
+  .. code-block:: none
 
     [<Django version>] Fixed <ticket> -- <description>
 
     Backport of <revision> from <branch>.
 
-  For example::
+  For example:
+
+  .. code-block:: none
 
     [1.3.x] Fixed #17028 -- Changed diveintopython.org -> diveintopython.net.
 
