@@ -43,6 +43,5 @@ Bugfixes
 
 * Fixed crash in ``BaseGeometryWidget.subwidgets()`` (:ticket:`28039`).
 
-* Re-raised the original exception when ``cursor.execute()`` fails and the
-  cleanup code ``cursor.close()`` fails as well, instead of raising the cleanup
-  code failure (:ticket:28091).
+* Fixed exception reraising in ORM query execution when ``cursor.execute()``
+  fails and the subsequent ``cursor.close()`` also fails (:ticket:`28091`).
