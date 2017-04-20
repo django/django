@@ -582,6 +582,7 @@ renderers
 repo
 reportable
 reprojection
+reraising
 resampling
 reST
 reStructuredText
