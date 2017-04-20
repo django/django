@@ -40,3 +40,5 @@ Bugfixes
 * Restored the output of the ``class`` attribute in the ``<ul>`` of widgets
   that use the ``multiple_input.html`` template. This fixes
   ``ModelAdmin.radio_fields`` with ``admin.HORIZONTAL`` (:ticket:`28059`).
+
+* Fixed crash in ``BaseGeometryWidget.subwidgets()`` (:ticket:`28039`).
