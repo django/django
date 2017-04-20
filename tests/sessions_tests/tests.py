@@ -671,8 +671,8 @@ class SessionMiddlewareTests(TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertTrue(
-            response.cookies[settings.SESSION_COOKIE_NAME]['samesite'])
+        self.assertEqual(
+            response.cookies[settings.SESSION_COOKIE_NAME]['samesite'], 'Lax')
 
     @override_settings(SESSION_COOKIE_HTTPONLY=False)
     def test_no_httponly_session_cookie(self):
