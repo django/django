@@ -157,7 +157,7 @@ class HttpResponseBase:
         return self._headers.get(header.lower(), (None, alternate))[1]
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
-                   domain=None, secure=False, httponly=False):
+                   domain=None, secure=False, httponly=False, samesite=None):
         """
         Set a cookie.
 
@@ -198,6 +198,8 @@ class HttpResponseBase:
             self.cookies[key]['secure'] = True
         if httponly:
             self.cookies[key]['httponly'] = True
+        if samesite:
+            self.cookies[key]['samesite'] = samesite.capitalize()
 
     def setdefault(self, key, value):
         """Set a header unless it has already been set."""
