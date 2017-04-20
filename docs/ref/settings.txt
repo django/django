@@ -1713,18 +1713,6 @@ permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting) and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the old one.
 
-.. setting:: LANGUAGE_COOKIE_DOMAIN
-
-``LANGUAGE_COOKIE_SAMESITE``
---------------------------
-
-Default: ``'lax'``
-
-The value of ``SameSite`` flag on the languasge cookie. This flag prevents the cookie
-from being sent in cross-site requests.
-
-See :setting:`SESSION_COOKIE_SAMESITE` for details on ``SameSite``.
-
 .. setting:: LANGUAGE_COOKIE_NAME
 
 ``LANGUAGE_COOKIE_NAME``

@@ -157,8 +157,6 @@ LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = None
 LANGUAGE_COOKIE_DOMAIN = None
 LANGUAGE_COOKIE_PATH = '/'
-LANGUAGE_COOKIE_SAMESITE = 'lax'
-
 
 # If you set this to True, Django will format dates, numbers and calendars
 # according to user current locale.
