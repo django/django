@@ -42,3 +42,6 @@ Bugfixes
   ``ModelAdmin.radio_fields`` with ``admin.HORIZONTAL`` (:ticket:`28059`).
 
 * Fixed crash in ``BaseGeometryWidget.subwidgets()`` (:ticket:`28039`).
+
+* Fixed exception reraising in ORM query execution when ``cursor.execute()``
+  fails and the subsequent ``cursor.close()`` also fails (:ticket:`28091`).
