@@ -45,3 +45,7 @@ Bugfixes
 
 * Fixed exception reraising in ORM query execution when ``cursor.execute()``
   fails and the subsequent ``cursor.close()`` also fails (:ticket:`28091`).
+
+* Fixed a regression where ``CheckboxSelectMultiple``, ``NullBooleanSelect``,
+  ``RadioSelect``, ``SelectMultiple``, and ``Select`` localized option values
+  (:ticket:`28075`).
