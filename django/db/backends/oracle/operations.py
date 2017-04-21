@@ -89,7 +89,7 @@ WHEN (new.%(col_name)s IS NULL)
             # IW = ISO week number
             return "TO_CHAR(%s, 'IW')" % field_name
         else:
-            # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
+            # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_interval_sql(self, timedelta):
@@ -99,7 +99,7 @@ WHEN (new.%(col_name)s IS NULL)
         return "NUMTODSINTERVAL(%06f, 'SECOND')" % (timedelta.total_seconds()), []
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
+        # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         else:
@@ -135,7 +135,7 @@ WHEN (new.%(col_name)s IS NULL)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
+        # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'day':
