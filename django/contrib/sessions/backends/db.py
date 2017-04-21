@@ -6,7 +6,6 @@ from django.contrib.sessions.backends.base import (
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 
@@ -38,7 +37,7 @@ class SessionStore(SessionBase):
         except (self.model.DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
                 logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                logger.warning(force_text(e))
+                logger.warning(str(e))
             self._session_key = None
             return {}
 

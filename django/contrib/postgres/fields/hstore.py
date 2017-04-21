@@ -4,7 +4,6 @@ from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
-from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ['HStoreField']
@@ -57,14 +56,14 @@ class HStoreField(Field):
         if isinstance(value, dict):
             prep_value = {}
             for key, val in value.items():
-                key = force_text(key)
+                key = str(key)
                 if val is not None:
-                    val = force_text(val)
+                    val = str(val)
                 prep_value[key] = val
             value = prep_value
 
         if isinstance(value, list):
-            value = [force_text(item) for item in value]
+            value = [str(item) for item in value]
 
         return value
 

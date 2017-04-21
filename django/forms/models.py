@@ -16,7 +16,6 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
-from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -1085,7 +1084,7 @@ class InlineForeignKeyField(Field):
             orig = getattr(self.parent_instance, self.to_field)
         else:
             orig = self.parent_instance.pk
-        if force_text(value) != force_text(orig):
+        if str(value) != str(orig):
             raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
         return self.parent_instance
 
@@ -1176,7 +1175,7 @@ class ModelChoiceField(ChoiceField):
         presented by this object. Subclasses can override this method to
         customize the display of the choices.
         """
-        return force_text(obj)
+        return str(obj)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
@@ -1219,7 +1218,7 @@ class ModelChoiceField(ChoiceField):
     def has_changed(self, initial, data):
         initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
-        return force_text(self.prepare_value(initial_value)) != force_text(data_value)
+        return str(self.prepare_value(initial_value)) != str(data_value)
 
 
 class ModelMultipleChoiceField(ModelChoiceField):
@@ -1286,9 +1285,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     params={'pk': pk},
                 )
         qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = set(force_text(getattr(o, key)) for o in qs)
+        pks = set(str(getattr(o, key)) for o in qs)
         for val in value:
-            if force_text(val) not in pks:
+            if str(val) not in pks:
                 raise ValidationError(
                     self.error_messages['invalid_choice'],
                     code='invalid_choice',
@@ -1310,8 +1309,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set(force_text(value) for value in self.prepare_value(initial))
-        data_set = set(force_text(value) for value in data)
+        initial_set = set(str(value) for value in self.prepare_value(initial))
+        data_set = set(str(value) for value in data)
         return data_set != initial_set
 
 

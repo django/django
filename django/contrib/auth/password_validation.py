@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, ValidationError,
 )
-from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import format_html
 from django.utils.module_loading import import_string
@@ -145,7 +144,7 @@ class UserAttributeSimilarityValidator:
             for value_part in value_parts:
                 if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() >= self.max_similarity:
                     try:
-                        verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
+                        verbose_name = str(user._meta.get_field(attribute_name).verbose_name)
                     except FieldDoesNotExist:
                         verbose_name = attribute_name
                     raise ValidationError(

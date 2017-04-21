@@ -14,7 +14,6 @@ from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats
-from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
@@ -233,7 +232,7 @@ def items_for_result(cl, result, form):
                     result_repr = display_for_field(value, f, empty_value_display)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_classes.append('nowrap')
-        if force_text(result_repr) == '':
+        if str(result_repr) == '':
             result_repr = mark_safe('&nbsp;')
         row_class = mark_safe(' class="%s"' % ' '.join(row_classes))
         # If list_display_links not defined, add the link tag to the first field
@@ -277,7 +276,7 @@ def items_for_result(cl, result, form):
                     field_name == cl.model._meta.pk.name and
                     form[cl.model._meta.pk.name].is_hidden)):
                 bf = form[field_name]
-                result_repr = mark_safe(force_text(bf.errors) + force_text(bf))
+                result_repr = mark_safe(str(bf.errors) + str(bf))
             yield format_html('<td{}>{}</td>', row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
         yield format_html('<td>{}</td>', form[cl.model._meta.pk.name])

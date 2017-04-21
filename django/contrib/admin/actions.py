@@ -8,7 +8,6 @@ from django.contrib.admin.utils import get_deleted_objects, model_ngettext
 from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.template.response import TemplateResponse
-from django.utils.encoding import force_text
 from django.utils.translation import gettext as _, gettext_lazy
 
 
@@ -44,7 +43,7 @@ def delete_selected(modeladmin, request, queryset):
         n = queryset.count()
         if n:
             for obj in queryset:
-                obj_display = force_text(obj)
+                obj_display = str(obj)
                 modeladmin.log_deletion(request, obj, obj_display)
             queryset.delete()
             modeladmin.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
@@ -63,7 +62,7 @@ def delete_selected(modeladmin, request, queryset):
     context = dict(
         modeladmin.admin_site.each_context(request),
         title=title,
-        objects_name=objects_name,
+        objects_name=str(objects_name),
         deletable_objects=[deletable_objects],
         model_count=dict(model_count).items(),
         queryset=queryset,

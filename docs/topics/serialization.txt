@@ -256,13 +256,12 @@ For example, if you have some custom type in an object to be serialized, you'll
 have to write a custom :mod:`json` encoder for it. Something like this will
 work::
 
-    from django.utils.encoding import force_text
     from django.core.serializers.json import DjangoJSONEncoder
 
     class LazyEncoder(DjangoJSONEncoder):
         def default(self, obj):
             if isinstance(obj, YourCustomType):
-                return force_text(obj)
+                return str(obj)
             return super().default(obj)
 
 You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``

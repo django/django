@@ -5,7 +5,6 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_text
 from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
@@ -55,8 +54,7 @@ class RegexValidator:
         Validate that the input contains a match for the regular expression
         if inverse_match is False, otherwise raise ValidationError.
         """
-        if not (self.inverse_match is not bool(self.regex.search(
-                force_text(value)))):
+        if not (self.inverse_match is not bool(self.regex.search(str(value)))):
             raise ValidationError(self.message, code=self.code)
 
     def __eq__(self, other):

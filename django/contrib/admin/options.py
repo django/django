@@ -38,7 +38,6 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -722,7 +721,7 @@ class ModelAdmin(BaseModelAdmin):
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
-            object_repr=force_text(object),
+            object_repr=str(object),
             action_flag=ADDITION,
             change_message=message,
         )
@@ -738,7 +737,7 @@ class ModelAdmin(BaseModelAdmin):
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
-            object_repr=force_text(object),
+            object_repr=str(object),
             action_flag=CHANGE,
             change_message=message,
         )
@@ -763,7 +762,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         A list_display column containing a checkbox widget.
         """
-        return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, force_text(obj.pk))
+        return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle" />')
 
     def get_actions(self, request):
@@ -1056,7 +1055,7 @@ class ModelAdmin(BaseModelAdmin):
         if self.has_change_permission(request, obj):
             obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
         else:
-            obj_repr = force_text(obj)
+            obj_repr = str(obj)
         msg_dict = {
             'name': opts.verbose_name,
             'obj': obj_repr,
@@ -1652,7 +1651,7 @@ class ModelAdmin(BaseModelAdmin):
 
         context = dict(
             self.admin_site.each_context(request),
-            module_name=force_text(opts.verbose_name_plural),
+            module_name=str(opts.verbose_name_plural),
             selection_note=_('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
             selection_note_all=selection_note_all % {'total_count': cl.result_count},
             title=cl.title,
@@ -1710,7 +1709,7 @@ class ModelAdmin(BaseModelAdmin):
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
-            obj_display = force_text(obj)
+            obj_display = str(obj)
             attr = str(to_field) if to_field else opts.pk.attname
             obj_id = obj.serializable_value(attr)
             self.log_deletion(request, obj, obj_display)
@@ -1718,7 +1717,7 @@ class ModelAdmin(BaseModelAdmin):
 
             return self.response_delete(request, obj_display, obj_id)
 
-        object_name = force_text(opts.verbose_name)
+        object_name = str(opts.verbose_name)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
@@ -1769,7 +1768,7 @@ class ModelAdmin(BaseModelAdmin):
             self.admin_site.each_context(request),
             title=_('Change history: %s') % obj,
             action_list=action_list,
-            module_name=capfirst(force_text(opts.verbose_name_plural)),
+            module_name=str(capfirst(opts.verbose_name_plural)),
             object=obj,
             opts=opts,
             preserved_filters=self.get_preserved_filters(request),

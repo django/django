@@ -2,7 +2,6 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
-from django.utils.encoding import force_text
 from django.utils.translation import gettext_lazy as _
 
 
@@ -151,7 +150,7 @@ class ContentType(models.Model):
         model = self.model_class()
         if not model:
             return self.model
-        return force_text(model._meta.verbose_name)
+        return str(model._meta.verbose_name)
 
     def model_class(self):
         """Return the model class for this type of content."""

@@ -25,7 +25,7 @@ from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
 from django.utils.duration import duration_string
-from django.utils.encoding import force_bytes, force_text, smart_text
+from django.utils.encoding import force_bytes, smart_text
 from django.utils.functional import Promise, cached_property, curry
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
@@ -805,7 +805,7 @@ class Field(RegisterLookupMixin):
         Return a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
-        return force_text(self.value_from_object(obj))
+        return str(self.value_from_object(obj))
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
@@ -1058,7 +1058,7 @@ class CharField(Field):
     def to_python(self, value):
         if isinstance(value, str) or value is None:
             return value
-        return force_text(value)
+        return str(value)
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
@@ -1920,7 +1920,7 @@ class GenericIPAddressField(Field):
         if value is None:
             return None
         if not isinstance(value, str):
-            value = force_text(value)
+            value = str(value)
         value = value.strip()
         if ':' in value:
             return clean_ipv6_address(value, self.unpack_ipv4, self.error_messages['invalid'])
@@ -2089,7 +2089,7 @@ class TextField(Field):
     def to_python(self, value):
         if isinstance(value, str) or value is None:
             return value
-        return force_text(value)
+        return str(value)
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)

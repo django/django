@@ -13,7 +13,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import force_bytes, iri_to_uri
 from django.utils.http import cookie_date
 
 _charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
@@ -405,7 +405,7 @@ class HttpResponseRedirectBase(HttpResponse):
     def __init__(self, redirect_to, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
-        parsed = urlparse(force_text(redirect_to))
+        parsed = urlparse(str(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
 

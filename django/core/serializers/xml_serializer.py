@@ -11,7 +11,6 @@ from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils.encoding import force_text
 from django.utils.xmlutils import (
     SimplerXMLGenerator, UnserializableContentError,
 )
@@ -48,11 +47,11 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        attrs = OrderedDict([("model", force_text(obj._meta))])
+        attrs = OrderedDict([("model", str(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             obj_pk = obj._get_pk_val()
             if obj_pk is not None:
-                attrs['pk'] = force_text(obj_pk)
+                attrs['pk'] = str(obj_pk)
 
         self.xml.startElement("object", attrs)
 
@@ -101,10 +100,10 @@ class Serializer(base.Serializer):
                 # Iterable natural keys are rolled out as subelements
                 for key_value in related:
                     self.xml.startElement("natural", {})
-                    self.xml.characters(force_text(key_value))
+                    self.xml.characters(str(key_value))
                     self.xml.endElement("natural")
             else:
-                self.xml.characters(force_text(related_att))
+                self.xml.characters(str(related_att))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
@@ -125,13 +124,13 @@ class Serializer(base.Serializer):
                     self.xml.startElement("object", {})
                     for key_value in natural:
                         self.xml.startElement("natural", {})
-                        self.xml.characters(force_text(key_value))
+                        self.xml.characters(str(key_value))
                         self.xml.endElement("natural")
                     self.xml.endElement("object")
             else:
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={
-                        'pk': force_text(value._get_pk_val())
+                        'pk': str(value._get_pk_val())
                     })
             for relobj in getattr(obj, field.name).iterator():
                 handle_m2m(relobj)
@@ -144,7 +143,7 @@ class Serializer(base.Serializer):
         self.xml.startElement("field", OrderedDict([
             ("name", field.name),
             ("rel", field.remote_field.__class__.__name__),
-            ("to", force_text(field.remote_field.model._meta)),
+            ("to", str(field.remote_field.model._meta)),
         ]))
 
 

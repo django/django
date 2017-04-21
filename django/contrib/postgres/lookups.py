@@ -1,5 +1,4 @@
 from django.db.models import Lookup, Transform
-from django.utils.encoding import force_text
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
@@ -38,7 +37,7 @@ class HasKeys(PostgresSimpleLookup):
     operator = '?&'
 
     def get_prep_lookup(self):
-        return [force_text(item) for item in self.rhs]
+        return [str(item) for item in self.rhs]
 
 
 class HasAnyKeys(HasKeys):

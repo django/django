@@ -28,7 +28,6 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
-from django.utils.encoding import force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
@@ -221,7 +220,7 @@ class CharField(Field):
         """Return a string."""
         if value in self.empty_values:
             return self.empty_value
-        value = force_text(value)
+        value = str(value)
         if self.strip:
             value = value.strip()
         return value
@@ -268,7 +267,7 @@ class IntegerField(Field):
             value = formats.sanitize_separators(value)
         # Strip trailing decimal and zeros.
         try:
-            value = int(self.re_decimal.sub('', force_text(value)))
+            value = int(self.re_decimal.sub('', str(value)))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -341,7 +340,7 @@ class DecimalField(IntegerField):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
-        value = force_text(value).strip()
+        value = str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
@@ -484,7 +483,7 @@ class DurationField(Field):
             return None
         if isinstance(value, datetime.timedelta):
             return value
-        value = parse_duration(force_text(value))
+        value = parse_duration(str(value))
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -784,7 +783,7 @@ class ChoiceField(Field):
         """Return a string."""
         if value in self.empty_values:
             return ''
-        return force_text(value)
+        return str(value)
 
     def validate(self, value):
         """Validate that the input is in self.choices."""
@@ -798,15 +797,15 @@ class ChoiceField(Field):
 
     def valid_value(self, value):
         """Check to see if the provided value is a valid choice."""
-        text_value = force_text(value)
+        text_value = str(value)
         for k, v in self.choices:
             if isinstance(v, (list, tuple)):
                 # This is an optgroup, so look inside the group for options
                 for k2, v2 in v:
-                    if value == k2 or text_value == force_text(k2):
+                    if value == k2 or text_value == str(k2):
                         return True
             else:
-                if value == k or text_value == force_text(k):
+                if value == k or text_value == str(k):
                     return True
         return False
 
@@ -851,7 +850,7 @@ class MultipleChoiceField(ChoiceField):
             return []
         elif not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['invalid_list'], code='invalid_list')
-        return [force_text(val) for val in value]
+        return [str(val) for val in value]
 
     def validate(self, value):
         """Validate that the input is a list or tuple."""
@@ -873,8 +872,8 @@ class MultipleChoiceField(ChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set(force_text(value) for value in initial)
-        data_set = set(force_text(value) for value in data)
+        initial_set = set(str(value) for value in initial)
+        data_set = set(str(value) for value in data)
         return data_set != initial_set
 
 

@@ -10,7 +10,6 @@ they're the closest concept currently available.
 """
 
 from django.core import exceptions
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 from . import BLANK_CHOICE_DASH
@@ -123,7 +122,7 @@ class ForeignObjectRel:
         initially for utilization by RelatedFieldListFilter.
         """
         return (blank_choice if include_blank else []) + [
-            (x._get_pk_val(), force_text(x)) for x in self.related_model._default_manager.all()
+            (x._get_pk_val(), str(x)) for x in self.related_model._default_manager.all()
         ]
 
     def is_hidden(self):

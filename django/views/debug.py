@@ -287,7 +287,7 @@ class ExceptionReporter:
             user_str = None
         else:
             try:
-                user_str = force_text(self.request.user)
+                user_str = str(self.request.user)
             except Exception:
                 # request.user may raise OperationalError if the database is
                 # unavailable, for example.
@@ -318,7 +318,7 @@ class ExceptionReporter:
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
         if self.exc_value:
-            c['exception_value'] = force_text(self.exc_value, errors='replace')
+            c['exception_value'] = str(self.exc_value)
         if frames:
             c['lastframe'] = frames[-1]
         return c

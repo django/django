@@ -43,7 +43,7 @@ def escape(text):
     conditional_escape() instead.
     """
     return mark_safe(
-        force_text(text).replace('&', '&amp;').replace('<', '&lt;')
+        str(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
     )
 
@@ -70,7 +70,7 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 @keep_lazy(str, SafeText)
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
-    return mark_safe(force_text(value).translate(_js_escapes))
+    return mark_safe(str(value).translate(_js_escapes))
 
 
 def conditional_escape(text):
@@ -121,8 +121,8 @@ def format_html_join(sep, format_string, args_generator):
 @keep_lazy_text
 def linebreaks(value, autoescape=False):
     """Convert newlines into <p> and <br />s."""
-    value = normalize_newlines(force_text(value))
-    paras = re.split('\n{2,}', value)
+    value = normalize_newlines(value)
+    paras = re.split('\n{2,}', str(value))
     if autoescape:
         paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
     else:

@@ -13,7 +13,6 @@ from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import datetime_safe
-from django.utils.encoding import force_text
 from django.utils.functional import LazyObject, Promise
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
@@ -303,7 +302,7 @@ class UUIDSerializer(BaseSerializer):
 def serializer_factory(value):
     from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
-        value = force_text(value)
+        value = str(value)
     elif isinstance(value, LazyObject):
         # The unwrapped value is returned as the first item of the arguments
         # tuple.

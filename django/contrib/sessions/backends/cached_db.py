@@ -9,7 +9,6 @@ from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.core.cache import caches
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
-from django.utils.encoding import force_text
 
 KEY_PREFIX = "django.contrib.sessions.cached_db"
 
@@ -49,7 +48,7 @@ class SessionStore(DBStore):
             except (self.model.DoesNotExist, SuspiciousOperation) as e:
                 if isinstance(e, SuspiciousOperation):
                     logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                    logger.warning(force_text(e))
+                    logger.warning(str(e))
                 self._session_key = None
                 data = {}
         return data
