@@ -17,6 +17,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
     can_release_savepoints = True
     supports_tablespaces = True
+    supports_schemas = True
     supports_transactions = True
     can_introspect_autofield = True
     can_introspect_ip_address_field = True

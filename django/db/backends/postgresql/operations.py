@@ -99,7 +99,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
-        return '"%s"' % name
+        # Quote schema and db seperately (#22673)
+        parts = name.split('.')
+        return '"' + '"."'.join(parts) + '"'
 
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
@@ -150,6 +152,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "USING INDEX TABLESPACE %s" % self.quote_name(tablespace)
         else:
             return "TABLESPACE %s" % self.quote_name(tablespace)
+
+    # Return SQL to create schema (#22673)
+    def schema_sql(self, schema):
+        return "CREATE SCHEMA IF NOT EXISTS %s;" % self.quote_name(schema)
 
     def sequence_reset_sql(self, style, model_list):
         from django.db import models

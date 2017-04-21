@@ -30,6 +30,16 @@ functionality.
 Note, however, that this view has always carried a warning that it is not
 hardened for production use and should be used only as a development aid.
 
++PostgreSQL Schema Objects
+
+PostgreSQL Schema Objects
+=========================
+
+Logic has been added to allow for PostgreSQL schema objects to be specified
+as part of the table name specification.  By prepending the schema name
+to the table name, separated by a period, the table will be created
+and manipulated within the given schema. (:ticket:`22673`)
+
 Bugfixes
 ========
 

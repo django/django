@@ -58,6 +58,10 @@ class Command(BaseCommand):
             tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
 
             for table_name in tables_to_introspect:
+                if options['table'] or table_name.startswith('"') and table_name.endswith('"'):
+                    quoted_table_name = table_name
+                else:
+                    quoted_table_name = '"' + table_name + '"'
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
@@ -75,7 +79,7 @@ class Command(BaseCommand):
                         c['columns'][0] for c in constraints.values()
                         if c['unique'] and len(c['columns']) == 1
                     ]
-                    table_description = connection.introspection.get_table_description(cursor, table_name)
+                    table_description = connection.introspection.get_table_description(cursor, quoted_table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
                     yield "# The error was: %s" % e
