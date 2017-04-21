@@ -49,3 +49,6 @@ Bugfixes
 * Fixed a regression where ``CheckboxSelectMultiple``, ``NullBooleanSelect``,
   ``RadioSelect``, ``SelectMultiple``, and ``Select`` localized option values
   (:ticket:`28075`).
+
+* Corrected the stack level of unordered queryset pagination warnings
+  (:ticket:`28109`).

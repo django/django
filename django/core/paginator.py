@@ -109,7 +109,8 @@ class Paginator(object):
             warnings.warn(
                 'Pagination may yield inconsistent results with an unordered '
                 'object_list: {!r}'.format(self.object_list),
-                UnorderedObjectListWarning
+                UnorderedObjectListWarning,
+                stacklevel=3
             )
 
 
