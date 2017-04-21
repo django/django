@@ -1,5 +1,8 @@
+import datetime
+
 from django import forms
 from django.forms import CheckboxSelectMultiple
+from django.test import override_settings
 
 from .base import WidgetTest
 
@@ -148,6 +151,34 @@ class CheckboxSelectMultipleTest(WidgetTest):
         </ul>
         """
         self.check_html(widget, 'letters', ['a', 'c'], html=html)
+
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_doesnt_localize_input_value(self):
+        choices = [
+            (1, 'One'),
+            (1000, 'One thousand'),
+            (1000000, 'One million'),
+        ]
+        html = """
+        <ul>
+        <li><label><input type="checkbox" name="numbers" value="1" /> One</label></li>
+        <li><label><input type="checkbox" name="numbers" value="1000" /> One thousand</label></li>
+        <li><label><input type="checkbox" name="numbers" value="1000000" /> One million</label></li>
+        </ul>
+        """
+        self.check_html(self.widget(choices=choices), 'numbers', None, html=html)
+
+        choices = [
+            (datetime.time(0, 0), 'midnight'),
+            (datetime.time(12, 0), 'noon'),
+        ]
+        html = """
+        <ul>
+        <li><label><input type="checkbox" name="times" value="00:00:00" /> midnight</label></li>
+        <li><label><input type="checkbox" name="times" value="12:00:00" /> noon</label></li>
+        </ul>
+        """
+        self.check_html(self.widget(choices=choices), 'times', None, html=html)
 
     def test_use_required_attribute(self):
         widget = self.widget(choices=self.beatles)

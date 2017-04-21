@@ -594,7 +594,7 @@ class ChoiceWidget(Widget):
             option_attrs['id'] = self.id_for_label(option_attrs['id'], index)
         return {
             'name': name,
-            'value': value,
+            'value': str(value),
             'label': label,
             'selected': selected,
             'index': index,

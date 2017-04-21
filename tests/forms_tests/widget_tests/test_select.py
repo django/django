@@ -1,6 +1,8 @@
 import copy
+import datetime
 
 from django.forms import Select
+from django.test import override_settings
 from django.utils.safestring import mark_safe
 
 from .base import WidgetTest
@@ -217,6 +219,34 @@ class SelectTest(WidgetTest):
             </optgroup>
             </select>"""
         ))
+
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_doesnt_localize_option_value(self):
+        choices = [
+            (1, 'One'),
+            (1000, 'One thousand'),
+            (1000000, 'One million'),
+        ]
+        html = """
+        <select name="number">
+        <option value="1">One</option>
+        <option value="1000">One thousand</option>
+        <option value="1000000">One million</option>
+        </select>
+        """
+        self.check_html(self.widget(choices=choices), 'number', None, html=html)
+
+        choices = [
+            (datetime.time(0, 0), 'midnight'),
+            (datetime.time(12, 0), 'noon'),
+        ]
+        html = """
+        <select name="time">
+        <option value="00:00:00">midnight</option>
+        <option value="12:00:00">noon</option>
+        </select>
+        """
+        self.check_html(self.widget(choices=choices), 'time', None, html=html)
 
     def test_options(self):
         options = list(self.widget(choices=self.beatles).options(
