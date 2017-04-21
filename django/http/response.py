@@ -199,7 +199,7 @@ class HttpResponseBase:
         if httponly:
             self.cookies[key]['httponly'] = True
         if samesite:
-            self.cookies[key]['samesite'] = samesite.capitalize()
+            self.cookies[key]['samesite'] = samesite
 
     def setdefault(self, key, value):
         """Set a header unless it has already been set."""
