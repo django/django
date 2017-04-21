@@ -11,7 +11,7 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=[], name=None):
+    def __init__(self, *, fields=[], name=None, db_tablespace=None):
         if not isinstance(fields, list):
             raise ValueError('Index.fields must be a list.')
         if not fields:
@@ -29,6 +29,7 @@ class Index:
                 errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
             if errors:
                 raise ValueError(errors)
+        self.db_tablespace = db_tablespace
 
     def check_name(self):
         errors = []
@@ -44,7 +45,7 @@ class Index:
 
     def get_sql_create_template_values(self, model, schema_editor, using):
         fields = [model._meta.get_field(field_name) for field_name, order in self.fields_orders]
-        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields)
+        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields, self.db_tablespace)
         quote_name = schema_editor.quote_name
         columns = [
             ('%s %s' % (quote_name(field.column), order)).strip()
@@ -73,7 +74,10 @@ class Index:
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         path = path.replace('django.db.models.indexes', 'django.db.models')
-        return (path, (), {'fields': self.fields, 'name': self.name})
+        kwargs = {'fields': self.fields, 'name': self.name}
+        if self.db_tablespace is not None:
+            kwargs['db_tablespace'] = self.db_tablespace
+        return (path, (), kwargs)
 
     def clone(self):
         """Create a copy of this Index."""

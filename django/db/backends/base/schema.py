@@ -879,16 +879,15 @@ class BaseDatabaseSchemaEditor:
             index_name = "D%s" % index_name[:-1]
         return index_name
 
-    def _get_index_tablespace_sql(self, model, fields):
-        if len(fields) == 1 and fields[0].db_tablespace:
-            tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
-        elif model._meta.db_tablespace:
-            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
-        else:
-            tablespace_sql = ""
-        if tablespace_sql:
-            tablespace_sql = " " + tablespace_sql
-        return tablespace_sql
+    def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
+        if db_tablespace is None:
+            if len(fields) == 1 and fields[0].db_tablespace:
+                db_tablespace = fields[0].db_tablespace
+            elif model._meta.db_tablespace:
+                db_tablespace = model._meta.db_tablespace
+        if db_tablespace is not None:
+            return ' ' + self.connection.ops.tablespace_sql(db_tablespace)
+        return ''
 
     def _create_index_sql(self, model, fields, suffix="", sql=None):
         """

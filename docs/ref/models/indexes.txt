@@ -23,7 +23,7 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=[], name=None)
+.. class:: Index(fields=[], name=None, db_tablespace=None)
 
     Creates an index (B-Tree) in the database.
 
@@ -56,6 +56,23 @@ case, a descending index is created as a normal index.
 The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
+
+``db_tablespace``
+-----------------
+
+.. attribute:: Index.db_tablespace
+
+.. versionadded:: 2.0
+
+The name of the :doc:`database tablespace </topics/db/tablespaces>` to use for
+this index. For single field indexes, if ``db_tablespace`` isn't provided, the
+index is created in the ``db_tablespace`` of the field.
+
+If :attr:`.Field.db_tablespace` isn't specified (or if the index uses multiple
+fields), the index is created in tablespace specified in the
+:attr:`~django.db.models.Options.db_tablespace` option inside the model's
+``class Meta``. If neither of those tablespaces are set, the index is created
+in the same tablespace as the table.
 
 .. seealso::
 
