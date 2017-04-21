@@ -571,9 +571,9 @@ class ChoiceWidget(Widget):
             for subvalue, sublabel in choices:
                 selected = (
                     force_text(subvalue) in value and
-                    (has_selected is False or self.allow_multiple_selected)
+                    (not has_selected or self.allow_multiple_selected)
                 )
-                if selected is True and has_selected is False:
+                if selected and not has_selected:
                     has_selected = True
                 subgroup.append(self.create_option(
                     name, subvalue, sublabel, selected, index,
@@ -931,7 +931,7 @@ class SelectDateWidget(Widget):
         context = super().get_context(name, value, attrs)
         date_context = {}
         year_choices = [(i, i) for i in self.years]
-        if self.is_required is False:
+        if not self.is_required:
             year_choices.insert(0, self.year_none_value)
         year_attrs = context['widget']['attrs'].copy()
         year_name = self.year_field % name
@@ -942,7 +942,7 @@ class SelectDateWidget(Widget):
             attrs=year_attrs,
         )
         month_choices = list(self.months.items())
-        if self.is_required is False:
+        if not self.is_required:
             month_choices.insert(0, self.month_none_value)
         month_attrs = context['widget']['attrs'].copy()
         month_name = self.month_field % name
@@ -953,7 +953,7 @@ class SelectDateWidget(Widget):
             attrs=month_attrs,
         )
         day_choices = [(i, i) for i in range(1, 32)]
-        if self.is_required is False:
+        if not self.is_required:
             day_choices.insert(0, self.day_none_value)
         day_attrs = context['widget']['attrs'].copy()
         day_name = self.day_field % name
