@@ -326,6 +326,7 @@ class Query:
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         obj.context = self.context.copy()
+        obj._forced_pk = getattr(self, '_forced_pk', False)
         return obj
 
     def add_context(self, key, value):

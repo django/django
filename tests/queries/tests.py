@@ -22,11 +22,11 @@ from .models import (
     Note, NullableName, Number, ObjectA, ObjectB, ObjectC, OneToOneCategory,
     Order, OrderItem, Page, Paragraph, Person, Plaything, PointerA, Program,
     ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking, Related,
-    RelatedIndividual, RelatedObject, Report, ReservedName, Responsibility,
-    School, SharedConnection, SimpleCategory, SingleObject, SpecialCategory,
-    Staff, StaffUser, Student, Tag, Task, Teacher, Ticket21203Child,
-    Ticket21203Parent, Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
-    X,
+    RelatedIndividual, RelatedObject, Report, ReportComment, ReservedName,
+    Responsibility, School, SharedConnection, SimpleCategory, SingleObject,
+    SpecialCategory, Staff, StaffUser, Student, Tag, Task, Teacher,
+    Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
+    Ticket23605C, TvChef, Valid, X,
 )
 
 
@@ -2405,6 +2405,18 @@ class ToFieldTests(TestCase):
             set(Food.objects.filter(eaten__in=Eaten.objects.filter(meal='lunch'))),
             {apple}
         )
+
+    def test_nested_in_subquery(self):
+        extra = ExtraInfo.objects.create()
+        author = Author.objects.create(num=42, extra=extra)
+        report = Report.objects.create(creator=author)
+        comment = ReportComment.objects.create(report=report)
+        comments = ReportComment.objects.filter(
+            report__in=Report.objects.filter(
+                creator__in=extra.author_set.all(),
+            ),
+        )
+        self.assertSequenceEqual(comments, [comment])
 
     def test_reverse_in(self):
         apple = Food.objects.create(name="apple")

@@ -52,3 +52,6 @@ Bugfixes
 
 * Corrected the stack level of unordered queryset pagination warnings
   (:ticket:`28109`).
+
+* Fixed a regression causing incorrect queries for ``__in`` subquery lookups
+  when models use ``ForeignKey.to_field`` (:ticket:`28101`).

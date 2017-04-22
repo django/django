@@ -69,7 +69,7 @@ class Annotation(models.Model):
 
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
-    note = models.ForeignKey(Note, models.CASCADE)
+    note = models.ForeignKey(Note, models.CASCADE, null=True)
     value = models.IntegerField(null=True)
 
     class Meta:
@@ -112,6 +112,10 @@ class Report(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ReportComment(models.Model):
+    report = models.ForeignKey(Report, models.CASCADE)
 
 
 class Ranking(models.Model):
