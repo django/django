@@ -7,6 +7,7 @@ from django.forms import (
 )
 from django.forms.models import ModelFormMetaclass
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import isolate_apps
 
 from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
@@ -235,6 +236,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
 
 
+@isolate_apps('forms_tests')
 class RelatedModelFormTests(SimpleTestCase):
     def test_invalid_loading_order(self):
         """
