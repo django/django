@@ -5,7 +5,8 @@ from datetime import date, datetime
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils import timezone
 
 from .models import Article, Author, MySQLUnixTimestamp
@@ -180,13 +181,6 @@ class CustomField(models.TextField):
             key, name = lookup_name.split('_', 1)
             return SQLFuncFactory(key, name)
         return super().get_transform(lookup_name)
-
-
-class CustomModel(models.Model):
-    field = CustomField()
-
-
-# We will register this class temporarily in the test method.
 
 
 class InMonth(models.lookups.Lookup):
@@ -523,22 +517,29 @@ class LookupTransformCallOrderTests(TestCase):
                              ['lookup'])
 
 
-class CustomisedMethodsTests(TestCase):
+@isolate_apps('custom_lookups')
+class CustomisedMethodsTests(SimpleTestCase):
+
+    def setUp(self):
+        class CustomModel(models.Model):
+            field = CustomField()
+
+        self.model = CustomModel
 
     def test_overridden_get_lookup(self):
-        q = CustomModel.objects.filter(field__lookupfunc_monkeys=3)
+        q = self.model.objects.filter(field__lookupfunc_monkeys=3)
         self.assertIn('monkeys()', str(q.query))
 
     def test_overridden_get_transform(self):
-        q = CustomModel.objects.filter(field__transformfunc_banana=3)
+        q = self.model.objects.filter(field__transformfunc_banana=3)
         self.assertIn('banana()', str(q.query))
 
     def test_overridden_get_lookup_chain(self):
-        q = CustomModel.objects.filter(field__transformfunc_banana__lookupfunc_elephants=3)
+        q = self.model.objects.filter(field__transformfunc_banana__lookupfunc_elephants=3)
         self.assertIn('elephants()', str(q.query))
 
     def test_overridden_get_transform_chain(self):
-        q = CustomModel.objects.filter(field__transformfunc_banana__transformfunc_pear=3)
+        q = self.model.objects.filter(field__transformfunc_banana__transformfunc_pear=3)
         self.assertIn('pear()', str(q.query))
 
 
