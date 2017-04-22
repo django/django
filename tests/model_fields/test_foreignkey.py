@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-from django.apps import apps
 from django.core import checks
 from django.db import models
 from django.test import TestCase, skipIfDBFeature
@@ -51,7 +50,8 @@ class ForeignKeyTests(TestCase):
         rel_name = Bar._meta.get_field('a').remote_field.related_name
         self.assertIsInstance(rel_name, str)
 
-    def test_abstract_model_pending_operations(self):
+    @isolate_apps('model_fields', kwarg_name='apps')
+    def test_abstract_model_pending_operations(self, apps):
         """
         Foreign key fields declared on abstract models should not add lazy
         relations to resolve relationship declared as string (#24215).

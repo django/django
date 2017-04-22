@@ -1,4 +1,3 @@
-from django.apps import apps
 from django.db import models
 from django.test import SimpleTestCase
 from django.test.utils import isolate_apps
@@ -16,7 +15,8 @@ class ManyToManyFieldTests(SimpleTestCase):
         self.assertEqual(qs.model, ManyToManyModel)
         self.assertEqual(list(qs), [])
 
-    def test_abstract_model_pending_operations(self):
+    @isolate_apps('model_fields', kwarg_name='apps')
+    def test_abstract_model_pending_operations(self, apps):
         """
         Many-to-many fields declared on abstract models should not add lazy
         relations to resolve relationship declared as string (#24215).
