@@ -184,12 +184,14 @@ their registration dates. We can do this using a conditional expression and the
     >>> Client.objects.values_list('name', 'account_type')
     <QuerySet [('Jane Doe', 'G'), ('James Smith', 'R'), ('Jack Black', 'P')]>
 
+.. _conditional-aggregation:
+
 Conditional aggregation
 -----------------------
 
 What if we want to find out how many clients there are for each
-``account_type``? We can nest conditional expression within
-:ref:`aggregate functions <aggregation-functions>` to achieve this::
+``account_type``? We can use the ``filter`` argument of :ref:`aggregate
+functions <aggregation-functions>` to achieve this::
 
     >>> # Create some more Clients first so we can have something to count
     >>> Client.objects.create(
@@ -207,17 +209,30 @@ What if we want to find out how many clients there are for each
     >>> # Get counts for each value of account_type
     >>> from django.db.models import IntegerField, Sum
     >>> Client.objects.aggregate(
-    ...     regular=Sum(
-    ...         Case(When(account_type=Client.REGULAR, then=1),
-    ...              output_field=IntegerField())
-    ...     ),
-    ...     gold=Sum(
-    ...         Case(When(account_type=Client.GOLD, then=1),
-    ...              output_field=IntegerField())
-    ...     ),
-    ...     platinum=Sum(
-    ...         Case(When(account_type=Client.PLATINUM, then=1),
-    ...              output_field=IntegerField())
-    ...     )
+    ...     regular=Count('pk', filter=Q(account_type=Client.REGULAR)),
+    ...     gold=Count('pk', filter=Q(account_type=Client.GOLD)),
+    ...     platinum=Count('pk', filter=Q(account_type=Client.PLATINUM)),
     ... )
     {'regular': 2, 'gold': 1, 'platinum': 3}
+
+This aggregate produces a query with the SQL 2003 ``FILTER WHERE`` syntax
+on databases that support it:
+
+.. code-block:: sql
+
+    SELECT count('id') FILTER (WHERE account_type=1) as regular,
+           count('id') FILTER (WHERE account_type=2) as gold,
+           count('id') FILTER (WHERE account_type=3) as platinum
+    FROM clients;
+
+On other databases, this is emulated using a ``CASE`` statement:
+
+.. code-block:: sql
+
+    SELECT count(CASE WHEN account_type=1 THEN id ELSE null) as regular,
+           count(CASE WHEN account_type=2 THEN id ELSE null) as gold,
+           count(CASE WHEN account_type=3 THEN id ELSE null) as platinum
+    FROM clients;
+
+The two SQL statements are functionally equivalent but the more explicit
+``FILTER`` may perform better.

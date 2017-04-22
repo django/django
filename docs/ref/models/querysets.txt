@@ -3085,6 +3085,17 @@ of the return value
     ``output_field`` if all fields are of the same type. Otherwise, you
     must provide the ``output_field`` yourself.
 
+``filter``
+~~~~~~~~~~
+
+.. versionadded:: 2.0
+
+An optional :class:`Q object <django.db.models.Q>` that's used to filter the
+rows that are aggregated.
+
+See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
+example usage.
+
 ``**extra``
 ~~~~~~~~~~~
 
@@ -3094,7 +3105,7 @@ by the aggregate.
 ``Avg``
 ~~~~~~~
 
-.. class:: Avg(expression, output_field=FloatField(), **extra)
+.. class:: Avg(expression, output_field=FloatField(), filter=None, **extra)
 
     Returns the mean value of the given expression, which must be numeric
     unless you specify a different ``output_field``.
@@ -3106,7 +3117,7 @@ by the aggregate.
 ``Count``
 ~~~~~~~~~
 
-.. class:: Count(expression, distinct=False, **extra)
+.. class:: Count(expression, distinct=False, filter=None, **extra)
 
     Returns the number of objects that are related through the provided
     expression.
@@ -3125,7 +3136,7 @@ by the aggregate.
 ``Max``
 ~~~~~~~
 
-.. class:: Max(expression, output_field=None, **extra)
+.. class:: Max(expression, output_field=None, filter=None, **extra)
 
     Returns the maximum value of the given expression.
 
@@ -3135,7 +3146,7 @@ by the aggregate.
 ``Min``
 ~~~~~~~
 
-.. class:: Min(expression, output_field=None, **extra)
+.. class:: Min(expression, output_field=None, filter=None, **extra)
 
     Returns the minimum value of the given expression.
 
@@ -3145,7 +3156,7 @@ by the aggregate.
 ``StdDev``
 ~~~~~~~~~~
 
-.. class:: StdDev(expression, sample=False, **extra)
+.. class:: StdDev(expression, sample=False, filter=None, **extra)
 
     Returns the standard deviation of the data in the provided expression.
 
@@ -3169,7 +3180,7 @@ by the aggregate.
 ``Sum``
 ~~~~~~~
 
-.. class:: Sum(expression, output_field=None, **extra)
+.. class:: Sum(expression, output_field=None, filter=None, **extra)
 
     Computes the sum of all values of the given expression.
 
@@ -3179,7 +3190,7 @@ by the aggregate.
 ``Variance``
 ~~~~~~~~~~~~
 
-.. class:: Variance(expression, sample=False, **extra)
+.. class:: Variance(expression, sample=False, filter=None, **extra)
 
     Returns the variance of the data in the provided expression.
 

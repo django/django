@@ -273,6 +273,10 @@ Models
   parameters, if the backend supports this feature. Of Django's built-in
   backends, only Oracle supports it.
 
+* The new ``filter`` argument for built-in aggregates allows :ref:`adding
+  different conditionals <conditional-aggregation>` to multiple aggregations
+  over the same fields or relations.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

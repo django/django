@@ -84,6 +84,16 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> pubs[0].num_books
     73
 
+    # Each publisher, with a separate count of books with a rating above and below 5
+    >>> from django.db.models import Q
+    >>> above_5 = Count('book', filter=Q(book__rating__gt=5))
+    >>> below_5 = Count('book', filter=Q(book__rating__lte=5))
+    >>> pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
+    >>> pubs[0].above_5
+    23
+    >>> pubs[0].below_5
+    12
+
     # The top 5 publishers, in order by number of books.
     >>> pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]
     >>> pubs[0].num_books
@@ -324,6 +334,8 @@ title that starts with "Django" using the query::
 
     >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
 
+.. _filtering-on-annotations:
+
 Filtering on annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -338,6 +350,27 @@ you can issue the query::
 
 This query generates an annotated result set, and then generates a filter
 based upon that annotation.
+
+If you need two annotations with two separate filters you can use the
+``filter`` argument with any aggregate. For example, to generate a list of
+authors with a count of highly rated books::
+
+    >>> highly_rated = Count('books', filter=Q(books__rating__gte=7))
+    >>> Author.objects.annotate(num_books=Count('books'), highly_rated_books=highly_rated)
+
+Each ``Author`` in the result set will have the ``num_books`` and
+``highly_rated_books`` attributes.
+
+.. admonition:: Choosing between ``filter`` and ``QuerySet.filter()``
+
+    Avoid using the ``filter`` argument with a single annotation or
+    aggregation. It's more efficient to use ``QuerySet.filter()`` to exclude
+    rows. The aggregation ``filter`` argument is only useful when using two or
+    more aggregations over the same relations with different conditionals.
+
+.. versionchanged:: 2.0
+
+    The ``filter`` argument was added to aggregates.
 
 Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

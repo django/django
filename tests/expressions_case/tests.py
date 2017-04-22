@@ -1255,6 +1255,15 @@ class CaseDocumentationExamples(TestCase):
         )
         self.assertEqual(
             Client.objects.aggregate(
+                regular=models.Count('pk', filter=Q(account_type=Client.REGULAR)),
+                gold=models.Count('pk', filter=Q(account_type=Client.GOLD)),
+                platinum=models.Count('pk', filter=Q(account_type=Client.PLATINUM)),
+            ),
+            {'regular': 2, 'gold': 1, 'platinum': 3}
+        )
+        # This was the example before the filter argument was added.
+        self.assertEqual(
+            Client.objects.aggregate(
                 regular=models.Sum(Case(
                     When(account_type=Client.REGULAR, then=1),
                     output_field=models.IntegerField(),

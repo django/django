@@ -22,7 +22,7 @@ General-purpose aggregation functions
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, distinct=False, **extra)
+.. class:: ArrayAgg(expression, distinct=False, filter=None, **extra)
 
     Returns a list of values, including nulls, concatenated into an array.
 
@@ -36,7 +36,7 @@ General-purpose aggregation functions
 ``BitAnd``
 ----------
 
-.. class:: BitAnd(expression, **extra)
+.. class:: BitAnd(expression, filter=None, **extra)
 
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``None`` if all values are null.
@@ -44,7 +44,7 @@ General-purpose aggregation functions
 ``BitOr``
 ---------
 
-.. class:: BitOr(expression, **extra)
+.. class:: BitOr(expression, filter=None, **extra)
 
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``None`` if all values are null.
@@ -52,7 +52,7 @@ General-purpose aggregation functions
 ``BoolAnd``
 -----------
 
-.. class:: BoolAnd(expression, **extra)
+.. class:: BoolAnd(expression, filter=None, **extra)
 
     Returns ``True``, if all input values are true, ``None`` if all values are
     null or if there are no values, otherwise ``False`` .
@@ -60,7 +60,7 @@ General-purpose aggregation functions
 ``BoolOr``
 ----------
 
-.. class:: BoolOr(expression, **extra)
+.. class:: BoolOr(expression, filter=None, **extra)
 
     Returns ``True`` if at least one input value is true, ``None`` if all
     values are null or if there are no values, otherwise ``False``.
@@ -68,7 +68,7 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, **extra)
+.. class:: JSONBAgg(expressions, filter=None, **extra)
 
     .. versionadded:: 1.11
 
@@ -77,7 +77,7 @@ General-purpose aggregation functions
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter, distinct=False)
+.. class:: StringAgg(expression, delimiter, distinct=False, filter=None)
 
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string.
@@ -105,7 +105,7 @@ field or an expression returning a numeric data. Both are required.
 ``Corr``
 --------
 
-.. class:: Corr(y, x)
+.. class:: Corr(y, x, filter=None)
 
     Returns the correlation coefficient as a ``float``, or ``None`` if there
     aren't any matching rows.
@@ -113,7 +113,7 @@ field or an expression returning a numeric data. Both are required.
 ``CovarPop``
 ------------
 
-.. class:: CovarPop(y, x, sample=False)
+.. class:: CovarPop(y, x, sample=False, filter=None)
 
     Returns the population covariance as a ``float``, or ``None`` if there
     aren't any matching rows.
@@ -129,7 +129,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrAvgX``
 ------------
 
-.. class:: RegrAvgX(y, x)
+.. class:: RegrAvgX(y, x, filter=None)
 
     Returns the average of the independent variable (``sum(x)/N``) as a
     ``float``, or ``None`` if there aren't any matching rows.
@@ -137,7 +137,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrAvgY``
 ------------
 
-.. class:: RegrAvgY(y, x)
+.. class:: RegrAvgY(y, x, filter=None)
 
     Returns the average of the dependent variable (``sum(y)/N``) as a
     ``float``, or ``None`` if there aren't any matching rows.
@@ -145,7 +145,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrCount``
 -------------
 
-.. class:: RegrCount(y, x)
+.. class:: RegrCount(y, x, filter=None)
 
     Returns an ``int`` of the number of input rows in which both expressions
     are not null.
@@ -153,7 +153,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrIntercept``
 -----------------
 
-.. class:: RegrIntercept(y, x)
+.. class:: RegrIntercept(y, x, filter=None)
 
     Returns the y-intercept of the least-squares-fit linear equation determined
     by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
@@ -162,7 +162,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrR2``
 ----------
 
-.. class:: RegrR2(y, x)
+.. class:: RegrR2(y, x, filter=None)
 
     Returns the square of the correlation coefficient as a ``float``, or
     ``None`` if there aren't any matching rows.
@@ -170,7 +170,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrSlope``
 -------------
 
-.. class:: RegrSlope(y, x)
+.. class:: RegrSlope(y, x, filter=None)
 
     Returns the slope of the least-squares-fit linear equation determined
     by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
@@ -179,7 +179,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrSXX``
 -----------
 
-.. class:: RegrSXX(y, x)
+.. class:: RegrSXX(y, x, filter=None)
 
     Returns ``sum(x^2) - sum(x)^2/N`` ("sum of squares" of the independent
     variable) as a ``float``, or ``None`` if there aren't any matching rows.
@@ -187,7 +187,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrSXY``
 -----------
 
-.. class:: RegrSXY(y, x)
+.. class:: RegrSXY(y, x, filter=None)
 
     Returns ``sum(x*y) - sum(x) * sum(y)/N`` ("sum of products" of independent
     times dependent variable) as a ``float``, or ``None`` if there aren't any
@@ -196,7 +196,7 @@ field or an expression returning a numeric data. Both are required.
 ``RegrSYY``
 -----------
 
-.. class:: RegrSYY(y, x)
+.. class:: RegrSYY(y, x, filter=None)
 
     Returns ``sum(y^2) - sum(y)^2/N`` ("sum of squares" of the dependent
     variable)  as a ``float``, or ``None`` if there aren't any matching rows.

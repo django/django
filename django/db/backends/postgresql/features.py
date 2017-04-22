@@ -51,6 +51,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     $$ LANGUAGE plpgsql;"""
 
     @cached_property
+    def supports_aggregate_filter_clause(self):
+        return self.connection.pg_version >= 90400
+
+    @cached_property
     def has_select_for_update_skip_locked(self):
         return self.connection.pg_version >= 90500
 
