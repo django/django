@@ -1,10 +1,13 @@
 import pickle
+from unittest import mock
 
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.test import TestCase
+from django.test.utils import isolate_apps
 from django.utils.version import get_version
 
 
+@isolate_apps('model_regress', attr_name='apps')
 class ModelPickleTestCase(TestCase):
     def test_missing_django_version_unpickling(self):
         """
@@ -22,7 +25,7 @@ class ModelPickleTestCase(TestCase):
 
         p = MissingDjangoVersion(title="FooBar")
         msg = "Pickled model instance's Django version is not specified."
-        with self.assertRaisesMessage(RuntimeWarning, msg):
+        with mock.patch('django.db.models.base.apps', self.apps), self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
 
     def test_unsupported_unpickle(self):
@@ -41,5 +44,5 @@ class ModelPickleTestCase(TestCase):
 
         p = DifferentDjangoVersion(title="FooBar")
         msg = "Pickled model instance's Django version 1.0 does not match the current version %s." % get_version()
-        with self.assertRaisesMessage(RuntimeWarning, msg):
+        with mock.patch('django.db.models.base.apps', self.apps), self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
