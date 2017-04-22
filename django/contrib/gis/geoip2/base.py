@@ -4,8 +4,8 @@ import socket
 import geoip2.database
 
 from django.conf import settings
-from django.core.validators import ipv4_re
-from django.utils.ipv6 import is_valid_ipv6_address
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_ipv46_address
 
 from .resources import City, Country
 
@@ -157,7 +157,9 @@ class GeoIP2:
             raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._city_file)
 
         # Return the query string back to the caller. GeoIP2 only takes IP addresses.
-        if not (ipv4_re.match(query) or is_valid_ipv6_address(query)):
+        try:
+            validate_ipv46_address(query)
+        except ValidationError:
             query = socket.gethostbyname(query)
 
         return query

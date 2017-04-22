@@ -161,3 +161,10 @@ class GeoIPTest(unittest.TestCase):
             'city': city_path,
         }
         self.assertEqual(repr(g), expected)
+
+    @mock.patch('socket.gethostbyname', return_value='expected')
+    def test_check_query(self, gethostbyname):
+        g = GeoIP2()
+        self.assertEqual(g._check_query('127.0.0.1'), '127.0.0.1')
+        self.assertEqual(g._check_query('2002:81ed:c9a5::81ed:c9a5'), '2002:81ed:c9a5::81ed:c9a5')
+        self.assertEqual(g._check_query('invalid-ip-address'), 'expected')
