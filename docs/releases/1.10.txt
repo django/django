@@ -355,7 +355,7 @@ Management Commands
   accepts a command object as the first argument.
 
 * The :djadmin:`shell` command supports tab completion on systems using
-  ``libedit``, e.g. Mac OSX.
+  ``libedit``, e.g. macOS.
 
 * The :djadmin:`inspectdb` command lets you choose what tables should be
   inspected by specifying their names as arguments.

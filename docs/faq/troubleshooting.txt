@@ -24,12 +24,12 @@ If ``django-admin`` doesn't work but ``django-admin.py`` does, you're probably
 using a version of Django that doesn't match the version of this documentation.
 ``django-admin`` is new in Django 1.7.
 
-Mac OS X permissions
---------------------
+macOS permissions
+-----------------
 
-If you're using Mac OS X, you may see the message "permission denied" when
+If you're using macOS, you may see the message "permission denied" when
 you try to run ``django-admin``. This is because, on Unix-based systems like
-OS X, a file must be marked as "executable" before it can be run as a program.
+macOS, a file must be marked as "executable" before it can be run as a program.
 To do this, open Terminal.app and navigate (using the ``cd`` command) to the
 directory where :doc:`django-admin </ref/django-admin>` is installed, then
 run the command ``sudo chmod +x django-admin``.

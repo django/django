@@ -34,8 +34,8 @@ features include:
   may be used outside of a Django project/application.  In other words,
   no need to have ``DJANGO_SETTINGS_MODULE`` set or use a database, etc.
 * Mutability: :class:`GEOSGeometry` objects may be modified.
-* Cross-platform and tested; compatible with Windows, Linux, Solaris, and Mac
-  OS X platforms.
+* Cross-platform and tested; compatible with Windows, Linux, Solaris, and
+  macOS platforms.
 
 .. _geos-tutorial:
 

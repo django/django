@@ -258,7 +258,7 @@ a dependency for one or more of the Python packages. Consult the failing
 package's documentation or search the Web with the error message that you
 encounter.
 
-Now we are ready to run the test suite. If you're using GNU/Linux, Mac OS X or
+Now we are ready to run the test suite. If you're using GNU/Linux, macOS, or
 some other flavor of Unix, run:
 
 .. code-block:: console

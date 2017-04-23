@@ -65,7 +65,7 @@ Optional packages to consider:
 * ``libgeoip1``: for :doc:`GeoIP <../geoip2>` support
 * ``python-gdal`` for GDAL's own Python bindings -- includes interfaces for raster manipulation
 
-Please also consult platform-specific instructions if you are on :ref:`macosx`
+Please also consult platform-specific instructions if you are on :ref:`macos`
 or :ref:`windows`.
 
 .. _build_from_source:
@@ -88,11 +88,9 @@ is required.
 
 .. note::
 
-    OS X users are required to install `Apple Developer Tools`_ in order
-    to compile software from source.  This is typically included on your
-    OS X installation DVDs.
+    macOS users must install `Xcode`_ in order to compile software from source.
 
-.. _Apple Developer Tools: https://developer.apple.com/technologies/tools/
+.. _Xcode: https://developer.apple.com/xcode/
 
 .. _geosbuild:
 

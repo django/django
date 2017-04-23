@@ -14,7 +14,7 @@ On Debian/Ubuntu, you are advised to install the following packages:
 postgresql-x.x, postgresql-x.x-postgis, postgresql-server-dev-x.x,
 python-psycopg2 (x.x matching the PostgreSQL version you want to install).
 Alternately, you can `build from source`_. Consult the platform-specific
-instructions if you are on :ref:`macosx` or :ref:`windows`.
+instructions if you are on :ref:`macos` or :ref:`windows`.
 
 .. _PostGIS: https://postgis.net/
 .. _psycopg2: http://initd.org/psycopg/
