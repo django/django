@@ -1100,15 +1100,12 @@ class QuerySet:
             self._known_related_objects.setdefault(field, {}).update(objects)
 
     def _prepare_as_filter_value(self):
-        if self._fields is None:
-            queryset = self.values('pk')
-            queryset.query._forced_pk = True
-        else:
+        if self._fields and len(self._fields) > 1:
             # values() queryset can only be used as nested queries
             # if they are set up to select only a single field.
             if len(self._fields) > 1:
                 raise TypeError('Cannot use multi-field values as a filter value.')
-            queryset = self._clone()
+        queryset = self._clone()
         return queryset.query.as_subquery_filter(queryset._db)
 
     def _add_hints(self, **hints):

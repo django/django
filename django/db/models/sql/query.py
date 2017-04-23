@@ -214,6 +214,10 @@ class Query:
             self._annotations = OrderedDict()
         return self._annotations
 
+    @property
+    def has_select_fields(self):
+        return bool(self.select or self.annotation_select_mask or self.extra_select_mask)
+
     def __str__(self):
         """
         Return the query as a string of SQL with the parameter values
@@ -326,7 +330,6 @@ class Query:
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         obj.context = self.context.copy()
-        obj._forced_pk = getattr(self, '_forced_pk', False)
         return obj
 
     def add_context(self, key, value):
@@ -1060,10 +1063,7 @@ class Query:
             # opts would be Author's (from the author field) and value.model
             # would be Author.objects.all() queryset's .model (Author also).
             # The field is the related field on the lhs side.
-            # If _forced_pk isn't set, this isn't a queryset query or values()
-            # or values_list() was specified by the developer in which case
-            # that choice is trusted.
-            if (getattr(value, '_forced_pk', False) and
+            if (isinstance(value, Query) and not value.has_select_fields and
                     not check_rel_lookup_compatibility(value.model, opts, field)):
                 raise ValueError(
                     'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
