@@ -717,7 +717,7 @@ If your tests make any database queries, use subclasses
     ``tearDownClass()`` are run. In the case of :class:`django.test.TestCase`,
     this will leak the transaction created in ``super()``  which results in
     various symptoms including a segmentation fault on some platforms (reported
-    on OS X). If you want to intentionally raise an exception such as
+    on macOS). If you want to intentionally raise an exception such as
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 

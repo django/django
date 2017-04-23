@@ -11,7 +11,7 @@ For example, on Debian-based distributions, try to install the
 ``spatialite-bin`` package. For distributions that package SpatiaLite 4.2+,
 install ``libsqlite3-mod-spatialite``.
 
-For Mac OS X, follow the :ref:`instructions below<spatialite_macosx>`.
+For macOS, follow the :ref:`instructions below<spatialite_macos>`.
 
 For Windows, you may find binaries on the `Gaia-SINS`__ home page.
 
@@ -81,19 +81,19 @@ Get the latest SpatiaLite library source bundle from the
 
 .. note::
 
-    For Mac OS X users building from source, the SpatiaLite library *and* tools
+    For macOS users building from source, the SpatiaLite library *and* tools
     need to have their ``target`` configured::
 
         $ ./configure --target=macosx
 
 __ https://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
-.. _spatialite_macosx:
+.. _spatialite_macos:
 
-Mac OS X-specific instructions
+macOS-specific instructions
 ==============================
 
-To install the SpatiaLite library and tools, Mac OS X users can choose between
+To install the SpatiaLite library and tools, macOS users can choose between
 :ref:`kyngchaos` and `Homebrew`_.
 
 KyngChaos
@@ -103,7 +103,7 @@ First, follow the instructions in the :ref:`kyngchaos` section.
 
 When creating a SpatiaLite database, the ``spatialite`` program is required.
 However, instead of attempting to compile the SpatiaLite tools from source,
-download the `SpatiaLite Binaries`__ for OS X, and install ``spatialite`` in a
+download the `SpatiaLite Binaries`__ for macOS, and install ``spatialite`` in a
 location available in your ``PATH``.  For example::
 
     $ curl -O https://www.gaia-gis.it/spatialite/spatialite-tools-osx-x86-2.3.1.tar.gz

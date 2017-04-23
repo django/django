@@ -16,7 +16,7 @@ Details for each of the requirements and installation instructions
 are provided in the sections below. In addition, platform-specific
 instructions are available for:
 
-* :ref:`macosx`
+* :ref:`macos`
 * :ref:`windows`
 
 .. admonition:: Use the Source
@@ -181,12 +181,12 @@ Similarly, on Red Hat and CentOS systems::
 Platform-specific instructions
 ==============================
 
-.. _macosx:
+.. _macos:
 
-Mac OS X
---------
+macOS
+-----
 
-Because of the variety of packaging systems available for OS X, users have
+Because of the variety of packaging systems available for macOS, users have
 several different options for installing GeoDjango. These options are:
 
 * :ref:`postgresapp` (easiest and recommended)
@@ -197,17 +197,17 @@ several different options for installing GeoDjango. These options are:
 * :ref:`build_from_source`
 
 This section also includes instructions for installing an upgraded version
-of :ref:`macosx_python` from packages provided by the Python Software
+of :ref:`macos_python` from packages provided by the Python Software
 Foundation, however, this is not required.
 
-.. _macosx_python:
+.. _macos_python:
 
 Python
 ~~~~~~
 
-Although OS X comes with Python installed, users can use `framework
+Although macOS comes with Python installed, users can use `framework
 installers`__ provided by the Python Software Foundation.  An advantage to
-using the installer is that OS X's Python will remain "pristine" for internal
+using the installer is that macOS's Python will remain "pristine" for internal
 operating system use.
 
 __ https://www.python.org/ftp/python/
@@ -247,8 +247,8 @@ Homebrew
 
 `Homebrew`__ provides "recipes" for building binaries and packages from source.
 It provides recipes for the GeoDjango prerequisites on Macintosh computers
-running OS X. Because Homebrew still builds the software from source, the
-`Apple Developer Tools`_ are required.
+running macOS. Because Homebrew still builds the software from source, `Xcode`_
+is required.
 
 Summary::
 
@@ -258,7 +258,7 @@ Summary::
     $ brew install libgeoip
 
 __ http://brew.sh/
-.. _Apple Developer Tools: https://developer.apple.com/technologies/tools/
+.. _Xcode: https://developer.apple.com/xcode/
 
 .. _kyngchaos:
 
@@ -266,14 +266,13 @@ KyngChaos packages
 ~~~~~~~~~~~~~~~~~~
 
 William Kyngesburye provides a number of `geospatial library binary packages`__
-that make it simple to get GeoDjango installed on OS X without compiling
-them from source.  However, the `Apple Developer Tools`_ are still necessary
-for compiling the Python database adapters :ref:`psycopg2_kyngchaos` (for
-PostGIS).
+that make it simple to get GeoDjango installed on macOS without compiling
+them from source.  However, `Xcode`_ is still necessary for compiling the
+Python database adapters :ref:`psycopg2_kyngchaos` (for PostGIS).
 
 .. note::
 
-    SpatiaLite users should consult the :ref:`spatialite_macosx` section
+    SpatiaLite users should consult the :ref:`spatialite_macos` section
     after installing the packages for additional instructions.
 
 Download the framework packages for:
@@ -336,9 +335,9 @@ __ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 MacPorts
 ~~~~~~~~
 
-`MacPorts`__ may be used to install GeoDjango prerequisites on Macintosh
-computers running OS X.  Because MacPorts still builds the software from source,
-the `Apple Developer Tools`_ are required.
+`MacPorts`__ may be used to install GeoDjango prerequisites on computers
+running macOS.  Because MacPorts still builds the software from source,
+`Xcode`_ is required.
 
 Summary::
 
