@@ -113,9 +113,10 @@ class BaseDatabaseIntrospection:
         all apps.
         """
         from django.apps import apps
-        from django.db import models, router
+        from django.db import router
 
         sequence_list = []
+        cursor = self.connection.cursor()
 
         for app_config in apps.get_app_configs():
             for model in router.get_migratable_models(app_config, self.connection.alias):
@@ -123,18 +124,22 @@ class BaseDatabaseIntrospection:
                     continue
                 if model._meta.swapped:
                     continue
-                for f in model._meta.local_fields:
-                    if isinstance(f, models.AutoField):
-                        sequence_list.append({'table': model._meta.db_table, 'column': f.column})
-                        break  # Only one AutoField is allowed per model, so don't bother continuing.
-
+                sequence_list.extend(self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields))
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
                     if f.remote_field.through is None:
-                        sequence_list.append({'table': f.m2m_db_table(), 'column': None})
-
+                        sequence = self.get_sequences(cursor, f.m2m_db_table())
+                        sequence_list.extend(sequence if sequence else [{'table': f.m2m_db_table(), 'column': None}])
         return sequence_list
+
+    def get_sequences(self, cursor, table_name, table_fields=()):
+        """
+        Return a list of introspected sequences for table_name. Each sequence
+        is a dict: {'table': <table_name>, 'column': <column_name>}. An optional
+        'name' key can be added if the backend supports named sequences.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_sequences() method')
 
     def get_key_columns(self, cursor, table_name):
         """
