@@ -311,6 +311,35 @@ pass a dictionary mapping field names to errors::
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
 
+.. admonition:: How to raise field-specific validation errors if those fields don't appear in a ``ModelForm``
+
+    You can't raise validation errors in ``Model.clean()`` for fields that
+    don't appear in a model form (a form may limit its fields using
+    ``Meta.fields`` or ``Meta.exclude``). Doing so will raise a ``ValueError``
+    because the validation error won't be able to be associated with the
+    excluded field.
+
+    To work around this dilemma, instead override :meth:`Model.clean_fields()
+    <django.db.models.Model.clean_fields>` as it receives the list of fields
+    that are excluded from validation. For example::
+
+        class Article(models.Model):
+            ...
+            def clean_fields(self, exclude=None):
+                super().clean_fields(exclude=exclude)
+                if self.status == 'draft' and self.pub_date is not None:
+                    if exclude and 'status' in exclude:
+                        raise ValidationError(
+                            _('Draft entries may not have a publication date.')
+                        )
+                    else:
+                        raise ValidationError({
+                            'status': _(
+                                'Set status to draft if there is not a '
+                                'publication date.'
+                             ),
+                        })
+
 .. method:: Model.validate_unique(exclude=None)
 
 This method is similar to :meth:`~Model.clean_fields`, but validates all
