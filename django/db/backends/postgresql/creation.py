@@ -1,5 +1,7 @@
 import sys
 
+from psycopg2 import errorcodes
+
 from django.db.backends.base.creation import BaseDatabaseCreation
 
 
@@ -32,9 +34,8 @@ class DatabaseCreation(BaseDatabaseCreation):
         try:
             super()._execute_create_test_db(cursor, parameters, keepdb)
         except Exception as e:
-            exc_msg = 'database %s already exists' % parameters['dbname']
-            if exc_msg not in str(e):
-                # All errors except "database already exists" cancel tests
+            if getattr(e.__cause__, 'pgcode', '') != errorcodes.DUPLICATE_DATABASE:
+                # All errors except "database already exists" cancel tests.
                 sys.stderr.write('Got an error creating the test database: %s\n' % e)
                 sys.exit(2)
             elif not keepdb:
