@@ -399,6 +399,10 @@ backends.
   :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
   ``max_length`` argument isn't provided.
 
+* Third-party database backends should add a
+  ``DatabaseIntrospection.get_sequences()`` method based on the stub in
+  ``BaseDatabaseIntrospection``..
+
 Dropped support for Oracle 11.2
 -------------------------------
 
