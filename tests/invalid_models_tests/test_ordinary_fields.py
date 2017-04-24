@@ -139,6 +139,21 @@ class CharFieldTests(TestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_str_max_length_type(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=True)
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                "'max_length' must be a positive integer.",
+                obj=field,
+                id='fields.E121'
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     def test_non_iterable_choices(self):
         class Model(models.Model):
             field = models.CharField(max_length=10, choices='bad')
