@@ -63,3 +63,6 @@ Bugfixes
   that have initial data (:ticket:`28130`).
 
 * Prepared for ``cx_Oracle`` 6.0 support (:ticket:`28138`).
+
+* Updated the ``contrib.postgres`` ``SplitArrayWidget`` to use template-based
+  widget rendering (:ticket:`28040`).
