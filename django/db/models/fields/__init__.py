@@ -1040,8 +1040,8 @@ class CharField(Field):
                     id='fields.E120',
                 )
             ]
-        elif (not isinstance(self.max_length, int) or isinstance(self.max_length, bool)
-                or self.max_length <= 0):
+        elif (not isinstance(self.max_length, int) or isinstance(self.max_length, bool) or
+                self.max_length <= 0):
             return [
                 checks.Error(
                     "'max_length' must be a positive integer.",
