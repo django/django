@@ -29,9 +29,6 @@ class ComplexMultiWidget(MultiWidget):
             ]
         return [None, None, None]
 
-    def format_output(self, rendered_widgets):
-        return '\n'.join(rendered_widgets)
-
 
 class ComplexField(MultiValueField):
     def __init__(self, required=True, widget=None, label=None, initial=None):
