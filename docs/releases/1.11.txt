@@ -601,14 +601,15 @@ Some widget values, such as ``<select>`` options, are now localized if
 widget templates that uses the :ttag:`localize` template tag to turn off
 localization.
 
-``django.Template.render()`` prohibits non-dict context
--------------------------------------------------------
+``django.template.backends.django.Template.render()`` prohibits non-dict context
+--------------------------------------------------------------------------------
 
-For compatibility with multiple template engines, ``django.Template.render()``
-must receive a dictionary of context rather than ``Context`` or
-``RequestContext``. If you were passing either of the two classes, pass a
-dictionary instead -- doing so is backwards-compatible with older versions of
-Django.
+For compatibility with multiple template engines,
+``django.template.backends.django.Template.render()`` (returned from high-level
+template loader APIs such as ``loader.get_template()``) must receive a
+dictionary of context rather than ``Context`` or ``RequestContext``. If you
+were passing either of the two classes, pass a dictionary instead -- doing so
+is backwards-compatible with older versions of Django.
 
 Model state changes in migration operations
 -------------------------------------------
