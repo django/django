@@ -239,6 +239,28 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             '<ul><li>Your password can&#39;t be too similar to your other personal information.</li></ul>'
         )
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    ])
+    def test_user_create_form_validates_password_with_all_data(self):
+        """UserCreationForm password validation uses all of the form's data."""
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = User
+                fields = ('username', 'email', 'first_name', 'last_name')
+        form = CustomUserCreationForm({
+            'username': 'testuser',
+            'password1': 'testpassword',
+            'password2': 'testpassword',
+            'first_name': 'testpassword',
+            'last_name': 'lastname',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors['password2'],
+            ['The password is too similar to the first name.'],
+        )
+
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
