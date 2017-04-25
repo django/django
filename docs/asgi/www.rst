@@ -262,7 +262,7 @@ Channel: ``websocket.connect``
 
 Keys:
 
-* ``reply_channel``: Channel name for sending data, start with ``websocket.send!``
+* ``reply_channel``: Channel name for sending data
 
 * ``scheme``: Unicode string URL scheme portion (likely ``ws`` or ``wss``).
   Optional (but must not be empty), default is ``ws``.
@@ -304,7 +304,7 @@ Channel: ``websocket.receive``
 
 Keys:
 
-* ``reply_channel``: Channel name for sending data, starting with ``websocket.send!``
+* ``reply_channel``: Channel name for sending data
 
 * ``path``: Path sent during ``connect``, sent to make routing easier for apps.
 
@@ -332,8 +332,8 @@ Channel: ``websocket.disconnect``
 
 Keys:
 
-* ``reply_channel``: Channel name that was used for sending data, starting
-  with ``websocket.send!``. Cannot be used to send at this point; provided
+* ``reply_channel``: Channel name that was used for sending data.
+  Cannot be used to send at this point; provided
   as a way to identify the connection only.
 
 * ``code``: The WebSocket close code (integer), as per the WebSocket spec.
