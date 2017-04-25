@@ -82,12 +82,11 @@ class DatabaseErrorWrapper:
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*exc_value.args)
-                dj_exc_value.__cause__ = exc_value
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
                     self.wrapper.errors_occurred = True
-                raise dj_exc_value.with_traceback(traceback)
+                raise dj_exc_value.with_traceback(traceback) from exc_value
 
     def __call__(self, func):
         # Note that we are intentionally not using @wraps here for performance
