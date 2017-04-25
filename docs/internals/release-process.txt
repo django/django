@@ -137,7 +137,7 @@ page for the current state of support for each version.
 
   * Crashing bugs.
 
-  * Major functionality bugs in newly-introduced features.
+  * Major functionality bugs in new features of the latest stable release.
 
   * Regressions from older versions of Django.
 
