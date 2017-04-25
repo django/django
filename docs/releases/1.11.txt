@@ -464,6 +464,13 @@ Backwards incompatible changes in 1.11
 
 * Support for GDAL 1.7 and 1.8 is dropped.
 
+* The widgets in ``contrib.gis.forms.widgets`` and the admin's
+  ``OpenLayersWidget`` use the :doc:`form rendering API </ref/forms/renderers>`
+  rather than ``loader.render_to_string()``. If you're using a custom widget
+  template, you'll need to be sure your form renderer can locate it. For
+  example, you could use the :class:`~django.forms.renderers.TemplatesSetting`
+  renderer.
+
 :mod:`django.contrib.staticfiles`
 ---------------------------------
 
