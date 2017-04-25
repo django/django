@@ -7,6 +7,7 @@ from email.parser import HeaderParser
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.safestring import mark_safe
+from django.utils.six.moves import zip as izip
 
 try:
     import docutils.core
@@ -145,93 +146,53 @@ if docutils_is_available:
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
 
-# Match the beginning of a named or unnamed group.
-named_group_matcher = re.compile(r'\(\?P(<\w+>)')
-unnamed_group_matcher = re.compile(r'\(')
+
+# Match unescaped parenthesis in a regex, simplify groups and then clean.
+parenthesis_matcher = re.compile(r'\\.|([()])')
+groups_matcher = re.compile(r'^\((?:\?(?:([iLmsux:])|P(<\w+>)|([P#=!<(]))|(?#empty))(.*)\)$')
+cleanup_matcher = re.compile(
+    r'(\\0[0-9]{0,3})|\\([^1-9AbBdDsSwWZafnrt])|\\[1-9][0-9]?|\\[AbBdDsSwWZafnrt]|[.^$*+?|]|\[[^]]*\]|\{[^}]*\}')
 
 
-def replace_named_groups(pattern):
+def simplify_regex(pattern):
     r"""
-    Find named groups in `pattern` and replace them with the group name. E.g.,
-    1. ^(?P<a>\w+)/b/(\w+)$ ==> ^<a>/b/(\w+)$
-    2. ^(?P<a>\w+)/b/(?P<c>\w+)/$ ==> ^<a>/b/<c>/$
+    Clean up urlpattern regexes into something more readable by humans. For
+    example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
+    into "/<sport_slug>/athletes/<athlete_slug>/".
     """
-    named_group_indices = [
-        (m.start(0), m.end(0), m.group(1))
-        for m in named_group_matcher.finditer(pattern)
-    ]
-    # Tuples of (named capture group pattern, group name).
-    group_pattern_and_name = []
-    # Loop over the groups and their start and end indices.
-    for start, end, group_name in named_group_indices:
-        # Handle nested parentheses, e.g. '^(?P<a>(x|y))/b'.
-        unmatched_open_brackets, prev_char = 1, None
-        for idx, val in enumerate(list(pattern[end:])):
-            # If brackets are balanced, the end of the string for the current
-            # named capture group pattern has been reached.
-            if unmatched_open_brackets == 0:
-                group_pattern_and_name.append((pattern[start:end + idx], group_name))
-                break
+    indices = [m.start(1) for m in parenthesis_matcher.finditer(pattern) if m.start(1) != -1]
+    level = 0
+    indices_level = {}
+    for start in indices:
+        val = pattern[start]
+        if val == '(':
+            indices_level.setdefault(level, []).append(start)
+            level += 1
+        else:
+            level -= 1
+            indices_level.setdefault(level, []).append(start + 1)
+    adjustments = [0] * len(pattern)
+    for level, indices in sorted(indices_level.items(), reverse=True):
+        it = iter(indices)
+        for i, (start, end) in enumerate(izip(it, it)):
+            adjusted_start = start + sum(adjustments[:start])
+            adjusted_end = end + sum(adjustments[:end])
+            val = pattern[adjusted_start:adjusted_end]
+            match = groups_matcher.match(val)
+            non_capturing, named, ignored, content = match.groups()
+            if named:
+                replacer = named
+            elif non_capturing:
+                replacer = content
+            elif ignored:
+                replacer = ''
+            else:
+                replacer = '<var>'
+            adjustments[start] += len(replacer) - (adjusted_end - adjusted_start)
+            pattern = pattern[:adjusted_start] + replacer + pattern[adjusted_end:]
 
-            # Check for unescaped `(` and `)`. They mark the start and end of a
-            # nested group.
-            if val == '(' and prev_char != '\\':
-                unmatched_open_brackets += 1
-            elif val == ')' and prev_char != '\\':
-                unmatched_open_brackets -= 1
-            prev_char = val
-
-    # Replace the string for named capture groups with their group names.
-    for group_pattern, group_name in group_pattern_and_name:
-        pattern = pattern.replace(group_pattern, group_name)
+    # clean up any outstanding regex-y characters.
+    pattern = cleanup_matcher.sub(lambda m: m.group(1) or m.group(2), pattern)
+    if not pattern.startswith('/'):
+        pattern = '/' + pattern
     return pattern
-
-
-def replace_unnamed_groups(pattern):
-    r"""
-    Find unnamed groups in `pattern` and replace them with '<var>'. E.g.,
-    1. ^(?P<a>\w+)/b/(\w+)$ ==> ^(?P<a>\w+)/b/<var>$
-    2. ^(?P<a>\w+)/b/((x|y)\w+)$ ==> ^(?P<a>\w+)/b/<var>$
-    """
-    unnamed_group_indices = [m.start(0) for m in unnamed_group_matcher.finditer(pattern)]
-    # Indices of the start of unnamed capture groups.
-    group_indices = []
-    # Loop over the start indices of the groups.
-    for start in unnamed_group_indices:
-        # Handle nested parentheses, e.g. '^b/((x|y)\w+)$'.
-        unmatched_open_brackets, prev_char = 1, None
-        for idx, val in enumerate(list(pattern[start + 1:])):
-            if unmatched_open_brackets == 0:
-                group_indices.append((start, start + 1 + idx))
-                break
-
-            # Check for unescaped `(` and `)`. They mark the start and end of
-            # a nested group.
-            if val == '(' and prev_char != '\\':
-                unmatched_open_brackets += 1
-            elif val == ')' and prev_char != '\\':
-                unmatched_open_brackets -= 1
-            prev_char = val
-
-    # Remove unnamed group matches inside other unnamed capture groups.
-    group_start_end_indices = []
-    prev_end = None
-    for start, end in group_indices:
-        if prev_end and start > prev_end or not prev_end:
-            group_start_end_indices.append((start, end))
-        prev_end = end
-
-    if group_start_end_indices:
-        # Replace unnamed groups with <var>. Handle the fact that replacing the
-        # string between indices will change string length and thus indices
-        # will point to the wrong substring if not corrected.
-        final_pattern, prev_end = [], None
-        for start, end in group_start_end_indices:
-            if prev_end:
-                final_pattern.append(pattern[prev_end:start])
-            final_pattern.append(pattern[:start] + '<var>')
-            prev_end = end
-        final_pattern.append(pattern[prev_end:])
-        return ''.join(final_pattern)
-    else:
-        return pattern

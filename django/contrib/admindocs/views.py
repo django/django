@@ -7,9 +7,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
-from django.contrib.admindocs.utils import (
-    replace_named_groups, replace_unnamed_groups,
-)
+from django.contrib.admindocs.utils import simplify_regex
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
@@ -413,18 +411,3 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
         else:
             raise TypeError(_("%s does not appear to be a urlpattern object") % p)
     return views
-
-
-def simplify_regex(pattern):
-    r"""
-    Clean up urlpattern regexes into something more readable by humans. For
-    example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
-    into "/<sport_slug>/athletes/<athlete_slug>/".
-    """
-    pattern = replace_named_groups(pattern)
-    pattern = replace_unnamed_groups(pattern)
-    # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '')
-    if not pattern.startswith('/'):
-        pattern = '/' + pattern
-    return pattern
