@@ -94,13 +94,16 @@ def directory_index(path, fullpath):
         ])
     except TemplateDoesNotExist:
         t = Engine(libraries={'i18n': 'django.templatetags.i18n'}).from_string(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
+        c = Context()
+    else:
+        c = {}
     files = []
     for f in os.listdir(fullpath):
         if not f.startswith('.'):
             if os.path.isdir(os.path.join(fullpath, f)):
                 f += '/'
             files.append(f)
-    c = Context({
+    c.update({
         'directory': path + '/',
         'file_list': files,
     })

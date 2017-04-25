@@ -55,3 +55,6 @@ Bugfixes
 
 * Fixed a regression causing incorrect queries for ``__in`` subquery lookups
   when models use ``ForeignKey.to_field`` (:ticket:`28101`).
+
+* Fixed crash when overriding the template of
+  ``django.views.static.directory_index()`` (:ticket:`28122`).
