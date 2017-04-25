@@ -112,6 +112,20 @@ class StaticTests(SimpleTestCase):
         response = self.client.get('/%s/' % self.prefix)
         self.assertContains(response, 'Index of ./')
 
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    'static/directory_index.html': 'Test index',
+                }),
+            ],
+        },
+    }])
+    def test_index_custom_template(self):
+        response = self.client.get('/%s/' % self.prefix)
+        self.assertEqual(response.content, b'Test index')
+
 
 class StaticHelperTest(StaticTests):
     """
