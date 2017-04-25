@@ -12,10 +12,17 @@ from django.db.backends.mysql.creation import \
     DatabaseCreation as MySQLDatabaseCreation
 from django.db.backends.oracle.creation import \
     DatabaseCreation as OracleDatabaseCreation
-from django.db.backends.postgresql.creation import \
-    DatabaseCreation as PostgreSQLDatabaseCreation
 from django.db.utils import DatabaseError
 from django.test import SimpleTestCase, TestCase
+
+try:
+    import psycopg2  # NOQA
+except ImportError:
+    pass
+else:
+    from psycopg2 import errorcodes
+    from django.db.backends.postgresql.creation import \
+        DatabaseCreation as PostgreSQLDatabaseCreation
 
 
 class TestDbSignatureTests(SimpleTestCase):
@@ -98,10 +105,14 @@ class PostgreSQLDatabaseCreationTests(SimpleTestCase):
         self.check_sql_table_creation_suffix(settings, '''WITH ENCODING 'UTF8' TEMPLATE "template0"''')
 
     def _execute_raise_database_already_exists(self, cursor, parameters, keepdb=False):
-        raise DatabaseError('database %s already exists' % parameters['dbname'])
+        error = DatabaseError('database %s already exists' % parameters['dbname'])
+        error.pgcode = errorcodes.DUPLICATE_DATABASE
+        raise DatabaseError() from error
 
     def _execute_raise_permission_denied(self, cursor, parameters, keepdb=False):
-        raise DatabaseError('permission denied to create database')
+        error = DatabaseError('permission denied to create database')
+        error.pgcode = errorcodes.INSUFFICIENT_PRIVILEGE
+        raise DatabaseError() from error
 
     def patch_test_db_creation(self, execute_create_test_db):
         return mock.patch.object(BaseDatabaseCreation, '_execute_create_test_db', execute_create_test_db)
