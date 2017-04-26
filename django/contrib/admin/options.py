@@ -1,6 +1,7 @@
 import copy
 import json
 import operator
+import warnings
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
 from urllib.parse import quote as urlquote
@@ -38,9 +39,11 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import RemovedInDjango22Warning
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.http import urlencode
+from django.utils.inspect import getargspec
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
 from django.utils.translation import gettext as _, ngettext
@@ -534,11 +537,25 @@ class ModelAdmin(BaseModelAdmin):
         for inline_class in self.inlines:
             inline = inline_class(self.model, self.admin_site)
             if request:
-                if not (inline.has_add_permission(request) or
+
+                args, varargs, varkw, defaults = getargspec(inline.has_add_permission)
+                if 'obj' in args:
+                    inline_has_add_permission = inline.has_add_permission(request, obj)
+                else:
+                    warnings.warn(
+                        'Backwards compatibility for inline models without '
+                        'support for the `obj` argument in '
+                        'InlineModelAdmin.has_add_permission() will be removed in '
+                        'Django 2.2.',
+                        RemovedInDjango22Warning, stacklevel=2
+                    )
+                    inline_has_add_permission = inline.has_add_permission(request)
+
+                if not (inline_has_add_permission or
                         inline.has_change_permission(request, obj) or
                         inline.has_delete_permission(request, obj)):
                     continue
-                if not inline.has_add_permission(request):
+                if not inline_has_add_permission:
                     inline.max_num = 0
             inline_instances.append(inline)
 
@@ -1957,7 +1974,7 @@ class InlineModelAdmin(BaseModelAdmin):
             queryset = queryset.none()
         return queryset
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         if self.opts.auto_created:
             # We're checking the rights to an auto-created intermediate model,
             # which doesn't have its own individual permissions. The user needs
