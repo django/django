@@ -228,6 +228,14 @@ Example usage::
 
     django-admin runserver --insecure
 
+.. deprecated:: 2.0
+
+    The runserver command in staticfiles is deprecated in favor of using the
+    core :djadmin:`runserver` command with
+    :class:`~django.contrib.staticfiles.middleware.WhiteNoiseMiddleware`.
+    Add ``django.contrib.staticfiles.runserver_nostatic`` above
+    :mod:`django.contrib.staticfiles` to your :setting:`INSTALLED_APPS`
+    to recover the core runserver command.
 .. _staticfiles-storages:
 
 Storages
@@ -499,6 +507,13 @@ files in app directories.
     **insecure**. This is only intended for local development, and should
     **never be used in production**.
 
+.. deprecated:: 2.0
+
+    The static files development view
+    :func:`django.contrib.staticfiles.views.serve`
+    is deprecated in favor of using
+    :class:`~django.contrib.staticfiles.middleware.WhiteNoiseMiddleware`.
+
 Specialized test case to support 'live testing'
 -----------------------------------------------
 
@@ -511,8 +526,15 @@ code under test and consuming it with testing tools through HTTP (e.g. Selenium,
 PhantomJS, etc.), because of which it's needed that the static assets are also
 published.
 
-But given the fact that it makes use of the
-:func:`django.contrib.staticfiles.views.serve` view described above, it can
-transparently overlay at test execution-time the assets provided by the
-``staticfiles`` finders. This means you don't need to run
-:djadmin:`collectstatic` before or as a part of your tests setup.
+It uses ``django.contrib.staticfiles.handlers.DjangoWhiteNoise`` as WSGI
+middleware to serve static files. If you don't want to use
+:djadmin:`collectstatic` before or as a part of your tests setup use
+:setting:`WHITENOISE_AUTOREFRESH` ``= True`` and :setting:`WHITENOISE_USE_FINDERS` ``= True``
+to transparently overlay at test execution-time and provide the assets by the
+``staticfiles`` finders.
+
+.. versionchanged:: 2.0
+
+    Instead of using :func:`django.contrib.staticfiles.views.serve` view it
+    uses ``django.contrib.staticfiles.handlers.DjangoWhiteNoise`` as WSGI
+    middleware to serve static files.

@@ -1,4 +1,4 @@
-from django.contrib.staticfiles.handlers import StaticFilesHandler
+from django.contrib.staticfiles.handlers import DjangoWhiteNoise
 from django.test import LiveServerTestCase
 
 
@@ -10,4 +10,4 @@ class StaticLiveServerTestCase(LiveServerTestCase):
     setup.
     """
 
-    static_handler = StaticFilesHandler
+    static_handler = DjangoWhiteNoise

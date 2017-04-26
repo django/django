@@ -2,7 +2,8 @@ import posixpath
 from urllib.parse import quote
 
 from django.conf import settings
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .cases import StaticFilesTestCase, TestDefaults
 
@@ -22,6 +23,7 @@ class TestServeStatic(StaticFilesTestCase):
         self.assertEqual(self._response(filepath).status_code, 404)
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(DEBUG=False)
 class TestServeDisabled(TestServeStatic):
     """
@@ -31,6 +33,7 @@ class TestServeDisabled(TestServeStatic):
         self.assertFileNotFound('test.txt')
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(DEBUG=True)
 class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
@@ -38,6 +41,7 @@ class TestServeStaticWithDefaultURL(TestDefaults, TestServeStatic):
     """
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(DEBUG=True, ROOT_URLCONF='staticfiles_tests.urls.helper')
 class TestServeStaticWithURLHelper(TestDefaults, TestServeStatic):
     """

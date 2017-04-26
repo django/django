@@ -117,7 +117,12 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added WhiteNoise as dependency which enables Django to serve
+  static files on its own ready for production.
+  ``django.contrib.staticfiles.handlers.DjangoWhiteNoise``
+  can be used as WSGI middleware which intercept requests for static files and serves
+  them. :class:`~django.contrib.staticfiles.middleware.WhiteNoiseMiddleware`
+  wraps ``DjangoWhiteNoise`` to work as Django middleware.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -333,6 +338,16 @@ Miscellaneous
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
   well with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
+
+* The ``django.contrib.staticfiles.handlers.StaticFilesHandler`` WSGI
+  middleware is deprecated in favor of
+  ``django.contrib.staticfiles.handlers.DjangoWhiteNoise``.
+  The ``django.contrib.staticfiles.management.commands.runserver.Command``
+  command and ``django.contrib.staticfiles.views.serve()`` view
+  is deprecated in favor of using the core runserver command
+  ``django.core.management.commands.runserver.Command`` and
+  ``django.contrib.staticfiles.middleware.WhiteNoiseMiddleware``
+
 
 .. _removed-features-2.0:
 

@@ -403,6 +403,7 @@ middleware
 middlewares
 migrationname
 millimetre
+mimetype
 Minification
 minified
 minify

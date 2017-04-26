@@ -451,6 +451,33 @@ fields to POST forms and checking requests for the correct value. See the
 
 Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
 
+Static files middleware
+-----------------------
+
+.. module:: django.contrib.staticfiles.middleware
+  :synopsis: Middleware serving statc files.
+
+.. class:: WhiteNoiseMiddleware
+
+Intercepts requests for static files and serves them. It is configurable with
+following settings.
+
+* :setting:`WHITENOISE_ROOT`
+* :setting:`WHITENOISE_AUTOREFRESH`
+* :setting:`WHITENOISE_USE_FINDERS`
+* :setting:`WHITENOISE_MAX_AGE`
+* :setting:`WHITENOISE_MIMETYPES`
+* :setting:`WHITENOISE_CHARSET`
+* :setting:`WHITENOISE_ALLOW_ALL_ORIGINS`
+* :setting:`WHITENOISE_SKIP_COMPRESS_EXTENSIONS`
+* :setting:`WHITENOISE_ADD_HEADERS_FUNCTION`
+* :setting:`WHITENOISE_STATIC_PREFIX`
+
+.. versionadded:: 2.0
+
+    :class:`~django.contrib.staticfiles.middleware.WhiteNoiseMiddleware` was added
+    to enable Django to serve static files suitable for production.
+
 .. _middleware-ordering:
 
 Middleware ordering
@@ -463,6 +490,10 @@ Here are some hints about the ordering of various Django middleware classes:
    It should go near the top of the list if you're going to turn on the SSL
    redirect as that avoids running through a bunch of other unnecessary
    middleware.
+
+#. :class:`~django.contrib.staticfiles.middleware.WhiteNoiseMiddleware`
+
+   Before any middleware apart from ``SecurityMiddleware``.
 
 #. :class:`~django.middleware.cache.UpdateCacheMiddleware`
 

@@ -5,10 +5,12 @@ development, and SHOULD NOT be used in a production setting.
 """
 import os
 import posixpath
+import warnings
 
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.http import Http404
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.views import static
 
 
@@ -27,6 +29,14 @@ def serve(request, path, insecure=False, **kwargs):
 
     It uses the django.views.static.serve() view to serve the found files.
     """
+    warnings.warn(
+        "django.contrib.staticfiles.views.serve is deprecated"
+        "in favor of django.contrib.staticfiles.middleware.WhiteNoiseMiddleware"
+        "for serving static files.",
+        RemovedInDjango30Warning,
+        stacklevel=2,
+    )
+
     if not settings.DEBUG and not insecure:
         raise Http404
     normalized_path = posixpath.normpath(path).lstrip('/')

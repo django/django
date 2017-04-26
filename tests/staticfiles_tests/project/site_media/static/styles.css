@@ -1,0 +1,19 @@
+body {
+  background-color: white;
+  color: black;
+}
+
+.thing {
+  border: 1px solid black;
+  color: blue;
+}
+
+.thing2 {
+  border: 1px solid green;
+  color: red;
+}
+
+.thing3 {
+  border: 1px solid yellow;
+  color: purple;
+}

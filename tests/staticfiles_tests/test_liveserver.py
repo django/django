@@ -5,11 +5,12 @@ django.test.LiveServerTestCase.
 """
 
 import os
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
+from django.contrib.staticfiles.handlers import DjangoWhiteNoise
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.core.exceptions import ImproperlyConfigured
-from django.test import modify_settings, override_settings
+from django.test import TestCase, modify_settings, override_settings
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
@@ -19,70 +20,179 @@ TEST_SETTINGS = {
     'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
 }
 
+TEST_SETTINGS_USE_FINDERS = dict(TEST_SETTINGS)
+TEST_SETTINGS_USE_FINDERS['WHITENOISE_USE_FINDERS'] = True
+TEST_SETTINGS_USE_FINDERS['WHITENOISE_AUTOREFRESH'] = True
 
-class LiveServerBase(StaticLiveServerTestCase):
 
+@override_settings(**TEST_SETTINGS)
+class StaticLiveServerView(StaticLiveServerTestCase):
     available_apps = []
 
-    @classmethod
-    def setUpClass(cls):
-        # Override settings
-        cls.settings_override = override_settings(**TEST_SETTINGS)
-        cls.settings_override.enable()
-        super().setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        # Restore original settings
-        cls.settings_override.disable()
-
-
-class StaticLiveServerChecks(LiveServerBase):
-
-    @classmethod
-    def setUpClass(cls):
-        # If contrib.staticfiles isn't configured properly, the exception
-        # should bubble up to the main thread.
-        old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
-        TEST_SETTINGS['STATIC_URL'] = None
-        cls.raises_exception()
-        TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
-
-    @classmethod
-    def tearDownClass(cls):
-        # skip it, as setUpClass doesn't call its parent either
-        pass
-
-    @classmethod
-    def raises_exception(cls):
-        try:
-            super().setUpClass()
-            raise Exception("The line above should have raised an exception")
-        except ImproperlyConfigured:
-            # This raises ImproperlyConfigured("You're using the staticfiles
-            # app without having set the required STATIC_URL setting.")
-            pass
-        finally:
-            super().tearDownClass()
-
-    def test_test_test(self):
-        # Intentionally empty method so that the test is picked up by the
-        # test runner and the overridden setUpClass() method is executed.
-        pass
-
-
-class StaticLiveServerView(LiveServerBase):
-
-    def urlopen(self, url):
-        return urlopen(self.live_server_url + url)
+    def urlopen(self, url, *args, **kwargs):
+        url = self.live_server_url + url
+        request = Request(url, *args, **kwargs)
+        return urlopen(request)
 
     # The test is going to access a static file stored in this application.
     @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
     def test_collectstatic_emulation(self):
         """
-        StaticLiveServerTestCase use of staticfiles' serve() allows it
+        DjangoWhiteNoise and WHITENOISE_USE_FINDERS=False, WHITENOISE_AUTOREFRESH=False disallow it
+        to discover app's static assets without having to collectstatic first.
+        """
+        try:
+            self.urlopen('/static/test/file.txt')
+        except HTTPError as e:
+            self.assertEqual(e.code, 404)
+
+    def test_get_file(self):
+        """
+        DjangoWhiteNoise serves static files in STATIC_ROOT.
+        """
+        with self.urlopen('/static/testfile.txt') as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'Test!')
+
+    def test_unversioned_file_not_cached_forever(self):
+        with self.urlopen('/static/styles.css') as f:
+            self.assertEqual(f.headers.get('Cache-Control'),
+                             'max-age={}, public'.format(DjangoWhiteNoise.max_age))
+
+    def test_no_content_type_when_not_modified(self):
+        last_mod = 'Fri, 11 Apr 2100 11:47:06 GMT'
+
+        try:
+            self.urlopen('/static/styles.css', headers={'If-Modified-Since': last_mod})
+        except HTTPError as e:
+            self.assertEqual(e.code, 304)
+            self.assertNotIn('Content-Type', e.headers)
+
+    def test_get_nonascii_file(self):
+        with self.urlopen('/static/nonascii%E2%9C%93.txt') as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'hi')
+
+
+@override_settings(**TEST_SETTINGS_USE_FINDERS)
+class StaticLiveServerViewUseFinders(StaticLiveServerTestCase):
+    available_apps = []
+
+    def urlopen(self, url, *args, **kwargs):
+        url = self.live_server_url + url
+        request = Request(url, *args, **kwargs)
+        return urlopen(request)
+
+    # The test is going to access a static file stored in this application.
+    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
+    def test_collectstatic_emulation(self):
+        """
+        DjangoWhiteNoise and WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True allow it
         to discover app's static assets without having to collectstatic first.
         """
         with self.urlopen('/static/test/file.txt') as f:
             self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')
+
+    def test_get_file(self):
+        """
+        DjangoWhiteNoise serves static files in STATIC_ROOT.
+        """
+        with self.urlopen('/static/testfile.txt') as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'Test!')
+
+    def test_non_ascii_requests_safely_ignored(self):
+        try:
+            self.urlopen('/%E2%9C%93')
+        except HTTPError as e:
+            self.assertEqual(e.code, 404)
+
+    def test_requests_for_directory_safely_ignored(self):
+        try:
+            self.urlopen('/static/test')
+        except HTTPError as e:
+            self.assertEqual(e.code, 404)
+
+
+@override_settings(MIDDLEWARE=['django.contrib.staticfiles.middleware.WhiteNoiseMiddleware'])
+@override_settings(**TEST_SETTINGS)
+class TestWhitenoiseMiddleware(TestCase):
+
+    # The test is going to access a static file stored in this application.
+    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
+    def test_collectstatic_emulation(self):
+        """
+        WhiteNoiseMiddleware and WHITENOISE_USE_FINDERS=False, WHITENOISE_AUTOREFRESH=False disallow it
+        to discover app's static assets without having to collectstatic first.
+        """
+        response = self.client.get('/static/test/file.txt')
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_file(self):
+        """
+        WhiteNoiseMiddleware serves static files in STATIC_ROOT.
+        """
+        response = self.client.get('/static/testfile.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'Test!')
+
+    def test_unversioned_file_not_cached_forever(self):
+        response = self.client.get('/static/styles.css')
+        self.assertEqual(response['Cache-Control'], 'max-age={}, public'.format(DjangoWhiteNoise.max_age))
+
+    def test_no_content_type_when_not_modified(self):
+        last_mod = 'Fri, 11 Apr 2100 11:47:06 GMT'
+        response = self.client.get('/static/styles.css', HTTP_IF_MODIFIED_SINCE=last_mod)
+        self.assertEqual(response.status_code, 304)
+        self.assertRaises(KeyError, response.__getitem__, 'Content-Type')
+
+    def test_get_nonascii_file(self):
+        response = self.client.get('/static/nonascii%E2%9C%93.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'hi')
+
+
+@override_settings(MIDDLEWARE=['django.contrib.staticfiles.middleware.WhiteNoiseMiddleware'])
+@override_settings(**TEST_SETTINGS_USE_FINDERS)
+class TestWhitenoiseMiddlewareUseFinders(TestCase):
+
+    # The test is going to access a static file stored in this application.
+    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
+    def test_collectstatic_emulation(self):
+        """
+        WhiteNoiseMiddleware and WHITENOISE_USE_FINDERS=True, WHITENOISE_AUTOREFRESH=True allow it
+        to discover app's static assets without having to collectstatic first.
+        """
+        response = self.client.get('/static/test/file.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'In static directory.')
+
+    def test_get_file(self):
+        """
+        WhiteNoiseMiddleware serves static files in STATIC_ROOT.
+        """
+        response = self.client.get('/static/testfile.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'Test!')
+
+    def test_unversioned_file_not_cached_forever(self):
+        response = self.client.get('/static/styles.css')
+        self.assertEqual(response['Cache-Control'], 'max-age={}, public'.format(DjangoWhiteNoise.max_age))
+
+    def test_no_content_type_when_not_modified(self):
+        last_mod = 'Fri, 11 Apr 2100 11:47:06 GMT'
+        response = self.client.get('/static/styles.css', HTTP_IF_MODIFIED_SINCE=last_mod)
+        self.assertEqual(response.status_code, 304)
+        self.assertRaises(KeyError, response.__getitem__, 'Content-Type')
+
+    def test_get_nonascii_file(self):
+        response = self.client.get('/static/nonascii%E2%9C%93.txt')
+        content = b''
+        for item in response.streaming_content:
+            content += item
+        self.assertEqual(content.rstrip(b'\r\n'), b'hi')
