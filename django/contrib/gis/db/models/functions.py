@@ -229,7 +229,7 @@ class AsSVG(GeoFunc):
 
 class BoundingCircle(OracleToleranceMixin, GeoFunc):
     def __init__(self, expression, num_seg=48, **extra):
-        super().__init__(*[expression, num_seg], **extra)
+        super().__init__(expression, num_seg, **extra)
 
     def as_oracle(self, compiler, connection):
         clone = self.copy()
