@@ -145,6 +145,32 @@ to, or in lieu of custom ``field.clean()`` methods.
         ``['localhost']``. Other domains that don't contain a dot won't pass
         validation, so you'd need to whitelist them as necessary.
 
+    .. deprecated:: 2.0
+
+       The ``whitelist`` parameter for email validation is deprecated. This is
+       because the HTML5 email validation standard considers domains without a
+       period to be valid.
+
+    The :class:`EmailValidator` works in accordance with the `HTML5 email
+    validation standard`_.
+
+    .. _HTML5 email validation standard: https://html.spec.whatwg.org/multipage/forms.html#valid-e-mail-address
+
+    .. versionchanged:: 2.0
+
+        In older version, email validation was done with Django's own logic.
+	Since version 2.0, it uses the HTML5 email validation standard.
+
+	It was decided to make this switch because tweaking the current
+	validation regex to get closer to exactly matching an email address does
+	not serve any real world purpose. For example, while the previous
+	validation would reject ``gmail.-com``, it would accept ``gmail.ccomm``,
+	which is as useless an email address as the former.
+
+	By adopting the HTML5 validation standard, we won't end up inventing a
+	parallel standard. Also, an email is almost always confirmed by sending
+	an email anyway.
+
 ``URLValidator``
 ----------------
 

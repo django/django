@@ -21,6 +21,16 @@ details on these changes.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
 
+.. _deprecation-removed-in-2.2:
+
+2.2
+---
+See the :ref:`Django 2.0 release notes<deprecated-features-2.0>` for more
+details on these changes.
+
+* The ``whitelist`` parameter of :class:`django.core.validators.EmailValidator`
+  will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
