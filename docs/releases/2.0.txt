@@ -334,6 +334,9 @@ Miscellaneous
   well with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
 
+* ``HttpRequest.xreadlines()`` is deprecated in favor of iterating over the
+  request.
+
 .. _removed-features-2.0:
 
 Features removed in 2.0

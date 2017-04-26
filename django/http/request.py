@@ -1,5 +1,6 @@
 import copy
 import re
+import warnings
 from io import BytesIO
 from itertools import chain
 from urllib.parse import quote, urlencode, urljoin, urlsplit
@@ -12,6 +13,7 @@ from django.core.exceptions import (
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import ImmutableList, MultiValueDict
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
 from django.utils.http import is_same_domain, limited_parse_qsl
 
@@ -328,14 +330,19 @@ class HttpRequest:
         except IOError as e:
             raise UnreadablePostError(*e.args) from e
 
-    def xreadlines(self):
+    def __iter__(self):
         while True:
             buf = self.readline()
             if not buf:
                 break
             yield buf
 
-    __iter__ = xreadlines
+    def xreadlines(self):
+        warnings.warn(
+            'HttpRequest.xreadlines() is deprecated in favor of iterating the '
+            'request.', RemovedInDjango30Warning, stacklevel=2,
+        )
+        yield from self
 
     def readlines(self):
         return list(iter(self))

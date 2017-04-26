@@ -21,6 +21,8 @@ details on these changes.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
 
+* ``HttpRequest.xreadlines()`` will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1

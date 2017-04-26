@@ -362,7 +362,6 @@ Methods
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
 .. method:: HttpRequest.readlines()
-.. method:: HttpRequest.xreadlines()
 .. method:: HttpRequest.__iter__()
 
     Methods implementing a file-like interface for reading from an
