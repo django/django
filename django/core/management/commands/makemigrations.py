@@ -244,7 +244,7 @@ class Command(BaseCommand):
             def all_items_equal(seq):
                 return all(item == seq[0] for item in seq[1:])
 
-            merge_migrations_generations = zip(*[m.ancestry for m in merge_migrations])
+            merge_migrations_generations = zip(*(m.ancestry for m in merge_migrations))
             common_ancestor_count = sum(1 for common_ancestor_generation
                                         in takewhile(all_items_equal, merge_migrations_generations))
             if not common_ancestor_count:

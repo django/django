@@ -51,7 +51,7 @@ class Media:
         return self.render()
 
     def render(self):
-        return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
+        return mark_safe('\n'.join(chain.from_iterable(getattr(self, 'render_' + name)() for name in MEDIA_TYPES)))
 
     def render_js(self):
         return [
@@ -65,12 +65,12 @@ class Media:
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
-        return chain(*[[
+        return chain.from_iterable([
             format_html(
                 '<link href="{}" type="text/css" media="{}" rel="stylesheet" />',
                 self.absolute_path(path), medium
             ) for path in self._css[medium]
-        ] for medium in media])
+        ] for medium in media)
 
     def absolute_path(self, path):
         """

@@ -86,7 +86,10 @@ class CheckRegistry:
         return tag in self.tags_available(include_deployment_checks)
 
     def tags_available(self, deployment_checks=False):
-        return set(chain(*[check.tags for check in self.get_checks(deployment_checks) if hasattr(check, 'tags')]))
+        return set(chain.from_iterable(
+            check.tags for check in self.get_checks(deployment_checks)
+            if hasattr(check, 'tags')
+        ))
 
     def get_checks(self, include_deployment_checks=False):
         checks = list(self.registered_checks)
