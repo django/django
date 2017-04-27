@@ -326,6 +326,9 @@ Miscellaneous
   require them. Third-party apps that use these methods may want to adopt a
   similar approach.
 
+* The ``FIRST_DAY_OF_WEEK`` and ``NUMBER_GROUPING`` format settings are now
+  kept as integers in JavaScript and JSON i18n view outputs.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

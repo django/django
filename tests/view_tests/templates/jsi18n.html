@@ -4,6 +4,14 @@
 </head>
 
 <body>
+  <p id="formats">
+    <script type="text/javascript">
+    document.write("DATE_INPUT_FORMATS is an " + typeof get_format("DATE_INPUT_FORMATS") + "; ");
+    document.write("DECIMAL_SEPARATOR is a " + typeof get_format("DECIMAL_SEPARATOR") + "; ");
+    document.write("FIRST_DAY_OF_WEEK is a " + typeof get_format("FIRST_DAY_OF_WEEK") + ";");
+    </script>
+  </p>
+
   <p id="gettext">
     <script type="text/javascript">
     document.write(gettext("Remove"));
