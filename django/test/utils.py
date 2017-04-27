@@ -7,6 +7,7 @@ import warnings
 from contextlib import contextmanager
 from functools import wraps
 from io import StringIO
+from itertools import chain
 from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
@@ -85,11 +86,7 @@ class ContextList(list):
         """
         Flattened keys of subcontexts.
         """
-        keys = set()
-        for subcontext in self:
-            for dict in subcontext:
-                keys |= set(dict.keys())
-        return keys
+        return set(chain.from_iterable(d for subcontext in self for d in subcontext))
 
 
 def instrumented_test_render(self, context):
