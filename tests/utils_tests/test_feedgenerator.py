@@ -4,6 +4,7 @@ import unittest
 from django.test import TestCase
 from django.utils import feedgenerator
 from django.utils.timezone import get_fixed_timezone, utc
+from django.utils.translation import gettext_lazy as _
 
 
 class FeedgeneratorTest(unittest.TestCase):
@@ -125,6 +126,94 @@ class FeedgeneratorTest(unittest.TestCase):
         feed = feedgenerator.Atom1Feed('title', '/link/', 'descr')
         feed.add_item('item_title', 'item_link', 'item_description')
         feed.writeString('utf-8')
+
+
+class CategoryTest(unittest.TestCase):
+    """
+    Tests for category object support in low-level syndication feed framework.
+    """
+
+    def test_can_be_instantiated_with_one_argument(self):
+        term = 'django'
+        cat = feedgenerator.Category(term)
+        self.assertEqual(cat.term, term)
+        self.assertIsNone(cat.label)
+        self.assertIsNone(cat.scheme)
+        self.assertIsNone(cat.domain)
+
+    def test_arguments_can_be_lazy(self):
+        term, scheme, label = _('term'), _('scheme'), _('label')
+        cat = feedgenerator.Category(term, scheme=scheme, label=label)
+        self.assertEqual(cat.term, str(term))
+        self.assertEqual(cat.label, str(label))
+        self.assertEqual(cat.scheme, str(scheme))
+
+    def test_label_is_none_is_not_provided(self):
+        cat = feedgenerator.Category('term')
+        self.assertIsNone(cat.label)
+
+    def test_label_is_string_if_provided(self):
+        label = 123
+        cat = feedgenerator.Category('term', label=label)
+        self.assertEqual(cat.label, str(label))
+
+    def test_domain_is_used_if_scheme_is_not_provided(self):
+        domain = '1'
+        cat = feedgenerator.Category('term', domain=domain)
+        self.assertEqual(cat.scheme, domain)
+        self.assertEqual(cat.domain, domain)
+
+    def test_scheme_is_used_if_domain_is_not_provided(self):
+        scheme = '2'
+        cat = feedgenerator.Category('term', scheme=scheme)
+        self.assertEqual(cat.scheme, scheme)
+        self.assertEqual(cat.domain, scheme)
+
+    def test_scheme_is_used_if_domain_is_also_provided(self):
+        scheme, domain = '1', '2'
+        cat = feedgenerator.Category('term', scheme=scheme, domain=domain)
+        self.assertEqual(cat.scheme, scheme)
+        self.assertEqual(cat.domain, scheme)
+
+    def test_atom_support(self):
+        feed_categories = (feedgenerator.Category('etc', label=4), )
+        item_categories = (feedgenerator.Category('in-item', scheme='thing'), )
+        feed = feedgenerator.Atom1Feed(
+            'title', 'link', 'description', categories=feed_categories)
+        feed.add_item(
+            'item_title', 'item_link', 'item_description',
+            categories=item_categories)
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('term="etc"', feed_content)
+        self.assertIn('term="in-item"', feed_content)
+        self.assertIn('label="4"', feed_content)
+        self.assertIn('scheme="thing"', feed_content)
+
+    def test_rss091_support(self):
+        feed_categories = (feedgenerator.Category('etc', label=4), )
+        item_categories = (feedgenerator.Category('in-item', scheme='thing'), )
+        feed = feedgenerator.RssUserland091Feed(
+            'title', 'link', 'description', categories=feed_categories)
+        feed.add_item(
+            'item_title', 'item_link', 'item_description',
+            categories=item_categories)
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('<category atom:label="4">etc</category>', feed_content)
+        self.assertNotIn(
+            '<category domain="thing">in-item</category>', feed_content)
+
+    def test_rss2_support(self):
+        feed_categories = (feedgenerator.Category('etc', label=4), )
+        item_categories = (feedgenerator.Category('in-item', scheme='thing'), )
+        feed = feedgenerator.Rss201rev2Feed(
+            'title', 'link', 'description', categories=feed_categories)
+        feed.add_item(
+            'item_title', 'item_link', 'item_description',
+            categories=item_categories)
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('<category atom:label="4">etc</category>', feed_content)
+        self.assertIn(
+            '<category domain="thing">in-item</category>', feed_content)
 
 
 class FeedgeneratorDBTest(TestCase):
