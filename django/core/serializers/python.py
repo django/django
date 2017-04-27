@@ -6,7 +6,6 @@ other serializers.
 from collections import OrderedDict
 
 from django.apps import apps
-from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.encoding import force_text, is_protected_type
@@ -115,11 +114,6 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
             if ignorenonexistent and field_name not in field_names:
                 # skip fields no longer on model
                 continue
-
-            if isinstance(field_value, str):
-                field_value = force_text(
-                    field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True
-                )
 
             field = Model._meta.get_field(field_name)
 
