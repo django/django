@@ -981,12 +981,6 @@ class Query:
         # Subqueries need to use a different set of aliases than the outer query.
         clone.bump_prefix(query)
         clone.subquery = True
-        # It's safe to drop ordering if the queryset isn't using slicing,
-        # distinct(*fields) or select_for_update().
-        if (self.low_mark == 0 and self.high_mark is None and
-                not self.distinct_fields and
-                not self.select_for_update):
-            clone.clear_ordering(True)
         return clone
 
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
