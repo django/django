@@ -1017,7 +1017,7 @@ class Query:
                     )
                     # The used_joins for a tuple of expressions is the union of
                     # the used_joins for the individual expressions.
-                    used_joins |= set(k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0))
+                    used_joins.update(k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0))
         # For Oracle '' is equivalent to null. The check needs to be done
         # at this stage because join promotion can't be done at compiler
         # stage. Using DEFAULT_DB_ALIAS isn't nice, but it is the best we

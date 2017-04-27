@@ -204,7 +204,7 @@ class ModelBase(type):
             if base not in parents or not hasattr(base, '_meta'):
                 # Things without _meta aren't functional models, so they're
                 # uninteresting parents.
-                inherited_attributes |= set(base.__dict__.keys())
+                inherited_attributes.update(base.__dict__)
                 continue
 
             parent_fields = base._meta.local_fields + base._meta.local_many_to_many
