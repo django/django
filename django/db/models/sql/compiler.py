@@ -523,6 +523,31 @@ class SQLCompiler:
             if for_update_part and not self.connection.features.for_update_after_from:
                 result.append(for_update_part)
 
+            if self.query.subquery and extra_select:
+                # If the query is used as a subquery, the extra selects would
+                # result in more columns than the left-hand side expression is
+                # expecting. This can happen when a subquery uses a combination
+                # of order_by() and distinct(), forcing the ordering expressions
+                # to be selected as well. Wrap the query in another subquery
+                # to exclude extraneous selects.
+                sub_selects = []
+                sub_params = []
+                for select, _, alias in self.select:
+                    if alias:
+                        sub_selects.append("%s.%s" % (
+                            self.connection.ops.quote_name('subquery'),
+                            self.connection.ops.quote_name(alias),
+                        ))
+                    else:
+                        select_clone = select.relabeled_clone({select.alias: 'subquery'})
+                        subselect, subparams = select_clone.as_sql(self, self.connection)
+                        sub_selects.append(subselect)
+                        sub_params.extend(subparams)
+                return 'SELECT %s FROM (%s) AS subquery' % (
+                    ', '.join(sub_selects),
+                    ' '.join(result),
+                ), sub_params + params
+
             return ' '.join(result), tuple(params)
         finally:
             # Finally do cleanup - get rid of the joins we created above.

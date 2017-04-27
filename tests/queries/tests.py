@@ -2005,10 +2005,10 @@ class QuerysetOrderedTests(unittest.TestCase):
 class SubqueryTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        DumbCategory.objects.create(id=1)
-        DumbCategory.objects.create(id=2)
-        DumbCategory.objects.create(id=3)
-        DumbCategory.objects.create(id=4)
+        NamedCategory.objects.create(id=1, name='first')
+        NamedCategory.objects.create(id=2, name='second')
+        NamedCategory.objects.create(id=3, name='third')
+        NamedCategory.objects.create(id=4, name='fourth')
 
     def test_ordered_subselect(self):
         "Subselects honor any manual ordering"
@@ -2063,6 +2063,28 @@ class SubqueryTests(TestCase):
 
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
         self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {3})
+
+    def test_distinct_ordered_sliced_subquery(self):
+        # Implicit values('id').
+        self.assertSequenceEqual(
+            NamedCategory.objects.filter(
+                id__in=NamedCategory.objects.distinct().order_by('name')[0:2],
+            ).order_by('name').values_list('name', flat=True), ['first', 'fourth']
+        )
+        # Explicit values('id').
+        self.assertSequenceEqual(
+            NamedCategory.objects.filter(
+                id__in=NamedCategory.objects.distinct().order_by('-name').values('id')[0:2],
+            ).order_by('name').values_list('name', flat=True), ['second', 'third']
+        )
+        # Annotated value.
+        self.assertSequenceEqual(
+            DumbCategory.objects.filter(
+                id__in=DumbCategory.objects.annotate(
+                    double_id=F('id') * 2
+                ).order_by('id').distinct().values('double_id')[0:2],
+            ).order_by('id').values_list('id', flat=True), [2, 4]
+        )
 
 
 class CloneTests(TestCase):
