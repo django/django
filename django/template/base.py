@@ -49,16 +49,15 @@ times with multiple contexts)
 '<html></html>'
 """
 
-import inspect
 import logging
 import re
+from inspect import getcallargs, getfullargspec
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
-from django.utils.inspect import getargspec
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
@@ -715,7 +714,7 @@ class FilterExpression:
         # Check to see if a decorator is providing the real function.
         func = getattr(func, '_decorated_function', func)
 
-        args, _, _, defaults = getargspec(func)
+        args, _, _, defaults, _, _, _ = getfullargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
@@ -865,7 +864,7 @@ class Variable:
                             current = current()
                         except TypeError:
                             try:
-                                inspect.getcallargs(current)
+                                getcallargs(current)
                             except TypeError:  # arguments *were* required
                                 current = context.template.engine.string_if_invalid  # invalid method call
                             else:
