@@ -26,7 +26,7 @@ from io import StringIO
 from urllib.parse import urlparse
 
 from django.utils import datetime_safe
-from django.utils.encoding import force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.timezone import utc
 from django.utils.xmlutils import SimplerXMLGenerator
 
@@ -85,12 +85,9 @@ class SyndicationFeed:
                  author_name=None, author_link=None, subtitle=None, categories=None,
                  feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
         def to_str(s):
-            return force_text(s, strings_only=True)
+            return str(s) if s is not None else s
         if categories:
-            categories = [force_text(c) for c in categories]
-        if ttl is not None:
-            # Force ints to str
-            ttl = force_text(ttl)
+            categories = [str(c) for c in categories]
         self.feed = {
             'title': to_str(title),
             'link': iri_to_uri(link),
@@ -104,7 +101,7 @@ class SyndicationFeed:
             'feed_url': iri_to_uri(feed_url),
             'feed_copyright': to_str(feed_copyright),
             'id': feed_guid or link,
-            'ttl': ttl,
+            'ttl': to_str(ttl),
         }
         self.feed.update(kwargs)
         self.items = []
@@ -119,12 +116,9 @@ class SyndicationFeed:
         enclosures, which is an iterable of instances of the Enclosure class.
         """
         def to_str(s):
-            return force_text(s, strings_only=True)
+            return str(s) if s is not None else s
         if categories:
             categories = [to_str(c) for c in categories]
-        if ttl is not None:
-            # Force ints to str
-            ttl = force_text(ttl)
         item = {
             'title': to_str(title),
             'link': iri_to_uri(link),
@@ -140,7 +134,7 @@ class SyndicationFeed:
             'enclosures': enclosures or (),
             'categories': categories or (),
             'item_copyright': to_str(item_copyright),
-            'ttl': ttl,
+            'ttl': to_str(ttl),
         }
         item.update(kwargs)
         self.items.append(item)
