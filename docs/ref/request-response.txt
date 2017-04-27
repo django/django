@@ -40,9 +40,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
     The raw HTTP request body as a byte string. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
-    XML payload etc. For processing conventional form data, use ``HttpRequest.POST``.
+    XML payload etc. For processing conventional form data, use
+    :attr:`HttpRequest.POST`.
 
-    You can also read from an HttpRequest using a file-like interface. See
+    You can also read from an ``HttpRequest`` using a file-like interface. See
     :meth:`HttpRequest.read()`.
 
 .. attribute:: HttpRequest.path
@@ -68,7 +69,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.method
 
     A string representing the HTTP method used in the request. This is
-    guaranteed to be uppercase. Example::
+    guaranteed to be uppercase. For example::
 
         if request.method == 'GET':
             do_something()
@@ -81,8 +82,9 @@ All attributes should be considered read-only, unless stated otherwise.
     data (or ``None``, which means the :setting:`DEFAULT_CHARSET` setting is
     used). You can write to this attribute to change the encoding used when
     accessing the form data. Any subsequent attribute accesses (such as reading
-    from ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if
-    you know the form data is not in the :setting:`DEFAULT_CHARSET` encoding.
+    from :attr:`GET` or :attr:`POST`) will use the new ``encoding`` value.
+    Useful if you know the form data is not in the :setting:`DEFAULT_CHARSET`
+    encoding.
 
 .. attribute:: HttpRequest.content_type
 
@@ -115,14 +117,13 @@ All attributes should be considered read-only, unless stated otherwise.
     dictionary -- if, say, a form is requested via the POST HTTP method but
     does not include form data. Therefore, you shouldn't use ``if request.POST``
     to check for use of the POST method; instead, use ``if request.method ==
-    "POST"`` (see above).
+    "POST"`` (see :attr:`HttpRequest.method`).
 
-    Note: ``POST`` does *not* include file-upload information. See ``FILES``.
+    ``POST`` does *not* include file-upload information. See :attr:`FILES`.
 
 .. attribute:: HttpRequest.COOKIES
 
-    A standard Python dictionary containing all cookies. Keys and values are
-    strings.
+    A dictionary containing all cookies. Keys and values are strings.
 
 .. attribute:: HttpRequest.FILES
 
@@ -132,16 +133,14 @@ All attributes should be considered read-only, unless stated otherwise.
 
     See :doc:`/topics/files` for more information.
 
-    Note that ``FILES`` will only contain data if the request method was POST
-    and the ``<form>`` that posted to the request had
-    ``enctype="multipart/form-data"``. Otherwise, ``FILES`` will be a blank
-    dictionary-like object.
+    ``FILES`` will only contain data if the request method was POST and the
+    ``<form>`` that posted to the request had ``enctype="multipart/form-data"``.
+    Otherwise, ``FILES`` will be a blank dictionary-like object.
 
 .. attribute:: HttpRequest.META
 
-    A standard Python dictionary containing all available HTTP headers.
-    Available headers depend on the client and server, but here are some
-    examples:
+    A dictionary containing all available HTTP headers. Available headers
+    depend on the client and server, but here are some examples:
 
     * ``CONTENT_LENGTH`` -- The length of the request body (as a string).
     * ``CONTENT_TYPE`` -- The MIME type of the request body.
@@ -353,7 +352,7 @@ Methods
     Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
     checking the ``HTTP_X_REQUESTED_WITH`` header for the string
     ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
-    If you write your own XMLHttpRequest call (on the browser side), you'll
+    If you write your own ``XMLHttpRequest`` call (on the browser side), you'll
     have to set this header manually if you want ``is_ajax()`` to work.
 
     If a response varies on whether or not it's requested via AJAX and you are
@@ -370,13 +369,14 @@ Methods
 .. method:: HttpRequest.__iter__()
 
     Methods implementing a file-like interface for reading from an
-    HttpRequest instance. This makes it possible to consume an incoming
+    ``HttpRequest`` instance. This makes it possible to consume an incoming
     request in a streaming fashion. A common use-case would be to process a
     big XML payload with an iterative parser without constructing a whole
     XML tree in memory.
 
-    Given this standard interface, an HttpRequest instance can be
-    passed directly to an XML parser such as ElementTree::
+    Given this standard interface, an ``HttpRequest`` instance can be
+    passed directly to an XML parser such as
+    :class:`~xml.etree.ElementTree.ElementTree`::
 
         import xml.etree.ElementTree as ET
         for element in ET.iterparse(request):
@@ -388,15 +388,15 @@ Methods
 
 .. class:: QueryDict
 
-In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are
-instances of ``django.http.QueryDict``, a dictionary-like class customized to
-deal with multiple values for the same key. This is necessary because some HTML
-form elements, notably ``<select multiple>``, pass multiple values for the same
-key.
+In an :class:`HttpRequest` object, the :attr:`~HttpRequest.GET` and
+`attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
+a dictionary-like class customized to deal with multiple values for the same
+key. This is necessary because some HTML form elements, notably
+``<select multiple>``, pass multiple values for the same key.
 
 The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
 when accessed in a normal request/response cycle. To get a mutable version you
-need to use ``.copy()``.
+need to use :meth:`QueryDict.copy`.
 
 Methods
 -------
@@ -420,7 +420,8 @@ a subclass of dictionary. Exceptions are outlined here:
     ``mutable=True`` to its ``__init__()``.
 
     Strings for setting both keys and values will be converted from ``encoding``
-    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+    to unicode. If ``encoding`` is not set, it defaults to
+    :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
@@ -435,17 +436,17 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.__getitem__(key)
 
     Returns the value for the given key. If the key has more than one value,
-    ``__getitem__()`` returns the last value. Raises
+    it returns the last value. Raises
     ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
-    exist. (This is a subclass of Python's standard ``KeyError``, so you can
+    exist. (This is a subclass of Python's standard :exc:`KeyError`, so you can
     stick to catching ``KeyError``.)
 
 .. method:: QueryDict.__setitem__(key, value)
 
-    Sets the given key to ``[value]`` (a Python list whose single element is
+    Sets the given key to ``[value]`` (a list whose single element is
     ``value``). Note that this, as other dictionary functions that have side
     effects, can only be called on a mutable ``QueryDict`` (such as one that
-    was created via ``copy()``).
+    was created via :meth:`QueryDict.copy`).
 
 .. method:: QueryDict.__contains__(key)
 
@@ -454,19 +455,18 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.get(key, default=None)
 
-    Uses the same logic as ``__getitem__()`` above, with a hook for returning a
+    Uses the same logic as :meth:`__getitem__`, with a hook for returning a
     default value if the key doesn't exist.
 
 .. method:: QueryDict.setdefault(key, default=None)
 
-    Just like the standard dictionary ``setdefault()`` method, except it uses
-    ``__setitem__()`` internally.
+    Like :meth:`dict.setdefault`, except it uses :meth:`__setitem__` internally.
 
 .. method:: QueryDict.update(other_dict)
 
-    Takes either a ``QueryDict`` or standard dictionary. Just like the standard
-    dictionary ``update()`` method, except it *appends* to the current
-    dictionary items rather than replacing them. For example::
+    Takes either a ``QueryDict`` or a dictionary. Like :meth:`dict.update`,
+    except it *appends* to the current dictionary items rather than replacing
+    them. For example::
 
         >>> q = QueryDict('a=1', mutable=True)
         >>> q.update({'a': '2'})
@@ -477,8 +477,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.items()
 
-    Just like the standard dictionary ``items()`` method, except this uses the
-    same last-value logic as ``__getitem__()``. For example::
+    Like :meth:`dict.items`, except this uses the same last-value logic as
+    :meth:`__getitem__`. For example::
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.items()
@@ -486,9 +486,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.iteritems()
 
-    Just like the standard dictionary ``iteritems()`` method. Like
-    :meth:`QueryDict.items()` this uses the same last-value logic as
-    :meth:`QueryDict.__getitem__()`.
+    Like ``dict.iteritems()``, except this uses the same last-value logic as
+    :meth:`__getitem__`.
 
     Available only on Python 2.
 
@@ -501,8 +500,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. method:: QueryDict.values()
 
-    Just like the standard dictionary ``values()`` method, except this uses the
-    same last-value logic as ``__getitem__()``. For example::
+    Like :meth:`dict.values`, except this uses the same last-value logic as
+    :meth:`__getitem__`. For example::
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.values()
@@ -518,19 +517,18 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.copy()
 
-    Returns a copy of the object, using ``copy.deepcopy()`` from the Python
-    standard library. This copy will be mutable even if the original was not.
+    Returns a copy of the object using :func:`copy.deepcopy`. This copy will
+    be mutable even if the original was not.
 
 .. method:: QueryDict.getlist(key, default=None)
 
-    Returns the data with the requested key, as a Python list. Returns an
-    empty list if the key doesn't exist and no default value was provided.
-    It's guaranteed to return a list of some sort unless the default value
-    provided is not a list.
+    Returns a list of the data with the requested key. Returns an empty list if
+    the key doesn't exist and a default value wasn't provided. It's guaranteed
+    to return a list unless the default value provided isn't a list.
 
 .. method:: QueryDict.setlist(key, list_)
 
-    Sets the given key to ``list_`` (unlike ``__setitem__()``).
+    Sets the given key to ``list_`` (unlike :meth:`__setitem__`).
 
 .. method:: QueryDict.appendlist(key, item)
 
@@ -538,7 +536,7 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.setlistdefault(key, default_list=None)
 
-    Just like ``setdefault``, except it takes a list of values instead of a
+    Like :meth:`setdefault`, except it takes a list of values instead of a
     single value.
 
 .. method:: QueryDict.lists()
@@ -572,9 +570,9 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.dict()
 
-    Returns ``dict`` representation of ``QueryDict``. For every (key, list)
+    Returns a ``dict`` representation of ``QueryDict``. For every (key, list)
     pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
-    element of the list, using same logic as :meth:`QueryDict.__getitem__()`::
+    element of the list, using the same logic as :meth:`QueryDict.__getitem__`::
 
         >>> q = QueryDict('a=1&a=3&a=5')
         >>> q.dict()
@@ -582,14 +580,14 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.urlencode(safe=None)
 
-    Returns a string of the data in query-string format. Example::
+    Returns a string of the data in query string format. For example::
 
         >>> q = QueryDict('a=2&b=3&b=5')
         >>> q.urlencode()
         'a=2&b=3&b=5'
 
-    Optionally, urlencode can be passed characters which
-    do not require encoding. For example::
+    Use the ``safe`` parameter to pass characters which don't require encoding.
+    For example::
 
         >>> q = QueryDict(mutable=True)
         >>> q['next'] = '/a&b/'
@@ -603,7 +601,7 @@ In addition, ``QueryDict`` has the following methods:
 
 In contrast to :class:`HttpRequest` objects, which are created automatically by
 Django, :class:`HttpResponse` objects are your responsibility. Each view you
-write is responsible for instantiating, populating and returning an
+write is responsible for instantiating, populating, and returning an
 :class:`HttpResponse`.
 
 The :class:`HttpResponse` class lives in the :mod:`django.http` module.
