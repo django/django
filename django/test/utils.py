@@ -594,10 +594,6 @@ def strip_quotes(want, got):
     return want, got
 
 
-def str_prefix(s):
-    return s % {'_': ''}
-
-
 class CaptureQueriesContext:
     """
     Context manager that captures queries executed by the specified connection.
