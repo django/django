@@ -24,6 +24,7 @@ from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
+from django.forms.renderers import DjangoTemplates, Jinja2
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
 from django.test.client import Client
@@ -36,6 +37,11 @@ from django.test.utils import (
 from django.utils.decorators import classproperty
 from django.utils.encoding import force_text
 from django.views.static import serve
+
+try:
+    import jinja2
+except ImportError:
+    jinja2 = None
 
 __all__ = ('TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
@@ -1345,3 +1351,26 @@ class SerializeMixin:
     def tearDownClass(cls):
         super().tearDownClass()
         cls._lockfile.close()
+
+
+class WidgetTestCase(SimpleTestCase):
+    """
+    For testing widget rendering in Django's test suite (not a public API).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.django_renderer = DjangoTemplates()
+        cls.jinja2_renderer = Jinja2() if jinja2 else None
+        cls.renderers = [cls.django_renderer] + ([cls.jinja2_renderer] if cls.jinja2_renderer else [])
+        super().setUpClass()
+
+    def check_html(self, widget, name, value, html='', attrs=None, strict=False, **kwargs):
+        assertEqual = self.assertEqual if strict else self.assertHTMLEqual
+        if self.jinja2_renderer:
+            output = widget.render(name, value, attrs=attrs, renderer=self.jinja2_renderer, **kwargs)
+            # Django escapes quotes with '&quot;' while Jinja2 uses '&#34;'.
+            assertEqual(output.replace('&#34;', '&quot;'), html)
+
+        output = widget.render(name, value, attrs=attrs, renderer=self.django_renderer, **kwargs)
+        assertEqual(output, html)
