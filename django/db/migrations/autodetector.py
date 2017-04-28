@@ -1065,14 +1065,14 @@ class MigrationAutodetector:
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            old_options = dict(
-                option for option in old_model_state.options.items()
-                if option[0] in AlterModelOptions.ALTER_OPTION_KEYS
-            )
-            new_options = dict(
-                option for option in new_model_state.options.items()
-                if option[0] in AlterModelOptions.ALTER_OPTION_KEYS
-            )
+            old_options = {
+                key: value for key, value in old_model_state.options.items()
+                if key in AlterModelOptions.ALTER_OPTION_KEYS
+            }
+            new_options = {
+                key: value for key, value in new_model_state.options.items()
+                if key in AlterModelOptions.ALTER_OPTION_KEYS
+            }
             if old_options != new_options:
                 self.add_operation(
                     app_label,

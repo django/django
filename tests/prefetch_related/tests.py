@@ -858,7 +858,7 @@ class GenericRelationTests(TestCase):
 
         with self.assertNumQueries(3):
             bookmark = Bookmark.objects.filter(pk=b.pk).prefetch_related('tags', 'favorite_tags')[0]
-            self.assertEqual(sorted([i.tag for i in bookmark.tags.all()]), ["django", "python"])
+            self.assertEqual(sorted(i.tag for i in bookmark.tags.all()), ["django", "python"])
             self.assertEqual([i.tag for i in bookmark.favorite_tags.all()], ["python"])
 
     def test_custom_queryset(self):

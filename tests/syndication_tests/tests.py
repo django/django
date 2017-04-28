@@ -41,7 +41,7 @@ class FeedTestCase(TestCase):
         cls.a1 = Article.objects.create(title='My first article', entry=cls.e1)
 
     def assertChildNodes(self, elem, expected):
-        actual = set(n.nodeName for n in elem.childNodes)
+        actual = {n.nodeName for n in elem.childNodes}
         expected = set(expected)
         self.assertEqual(actual, expected)
 
@@ -52,7 +52,7 @@ class FeedTestCase(TestCase):
 
     def assertCategories(self, elem, expected):
         self.assertEqual(
-            set(i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'),
+            {i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'},
             set(expected)
         )
 

@@ -8,7 +8,7 @@ urlpatterns = [
     url(r'^test_admin/admin/secure-view2/$', views.secure_view2, name='secure_view2'),
     url(r'^test_admin/admin/', admin.site.urls),
     url(r'^test_admin/admin2/', customadmin.site.urls),
-    url(r'^test_admin/admin3/', (admin.site.get_urls(), 'admin', 'admin3'), dict(form_url='pony')),
+    url(r'^test_admin/admin3/', (admin.site.get_urls(), 'admin', 'admin3'), {'form_url': 'pony'}),
     url(r'^test_admin/admin4/', customadmin.simple_site.urls),
     url(r'^test_admin/admin5/', admin.site2.urls),
     url(r'^test_admin/admin7/', admin.site7.urls),

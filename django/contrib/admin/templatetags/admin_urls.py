@@ -25,7 +25,7 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
 
     parsed_url = list(urlparse(url))
     parsed_qs = dict(parse_qsl(parsed_url[4]))
-    merged_qs = dict()
+    merged_qs = {}
 
     if opts and preserved_filters:
         preserved_filters = dict(parse_qsl(preserved_filters))

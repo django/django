@@ -89,19 +89,19 @@ class PostgreSQLDatabaseCreationTests(SimpleTestCase):
             self.assertEqual(suffix, expected)
 
     def test_sql_table_creation_suffix_with_none_settings(self):
-        settings = dict(CHARSET=None, TEMPLATE=None)
+        settings = {'CHARSET': None, 'TEMPLATE': None}
         self.check_sql_table_creation_suffix(settings, "")
 
     def test_sql_table_creation_suffix_with_encoding(self):
-        settings = dict(CHARSET='UTF8')
+        settings = {'CHARSET': 'UTF8'}
         self.check_sql_table_creation_suffix(settings, "WITH ENCODING 'UTF8'")
 
     def test_sql_table_creation_suffix_with_template(self):
-        settings = dict(TEMPLATE='template0')
+        settings = {'TEMPLATE': 'template0'}
         self.check_sql_table_creation_suffix(settings, 'WITH TEMPLATE "template0"')
 
     def test_sql_table_creation_suffix_with_encoding_and_template(self):
-        settings = dict(CHARSET='UTF8', TEMPLATE='template0')
+        settings = {'CHARSET': 'UTF8', 'TEMPLATE': 'template0'}
         self.check_sql_table_creation_suffix(settings, '''WITH ENCODING 'UTF8' TEMPLATE "template0"''')
 
     def _execute_raise_database_already_exists(self, cursor, parameters, keepdb=False):

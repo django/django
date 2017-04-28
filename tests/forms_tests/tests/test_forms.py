@@ -920,7 +920,7 @@ Java</label></li>
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
-        data = MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P']))
+        data = MultiValueDict({'name': ['Yesterday'], 'composers': ['J', 'P']})
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
@@ -946,7 +946,7 @@ Java</label></li>
                 widget=MultipleHiddenInput,
             )
 
-        f = SongFormHidden(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])), auto_id=False)
+        f = SongFormHidden(MultiValueDict({'name': ['Yesterday'], 'composers': ['J', 'P']}), auto_id=False)
         self.assertHTMLEqual(
             f.as_ul(),
             """<li>Name: <input type="text" name="name" value="Yesterday" required />
@@ -3390,7 +3390,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             email = EmailField()
             comment = CharField()
 
-        data = dict(email='invalid')
+        data = {'email': 'invalid'}
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
         self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
 <div class="errorlist"><div class="error">Enter a valid email address.</div></div>

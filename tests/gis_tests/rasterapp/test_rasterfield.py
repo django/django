@@ -317,7 +317,7 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_lookup_value_error(self):
         # Test with invalid dict lookup parameter
-        obj = dict()
+        obj = {}
         msg = "Couldn't create spatial object from lookup value '%s'." % obj
         with self.assertRaisesMessage(ValueError, msg):
             RasterModel.objects.filter(geom__intersects=obj)

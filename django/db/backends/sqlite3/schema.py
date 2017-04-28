@@ -169,7 +169,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             'indexes': indexes,
             'apps': apps,
         }
-        meta = type("Meta", tuple(), meta_contents)
+        meta = type("Meta", (), meta_contents)
         body['Meta'] = meta
         body['__module__'] = model.__module__
 

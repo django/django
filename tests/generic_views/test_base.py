@@ -136,9 +136,8 @@ class ViewTest(unittest.TestCase):
         """
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:
-            kwargs = dict(((method, "value"),))
             with self.assertRaises(TypeError):
-                SimpleView.as_view(**kwargs)
+                SimpleView.as_view(**{method: 'value'})
 
         # Check the case view argument is ok if predefined on the class...
         CustomizableView.as_view(parameter="value")

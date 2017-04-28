@@ -32,7 +32,7 @@ class SetLanguageTests(TestCase):
         The user is redirected to the 'next' argument if provided.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code, next='/')
+        post_data = {'language': lang_code, 'next': '/'}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i_should_not_be_used/')
         self.assertRedirects(response, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -43,7 +43,7 @@ class SetLanguageTests(TestCase):
         "safe".
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code, next='//unsafe/redirection/')
+        post_data = {'language': lang_code, 'next': '//unsafe/redirection/'}
         response = self.client.post('/i18n/setlang/', data=post_data)
         self.assertEqual(response.url, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -55,7 +55,7 @@ class SetLanguageTests(TestCase):
         """
         lang_code = self._get_inactive_language_code()
         non_https_next_url = 'http://testserver/redirection/'
-        post_data = dict(language=lang_code, next=non_https_next_url)
+        post_data = {'language': lang_code, 'next': non_https_next_url}
         # Insecure URL in POST data.
         response = self.client.post('/i18n/setlang/', data=post_data, secure=True)
         self.assertEqual(response.url, '/')
@@ -71,7 +71,7 @@ class SetLanguageTests(TestCase):
         there isn't a "next" parameter.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code)
+        post_data = {'language': lang_code}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i18n/')
         self.assertRedirects(response, '/i18n/', fetch_redirect_response=False)
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -82,7 +82,7 @@ class SetLanguageTests(TestCase):
         "next" parameter.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code)
+        post_data = {'language': lang_code}
         response = self.client.post('/i18n/setlang/', post_data)
         self.assertRedirects(response, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -92,7 +92,7 @@ class SetLanguageTests(TestCase):
         The set_language view redirects to the "next" parameter for AJAX calls.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code, next='/')
+        post_data = {'language': lang_code, 'next': '/'}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertRedirects(response, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -103,7 +103,7 @@ class SetLanguageTests(TestCase):
         AJAX calls.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code)
+        post_data = {'language': lang_code}
         headers = {'HTTP_REFERER': '/', 'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         response = self.client.post('/i18n/setlang/', post_data, **headers)
         self.assertEqual(response.status_code, 204)
@@ -114,7 +114,7 @@ class SetLanguageTests(TestCase):
         The set_language view returns 204 for AJAX calls by default.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code)
+        post_data = {'language': lang_code}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 204)
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -124,7 +124,7 @@ class SetLanguageTests(TestCase):
         The fallback to root URL for the set_language view works for AJAX calls.
         """
         lang_code = self._get_inactive_language_code()
-        post_data = dict(language=lang_code, next='//unsafe/redirection/')
+        post_data = {'language': lang_code, 'next': '//unsafe/redirection/'}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.url, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
@@ -143,7 +143,7 @@ class SetLanguageTests(TestCase):
             'LANGUAGE_COOKIE_PATH': '/test/',
         }
         with self.settings(**test_settings):
-            post_data = dict(language='pl', next='/views/')
+            post_data = {'language': 'pl', 'next': '/views/'}
             response = self.client.post('/i18n/setlang/', data=post_data)
             language_cookie = response.cookies.get('mylanguage')
             self.assertEqual(language_cookie.value, 'pl')

@@ -300,7 +300,7 @@ class Apps:
         This method is safe in the sense that it doesn't trigger any imports.
         """
         available = set(available)
-        installed = set(app_config.name for app_config in self.get_app_configs())
+        installed = {app_config.name for app_config in self.get_app_configs()}
         if not available.issubset(installed):
             raise ValueError(
                 "Available apps isn't a subset of installed apps, extra apps: %s"

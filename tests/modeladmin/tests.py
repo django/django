@@ -221,7 +221,7 @@ class ModelAdminTests(TestCase):
             name = forms.CharField()
 
             class Meta:
-                exclude = tuple()
+                exclude = ()
                 model = Band
 
         class BandAdmin(ModelAdmin):

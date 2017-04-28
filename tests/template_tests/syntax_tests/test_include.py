@@ -326,5 +326,5 @@ class IncludeTests(SimpleTestCase):
                 'next': '{% load custom %}{% counter %}'
             }),
         ], libraries={'custom': 'template_tests.templatetags.custom'})
-        output = engine.render_to_string('template', dict(vars=range(9)))
+        output = engine.render_to_string('template', {'vars': range(9)})
         self.assertEqual(output, '012345678')

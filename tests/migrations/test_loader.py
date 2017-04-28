@@ -19,23 +19,23 @@ class RecorderTests(TestCase):
         """
         recorder = MigrationRecorder(connection)
         self.assertEqual(
-            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
+            {(x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"},
             set(),
         )
         recorder.record_applied("myapp", "0432_ponies")
         self.assertEqual(
-            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
+            {(x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"},
             {("myapp", "0432_ponies")},
         )
         # That should not affect records of another database
         recorder_other = MigrationRecorder(connections['other'])
         self.assertEqual(
-            set((x, y) for (x, y) in recorder_other.applied_migrations() if x == "myapp"),
+            {(x, y) for (x, y) in recorder_other.applied_migrations() if x == "myapp"},
             set(),
         )
         recorder.record_unapplied("myapp", "0432_ponies")
         self.assertEqual(
-            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
+            {(x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"},
             set(),
         )
 

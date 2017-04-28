@@ -51,7 +51,7 @@ class StartsWithRelation(models.ForeignObject):
         return StartsWith(to_field.get_col(alias), from_field.get_col(related_alias))
 
     def get_joining_columns(self, reverse_join=False):
-        return tuple()
+        return ()
 
     def get_path_info(self):
         to_opts = self.remote_field.model._meta

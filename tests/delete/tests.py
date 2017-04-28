@@ -186,7 +186,7 @@ class DeletionTests(TestCase):
             obj = kwargs['instance']
             deleted.append(obj)
             if isinstance(obj, R):
-                related_setnull_sets.append(list(a.pk for a in obj.setnull_set.all()))
+                related_setnull_sets.append([a.pk for a in obj.setnull_set.all()])
 
         models.signals.pre_delete.connect(pre_delete)
         a = create_a('update_setnull')

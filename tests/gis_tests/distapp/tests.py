@@ -421,7 +421,7 @@ class DistanceFunctionsTests(TestCase):
             qs = CensusZipcode.objects.exclude(name='77005').annotate(
                 distance=Distance(Transform('poly', 32140), buf)
             ).order_by('name')
-            self.assertEqual(ref_zips, sorted([c.name for c in qs]))
+            self.assertEqual(ref_zips, sorted(c.name for c in qs))
             for i, z in enumerate(qs):
                 self.assertAlmostEqual(z.distance.m, dists_m[i], 5)
 

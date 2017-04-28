@@ -20,7 +20,7 @@ from django.utils.translation import override
 
 PROXY_PARENTS = object()
 
-EMPTY_RELATION_TREE = tuple()
+EMPTY_RELATION_TREE = ()
 
 IMMUTABLE_WARNING = (
     "The return type of '%s' should never be mutated. If you want to manipulate this list "

@@ -318,8 +318,8 @@ class AbstractInheritanceTests(TestCase):
 
         def fields(model):
             if not hasattr(model, '_meta'):
-                return list()
-            return list((f.name, f.__class__) for f in model._meta.get_fields())
+                return []
+            return [(f.name, f.__class__) for f in model._meta.get_fields()]
 
         model_dict = {'__module__': 'model_inheritance'}
         model1 = type('Model1', (AbstractModel, Mixin), model_dict.copy())

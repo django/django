@@ -194,7 +194,7 @@ class AppsTests(SimpleTestCase):
             'app_label': "apps",
             'apps': new_apps,
         }
-        meta = type("Meta", tuple(), meta_contents)
+        meta = type("Meta", (), meta_contents)
         body['Meta'] = meta
         body['__module__'] = TotallyNormal.__module__
         temp_model = type("SouthPonies", (models.Model,), body)
@@ -215,7 +215,7 @@ class AppsTests(SimpleTestCase):
         }
 
         body = {}
-        body['Meta'] = type("Meta", tuple(), meta_contents)
+        body['Meta'] = type("Meta", (), meta_contents)
         body['__module__'] = TotallyNormal.__module__
         type("SouthPonies", (models.Model,), body)
 
@@ -223,7 +223,7 @@ class AppsTests(SimpleTestCase):
         # was reloaded and issue a warning. This use-case is
         # useful for REPL. Refs #23621.
         body = {}
-        body['Meta'] = type("Meta", tuple(), meta_contents)
+        body['Meta'] = type("Meta", (), meta_contents)
         body['__module__'] = TotallyNormal.__module__
         msg = (
             "Model 'apps.southponies' was already registered. "
@@ -236,7 +236,7 @@ class AppsTests(SimpleTestCase):
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
         body = {}
-        body['Meta'] = type("Meta", tuple(), meta_contents)
+        body['Meta'] = type("Meta", (), meta_contents)
         body['__module__'] = TotallyNormal.__module__ + '.whatever'
         with self.assertRaisesMessage(RuntimeError, "Conflicting 'southponies' models in application 'apps':"):
             type("SouthPonies", (models.Model,), body)

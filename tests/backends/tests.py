@@ -970,9 +970,7 @@ class ThreadTests(TransactionTestCase):
             t.start()
             t.join()
         # Each created connection got different inner connection.
-        self.assertEqual(
-            len(set(conn.connection for conn in connections_dict.values())),
-            3)
+        self.assertEqual(len({conn.connection for conn in connections_dict.values()}), 3)
         # Finish by closing the connections opened by the other threads (the
         # connection opened in the main thread will automatically be closed on
         # teardown).

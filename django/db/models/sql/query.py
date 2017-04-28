@@ -1251,8 +1251,7 @@ class Query:
         # (Consider case where rel_a is LOUTER and rel_a__col=1 is added - if
         # rel_a doesn't produce any rows, then the whole condition must fail.
         # So, demotion is OK.
-        existing_inner = set(
-            (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
+        existing_inner = {a for a in self.alias_map if self.alias_map[a].join_type == INNER}
         clause, _ = self._add_q(q_object, self.used_aliases)
         if clause:
             self.where.add(clause, AND)
@@ -1437,8 +1436,8 @@ class Query:
         for pos, info in enumerate(reversed(path)):
             if len(joins) == 1 or not info.direct:
                 break
-            join_targets = set(t.column for t in info.join_field.foreign_related_fields)
-            cur_targets = set(t.column for t in targets)
+            join_targets = {t.column for t in info.join_field.foreign_related_fields}
+            cur_targets = {t.column for t in targets}
             if not cur_targets.issubset(join_targets):
                 break
             targets_dict = {r[1].column: r[0] for r in info.join_field.related_fields if r[1].column in cur_targets}

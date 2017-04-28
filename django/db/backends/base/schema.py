@@ -324,8 +324,8 @@ class BaseDatabaseSchemaEditor:
         unique_togethers must be doubly-nested, not the single-nested
         ["foo", "bar"] format.
         """
-        olds = set(tuple(fields) for fields in old_unique_together)
-        news = set(tuple(fields) for fields in new_unique_together)
+        olds = {tuple(fields) for fields in old_unique_together}
+        news = {tuple(fields) for fields in new_unique_together}
         # Deleted uniques
         for fields in olds.difference(news):
             self._delete_composed_index(model, fields, {'unique': True}, self.sql_delete_unique)
@@ -340,8 +340,8 @@ class BaseDatabaseSchemaEditor:
         index_togethers must be doubly-nested, not the single-nested
         ["foo", "bar"] format.
         """
-        olds = set(tuple(fields) for fields in old_index_together)
-        news = set(tuple(fields) for fields in new_index_together)
+        olds = {tuple(fields) for fields in old_index_together}
+        news = {tuple(fields) for fields in new_index_together}
         # Deleted indexes
         for fields in olds.difference(news):
             self._delete_composed_index(model, fields, {'index': True}, self.sql_delete_index)

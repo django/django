@@ -159,7 +159,7 @@ class MemcachedCache(BaseMemcachedCache):
     @property
     def _cache(self):
         if getattr(self, '_client', None) is None:
-            client_kwargs = dict(pickleProtocol=pickle.HIGHEST_PROTOCOL)
+            client_kwargs = {'pickleProtocol': pickle.HIGHEST_PROTOCOL}
             client_kwargs.update(self._options)
             self._client = self._lib.Client(self._servers, **client_kwargs)
         return self._client
