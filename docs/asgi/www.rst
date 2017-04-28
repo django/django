@@ -49,8 +49,7 @@ Channel: ``http.request``
 
 Keys:
 
-* ``reply_channel``: Channel name for responses and server pushes, starting with
-  ``http.response!``
+* ``reply_channel``: Channel name for responses and server pushes.
 
 * ``http_version``: Unicode string, one of ``1.0``, ``1.1`` or ``2``.
 
@@ -137,7 +136,7 @@ Keys:
 * ``headers``: A list of ``[name, value]`` lists, where ``name`` is the
   byte string header name, and ``value`` is the byte string
   header value. Order must be preserved in the HTTP response. Header names
-  must be lowercased.
+  must be lowercased. Optional, defaults to an empty list.
 
 * ``content``: Byte string of HTTP body content.
   Optional, defaults to empty string.
@@ -357,13 +356,14 @@ message:
 * If ``accept`` is ``True``, accept the connection (and send any data provided).
 * If ``accept`` is ``False``, reject the connection and do nothing else.
   If ``bytes`` or ``text`` were also present they must be ignored.
-* If ``bytes`` or ``text`` is present, accept the connection and send the data.
+* If ``bytes`` or ``text`` is present and contains a non-empty value,
+  accept the connection and send the data.
 * If ``close`` is ``True`` or a positive integer, reject the connection. If
-  ``bytes`` or ``text`` is also set, it should accept the connection, send the
-  frame, then immediately close the connection. Note that any close code integer
-  sent is ignored, as connections are rejected with HTTP's ``403 Forbidden``,
-  unless data is also sent, in which case a full WebSocket close is done with
-  the provided code.
+  ``bytes`` or ``text`` is also set and not empty, it should accept the
+  connection,  send the  frame, then immediately close the connection.
+  Note that any close code integer sent is ignored, as connections are
+  rejected with HTTP's ``403 Forbidden``, unless data is also sent, in which
+  case a full WebSocket close is done with the provided code.
 
 If received while the connection is established:
 
