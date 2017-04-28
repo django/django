@@ -986,6 +986,9 @@ class OneToOneField(ForeignKey):
     def save_form_data(self, instance, data):
         if isinstance(data, self.remote_field.model):
             setattr(instance, self.name, data)
+        elif data is None:
+            setattr(instance, self.name, data)
+            setattr(instance, self.attname, data)
         else:
             setattr(instance, self.attname, data)
 
