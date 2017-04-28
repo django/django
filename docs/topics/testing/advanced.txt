@@ -569,8 +569,43 @@ Methods
 
 .. method:: DiscoverRunner.setup_databases(**kwargs)
 
+    versionchanged:: 2.0
+
+    Runs :func:`DiscoverRunner.prepare_databases`,
+    and :func:`DiscoverRunner.populate_databases`,
+    and :func:`DiscoverRunner.duplicate_databases_if_necessary`,
+
+    The reason this function was separated in three is to make easier the life of
+    those who extend this class.
+
+.. method:: DiscoverRunner.prepare_databases(**kwargs)
+
+    .. versionadded:: 2.0
+
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
+
+    Please notice this function will only create the DB(s) for running tests without paralellistion.
+    If you run tests in parallel, the copies of the DBs created in this function
+    will be created by ``DiscoverRunner.duplicate_databases_if_necessary()``
+
+.. method:: DiscoverRunner.populate_databases(**kwargs)
+
+    .. versionadded:: 2.0
+
+    No Op. Override this function to populate your test dabasases.
+
+    This function it called before the DBs are duplicated in case tests are
+    executed in parallel.
+
+.. method:: DiscoverRunner.duplicate_databases_if_necessary()
+
+    .. versionadded:: 2.0
+
+    This is called after the test databases are created and populated.
+    Duplicate all the test database(s) for tests to run in parallel by calling
+    :func:`~django.test.utils.duplicate_database`.
+
 
 .. method:: DiscoverRunner.run_checks()
 
@@ -637,13 +672,21 @@ utility methods in the ``django.test.utils`` module.
 
 .. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs)
 
-    .. versionadded:: 1.11
+    .. versionchanged:: 2.0
 
     Creates the test databases.
 
     Returns a data structure that provides enough detail to undo the changes
     that have been made. This data will be provided to the
     :func:`teardown_databases` function at the conclusion of testing.
+
+.. function:: duplicate_database(self.verbosity, keepdb=self.keepdb, parallel=self.parallel)
+
+    .. versionadded:: 2.0
+
+    This function duplicates all the test databases so tests can run in parallel.
+    It is called after the test databases are created and populated so all tests can
+    run consistently.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 

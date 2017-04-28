@@ -154,7 +154,7 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
     """Create the test databases."""
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
 
@@ -175,13 +175,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                     keepdb=keepdb,
                     serialize=connection.settings_dict.get('TEST', {}).get('SERIALIZE', True),
                 )
-                if parallel > 1:
-                    for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            number=index + 1,
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
+
             # Configure all other connections as mirrors of the first one
             else:
                 connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
@@ -196,6 +190,26 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             connections[alias].force_debug_cursor = True
 
     return old_names
+
+
+def duplicate_database(verbosity, keepdb=False, parallel=0):
+    if parallel < 2:
+        return
+    test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
+    for signature, (db_name, aliases) in test_databases.items():
+        first_alias = None
+        for alias in aliases:
+            connection = connections[alias]
+
+            # Actually create the database for the first connection
+            if first_alias is None:
+                first_alias = alias
+                for index in range(parallel):
+                    connection.creation.clone_test_db(
+                        number=index + 1,
+                        verbosity=verbosity,
+                        keepdb=keepdb,
+                    )
 
 
 def dependency_ordered(test_databases, dependencies):
