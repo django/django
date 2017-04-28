@@ -367,18 +367,9 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
         else:
-            from django.db.models.sql.query import Query  # avoid circular import
-            if isinstance(self.rhs, Query):
-                query = self.rhs
-                # It's safe to drop ordering if the queryset isn't using
-                # slicing, distinct(*fields), or select_for_update().
-                if (query.low_mark == 0 and query.high_mark is None and
-                        not query.distinct_fields and
-                        not query.select_for_update):
-                    query.clear_ordering(True)
-                if not query.has_select_fields:
-                    query.clear_select_clause()
-                    query.add_fields(['pk'])
+            if not getattr(self.rhs, 'has_select_fields', True):
+                self.rhs.clear_select_clause()
+                self.rhs.add_fields(['pk'])
             return super().process_rhs(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
