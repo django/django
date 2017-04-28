@@ -244,8 +244,9 @@ class SequenceSerializer(BaseSequenceSerializer):
 
 class SetSerializer(BaseSequenceSerializer):
     def _format(self):
-        # Don't use the literal "{%s}" as it doesn't support empty set
-        return "set([%s])"
+        # Serialize as a set literal except when value is empty because {}
+        # is an empty dict.
+        return '{%s}' if self.value else 'set(%s)'
 
 
 class SettingsReferenceSerializer(BaseSerializer):

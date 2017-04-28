@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ('old_path',),
-                'unique_together': set([('site', 'old_path')]),
+                'unique_together': {('site', 'old_path')},
                 'db_table': 'django_redirect',
                 'verbose_name': 'redirect',
                 'verbose_name_plural': 'redirects',
