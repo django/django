@@ -57,9 +57,13 @@ class AsgiRequest(http.HttpRequest):
             self.path_info = self.path
         # HTTP basics
         self.method = self.message['method'].upper()
+        # fix https://github.com/django/channels/issues/622
+        query_string = self.message.get('query_string', '')
+        if isinstance(query_string, bytes):
+            query_string = query_string.decode('utf-8')
         self.META = {
             "REQUEST_METHOD": self.method,
-            "QUERY_STRING": self.message.get('query_string', ''),
+            "QUERY_STRING": query_string,
             "SCRIPT_NAME": self.script_name,
             "PATH_INFO": self.path_info,
             # Old code will need these for a while
