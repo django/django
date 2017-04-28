@@ -61,3 +61,5 @@ Bugfixes
 
 * Fixed a regression in formset ``min_num`` validation with unchanged forms
   that have initial data (:ticket:`28130`).
+
+* Prepared for ``cx_Oracle`` 6.0 support (:ticket:`28138`).
