@@ -89,12 +89,6 @@ class Lookup:
                 value = Value(value, output_field=self.lhs.output_field)
             value = self.apply_bilateral_transforms(value)
             value = value.resolve_expression(compiler.query)
-        # Due to historical reasons there are a couple of different
-        # ways to produce sql here. get_compiler is likely a Query
-        # instance and as_sql just something with as_sql. Finally the value
-        # can of course be just plain Python value.
-        if hasattr(value, 'get_compiler'):
-            value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql'):
             sql, params = compiler.compile(value)
             return '(' + sql + ')', params

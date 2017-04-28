@@ -989,6 +989,9 @@ class Query:
             clone.clear_ordering(True)
         return clone
 
+    def as_sql(self, compiler, connection):
+        return self.get_compiler(connection=connection).as_sql()
+
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
         used_joins = []
