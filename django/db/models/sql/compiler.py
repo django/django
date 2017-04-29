@@ -161,7 +161,12 @@ class SQLCompiler:
             # present in the grouped columns. This is done by identifying all
             # tables that have their primary key included in the grouped
             # columns and removing non-primary key columns referring to them.
-            pks = {expr for expr in expressions if hasattr(expr, 'target') and expr.target.primary_key}
+            # Unmanaged models are excluded because they could be representing
+            # database views on which the optimization might not be allowed.
+            pks = {
+                expr for expr in expressions
+                if hasattr(expr, 'target') and expr.target.primary_key and expr.target.model._meta.managed
+            }
             aliases = {expr.alias for expr in pks}
             expressions = [
                 expr for expr in expressions if expr in pks or getattr(expr, 'alias', None) not in aliases
