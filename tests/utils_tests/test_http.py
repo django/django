@@ -100,6 +100,8 @@ class TestUtilsHttp(unittest.TestCase):
             'http:999999999',
             'ftp:9999999999',
             '\n',
+            'http://[2001:cdba:0000:0000:0000:0000:3257:9652/',
+            'http://2001:cdba:0000:0000:0000:0000:3257:9652]/',
         )
         for bad_url in bad_urls:
             with ignore_warnings(category=RemovedInDjango21Warning):

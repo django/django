@@ -15,3 +15,6 @@ Bugfixes
 * Changed ``contrib.gis`` to raise ``ImproperlyConfigured`` rather than
   ``GDALException`` if ``gdal`` isn't installed, to allow third-party apps to
   catch that exception (:ticket:`28178`).
+
+* Fixed ``django.utils.http.is_safe_url()`` crash on invalid IPv6 URLs
+  (:ticket:`28142`).
