@@ -502,7 +502,7 @@ The ``login_required`` decorator
 
         from django.contrib.auth import views as auth_views
 
-        url(r'^accounts/login/$', auth_views.Login.as_view()),
+        url(r'^accounts/login/$', auth_views.LoginView.as_view()),
 
     The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
     names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
