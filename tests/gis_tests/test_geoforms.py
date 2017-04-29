@@ -1,6 +1,7 @@
 import re
 
 from django.contrib.gis import forms
+from django.contrib.gis.forms import BaseGeometryWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
@@ -352,6 +353,12 @@ class OSMWidgetTest(SimpleTestCase):
 
 @skipUnlessDBFeature("gis_enabled")
 class GeometryWidgetTests(SimpleTestCase):
+
+    def test_get_context_attrs(self):
+        """The Widget.get_context() attrs argument overrides self.attrs."""
+        widget = BaseGeometryWidget(attrs={'geom_type': 'POINT'})
+        context = widget.get_context('point', None, attrs={'geom_type': 'POINT2'})
+        self.assertEqual(context['geom_type'], 'POINT2')
 
     def test_subwidgets(self):
         widget = forms.BaseGeometryWidget()

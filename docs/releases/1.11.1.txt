@@ -66,3 +66,6 @@ Bugfixes
 
 * Updated the ``contrib.postgres`` ``SplitArrayWidget`` to use template-based
   widget rendering (:ticket:`28040`).
+
+* Fixed crash in ``BaseGeometryWidget.get_context()`` when overriding existing
+  ``attrs`` (:ticket:`28105`).
