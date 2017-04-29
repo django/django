@@ -1,5 +1,4 @@
 import unittest
-
 from decimal import Decimal
 
 from django.core import validators
