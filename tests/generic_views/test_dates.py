@@ -22,7 +22,10 @@ class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
         cls.series1 = Series.objects.create(
-            name='Django books', pubdate=datetime.date(2003, 10, 1),
+            name='Django books 1', pubdate=datetime.date(2003, 10, 1),
+        )
+        cls.series2 = Series.objects.create(
+            name='Django books 2', pubdate=datetime.date(2003, 9, 1),
         )
         cls.artist1 = Artist.objects.create(name='Rene Magritte')
         cls.author1 = Author.objects.create(name='Roberto Bolaño', slug='roberto-bolano')
@@ -33,7 +36,8 @@ class TestDataMixin:
         )
         cls.book1.authors.add(cls.author1)
         cls.book2 = Book.objects.create(
-            name='Dreaming in Code', slug='dreaming-in-code', pages=300, pubdate=datetime.date(2006, 5, 1)
+            name='Dreaming in Code', slug='dreaming-in-code', pages=300,
+            series=cls.series2, pubdate=datetime.date(2006, 5, 1),
         )
         cls.page1 = Page.objects.create(
             content='I was once bitten by a moose.', template='generic_views/page_template.html'

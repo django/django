@@ -1,9 +1,10 @@
 import datetime
+import functools
 
 from django.conf import settings
-from django.contrib.admin.utils import get_fields_from_path
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
+from django.db.models.constants import LOOKUP_SEP
 from django.http import Http404
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -255,8 +256,17 @@ class DateMixin:
         if it's a `DateField`.
         """
         model = self.get_queryset().model if self.model is None else self.model
-        field = get_fields_from_path(model, self.get_date_field())[-1]
-        return isinstance(field, models.DateTimeField)
+
+        pieces = self.get_date_field().split(LOOKUP_SEP)
+        fields = []
+        for piece in pieces:
+            parent = model
+            if (fields and fields[-1].is_relation and
+                    fields[-1].remote_field.model != model):
+                parent = fields[-1].remote_field.model
+            fields.append(parent._meta.get_field(piece))
+
+        return isinstance(fields[-1], models.DateTimeField)
 
     def _make_date_lookup_arg(self, value):
         """
@@ -697,7 +707,8 @@ def _get_next_prev(generic_view, date, is_previous, period):
         # Snag the first object from the queryset; if it doesn't exist that
         # means there's no next/previous link available.
         try:
-            result = getattr(qs[0], date_field)
+            result = functools.reduce(
+                getattr, date_field.split(LOOKUP_SEP), qs[0])
         except IndexError:
             return None
 
