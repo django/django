@@ -739,6 +739,15 @@ Miscellaneous
 
 * Support for IPython < 1.0 is removed from the ``shell`` command.
 
+* :meth:`~django.forms.Widget.build_attrs` no longer accepts ``kwargs`` parameters.
+  For backwards compatibility in custom :class:`~django.forms.Widget` subclasses,
+  use something like::
+
+    def build_attrs(self, extra_attrs=None, **kwargs):
+        if extra_attrs:
+            kwargs.update(extra_attrs)
+        return super().build_attrs(extra_attrs=kwargs)
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

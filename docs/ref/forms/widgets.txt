@@ -263,6 +263,19 @@ foundation for custom widgets.
         ``Widget`` subclasses can provide custom context values by overriding
         this method.
 
+    .. method:: build_attrs(base_attrs, extra_attrs=None)
+
+        Returns a dictionary containing HTML attributes. If ``extra_attrs`` is
+        not ``None``, ``base_attrs`` is extended with its contents and returned
+        in a new dictionary. ``base_attrs`` is not modified.
+
+        .. versionchanged:: 1.11
+
+            In older versions, this method accepted a ``kwargs`` parameter.
+
+        * ``'base_attrs'``: The base attribute dictionary to extend.
+        * ``'extra_attrs'=None``: The additional attributes to add.
+
     .. method:: id_for_label(id_)
 
         Returns the HTML ID attribute of this widget for use by a ``<label>``,
