@@ -213,7 +213,7 @@ class CharFieldTests(TestCase):
         errors = field.check()
         expected = [
             Error(
-                "'db_index' must be None, True or False.",
+                "'db_index' must be None, True or False, or an instance of Index.",
                 obj=field,
                 id='fields.E006',
             ),

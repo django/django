@@ -634,6 +634,7 @@ class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
                 schema_editor.add_field(
                     from_model,
                     field,
+                    to_model,
                 )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):

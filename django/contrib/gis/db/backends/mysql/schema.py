@@ -41,8 +41,8 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         super().create_model(model)
         self.create_spatial_indexes()
 
-    def add_field(self, model, field):
-        super().add_field(model, field)
+    def add_field(self, model, field, to_model):
+        super().add_field(model, field, to_model)
         self.create_spatial_indexes()
 
     def remove_field(self, model, field):

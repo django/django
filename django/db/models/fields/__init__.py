@@ -18,6 +18,7 @@ from django.core import checks, exceptions, validators
 from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.indexes import Index
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
 from django.utils.datastructures import DictWrapper
@@ -267,10 +268,10 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_db_index(self):
-        if self.db_index not in (None, True, False):
+        if self.db_index not in (None, True, False) and not isinstance(self.db_index, Index):
             return [
                 checks.Error(
-                    "'db_index' must be None, True or False.",
+                    "'db_index' must be None, True or False, or an instance of Index.",
                     obj=self,
                     id='fields.E006',
                 )
@@ -664,6 +665,27 @@ class Field(RegisterLookupMixin):
 
     def db_type_suffix(self, connection):
         return connection.data_types_suffix.get(self.get_internal_type())
+
+    def get_indexes(self, schema, model=None):
+        """
+        Return a list of all index SQL statements for the specified field.
+        """
+        indexes = []
+        if model is None:
+            model = self.model
+        if isinstance(self.db_index, Index):
+            index = self.db_index.clone()
+            index.fields = [self.name]
+            if not index.name:
+                index.set_name_with_model(model)
+            indexes.append(index)
+        elif self.db_index and not self.unique:
+            index = Index(fields=[self.name])
+            name = schema._create_index_name(model, [self.column])
+            index.name = name
+            indexes.append(index)
+        indexes.extend(schema._get_db_specific_indexes(model, self))
+        return indexes
 
     def get_db_converters(self, connection):
         if hasattr(self, 'from_db_value'):

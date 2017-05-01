@@ -14,14 +14,7 @@ class Index:
     def __init__(self, fields=[], name=None):
         if not isinstance(fields, list):
             raise ValueError('Index.fields must be a list.')
-        if not fields:
-            raise ValueError('At least one field is required to define an index.')
         self.fields = fields
-        # A list of 2-tuple with the field name and ordering ('' or 'DESC').
-        self.fields_orders = [
-            (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
-            for field_name in self.fields
-        ]
         self.name = name or ''
         if self.name:
             errors = self.check_name()
@@ -29,6 +22,19 @@ class Index:
                 errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
             if errors:
                 raise ValueError(errors)
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @fields.setter
+    def fields(self, fields):
+        self._fields = fields
+        # A list of 2-tuple with the field name and ordering ('' or 'DESC').
+        self.fields_orders = [
+            (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
+            for field_name in self.fields
+        ]
 
     def check_name(self):
         errors = []
@@ -43,6 +49,8 @@ class Index:
         return errors
 
     def get_sql_create_template_values(self, model, schema_editor, using):
+        if not self.fields:
+            raise ValueError('At least one field is required to define an index.')
         fields = [model._meta.get_field(field_name) for field_name, order in self.fields_orders]
         tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields)
         quote_name = schema_editor.quote_name
@@ -124,3 +132,6 @@ class Index:
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+
+    def __hash__(self):
+        return hash((self.__class__.__name__, tuple(self.fields), self.name))

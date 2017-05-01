@@ -133,8 +133,18 @@ class IntrospectionTests(TransactionTestCase):
             editor.remove_field(Article, body)
         with connection.cursor() as cursor:
             relations = connection.introspection.get_relations(cursor, Article._meta.db_table)
+
+        def clone_model(model):
+            class to_model(model):
+                class Meta:
+                    app_label = 'introspection2'
+                    db_table = model._meta.db_table
+            return to_model
+
         with connection.schema_editor() as editor:
-            editor.add_field(Article, body)
+            to_model = clone_model(Article)
+            body.contribute_to_class(to_model, body.name)
+            editor.add_field(Article, body, to_model)
         self.assertEqual(relations, expected_relations)
 
     @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
