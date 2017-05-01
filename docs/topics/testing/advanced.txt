@@ -569,7 +569,7 @@ Methods
 
 .. method:: DiscoverRunner.setup_databases(**kwargs)
 
-    versionchanged:: 2.0
+    .. versionchanged:: 2.0
 
     Runs :func:`DiscoverRunner.prepare_databases`,
     and :func:`DiscoverRunner.populate_databases`,
@@ -585,7 +585,7 @@ Methods
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
 
-    Please notice this function will only create the DB(s) for running tests without paralellistion.
+    Please notice this function will only create the DB(s) for running tests without parallelisation.
     If you run tests in parallel, the copies of the DBs created in this function
     will be created by ``DiscoverRunner.duplicate_databases_if_necessary()``
 
@@ -593,7 +593,7 @@ Methods
 
     .. versionadded:: 2.0
 
-    No Op. Override this function to populate your test dabasases.
+    No Op. Override this function to populate your test databases.
 
     This function it called before the DBs are duplicated in case tests are
     executed in parallel.
