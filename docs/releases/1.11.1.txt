@@ -81,3 +81,6 @@ Bugfixes
 
 * Fixed a regression in choice ordering in form fields with grouped and
   non-grouped options (:ticket:`28157`).
+
+* Fixed crash in  ``BaseInlineFormSet._construct_form()`` when using
+  ``save_as_new`` (:ticket:`28159`).
