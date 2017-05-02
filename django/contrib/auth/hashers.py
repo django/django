@@ -446,7 +446,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         salt = data[:29]  # Length of the salt in bcrypt.
         rounds = data.split('$')[2]
         # work factor is logarithmic, adding one doubles the load.
-        diff = 2**(self.rounds - int(rounds)) - 1
+        diff = 2 ** (self.rounds - int(rounds)) - 1
         while diff > 0:
             self.encode(password, force_bytes(salt))
             diff -= 1
