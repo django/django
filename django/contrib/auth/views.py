@@ -323,6 +323,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
         title = _('Password reset unsuccessful')
     context = {
         'form': form,
+        'user': user,
         'title': title,
         'validlink': validlink,
     }
