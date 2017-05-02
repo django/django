@@ -171,6 +171,7 @@ class QuerySet:
         from django.db.models.manager import Manager
         manager = Manager.from_queryset(cls)()
         manager._built_with_as_manager = True
+        manager.use_in_migrations = getattr(cls, 'use_in_migrations', Manager.use_in_migrations)
         return manager
     as_manager.queryset_only = True
     as_manager = classmethod(as_manager)
