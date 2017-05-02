@@ -1,7 +1,9 @@
 import re
 from itertools import chain
 
-from django.core.exceptions import EmptyResultSet, FieldError
+from django.core.exceptions import (
+    EmptyResultSet, FieldDoesNotExist, FieldError,
+)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy, Random, RawSQL, Ref
 from django.db.models.query_utils import QueryWrapper, select_related_descend
@@ -688,6 +690,22 @@ class SQLCompiler:
             )
             return chain(direct_choices, reverse_choices)
 
+        def _build_error_msg(field_name):
+            try:
+                field = opts.get_field(field_name)
+            except FieldDoesNotExist:
+                return "'%s' (reason: non existing field)" % field_name
+            if field_name in opts.fields_map:
+                return "'%s' (reason: reverse relational field)" % field_name
+            if field.is_relation and field.many_to_many:
+                return "'%s' (reason: many to many field)" % field_name
+            if field.is_relation and field.one_to_many:
+                return "'%s' (reason: generic relation)" % field_name
+            if (field.is_relation and field.many_to_one and
+                    not hasattr(field.remote_field, 'model')):
+                return "'%s' (reason: generic foreign key)" % field_name
+            return "'%s'" % field_name
+
         related_klass_infos = []
         if not restricted and self.query.max_depth and cur_depth > self.query.max_depth:
             # We've recursed far enough; bail out.
@@ -792,7 +810,7 @@ class SQLCompiler:
                 get_related_klass_infos(klass_info, next_klass_infos)
             fields_not_found = set(requested.keys()).difference(fields_found)
             if fields_not_found:
-                invalid_fields = ("'%s'" % s for s in fields_not_found)
+                invalid_fields = (_build_error_msg(field_name) for field_name in fields_not_found)
                 raise FieldError(
                     'Invalid field name(s) given in select_related: %s. '
                     'Choices are: %s' % (

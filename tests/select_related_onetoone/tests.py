@@ -220,12 +220,13 @@ class ReverseSelectRelatedValidationTests(SimpleTestCase):
     invalid field is given in select_related().
     """
     non_relational_error = "Non-relational field given in select_related: '%s'. Choices are: %s"
-    invalid_error = "Invalid field name(s) given in select_related: '%s'. Choices are: %s"
+    invalid_error = "Invalid field name(s) given in select_related: %s. Choices are: %s"
 
     def test_reverse_related_validation(self):
         fields = 'userprofile, userstat'
 
-        with self.assertRaisesMessage(FieldError, self.invalid_error % ('foobar', fields)):
+        with self.assertRaisesMessage(FieldError, self.invalid_error %
+                                      ("'foobar' (reason: non existing field)", fields)):
             list(User.objects.select_related('foobar'))
 
         with self.assertRaisesMessage(FieldError, self.non_relational_error % ('username', fields)):
