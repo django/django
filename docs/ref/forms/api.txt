@@ -1082,6 +1082,29 @@ be implemented as follows::
 Now you can access the country in a template with
 ``{{ form.coordinates.country }}``.
 
+.. attribute:: BoundField.id_for_label
+
+Use this property to render the ID of this field. For example, if you are
+manually constructing a ``<label>`` in your template (despite the fact that
+:meth:`~BoundField.label_tag` will do this for you):
+
+.. code-block:: html+django
+
+    <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
+
+By default, this will be the field's name prefixed by ``id_``
+("``id_my_field``" for the example above). You may modify the ID by setting
+:attr:`~django.forms.Widget.attrs` on the field's widget. For example,
+declaring a field like this::
+
+    my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
+
+and using the template above, would render something like:
+
+.. code-block:: html
+
+    <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
+
 .. _binding-uploaded-files:
 
 Binding uploaded files to a form

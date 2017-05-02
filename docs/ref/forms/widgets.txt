@@ -168,6 +168,9 @@ Django will then include the extra attributes in the rendered output:
 You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 :attr:`BoundField.id_for_label` for an example.
 
+You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
+:attr:`BoundField.id_for_label` for an example.
+
 .. _styling-widget-classes:
 
 Styling widget classes
