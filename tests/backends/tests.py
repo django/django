@@ -327,6 +327,31 @@ class PostgreSQLTests(TestCase):
         with mock.patch(version_path, '2.5.dev0'):
             self.assertEqual(psycopg2_version(), (2, 5))
 
+    @unittest.skipUnless(connection.vendor == 'mysql',
+                        "Test valid only for MySQL")
+    def test_mysql_specific_validation(self):
+        from django.db import models
+        from django.core.checks import Error
+        """
+        Test that no character (varchar) fields can have a length
+        exceeding 255 characters if they have a unique index on them.
+        """
+        class ModelForMysqlValidation(models.Model):
+            field1 = models.CharField(unique=True, max_length=256)
+
+        field = ModelForMysqlValidation._meta.get_field('field1')
+        errors = ModelForMysqlValidation.check()
+        expected = [
+            Error(
+                'MySQL does not allow unique CharFields to have a max_length > 255.',
+                hint=None,
+                obj=field,
+                id='mysql.E001',
+            )
+        ]
+
+        self.assertEqual(errors, expected)
+
 
 class DateQuotingTest(TestCase):
 
