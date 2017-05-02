@@ -1355,3 +1355,5 @@ to remove usage of these features.
 
 * The warning that :class:`~django.core.signing.Signer` issued when given an
   invalid separator is now a ``ValueError``.
+
+* The undocumented `xmlhttp` from `core.js` was removed.
