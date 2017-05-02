@@ -636,7 +636,7 @@ msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Если вы не получили письмо, пожалуйста, убедитесь, что вы ввели адрес с "
+"Если вы не получили письмо, пожалуйста, убедитесь, что вы ввели адрес, с "
 "которым Вы зарегистрировались, и проверьте папку со спамом."
 
 #, python-format
