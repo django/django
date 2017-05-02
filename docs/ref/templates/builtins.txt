@@ -2249,6 +2249,8 @@ If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 ``truncatechars``
 -----------------
 
+.. versionadded:: 1.4
+
 Truncates a string if it is longer than the specified number of characters.
 Truncated strings will end with a translatable ellipsis sequence ("...").
 
