@@ -500,7 +500,7 @@ def password_change(request,
                   "class-based PasswordChangeView().",
                   RemovedInDjango21Warning, stacklevel=2)
     if post_change_redirect is None:
-        post_change_redirect = reverse('password_change_done')
+        post_change_redirect = reverse(password_change_done)
     else:
         post_change_redirect = resolve_url(post_change_redirect)
     if request.method == "POST":
