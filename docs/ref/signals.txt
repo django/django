@@ -5,6 +5,11 @@ Signals
 A list of all the signals that Django sends. All built-in signals are sent
 using the :meth:`~django.dispatch.Signal.send` method.
 
+.. note::
+
+    Built-in signals are sent using the :meth:`~django.dispatch.Signal.send` method
+    which does not catch any exceptions raised by receivers.
+
 .. seealso::
 
     See the documentation on the :doc:`signal dispatcher </topics/signals>` for
