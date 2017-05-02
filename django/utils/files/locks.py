@@ -11,7 +11,7 @@ Anatoly Techtonik for Roundup [2] (license [3]).
 
 Example Usage::
 
-    >>> from django.core.files import locks
+    >>> from django.utils.files import locks
     >>> with open('./file', 'wb') as f:
     ...     locks.lock(f, locks.LOCK_EX)
     ...     f.write('Django')
