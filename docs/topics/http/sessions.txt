@@ -470,6 +470,16 @@ Here's a typical usage example::
 Using sessions out of views
 ===========================
 
+
+SessionStore has two main methods that can be utilized through API,
+``create()`` and ``save()``.The method ``create()`` is designed to create
+a new session (i.e. not loaded from the session store, ``session_key = None``)
+. ``save()`` is designed to save an existing session (i.e. loaded from
+the session store with a known session_key). Calling ``save()`` on a new
+session will also work as it will create a new session key if none exists.
+If a key already exits then calling a ``save()`` will create a new key which
+may collide with an existing one albeit with an extremely low probability.
+
 .. note::
 
     The examples in this section import the ``SessionStore`` object directly
@@ -485,7 +495,8 @@ An API is available to manipulate session data outside of a view::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
-    >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
+    >>> # stored as seconds since epoch since datetimes are not serializable 
+    >>> # in JSON.
     >>> s['last_login'] = 1376587691
     >>> s.create()
     >>> s.session_key
