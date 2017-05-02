@@ -757,7 +757,9 @@ Boolean value to control whether or not the default test runner serializes the
 database into an in-memory JSON string before running tests (used to restore
 the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
-with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
+with :ref:`serialized_rollback=True <test-case-serialized-rollback>` and don't
+want to keep the pre-test database state at the end of the tests (
+:option:`--keepdb <test --keepdb>` option).
 
 .. setting:: TEST_TEMPLATE
 
