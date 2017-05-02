@@ -449,6 +449,29 @@ class QuerySet:
             return self.get(**lookup), False
         except self.model.DoesNotExist:
             return self._create_object_from_params(lookup, params)
+    
+    def get_or_none(self, *args, **kwargs):
+        """
+        Performs the query and returns a single object matching the given
+        keyword arguments. If no object found, it returns None
+        """
+        clone = self.filter(*args, **kwargs)
+        if self.query.can_filter():
+            clone = clone.order_by()
+        num = len(clone)
+        if num == 0:
+            return None
+        elif num == 1:
+            return clone._result_cache[0]
+        if not num:
+            raise self.model.DoesNotExist(
+                "%s matching query does not exist." %
+                self.model._meta.object_name
+            )
+        raise self.model.MultipleObjectsReturned(
+            "get() returned more than one %s -- it returned %s!" %
+            (self.model._meta.object_name, num)
+        )
 
     def update_or_create(self, defaults=None, **kwargs):
         """
