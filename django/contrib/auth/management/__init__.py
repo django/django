@@ -79,7 +79,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
-            print("Adding permission '%s'" % perm)
+            print(u"Adding permission '%s'" % perm)
 
 
 def get_system_username():
