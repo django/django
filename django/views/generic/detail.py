@@ -63,7 +63,8 @@ class SingleObjectMixin(ContextMixin):
         """
         if self.queryset is None:
             if self.model:
-                return self.model._default_manager.all()
+                self.queryset = self.model._default_manager
+                return self.queryset.all()
             else:
                 raise ImproperlyConfigured(
                     "%(cls)s is missing a QuerySet. Define "
