@@ -284,6 +284,11 @@ Methods
         separate from the production settings, ``manage.py test`` would still
         execute some queries against your **production** database!
 
+    .. warning::
+
+        Additionally, avoid importing models in __init__.py; doing so leads to
+        inconsistent behavior.
+
     .. note::
 
         In the usual initialization process, the ``ready`` method is only called
