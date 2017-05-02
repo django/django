@@ -57,6 +57,40 @@ class LazyObjectTestCase(TestCase):
         with self.assertRaises(AttributeError):
             obj.bar
 
+    def test_iter_list(self):
+
+        lazy_list = self.lazy_wrap(['one', 'two', 'three'])
+        new_list = []
+
+        for item in lazy_list:
+            new_list.append(item)
+
+        self.assertEqual(new_list[0], 'one')
+        self.assertEqual(new_list[1], 'two')
+        self.assertEqual(new_list[2], 'three')
+
+    def test_iter_dict(self):
+
+        original_dict = {
+            'one': 'ONE',
+            'two': 'TWO',
+            'three': 'THREE'
+        }
+        lazy_dict = self.lazy_wrap(original_dict)
+
+        new_dict = {}
+
+        for key, value in lazy_dict.items():
+            new_dict[key] = value
+
+        self.assertEqual(len(new_dict), 3)
+        self.assertIn('one', new_dict)
+        self.assertIn('two', new_dict)
+        self.assertIn('three', new_dict)
+        self.assertEqual(new_dict['one'], 'ONE')
+        self.assertEqual(new_dict['two'], 'TWO')
+        self.assertEqual(new_dict['three'], 'THREE')
+
     def test_cmp(self):
         obj1 = self.lazy_wrap('foo')
         obj2 = self.lazy_wrap('bar')
