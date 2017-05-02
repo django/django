@@ -92,14 +92,7 @@ class SQLCompiler:
         if self.query.group_by is not True:
             # If the group by is set to a list (by .values() call most likely),
             # then we need to add everything in it to the GROUP BY clause.
-            # Backwards compatibility hack for setting query.group_by. Remove
-            # when  we have public API way of forcing the GROUP BY clause.
-            # Converts string references to expressions.
-            for expr in self.query.group_by:
-                if not hasattr(expr, 'as_sql'):
-                    expressions.append(self.query.resolve_ref(expr))
-                else:
-                    expressions.append(expr)
+            expressions.extend(self.query.group_by)
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
