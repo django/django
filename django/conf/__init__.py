@@ -99,6 +99,8 @@ class Settings:
         for setting in dir(global_settings):
             if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))
+            else:
+                raise ImproperlyConfigured("The %s setting must be named in uppercase. " % setting)
 
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
