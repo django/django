@@ -301,7 +301,7 @@ Cleaning a specific field attribute
 
 Continuing on from the previous example, suppose that in our ``ContactForm``,
 we want to make sure that the ``recipients`` field always contains the address
-``"fred@example.com"``. This is validation that is specific to our form, so we
+``"dr.dre@example.com"``. This is validation that is specific to our form, so we
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
@@ -313,8 +313,8 @@ write a cleaning method that operates on the ``recipients`` field, like so::
 
         def clean_recipients(self):
             data = self.cleaned_data['recipients']
-            if "fred@example.com" not in data:
-                raise forms.ValidationError("You have forgotten about Fred!")
+            if "dr.dre@example.com" not in data:
+                raise forms.ValidationError("You have forgotten about Dre!")
 
             # Always return a value to use as the new cleaned data, even if
             # this method didn't change it.
