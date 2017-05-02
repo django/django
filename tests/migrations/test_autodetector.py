@@ -1871,6 +1871,30 @@ class AutodetectorTests(TestCase):
         self.assertEqual(changes['otherapp'][0].operations[0].managers[1][1].args, ('a', 'b', 1, 2))
         self.assertEqual(changes['otherapp'][0].operations[0].managers[2][1].args, ('x', 'y', 3, 4))
 
+    def test_custom_manager_does_not_add_new_operation(self):
+        """
+        #26643 -- Prevented migrations for all custom managers
+
+        TODO: This tests only the symptom (the autodetector), rather than generating ModelState.
+
+        Currently, the ModelState generation code spuriously adds a "standard" model when a custom
+        manager (that is explicitly not marked as being included in migrations) is found. This cannot
+        be fixed easily because there are other tests (related to model and manager inheritance) that
+        throw errors if a custom manager is used.
+
+        So, this test ensures that an ('objects', models.Manager()) is just ignored by the autodetector,
+        rather than asserting that model state generation doesn't include this.
+        """
+        before = self.make_project_state([self.other_pony])
+        after = self.make_project_state([ModelState("otherapp", "Pony", [
+            ("id", models.AutoField(primary_key=True)),
+        ], managers=[
+            ('objects', models.Manager()),
+        ])])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'otherapp', 0)
+
     def test_swappable_first_inheritance(self):
         """Swappable models get their CreateModel first."""
         changes = self.get_changes([], [self.custom_user, self.aardvark])
