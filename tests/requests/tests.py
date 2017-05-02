@@ -164,6 +164,11 @@ class RequestsTests(SimpleTestCase):
         request.META = {'post-key': 'post-value'}
         self.assertEqual(repr(request), "<WSGIRequest: GET '/somepath/'>")
 
+    def test_wsgirequest_parse_error_repr(self):
+        content = b'foobar'
+        request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'post', 'CONTENT_LENGTH': len(content), 'CONTENT_TYPE': 'multipart/form-data; boundaryfoobar', 'wsgi.input': BytesIO(content)})
+        self.assertIn("POST:<could not parse>", repr(request))
+
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info, encoding='utf-8'):
             path_info = path_info.encode(encoding)  # Actual URL sent by the browser (bytestring)
