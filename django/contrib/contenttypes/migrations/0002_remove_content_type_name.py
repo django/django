@@ -30,7 +30,11 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             migrations.RunPython.noop,
             add_legacy_name,
-            hints={'model_name': 'contenttype'},
+            hints={
+                'model': 'contenttype',
+                # Keep backwards compatibility from 1.9 for anyone expecting this, see #27832
+                'model_name': 'contenttype',
+            },
         ),
         migrations.RemoveField(
             model_name='contenttype',
