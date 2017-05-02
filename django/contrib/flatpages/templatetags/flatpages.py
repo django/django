@@ -1,6 +1,5 @@
 from django import template
 from django.conf import settings
-from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.shortcuts import get_current_site
 
 register = template.Library()
@@ -19,6 +18,8 @@ class FlatpageNode(template.Node):
             self.user = None
 
     def render(self, context):
+        from django.contrib.flatpages.models import FlatPage
+
         if 'request' in context:
             site_pk = get_current_site(context['request']).pk
         else:
