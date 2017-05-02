@@ -28,6 +28,13 @@ class GenericIPAddressFieldTests(TestCase):
         GenericIPAddress.objects.create()
         o = GenericIPAddress.objects.get()
         self.assertIsNone(o.ip)
+        o.ip = ''
+        o.save()
+        o = GenericIPAddress.objects.get()
+        self.assertIsNone(o.ip)
+        GenericIPAddress.objects.update(ip='')
+        o = GenericIPAddress.objects.get()
+        self.assertIsNone(o.ip)
 
     def test_blank_string_saved_as_null(self):
         o = GenericIPAddress.objects.create(ip='')
