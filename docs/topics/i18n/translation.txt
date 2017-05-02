@@ -1754,6 +1754,11 @@ Activate this view by adding the following line to your URLconf::
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
+Make sure that the following item is in your
+:setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
+
+    'django.core.context_processors.i18n'
+
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
 .. warning::
