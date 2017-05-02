@@ -441,6 +441,8 @@ query spans multiple tables, it's possible to get duplicate results when a
     otherwise duplicate rows appear to be distinct. Since the extra columns
     don't appear in the returned results (they are only there to support
     ordering), it sometimes looks like non-distinct results are being returned.
+    In this case, it may be possible to get distinct results using 
+    :meth:`annotate` instead.
 
     Similarly, if you use a :meth:`values()` query to restrict the columns
     selected, the columns used in any :meth:`order_by()` (or default model
