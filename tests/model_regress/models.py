@@ -8,13 +8,13 @@ CHOICES = (
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
     status = models.IntegerField(blank=True, null=True, choices=CHOICES)
     misc_data = models.CharField(max_length=100, blank=True)
     article_text = models.TextField()
 
     class Meta:
-        ordering = ('pub_date', 'headline')
+        ordering = ('publication_date', 'headline')
         # A utf-8 verbose name (Ångström's Articles) to test they are valid.
         verbose_name = "\xc3\x85ngstr\xc3\xb6m's Articles"
 

@@ -57,7 +57,7 @@ useful when commenting out code for documenting why the code was disabled.
 
 Sample usage::
 
-    <p>Rendered text with {{ pub_date|date:"c" }}</p>
+    <p>Rendered text with {{ publication_date|date:"c" }}</p>
     {% comment "Optional note" %}
         <p>Commented out text with {{ create_date|date:"c" }}</p>
     {% endcomment %}

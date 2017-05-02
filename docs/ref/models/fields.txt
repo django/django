@@ -328,8 +328,8 @@ Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
 require that this field be unique for the value of the date field.
 
 For example, if you have a field ``title`` that has
-``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
-records with the same ``title`` and ``pub_date``.
+``unique_for_date="publication_date"``, then Django wouldn't allow the entry of two
+records with the same ``title`` and ``publication_date``.
 
 Note that if you set this to point to a :class:`DateTimeField`, only the date
 portion of the field will be considered. Besides, when :setting:`USE_TZ` is
@@ -1322,10 +1322,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     with the Python ``datetime`` module to limit selections by date range. For
     example::
 
-        def limit_pub_date_choices():
-            return {'pub_date__lte': datetime.date.utcnow()}
+        def limit_publication_date_choices():
+            return {'publication_date__lte': datetime.date.utcnow()}
 
-        limit_choices_to = limit_pub_date_choices
+        limit_choices_to = limit_publication_date_choices
 
     If ``limit_choices_to`` is or returns a :class:`Q object
     <django.db.models.Q>`, which is useful for :ref:`complex queries

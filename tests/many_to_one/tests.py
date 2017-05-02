@@ -21,7 +21,7 @@ class ManyToOneTests(TestCase):
         self.r2 = Reporter(first_name='Paul', last_name='Jones', email='paul@example.com')
         self.r2.save()
         # Create an Article.
-        self.a = Article(headline="This is a test", pub_date=datetime.date(2005, 7, 27), reporter=self.r)
+        self.a = Article(headline="This is a test", publication_date=datetime.date(2005, 7, 27), reporter=self.r)
         self.a.save()
 
     def test_get(self):
@@ -33,23 +33,23 @@ class ManyToOneTests(TestCase):
     def test_create(self):
         # You can also instantiate an Article by passing the Reporter's ID
         # instead of a Reporter object.
-        a3 = Article(headline="Third article", pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
+        a3 = Article(headline="Third article", publication_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
         a3.save()
         self.assertEqual(a3.reporter.id, self.r.id)
 
         # Similarly, the reporter ID can be a string.
-        a4 = Article(headline="Fourth article", pub_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
+        a4 = Article(headline="Fourth article", publication_date=datetime.date(2005, 7, 27), reporter_id=str(self.r.id))
         a4.save()
         self.assertEqual(repr(a4.reporter), "<Reporter: John Smith>")
 
     def test_add(self):
         # Create an Article via the Reporter object.
-        new_article = self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
+        new_article = self.r.article_set.create(headline="John's second story", publication_date=datetime.date(2005, 7, 29))
         self.assertEqual(repr(new_article), "<Article: John's second story>")
         self.assertEqual(new_article.reporter.id, self.r.id)
 
         # Create a new article, and add it to the article set.
-        new_article2 = Article(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
+        new_article2 = Article(headline="Paul's story", publication_date=datetime.date(2006, 1, 17))
         msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
         with self.assertRaisesMessage(ValueError, msg):
             self.r.article_set.add(new_article2)
@@ -76,8 +76,8 @@ class ManyToOneTests(TestCase):
         )
 
     def test_set(self):
-        new_article = self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
-        new_article2 = self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
+        new_article = self.r.article_set.create(headline="John's second story", publication_date=datetime.date(2005, 7, 29))
+        new_article2 = self.r2.article_set.create(headline="Paul's story", publication_date=datetime.date(2006, 1, 17))
 
         # Assign the article to the reporter.
         new_article2.reporter = self.r
@@ -117,8 +117,8 @@ class ManyToOneTests(TestCase):
             self.r2.article_set = []
 
     def test_assign(self):
-        new_article = self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
-        new_article2 = self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
+        new_article = self.r.article_set.create(headline="John's second story", publication_date=datetime.date(2005, 7, 29))
+        new_article2 = self.r2.article_set.create(headline="Paul's story", publication_date=datetime.date(2006, 1, 17))
 
         # Assign the article to the reporter directly using the descriptor.
         new_article2.reporter = self.r
@@ -153,8 +153,8 @@ class ManyToOneTests(TestCase):
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
 
     def test_selects(self):
-        self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
-        self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
+        self.r.article_set.create(headline="John's second story", publication_date=datetime.date(2005, 7, 29))
+        self.r2.article_set.create(headline="Paul's story", publication_date=datetime.date(2006, 1, 17))
         # Reporter objects have access to their related Article objects.
         self.assertQuerysetEqual(self.r.article_set.all(), [
             "<Article: John's second story>",
@@ -259,12 +259,12 @@ class ManyToOneTests(TestCase):
     def test_reverse_selects(self):
         a3 = Article.objects.create(
             headline="Third article",
-            pub_date=datetime.date(2005, 7, 27),
+            publication_date=datetime.date(2005, 7, 27),
             reporter_id=self.r.id,
         )
         Article.objects.create(
             headline="Fourth article",
-            pub_date=datetime.date(2005, 7, 27),
+            publication_date=datetime.date(2005, 7, 27),
             reporter_id=self.r.id,
         )
         john_smith = ["<Reporter: John Smith>"]
@@ -325,28 +325,28 @@ class ManyToOneTests(TestCase):
         # objects (Reporters).
         r1 = Reporter.objects.create(first_name='Mike', last_name='Royko', email='royko@suntimes.com')
         r2 = Reporter.objects.create(first_name='John', last_name='Kass', email='jkass@tribune.com')
-        Article.objects.create(headline='First', pub_date=datetime.date(1980, 4, 23), reporter=r1)
-        Article.objects.create(headline='Second', pub_date=datetime.date(1980, 4, 23), reporter=r2)
+        Article.objects.create(headline='First', publication_date=datetime.date(1980, 4, 23), reporter=r1)
+        Article.objects.create(headline='Second', publication_date=datetime.date(1980, 4, 23), reporter=r2)
         self.assertEqual(
-            list(Article.objects.select_related().dates('pub_date', 'day')),
+            list(Article.objects.select_related().dates('publication_date', 'day')),
             [datetime.date(1980, 4, 23), datetime.date(2005, 7, 27)]
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates('pub_date', 'month')),
+            list(Article.objects.select_related().dates('publication_date', 'month')),
             [datetime.date(1980, 4, 1), datetime.date(2005, 7, 1)]
         )
         self.assertEqual(
-            list(Article.objects.select_related().dates('pub_date', 'year')),
+            list(Article.objects.select_related().dates('publication_date', 'year')),
             [datetime.date(1980, 1, 1), datetime.date(2005, 1, 1)]
         )
 
     def test_delete(self):
-        self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
-        self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        Article.objects.create(headline="Third article", pub_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
+        self.r.article_set.create(headline="John's second story", publication_date=datetime.date(2005, 7, 29))
+        self.r2.article_set.create(headline="Paul's story", publication_date=datetime.date(2006, 1, 17))
+        Article.objects.create(headline="Third article", publication_date=datetime.date(2005, 7, 27), reporter_id=self.r.id)
         Article.objects.create(
             headline="Fourth article",
-            pub_date=datetime.date(2005, 7, 27),
+            publication_date=datetime.date(2005, 7, 27),
             reporter_id=str(self.r.id),
         )
         # If you delete a reporter, his articles will be deleted.
@@ -385,7 +385,7 @@ class ManyToOneTests(TestCase):
         # for a ForeignKey.
         a2, created = Article.objects.get_or_create(
             headline="John's second test",
-            pub_date=datetime.date(2011, 5, 7),
+            publication_date=datetime.date(2011, 5, 7),
             reporter_id=self.r.id,
         )
         self.assertTrue(created)
@@ -400,7 +400,7 @@ class ManyToOneTests(TestCase):
         # Create an Article by Paul for the same date.
         a3 = Article.objects.create(
             headline="Paul's commentary",
-            pub_date=datetime.date(2011, 5, 7),
+            publication_date=datetime.date(2011, 5, 7),
             reporter_id=self.r2.id,
         )
         self.assertEqual(a3.reporter.id, self.r2.id)
@@ -410,7 +410,7 @@ class ManyToOneTests(TestCase):
             Article.objects.get(reporter_id=self.r.id)
         self.assertEqual(
             repr(a3),
-            repr(Article.objects.get(reporter_id=self.r2.id, pub_date=datetime.date(2011, 5, 7)))
+            repr(Article.objects.get(reporter_id=self.r2.id, publication_date=datetime.date(2011, 5, 7)))
         )
 
     def test_deepcopy_and_circular_references(self):
@@ -432,7 +432,7 @@ class ManyToOneTests(TestCase):
     def test_create_relation_with_gettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John', last_name='Smith', email='john.smith@example.com')
         lazy = gettext_lazy('test')
-        reporter.article_set.create(headline=lazy, pub_date=datetime.date(2011, 6, 10))
+        reporter.article_set.create(headline=lazy, publication_date=datetime.date(2011, 6, 10))
         notlazy = str(lazy)
         article = reporter.article_set.get()
         self.assertEqual(article.headline, notlazy)

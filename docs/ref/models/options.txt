@@ -260,17 +260,17 @@ Django quotes column and table names behind the scenes.
     "-" prefix, which indicates descending order. Fields without a leading "-" will
     be ordered ascending. Use the string "?" to order randomly.
 
-    For example, to order by a ``pub_date`` field ascending, use this::
+    For example, to order by a ``publication_date`` field ascending, use this::
 
-        ordering = ['pub_date']
+        ordering = ['publication_date']
 
-    To order by ``pub_date`` descending, use this::
+    To order by ``publication_date`` descending, use this::
 
-        ordering = ['-pub_date']
+        ordering = ['-publication_date']
 
-    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+    To order by ``publication_date`` descending, then by ``author`` ascending, use this::
 
-        ordering = ['-pub_date', 'author']
+        ordering = ['-publication_date', 'author']
 
     Default ordering also affects :ref:`aggregation queries
     <aggregation-ordering-interaction>`.
@@ -420,7 +420,7 @@ Django quotes column and table names behind the scenes.
     Sets of field names that, taken together, are indexed::
 
         index_together = [
-            ["pub_date", "deadline"],
+            ["publication_date", "deadline"],
         ]
 
     This list of fields will be indexed together (i.e. the appropriate
@@ -429,7 +429,7 @@ Django quotes column and table names behind the scenes.
     For convenience, ``index_together`` can be a single list when dealing with a single
     set of fields::
 
-        index_together = ["pub_date", "deadline"]
+        index_together = ["publication_date", "deadline"]
 
 ``verbose_name``
 ----------------

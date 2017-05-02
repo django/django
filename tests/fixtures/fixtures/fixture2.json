@@ -4,7 +4,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "Copyright is fine the way it is",
-            "pub_date": "2006-06-16 14:00:00"
+            "publication_date": "2006-06-16 14:00:00"
         }
     },
     {
@@ -12,7 +12,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "Django conquers world!",
-            "pub_date": "2006-06-16 15:00:00"
+            "publication_date": "2006-06-16 15:00:00"
         }
     }
 ]

@@ -323,7 +323,7 @@ class MultiColumnFKTests(TestCase):
 
     @translation.override('fi')
     def test_translations(self):
-        a1 = Article.objects.create(pub_date=datetime.date.today())
+        a1 = Article.objects.create(publication_date=datetime.date.today())
         at1_fi = ArticleTranslation(article=a1, lang='fi', title='Otsikko', body='Diipadaapa')
         at1_fi.save()
         at2_en = ArticleTranslation(article=a1, lang='en', title='Title', body='Lalalalala')
@@ -335,16 +335,16 @@ class MultiColumnFKTests(TestCase):
             fetched = Article.objects.select_related('active_translation').get(
                 active_translation__title='Otsikko')
             self.assertEqual(fetched.active_translation.title, 'Otsikko')
-        a2 = Article.objects.create(pub_date=datetime.date.today())
+        a2 = Article.objects.create(publication_date=datetime.date.today())
         at2_fi = ArticleTranslation(article=a2, lang='fi', title='Atsikko', body='Diipadaapa',
                                     abstract='dipad')
         at2_fi.save()
-        a3 = Article.objects.create(pub_date=datetime.date.today())
+        a3 = Article.objects.create(publication_date=datetime.date.today())
         at3_en = ArticleTranslation(article=a3, lang='en', title='A title', body='lalalalala',
                                     abstract='lala')
         at3_en.save()
         # Test model initialization with active_translation field.
-        a3 = Article(id=a3.id, pub_date=a3.pub_date, active_translation=at3_en)
+        a3 = Article(id=a3.id, publication_date=a3.publication_date, active_translation=at3_en)
         a3.save()
         self.assertEqual(
             list(Article.objects.filter(active_translation__abstract=None)),
@@ -365,7 +365,7 @@ class MultiColumnFKTests(TestCase):
             referrer.article
 
     def test_foreign_key_related_query_name(self):
-        a1 = Article.objects.create(pub_date=datetime.date.today())
+        a1 = Article.objects.create(publication_date=datetime.date.today())
         ArticleTag.objects.create(article=a1, name="foo")
         self.assertEqual(Article.objects.filter(tag__name="foo").count(), 1)
         self.assertEqual(Article.objects.filter(tag__name="bar").count(), 0)
@@ -373,7 +373,7 @@ class MultiColumnFKTests(TestCase):
             Article.objects.filter(tags__name="foo")
 
     def test_many_to_many_related_query_name(self):
-        a1 = Article.objects.create(pub_date=datetime.date.today())
+        a1 = Article.objects.create(publication_date=datetime.date.today())
         i1 = ArticleIdea.objects.create(name="idea1")
         a1.ideas.add(i1)
         self.assertEqual(Article.objects.filter(idea_things__name="idea1").count(), 1)
@@ -383,7 +383,7 @@ class MultiColumnFKTests(TestCase):
 
     @translation.override('fi')
     def test_inheritance(self):
-        na = NewsArticle.objects.create(pub_date=datetime.date.today())
+        na = NewsArticle.objects.create(publication_date=datetime.date.today())
         ArticleTranslation.objects.create(
             article=na, lang="fi", title="foo", body="bar")
         self.assertSequenceEqual(
@@ -468,7 +468,7 @@ class TestModelCheckTests(SimpleTestCase):
 class TestExtraJoinFilterQ(TestCase):
     @translation.override('fi')
     def test_extra_join_filter_q(self):
-        a = Article.objects.create(pub_date=datetime.datetime.today())
+        a = Article.objects.create(publication_date=datetime.datetime.today())
         ArticleTranslation.objects.create(article=a, lang='fi', title='title', body='body')
         qs = Article.objects.all()
         with self.assertNumQueries(2):

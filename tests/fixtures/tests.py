@@ -93,8 +93,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
-            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            'on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # Try just dumping the contents of fixtures.Category
@@ -108,8 +108,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(
             ['fixtures.Article'],
             '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-            '"pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": '
-            '"Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            '"publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": '
+            '"Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # ...and both
@@ -117,8 +117,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures.Category', 'fixtures.Article'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", '
             '"title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has '
-            'no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", '
-            '"fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            'no place on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", '
+            '"fields": {"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # Specify a specific model twice
@@ -126,8 +126,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures.Article', 'fixtures.Article'],
             (
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-                '"pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": '
-                '"Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+                '"publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": '
+                '"Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
             )
         )
 
@@ -136,8 +136,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures.Article', 'fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
-            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            'on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # Specify a dump that specifies Article both explicitly and implicitly,
@@ -146,8 +146,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures', 'fixtures.Article'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
-            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            'on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # Same again, but specify in the reverse order
@@ -155,8 +155,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no '
-            'place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields":'
-            ' {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            'place on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields":'
+            ' {"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # Specify one model from one application, and an entire other application.
@@ -252,11 +252,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker on TV is '
-            'great!", "pub_date": "2006-06-16T11:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}, {"pk": 4, '
-            '"model": "fixtures.article", "fields": {"headline": "Django conquers world!", "pub_date": '
+            'great!", "publication_date": "2006-06-16T11:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Copyright is fine the way it is", "publication_date": "2006-06-16T14:00:00"}}, {"pk": 4, '
+            '"model": "fixtures.article", "fields": {"headline": "Django conquers world!", "publication_date": '
             '"2006-06-16T15:00:00"}}, {"pk": 5, "model": "fixtures.article", "fields": {"headline": "XML '
-            'identified as leading cause of cancer", "pub_date": "2006-06-16T16:00:00"}}, {"pk": 1, "model": '
+            'identified as leading cause of cancer", "publication_date": "2006-06-16T16:00:00"}}, {"pk": 1, "model": '
             '"fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": '
             '3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": '
             '"legal", "tagged_id": 3}}, {"pk": 3, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", '
@@ -282,13 +282,13 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             'model="fixtures.category"><field type="CharField" name="title">News Stories</field><field '
             'type="TextField" name="description">Latest news stories</field></object><object pk="2" '
             'model="fixtures.article"><field type="CharField" name="headline">Poker on TV is great!</field><field '
-            'type="DateTimeField" name="pub_date">2006-06-16T11:00:00</field></object><object pk="3" '
+            'type="DateTimeField" name="publication_date">2006-06-16T11:00:00</field></object><object pk="3" '
             'model="fixtures.article"><field type="CharField" name="headline">Copyright is fine the way it '
-            'is</field><field type="DateTimeField" name="pub_date">2006-06-16T14:00:00</field></object><object '
+            'is</field><field type="DateTimeField" name="publication_date">2006-06-16T14:00:00</field></object><object '
             'pk="4" model="fixtures.article"><field type="CharField" name="headline">Django conquers world!'
-            '</field><field type="DateTimeField" name="pub_date">2006-06-16T15:00:00</field></object><object '
+            '</field><field type="DateTimeField" name="publication_date">2006-06-16T15:00:00</field></object><object '
             'pk="5" model="fixtures.article"><field type="CharField" name="headline">XML identified as leading '
-            'cause of cancer</field><field type="DateTimeField" name="pub_date">2006-06-16T16:00:00</field>'
+            'cause of cancer</field><field type="DateTimeField" name="publication_date">2006-06-16T16:00:00</field>'
             '</object><object pk="1" model="fixtures.tag"><field type="CharField" name="name">copyright</field>'
             '<field to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures'
             '</natural><natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3'
@@ -401,15 +401,15 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self._dumpdata_assert(
             ['fixtures.Article'],
             '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-            '"pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": '
-            '"Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+            '"publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": '
+            '"Copyright is fine the way it is", "publication_date": "2006-06-16T14:00:00"}}]',
             primary_keys='2,3'
         )
 
         self._dumpdata_assert(
             ['fixtures.Article'],
             '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-            '"pub_date": "2006-06-16T12:00:00"}}]',
+            '"publication_date": "2006-06-16T12:00:00"}}]',
             primary_keys='2'
         )
 
@@ -417,8 +417,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             self._dumpdata_assert(
                 ['fixtures'],
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-                '"pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-                '{"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                '"publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+                '{"headline": "Copyright is fine the way it is", "publication_date": "2006-06-16T14:00:00"}}]',
                 primary_keys='2,3'
             )
 
@@ -426,8 +426,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             self._dumpdata_assert(
                 '',
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-                '"pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-                '{"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                '"publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+                '{"headline": "Copyright is fine the way it is", "publication_date": "2006-06-16T14:00:00"}}]',
                 primary_keys='2,3'
             )
 
@@ -435,8 +435,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             self._dumpdata_assert(
                 ['fixtures.Article', 'fixtures.category'],
                 '[{"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", '
-                '"pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-                '{"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
+                '"publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+                '{"headline": "Copyright is fine the way it is", "publication_date": "2006-06-16T14:00:00"}}]',
                 primary_keys='2,3'
             )
 
@@ -458,8 +458,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
-            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
+            'on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]',
             filename='dumpdata.json'
         )
 
@@ -623,8 +623,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
-            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 1, "model": '
+            'on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}, {"pk": 1, "model": '
             '"fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": "copyright", "tagged_id": '
             '3}}, {"pk": 2, "model": "fixtures.tag", "fields": {"tagged_type": ["fixtures", "article"], "name": '
             '"law", "tagged_id": 3}}, {"pk": 1, "model": "fixtures.person", "fields": {"name": "Django '
@@ -640,9 +640,9 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             'model="fixtures.category"><field type="CharField" name="title">News Stories</field><field '
             'type="TextField" name="description">Latest news stories</field></object><object pk="2" '
             'model="fixtures.article"><field type="CharField" name="headline">Poker has no place on ESPN</field>'
-            '<field type="DateTimeField" name="pub_date">2006-06-16T12:00:00</field></object><object pk="3" '
+            '<field type="DateTimeField" name="publication_date">2006-06-16T12:00:00</field></object><object pk="3" '
             'model="fixtures.article"><field type="CharField" name="headline">Time to reform copyright</field>'
-            '<field type="DateTimeField" name="pub_date">2006-06-16T13:00:00</field></object><object pk="1" '
+            '<field type="DateTimeField" name="publication_date">2006-06-16T13:00:00</field></object><object pk="1" '
             'model="fixtures.tag"><field type="CharField" name="name">copyright</field><field '
             'to="contenttypes.contenttype" name="tagged_type" rel="ManyToOneRel"><natural>fixtures</natural>'
             '<natural>article</natural></field><field type="PositiveIntegerField" name="tagged_id">3</field>'
@@ -738,8 +738,8 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
             ['fixtures'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place '
-            'on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
-            '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
+            'on ESPN", "publication_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": '
+            '{"headline": "Time to reform copyright", "publication_date": "2006-06-16T13:00:00"}}]'
         )
 
         # Load fixture 4 (compressed), using format discovery

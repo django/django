@@ -531,7 +531,7 @@ msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Eg: "Title must be unique for publication_date year"
 #: db/models/fields/__init__.py:117
 #, python-format
 msgid ""

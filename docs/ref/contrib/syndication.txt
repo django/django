@@ -62,7 +62,7 @@ a feed of the latest five news items::
         description = "Updates on changes and additions to police beat central."
 
         def items(self):
-            return NewsItem.objects.order_by('-pub_date')[:5]
+            return NewsItem.objects.order_by('-publication_date')[:5]
 
         def item_title(self, item):
             return item.title
@@ -152,7 +152,7 @@ into those elements.
             description_template = "feeds/articles.html"
 
             def items(self):
-                return Article.objects.order_by('-pub_date')[:5]
+                return Article.objects.order_by('-publication_date')[:5]
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
@@ -344,7 +344,7 @@ Here's a full example::
         description = "Updates on changes and additions to police beat central."
 
         def items(self):
-            return NewsItem.objects.order_by('-pub_date')[:5]
+            return NewsItem.objects.order_by('-publication_date')[:5]
 
     class AtomSiteNewsFeed(RssSiteNewsFeed):
         feed_type = Atom1Feed

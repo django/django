@@ -17,7 +17,7 @@ views for displaying drilldown pages for date-based data.
 
         class Article(models.Model):
             title = models.CharField(max_length=200)
-            pub_date = models.DateField()
+            publication_date = models.DateField()
 
             def get_absolute_url(self):
                 return reverse('article-detail', kwargs={'pk': self.pk})
@@ -70,7 +70,7 @@ views for displaying drilldown pages for date-based data.
 
         urlpatterns = [
             url(r'^archive/$',
-                ArchiveIndexView.as_view(model=Article, date_field="pub_date"),
+                ArchiveIndexView.as_view(model=Article, date_field="publication_date"),
                 name="article_archive"),
         ]
 
@@ -80,7 +80,7 @@ views for displaying drilldown pages for date-based data.
 
         <ul>
             {% for article in latest %}
-                <li>{{ article.pub_date }}: {{ article.title }}</li>
+                <li>{{ article.publication_date }}: {{ article.title }}</li>
             {% endfor %}
         </ul>
 
@@ -156,7 +156,7 @@ views for displaying drilldown pages for date-based data.
 
         class ArticleYearArchiveView(YearArchiveView):
             queryset = Article.objects.all()
-            date_field = "pub_date"
+            date_field = "publication_date"
             make_object_list = True
             allow_future = True
 
@@ -186,7 +186,7 @@ views for displaying drilldown pages for date-based data.
             <h1>All Articles for {{ year|date:"Y" }}</h1>
             {% for obj in object_list %}
                 <p>
-                    {{ obj.title }} - {{ obj.pub_date|date:"F j, Y" }}
+                    {{ obj.title }} - {{ obj.publication_date|date:"F j, Y" }}
                 </p>
             {% endfor %}
         </div>
@@ -249,7 +249,7 @@ views for displaying drilldown pages for date-based data.
 
         class ArticleMonthArchiveView(MonthArchiveView):
             queryset = Article.objects.all()
-            date_field = "pub_date"
+            date_field = "publication_date"
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -275,7 +275,7 @@ views for displaying drilldown pages for date-based data.
 
         <ul>
             {% for article in object_list %}
-                <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
+                <li>{{ article.publication_date|date:"F j, Y" }}: {{ article.title }}</li>
             {% endfor %}
         </ul>
 
@@ -350,7 +350,7 @@ views for displaying drilldown pages for date-based data.
 
         class ArticleWeekArchiveView(WeekArchiveView):
             queryset = Article.objects.all()
-            date_field = "pub_date"
+            date_field = "publication_date"
             week_format = "%W"
             allow_future = True
 
@@ -375,7 +375,7 @@ views for displaying drilldown pages for date-based data.
 
         <ul>
             {% for article in object_list %}
-                <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
+                <li>{{ article.publication_date|date:"F j, Y" }}: {{ article.title }}</li>
             {% endfor %}
         </ul>
 
@@ -463,7 +463,7 @@ views for displaying drilldown pages for date-based data.
 
         class ArticleDayArchiveView(DayArchiveView):
             queryset = Article.objects.all()
-            date_field = "pub_date"
+            date_field = "publication_date"
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -487,7 +487,7 @@ views for displaying drilldown pages for date-based data.
 
         <ul>
             {% for article in object_list %}
-                <li>{{ article.pub_date|date:"F j, Y" }}: {{ article.title }}</li>
+                <li>{{ article.publication_date|date:"F j, Y" }}: {{ article.title }}</li>
             {% endfor %}
         </ul>
 
@@ -536,7 +536,7 @@ views for displaying drilldown pages for date-based data.
 
         class ArticleTodayArchiveView(TodayArchiveView):
             queryset = Article.objects.all()
-            date_field = "pub_date"
+            date_field = "publication_date"
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -596,7 +596,7 @@ views for displaying drilldown pages for date-based data.
 
         urlpatterns = [
             url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
-                DateDetailView.as_view(model=Article, date_field="pub_date"),
+                DateDetailView.as_view(model=Article, date_field="publication_date"),
                 name="archive_date_detail"),
         ]
 

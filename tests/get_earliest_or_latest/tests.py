@@ -11,7 +11,7 @@ class EarliestOrLatestTests(TestCase):
     def tearDown(self):
         """Makes sure Article has a get_latest_by"""
         if not Article._meta.get_latest_by:
-            Article._meta.get_latest_by = 'pub_date'
+            Article._meta.get_latest_by = 'publication_date'
 
     def test_earliest(self):
         # Because no Articles exist yet, earliest() raises ArticleDoesNotExist.
@@ -19,19 +19,19 @@ class EarliestOrLatestTests(TestCase):
             Article.objects.earliest()
 
         a1 = Article.objects.create(
-            headline="Article 1", pub_date=datetime(2005, 7, 26),
+            headline="Article 1", publication_date=datetime(2005, 7, 26),
             expire_date=datetime(2005, 9, 1)
         )
         a2 = Article.objects.create(
-            headline="Article 2", pub_date=datetime(2005, 7, 27),
+            headline="Article 2", publication_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 7, 28)
         )
         Article.objects.create(
-            headline="Article 3", pub_date=datetime(2005, 7, 28),
+            headline="Article 3", publication_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 8, 27)
         )
         Article.objects.create(
-            headline="Article 4", pub_date=datetime(2005, 7, 28),
+            headline="Article 4", publication_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 7, 30)
         )
 
@@ -39,7 +39,7 @@ class EarliestOrLatestTests(TestCase):
         self.assertEqual(Article.objects.earliest(), a1)
         # Get the earliest Article that matches certain filters.
         self.assertEqual(
-            Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).earliest(),
+            Article.objects.filter(publication_date__gt=datetime(2005, 7, 26)).earliest(),
             a2
         )
 
@@ -47,7 +47,7 @@ class EarliestOrLatestTests(TestCase):
         # to determine the earliest object.
         self.assertEqual(Article.objects.earliest('expire_date'), a2)
         self.assertEqual(Article.objects.filter(
-            pub_date__gt=datetime(2005, 7, 26)).earliest('expire_date'), a2)
+            publication_date__gt=datetime(2005, 7, 26)).earliest('expire_date'), a2)
 
         # earliest() overrides any other ordering specified on the query.
         # Refs #11283.
@@ -69,19 +69,19 @@ class EarliestOrLatestTests(TestCase):
             Article.objects.latest()
 
         a1 = Article.objects.create(
-            headline="Article 1", pub_date=datetime(2005, 7, 26),
+            headline="Article 1", publication_date=datetime(2005, 7, 26),
             expire_date=datetime(2005, 9, 1)
         )
         Article.objects.create(
-            headline="Article 2", pub_date=datetime(2005, 7, 27),
+            headline="Article 2", publication_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 7, 28)
         )
         a3 = Article.objects.create(
-            headline="Article 3", pub_date=datetime(2005, 7, 27),
+            headline="Article 3", publication_date=datetime(2005, 7, 27),
             expire_date=datetime(2005, 8, 27)
         )
         a4 = Article.objects.create(
-            headline="Article 4", pub_date=datetime(2005, 7, 28),
+            headline="Article 4", publication_date=datetime(2005, 7, 28),
             expire_date=datetime(2005, 7, 30)
         )
 
@@ -89,7 +89,7 @@ class EarliestOrLatestTests(TestCase):
         self.assertEqual(Article.objects.latest(), a4)
         # Get the latest Article that matches certain filters.
         self.assertEqual(
-            Article.objects.filter(pub_date__lt=datetime(2005, 7, 27)).latest(),
+            Article.objects.filter(publication_date__lt=datetime(2005, 7, 27)).latest(),
             a1
         )
 
@@ -97,7 +97,7 @@ class EarliestOrLatestTests(TestCase):
         # to determine the latest object.
         self.assertEqual(Article.objects.latest('expire_date'), a1)
         self.assertEqual(
-            Article.objects.filter(pub_date__gt=datetime(2005, 7, 26)).latest('expire_date'),
+            Article.objects.filter(publication_date__gt=datetime(2005, 7, 26)).latest('expire_date'),
             a3,
         )
 
@@ -161,7 +161,7 @@ class TestFirstLast(TestCase):
 
         # And it does not matter if there are any records in the DB.
         IndexErrorArticle.objects.create(
-            headline="Article 1", pub_date=datetime(2005, 7, 26),
+            headline="Article 1", publication_date=datetime(2005, 7, 26),
             expire_date=datetime(2005, 9, 1)
         )
         check()

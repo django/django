@@ -105,7 +105,7 @@ class SerializersTestBase:
         self.a1 = Article(
             author=self.jane,
             headline="Poker has no place on ESPN",
-            pub_date=datetime(2006, 6, 16, 11, 00)
+            publication_date=datetime(2006, 6, 16, 11, 00)
         )
         self.a1.save()
         self.a1.categories.set([sports, op_ed])
@@ -113,7 +113,7 @@ class SerializersTestBase:
         self.a2 = Article(
             author=self.joe,
             headline="Time to reform copyright",
-            pub_date=datetime(2006, 6, 16, 13, 00, 11, 345)
+            publication_date=datetime(2006, 6, 16, 13, 00, 11, 345)
         )
         self.a2.save()
         self.a2.categories.set([music, op_ed])
@@ -197,7 +197,7 @@ class SerializersTestBase:
 
     def test_serialize_field_subset(self):
         """Output can be restricted to a subset of fields"""
-        valid_fields = ('headline', 'pub_date')
+        valid_fields = ('headline', 'publication_date')
         invalid_fields = ("author", "categories")
         serial_str = serializers.serialize(self.serializer_name, Article.objects.all(), fields=valid_fields)
         for field_name in invalid_fields:
@@ -297,10 +297,10 @@ class SerializersTestBase:
         a = Article.objects.create(
             author=self.jane,
             headline="Nobody remembers the early years",
-            pub_date=datetime(1, 2, 3, 4, 5, 6))
+            publication_date=datetime(1, 2, 3, 4, 5, 6))
 
         serial_str = serializers.serialize(self.serializer_name, [a])
-        date_values = self._get_field_values(serial_str, "pub_date")
+        date_values = self._get_field_values(serial_str, "publication_date")
         self.assertEqual(date_values[0].replace('T', ' '), "0001-02-03 04:05:06")
 
     def test_pkless_serialized_strings(self):

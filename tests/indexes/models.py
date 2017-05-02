@@ -26,24 +26,24 @@ class ArticleTranslation(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     # Add virtual relation to the ArticleTranslation model.
     translation = CurrentTranslation(ArticleTranslation, models.CASCADE, ['id'], ['article'])
 
     class Meta:
         index_together = [
-            ["headline", "pub_date"],
+            ["headline", "publication_date"],
         ]
 
 
 # Model for index_together being used only with single list
 class IndexTogetherSingleList(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     class Meta:
-        index_together = ["headline", "pub_date"]
+        index_together = ["headline", "publication_date"]
 
 
 # Indexing a TextField on Oracle or MySQL results in index creation error.

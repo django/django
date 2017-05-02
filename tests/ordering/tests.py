@@ -12,10 +12,10 @@ class OrderingTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.a1 = Article.objects.create(headline="Article 1", pub_date=datetime(2005, 7, 26))
-        cls.a2 = Article.objects.create(headline="Article 2", pub_date=datetime(2005, 7, 27))
-        cls.a3 = Article.objects.create(headline="Article 3", pub_date=datetime(2005, 7, 27))
-        cls.a4 = Article.objects.create(headline="Article 4", pub_date=datetime(2005, 7, 28))
+        cls.a1 = Article.objects.create(headline="Article 1", publication_date=datetime(2005, 7, 26))
+        cls.a2 = Article.objects.create(headline="Article 2", publication_date=datetime(2005, 7, 27))
+        cls.a3 = Article.objects.create(headline="Article 3", publication_date=datetime(2005, 7, 27))
+        cls.a4 = Article.objects.create(headline="Article 4", publication_date=datetime(2005, 7, 28))
         cls.author_1 = Author.objects.create(name="Name 1")
         cls.author_2 = Author.objects.create(name="Name 2")
         for i in range(2):
@@ -23,7 +23,7 @@ class OrderingTests(TestCase):
 
     def test_default_ordering(self):
         """
-        By default, Article.objects.all() orders by pub_date descending, then
+        By default, Article.objects.all() orders by publication_date descending, then
         headline ascending.
         """
         self.assertQuerysetEqual(
@@ -54,7 +54,7 @@ class OrderingTests(TestCase):
             attrgetter("headline")
         )
         self.assertQuerysetEqual(
-            Article.objects.order_by("pub_date", "-headline"), [
+            Article.objects.order_by("publication_date", "-headline"), [
                 "Article 1",
                 "Article 3",
                 "Article 2",
@@ -208,7 +208,7 @@ class OrderingTests(TestCase):
         Ordering can be based on fields included from an 'extra' clause
         """
         self.assertQuerysetEqual(
-            Article.objects.extra(select={"foo": "pub_date"}, order_by=["foo", "headline"]), [
+            Article.objects.extra(select={"foo": "publication_date"}, order_by=["foo", "headline"]), [
                 "Article 1",
                 "Article 2",
                 "Article 3",
@@ -223,7 +223,7 @@ class OrderingTests(TestCase):
         protected by quoting.
         """
         self.assertQuerysetEqual(
-            Article.objects.extra(select={"order": "pub_date"}, order_by=["order", "headline"]), [
+            Article.objects.extra(select={"order": "publication_date"}, order_by=["order", "headline"]), [
                 "Article 1",
                 "Article 2",
                 "Article 3",

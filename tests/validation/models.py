@@ -81,11 +81,11 @@ class Author(models.Model):
 class Article(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, models.CASCADE)
-    pub_date = models.DateTimeField(blank=True)
+    publication_date = models.DateTimeField(blank=True)
 
     def clean(self):
-        if self.pub_date is None:
-            self.pub_date = datetime.now()
+        if self.publication_date is None:
+            self.publication_date = datetime.now()
 
 
 class Post(models.Model):

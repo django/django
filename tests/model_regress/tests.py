@@ -47,7 +47,7 @@ class ModelTests(TestCase):
         # NOTE: Part of the regression test here is merely parsing the model
         # declaration. The verbose_name, in particular, did not always work.
         a = Article.objects.create(
-            headline="Look at me!", pub_date=datetime.datetime.now()
+            headline="Look at me!", publication_date=datetime.datetime.now()
         )
         # An empty choice field should return None for the display name.
         self.assertIs(a.get_status_display(), None)
@@ -61,7 +61,7 @@ class ModelTests(TestCase):
         # Oracle).
         a = Article.objects.create(
             headline="Really, really big",
-            pub_date=datetime.datetime.now(),
+            publication_date=datetime.datetime.now(),
             article_text="ABCDE" * 1000
         )
         a = Article.objects.get(pk=a.pk)
@@ -72,7 +72,7 @@ class ModelTests(TestCase):
         # less than 4000 characters
         a = Article.objects.create(
             headline="Really, really big",
-            pub_date=datetime.datetime.now(),
+            publication_date=datetime.datetime.now(),
             article_text='\u05d0\u05d1\u05d2' * 1000
         )
         a = Article.objects.get(pk=a.pk)
@@ -200,12 +200,12 @@ class ModelTests(TestCase):
         dt1 = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=get_fixed_timezone(600))
         dt2 = datetime.datetime(2008, 8, 31, 17, 20, tzinfo=get_fixed_timezone(600))
         obj = Article.objects.create(
-            headline="A headline", pub_date=dt1, article_text="foo"
+            headline="A headline", publication_date=dt1, article_text="foo"
         )
-        obj.pub_date = dt2
+        obj.publication_date = dt2
         obj.save()
         self.assertEqual(
-            Article.objects.filter(headline="A headline").update(pub_date=dt1),
+            Article.objects.filter(headline="A headline").update(publication_date=dt1),
             1
         )
 

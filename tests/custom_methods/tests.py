@@ -8,10 +8,10 @@ from .models import Article
 class MethodsTests(TestCase):
     def test_custom_methods(self):
         a = Article.objects.create(
-            headline="Parrot programs in Python", pub_date=date(2005, 7, 27)
+            headline="Parrot programs in Python", publication_date=date(2005, 7, 27)
         )
         b = Article.objects.create(
-            headline="Beatles reunite", pub_date=date(2005, 7, 27)
+            headline="Beatles reunite", publication_date=date(2005, 7, 27)
         )
 
         self.assertFalse(a.was_published_today())

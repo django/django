@@ -37,7 +37,7 @@ models, which comprise a Weblog application:
         blog = models.ForeignKey(Blog)
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
-        pub_date = models.DateField()
+        publication_date = models.DateField()
         mod_date = models.DateField()
         authors = models.ManyToManyField(Author)
         n_comments = models.IntegerField()
@@ -208,11 +208,11 @@ For example, to get a :class:`~django.db.models.query.QuerySet` of blog entries
 from the year 2006, use :meth:`~django.db.models.query.QuerySet.filter` like
 so::
 
-    Entry.objects.filter(pub_date__year=2006)
+    Entry.objects.filter(publication_date__year=2006)
 
 With the default manager class, it is the same as::
 
-    Entry.objects.all().filter(pub_date__year=2006)
+    Entry.objects.all().filter(publication_date__year=2006)
 
 .. _chaining-filters:
 
@@ -226,9 +226,9 @@ refinements together. For example::
     >>> Entry.objects.filter(
     ...     headline__startswith='What'
     ... ).exclude(
-    ...     pub_date__gte=datetime.date.today()
+    ...     publication_date__gte=datetime.date.today()
     ... ).filter(
-    ...     pub_date__gte=datetime(2005, 1, 30)
+    ...     publication_date__gte=datetime(2005, 1, 30)
     ... )
 
 This takes the initial :class:`~django.db.models.query.QuerySet` of all entries
@@ -251,15 +251,15 @@ stored, used and reused.
 Example::
 
     >>> q1 = Entry.objects.filter(headline__startswith="What")
-    >>> q2 = q1.exclude(pub_date__gte=datetime.date.today())
-    >>> q3 = q1.filter(pub_date__gte=datetime.date.today())
+    >>> q2 = q1.exclude(publication_date__gte=datetime.date.today())
+    >>> q3 = q1.filter(publication_date__gte=datetime.date.today())
 
 These three ``QuerySets`` are separate. The first is a base
 :class:`~django.db.models.query.QuerySet` containing all entries that contain a
 headline starting with "What". The second is a subset of the first, with an
-additional criteria that excludes records whose ``pub_date`` is today or in the
+additional criteria that excludes records whose ``publication_date`` is today or in the
 future. The third is a subset of the first, with an additional criteria that
-selects only the records whose ``pub_date`` is today or in the future. The
+selects only the records whose ``publication_date`` is today or in the future. The
 initial :class:`~django.db.models.query.QuerySet` (``q1``) is unaffected by the
 refinement process.
 
@@ -275,7 +275,7 @@ actually run the query until the :class:`~django.db.models.query.QuerySet` is
 *evaluated*. Take a look at this example::
 
     >>> q = Entry.objects.filter(headline__startswith="What")
-    >>> q = q.filter(pub_date__lte=datetime.date.today())
+    >>> q = q.filter(publication_date__lte=datetime.date.today())
     >>> q = q.exclude(body_text__icontains="food")
     >>> print(q)
 
@@ -390,13 +390,13 @@ methods :meth:`~django.db.models.query.QuerySet.filter`,
 Basic lookups keyword arguments take the form ``field__lookuptype=value``.
 (That's a double-underscore). For example::
 
-    >>> Entry.objects.filter(pub_date__lte='2006-01-01')
+    >>> Entry.objects.filter(publication_date__lte='2006-01-01')
 
 translates (roughly) into the following SQL:
 
 .. code-block:: sql
 
-    SELECT * FROM blog_entry WHERE pub_date <= '2006-01-01';
+    SELECT * FROM blog_entry WHERE publication_date <= '2006-01-01';
 
 .. admonition:: How this is possible
 
@@ -555,12 +555,12 @@ select all blogs that contain entries with both *"Lennon"* in the headline
 and that were published in 2008 (the same entry satisfying both conditions),
 we would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon', entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains='Lennon', entry__publication_date__year=2008)
 
 To select all blogs that contain an entry with *"Lennon"* in the headline
 **as well as** an entry that was published in 2008, we would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__publication_date__year=2008)
 
 Suppose there is only one blog that had both entries containing *"Lennon"* and
 entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.
@@ -587,7 +587,7 @@ may not be the same as the entries in the first filter. We are filtering the
 
         Blog.objects.exclude(
             entry__headline__contains='Lennon',
-            entry__pub_date__year=2008,
+            entry__publication_date__year=2008,
         )
 
     However, unlike the behavior when using
@@ -599,7 +599,7 @@ may not be the same as the entries in the first filter. We are filtering the
         Blog.objects.exclude(
             entry__in=Entry.objects.filter(
                 headline__contains='Lennon',
-                pub_date__year=2008,
+                publication_date__year=2008,
             ),
         )
 
@@ -650,7 +650,7 @@ For date and date/time fields, you can add or subtract a
 that were modified more than 3 days after they were published::
 
     >>> from datetime import timedelta
-    >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
+    >>> Entry.objects.filter(mod_date__gt=F('publication_date') + timedelta(days=3))
 
 The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 ``.bitrightshift()``, and ``.bitleftshift()``. For example::
@@ -740,7 +740,7 @@ following will create two :class:`~django.db.models.query.QuerySet`\s, evaluate
 them, and throw them away::
 
     >>> print([e.headline for e in Entry.objects.all()])
-    >>> print([e.pub_date for e in Entry.objects.all()])
+    >>> print([e.publication_date for e in Entry.objects.all()])
 
 That means the same database query will be executed twice, effectively doubling
 your database load. Also, there's a possibility the two lists may not include
@@ -752,7 +752,7 @@ To avoid this problem, simply save the
 
     >>> queryset = Entry.objects.all()
     >>> print([p.headline for p in queryset]) # Evaluate the query set.
-    >>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
+    >>> print([p.publication_date for p in queryset]) # Re-use the cache from the evaluation.
 
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -826,7 +826,7 @@ with the ``&`` and ``|`` operators and use parenthetical grouping. Also, ``Q``
 objects can be negated using the ``~`` operator, allowing for combined lookups
 that combine both a normal query and a negated (``NOT``) query::
 
-    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
+    Q(question__startswith='Who') | ~Q(publication_date__year=2005)
 
 Each lookup function that takes keyword-arguments
 (e.g. :meth:`~django.db.models.query.QuerySet.filter`,
@@ -838,13 +838,13 @@ together. For example::
 
     Poll.objects.get(
         Q(question__startswith='Who'),
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+        Q(publication_date=date(2005, 5, 2)) | Q(publication_date=date(2005, 5, 6))
     )
 
 ... roughly translates into the SQL::
 
     SELECT * from polls WHERE question LIKE 'Who%'
-        AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
+        AND (publication_date = '2005-05-02' OR publication_date = '2005-05-06')
 
 Lookup functions can mix the use of ``Q`` objects and keyword arguments. All
 arguments provided to a lookup function (be they keyword arguments or ``Q``
@@ -852,7 +852,7 @@ objects) are "AND"ed together. However, if a ``Q`` object is provided, it must
 precede the definition of any keyword arguments. For example::
 
     Poll.objects.get(
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
+        Q(publication_date=date(2005, 5, 2)) | Q(publication_date=date(2005, 5, 6)),
         question__startswith='Who',
     )
 
@@ -861,7 +861,7 @@ precede the definition of any keyword arguments. For example::
     # INVALID QUERY
     Poll.objects.get(
         question__startswith='Who',
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+        Q(publication_date=date(2005, 5, 2)) | Q(publication_date=date(2005, 5, 6))
     )
 
 ... would not be valid.
@@ -910,10 +910,10 @@ You can also delete objects in bulk. Every
 :meth:`~django.db.models.query.QuerySet.delete` method, which deletes all
 members of that :class:`~django.db.models.query.QuerySet`.
 
-For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
+For example, this deletes all ``Entry`` objects with a ``publication_date`` year of
 2005::
 
-    >>> Entry.objects.filter(pub_date__year=2005).delete()
+    >>> Entry.objects.filter(publication_date__year=2005).delete()
     (5, {'webapp.Entry': 5})
 
 Keep in mind that this will, whenever possible, be executed purely in SQL, and
@@ -1007,8 +1007,8 @@ Sometimes you want to set a field to a particular value for all the objects in
 a :class:`~django.db.models.query.QuerySet`. You can do this with the
 :meth:`~django.db.models.query.QuerySet.update` method. For example::
 
-    # Update all the headlines with pub_date in 2007.
-    Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
+    # Update all the headlines with publication_date in 2007.
+    Entry.objects.filter(publication_date__year=2007).update(headline='Everything is the same')
 
 You can only set non-relation fields and :class:`~django.db.models.ForeignKey`
 fields using this method. To update a non-relation field, provide the new value

@@ -65,7 +65,7 @@ class Article(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
-    pub_date = models.DateField()
+    publication_date = models.DateField()
 
     def __str__(self):
         try:

@@ -362,10 +362,10 @@ class BaseCacheTests:
         Poll.objects.all().delete()
         my_poll = Poll.objects.create(question="Well?")
         self.assertEqual(Poll.objects.count(), 1)
-        pub_date = my_poll.pub_date
+        publication_date = my_poll.publication_date
         cache.set('question', my_poll)
         cached_poll = cache.get('question')
-        self.assertEqual(cached_poll.pub_date, pub_date)
+        self.assertEqual(cached_poll.publication_date, publication_date)
         # We only want the default expensive calculation run once
         self.assertEqual(expensive_calculation.num_runs, 1)
 

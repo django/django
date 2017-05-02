@@ -53,7 +53,7 @@ class Writer(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=50)
     slug = models.SlugField()
-    pub_date = models.DateField()
+    publication_date = models.DateField()
     created = models.DateField(editable=False)
     writer = models.ForeignKey(Writer, models.CASCADE)
     article = models.TextField()

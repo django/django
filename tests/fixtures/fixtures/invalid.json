@@ -4,7 +4,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "Breaking news",
-            "pub_date": null
+            "publication_date": null
         }
     }
 ]

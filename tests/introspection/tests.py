@@ -190,7 +190,7 @@ class IntrospectionTests(TransactionTestCase):
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
         index = {}
         for key, val in constraints.items():
-            if val['columns'] == ['headline', 'pub_date']:
+            if val['columns'] == ['headline', 'publication_date']:
                 index = val
         self.assertEqual(index['type'], Index.suffix)
 
@@ -204,7 +204,7 @@ class IntrospectionTests(TransactionTestCase):
         indexes_verified = 0
         expected_columns = [
             ['reporter_id'],
-            ['headline', 'pub_date'],
+            ['headline', 'publication_date'],
             ['response_to_id'],
         ]
         for key, val in constraints.items():

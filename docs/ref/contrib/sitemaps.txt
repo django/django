@@ -110,7 +110,7 @@ your sitemap class might look::
             return Entry.objects.filter(is_draft=False)
 
         def lastmod(self, obj):
-            return obj.pub_date
+            return obj.publication_date
 
 Note:
 
@@ -290,7 +290,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
 
     info_dict = {
         'queryset': Entry.objects.all(),
-        'date_field': 'pub_date',
+        'date_field': 'publication_date',
     }
 
     urlpatterns = [

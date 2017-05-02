@@ -91,10 +91,10 @@ class SelfRefChild(SelfRefParent):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateTimeField()
+    publication_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
+        ordering = ('-publication_date', 'headline')
 
     def __str__(self):
         return self.headline

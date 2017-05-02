@@ -29,7 +29,7 @@ For example::
     >>> class ArticleForm(ModelForm):
     ...     class Meta:
     ...         model = Article
-    ...         fields = ['pub_date', 'headline', 'content', 'reporter']
+    ...         fields = ['publication_date', 'headline', 'content', 'reporter']
 
     # Creating a form to add an article.
     >>> form = ArticleForm()
@@ -553,7 +553,7 @@ field, you could do the following::
     class ArticleForm(ModelForm):
         class Meta:
             model = Article
-            fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
+            fields = ['publication_date', 'headline', 'content', 'reporter', 'slug']
             field_classes = {
                 'slug': MySlugFormField,
             }
@@ -574,7 +574,7 @@ the field declaratively and setting its ``validators`` parameter::
 
         class Meta:
             model = Article
-            fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
+            fields = ['publication_date', 'headline', 'content', 'reporter', 'slug']
 
 .. note::
 
@@ -658,11 +658,11 @@ parent class for use in a number of forms derived from models. For example,
 using the previous ``ArticleForm`` class::
 
     >>> class EnhancedArticleForm(ArticleForm):
-    ...     def clean_pub_date(self):
+    ...     def clean_publication_date(self):
     ...         ...
 
 This creates a form that behaves identically to ``ArticleForm``, except there's
-some extra validation and cleaning for the ``pub_date`` field.
+some extra validation and cleaning for the ``publication_date`` field.
 
 You can also subclass the parent's ``Meta`` inner class if you want to change
 the ``Meta.fields`` or ``Meta.exclude`` lists::

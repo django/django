@@ -468,13 +468,13 @@ class ModelFormBaseTest(TestCase):
 
         self.assertEqual(
             list(MixModelForm.base_fields),
-            ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
+            ['headline', 'slug', 'publication_date', 'writer', 'article', 'categories', 'status']
         )
 
     def test_article_form(self):
         self.assertEqual(
             list(ArticleForm.base_fields),
-            ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
+            ['headline', 'slug', 'publication_date', 'writer', 'article', 'categories', 'status']
         )
 
     def test_bad_form(self):
@@ -484,7 +484,7 @@ class ModelFormBaseTest(TestCase):
 
         self.assertEqual(
             list(BadForm.base_fields),
-            ['headline', 'slug', 'pub_date', 'writer', 'article', 'categories', 'status']
+            ['headline', 'slug', 'publication_date', 'writer', 'article', 'categories', 'status']
         )
 
     def test_invalid_meta_model(self):
@@ -1154,7 +1154,7 @@ class ModelFormBasicTests(TestCase):
             f.as_ul(),
             '''<li>Headline: <input type="text" name="headline" value="Your headline here" maxlength="50" required /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" required /></li>
+<li>Pub date: <input type="text" name="publication_date" required /></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1185,7 +1185,7 @@ class ModelFormBasicTests(TestCase):
         art = Article.objects.create(
             headline='Test article',
             slug='test-article',
-            pub_date=datetime.date(1988, 1, 4),
+            publication_date=datetime.date(1988, 1, 4),
             writer=self.w_royko,
             article='Hello.'
         )
@@ -1196,7 +1196,7 @@ class ModelFormBasicTests(TestCase):
             f.as_ul(),
             '''<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" required /></li>
 <li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required /></li>
+<li>Pub date: <input type="text" name="publication_date" value="1988-01-04" required /></li>
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1218,7 +1218,7 @@ class ModelFormBasicTests(TestCase):
         f = ArticleForm({
             'headline': 'Test headline',
             'slug': 'test-headline',
-            'pub_date': '1984-02-06',
+            'publication_date': '1984-02-06',
             'writer': str(self.w_royko.pk),
             'article': 'Hello.'
         }, instance=art)
@@ -1312,7 +1312,7 @@ class ModelFormBasicTests(TestCase):
             str(f),
             '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required /></td></tr>
 <tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" required /></td></tr>
-<tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>
+<tr><th>Pub date:</th><td><input type="text" name="publication_date" required /></td></tr>
 <tr><th>Writer:</th><td><select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1334,7 +1334,7 @@ class ModelFormBasicTests(TestCase):
         # Add some categories and test the many-to-many form output.
         new_art = Article.objects.create(
             article="Hello.", headline="New headline", slug="new-headline",
-            pub_date=datetime.date(1988, 1, 4), writer=self.w_royko)
+            publication_date=datetime.date(1988, 1, 4), writer=self.w_royko)
         new_art.categories.add(Category.objects.get(name='Entertainment'))
         self.assertQuerysetEqual(new_art.categories.all(), ["Entertainment"])
         f = ArticleForm(auto_id=False, instance=new_art)
@@ -1342,7 +1342,7 @@ class ModelFormBasicTests(TestCase):
             f.as_ul(),
             '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required /></li>
+<li>Pub date: <input type="text" name="publication_date" value="1988-01-04" required /></li>
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1371,33 +1371,33 @@ class ModelFormBasicTests(TestCase):
         class PartialArticleForm(forms.ModelForm):
             class Meta:
                 model = Article
-                fields = ('headline', 'pub_date')
+                fields = ('headline', 'publication_date')
 
         f = PartialArticleForm(auto_id=False)
         self.assertHTMLEqual(
             str(f),
             '''<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" required /></td></tr>
-<tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>''')
+<tr><th>Pub date:</th><td><input type="text" name="publication_date" required /></td></tr>''')
 
         class PartialArticleFormWithSlug(forms.ModelForm):
             class Meta:
                 model = Article
-                fields = ('headline', 'slug', 'pub_date')
+                fields = ('headline', 'slug', 'publication_date')
 
         w_royko = Writer.objects.create(name='Mike Royko')
         art = Article.objects.create(
             article="Hello.", headline="New headline", slug="new-headline",
-            pub_date=datetime.date(1988, 1, 4), writer=w_royko)
+            publication_date=datetime.date(1988, 1, 4), writer=w_royko)
         f = PartialArticleFormWithSlug({
             'headline': 'New headline',
             'slug': 'new-headline',
-            'pub_date': '1988-01-04'
+            'publication_date': '1988-01-04'
         }, auto_id=False, instance=art)
         self.assertHTMLEqual(
             f.as_ul(),
             '''<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" required /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" required /></li>'''
+<li>Pub date: <input type="text" name="publication_date" value="1988-01-04" required /></li>'''
         )
         self.assertTrue(f.is_valid())
         new_art = f.save()
@@ -1410,7 +1410,7 @@ class ModelFormBasicTests(TestCase):
         form_data = {
             'headline': 'New headline',
             'slug': 'new-headline',
-            'pub_date': '1988-01-04',
+            'publication_date': '1988-01-04',
             'writer': str(self.w_royko.pk),
             'article': 'Hello.',
             'categories': [str(self.c1.id), str(self.c2.id)]
@@ -1486,7 +1486,7 @@ class ModelFormBasicTests(TestCase):
             f.as_ul(),
             '''<li>Headline: <input type="text" name="headline" maxlength="50" required /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" required /></li>
+<li>Pub date: <input type="text" name="publication_date" required /></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1511,7 +1511,7 @@ class ModelFormBasicTests(TestCase):
             f.as_ul(),
             '''<li>Headline: <input type="text" name="headline" maxlength="50" required /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
-<li>Pub date: <input type="text" name="pub_date" required /></li>
+<li>Pub date: <input type="text" name="publication_date" required /></li>
 <li>Writer: <select name="writer" required>
 <option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
@@ -1708,7 +1708,7 @@ class ModelChoiceFieldTests(TestCase):
         category1 = Category.objects.create(name='cat1')
         category2 = Category.objects.create(name='cat2')
         article = Article.objects.create(
-            pub_date=datetime.date(1988, 1, 4),
+            publication_date=datetime.date(1988, 1, 4),
             writer=Writer.objects.create(name='Test writer'),
         )
         article.categories.set([category1.pk])
@@ -1984,7 +1984,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
         article = Article.objects.create(
             headline='Test article',
             slug='test-article',
-            pub_date=datetime.date(1988, 1, 4),
+            publication_date=datetime.date(1988, 1, 4),
             writer=Writer.objects.create(name='Test writer'),
             article='Hello.',
         )

@@ -16,7 +16,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
-        pub_date = models.DateField()
+        publication_date = models.DateField()
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
         def __str__(self):
@@ -41,7 +41,7 @@ Create a few Reporters::
 Create an Article::
 
     >>> from datetime import date
-    >>> a = Article(id=None, headline="This is a test", pub_date=date(2005, 7, 27), reporter=r)
+    >>> a = Article(id=None, headline="This is a test", publication_date=date(2005, 7, 27), reporter=r)
     >>> a.save()
 
     >>> a.reporter.id
@@ -55,7 +55,7 @@ relationship. For example, creating an ``Article`` with unsaved ``Reporter``
 raises ``ValueError``::
 
     >>> r3 = Reporter(first_name='John', last_name='Smith', email='john@example.com')
-    >>> Article.objects.create(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
+    >>> Article.objects.create(headline="This is a test", publication_date=date(2005, 7, 27), reporter=r3)
     Traceback (most recent call last):
     ...
     ValueError: save() prohibited to prevent data loss due to unsaved related object 'reporter'.
@@ -66,7 +66,7 @@ Article objects have access to their related Reporter objects::
 
 Create an Article via the Reporter object::
 
-    >>> new_article = r.article_set.create(headline="John's second story", pub_date=date(2005, 7, 29))
+    >>> new_article = r.article_set.create(headline="John's second story", publication_date=date(2005, 7, 29))
     >>> new_article
     <Article: John's second story>
     >>> new_article.reporter
@@ -76,7 +76,7 @@ Create an Article via the Reporter object::
 
 Create a new article, and add it to the article set::
 
-    >>> new_article2 = Article(headline="Paul's story", pub_date=date(2006, 1, 17))
+    >>> new_article2 = Article(headline="Paul's story", publication_date=date(2006, 1, 17))
     >>> r.article_set.add(new_article2)
     >>> new_article2.reporter
     <Reporter: John Smith>

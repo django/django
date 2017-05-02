@@ -205,7 +205,7 @@ class SchemaTests(TransactionTestCase):
             Book.objects.create(
                 author_id=1,
                 title="Much Ado About Foreign Keys",
-                pub_date=datetime.datetime.now(),
+                publication_date=datetime.datetime.now(),
             )
         # Repoint the FK constraint
         old_field = Book._meta.get_field("author")
@@ -758,7 +758,7 @@ class SchemaTests(TransactionTestCase):
         class LocalBook(Model):
             author = IntegerField()
             title = CharField(max_length=100, db_index=True)
-            pub_date = DateTimeField()
+            publication_date = DateTimeField()
 
             class Meta:
                 app_label = 'schema'
@@ -803,9 +803,9 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['author_id'][0], "IntegerField")
         # Ensure the field is unique
         author = Author.objects.create(name="Joe")
-        BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
+        BookWithO2O.objects.create(author=author, title="Django 1", publication_date=datetime.datetime.now())
         with self.assertRaises(IntegrityError):
-            BookWithO2O.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+            BookWithO2O.objects.create(author=author, title="Django 2", publication_date=datetime.datetime.now())
         BookWithO2O.objects.all().delete()
         # Make sure the FK constraint is present
         constraints = self.get_constraints(BookWithO2O._meta.db_table)
@@ -825,8 +825,8 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Book)
         self.assertEqual(columns['author_id'][0], "IntegerField")
         # Ensure the field is not unique anymore
-        Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
-        Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Django 1", publication_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Django 2", publication_date=datetime.datetime.now())
         # Make sure the FK constraint is still present
         constraints = self.get_constraints(Book._meta.db_table)
         author_is_fk = False
@@ -850,8 +850,8 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['author_id'][0], "IntegerField")
         # Ensure the field is not unique
         author = Author.objects.create(name="Joe")
-        Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
-        Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Django 1", publication_date=datetime.datetime.now())
+        Book.objects.create(author=author, title="Django 2", publication_date=datetime.datetime.now())
         Book.objects.all().delete()
         # Make sure the FK constraint is present
         constraints = self.get_constraints(Book._meta.db_table)
@@ -871,9 +871,9 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(BookWithO2O)
         self.assertEqual(columns['author_id'][0], "IntegerField")
         # Ensure the field is unique now
-        BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
+        BookWithO2O.objects.create(author=author, title="Django 1", publication_date=datetime.datetime.now())
         with self.assertRaises(IntegrityError):
-            BookWithO2O.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
+            BookWithO2O.objects.create(author=author, title="Django 2", publication_date=datetime.datetime.now())
         # Make sure the FK constraint is present
         constraints = self.get_constraints(BookWithO2O._meta.db_table)
         author_is_fk = False
@@ -1129,7 +1129,7 @@ class SchemaTests(TransactionTestCase):
         class LocalBookWithM2M(Model):
             author = ForeignKey(Author, CASCADE)
             title = CharField(max_length=100, db_index=True)
-            pub_date = DateTimeField()
+            publication_date = DateTimeField()
             tags = M2MFieldClass("TagM2MTest", related_name="books")
 
             class Meta:
@@ -1305,7 +1305,7 @@ class SchemaTests(TransactionTestCase):
         class LocalBookWithM2M(Model):
             author = ForeignKey(Author, CASCADE)
             title = CharField(max_length=100, db_index=True)
-            pub_date = DateTimeField()
+            publication_date = DateTimeField()
             tags = M2MFieldClass("TagM2MTest", related_name="books")
 
             class Meta:

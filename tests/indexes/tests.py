@@ -56,7 +56,7 @@ class SchemaIndexesTests(TestCase):
         # Ensure the index name is properly quoted
         self.assertIn(
             connection.ops.quote_name(
-                editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
+                editor._create_index_name(Article, ['headline', 'publication_date'], suffix='_idx')
             ),
             index_sql[0]
         )

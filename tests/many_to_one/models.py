@@ -17,7 +17,7 @@ class Reporter(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
+    publication_date = models.DateField()
     reporter = models.ForeignKey(Reporter, models.CASCADE)
 
     def __str__(self):

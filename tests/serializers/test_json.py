@@ -33,7 +33,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
   "fields": {
     "author": %(author_pk)s,
     "headline": "Poker has no place on ESPN",
-    "pub_date": "2006-06-16T11:00:00",
+    "publication_date": "2006-06-16T11:00:00",
     "categories": [
       %(first_category_pk)s,
       %(second_category_pk)s
@@ -165,7 +165,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             "fields": {
                 "author": 1,
                 "headline": "Unknown many to many",
-                "pub_date": "2014-09-15T10:35:00",
+                "publication_date": "2014-09-15T10:35:00",
                 "categories": [1, "doesnotexist"]
             }
         }, {
@@ -204,7 +204,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             "fields": {
                 "author": 1,
                 "headline": "Unknown many to many",
-                "pub_date": "2014-09-15T10:35:00",
+                "publication_date": "2014-09-15T10:35:00",
                 "meta_data": [
                     ["author", "meta1"],
                     ["doesnotexist", "meta1"],
@@ -236,7 +236,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             "fields": {
                 "author": 1,
                 "headline": "Unknown many to many",
-                "pub_date": "2014-09-15T10:35:00",
+                "publication_date": "2014-09-15T10:35:00",
                 "meta_data": [1, "doesnotexist"]
             }
         }, {
@@ -268,7 +268,7 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
         "model": "serializers.article",
         "fields": {
             "headline": "Forward references pose no problem",
-            "pub_date": "2006-06-16T15:00:00",
+            "publication_date": "2006-06-16T15:00:00",
             "categories": [1],
             "author": 1
         }

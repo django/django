@@ -143,7 +143,7 @@ These concepts are represented by simple Python classes. Edit the
 
     class Question(models.Model):
         question_text = models.CharField(max_length=200)
-        pub_date = models.DateTimeField('date published')
+        publication_date = models.DateTimeField('date published')
 
 
     class Choice(models.Model):
@@ -161,7 +161,7 @@ class -- e.g., :class:`~django.db.models.CharField` for character fields and
 type of data each field holds.
 
 The name of each :class:`~django.db.models.Field` instance (e.g.
-``question_text`` or ``pub_date``) is the field's name, in machine-friendly
+``question_text`` or ``publication_date``) is the field's name, in machine-friendly
 format. You'll use this value in your Python code, and your database will use
 it as the column name.
 
@@ -169,7 +169,7 @@ You can use an optional first positional argument to a
 :class:`~django.db.models.Field` to designate a human-readable name. That's used
 in a couple of introspective parts of Django, and it doubles as documentation.
 If this field isn't provided, Django will use the machine-readable name. In this
-example, we've only defined a human-readable name for ``Question.pub_date``.
+example, we've only defined a human-readable name for ``Question.publication_date``.
 For all other fields in this model, the field's machine-readable name will
 suffice as its human-readable name.
 
@@ -280,7 +280,7 @@ readability):
     CREATE TABLE "polls_question" (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
-        "pub_date" timestamp with time zone NOT NULL
+        "publication_date" timestamp with time zone NOT NULL
     );
     --
     -- Add field question to choice
@@ -413,10 +413,10 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
     # Create a new Question.
     # Support for time zones is enabled in the default settings file, so
-    # Django expects a datetime with tzinfo for pub_date. Use timezone.now()
+    # Django expects a datetime with tzinfo for publication_date. Use timezone.now()
     # instead of datetime.datetime.now() and it will do the right thing.
     >>> from django.utils import timezone
-    >>> q = Question(question_text="What's new?", pub_date=timezone.now())
+    >>> q = Question(question_text="What's new?", publication_date=timezone.now())
 
     # Save the object into the database. You have to call save() explicitly.
     >>> q.save()
@@ -428,7 +428,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     # Access model field values via Python attributes.
     >>> q.question_text
     "What's new?"
-    >>> q.pub_date
+    >>> q.publication_date
     datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
 
     # Change values by changing the attributes, then calling save().
@@ -480,7 +480,7 @@ demonstration:
     class Question(models.Model):
         # ...
         def was_published_recently(self):
-            return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+            return self.publication_date >= timezone.now() - datetime.timedelta(days=1)
 
 Note the addition of ``import datetime`` and ``from django.utils import
 timezone``, to reference Python's standard :mod:`datetime` module and Django's
@@ -507,7 +507,7 @@ Save these changes and start a new Python interactive shell by running
     # Get the question that was published this year.
     >>> from django.utils import timezone
     >>> current_year = timezone.now().year
-    >>> Question.objects.get(pub_date__year=current_year)
+    >>> Question.objects.get(publication_date__year=current_year)
     <Question: What's up?>
 
     # Request an ID that doesn't exist, this will raise an exception.
@@ -558,9 +558,9 @@ Save these changes and start a new Python interactive shell by running
     # The API automatically follows relationships as far as you need.
     # Use double underscores to separate relationships.
     # This works as many levels deep as you want; there's no limit.
-    # Find all Choices for any question whose pub_date is in this year
+    # Find all Choices for any question whose publication_date is in this year
     # (reusing the 'current_year' variable we created above).
-    >>> Choice.objects.filter(question__pub_date__year=current_year)
+    >>> Choice.objects.filter(question__publication_date__year=current_year)
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
     # Let's delete one of the choices. Use delete() for that.

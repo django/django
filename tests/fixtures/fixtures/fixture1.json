@@ -12,7 +12,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "Poker has no place on ESPN",
-            "pub_date": "2006-06-16 12:00:00"
+            "publication_date": "2006-06-16 12:00:00"
         }
     },
     {
@@ -20,7 +20,7 @@
         "model": "fixtures.article",
         "fields": {
             "headline": "Time to reform copyright",
-            "pub_date": "2006-06-16 13:00:00"
+            "publication_date": "2006-06-16 13:00:00"
         }
     },
     {

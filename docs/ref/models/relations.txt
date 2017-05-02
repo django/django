@@ -71,7 +71,7 @@ Related objects reference
             >>> e = b.entry_set.create(
             ...     headline='Hello',
             ...     body_text='Hi',
-            ...     pub_date=datetime.date(2005, 1, 1)
+            ...     publication_date=datetime.date(2005, 1, 1)
             ... )
 
             # No need to call e.save() at this point -- it's already been saved.
@@ -83,7 +83,7 @@ Related objects reference
             ...     blog=b,
             ...     headline='Hello',
             ...     body_text='Hi',
-            ...     pub_date=datetime.date(2005, 1, 1)
+            ...     publication_date=datetime.date(2005, 1, 1)
             ... )
             >>> e.save(force_insert=True)
 

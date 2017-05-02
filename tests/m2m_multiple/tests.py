@@ -13,13 +13,13 @@ class M2MMultipleTests(TestCase):
         ]
 
         a1 = Article.objects.create(
-            headline="Parrot steals", pub_date=datetime(2005, 11, 27)
+            headline="Parrot steals", publication_date=datetime(2005, 11, 27)
         )
         a1.primary_categories.add(c2, c3)
         a1.secondary_categories.add(c4)
 
         a2 = Article.objects.create(
-            headline="Parrot runs", pub_date=datetime(2005, 11, 28)
+            headline="Parrot runs", publication_date=datetime(2005, 11, 28)
         )
         a2.primary_categories.add(c1, c2)
         a2.secondary_categories.add(c4)

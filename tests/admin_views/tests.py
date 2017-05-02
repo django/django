@@ -636,7 +636,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response, '%s?e=1' % changelist_url)
 
         # Regression test for #18530
-        response = self.client.get(changelist_url, {'pub_date__gte': 'foo'})
+        response = self.client.get(changelist_url, {'publication_date__gte': 'foo'})
         self.assertRedirects(response, '%s?e=1' % changelist_url)
 
     def test_isnull_lookups(self):

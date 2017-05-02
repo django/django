@@ -38,8 +38,8 @@ By default, indexes are created with an ascending order for each column. To
 define an index with a descending order for a column, add a hyphen before the
 field's name.
 
-For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
-``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
+For example ``Index(fields=['headline', '-publication_date'])`` would create SQL with
+``(headline, publication_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
 
 .. admonition:: Support for column ordering on SQLite

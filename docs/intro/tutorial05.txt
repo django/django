@@ -132,7 +132,7 @@ We identify a bug
 Fortunately, there's a little bug in the ``polls`` application for us to fix
 right away: the ``Question.was_published_recently()`` method returns ``True`` if
 the ``Question`` was published within the last day (which is correct) but also if
-the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
+the ``Question``’s ``publication_date`` field is in the future (which certainly isn't).
 
 To check if the bug really exists, using the Admin create a question whose date
 lies in the future and check the method using the :djadmin:`shell`::
@@ -140,8 +140,8 @@ lies in the future and check the method using the :djadmin:`shell`::
     >>> import datetime
     >>> from django.utils import timezone
     >>> from polls.models import Question
-    >>> # create a Question instance with pub_date 30 days in the future
-    >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
+    >>> # create a Question instance with publication_date 30 days in the future
+    >>> future_question = Question(publication_date=timezone.now() + datetime.timedelta(days=30))
     >>> # was it published recently?
     >>> future_question.was_published_recently()
     True
@@ -176,14 +176,14 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
         def test_was_published_recently_with_future_question(self):
             """
             was_published_recently() should return False for questions whose
-            pub_date is in the future.
+            publication_date is in the future.
             """
             time = timezone.now() + datetime.timedelta(days=30)
-            future_question = Question(pub_date=time)
+            future_question = Question(publication_date=time)
             self.assertIs(future_question.was_published_recently(), False)
 
 What we have done here is created a :class:`django.test.TestCase` subclass
-with a method that creates a ``Question`` instance with a ``pub_date`` in the
+with a method that creates a ``Question`` instance with a ``publication_date`` in the
 future. We then check the output of ``was_published_recently()`` - which
 *ought* to be False.
 
@@ -224,7 +224,7 @@ What happened is this:
 * it looked for test methods - ones whose names begin with ``test``
 
 * in ``test_was_published_recently_with_future_question`` it created a ``Question``
-  instance whose ``pub_date`` field is 30 days in the future
+  instance whose ``publication_date`` field is 30 days in the future
 
 * ... and using the ``assertIs()`` method, it discovered that its
   ``was_published_recently()`` returns ``True``, though we wanted it to return
@@ -237,7 +237,7 @@ Fixing the bug
 --------------
 
 We already know what the problem is: ``Question.was_published_recently()`` should
-return ``False`` if its ``pub_date`` is in the future. Amend the method in
+return ``False`` if its ``publication_date`` is in the future. Amend the method in
 ``models.py``, so that it will only return ``True`` if the date is also in the
 past:
 
@@ -246,7 +246,7 @@ past:
 
     def was_published_recently(self):
         now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+        return now - datetime.timedelta(days=1) <= self.publication_date <= now
 
 and run the test again::
 
@@ -283,19 +283,19 @@ more comprehensively:
     def test_was_published_recently_with_old_question(self):
         """
         was_published_recently() should return False for questions whose
-        pub_date is older than 1 day.
+        publication_date is older than 1 day.
         """
         time = timezone.now() - datetime.timedelta(days=30)
-        old_question = Question(pub_date=time)
+        old_question = Question(publication_date=time)
         self.assertIs(old_question.was_published_recently(), False)
 
     def test_was_published_recently_with_recent_question(self):
         """
         was_published_recently() should return True for questions whose
-        pub_date is within the last day.
+        publication_date is within the last day.
         """
         time = timezone.now() - datetime.timedelta(hours=1)
-        recent_question = Question(pub_date=time)
+        recent_question = Question(publication_date=time)
         self.assertIs(recent_question.was_published_recently(), True)
 
 And now we have three tests that confirm that ``Question.was_published_recently()``
@@ -309,8 +309,8 @@ Test a view
 ===========
 
 The polls application is fairly undiscriminating: it will publish any question,
-including ones whose ``pub_date`` field lies in the future. We should improve
-this. Setting a ``pub_date`` in the future should mean that the Question is
+including ones whose ``publication_date`` field lies in the future. We should improve
+this. Setting a ``publication_date`` in the future should mean that the Question is
 published at that moment, but invisible until then.
 
 A test for a view
@@ -381,7 +381,7 @@ Improving our view
 ------------------
 
 The list of polls shows polls that aren't published yet (i.e. those that have a
-``pub_date`` in the future). Let's fix that.
+``publication_date`` in the future). Let's fix that.
 
 In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
 based on :class:`~django.views.generic.list.ListView`:
@@ -395,7 +395,7 @@ based on :class:`~django.views.generic.list.ListView`:
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by('-publication_date')[:5]
 
 We need to amend the ``get_queryset()`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
@@ -417,11 +417,11 @@ and then we must amend the ``get_queryset`` method like so:
         published in the future).
         """
         return Question.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+            publication_date__lte=timezone.now()
+        ).order_by('-publication_date')[:5]
 
-``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
-containing ``Question``\s whose ``pub_date`` is less than or equal to - that
+``Question.objects.filter(publication_date__lte=timezone.now())`` returns a queryset
+containing ``Question``\s whose ``publication_date`` is less than or equal to - that
 is, earlier than or equal to - ``timezone.now``.
 
 Testing our new view
@@ -454,7 +454,7 @@ class:
         in the past, positive for questions that have yet to be published).
         """
         time = timezone.now() + datetime.timedelta(days=days)
-        return Question.objects.create(question_text=question_text, pub_date=time)
+        return Question.objects.create(question_text=question_text, publication_date=time)
 
 
     class QuestionViewTests(TestCase):
@@ -469,7 +469,7 @@ class:
 
         def test_index_view_with_a_past_question(self):
             """
-            Questions with a pub_date in the past should be displayed on the
+            Questions with a publication_date in the past should be displayed on the
             index page.
             """
             create_question(question_text="Past question.", days=-30)
@@ -481,7 +481,7 @@ class:
 
         def test_index_view_with_a_future_question(self):
             """
-            Questions with a pub_date in the future should not be displayed on
+            Questions with a publication_date in the future should not be displayed on
             the index page.
             """
             create_question(question_text="Future question.", days=30)
@@ -531,7 +531,7 @@ In ``test_index_view_with_a_past_question``, we create a question and verify tha
 appears in the list.
 
 In ``test_index_view_with_a_future_question``, we create a question with a
-``pub_date`` in the future. The database is reset for each test method, so the
+``publication_date`` in the future. The database is reset for each test method, so the
 first question is no longer there, and so again the index shouldn't have any
 questions in it.
 
@@ -555,10 +555,10 @@ we need to add a similar  constraint to ``DetailView``:
             """
             Excludes any questions that aren't published yet.
             """
-            return Question.objects.filter(pub_date__lte=timezone.now())
+            return Question.objects.filter(publication_date__lte=timezone.now())
 
 And of course, we will add some tests, to check that a ``Question`` whose
-``pub_date`` is in the past can be displayed, and that one with a ``pub_date``
+``publication_date`` is in the past can be displayed, and that one with a ``publication_date``
 in the future is not:
 
 .. snippet::
@@ -567,7 +567,7 @@ in the future is not:
     class QuestionIndexDetailTests(TestCase):
         def test_detail_view_with_a_future_question(self):
             """
-            The detail view of a question with a pub_date in the future should
+            The detail view of a question with a publication_date in the future should
             return a 404 not found.
             """
             future_question = create_question(question_text='Future question.', days=5)
@@ -577,7 +577,7 @@ in the future is not:
 
         def test_detail_view_with_a_past_question(self):
             """
-            The detail view of a question with a pub_date in the past should
+            The detail view of a question with a publication_date in the past should
             display the question's text.
             """
             past_question = create_question(question_text='Past Question.', days=-5)

@@ -440,7 +440,7 @@ msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Er bestaat al een %(model_name)s met eenzelfde %(field_label)s."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Eg: "Title must be unique for publication_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."

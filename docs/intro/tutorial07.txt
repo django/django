@@ -27,7 +27,7 @@ the ``admin.site.register(Question)`` line with:
 
 
     class QuestionAdmin(admin.ModelAdmin):
-        fields = ['pub_date', 'question_text']
+        fields = ['publication_date', 'question_text']
 
     admin.site.register(Question, QuestionAdmin)
 
@@ -58,7 +58,7 @@ up into fieldsets:
     class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date']}),
+            ('Date information', {'fields': ['publication_date']}),
         ]
 
     admin.site.register(Question, QuestionAdmin)
@@ -131,7 +131,7 @@ registration code to read:
     class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
+            ('Date information', {'fields': ['publication_date'], 'classes': ['collapse']}),
         ]
         inlines = [ChoiceInline]
 
@@ -199,7 +199,7 @@ object:
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date')
+        list_display = ('question_text', 'publication_date')
 
 Just for good measure, let's also include the ``was_published_recently()``
 method from :doc:`Tutorial 2 </intro/tutorial02>`:
@@ -209,7 +209,7 @@ method from :doc:`Tutorial 2 </intro/tutorial02>`:
 
     class QuestionAdmin(admin.ModelAdmin):
         # ...
-        list_display = ('question_text', 'pub_date', 'was_published_recently')
+        list_display = ('question_text', 'publication_date', 'was_published_recently')
 
 Now the question change list page looks like this:
 
@@ -233,8 +233,8 @@ attributes, as follows:
         # ...
         def was_published_recently(self):
             now = timezone.now()
-            return now - datetime.timedelta(days=1) <= self.pub_date <= now
-        was_published_recently.admin_order_field = 'pub_date'
+            return now - datetime.timedelta(days=1) <= self.publication_date <= now
+        was_published_recently.admin_order_field = 'publication_date'
         was_published_recently.boolean = True
         was_published_recently.short_description = 'Published recently?'
 
@@ -246,16 +246,16 @@ Edit your :file:`polls/admin.py` file again and add an improvement to the
 :attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
 ``QuestionAdmin``::
 
-    list_filter = ['pub_date']
+    list_filter = ['publication_date']
 
 That adds a "Filter" sidebar that lets people filter the change list by the
-``pub_date`` field:
+``publication_date`` field:
 
 .. image:: _images/admin13t.png
    :alt: Polls change list page, updated
 
 The type of filter displayed depends on the type of field you're filtering on.
-Because ``pub_date`` is a :class:`~django.db.models.DateTimeField`, Django
+Because ``publication_date`` is a :class:`~django.db.models.DateTimeField`, Django
 knows to give appropriate filter options: "Any date", "Today", "Past 7 days",
 "This month", "This year".
 

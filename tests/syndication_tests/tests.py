@@ -124,7 +124,7 @@ class SyndicationFeedTest(FeedTestCase):
 
         # Find the pubdate of the first feed item
         d = Entry.objects.get(pk=1).published
-        pub_date = rfc2822_date(timezone.make_aware(d, TZ))
+        publication_date = rfc2822_date(timezone.make_aware(d, TZ))
 
         items = chan.getElementsByTagName('item')
         self.assertEqual(len(items), Entry.objects.count())
@@ -133,7 +133,7 @@ class SyndicationFeedTest(FeedTestCase):
             'description': 'Overridden description: My first entry',
             'link': 'http://example.com/blog/1/',
             'guid': 'http://example.com/blog/1/',
-            'pubDate': pub_date,
+            'pubDate': publication_date,
             'author': 'test@example.com (Sally Smith)',
         })
         self.assertCategories(items[0], ['python', 'testing'])
