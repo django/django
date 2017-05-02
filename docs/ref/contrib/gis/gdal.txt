@@ -1183,7 +1183,7 @@ blue.
             >>> rst = GDALRaster({'driver': 'GTiff', 'name': rstfile.name, 'srid': 4326,
             ...                   'width': 255, 'height': 255, 'nr_of_bands': 1})
             >>> rst.name
-            '/tmp/tmp7x9H4J.tif'           # The exact filename will be different on your computer
+            '/path/to/tmp7x9H4J.tif'           # The exact filename will be different on your computer
             >>> rst.driver.name
             'GTiff'
 
