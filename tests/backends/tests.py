@@ -79,13 +79,13 @@ class OracleTests(unittest.TestCase):
         self.assertEqual(quoted_name % (), name)
 
     def test_dbms_session(self):
-        # If the backend is Oracle, test that we can call a standard
+        # If the backend is Oracle, we can call a standard
         # stored procedure through our cursor wrapper.
         with connection.cursor() as cursor:
             cursor.callproc('DBMS_SESSION.SET_IDENTIFIER', ['_django_testing!'])
 
     def test_cursor_var(self):
-        # If the backend is Oracle, test that we can pass cursor variables
+        # If the backend is Oracle, we can pass cursor variables
         # as query parameters.
         from django.db.backends.oracle.base import Database
 
@@ -95,7 +95,7 @@ class OracleTests(unittest.TestCase):
             self.assertEqual(var.getvalue(), 'X')
 
     def test_long_string(self):
-        # If the backend is Oracle, test that we can save a text longer
+        # If the backend is Oracle, we can save a text longer
         # than 4000 chars and read it properly
         with connection.cursor() as cursor:
             cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
@@ -107,7 +107,7 @@ class OracleTests(unittest.TestCase):
             cursor.execute('DROP TABLE ltext')
 
     def test_client_encoding(self):
-        # If the backend is Oracle, test that the client encoding is set
+        # If the backend is Oracle, the client encoding is set
         # correctly.  This was broken under Cygwin prior to r14781.
         connection.ensure_connection()
         self.assertEqual(connection.connection.encoding, "UTF-8")
@@ -222,7 +222,7 @@ class PostgreSQLTests(TestCase):
         new_connection = connection.copy()
 
         try:
-            # Ensure the database default time zone is different than
+            # the database default time zone is different than
             # the time zone in new_connection.settings_dict. We can
             # get the default time zone by reset & show.
             cursor = new_connection.cursor()
