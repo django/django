@@ -722,6 +722,7 @@ that specifies the template used to render each choice. For example, for the
 
     That included the ``<label>`` tags. To get more granular, you can use each
     radio button's ``tag``, ``choice_label`` and ``id_for_label`` attributes.
+    There is also ``choice_value`` attribute for button's values.
     For example, this template...
 
     .. code-block:: html+django
