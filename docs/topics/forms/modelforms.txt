@@ -221,9 +221,8 @@ when calling :meth:`~django.forms.Form.is_valid()` or accessing the
 ``full_clean()``, although you will typically not use the latter method in
 practice.
 
-``Model`` validation (:meth:`Model.full_clean()
-<django.db.models.Model.full_clean()>`) is triggered from within the form
-validation step, right after the form's ``clean()`` method is called.
+``Model`` validation is triggered from within the form validation step, right
+after the form's ``clean()`` method is called.
 
 .. warning::
 
