@@ -299,10 +299,10 @@ Finally, here's an example of a fairly complex logging setup::
         'disable_existing_loggers': False,
         'formatters': {
             'verbose': {
-                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+                'format': '%(levelname)s %(name)s %(asctime)s %(module)s %(process)d %(thread)d %(pathname)s@%(lineno)s: %(message)s'
             },
             'simple': {
-                'format': '%(levelname)s %(message)s'
+                'format': '%(levelname)s %(name)s %(filename)s@%(lineno)s: %(message)s'
             },
         },
         'filters': {
@@ -328,6 +328,11 @@ Finally, here's an example of a fairly complex logging setup::
             }
         },
         'loggers': {
+            # Default catch-all logger ex. will catch any 'logger = logging.getLogger(__name__)'
+            '': {
+                'handlers': ['console'],
+                'level': 'INFO',
+            },
             'django': {
                 'handlers': ['console'],
                 'propagate': True,
