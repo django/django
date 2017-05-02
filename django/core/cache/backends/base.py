@@ -33,6 +33,13 @@ def default_key_func(key, key_prefix, version):
     return '%s:%s:%s' % (key_prefix, version, key)
 
 
+def noop_key_func(key, key_prefix, version):
+    """
+    Function to generate keys that ignores `key_prefix` and `version`.
+    """
+    return key
+
+
 def get_key_func(key_func):
     """
     Function to decide which key function to use.
