@@ -141,7 +141,8 @@ class BaseMemcachedCache(BaseCache):
         for key, value in data.items():
             key = self.make_key(key, version=version)
             safe_data[key] = value
-        self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
+        # return the list of failing keys
+        return self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
 
     def delete_many(self, keys, version=None):
         self._cache.delete_multi(self.make_key(key, version=version) for key in keys)
