@@ -87,10 +87,9 @@ class BaseFormSet:
         if self.is_bound:
             form = ManagementForm(self.data, auto_id=self.auto_id, prefix=self.prefix)
             if not form.is_valid():
-                raise ValidationError(
-                    _('ManagementForm data is missing or has been tampered with'),
-                    code='missing_management_form',
-                )
+                # Since the management formset is invalid, we don't know how
+                # many forms were submitted
+                form.cleaned_data[TOTAL_FORM_COUNT] = 0
         else:
             form = ManagementForm(auto_id=self.auto_id, prefix=self.prefix, initial={
                 TOTAL_FORM_COUNT: self.total_form_count(),
@@ -293,6 +292,10 @@ class BaseFormSet:
     def is_valid(self):
         """Return True if every form in self.forms is valid."""
         if not self.is_bound:
+            return False
+        if not self.management_form.is_valid():
+            error = _('Management form data is missing or has been tampered with.')
+            self._non_form_errors = self.error_class([error])
             return False
         # We loop over every form.errors here rather than short circuiting on the
         # first failure to make sure validation gets triggered for every form.

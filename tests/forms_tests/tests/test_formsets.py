@@ -1277,6 +1277,22 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertTrue(hasattr(formset, '__html__'))
         self.assertEqual(str(formset), formset.__html__())
 
+    def test_invalid_management_form_works(self):
+        class CheckForm(Form):
+            field = IntegerField()
+
+        data = {
+            'broken-TOTAL_FORMS': '',
+            'broken-INITIAL_FORMS': '',
+            'broken-MAX_NUM_FORMS': '',
+            'broken-0-field': '1'
+        }
+        CheckFormSet = formset_factory(CheckForm, max_num=1)
+        formset = CheckFormSet(data, prefix='broken')
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(list(formset.non_form_errors()),
+            ['Management form data is missing or has been tampered with.'])
+
 
 data = {
     'choices-TOTAL_FORMS': '1',  # the number of forms rendered
@@ -1336,10 +1352,6 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 
 class TestIsBoundBehavior(SimpleTestCase):
-    def test_no_data_raises_validation_error(self):
-        with self.assertRaises(ValidationError):
-            ArticleFormSet({}).is_valid()
-
     def test_with_management_data_attrs_work_fine(self):
         data = {
             'form-TOTAL_FORMS': '1',
