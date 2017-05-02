@@ -106,7 +106,15 @@ class AdminSite:
                 )
 
             if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+                registered_admin = self._registry[model]
+                registered_model = registered_admin.model
+                raise AlreadyRegistered(
+                    'Cannot register %s for %s, because %s is already registered.' % (
+                        model._meta.label,
+                        registered_admin,
+                        registered_model._meta.label,
+                    )
+                )
 
             # Ignore the registration if the model has been
             # swapped out.
