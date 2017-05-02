@@ -3115,6 +3115,10 @@ Settings for :mod:`django.contrib.staticfiles`.
 
 Default: ``None``
 
+.. versionchanged:: 1.6
+
+    The default changed from ``''`` (empty string) to ``None`` in Django 1.6.
+
 The absolute path to the directory where :djadmin:`collectstatic` will collect
 static files for deployment.
 
