@@ -86,9 +86,14 @@ overridden:
   Note that any errors raised by your :meth:`Form.clean()` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
-  :meth:`~django.forms.Form.non_field_errors` method if you need to. If you
-  want to attach errors to a specific field in the form, you need to call
-  :meth:`~django.forms.Form.add_error()`.
+  :meth:`~django.forms.Form.non_field_errors` method if you need to.
+
+  .. versionadded:: 1.7
+
+  If you want to attach errors to a specific field in the form, you need to
+  call :meth:`~django.forms.Form.add_error()`. This method allows adding
+  errors to specific fields from within the ``Form.clean()`` method, or from
+  outside the form altogether; for instance from a view.
 
   Also note that there are special considerations when overriding
   the ``clean()`` method of a ``ModelForm`` subclass. (see the
