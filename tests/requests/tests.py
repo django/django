@@ -616,6 +616,26 @@ class RequestsTests(SimpleTestCase):
         request = factory.get('/path/with:colons')
         self.assertEqual(request.get_raw_uri(), 'http://evil.com/path/with:colons')
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_get_params(self):
+        factory = RequestFactory(HTTP_HOST='evil.com')
+        request = factory.get('/?foo=bar')
+        self.assertTrue('foo' in request.GET.keys())
+        self.assertEqual(request.GET['foo'], 'bar')
+
+        request = factory.get(u'/?foo=☂')
+        self.assertTrue('foo' in request.GET.keys())
+        self.assertEqual(request.GET['foo'], u'☂')
+
+        request = factory.get(u'/?foo[]=☂')
+        self.assertTrue('foo[]' in request.GET.keys())
+        self.assertEqual(request.GET['foo[]'], u'☂')
+
+        request = factory.get(u'/?foo[]=☂&foo[]=bar')
+        self.assertTrue('foo[]' in request.GET.keys())
+        self.assertEqual(request.GET.getlist('foo[]'), [u'☂', 'bar'])
+
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [
