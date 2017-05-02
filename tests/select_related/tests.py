@@ -178,6 +178,8 @@ class SelectRelatedValidationTests(SimpleTestCase):
     """
     non_relational_error = "Non-relational field given in select_related: '%s'. Choices are: %s"
     invalid_error = "Invalid field name(s) given in select_related: '%s'. Choices are: %s"
+    invalid_error_with_reverse = "Invalid field name(s) given in select_related: '%s'. " \
+        "Choices are: %s. Reverse relations cannot be used in select_related"
 
     def test_non_relational_field(self):
         with self.assertRaisesMessage(FieldError, self.non_relational_error % ('name', 'genus')):
@@ -198,7 +200,7 @@ class SelectRelatedValidationTests(SimpleTestCase):
             list(Pizza.objects.select_related('toppings'))
 
     def test_reverse_relational_field(self):
-        with self.assertRaisesMessage(FieldError, self.invalid_error % ('child_1', 'genus')):
+        with self.assertRaisesMessage(FieldError, self.invalid_error_with_reverse % ('child_1', 'genus')):
             list(Species.objects.select_related('child_1'))
 
     def test_invalid_field(self):

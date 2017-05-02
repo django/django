@@ -793,13 +793,16 @@ class SQLCompiler:
             fields_not_found = set(requested.keys()).difference(fields_found)
             if fields_not_found:
                 invalid_fields = ("'%s'" % s for s in fields_not_found)
-                raise FieldError(
-                    'Invalid field name(s) given in select_related: %s. '
+                error_msg = 'Invalid field name(s) given in select_related: %s. ' \
                     'Choices are: %s' % (
                         ', '.join(invalid_fields),
                         ', '.join(_get_field_choices()) or '(none)',
                     )
-                )
+                has_reverse_relations = any((field_name in opts.fields_map
+                                             for field_name in fields_not_found))
+                if has_reverse_relations:
+                    error_msg += '. Reverse relations cannot be used in select_related'
+                raise FieldError(error_msg)
         return related_klass_infos
 
     def deferred_to_columns(self):
