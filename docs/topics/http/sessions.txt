@@ -118,6 +118,13 @@ and the :setting:`SECRET_KEY` setting.
 
 .. note::
 
+    When using cookies-based sessions :mod:`django.contrib.sessions` can be
+    removed from :setting:`INSTALLED_APPS` setting because data is loaded
+    from the key itself and not from the database so there is no need for the
+    creation and usage of ``django.contrib.sessions.models.Session`` table.
+
+.. note::
+
     It's recommended to leave the :setting:`SESSION_COOKIE_HTTPONLY` setting
     on ``True`` to prevent access to the stored data from JavaScript.
 
