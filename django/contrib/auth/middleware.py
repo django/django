@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
+from django.contrib.auth.models import Group
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
@@ -121,3 +122,42 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     the application wants to use Django's authentication mechanism.
     """
     force_logout_if_no_header = False
+
+
+class RemoteUserAttrMiddleware(RemoteUserMiddleware):
+    group_prefix = 'ext:'
+
+    def process_request(self, request):
+        if hasattr(request, 'user') and request.user.is_authenticated() and \
+          request.META.get(self.header, None) and \
+          request.user.get_username() == self.clean_username(request.META[self.header], request):
+            stored_backend = load_backend(request.session.get(auth.BACKEND_SESSION_KEY, ''))
+            if isinstance(stored_backend, RemoteUserBackend):
+                email = request.META.get("REMOTE_USER_EMAIL", None)
+                firstname = request.META.get("REMOTE_USER_FIRSTNAME", None)
+                lastname = request.META.get("REMOTE_USER_LASTNAME", None)
+                if email or firstname or lastname:
+                    user = request.user
+                    user.email = email
+                    user.first_name = firstname
+                    user.last_name = lastname
+
+                    ext_group_count = request.META.get("REMOTE_USER_GROUP_N", None)
+                    if ext_group_count and int(ext_group_count):
+                        current_groups = {}
+                        for g in user.groups.filter(name__startswith=self.group_prefix):
+                            current_groups[g.name] = g
+
+                        for i in range(1, int(ext_group_count)):
+                            if request.META.get("REMOTE_USER_GROUP_" + str(i), None):
+                                g = self.group_prefix + request.META["REMOTE_USER_GROUP_" + str(i)]
+                                if current_groups.has_key(g):
+                                    del current_groups[g]
+                                else:
+                                    g_obj = Group.objects.filter(name=g)
+                                    if g_obj:
+                                        user.groups.add(g_obj[0])
+
+                        for g in current_groups.values():
+                            user.groups.remove(g.id)
+                    user.save()
