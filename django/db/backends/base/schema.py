@@ -520,7 +520,7 @@ class BaseDatabaseSchemaEditor:
                 self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
         # Drop incoming FK constraints if we're a primary key and things are going
         # to change.
-        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+        if old_field.primary_key and new_field.primary_key and (old_type != new_type or old_field.column != new_field.column):
             # '_meta.related_field' also contains M2M reverse fields, these
             # will be filtered out
             for _old_rel, new_rel in _related_non_m2m_objects(old_field, new_field):

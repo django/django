@@ -1122,6 +1122,30 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             NoteRename.objects.create(detail_info=None)
 
+    def test_rename_pk_with_foreign_refs(self):
+        """
+        Renaming a PK field with foreign keys depending on it should work
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+
+        _old_name = "id"
+        _new_name = "renamed"
+
+        old_field = Author._meta.get_field(_old_name)
+        new_field = copy(old_field)
+        new_field.name = _new_name
+        new_field.set_attributes_from_name(_new_name)
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+        columns = self.column_classes(Author)
+
+        self.assertNotIn(_old_name, columns)
+        self.assertIn(_new_name, columns)
+
     def _test_m2m_create(self, M2MFieldClass):
         """
         Tests M2M fields on models during creation
