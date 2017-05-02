@@ -87,10 +87,11 @@ class Apps:
                     app_config = entry
                 else:
                     app_config = AppConfig.create(entry)
-                if app_config.label in self.app_configs:
-                    raise ImproperlyConfigured(
-                        "Application labels aren't unique, "
-                        "duplicates: %s" % app_config.label)
+
+                    if app_config.label in self.app_configs:
+                        raise ImproperlyConfigured(
+                            "Application labels aren't unique, "
+                            "duplicates: %s" % app_config.label)
 
                 self.app_configs[app_config.label] = app_config
                 app_config.apps = self
