@@ -37,6 +37,9 @@ Bugfixes
 * Allowed prefetch calls on managers with custom ``ModelIterable`` subclasses
   (:ticket:`28096`).
 
+* Fixed change password link in the ``contrib.auth`` admin for ``el``,
+  ``es_MX``, and ``pt`` translations (:ticket:`28100`).
+
 * Restored the output of the ``class`` attribute in the ``<ul>`` of widgets
   that use the ``multiple_input.html`` template. This fixes
   ``ModelAdmin.radio_fields`` with ``admin.HORIZONTAL`` (:ticket:`28059`).
