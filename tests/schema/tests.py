@@ -1670,6 +1670,9 @@ class SchemaTests(TransactionTestCase):
             self.assertNotIn(db_index_name, new_constraints)
             # The index from Meta.indexes is still in the database.
             self.assertIn(author_index_name, new_constraints)
+            # Drop the index
+            with connection.schema_editor() as editor:
+                editor.remove_index(AuthorWithIndexedName, index)
         finally:
             AuthorWithIndexedName._meta.indexes = []
 
@@ -1690,6 +1693,9 @@ class SchemaTests(TransactionTestCase):
             if connection.features.uppercases_column_names:
                 index_name = index_name.upper()
             self.assertIndexOrder(Author._meta.db_table, index_name, ['ASC', 'DESC'])
+        # Drop the index
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
 
     def test_indexes(self):
         """
