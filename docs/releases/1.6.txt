@@ -153,6 +153,13 @@ trigger which returns ``NULL``. In such cases it is possible to set
 :attr:`django.db.models.Options.select_on_save` flag to force saving to
 use the old algorithm.
 
+``checksetup`` management command added for verifying compatibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A ``checksetup`` management command was added, enabling you to verify if your
+current configuration (currently oriented at settings) is compatible with the
+current version of Django.
+
 Minor features
 --------------
 
