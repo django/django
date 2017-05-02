@@ -70,7 +70,8 @@ def handle_default_options(options):
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     if options.pythonpath:
-        sys.path.insert(0, options.pythonpath)
+        for path in options.pythonpath.split(":"):
+            sys.path.insert(0, path)
 
 
 class OutputWrapper(TextIOBase):
