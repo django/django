@@ -55,6 +55,7 @@ The app that contains the custom tags must be in :setting:`INSTALLED_APPS` in
 order for the :ttag:`{% load %}<load>` tag to work. This is a security feature:
 It allows you to host Python code for many template libraries on a single host
 machine without enabling access to all of them for every Django installation.
+Also you will need to restart your server before the new template tags or filters can be used.
 
 There's no limit on how many modules you put in the ``templatetags`` package.
 Just keep in mind that a :ttag:`{% load %}<load>` statement will load
