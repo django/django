@@ -179,7 +179,7 @@ class AuthenticationForm(forms.Form):
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
-        username = self.cleaned_data.get('username')
+        username = self.cleaned_data.get('username').strip()
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
