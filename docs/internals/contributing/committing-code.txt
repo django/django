@@ -122,11 +122,11 @@ Django's Git repository:
   have a lot of time to read mailing list discussions immediately, so you may
   have to wait a couple of days before getting a response.
 
-* Write detailed commit messages in the past tense, not present tense.
+* Write detailed commit messages in `imperative mood
+  <http://chris.beams.io/posts/git-commit/>`.
 
-  * Good: "Fixed Unicode bug in RSS API."
-  * Bad: "Fixes Unicode bug in RSS API."
-  * Bad: "Fixing Unicode bug in RSS API."
+  * Good: "Fix Unicode bug in RSS API."
+  * Bad: "Fixes/Fixed/Fixing Unicode bug in RSS API."
 
   The commit message should be in lines of 72 chars maximum. There should be
   a subject line, separated by a blank line and then paragraphs of 72 char
@@ -135,18 +135,17 @@ Django's Git repository:
 
   .. code-block:: none
 
-      Fixed #18307 -- Added git workflow guidelines
+      Fix #18307: Add git workflow guidelines
 
-      Refactored the Django's documentation to remove mentions of SVN
-      specific tasks. Added guidelines of how to use Git, GitHub, and
-      how to use pull request together with Trac instead.
+      Remove mentions of SVN specific tasks in Django's docs. Add guidelines of
+      how to use Git, GitHub, and pull requests together with Trac.
 
   If the patch wasn't a pull request, you should credit the contributors in
   the commit message: "Thanks A for report, B for the patch and C for the
   review."
 
 * For commits to a branch, prefix the commit message with the branch name.
-  For example: "[1.4.x] Fixed #xxxxx -- Added support for mind reading."
+  For example: "[1.4.x] Fix #xxxxx: Add support for mind reading."
 
 * Limit commits to the most granular change that makes sense. This means,
   use frequent small commits rather than infrequent large commits. For
@@ -158,16 +157,15 @@ Django's Git repository:
   to the stable branch, according to the :ref:`backwards-compatibility policy
   <backwards-compatibility-policy>`.
 
-* If your commit closes a ticket in the Django `ticket tracker`_, begin
-  your commit message with the text "Fixed #xxxxx", where "xxxxx" is the
-  number of the ticket your commit fixes. Example: "Fixed #123 -- Added
-  whizbang feature.". We've rigged Trac so that any commit message in that
-  format will automatically close the referenced ticket and post a comment
-  to it with the full commit message.
+* If your commit closes a ticket in the Django `ticket tracker`_, begin your
+  commit message with the text "Fix #xxxxx", where "xxxxx" is the number of the
+  ticket your commit fixes. Example: "Fix #123: Add whizbang feature.". We've
+  rigged Trac so that any commit message in that format will automatically
+  close the referenced ticket and post a comment to it with the commit message.
 
   If your commit closes a ticket and is in a branch, use the branch name
-  first, then the "Fixed #xxxxx." For example:
-  "[1.4.x] Fixed #123 -- Added whizbang feature."
+  first, then the "Fix #xxxxx." For example: "[1.4.x] Fix #123: Add whizbang
+  feature."
 
   For the curious, we're using a `Trac plugin`_ for this.
 
@@ -189,7 +187,7 @@ Django's Git repository:
 
   .. code-block:: none
 
-    [<Django version>] Fixed <ticket> -- <description>
+    [<Django version>] Fix <ticket>: <description>
 
     Backport of <revision> from <branch>.
 
@@ -197,7 +195,7 @@ Django's Git repository:
 
   .. code-block:: none
 
-    [1.3.x] Fixed #17028 -- Changed diveintopython.org -> diveintopython.net.
+    [1.3.x] Fix #17028: Change diveintopython.org -> diveintopython.net.
 
     Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from master.
 

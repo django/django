@@ -93,7 +93,7 @@ commit does.
 If you need to do additional work on your branch, commit as often as
 necessary::
 
-    git commit -m 'Added two more tests for edge cases'
+    git commit -m 'Add two more tests for edge cases'
 
 Publishing work
 ---------------
