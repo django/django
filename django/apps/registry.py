@@ -129,7 +129,7 @@ class Apps:
     def check_models_ready(self):
         """Raise an exception if all models haven't been imported yet."""
         if not self.models_ready:
-            raise AppRegistryNotReady("Models aren't loaded yet.")
+            raise AppRegistryNotReady("Models aren't loaded yet. Ensure django.setup() has been called.")
 
     def get_app_configs(self):
         """Import applications and return an iterable of app configs."""
