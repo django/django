@@ -105,6 +105,19 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
+    def test_get_or_set(self):
+        "Get or set allways will return default value on the dummy cahce backend"
+        cache.set("key1", "spam")
+        self.assertRaises(ValueError, cache.get_or_set, "key1")
+        self.assertEqual(
+            cache.get_or_set("key1", "eggs"),
+            "eggs"
+        )
+        self.assertEqual(
+            cache.get_or_set("key1", lambda: "fish"),
+            "fish"
+        )
+
     def test_has_key(self):
         "The has_key method doesn't ever return True for the dummy cache backend"
         cache.set("hello1", "goodbye1")
