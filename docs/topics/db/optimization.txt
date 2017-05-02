@@ -50,6 +50,8 @@ Use standard DB optimization techniques
 
 .. _Indexes: https://en.wikipedia.org/wiki/Database_index
 
+.. _Indexes: http://en.wikipedia.org/wiki/Database_index
+
 * Appropriate use of field types.
 
 We will assume you have done the obvious things above. The rest of this document
