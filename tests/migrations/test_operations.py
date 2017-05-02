@@ -1818,6 +1818,7 @@ class OperationTests(OperationTestBase):
         elidable_operation = migrations.RunSQL('SELECT 1 FROM void;', elidable=True)
         self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
+    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql_params(self):
         """
         #23426 - RunSQL should accept parameters.
