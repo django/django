@@ -750,7 +750,7 @@ Like :doc:`regular formsets </topics/forms/formsets>`, Django provides a couple
 of enhanced formset classes that make it easy to work with Django models. Let's
 reuse the ``Author`` model from above::
 
-    >>> from django.forms import modelformset_factory
+    >>> from django.forms.models import modelformset_factory
     >>> from myapp.models import Author
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
 
