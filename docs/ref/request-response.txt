@@ -186,6 +186,17 @@ application.
     The :ttag:`url` template tag will use its value as the ``current_app``
     argument to :func:`~django.urls.reverse()`.
 
+.. attribute:: HttpRequest.site
+
+    An object of type :class:`~django.contrib.sites.models.Site` or
+    :class:`~django.contrib.sites.requests.RequestSite` as returned by
+    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    representing the current site.
+
+    ``site`` is only available if your Django installation has the
+    :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`
+    activated. For more, see :doc:`/ref/contrib/sites`.
+
 .. attribute:: HttpRequest.urlconf
 
     This will be used as the root URLconf for the current request, overriding
