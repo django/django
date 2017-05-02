@@ -321,7 +321,9 @@ def main(main_func, args=None, kwargs=None):
         args = ()
     if kwargs is None:
         kwargs = {}
-    if sys.platform.startswith('java'):
+    if hasattr(settings, "RELOADER"):
+        reloader = settings.RELOADER['reloader']
+    elif sys.platform.startswith('java'):
         reloader = jython_reloader
     else:
         reloader = python_reloader

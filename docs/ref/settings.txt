@@ -3258,6 +3258,26 @@ setting.
 Static file finders are currently considered a private interface, and this
 interface is thus undocumented.
 
+.. setting:: RELOADER
+
+``RELOADER``
+-----------------------
+
+Default:: ``None``
+
+The function called by the Django process manager for the
+:djadmin:`runserver` management command.  If you want to provide your
+own reloader command, the format is a dictionary with a single key,
+`reloader`:
+
+    from my_reloader import my_reloader_function
+    RELOADER = {
+        "reloader": my_reloader_function 
+    }
+
+The dictionary can be used to pass additional arguments to the reloader,
+allowing for further customization.
+
 Core Settings Topical Index
 ===========================
 
@@ -3428,3 +3448,7 @@ URLs
 * :setting:`APPEND_SLASH`
 * :setting:`PREPEND_WWW`
 * :setting:`ROOT_URLCONF`
+
+Platform
+--------
+* :setting:`RELOADER`
