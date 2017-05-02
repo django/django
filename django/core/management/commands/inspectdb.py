@@ -142,6 +142,17 @@ class Command(BaseCommand):
                             extra_params['blank'] = True
                             extra_params['null'] = True
 
+                    if row.default:
+                        default = row.default
+                        try:
+                            if field_type in ('IntegerField(', 'BigIntegerField('):
+                                default = int(row.default)
+                            elif field_type == 'FloatField(':
+                                default = float(row.default)
+                        except ValueError:
+                            pass
+                        extra_params['default'] = default
+
                     field_desc = '%s = %s%s' % (
                         att_name,
                         # Custom fields will have a dotted path
