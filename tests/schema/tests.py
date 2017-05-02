@@ -712,6 +712,28 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(AuthorWithDefaultHeight)
         self.assertFalse(columns['height'][1][6])
 
+    def test_alter_pk(self):
+        """
+        Tests altering of PK - renaming the field in this case
+        """
+        class TestModel(Model):
+            field = IntegerField(primary_key=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+
+        self.local_models = [TestModel]
+
+        with connection.schema_editor() as editor:
+            editor.create_model(TestModel)
+
+        new_field = IntegerField(TestModel, primary_key=True)
+        new_field.set_attributes_from_name("new_field")
+        with connection.schema_editor() as editor:
+            editor.remove_field(TestModel, TestModel._meta.get_field('field'))
+            editor.add_field(TestModel, new_field)
+
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_fk(self):
         """
