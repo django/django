@@ -154,6 +154,11 @@ class MigrationLoader:
             # so we're fine.
             return
         if key[0] in self.migrated_apps:
+            # Fix #22484 where admin 0001_initial migration relies on a
+            # non-existing migration when running makemigrations with a custom
+            # user model
+            if key[0] in settings.AUTH_USER_MODEL:
+                return
             try:
                 if key[1] == "__first__":
                     return list(self.graph.root_nodes(key[0]))[0]
