@@ -69,6 +69,18 @@ from the fixture and re-loaded into the database. Note this means that if you
 change one of the rows created by a fixture and then run :djadmin:`loaddata`
 again, you'll wipe out any changes you've made.
 
+Automatically loading initial data fixtures
+-------------------------------------------
+
+.. deprecated:: 1.9
+
+``initial_data`` are no longer loaded for apps with migrations. If you want
+to load initial data for an app, we suggest you create a migration for your
+application and define a :class:`~django.db.migrations.operations.RunPython` or
+:class:`~django.db.migrations.operations.RunSQL` operation in the operations section
+of the migration.
+
+
 Where Django finds fixture files
 --------------------------------
 
