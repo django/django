@@ -84,7 +84,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
         if not getattr(f, 'editable', False):
             continue
-        if fields and f.name not in fields:
+        if fields and fields is not ALL_FIELDS and f.name not in fields:
             continue
         if exclude and f.name in exclude:
             continue
