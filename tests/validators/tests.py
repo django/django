@@ -24,6 +24,13 @@ except ImportError:
 else:
     PILLOW_IS_INSTALLED = True
 
+try:
+    from PIL import Image  # noqa
+except ImportError:
+    PILLOW_IS_INSTALLED = False
+else:
+    PILLOW_IS_INSTALLED = True
+
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file', 'git+ssh']
 
