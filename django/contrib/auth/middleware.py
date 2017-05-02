@@ -81,6 +81,12 @@ class RemoteUserMiddleware(MiddlewareMixin):
             # by logging the user in.
             request.user = user
             auth.login(request, user)
+        else:
+            # the attempt to login the user failed, so we logout any existing user.
+            # this can occur when the User is authenticated by the external system
+            # (e.g. AD server), but is not in the user database and the backend's
+            # create_unknown_user==False.
+            auth.logout(request)
 
     def clean_username(self, username, request):
         """
