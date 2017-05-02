@@ -1116,8 +1116,8 @@ class ModelChoiceIterator:
 
 class ModelChoiceField(ChoiceField):
     """A ChoiceField whose choices are a model QuerySet."""
-    # This class is a subclass of ChoiceField for purity, but it doesn't
-    # actually use any of ChoiceField's implementation.
+    # This class is a subclass of ChoiceField for purity, but it 
+    # overrides most of ChoiceField's implementation.
     default_error_messages = {
         'invalid_choice': _('Select a valid choice. That choice is not one of'
                             ' the available choices.'),
