@@ -148,6 +148,18 @@ Per-object summaries can be generated using the ``annotate()`` clause.
 When an ``annotate()`` clause is specified, each object in the ``QuerySet``
 will be annotated with the specified values.
 
+.. admonition:: If in doubt, inspect the SQL query!
+
+    In order to understand what happens in your query, consider inspecting the
+    ``query`` property of your ``QuerySet``.
+    
+    For instance, combining multiple aggregations with ``annotate()`` will
+    yield the wrong results, as multiple tables are the cross joined, resulting
+    in duplicate row aggregations. This important issue is elaborated in
+    `Issue#10060`_.
+    
+.. _Issue#10060: https://code.djangoproject.com/ticket/10060
+
 The syntax for these annotations is identical to that used for the
 ``aggregate()`` clause. Each argument to ``annotate()`` describes an
 aggregate that is to be calculated. For example, to annotate books with
@@ -548,3 +560,4 @@ aggregate that author count, referencing the annotation field::
     >>> from django.db.models import Count, Avg
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}
+
