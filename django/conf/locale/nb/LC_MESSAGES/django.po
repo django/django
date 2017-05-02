@@ -984,51 +984,51 @@ msgstr "des."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Januar"
+msgstr "januar"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Februar"
+msgstr "februar"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "April"
+msgstr "april"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Mai"
+msgstr "mai"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Juni"
+msgstr "juni"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Juli"
+msgstr "juli"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "August"
+msgstr "august"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Oktober"
+msgstr "oktober"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "November"
+msgstr "november"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Desember"
+msgstr "desember"
 
 msgid "This is not a valid IPv6 address."
 msgstr "Dette er ikke en gyldig IPv6-adresse."
