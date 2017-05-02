@@ -98,7 +98,12 @@ class SessionBase:
         return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
 
     def decode(self, session_data):
-        encoded_data = base64.b64decode(force_bytes(session_data))
+        try:
+            encoded_data = base64.b64decode(force_bytes(session_data))
+        except TypeError as e:
+            if e.message == 'Incorrect padding':
+                # Session data was not encoded to begin with, return session_data without decoding
+                return session_data
         try:
             # could produce ValueError if there is no ':'
             hash, serialized = encoded_data.split(b':', 1)

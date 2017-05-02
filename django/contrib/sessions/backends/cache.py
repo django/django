@@ -29,7 +29,7 @@ class SessionStore(SessionBase):
             # cache keys. If this happens, reset the session. See #17810.
             session_data = None
         if session_data is not None:
-            return session_data
+            return self.decode(session_data)
         self._session_key = None
         return {}
 
@@ -61,7 +61,7 @@ class SessionStore(SessionBase):
         else:
             raise UpdateError
         result = func(self.cache_key,
-                      self._get_session(no_load=must_create),
+                      self.encode(self._get_session(no_load=must_create)),
                       self.get_expiry_age())
         if must_create and not result:
             raise CreateError
