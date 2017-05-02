@@ -278,6 +278,36 @@ class NonAggregateAnnotationTestCase(TestCase):
             lambda b: b.store_name
         )
 
+    def test_annotation_with_m2m_then_filter(self):
+        author1 = Author.objects.get(pk=5)
+        author2 = Author.objects.get(pk=6)
+        author3 = Author.objects.get(pk=7)
+
+        books = (
+          Book.objects.annotate(num_authors=Count('authors'))
+          .filter(num_authors=3)
+          .filter(authors=author1)
+          .filter(authors=author2)
+          .filter(authors=author3)
+        )
+
+        self.assertQuerysetEqual(
+          books, ['<Book: Python Web Development with Django>'])
+
+    def test_annotation_with_m2m_then_filter_using_in(self):
+        author1 = Author.objects.get(pk=5)
+        author2 = Author.objects.get(pk=6)
+        author3 = Author.objects.get(pk=7)
+
+        books = (
+          Book.objects.annotate(num_authors=Count('authors'))
+          .filter(num_authors=3)
+          .filter(authors__in=[author1, author2, author3])
+        )
+
+        self.assertQuerysetEqual(
+          books, ['<Book: Python Web Development with Django>'])
+
     def test_values_annotation(self):
         """
         Annotations can reference fields in a values clause,
