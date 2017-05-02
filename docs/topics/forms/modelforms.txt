@@ -912,7 +912,9 @@ Pass ``commit=False`` to return the unsaved model instances:
 This gives you the ability to attach data to the instances before saving them
 to the database. If your formset contains a ``ManyToManyField``, you'll also
 need to call ``formset.save_m2m()`` to ensure the many-to-many relationships
-are saved properly.
+are saved properly. Also note that while calling ``formset.save(commit=False)``
+does not save new or changed objects to the database, it does delete objects
+that have been marked for deletion.
 
 After calling ``save()``, your model formset will have three new attributes
 containing the formset's changes:
