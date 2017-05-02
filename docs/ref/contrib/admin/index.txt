@@ -1474,6 +1474,14 @@ templates used by the :class:`ModelAdmin` views:
     being edited (or ``None`` on an add form) and is expected to return a list
     of fields, as described above in the :attr:`ModelAdmin.fields` section.
 
+.. method:: ModelAdmin.get_exclude(request, obj=None)
+
+	.. versionadded:: 1.9
+
+	The ``get_exclude`` method is given the ``HttpRequest`` and the ``obj``
+	being edited and is expected to return the attribute exclude, as described
+	above in the :attr:`ModelAdmin.exclude` section.
+
 .. method:: ModelAdmin.get_fieldsets(request, obj=None)
 
     The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``

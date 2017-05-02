@@ -330,6 +330,12 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             qs = qs.order_by(*ordering)
         return qs
 
+    def get_exclude(self, request, obj=None):
+        """
+        Hook for specifying exclude
+        """
+        return self.exclude
+
     def lookup_allowed(self, lookup, value):
         from django.contrib.admin.filters import SimpleListFilter
 
