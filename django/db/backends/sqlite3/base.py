@@ -412,12 +412,12 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     - A string representing a datetime
     """
     try:
-        if isinstance(lhs, int):
+        if isinstance(lhs, six.integer_types):
             lhs = str(decimal.Decimal(lhs) / decimal.Decimal(1000000))
         real_lhs = parse_duration(lhs)
         if real_lhs is None:
             real_lhs = backend_utils.typecast_timestamp(lhs)
-        if isinstance(rhs, int):
+        if isinstance(rhs, six.integer_types):
             rhs = str(decimal.Decimal(rhs) / decimal.Decimal(1000000))
         real_rhs = parse_duration(rhs)
         if real_rhs is None:
