@@ -377,6 +377,53 @@ running your tests, you can define test-only models in its ``models.py``
 file.
 
 
+Test-only models
+==========================================================
+
+Test-only models are models that are only created while running unit tests. This is particularly useful when writing :doc:`reusable applications </intro/reusable-apps>` that do not contain any models of their own.
+
+Consider the following structure::
+
+    polls/
+        migrations/
+            0001_initial.py
+            __init__.py
+        tests/
+            __init__.py
+            models.py
+            test_polls.py
+            ...
+        __init__.py
+        models.py
+        views.py
+        urls.py
+        ...
+
+The ``models.py`` file in the test module contains your test-only model definitions. It is important to leave the original ``models.py`` file in the app module even if it is empty.
+
+Create a migration for your test-models in the migrations module. You will need to adapt the migration to only execute during unit tests. You can do this by checking the database name::
+
+    from django.db import migrations
+    from django.conf import settings
+
+
+    def is_test_db():
+        return settings.DATABASES.get(
+            'default', {}).get('NAME', '').startswith('test_')
+
+    class Migration(migrations.Migration):
+
+        dependencies = []
+
+        if is_test_db():
+            operations = [
+                migrations.CreateModel(...),
+                ...
+            ]
+
+That's it! The test-models will now be usable in your unit tests.
+
+
 .. _other-testing-frameworks:
 
 Using different testing frameworks
