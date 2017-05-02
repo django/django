@@ -1963,6 +1963,8 @@ return the uncompressed versions of the various JavaScript files, including
 
 .. _admin-custom-validation:
 
+.. _admin-custom-validation:
+
 Adding custom validation to the admin
 -------------------------------------
 
