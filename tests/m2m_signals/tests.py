@@ -461,3 +461,57 @@ class ManyToManySignalsTest(TestCase):
                 'objects': [self.alice, self.bob],
             }
         ])
+
+    def test_m2m_relations_delete_related(self):
+        """
+        Tests that deleting an element belonging to a m2m triggers the signals
+        `pre_delete` and `post_delete`.
+        """
+        self.airbag.cars_optional.add(self.vw, self.bmw, self.toyota)
+
+        expected_messages = [{
+            'instance': self.airbag,
+            'action': 'pre_delete',
+            'reverse': True,
+            'model': Car,
+            'objects': [self.bmw, self.toyota, self.vw],
+        }, {
+            'instance': self.airbag,
+            'action': 'post_delete',
+            'reverse': True,
+            'model': Car,
+            'objects': [self.bmw, self.toyota, self.vw],
+        }]
+
+        self._initialize_signal_car(add_default_parts_before_set_signal=False)
+
+        self.airbag.delete()
+
+        self.assertEqual(self.m2m_changed_messages, expected_messages)
+
+    def test_m2m_relations_delete_reverse_related(self):
+        """
+        Tests that deleting an element belonging to a reversed m2m triggers
+        the signals `pre_delete` and `post_delete`.
+        """
+        self.vw.optional_parts.add(self.airbag, self.sunroof)
+
+        expected_messages = [{
+            'instance': self.vw,
+            'action': 'pre_delete',
+            'reverse': True,
+            'model': Part,
+            'objects': [self.airbag, self.sunroof],
+        }, {
+            'instance': self.vw,
+            'action': 'post_delete',
+            'reverse': True,
+            'model': Part,
+            'objects': [self.airbag, self.sunroof],
+        }]
+
+        self._initialize_signal_car(add_default_parts_before_set_signal=False)
+
+        self.vw.delete()
+
+        self.assertEqual(self.m2m_changed_messages, expected_messages)
