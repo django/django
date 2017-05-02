@@ -27,8 +27,12 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         # (`libspatialite`). If it's not in the system library path (e.g., it
         # cannot be found by `ctypes.util.find_library`), then it may be set
         # manually in the settings via the `SPATIALITE_LIBRARY_PATH` setting.
+        #
+        # `mod_spatialite` is workaround for libspatialite 4.2.0 package on OS X.
+        # It requires mod_spatialite.dylib instead of libspatialite.dylib.
         self.spatialite_lib = getattr(settings, 'SPATIALITE_LIBRARY_PATH',
-                                      find_library('spatialite'))
+                                      find_library('mod_spatialite') or find_library('spatialite')
+                                      )
         if not self.spatialite_lib:
             raise ImproperlyConfigured('Unable to locate the SpatiaLite library. '
                                        'Make sure it is in your library path, or set '
