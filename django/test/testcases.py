@@ -742,6 +742,8 @@ class SimpleTestCase(unittest.TestCase):
         """
         try:
             result = compare_xml(xml1, xml2)
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             standardMsg = 'First or second argument is not valid XML\n%s' % e
             self.fail(self._formatMessage(msg, standardMsg))
@@ -762,6 +764,8 @@ class SimpleTestCase(unittest.TestCase):
         """
         try:
             result = compare_xml(xml1, xml2)
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception as e:
             standardMsg = 'First or second argument is not valid XML\n%s' % e
             self.fail(self._formatMessage(msg, standardMsg))
