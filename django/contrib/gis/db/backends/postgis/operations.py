@@ -190,7 +190,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             # Run a basic query to check the status of the connection so we're
             # sure we only raise the error below if the problem comes from
             # PostGIS and not from PostgreSQL itself (see #24862).
-            self._get_postgis_func('version')
+            self.check_database_connection()
 
             try:
                 vtup = self.postgis_version_tuple()
@@ -346,6 +346,10 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     def postgis_full_version(self):
         "Return PostGIS version number and compile-time options."
         return self._get_postgis_func('postgis_full_version')
+
+    def check_database_connection(self):
+        "Runs a VERSION() SQL query to check that the database connection is OK."
+        return self._get_postgis_func('version')
 
     def postgis_version_tuple(self):
         """

@@ -43,6 +43,9 @@ if HAS_POSTGRES:
             else:
                 raise NotImplementedError('This function was not expected to be called')
 
+        def check_database_connection(self):
+            pass
+
 
 @unittest.skipUnless(HAS_POSTGRES, "The psycopg2 driver is needed for these tests")
 class TestPostGISVersionCheck(unittest.TestCase):
