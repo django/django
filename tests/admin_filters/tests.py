@@ -451,6 +451,7 @@ class ListFiltersTests(TestCase):
         "Windows doesn't support setting a timezone that differs from the "
         "system timezone."
     )
+
     @override_settings(USE_TZ=True)
     def test_datefieldlistfilter_with_time_zone_support(self):
         # Regression for #17830
