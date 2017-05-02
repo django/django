@@ -674,6 +674,11 @@ class ModelRefreshTests(TestCase):
         with self.assertNumQueries(1):
             a.refresh_from_db()
             self.assertEqual(a.headline, 'new headline')
+        # Check that it returns itself
+        with self.assertNumQueries(1):
+            self.assertEqual(a.refresh_from_db().headline, 'new headline')
+        with self.assertNumQueries(1):
+            self.assert_(a.refresh_from_db() is a)
 
         orig_pub_date = a.pub_date
         new_pub_date = a.pub_date + timedelta(10)

@@ -168,6 +168,14 @@ update, you could write a test similar to this::
         obj.refresh_from_db()
         self.assertEqual(obj.val, 2)
 
+The ``refresh_from_db()`` method returns the model instance itself, allowing
+for chaining of the result::
+
+    def test_update_result(self):
+        obj = MyModel.objects.create(val=1)
+        MyModel.objects.filter(pk=obj.pk).update(val=F('val') + 1)
+        self.assertEqual(obj.refresh_from_db().val, 2)
+
 Note that when deferred fields are accessed, the loading of the deferred
 field's value happens through this method. Thus it is possible to customize
 the way deferred loading happens. The example below shows how one can reload
