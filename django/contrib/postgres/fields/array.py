@@ -81,7 +81,7 @@ class ArrayField(Field):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
+    def get_db_prep_value(self, value, connection, **_):
         if isinstance(value, list) or isinstance(value, tuple):
             return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
         return value
