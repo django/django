@@ -473,7 +473,7 @@ which takes two arguments - the first is an :doc:`app registry
 </ref/applications/>` that has the historical versions of all your models
 loaded into it to match where in your history the migration sits, and the
 second is a :doc:`SchemaEditor </ref/schema-editor>`, which you can use to
-manually effect database schema changes (but beware, doing this can confuse
+manually affect database schema changes (but beware, doing this can confuse
 the migration autodetector!)
 
 Let's write a simple migration that populates our new ``name`` field with the
