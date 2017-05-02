@@ -47,7 +47,9 @@ To activate this behavior, put the email addresses of the recipients in the
 
     Server error emails are sent using the logging framework, so you can
     customize this behavior by :doc:`customizing your logging configuration
-    </topics/logging>`.
+    </topics/logging>`. Note that you do need to add an
+    :class:`~django.utils.log.AdminEmailHandler` to your logger to ensure that
+    emails will be sent.
 
 404 errors
 ----------
