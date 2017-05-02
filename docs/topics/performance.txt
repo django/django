@@ -310,6 +310,12 @@ HTML, CSS, and JavaScript. They remove unnecessary whitespace, newlines, and
 comments, and shorten variable names, and thus reduce the size of the documents
 that your site publishes.
 
+:ref:`Using cached sessions <cached-sessions-backend>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:ref:`Using cached sessions <cached-sessions-backend>` may also be a way to
+increase performance by eliminating the need to load session data from storage
+and instead stores frequently used session data in memory.
+
 Template performance
 ====================
 
