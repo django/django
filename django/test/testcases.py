@@ -1311,6 +1311,7 @@ class LiveServerTestCase(TransactionTestCase):
         # Restore sqlite in-memory database connections' non-shareability
         for conn in connections.all():
             if conn.vendor == 'sqlite' and conn.is_in_memory_db():
+                assert conn.allow_thread_sharing
                 conn.allow_thread_sharing = False
 
     @classmethod
