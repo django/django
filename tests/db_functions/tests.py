@@ -42,6 +42,16 @@ class FunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, 'Coalesce must take at least two expressions'):
             Author.objects.annotate(display_name=Coalesce('alias'))
 
+    def test_coalesce_datetime_value(self):
+        now = timezone.now()
+        Article.objects.create(title='Testing, testing.', written=now)
+
+        articles = Article.objects.annotate(
+            publised_default=Coalesce('published', now),
+        )
+        article = articles.get()
+        self.assertEqual(article.publised_default, now)
+
     def test_coalesce_mixed_values(self):
         a1 = Author.objects.create(name='John Smith', alias='smithj')
         a2 = Author.objects.create(name='Rhonda')
