@@ -424,7 +424,7 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: content
 
-        The body of the response, as a bytestring. This is the final page
+        The body of the response, as a byte string. This is the final page
         content as rendered by the view, or any error message.
 
     .. attribute:: context
