@@ -1697,7 +1697,7 @@ accepted by :class:`ForeignKey`, plus one extra argument:
     :term:`concrete model`, indicates that this field should be used as the
     link back to the parent class, rather than the extra
     ``OneToOneField`` which would normally be implicitly created by
-    subclassing.
+    subclassing. Non-abstract models are also sometimes called concrete models.
 
 See :doc:`One-to-one relationships </topics/db/examples/one_to_one>` for usage
 examples of ``OneToOneField``.
