@@ -1636,7 +1636,7 @@ templates used by the :class:`ModelAdmin` views:
                     # hide MyInline in the add view
                     if isinstance(inline, MyInline) and obj is None:
                         continue
-                    yield inline.get_formset(request, obj), inline
+                    yield inline.get_formsets_with_inlines(request, obj), inline
 
 .. method:: ModelAdmin.formfield_for_foreignkey(db_field, request, **kwargs)
 
