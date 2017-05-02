@@ -163,12 +163,12 @@ class EmailValidator:
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = _lazy_re_compile(
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
+        r"(^([-!#$%&'*+/=?^_`{}|~0-9A-Z]|\\[@ \\])+(\.([-!#$%&'*+/=?^_`{}|~0-9A-Z]|\\[@ \\])+)*\Z"  # dot-atom
+        r'|^"([\001-\010\013\014\016-\037\040!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
         re.IGNORECASE)
     domain_regex = _lazy_re_compile(
         # max length for domain name labels is 63 characters per RFC 1034
-        r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z',
+        r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?!-)(?:[A-Z0-9-]{2,63}(?<!-))\Z',
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
@@ -189,6 +189,12 @@ class EmailValidator:
             raise ValidationError(self.message, code=self.code)
 
         user_part, domain_part = value.rsplit('@', 1)
+
+        # local part can't exceed 64 chars and domain
+        # part can't exceed 255 chars per:
+        # http://tools.ietf.org/html/rfc2821#section-4.5.3.1
+        if (len(user_part) > 64) or (len(domain_part) > 255):
+            raise ValidationError(self.message, code=self.code)
 
         if not self.user_regex.match(user_part):
             raise ValidationError(self.message, code=self.code)
