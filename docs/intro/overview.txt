@@ -242,8 +242,8 @@ and renders the template with the retrieved data. Here's an example view for
         return render(request, 'news/year_archive.html', context)
 
 This example uses Django's :doc:`template system </topics/templates>`, which has
-several powerful features but strives to stay simple enough for non-programmers
-to use.
+several powerful features but strives to stay simple enough for novice
+programmers to use.
 
 Design your templates
 =====================
