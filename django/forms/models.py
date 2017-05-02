@@ -595,9 +595,29 @@ class BaseModelFormSet(BaseFormSet):
                 pass
         return super()._construct_form(i, **kwargs)
 
+    def _get_data_pks(self):
+        """Returns a list of all the pks in the form data."""
+        pks = []
+        pk_field = self.model._meta.pk
+        to_python = self._get_to_python(pk_field)
+        for i in range(self.initial_form_count()):
+            pk_key = "%s-%s" % (self.add_prefix(i), pk_field.name)
+            pk = self.data[pk_key]
+            pks.append(to_python(pk))
+        return pks
+
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
-            if self.queryset is not None:
+            if self.is_bound:
+                # Bound forms must only deal with the instances
+                # specified by the data. Allowing any other filters
+                # could cause the data specified instances to not be
+                # found.
+                qs = self.model._default_manager.get_queryset()
+                qs = qs.filter(**{
+                    self.model._meta.pk.name+'__in': self._get_data_pks(),
+                })
+            elif self.queryset is not None:
                 qs = self.queryset
             else:
                 qs = self.model._default_manager.get_queryset()

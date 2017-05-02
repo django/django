@@ -1492,6 +1492,47 @@ class ModelFormsetTest(TestCase):
         formset = FormSet(initial=[{'authors': Author.objects.all()}], data=data)
         self.assertFalse(formset.extra_forms[0].has_changed())
 
+    def test_model_formset_with_mismatched_queryset(self):
+        FormSet = modelformset_factory(Author, fields=('name', ))
+        Author.objects.create(pk=10, name='Charles Baudelaire')
+        Author.objects.create(pk=20, name='Arthur Rimbaud')
+        data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-MAX_NUM_FORMS': 1,
+            'form-0-id': '20',
+            'form-0-name': 'A. Rimbaud',
+        }
+        formset = FormSet(data=data, queryset=Author.objects.filter(pk=10))
+        formset.save()
+
+        self.assertEqual(
+            set(Author.objects.values_list('pk', 'name')),
+            set([
+                (10, 'Charles Baudelaire'),
+                (20, 'A. Rimbaud'),
+            ]),
+        )
+
+    def test_model_formset_limits_queryset_to_data(self):
+        FormSet = modelformset_factory(Author, fields=('name', ))
+        Author.objects.create(pk=10, name='Charles Baudelaire')
+        Author.objects.create(pk=20, name='Arthur Rimbaud')
+        data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-MAX_NUM_FORMS': 1,
+            'form-0-id': '20',
+            'form-0-name': 'A. Rimbaud',
+        }
+        formset = FormSet(data=data, queryset=Author.objects.filter(pk=10))
+        self.assertEqual(
+            set(formset.get_queryset().values_list('pk', 'name')),
+            set([
+                (20, 'Arthur Rimbaud'),
+            ]),
+        )
+
     def test_prevent_duplicates_from_with_the_same_formset(self):
         FormSet = modelformset_factory(Product, fields="__all__", extra=2)
         data = {
