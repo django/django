@@ -382,7 +382,7 @@ class BaseModelForm(BaseForm):
                 exclude.append(name)
 
         try:
-            self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
         except ValidationError as e:
             self._update_errors(e)
 
