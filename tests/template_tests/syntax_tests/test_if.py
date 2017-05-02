@@ -187,6 +187,36 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('if-tag-in-02', {'x': [1]})
         self.assertEqual(output, 'no')
 
+    @setup({'if-tag-in-03': '{% if "d" in "abc" %}yes{% else %}no{% endif %}'})
+    def test_if_tag_in_03(self):
+        output = self.engine.render_to_string('if-tag-in-03')
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-in-04': '{% if "a" in "abc" %}yes{% else %}no{% endif %}'})
+    def test_if_tag_in_04(self):
+        output = self.engine.render_to_string('if-tag-in-04')
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-in-05': '{% if "d" in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_in_05(self):
+        output = self.engine.render_to_string('if-tag-in-05', {'abc': 'abc'})
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-in-06': '{% if "a" in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_in_06(self):
+        output = self.engine.render_to_string('if-tag-in-06', {'abc': 'abc'})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-in-07': '{% if d in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_in_07(self):
+        output = self.engine.render_to_string('if-tag-in-07', {'abc': 'abc', 'd': 'd'})
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-in-08': '{% if a in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_in_08(self):
+        output = self.engine.render_to_string('if-tag-in-08', {'abc': 'abc', 'a': 'a'})
+        self.assertEqual(output, 'yes')
+
     @setup({'if-tag-not-in-01': '{% if 1 not in x %}yes{% else %}no{% endif %}'})
     def test_if_tag_not_in_01(self):
         output = self.engine.render_to_string('if-tag-not-in-01', {'x': [1]})
@@ -196,6 +226,36 @@ class IfTagTests(SimpleTestCase):
     def test_if_tag_not_in_02(self):
         output = self.engine.render_to_string('if-tag-not-in-02', {'x': [1]})
         self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-not-in-03': '{% if "d" not in "abc" %}yes{% else %}no{% endif %}'})
+    def test_if_tag_not_in_03(self):
+        output = self.engine.render_to_string('if-tag-not-in-03')
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-not-in-04': '{% if "a" not in "abc" %}yes{% else %}no{% endif %}'})
+    def test_if_tag_not_in_04(self):
+        output = self.engine.render_to_string('if-tag-not-in-04')
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-not-in-05': '{% if "d" not in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_not_in_05(self):
+        output = self.engine.render_to_string('if-tag-not-in-05', {'abc': 'abc'})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-not-in-06': '{% if "a" not in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_not_in_06(self):
+        output = self.engine.render_to_string('if-tag-not-in-06', {'abc': 'abc'})
+        self.assertEqual(output, 'no')
+
+    @setup({'if-tag-not-in-07': '{% if d not in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_not_in_07(self):
+        output = self.engine.render_to_string('if-tag-not-in-07', {'abc': 'abc', 'd': 'd'})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-not-in-08': '{% if a not in abc %}yes{% else %}no{% endif %}'})
+    def test_if_tag_not_in_08(self):
+        output = self.engine.render_to_string('if-tag-not-in-08', {'abc': 'abc', 'a': 'a'})
+        self.assertEqual(output, 'no')
 
     # AND
     @setup({'if-tag-and01': '{% if foo and bar %}yes{% else %}no{% endif %}'})
