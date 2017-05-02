@@ -171,7 +171,7 @@ class ConnectionHandler:
         conn.setdefault('ATOMIC_REQUESTS', False)
         conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
-        if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
+        if conn['ENGINE'] == 'django.db.backends.':
             conn['ENGINE'] = 'django.db.backends.dummy'
         conn.setdefault('CONN_MAX_AGE', 0)
         conn.setdefault('OPTIONS', {})
