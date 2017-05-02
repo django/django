@@ -198,6 +198,11 @@ OK, this is the fun part, where we actually push out a release!
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
 
+#. If the release notes document has been prepared gradually through a period
+   of a few days and/or by more than one team member it might be missing or
+   have a wrong date at the top. Make sure to update it to the day of the
+   actual release.
+
 #. Tag the release using ``git tag``. For example::
 
         $ git tag --sign --message="Tag 1.5.1" 1.5.1
