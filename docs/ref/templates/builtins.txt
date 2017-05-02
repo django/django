@@ -2570,7 +2570,7 @@ It is also able to consume standard context variables, e.g. assuming a
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
 
 If you'd like to retrieve a static URL without displaying it, you can use a
-slightly different call::
+slightly different call:
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
