@@ -1179,6 +1179,8 @@ class Model(metaclass=ModelBase):
     @classmethod
     def check(cls, **kwargs):
         errors = []
+        if not any(cls._meta.allowed_for_connection(connection) for connection in connections.all()):
+            return errors
         errors.extend(cls._check_swappable())
         errors.extend(cls._check_model())
         errors.extend(cls._check_managers(**kwargs))

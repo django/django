@@ -296,6 +296,19 @@ class Options:
     def __str__(self):
         return "%s.%s" % (self.app_label, self.model_name)
 
+    def allowed_for_connection(self, connection):
+        """
+        Return whether or not the connection matches the required database
+        vendor and features of this model.
+        """
+        return (
+            not self.required_db_vendor or self.required_db_vendor == connection.vendor
+        ) and (
+            not self.required_db_features or all(
+                getattr(connection.features, feature, False) for feature in self.required_db_features
+            )
+        )
+
     def can_migrate(self, connection):
         """
         Return True if the model can/should be migrated on the `connection`.
@@ -305,12 +318,7 @@ class Options:
             return False
         if isinstance(connection, str):
             connection = connections[connection]
-        if self.required_db_vendor:
-            return self.required_db_vendor == connection.vendor
-        if self.required_db_features:
-            return all(getattr(connection.features, feat, False)
-                       for feat in self.required_db_features)
-        return True
+        return self.allowed_for_connection(connection)
 
     @property
     def verbose_name_raw(self):
