@@ -1821,6 +1821,11 @@ class IntegerField(Field):
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.IntegerField}
+        for validator in self.validators:
+            if isinstance(validator, validators.MinValueValidator):
+                kwargs['min_value'] = validator.limit_value
+            if isinstance(validator, validators.MaxValueValidator):
+                kwargs['max_value'] = validator.limit_value
         defaults.update(kwargs)
         return super().formfield(**defaults)
 

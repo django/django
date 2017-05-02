@@ -131,6 +131,20 @@ class IntegerFieldTests(TestCase):
         instance = self.model.objects.get(value='10')
         self.assertEqual(instance.value, 10)
 
+    def test_min_max_validator_limit_value_passed_to_formfield(self):
+        """
+        IntegerField passes the limit value set in MinValueValidator and
+        MaxValueValidator to the form fields using formfield() method.
+        """
+        if1 = models.IntegerField()
+        if2 = models.IntegerField(validators=[validators.MinValueValidator(10),
+                                              validators.MaxValueValidator(100)
+                                              ])
+        self.assertIsNone(if1.formfield().min_value)
+        self.assertIsNone(if1.formfield().max_value)
+        self.assertEqual(10, if2.formfield().min_value)
+        self.assertEqual(100, if2.formfield().max_value)
+
 
 class SmallIntegerFieldTests(IntegerFieldTests):
     model = SmallIntegerModel
