@@ -474,6 +474,10 @@ class HttpResponseGone(HttpResponse):
     status_code = 410
 
 
+class HttpResponseCensored(HttpResponse):
+    status_code = 451
+
+
 class HttpResponseServerError(HttpResponse):
     status_code = 500
 

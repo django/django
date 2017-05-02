@@ -890,6 +890,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     Acts just like :class:`HttpResponse` but uses a 410 status code.
 
+.. class:: HttpResponseCensored
+
+    Acts just like :class:`HttpResponse` but uses a 451 status code.
+
 .. class:: HttpResponseServerError
 
     Acts just like :class:`HttpResponse` but uses a 500 status code.
