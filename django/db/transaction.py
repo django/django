@@ -260,6 +260,7 @@ class Atomic(ContextDecorator):
                     connection.connection = None
                 else:
                     connection.in_atomic_block = False
+                    connection.needs_rollback = False
 
 
 def atomic(using=None, savepoint=True):
