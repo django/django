@@ -1,0 +1,130 @@
+Deploy Settings Checklist
+=========================
+
+When you're finally ready to deploy your Django project to a production
+environment, you should take some time to review your ``settings.py`` file and
+make the appropriate changes for the transition.  You can use this section as a
+checklist for your deployment.
+
+Additionally, with the exception of :setting:`DEBUG`, if you're publishing the
+source code for your project, these variables should be treated as sensitive and
+confidential.  In these cases, it's generally better to keep these values in a
+separate unpublished file, imported by the published ``settings.py``.
+
+
+Security-related Settings
+-------------------------
+
+SECRET_KEY
+::::::::::
+Obviously, :setting:`SECRET_KEY` should never be published, but there's value in
+making sure that the key used on production is only used on production: you
+reduce the number of vectors from which an attacker may acquire the key.
+
+
+DEBUG
+:::::
+You've probably been developing your project with ``DEBUG = True``, since this
+enables all manner of handy things like a full traceback in your browser window.
+For a production environment, though, this is a really bad idea, so it's best to
+turn this off by setting ``DEBUG = False``.
+
+
+ALLOWED_HOSTS
+:::::::::::::
+This is just good security policy, and if you turn ``DEBUG`` off without setting
+this variable, your site will just outright fail... on every page.
+
+Not terribly important in development, the :setting:`ALLOWED_HOSTS` setting
+protects your site from cross site request forgeries, and should be enabled on
+any production server.
+
+
+DATABASES
+:::::::::
+Your production database setup is likely different from that in your development
+environment.  It may only be the case that your username and password values
+differ, but for some cases, even the database engine is different.
+
+
+STATIC & MEDIA, ROOT & URL
+:::::::::::::::::::::::::
+As :setting:`STATIC_ROOT` and :setting:`MEDIA_ROOT` are a complete paths, your
+values in your development environment are probably very different from
+production.  Maybe your production environment is using an NFS share,
+or a content delivery network (CDN), whatever your configuration, it makes sense
+to take a look at these values when you move environments.
+
+
+ALLOWED_INCLUDE_ROOTS
+:::::::::::::::::::::
+
+
+If You're Using HTTPS
+---------------------
+If you're using Django, you should be using HTTPS.  Without it, it's just too
+easy to capture sensitive information like user session cookies etc.
+
+
+CSRF_COOKIE_SECURE
+::::::::::::::::::
+
+
+SESSION_COOKIE_SECURE
+:::::::::::::::::::::
+
+
+Performance-related Settings
+----------------------------
+There's a lot of processing that goes on in development that is best avoided in
+production.  A lot of that can be avoided by setting ``DEBUG = False``, but
+Django offers a number of additional services out-of-the-box to aid in the
+performance of your site.
+
+CACHES
+::::::
+
+
+TEMPLATE_LOADERS
+::::::::::::::::
+enable the cached template loader
+
+
+Error Reporting
+---------------
+By the time your code is pushed to production, it's (hopefully) as close to
+perfect as you can get it, but unless you're infallible, there's a good chance
+you've missed something.  Thankfully, Django has lots of automatic services in
+place to capture errors and notify you accordingly.  It is highly recommended
+that you take advantage of these features.
+
+
+EMAIL_* + SERVER_EMAIL
+::::::::::::::::::::::
+If your site sends email to anyone, for any reason, (including to yourself for
+error reports), these values need to be set.
+
+
+LOGGING
+:::::::
+
+
+ADMINS
+::::::
+Typically, :setting:`ADMINS` is blank in development, but in a production
+environment, users in this list can be notified of server errors by way of an
+internal service.  Leaving this blank won't prevent your site from working, but
+it may prevent you from finding out why it sometimes doesn't work.
+
+
+MANAGERS
+::::::::
+Similar to :setting:`ADMINS`, the :setting:`MANAGERS` setting is useful if you
+want your broken link notifications to go to a specific (sub)set of your team.
+
+
+SERVER_EMAIL
+::::::::::::
+Variables like :setting:`ADMINS` depend on :setting:`SERVER_EMAIL` in order to
+be useful.  This is the email address used by default in all outgoing mail
+messages.
