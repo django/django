@@ -295,6 +295,96 @@ settings file  defines ``coverage_html`` as the output directory for the report
 and also excludes several directories not relevant to the results
 (test code or external code included in Django).
 
+Continuous integration
+~~~~~~~~~~~~~~~~~~~~~~
+
+While contributing to Django it can be useful to test your code using a
+continuous integration server. This allows for automated testing using a
+combination of Python versions and databases. Two common platforms for this
+are :ref:`jenkins` and :ref:`travis`, for which detailed instructions are
+provided below.
+
+Databases
+^^^^^^^^^
+
+To test django with a continuous integration server, configure your server to
+setup your choice of database servers. You will then need to make sure the
+dj-database-url_ package is installed on your server. This package allows
+configuring django :setting:`DATABASES` settings based on environment
+variables, allowing for convenient tests in multiple database environments.
+
+To communicate to the tests which database & login credentials to use, an
+environment variable called ``DEFAULT_DB_URL`` is required, according to
+following structure::
+
+   export DEFAULT_DB_URL=SCHEME://USERNAME:PASSWORD@SERVER_NAME:PORT/DATABASE_NAME
+
+Where:
+
+* `SCHEME` - designates the type of database (MySQL, Postgres and SQLite
+  are supported).
+* `USERNAME`, `PASSWORD` - login credentials to use.
+* `SERVER_NAME`, `PORT` - location of the database server
+  (typically localhost)
+* `DATABASE_NAME` - the name of the ``DEFAULT`` database
+
+For example, a typical MySQL configuration is::
+
+   export DEFAULT_DB_URL=mysql://root@localhost/django
+
+Similarly you can use ``OTHER_DB_URL`` to configure the secondary testing
+database. If not set, this defaults to sqlite.
+
+The default is to use an in-memory SQLite database
+(``DEFAULT_DB_URL=OTHER_DB_URL=sqlite:///``).
+
+.. _dj-database-url: https://pypi.python.org/pypi/dj-database-url
+
+.. _memcached_ci:
+
+Memcached
+^^^^^^^^^
+
+In order to run the tests with memcached, make the ``MEMCACHE`` environment
+variable available. For the default memcached configuration use::
+
+   export MEMCACHE=127.0.0.1:11211
+
+When all is set, let your server run the following command to run the tests::
+
+   ./tests/runtests.py --settings=test_ci
+
+.. _jenkins:
+
+Jenkins
+^^^^^^^
+
+After setting up your Jenkins project and setting up memcache and/or a
+database, use a VirtualEnv builder with something similar to the following
+lines. This will both install the dependencies and run the tests::
+
+   pip install psycopg2
+   pip install dj_database_url
+   pip install pytz markdown textile docutils py-bcrypt PyYAML PIL
+   pip install -e .
+   export DEFAULT_DB_URL=$DBA_POSTGRESQL_ADMIN_URI/django
+   ./tests/runtests.py --settings=test_ci
+
+.. NOTE:: This is just a starting point and not meant as a full-fledged
+  configuration for your CI environment.
+
+.. _travis:
+
+Travis CI
+^^^^^^^^^
+
+`Travis CI <https://travis-ci.org/>`_ is a hosted CI service which is free for
+Open Source projects. Django comes with a pre-configured ``.travis.yml`` file.
+By switching on Travis for your fork of the project on GitHub, any commits you
+push will be automatically tested in all supported Python releases and MySQL,
+Postgres and SQLite. For using Travis CI, no additional configuration is
+required.
+
 .. _contrib-apps:
 
 Contrib apps

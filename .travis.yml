@@ -1,0 +1,59 @@
+language: python
+
+python:
+ - "2.6"
+ - "2.7"
+ - "3.2"
+ - "3.3"
+
+matrix:
+  exclude:
+    # Disable MySQL tests for 3.2 and 3.3
+    - python: "3.2"
+      env: DEFAULT_DB_URL=mysql://root@localhost/django
+    - python: "3.3"
+      env: DEFAULT_DB_URL=mysql://root@localhost/django
+
+env:
+  - DEFAULT_DB_URL=mysql://root@localhost/django
+  - DEFAULT_DB_URL=postgres://postgres@localhost/django
+  - DEFAULT_DB_URL=sqlite:///
+
+before_install:
+  - "export PIP_USE_MIRRORS=true"
+  - "export PIP_INDEX_URL=https://simple.crate.io/"
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
+install:
+  # Common test dependencies
+  - pip install pytz markdown textile docutils py-bcrypt PyYAML
+
+  # Only on Python 2.x, for now
+  - sh -c "if [[ $TRAVIS_PYTHON_VERSION =~ "^2\." ]]; then pip install selenium PIL python-memcached; fi"
+  - sh -c "if [[ $TRAVIS_PYTHON_VERSION =~ "^2\." ]]; then export MEMCACHE=127.0.0.1:11211; fi"
+
+  # MySQL bindings
+  - sh -c "if [ '$DEFAULT_DB_URL' = 'mysql://root@localhost/django' ]; then pip install MySQL-python; fi"
+
+  # Postgres bindings
+  - sh -c "if [ '$DEFAULT_DB_URL' = 'postgres://postgres@localhost/django' ]; then pip install psycopg2; fi"
+
+  # Allow setting the database using environment variable
+  - pip install dj_database_url
+
+  # Install Django
+  - pip install -e .
+
+before_script:
+  # MySQL on Travis CI is started on boot, binds to 127.0.0.1 and requires
+  # authentication. You can connect using "root" username and blank password.
+  - sh -c "if [ '$DEFAULT_DB_URL' = 'mysql://root@localhost/django' ]; then mysql -e 'create database django;'; fi"
+
+  # PostgreSQL is started on boot, binds to 127.0.0.1 and requires
+  # authentication with "postgres" user and no password.
+  - sh -c "if [ '$DEFAULT_DB_URL' = 'postgres://postgres@localhost/django' ]; then psql -c 'create database django;' -U postgres; fi"
+
+script:
+  # Run the test and be verbose about it
+  - python -Wall tests/runtests.py --verbosity 1 --settings=test_ci
