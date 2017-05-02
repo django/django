@@ -1520,3 +1520,5 @@ remove usage of these features.
 * Private API ``django.test.utils.TestTemplateLoader`` is removed.
 
 * The ``django.contrib.contenttypes.generic`` module is removed.
+
+* ``ReverseSingleRelatedObjectDescriptor`` was renamed to ``ForwardManyToOneDescriptor``.
