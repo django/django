@@ -547,7 +547,7 @@ class BaseDatabaseSchemaEditor:
             index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
             for index_name in index_names:
                 if index_name in meta_index_names:
-                    # There only way to check if an index was created with
+                    # The only way to check if an index was created with
                     # db_index=True or with Index(['field'], name='foo')
                     # is to look at its name (refs #28053).
                     continue
