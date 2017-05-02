@@ -13,6 +13,12 @@ documentation organized by the class which defines the behavior, see
    `Classy Class-Based Views <https://ccbv.co.uk/>`_ provides a nice interface
    to navigate the class hierarchy of the built-in class-based views.
 
+.. seealso::
+
+   `Classy Class-Based Views <https://ccbv.co.uk/>`_ provides a nice interface
+   to easily navigate the class hierarchy of the built-in class-based views.
+
+
 Simple generic views
 ====================
 
