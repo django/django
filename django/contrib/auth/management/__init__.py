@@ -65,10 +65,16 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     # Find all the Permissions that have a content_type for a model we're
     # looking for.  We don't need to check for codenames since we already have
     # a list of the ones we're going to create.
-    all_perms = set(Permission.objects.using(using).filter(
+    all_perms_query = Permission.objects.using(using).filter(
         content_type__in=ctypes,
-    ).values_list(
+    )
+
+    all_perms = set(all_perms_query.values_list(
         "content_type", "codename"
+    ))
+
+    all_perms_named = set(all_perms_query.values_list(
+        "content_type", "codename", "name"
     ))
 
     perms = [
@@ -80,6 +86,17 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)
+
+    # If a model's verbose name was changed, its existing permissions' names
+    # should be updated to avoid inconsistencies with freshly created
+    # databases.
+    for ct, (codename, name) in searched_perms:
+        if (ct.pk, codename, name) not in all_perms_named and (ct.pk, codename) in all_perms:
+            perm = Permission.objects.using(using).get(content_type=ct, codename=codename)
+            perm.name = name
+            perm.save()
+            if verbosity >= 2:
+                print("Renaming permission '%s'" % perm)
 
 
 def get_system_username():
