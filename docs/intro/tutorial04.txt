@@ -173,7 +173,7 @@ Now, create a ``polls/results.html`` template:
     {% endfor %}
     </ul>
 
-    <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+    <a href="{% url 'polls:detail' question_id %}">Vote again?</a>
 
 Now, go to ``/polls/1/`` in your browser and vote in the question. You should see a
 results page that gets updated each time you vote. If you submit the form
