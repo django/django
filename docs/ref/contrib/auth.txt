@@ -262,6 +262,16 @@ Methods
         the :setting:`DEFAULT_FROM_EMAIL`. Any ``**kwargs`` are passed to the
         underlying :meth:`~django.core.mail.send_mail()` call.
 
+.. note::
+
+   Permisions on the user object are cached.
+
+   If permissions change the cache will need to be refreshed.
+   The easiest way to do this is to reload the user object from the 
+   database with for example::
+
+       user = User.objects.get(id=user_id) 
+
 Manager methods
 ---------------
 
