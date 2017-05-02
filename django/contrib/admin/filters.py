@@ -13,6 +13,7 @@ from django.contrib.admin.utils import (
 )
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models.query_utils import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -24,6 +25,7 @@ class ListFilter:
     def __init__(self, request, params, model, model_admin):
         # This dictionary will eventually contain the request's query string
         # parameters actually used by this filter.
+        self.filter_q_behavior = model_admin.filter_q_behavior
         self.used_parameters = {}
         if self.title is None:
             raise ImproperlyConfigured(
@@ -131,6 +133,8 @@ class FieldListFilter(ListFilter):
 
     def queryset(self, request, queryset):
         try:
+            if self.filter_q_behavior:
+                return Q(**self.user_parameters)
             return queryset.filter(**self.used_parameters)
         except ValidationError as e:
             raise IncorrectLookupParameters(e)

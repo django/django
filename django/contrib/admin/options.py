@@ -27,6 +27,7 @@ from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.query_utils import Q
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
@@ -501,6 +502,7 @@ class ModelAdmin(BaseModelAdmin):
     paginator = Paginator
     preserve_filters = True
     inlines = []
+    filter_q_behavior = False
 
     # Custom templates (designed to be over-ridden in subclasses)
     add_form_template = None
@@ -542,6 +544,12 @@ class ModelAdmin(BaseModelAdmin):
             inline_instances.append(inline)
 
         return inline_instances
+
+    def apply_query_objects(self, queryset, qlike_objects):
+        q_base = Q()
+        for item in qlike_objects:
+            q_base &= item
+        return queryset.filter(q_base)
 
     def get_urls(self):
         from django.conf.urls import url
