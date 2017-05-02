@@ -435,22 +435,26 @@ class QuerySet:
 
         return objs
 
-    def get_or_create(self, defaults=None, **kwargs):
+    def get_or_create(self, defaults=None, query=None, **kwargs):
         """
         Look up an object with the given kwargs, creating one if necessary.
         Return a tuple of (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        lookup, params = self._extract_model_params(defaults, **kwargs)
+        lookup, params = self._extract_model_params(defaults, query, **kwargs)
         # The get() needs to be targeted at the write database in order
         # to avoid potential transaction consistency problems.
         self._for_write = True
         try:
-            return self.get(**lookup), False
+            if query is not None:
+                qs = self.filter(query)
+            else:
+                qs = self
+            return qs.get(**lookup), False
         except self.model.DoesNotExist:
-            return self._create_object_from_params(lookup, params)
+            return self._create_object_from_params(query, lookup, params)
 
-    def update_or_create(self, defaults=None, **kwargs):
+    def update_or_create(self, defaults=None, query=None, **kwargs):
         """
         Look up an object with the given kwargs, updating one with defaults
         if it exists, otherwise create a new one.
@@ -458,13 +462,17 @@ class QuerySet:
         specifying whether an object was created.
         """
         defaults = defaults or {}
-        lookup, params = self._extract_model_params(defaults, **kwargs)
+        lookup, params = self._extract_model_params(defaults, query, **kwargs)
         self._for_write = True
         with transaction.atomic(using=self.db):
             try:
-                obj = self.select_for_update().get(**lookup)
+                if query is not None:
+                    qs = self.filter(query)
+                else:
+                    qs = self
+                obj = qs.select_for_update().get(**lookup)
             except self.model.DoesNotExist:
-                obj, created = self._create_object_from_params(lookup, params)
+                obj, created = self._create_object_from_params(query, lookup, params)
                 if created:
                     return obj, created
             for k, v in defaults.items():
@@ -472,7 +480,7 @@ class QuerySet:
             obj.save(using=self.db)
         return obj, False
 
-    def _create_object_from_params(self, lookup, params):
+    def _create_object_from_params(self, query, lookup, params):
         """
         Try to create an object using passed params. Used by get_or_create()
         and update_or_create().
@@ -485,17 +493,27 @@ class QuerySet:
         except IntegrityError:
             exc_info = sys.exc_info()
             try:
-                return self.get(**lookup), False
+                if query is not None:
+                    qs = self.filter(query)
+                else:
+                    qs = self
+                return qs.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
             raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
-    def _extract_model_params(self, defaults, **kwargs):
+    def _extract_model_params(self, defaults, query, **kwargs):
         """
         Prepare `lookup` (kwargs that are valid model attributes), `params`
         (for creating a model instance) based on given kwargs; for use by
         get_or_create() and update_or_create().
         """
+        if query is not None:
+            field_names = set([name for name, value in query.children])
+            for name in field_names:
+                if name not in defaults:
+                    raise ValueError("{} must be specified in `defaults`".format(name))
+
         defaults = defaults or {}
         lookup = kwargs.copy()
         for f in self.model._meta.fields:
