@@ -616,6 +616,16 @@ class RequestsTests(SimpleTestCase):
         request = factory.get('/path/with:colons')
         self.assertEqual(request.get_raw_uri(), 'http://evil.com/path/with:colons')
 
+    def test_set_encoding(self):
+        payload = FakePayload('name=Hello Günter')
+        request = WSGIRequest({'REQUEST_METHOD': 'POST',
+                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+                               'CONTENT_LENGTH': len(payload),
+                               'wsgi.input': payload})
+        self.assertEqual(request.POST, {'name': ['Hello Günter']})
+        request.encoding = 'iso-8859-16'
+        self.assertEqual(request.POST, {'name': ['Hello GĂŒnter']})
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [
