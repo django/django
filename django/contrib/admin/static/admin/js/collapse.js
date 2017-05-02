@@ -6,9 +6,20 @@
         $("fieldset.collapse").each(function(i, elem) {
             // Don't hide if fields in this fieldset have errors
             if ($(elem).find("div.errors").length === 0) {
-                $(elem).addClass("collapsed").find("h2").first().append(' (<a id="fieldsetcollapser' +
-                    i + '" class="collapse-toggle" href="#">' + gettext("Show") +
-                    '</a>)');
+            	if ($(elem).hasClass('no-initial-collapse')) {
+					// If elem has class 'no-initital-collapse', don't collapse it and
+					// set the toggle text to 'Hide'
+					var toggleState = gettext("Hide");
+            	} else {
+            		// Else, collapse it and set the toggle text to show.
+					$(elem).addClass("collapsed");
+					var toggleState = gettext("Show");
+				}
+				// Add a tag for the Show/Hide toggle.
+				$(elem).find("h2").first().append(' (<a id="fieldsetcollapser' +
+						i + '" class="collapse-toggle" href="#">' + toggleState  +
+						'</a>)');
+
             }
         });
         // Add toggle to anchor tag
@@ -24,3 +35,4 @@
         });
     });
 })(django.jQuery);
+
