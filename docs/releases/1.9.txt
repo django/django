@@ -1416,6 +1416,11 @@ remove usage of these features.
 * ``django.db.models.signals.pre_syncdb`` and
   ``django.db.models.signals.post_syncdb`` is removed.
 
+* A number of functions from ``django.db.models`` have been removed. These
+  are: ``load_app``, ``app_cache_ready``, ``get_app``, ``get_apps``,
+  ``get_app_package``, ``get_app_path``, ``get_app_paths``, and
+  ``register_models``.
+
 * Support for ``allow_syncdb`` on database routers is removed.
 
 * Automatic syncing of apps without migrations is removed. Migrations are
