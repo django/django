@@ -56,6 +56,11 @@ class BaseModelValidationTests(ValidationTestCase):
         mtv = ModelToValidate(number=10, name='Some Name', email='valid@email.com')
         self.assertIsNone(mtv.full_clean())
 
+    def test_trailing_dot_on_email_passes(self):
+        #regression test for #12027
+        mtv = ModelToValidate(number=10, name="Some Name", email="should@pass.com.")
+        self.assertEqual(None, mtv.full_clean())
+
     def test_wrong_url_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', url='not a url')
         self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'url', ['Enter a valid URL.'])
