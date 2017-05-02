@@ -1452,6 +1452,20 @@ uniqueness hash will be used. This means you might see table names like
 ``author_books_9cdf4``; this is perfectly normal.  You can manually provide the
 name of the join table using the :attr:`~ManyToManyField.db_table` option.
 
+When you create a ``ManyToManyField`` relation without a ``through`` parameter, there
+is still a ``through`` class and table created to hold the association. The class is::
+
+    <model_that_declares_field>.<ManyToManyField_name>.through
+
+and has three fields:
+* ``id``: the primary key of the relation
+* ``<containing_model>_id``: the ``id`` of the model that declares the
+  ``ManyToManyField``.
+* ``<other_model>_id``: the ``id`` of the model that the ManyToManyField points to.
+
+This class can be used to query associated records for a given model instance
+like a normal Django model.
+
 .. _manytomany-arguments:
 
 Arguments
