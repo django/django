@@ -1059,6 +1059,8 @@ You should make sure that:
   Specifically, you shouldn't import models in the root module of an
   application nor in the module that define its configuration class.
 
+* No app contains a model that inherits from a concrete (abstract = False) model that is defined in another app's models.py file.
+
 Django will enforce these requirements as of version 1.9, after a deprecation
 period.
 
