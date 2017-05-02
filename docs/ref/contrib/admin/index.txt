@@ -1044,7 +1044,7 @@ subclass::
     automatically generate the value for ``SlugField`` fields from one or more
     other fields. The generated value is produced by concatenating the values
     of the source fields, and then by transforming that result into a valid
-    slug (e.g. substituting dashes for spaces).
+    slug (e.g. substituting spaces for dashes).
 
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
