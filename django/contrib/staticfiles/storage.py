@@ -146,7 +146,7 @@ class HashedFilesMixin:
                 urlparts[2] += '?'
             final_url = urlunsplit(urlparts)
 
-        return unquote(final_url)
+        return final_url
 
     def url(self, name, force=False):
         """
