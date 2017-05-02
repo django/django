@@ -115,6 +115,8 @@ class Field:
 
         super().__init__()
 
+        super(Field, self).__init__()
+
     def prepare_value(self, value):
         return value
 
