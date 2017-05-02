@@ -5564,6 +5564,11 @@ class AdminViewLogoutTests(TestCase):
         self.assertEqual(response.request['PATH_INFO'], reverse('admin:login'))
         self.assertContains(response, '<input type="hidden" name="next" value="%s" />' % reverse('admin:index'))
 
+    def test_hide_user_tools_when_logged_out(self):
+        response = self.client.get(reverse('admin:logout'))
+        self.assertEqual(response.request['PATH_INFO'], reverse('admin:logout'))
+        self.assertNotContains(response, '<div id="user-tools">')
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class AdminUserMessageTest(TestCase):
