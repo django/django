@@ -2680,7 +2680,7 @@ year and month are displayed.
 For example, when a Django admin change-list page is being filtered by a date
 drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
-"January 2006," whereas another locale might say "2006/January."
+"January 2006", whereas another locale might say "2006/January".
 
 Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
 locale-dictated format has higher precedence and will be applied.
