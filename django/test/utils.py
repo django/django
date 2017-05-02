@@ -520,7 +520,7 @@ def compare_xml(want, got):
     _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
 
     def norm_whitespace(v):
-        return _norm_whitespace_re.sub(' ', v)
+        return _norm_whitespace_re.sub(' ', v).strip()
 
     def child_text(element):
         return ''.join(c.data for c in element.childNodes
