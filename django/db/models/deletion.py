@@ -241,20 +241,21 @@ class Collector:
 
     def sort(self):
         sorted_models = []
-        concrete_models = set()
         models = list(self.data)
         while len(sorted_models) < len(models):
-            found = False
+            to_add_models = []
             for model in models:
-                if model in sorted_models:
-                    continue
-                dependencies = self.dependencies.get(model._meta.concrete_model)
-                if not (dependencies and dependencies.difference(concrete_models)):
-                    sorted_models.append(model)
-                    concrete_models.add(model._meta.concrete_model)
-                    found = True
-            if not found:
+                if not (model in sorted_models or self.dependencies.get(model._meta.concrete_model)):
+                    to_add_models.append(model)
+            if not to_add_models:
                 return
+            to_add_models.sort(key=lambda x: x._meta.db_table)
+            sorted_models.extend(to_add_models)
+            for m in to_add_models:
+                concrete_model = m._meta.concrete_model
+                for value in self.dependencies.values():
+                    if concrete_model in value:
+                        value.remove(concrete_model)
         self.data = OrderedDict((model, self.data[model])
                                 for model in sorted_models)
 
