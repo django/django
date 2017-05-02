@@ -175,6 +175,7 @@ function findPosY(obj) {
             X: this.toLocaleTimeString(),
             y: ('' + this.getFullYear()).substr(2, 4),
             Y: '' + this.getFullYear(),
+            B: this.getFullMonthName(),
             '%': '%'
         };
         var result = '', i = 0;
