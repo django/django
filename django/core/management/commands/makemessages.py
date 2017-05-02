@@ -609,6 +609,11 @@ class Command(BaseCommand):
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
+                    self.stdout.write(errors) # bug exception bellow not shows errors
+                    import shutil
+                    pofile_debug = '%s.debug' % pofile
+                    shutil.copyfile(pofile, pofile_debug)
+                    self.stdout.write("See invalid input for msgmerge %s." % pofile_debug)
                     raise CommandError(
                         "errors happened while running msgmerge\n%s" % errors)
                 elif self.verbosity > 0:
