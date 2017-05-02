@@ -644,7 +644,7 @@ msgid "File"
 msgstr "Plik"
 
 msgid "Image"
-msgstr "Plik graficzny"
+msgstr "Obraz"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -727,7 +727,7 @@ msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Wgraj poprawny plik graficzny. Ten, który został wgrany, nie jest obrazem, "
+"Wgraj poprawny obraz. Ten, który został wgrany, nim nie jest, "
 "albo jest uszkodzony."
 
 #, python-format
