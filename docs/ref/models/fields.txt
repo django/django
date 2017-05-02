@@ -960,6 +960,9 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
 
+The default form widget for this field is a
+:class:`~django.forms.ClearableFileInput`.
+
 ``IntegerField``
 ----------------
 
