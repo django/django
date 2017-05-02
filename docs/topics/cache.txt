@@ -564,6 +564,8 @@ Cache keys also include the active :term:`language <language code>` when
 
 __ `Controlling cache: Using other headers`_
 
+.. _per-view-cache:
+
 The per-view cache
 ==================
 

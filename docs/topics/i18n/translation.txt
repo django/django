@@ -1026,6 +1026,66 @@ If you use more than one ``JavaScriptCatalog`` view on a site and some of them
 define the same strings, the strings in the catalog that was loaded last take
 precedence.
 
+Note on performance
+-------------------
+
+When using ``django.views.i18n.javascript_catalog`` be aware that this view
+will generate the catalog on every request. This can lead to significant CPU loads.
+You can avoid this by caching the output of the view server-side.
+Also, you can consider to save on bandwidth by implementing client-side caching.
+
+You can achieve this by defining a function which you can cache by wrapping it using
+decorators provided by django.
+
+.. code-block:: python
+
+    from django.views.i18n import javascript_catalog
+
+    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+        return javascript_catalog(request, domain, packages)
+
+* Server-side caching using the :ref:`@cache_page<per-view-cache>` decorator:
+
+.. code-block:: python
+
+    from django.views.decorators.cache import cache_page
+
+    # The get_version() function needs to be implemented to return a different
+    # value when you change translations.
+    key_prefix = 'js18n-%s' % get_version()
+    @cache_page(86400, key_prefix=key_prefix)
+        ...
+
+* Client-side caching by adding the If-Modified-Since header using the :doc:`@last_modified</topics/conditional-view-processing>` decorator:
+
+.. code-block:: python
+
+    from django.views.decorators.http import last_modified
+
+    last_modified_date = timezone.now()
+    @last_modified(lambda req, **kw: last_modified_date)
+        ...
+
+* Client-side caching by adding the Etag header using the :doc:`@etag</topics/conditional-view-processing>` decorator:
+
+.. code-block:: python
+
+    from django.views.decorators.http import etag
+
+    etag_value = 'js18n-%s' % get_version()
+    @etag(lambda req, **kw: etag_value)
+        ...
+
+You can combine the decorators but chaining the client-side decorators is not a good idea, as
+explained in the :ref:`conditional decorators<conditional-decorators-testing-both-conditions>` section.
+
+.. admonition:: Pre-generating the catalog files
+
+    Another strategy is generating the javascript catalog whenever you change translations.
+    These pre-generated files can then be served as part of your static files and thus these requests
+    will never hit your application. Be aware that these files are language specific so you will have
+    to generate them for all required languages. External projects exist which help you do this task.
+
 Using the JavaScript translation catalog
 ----------------------------------------
 
