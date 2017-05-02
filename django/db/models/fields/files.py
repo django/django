@@ -225,6 +225,8 @@ class FileField(Field):
         self._primary_key_set_explicitly = 'primary_key' in kwargs
 
         self.storage = storage or default_storage
+        if callable(self.storage):
+            self.storage = self.storage()
         self.upload_to = upload_to
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
