@@ -253,6 +253,22 @@ argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
 :doc:`writing validators </ref/validators>` to see a list of what is already
 available and for an example of how to write a validator.
 
+The default validator for ``EmailField`` will reject "user1@devlab" as "devlab"
+is not a valid domain name. In order to change this behaviour and support custom
+email domain, you will need to subclass :class:`~django.forms.EmailField` and
+set ``whitelist`` attribute with your custom domain on ``EmailValidator``::
+
+    from django.forms import EmailField
+    from django.core.validators import EmailValidator
+
+    class CustomEmailField(EmailField):
+        default_validators = [EmailValidator(whitelist=['devlab'])]
+
+The new custom field ``CustomEmailField`` will now validate "user1@devlab"::
+
+    CustomEmailField().clean('user1@devlab')
+
+
 Form field default cleaning
 ---------------------------
 
