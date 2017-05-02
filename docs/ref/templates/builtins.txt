@@ -1648,10 +1648,14 @@ templates to generate JavaScript/JSON.
 
 For example::
 
-    {{ value|escapejs }}
+    "{{ value|escapejs }}"
 
 If ``value`` is ``"testing\r\njavascript \'string" <b>escaping</b>"``,
 the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
+
+.. note::
+
+    You must use double quotes or else the slashes in the escaped value will be literally interpreted.
 
 .. templatefilter:: filesizeformat
 
