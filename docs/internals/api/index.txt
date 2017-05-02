@@ -1,0 +1,13 @@
+============
+Django's API
+============
+
+This section of Django's documentation describes Django's internals from a
+algorithmic level opposed to other areas of the documentation. It should not be
+seen as what a function signature looks like, rather than how certain larger
+parts work.
+
+.. toctree::
+   :maxdepth: 1
+
+   migrations
