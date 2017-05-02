@@ -162,7 +162,7 @@ will be returned::
 ``get_object_or_404()``
 =======================
 
-.. function:: get_object_or_404(klass, *args, **kwargs)
+.. function:: get_object_or_404(class, *args, **kwargs)
 
    Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
    but it raises :class:`~django.http.Http404` instead of the model's
@@ -171,7 +171,7 @@ will be returned::
 Required arguments
 ------------------
 
-``klass``
+``class``
     A :class:`~django.db.models.Model` class,
     a :class:`~django.db.models.Manager`,
     or a :class:`~django.db.models.query.QuerySet` instance from which to get
@@ -235,7 +235,7 @@ will be raised if more than one object is found.
 ``get_list_or_404()``
 =====================
 
-.. function:: get_list_or_404(klass, *args, **kwargs)
+.. function:: get_list_or_404(class, *args, **kwargs)
 
    Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on a
    given model manager cast to a list, raising :class:`~django.http.Http404` if
@@ -244,7 +244,7 @@ will be raised if more than one object is found.
 Required arguments
 ------------------
 
-``klass``
+``class``
     A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
     :class:`~django.db.models.query.QuerySet` instance from which to get the
     list.
