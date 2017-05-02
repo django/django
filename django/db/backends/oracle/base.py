@@ -550,7 +550,7 @@ def _rowfactory(row, cursor):
                     # NUMBER column: decimal-precision floating point
                     # This will normally be an integer from a sequence,
                     # but it could be a decimal value.
-                    if '.' in value:
+                    if '.' in str(value):
                         value = decimal.Decimal(value)
                     else:
                         value = int(value)
@@ -565,7 +565,7 @@ def _rowfactory(row, cursor):
                     value = int(value)
                 else:
                     value = decimal.Decimal(value)
-            elif '.' in value:
+            elif '.' in str(value):
                 # No type information. This normally comes from a
                 # mathematical expression in the SELECT list. Guess int
                 # or Decimal based on whether it has a decimal point.
