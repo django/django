@@ -303,6 +303,14 @@ Methods
         to redirect users to HTTPS, it's best to let your Web server redirect
         all HTTP traffic to HTTPS.
 
+    .. note::
+
+        Mixing HTTP and HTTPS on the same site is discouraged, therefore
+        :meth:`~HttpRequest.build_absolute_uri()` will always generate an
+        absolute URI with the same scheme the current request has. If you need
+        to redirect users to HTTPS, it's best to let your webserver redirect
+        all HTTP traffic to HTTPS.
+
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
     Returns a cookie value for a signed cookie, or raises a
