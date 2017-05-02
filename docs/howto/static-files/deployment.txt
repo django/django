@@ -114,7 +114,7 @@ Here's how this might look in a fabfile::
 Serving static files from a cloud service or CDN
 ------------------------------------------------
 
-Another common tactic is to serve static files from a cloud storage provider
+Another common stactic is to serve static files from a cloud storage provider
 like Amazon's S3 and/or a CDN (content delivery network). This lets you
 ignore the problems of serving static files and can often make for
 faster-loading Web pages (especially when using a CDN).
