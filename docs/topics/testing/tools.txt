@@ -1716,7 +1716,9 @@ redirected into a ``StringIO`` instance::
         def test_command_output(self):
             out = StringIO()
             call_command('closepoll', stdout=out)
-            self.assertIn('Expected output', out.getvalue())
+            command_output = out.getvalue()
+            out.close()
+            self.assertIn('Expected output', command_output)
 
 .. _skipping-tests:
 
