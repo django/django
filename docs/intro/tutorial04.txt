@@ -282,7 +282,7 @@ views and use Django's generic views instead. To do so, open the
     class DetailView(generic.DetailView):
         model = Question
         template_name = 'polls/detail.html'
-
+        context_object_name = 'question'
 
     class ResultsView(generic.DetailView):
         model = Question
