@@ -181,7 +181,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
         self.assertFalse(hasattr(kwargs['to'], "setting_name"))
         # Test swap detection for swappable model
         field = models.ForeignKey("auth.User", models.CASCADE)

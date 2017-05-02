@@ -791,7 +791,7 @@ class MigrationAutodetector:
                     if field.remote_field and field.remote_field.model and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
                         if old_rel_to in self.renamed_models_rel:
-                            old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to]
+                            old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to].lower()
                     if old_field_dec == field_dec:
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
                             self.add_operation(

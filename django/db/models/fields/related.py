@@ -567,7 +567,7 @@ class ForeignObject(RelatedField):
         else:
             kwargs['to'] = "%s.%s" % (
                 self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
+                self.remote_field.model._meta.object_name.lower(),
             )
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
