@@ -1061,6 +1061,10 @@ As a security measure, Django will *not* include settings that might be
 sensitive, such as :setting:`SECRET_KEY`. Specifically, it will exclude any
 setting whose name includes any of the following:
 
+For debugging purposes, you can fill in :setting:`INTERNAL_IPS`, it is possible
+to control which IP addresses that will trigger debugging information to be
+printed with :setting:`DEBUG` turned on.
+
 * ``'API'``
 * ``'KEY'``
 * ``'PASS'``
