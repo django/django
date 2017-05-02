@@ -48,6 +48,10 @@
           {% endspaceless %}
         </td>
         {% for fieldset in inline_admin_form %}
+          {% if fieldset.description and forloop.parentloop.first %}
+            <div class="description">{{ fieldset.description|safe }}</div>
+            <br/>
+          {% endif %}
           {% for line in fieldset %}
             {% for field in line %}
               {% if not field.field.is_hidden %}

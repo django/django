@@ -65,10 +65,12 @@ class ArticleInline(admin.TabularInline):
     fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
+            'description': 'These are some fields for Article',
             'fields': ('title', 'content')
         }),
         ('Some other fields', {
             'classes': ('wide',),
+            'description': 'These are some other fields for Article',
             'fields': ('date', 'section')
         })
     )

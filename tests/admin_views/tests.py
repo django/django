@@ -4217,6 +4217,14 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Category.objects.get(id=3).order, 1)
         self.assertEqual(Category.objects.get(id=4).order, 0)
 
+    def test_inline_fieldset(self):
+        """Check inline is rendered correctly when specifying a fieldset."""
+        response = self.client.get('/test_admin/admin/admin_views/section/add/')
+        self.assertContains(response,
+            '<div class="description">These are some fields for Article</div>')
+        self.assertContains(response,
+            '<div class="description">These are some other fields for Article</div>')
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class NeverCacheTests(TestCase):
