@@ -151,6 +151,7 @@ class FieldFlagsTests(test.SimpleTestCase):
         ]
         # Test classes are what we expect
         self.assertEqual(MANY_TO_MANY_CLASSES, {f.__class__ for f in m2m_type_fields})
+        self.assertTrue(len(m2m_type_fields) > 0)
 
         # Ensure all m2m reverses are m2m
         for field in m2m_type_fields:
