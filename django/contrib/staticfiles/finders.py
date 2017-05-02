@@ -28,6 +28,9 @@ class BaseFinder:
             'configured correctly.'
         )
 
+    def __init__(self, *args, **kwargs):
+        super(BaseFinder, self).__init__()
+
     def find(self, path, all=False):
         """
         Given a relative file path, find an absolute file path.
