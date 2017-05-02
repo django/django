@@ -59,6 +59,18 @@ code, then run the following command:
 This will create a ``mysite`` directory in your current directory. If it didn't
 work, see :ref:`troubleshooting-django-admin`.
 
+.. admonition:: Running virtualenv on Windows
+
+   If you used virtualenv_ to :ref:`install Django <installing-official-release>`
+   on Windows, you may get an ImportError when you try to run
+   ``django-admin.py startproject``. This is because Windows does not run the
+   Python interpreter from your virtual environment unless you invoke it
+   directly. Instead, prefix all commands that use .py files with ``python`` and
+   use the full path to the file, like so:
+   ``python C:\pythonXY\Scripts\django-admin.py startproject mysite``.
+
+.. _virtualenv: http://www.virtualenv.org/
+
 .. note::
 
     You'll need to avoid naming projects after built-in Python or Django
