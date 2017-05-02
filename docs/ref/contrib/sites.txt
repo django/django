@@ -275,7 +275,21 @@ To enable the sites framework, follow these steps:
 default site named ``example.com`` with the domain ``example.com``. This site
 will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use a :ref:`data migration
-<data-migrations>`.
+<data-migrations>`.  Below is an example migration for foo.com::
+
+    from django.db import migrations
+    from django.contrib.sites.models import Site
+    
+    def changeHostname(apps, schemd_editor):
+        mySite          = Site.objects.get_current()
+        mySite.name     = 'Foo Site'
+        mySite.domain   = 'foo.com'
+        mySite.save()
+
+    class Migration(migrations.Migration):
+        dependencies    = [ ('myCoolApp', 'prevMigration') ]
+        operations      = [ migrations.RunPython(changeHostname) ]
+
 
 In order to serve different sites in production, you'd create a separate
 settings file with each ``SITE_ID`` (perhaps importing from a common settings
