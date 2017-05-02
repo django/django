@@ -592,7 +592,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         if len(encoded) == 37 and encoded.startswith('md5$$'):
             encoded = encoded[5:]
         encoded_2 = self.encode(password, '')
-        return constant_time_compare(encoded, encoded_2)
+        return constant_time_compare(encoded[5:], encoded_2)
 
     def safe_summary(self, encoded):
         return OrderedDict([
