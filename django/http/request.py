@@ -506,6 +506,14 @@ class QueryDict(MultiValueDict):
                           for v in list_)
         return '&'.join(output)
 
+    def get(self, key, default=None):
+        data = self.getlist(key, default)
+        if not isinstance(data, list):
+            return data
+        num = len(data)
+        if num == 0:
+            return
+        return data if num > 1 else data[0]
 
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.force_text for parsing URLs and form inputs. Thus,

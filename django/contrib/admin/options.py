@@ -1252,7 +1252,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Use the action whose button was pushed
         try:
-            data.update({'action': data.getlist('action')[action_index]})
+            data['action'] = data.getlist('action')[action_index]
         except IndexError:
             # If we didn't get an action from the chosen form that's invalid
             # POST data, so by deleting action it'll fail the validation check
