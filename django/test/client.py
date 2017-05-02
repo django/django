@@ -678,9 +678,9 @@ class Client(RequestFactory):
             response = self.get(path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
-            if redirect_chain[-1] in redirect_chain[:-1]:
+            if redirect_chain[:-1].count(redirect_chain[-1]) > 2:
                 # Check that we're not redirecting to somewhere we've already
-                # been to, to prevent loops.
+                # been to more than twice, to prevent loops.
                 raise RedirectCycleError("Redirect loop detected.", last_response=response)
             if len(redirect_chain) > 20:
                 # Such a lengthy chain likely also means a loop, but one with
