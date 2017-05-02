@@ -87,6 +87,32 @@ class SimpleArrayField(forms.CharField):
         if errors:
             raise ValidationError(errors)
 
+    def clean(self, value):
+        super(SimpleArrayField, self).clean(value)
+        if value:
+            items = value.split(self.delimiter)
+        else:
+            items = []
+        cleaned_data = []
+        errors = []
+        for index, item in enumerate(items):
+            try:
+                cleaned_data.append(self.base_field.clean(item))
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': index},
+                ))
+                cleaned_data.append(None)
+            else:
+                errors.append(None)
+        errors = list(filter(None, errors))
+        if errors:
+            raise ValidationError(list(chain.from_iterable(errors)))
+        return cleaned_data
+
 
 class SplitArrayWidget(forms.Widget):
     template_name = 'postgres/widgets/split_array.html'

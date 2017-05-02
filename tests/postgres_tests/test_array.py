@@ -601,6 +601,11 @@ class TestSimpleFormField(PostgreSQLTestCase):
         value = field.clean('a,b,c')
         self.assertEqual(value, ['a', 'b', 'c'])
 
+    def test_valid_typed_choice_field(self):
+        field = SimpleArrayField(forms.TypedChoiceField(choices=((1, 'a'), (2, 'b')), coerce=int))
+        value = field.clean('1,2')
+        self.assertEqual(value, [1, 2])
+
     def test_to_python_fail(self):
         field = SimpleArrayField(forms.IntegerField())
         with self.assertRaises(exceptions.ValidationError) as cm:
