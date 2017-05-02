@@ -9,6 +9,7 @@ from datetime import timedelta
 from http import cookies
 
 from django.conf import settings
+from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.backends.base import UpdateError
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import \
@@ -783,8 +784,6 @@ class SessionMiddlewareTests(TestCase):
 
         # A cookie should not be set.
         self.assertEqual(response.cookies, {})
-        # The session is accessed so "Vary: Cookie" should be set.
-        self.assertEqual(response['Vary'], 'Cookie')
 
     def test_empty_session_saved(self):
         """
@@ -824,6 +823,27 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies)
         )
         self.assertEqual(response['Vary'], 'Cookie')
+
+    def test_calling_is_authenticated_gives_no_vary_header(self):
+        """
+        No vary header should be returned for an anonymous user with no
+        session
+        """
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        session_middleware = SessionMiddleware()
+        authentication_middleware = AuthenticationMiddleware()
+
+        # Simulate a request that passes to auth middleware to add a user
+        session_middleware.process_request(request)
+        authentication_middleware.process_request(request)
+
+        # Calling to see if the user is authenticated
+        request.user.is_authenticated
+
+        # Handle the response through the middleware
+        response = session_middleware.process_response(request, response)
+        self.assertNotIn("Vary", response)
 
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class

@@ -41,7 +41,9 @@ class SessionMiddleware(MiddlewareMixin):
                     domain=settings.SESSION_COOKIE_DOMAIN,
                 )
             else:
-                if accessed:
+                # Only set Vary: Cookie if the is there is a non-empty session.
+                # If it is empty then there is no reason to set header
+                if accessed and not empty:
                     patch_vary_headers(response, ('Cookie',))
                 if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
                     if request.session.get_expire_at_browser_close():
