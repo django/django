@@ -134,6 +134,9 @@ class Origin:
             self.loader == other.loader
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def loader_name(self):
         if self.loader:
