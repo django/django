@@ -18,6 +18,8 @@ class Command(BaseCommand):
         "(using each model's default manager unless --all is specified)."
     )
 
+    requires_system_checks = False
+    
     def add_arguments(self, parser):
         parser.add_argument(
             'args', metavar='app_label[.ModelName]', nargs='*',
