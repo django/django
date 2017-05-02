@@ -150,6 +150,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '{"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]'
         )
 
+        # Specify a dump that specifies Article both explicitly and implicitly,
+        # but lists the app first (#22025).
+        self._dumpdata_assert(['fixtures', 'fixtures.Article'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]')
+
         # Same again, but specify in the reverse order
         self._dumpdata_assert(
             ['fixtures'],
