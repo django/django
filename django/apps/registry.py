@@ -150,6 +150,7 @@ class Apps:
             for app_config in self.get_app_configs():
                 if app_config.name == app_label:
                     message += " Did you mean '%s'?" % app_config.label
+                    message += " Perhaps a missing dependency on a migration?"
                     break
             raise LookupError(message)
 
