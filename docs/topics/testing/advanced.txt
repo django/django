@@ -377,6 +377,15 @@ running your tests, you can define test-only models in its ``models.py``
 file.
 
 
+.. warning::
+
+    While not specific to testing, Django must be initialized when used
+    outside of ``manage.py``
+
+        >>> import django
+        >>> django.setup()
+
+
 .. _other-testing-frameworks:
 
 Using different testing frameworks
