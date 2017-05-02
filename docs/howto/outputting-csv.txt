@@ -92,6 +92,55 @@ the assembly and transmission of a large CSV file::
         response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
         return response
 
+This example is useful for large volumes of data from a database. A generator
+function streams rows returned from a cursor as they arrive from the database,
+adding column names for the first row::
+
+    import csv
+    import datetime
+
+    from django.db import connection
+    from django.http import StreamingHttpResponse
+
+    class Echo(object):
+        """An object that implements just the write method of the file-like
+        interface for csv.writer.
+        """
+        def write(self, value):
+            """Write the value by returning it, instead of storing in a buffer."""
+            return value
+
+    def export_csv(request):
+        """Export raw sql as a csv with column headers"""
+        def stream():
+            """Generator function to yield cursor rows with a header."""
+            pseudo_buffer = Echo()
+            writer = csv.writer(pseudo_buffer)
+            columns = True
+            for row in cursor.fetchall():
+                data = ''
+                if columns:
+                    # Write the columns if this is the first row
+                    columns = [col[0] for col in cursor.description]
+                    data = writer.writerow(columns)
+                    columns = False
+                data = data + writer.writerow(row)
+                yield data
+
+        # Create a unique file name for the download
+        dt = datetime.datetime.now()
+        cd = 'attachment; filename="myfile-{}.csv"'.format(dt.strftime('%Y-%m-%d-%H%M%S'))
+
+        # Execute raw SQL
+        sql = "SELECT * FROM myapp_foo WHERE bar = %s"
+        cursor = connection.cursor()
+        cursor.execute(sql, ['baz'])
+
+        response = StreamingHttpResponse(stream(), content_type="text/csv")
+        response['Content-Disposition'] = cd
+
+        return response
+
 Using the template system
 =========================
 
