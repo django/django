@@ -31,7 +31,7 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Afrikaans"
-msgstr "Африканська"
+msgstr "Африкаанс"
 
 msgid "Arabic"
 msgstr "Арабська"
