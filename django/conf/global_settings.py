@@ -546,6 +546,9 @@ CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 CSRF_TRUSTED_ORIGINS = []
 CSRF_USE_SESSIONS = False
 
+# Settings for CSRF header.
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
 ############
 # MESSAGES #
 ############
