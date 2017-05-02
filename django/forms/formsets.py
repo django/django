@@ -362,13 +362,14 @@ class BaseFormSet:
 
     def add_fields(self, form, index):
         """A hook for adding extra fields on to each form instance."""
+        initial_form_count = self.initial_form_count()
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
-            if index is not None and index < self.initial_form_count():
+            if index is not None and index < initial_form_count:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index + 1, required=False)
             else:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
-        if self.can_delete:
+        if self.can_delete and (self.can_delete_extra or index < initial_form_count):
             form.fields[DELETION_FIELD_NAME] = BooleanField(label=_('Delete'), required=False)
 
     def add_prefix(self, index):
@@ -414,7 +415,7 @@ class BaseFormSet:
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None, validate_max=False,
-                    min_num=None, validate_min=False):
+                    min_num=None, validate_min=False, can_delete_extra=True):
     """Return a FormSet for the given form class."""
     if min_num is None:
         min_num = DEFAULT_MIN_NUM
@@ -426,6 +427,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     absolute_max = max_num + DEFAULT_MAX_NUM
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
+             'can_delete_extra': can_delete_extra,
              'min_num': min_num, 'max_num': max_num,
              'absolute_max': absolute_max, 'validate_min': validate_min,
              'validate_max': validate_max}

@@ -599,6 +599,66 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertTrue(p.is_valid())
         self.assertEqual(len(p.deleted_forms), 1)
 
+    def test_delete_fields_are_not_added_for_extra_formset_forms(self):
+
+        """
+        When a formset is built with can_delete=True and extra>=1, the extra
+        forms should not be seen to hold DELETE fields.
+        """
+
+        class GenericForm(Form):
+            foo = CharField()
+
+        GenericFormFormset = formset_factory(
+            form=GenericForm,
+            can_delete=True,
+            can_delete_extra=False,
+            extra=2)
+
+        # Instantiate formset and check DELETE fields do not exist
+
+        formset = GenericFormFormset()
+
+        self.assertEqual(len(formset), 2)
+
+        self.assertNotIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)
+
+        # Instantiate formset with initial data, check DELETE's do not exist
+
+        formset = GenericFormFormset(initial=[{'foo': 'bar'}])
+
+        self.assertEqual(len(formset), 3)
+
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)
+        self.assertNotIn('DELETE', formset.forms[2].fields)
+
+        # Ensure validation behaviour of formsets works correctly
+
+        formset = GenericFormFormset(data={
+            'form-0-foo': 'bar',
+            'form-0-DELETE': 'on',
+            'form-1-foo': 'baz',
+            'form-2-foo': '',
+            'form-TOTAL_FORMS': '3',
+            'form-INITIAL_FORMS': '1',
+        }, initial=[{'foo': 'bar'}])
+
+        # Check correct cleaned data from the formset
+
+        self.assertEqual(formset.cleaned_data, [
+            {'foo': u'bar', u'DELETE': True},
+            {'foo': u'baz'},
+            {},
+        ])
+
+        # Ensure deletion flag is correctly detected by formset method
+
+        self.assertTrue(formset._should_delete_form(formset.forms[0]))
+        self.assertFalse(formset._should_delete_form(formset.forms[1]))
+        self.assertFalse(formset._should_delete_form(formset.forms[2]))
+
     def test_formsets_with_ordering(self):
         # FormSets with ordering ######################################################
         # We can also add ordering ability to a FormSet with an argument to

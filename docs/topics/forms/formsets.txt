@@ -384,9 +384,9 @@ deletion, is greater than or equal to ``min_num``.
 Dealing with ordering and deletion of forms
 ===========================================
 
-The :func:`~django.forms.formsets.formset_factory` provides two optional
-parameters ``can_order`` and ``can_delete`` to help with ordering of forms in
-formsets and deletion of forms from a formset.
+The :func:`~django.forms.formsets.formset_factory` provides three optional
+parameters ``can_order``, ``can_delete`` and ``can_delete_extra`` to help with
+ordering of forms in formsets and deletion of forms from a formset.
 
 ``can_order``
 -------------
@@ -519,6 +519,16 @@ them::
 On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
+
+``can_delete_extra``
+~~~~~~~~~~~~~~~~~~~~
+
+.. attribute:: BaseFormSet.can_delete_extra
+
+Default: ``True``
+
+While setting ``can_delete=True``, specifying ``can_delete_extra=False`` will
+remove the option to delete extra forms.
 
 Adding additional fields to a formset
 =====================================
