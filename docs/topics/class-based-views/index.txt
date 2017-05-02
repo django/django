@@ -18,6 +18,66 @@ reusable views which suits your use case. For full details, see the
    generic-display
    generic-editing
    mixins
+   usage-patterns
+
+Why class-based views?
+======================
+
+At their core, class-based views are intended to solve the same problem as
+function-based views: process requests and return responses. What makes class
+views different from function views is the approach they provide to solving
+that problem.
+
+That approach, as you could guess by the name, is modularity and extensibility
+via Python classes. The cost is potentially lost clarity around a view's flow
+of control. However, there are situations where for a sufficiently complex view
+the flow of control can be unclear and the implied flow-control offered by
+a well documented base-class becomes appropriate. These are differences 
+demonstrated with
+:doc:`usage patterns</topics/class-based-views/usage-patterns>`.
+
+Why so many methods with this approach?
+=======================================
+
+You might notice with class-based views that once you break from a convention
+prescribed by a base-class, there are a lot of potential hook methods you could
+extend to achieve your goal. In short, this is because the approach with many
+of the provided base-classes and mixins is to define workflow using the classic
+`template method <http://en.wikipedia.org/wiki/Template_method_pattern>`_
+design pattern. The benefit here is that there are some straightforward
+high-level methods that do easy-to-understand things, like
+:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`.
+Then there are specialized methods that let you hook into that "template method"
+such as
+:meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
+(which is a more commonly extended method).
+
+When should I use class-based views?
+====================================
+
+The :doc:`usage patterns</topics/class-based-views/usage-patterns>` should help
+you draw a useful comparison, but here are some questions that may help guide
+you:
+
+#. Is your view supported by a generic view?
+#. Do you have a function-based view that is greater than 20-30 lines of code?
+#. Do you have a generic view that needs to be extended or configured?
+#. Is it hard to test specific logic within your view function?
+#. Have decorators increased the minimum overhead required to test your view
+   function.
+
+So, when should you choose class-based views? Whenever the complexity of your
+view warrants modularity or re-usability similar to the generic views
+(:doc:`display</topics/class-based-views/generic-display>` and
+:doc:`editing</topics/class-based-views/generic-editing>`) or these
+:doc:`usage patterns</topics/class-based-views/usage-patterns>`. If you're
+having trouble determining what's right, please peruse those pages to see if
+your case looks similar and inform your decision.
+
+Finally, while the class-based generic views do provide good examples and
+anc comparisons for designing views, they are not required to be the basis of
+your views.
+
 
 Basic examples
 ==============
