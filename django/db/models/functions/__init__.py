@@ -4,7 +4,7 @@ from .base import (
 )
 from .datetime import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
-    ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear, Trunc, TruncDate,
+    ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractWeekDayIndex, ExtractYear, Trunc, TruncDate,
     TruncDay, TruncHour, TruncMinute, TruncMonth, TruncSecond, TruncTime,
     TruncYear,
 )
@@ -15,7 +15,7 @@ __all__ = [
     'Lower', 'Now', 'StrIndex', 'Substr', 'Upper',
     # datetime
     'Extract', 'ExtractDay', 'ExtractHour', 'ExtractMinute', 'ExtractMonth',
-    'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay', 'ExtractYear',
+    'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay', 'ExtractWeekDayIndex', 'ExtractYear',
     'Trunc', 'TruncDate', 'TruncDay', 'TruncHour', 'TruncMinute', 'TruncMonth',
     'TruncSecond', 'TruncTime', 'TruncYear',
 ]
