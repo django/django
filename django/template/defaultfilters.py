@@ -200,6 +200,17 @@ def make_list(value):
     return list(value)
 
 
+@register.filter(is_safe=False)
+@stringfilter
+def get_range(value):
+    """
+    Returns a list the length of the value
+
+    Will cast a string to an int
+    """
+    return list(range(int(value)))
+
+
 @register.filter(is_safe=True)
 @stringfilter
 def slugify(value):
