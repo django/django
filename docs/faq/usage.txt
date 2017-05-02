@@ -67,3 +67,8 @@ add a common dictionary to the template context.
 
 The correct solution is to use a ``RequestContext``. Details on how to do this
 are here: :ref:`subclassing-context-requestcontext`.
+
+How can I get the version number of my Django app at runtime?
+-------------------------------------------------------------
+
+http://stackoverflow.com/questions/14590292/version-number-in-django-applications asks a great set of questions but there do not seem to be great answers.  The Django community should receive clear guidance on which source file in a Django project should have a `version = 1.2.3` statement to have consistancy of access to application version numbers in Django.  Should the variable be `version`, `__version__`, `VERSION`, or `__VERSION__`?
