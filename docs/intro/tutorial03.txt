@@ -431,6 +431,7 @@ file, go ahead and add an ``app_name`` to set the application namespace:
     :filename: polls/urls.py
 
     from django.conf.urls import url
+    from . import views
 
     from . import views
 
