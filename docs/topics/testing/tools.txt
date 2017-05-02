@@ -1262,6 +1262,10 @@ The decorator can also be applied to test case classes::
     :func:`~django.test.modify_settings` with these settings is probably not
     going to do what you expect it to do.
 
+    In test cases you should avoid aliasing your settings as module-level
+    constants as override_settings() won't work on such values since they are
+    only evaluated the first time the module is imported.
+
     We do not recommend altering the :setting:`DATABASES` setting. Altering
     the :setting:`CACHES` setting is possible, but a bit tricky if you are
     using internals that make using of caching, like
