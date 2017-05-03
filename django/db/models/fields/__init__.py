@@ -95,11 +95,8 @@ class Field(RegisterLookupMixin):
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
 
-    # These track each time a Field instance is created. Used to retain order.
-    # The auto_creation_counter is used for fields that Django implicitly
-    # creates, creation_counter is used for all user-specified fields.
+    # Tracks each time a user-specified Field instance is created. Used to retain order.
     creation_counter = 0
-    auto_creation_counter = -1
     default_validators = []  # Default set of validators
     default_error_messages = {
         'invalid_choice': _('Value %(value)r is not a valid choice.'),
@@ -162,10 +159,7 @@ class Field(RegisterLookupMixin):
         self.auto_created = auto_created
 
         # Adjust the appropriate creation counter, and save our local copy.
-        if auto_created:
-            self.creation_counter = Field.auto_creation_counter
-            Field.auto_creation_counter -= 1
-        else:
+        if not auto_created:
             self.creation_counter = Field.creation_counter
             Field.creation_counter += 1
 
