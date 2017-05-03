@@ -1508,6 +1508,10 @@ class DecimalField(Field):
             validators.DecimalValidator(self.max_digits, self.decimal_places)
         ]
 
+    @cached_property
+    def context(self):
+        return decimal.Context(prec=self.max_digits)
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         if self.max_digits is not None:
@@ -1522,6 +1526,8 @@ class DecimalField(Field):
     def to_python(self, value):
         if value is None:
             return value
+        if isinstance(value, float):
+            return self.context.create_decimal_from_float(value)
         try:
             return decimal.Decimal(value)
         except decimal.InvalidOperation:
