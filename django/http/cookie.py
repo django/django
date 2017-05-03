@@ -4,7 +4,24 @@ from http import cookies
 # Cookie pickling bug is fixed in Python 3.4.3+
 # http://bugs.python.org/issue22775
 if sys.version_info >= (3, 4, 3):
-    SimpleCookie = cookies.SimpleCookie
+    if sys.version < (3, 7, 0):
+        # Monkey patching the Morsel object
+        # to support SameSite attribute
+        # added in 3.7 https://github.com/python/cpython/pull/214
+        class Morsel(cookies.Morsel):
+            _reserved = {
+                "expires": "expires",
+                "path": "Path",
+                "comment": "Comment",
+                "domain": "Domain",
+                "max-age": "Max-Age",
+                "secure": "Secure",
+                "httponly": "HttpOnly",
+                "version": "Version",
+                "samesite": "SameSite",
+            }
+    else:
+        SimpleCookie = cookies.SimpleCookie
 else:
     Morsel = cookies.Morsel
 
