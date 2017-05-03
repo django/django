@@ -348,7 +348,8 @@ class SessionTestsMixin:
         session = self.backend('someunknownkey')
         session.load()
 
-        self.assertFalse(session.exists(session.session_key))
+        self.assertIsNone(session.session_key)
+        self.assertIs(session.exists(session.session_key), False)
         # provided unknown key was cycled, not reused
         self.assertNotEqual(session.session_key, 'someunknownkey')
 
