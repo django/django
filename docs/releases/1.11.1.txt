@@ -84,3 +84,7 @@ Bugfixes
 
 * Fixed crash in  ``BaseInlineFormSet._construct_form()`` when using
   ``save_as_new`` (:ticket:`28159`).
+
+* Fixed a regression where ``Model._state.db`` wasn't set correctly on
+  multi-table inheritance parent models after saving a child model
+  (:ticket:`28166`).

@@ -472,6 +472,10 @@ class ModelInheritanceTest(TestCase):
         jane = Supplier.objects.order_by("name").select_related("restaurant")[0]
         self.assertEqual(jane.restaurant.name, "Craft")
 
+    def test_ptr_accessor_assigns_db(self):
+        r = Restaurant.objects.create()
+        self.assertEqual(r.place_ptr._state.db, 'default')
+
     def test_related_filtering_query_efficiency_ticket_15844(self):
         r = Restaurant.objects.create(
             name="Guido's House of Pasta",
