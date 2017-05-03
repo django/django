@@ -81,11 +81,10 @@ class GeoModelTest(TestCase):
         self.assertEqual(ply, ns.poly)
 
         # Testing the `ogr` and `srs` lazy-geometry properties.
-        if gdal.HAS_GDAL:
-            self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
-            self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
-            self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
-            self.assertEqual('WGS 84', ns.poly.srs.name)
+        self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
+        self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
+        self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
+        self.assertEqual('WGS 84', ns.poly.srs.name)
 
         # Changing the interior ring on the poly attribute.
         new_inner = LinearRing((30, 30), (30, 70), (70, 70), (70, 30), (30, 30))

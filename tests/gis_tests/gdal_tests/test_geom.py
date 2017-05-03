@@ -1,9 +1,11 @@
 import json
 import unittest
 from binascii import b2a_hex
-from unittest import skipUnless
 
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import (
+    CoordTransform, GDALException, OGRGeometry, OGRGeomType, OGRIndexError,
+    SpatialReference,
+)
 from django.utils.six.moves import range
 
 from ..test_data import TestDataMixin
@@ -14,14 +16,6 @@ except ImportError:
     import pickle
 
 
-if HAS_GDAL:
-    from django.contrib.gis.gdal import (
-        CoordTransform, GDALException, OGRGeometry, OGRGeomType, OGRIndexError,
-        SpatialReference,
-    )
-
-
-@skipUnless(HAS_GDAL, "GDAL is required")
 class OGRGeomTest(unittest.TestCase, TestDataMixin):
     "This tests the OGR Geometry."
 

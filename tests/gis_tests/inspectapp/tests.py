@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 import os
 import re
 
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
+from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
@@ -12,12 +13,7 @@ from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
 from ..utils import postgis
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, GDALException, GDAL_VERSION
-    from django.contrib.gis.utils.ogrinspect import ogrinspect
-
-    from .models import AllOGRFields
+from .models import AllOGRFields
 
 
 class InspectDbTests(TestCase):

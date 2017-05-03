@@ -4,7 +4,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.db.models.lookups import (
     DistanceLookupBase, gis_lookups,
 )
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
@@ -12,10 +12,7 @@ from django.db.models import Q
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from ..data.rasters.textrasters import JSON_RASTER
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import GDALRaster
-    from .models import RasterModel, RasterRelatedModel
+from .models import RasterModel, RasterRelatedModel
 
 
 @skipUnlessDBFeature('supports_raster')
