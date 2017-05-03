@@ -408,7 +408,7 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``.
 
 .. _MySQL option file: https://dev.mysql.com/doc/refman/en/option-files.html
-.. _MySQLdb connection options: https://mysqlclient.readthedocs.io/en/latest/user_guide.html#functions-and-attributes
+.. _MySQLdb connection options: https://mysqlclient.readthedocs.io/user_guide.html#functions-and-attributes
 
 .. _mysql-sql-mode:
 
