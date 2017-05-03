@@ -142,6 +142,7 @@ class Migration(migrations.Migration):
                 ('name', CICharField(primary_key=True, max_length=255)),
                 ('email', CIEmailField()),
                 ('description', CITextField()),
+                ('array_field', ArrayField(CITextField(), null=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

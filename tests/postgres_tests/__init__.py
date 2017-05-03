@@ -12,14 +12,14 @@ class PostgreSQLTestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
         # No need to keep that signal overhead for non PostgreSQL-related tests.
-        from django.contrib.postgres.signals import register_hstore_handler
+        from django.contrib.postgres.signals import register_type_handlers
 
-        connection_created.disconnect(register_hstore_handler)
+        connection_created.disconnect(register_type_handlers)
         super().tearDownClass()
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
 # To locate the widget's template.
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
-class PostgreSQLWidgetTestCase(WidgetTest):
+class PostgreSQLWidgetTestCase(WidgetTest, PostgreSQLTestCase):
     pass

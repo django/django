@@ -106,6 +106,7 @@ class CITestModel(PostgreSQLModel):
     name = CICharField(primary_key=True, max_length=255)
     email = CIEmailField()
     description = CITextField()
+    array_field = ArrayField(CITextField(), null=True)
 
     def __str__(self):
         return self.name
