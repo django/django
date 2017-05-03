@@ -88,3 +88,6 @@ Bugfixes
 * Fixed a regression where ``Model._state.db`` wasn't set correctly on
   multi-table inheritance parent models after saving a child model
   (:ticket:`28166`).
+
+* Corrected the return type of ``ArrayField(CITextField())`` values retrieved
+  from the database (:ticket:`28161`).

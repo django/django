@@ -5,7 +5,7 @@ from django.db.models import CharField, TextField
 from django.utils.translation import ugettext_lazy as _
 
 from .lookups import SearchLookup, TrigramSimilar, Unaccent
-from .signals import register_hstore_handler
+from .signals import register_type_handlers
 
 
 class PostgresConfig(AppConfig):
@@ -16,8 +16,8 @@ class PostgresConfig(AppConfig):
         # Connections may already exist before we are called.
         for conn in connections.all():
             if conn.connection is not None:
-                register_hstore_handler(conn)
-        connection_created.connect(register_hstore_handler)
+                register_type_handlers(conn)
+        connection_created.connect(register_type_handlers)
         CharField.register_lookup(Unaccent)
         TextField.register_lookup(Unaccent)
         CharField.register_lookup(SearchLookup)
