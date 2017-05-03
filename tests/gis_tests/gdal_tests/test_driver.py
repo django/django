@@ -1,11 +1,7 @@
 import unittest
 from unittest import mock
 
-from django.contrib.gis.gdal import HAS_GDAL
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, GDALException
-
+from django.contrib.gis.gdal import Driver, GDALException
 
 valid_drivers = (
     # vector
@@ -29,7 +25,6 @@ aliases = {
 }
 
 
-@unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class DriverTest(unittest.TestCase):
 
     def test01_valid_driver(self):

@@ -225,17 +225,8 @@ Troubleshooting
 Can't find GDAL library
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-When GeoDjango can't find the GDAL library, the ``HAS_GDAL`` flag
-will be false:
-
-.. code-block:: pycon
-
-    >>> from django.contrib.gis import gdal
-    >>> gdal.HAS_GDAL
-    False
-
-The solution is to properly configure your :ref:`libsettings` *or* set
-:ref:`gdallibrarypath` in your settings.
+When GeoDjango can't find the GDAL library, configure your :ref:`libsettings`
+*or* set :ref:`gdallibrarypath` in your settings.
 
 .. _gdallibrarypath:
 

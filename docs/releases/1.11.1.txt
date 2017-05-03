@@ -94,3 +94,6 @@ Bugfixes
 
 * Fixed ``QuerySet.prefetch_related()`` crash when fetching relations in nested
   ``Prefetch`` objects (:ticket:`27554`).
+
+* Prevented hiding GDAL errors if it's not installed when using ``contrib.gis``
+  (:ticket:`28160`). (It's a required dependency as of Django 1.11.)
