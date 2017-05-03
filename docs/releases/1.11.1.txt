@@ -78,3 +78,6 @@ Bugfixes
 
 * Prevented migrations from dropping database indexes from ``Meta.indexes``
   when changing ``Field.db_index`` to ``False`` (:ticket:`28052`).
+
+* Fixed a regression in choice ordering in form fields with grouped and
+  non-grouped options (:ticket:`28157`).

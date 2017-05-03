@@ -280,35 +280,73 @@ class SelectTest(WidgetTest):
         groups = list(self.widget(choices=choices).optgroups(
             'name', ['vhs'], attrs={'class': 'super'},
         ))
-        self.assertEqual(len(groups), 3)
-        self.assertEqual(groups[0][0], None)
-        self.assertEqual(groups[0][2], 0)
-        self.assertEqual(len(groups[0][1]), 1)
-        options = groups[0][1]
-        self.assertEqual(options[0]['name'], 'name')
-        self.assertEqual(options[0]['value'], 'unknown')
-        self.assertEqual(options[0]['label'], 'Unknown')
-        self.assertEqual(options[0]['index'], '0')
-        self.assertEqual(options[0]['selected'], False)
-        self.assertEqual(groups[1][0], 'Audio')
-        self.assertEqual(groups[1][2], 1)
-        self.assertEqual(len(groups[1][1]), 2)
-        options = groups[1][1]
-        self.assertEqual(options[0]['name'], 'name')
-        self.assertEqual(options[0]['value'], 'vinyl')
-        self.assertEqual(options[0]['label'], 'Vinyl')
-        self.assertEqual(options[0]['index'], '1_0')
-        self.assertEqual(options[1]['index'], '1_1')
-        self.assertEqual(groups[2][0], 'Video')
-        self.assertEqual(groups[2][2], 2)
-        self.assertEqual(len(groups[2][1]), 2)
-        options = groups[2][1]
-        self.assertEqual(options[0]['name'], 'name')
-        self.assertEqual(options[0]['value'], 'vhs')
-        self.assertEqual(options[0]['label'], 'VHS Tape')
-        self.assertEqual(options[0]['index'], '2_0')
-        self.assertEqual(options[0]['selected'], True)
-        self.assertEqual(options[1]['index'], '2_1')
+        audio, video, unknown = groups
+        label, options, index = audio
+        self.assertEqual(label, 'Audio')
+        self.assertEqual(
+            options,
+            [{
+                'value': 'vinyl',
+                'type': 'select',
+                'attrs': {},
+                'index': '0_0',
+                'label': 'Vinyl',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'name': 'name',
+                'selected': False,
+            }, {
+                'value': 'cd',
+                'type': 'select',
+                'attrs': {},
+                'index': '0_1',
+                'label': 'CD',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'name': 'name',
+                'selected': False,
+            }]
+        )
+        self.assertEqual(index, 0)
+        label, options, index = video
+        self.assertEqual(label, 'Video')
+        self.assertEqual(
+            options,
+            [{
+                'value': 'vhs',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'label': 'VHS Tape',
+                'attrs': {'selected': True},
+                'index': '1_0',
+                'name': 'name',
+                'selected': True,
+                'type': 'select',
+            }, {
+                'value': 'dvd',
+                'template_name': 'django/forms/widgets/select_option.html',
+                'label': 'DVD',
+                'attrs': {},
+                'index': '1_1',
+                'name': 'name',
+                'selected': False,
+                'type': 'select',
+            }]
+        )
+        self.assertEqual(index, 1)
+        label, options, index = unknown
+        self.assertEqual(label, None)
+        self.assertEqual(
+            options,
+            [{
+                'value': 'unknown',
+                'selected': False,
+                'template_name': 'django/forms/widgets/select_option.html',
+                'label': 'Unknown',
+                'attrs': {},
+                'index': '2',
+                'name': 'name',
+                'type': 'select',
+            }]
+        )
+        self.assertEqual(index, 2)
 
     def test_deepcopy(self):
         """

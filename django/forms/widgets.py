@@ -547,25 +547,23 @@ class ChoiceWidget(Widget):
 
     def optgroups(self, name, value, attrs=None):
         """Return a list of optgroups for this widget."""
-        default = (None, [], 0)
-        groups = [default]
+        groups = []
         has_selected = False
 
-        for option_value, option_label in chain(self.choices):
+        for index, (option_value, option_label) in enumerate(chain(self.choices)):
             if option_value is None:
                 option_value = ''
 
+            subgroup = []
             if isinstance(option_label, (list, tuple)):
-                index = groups[-1][2] + 1
+                group_name = option_value
                 subindex = 0
-                subgroup = []
-                groups.append((option_value, subgroup, index))
                 choices = option_label
             else:
-                index = len(default[1])
-                subgroup = default[1]
+                group_name = None
                 subindex = None
                 choices = [(option_value, option_label)]
+            groups.append((group_name, subgroup, index))
 
             for subvalue, sublabel in choices:
                 selected = (
