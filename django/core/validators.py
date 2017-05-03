@@ -459,7 +459,10 @@ class FileExtensionValidator:
     code = 'invalid_extension'
 
     def __init__(self, allowed_extensions=None, message=None, code=None):
-        self.allowed_extensions = sorted([allowed_extension.lower() for allowed_extension in allowed_extensions])
+        if allowed_extensions is not None:
+            self.allowed_extensions = sorted([allowed_extension.lower() for allowed_extension in allowed_extensions])
+        else:
+            self.allowed_extensions = allowed_extensions
         if message is not None:
             self.message = message
         if code is not None:
