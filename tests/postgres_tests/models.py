@@ -71,6 +71,7 @@ class OtherTypesArrayModel(PostgreSQLModel):
 
 class HStoreModel(PostgreSQLModel):
     field = HStoreField(blank=True, null=True)
+    array_field = ArrayField(HStoreField(), null=True)
 
 
 class CharFieldModel(models.Model):
