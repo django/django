@@ -3,10 +3,9 @@
 # released under the New BSD license.
 
 import unittest
-from unittest import skipUnless
 
 from django.contrib.gis.geos import (
-    HAS_GEOS, LinearRing, LineString, MultiPoint, Point, Polygon, fromstr,
+    LinearRing, LineString, MultiPoint, Point, Polygon, fromstr,
 )
 
 
@@ -72,7 +71,6 @@ geos_function_tests = [
 ]
 
 
-@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSMutationTest(unittest.TestCase):
     """
     Tests Pythonic Mutability of Python GEOS geometry wrappers

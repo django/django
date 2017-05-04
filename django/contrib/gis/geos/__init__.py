@@ -13,8 +13,3 @@ from .libgeos import geos_version, geos_version_info  # NOQA
 from .linestring import LinearRing, LineString  # NOQA
 from .point import Point  # NOQA
 from .polygon import Polygon  # NOQA
-
-try:
-    HAS_GEOS = geos_version_info()['version'] >= '3.3.0'
-except ImportError:
-    HAS_GEOS = False

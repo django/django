@@ -4,22 +4,18 @@ from copy import copy
 from decimal import Decimal
 
 from django.conf import settings
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.utils.layermapping import (
+    InvalidDecimal, InvalidString, LayerMapError, LayerMapping,
+    MissingForeignKey,
+)
 from django.db import connection
 from django.test import TestCase, override_settings
 
-if HAS_GEOS:
-    from django.contrib.gis.utils.layermapping import (
-        LayerMapping, LayerMapError, InvalidDecimal, InvalidString,
-        MissingForeignKey,
-    )
-    from django.contrib.gis.gdal import DataSource
-
-    from .models import (
-        City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-        city_mapping, co_mapping, cofeat_mapping, inter_mapping,
-    )
-
+from .models import (
+    City, County, CountyFeat, ICity1, ICity2, Interstate, Invalid, State,
+    city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+)
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')

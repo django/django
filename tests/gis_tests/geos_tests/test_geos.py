@@ -4,13 +4,13 @@ import pickle
 import random
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
-from unittest import mock, skipUnless
+from unittest import mock
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import (
-    HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, LinearRing,
-    LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
-    fromfile, fromstr,
+    GeometryCollection, GEOSException, GEOSGeometry, LinearRing, LineString,
+    MultiLineString, MultiPoint, MultiPolygon, Point, Polygon, fromfile,
+    fromstr,
 )
 from django.contrib.gis.geos.libgeos import geos_version_info
 from django.contrib.gis.shortcuts import numpy
@@ -22,7 +22,6 @@ from django.utils.encoding import force_bytes
 from ..test_data import TestDataMixin
 
 
-@skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_wkt(self):
