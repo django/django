@@ -68,6 +68,12 @@ Single object mixins
 
         .. _insecure direct object reference: https://www.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References
 
+    .. method:: get_model()
+
+        .. versionadded:: 1.10
+
+        Returns the model of the object that this view will display.
+
     .. method:: get_object(queryset=None)
 
         Returns the single object that this view will display. If ``queryset``

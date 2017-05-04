@@ -107,6 +107,16 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
             kwargs.update({'instance': self.object})
         return kwargs
 
+    def get_model(self):
+        """
+        Return the model of the form_class.
+        """
+        try:
+            model = super(ModelFormMixin, self).get_model()
+        except ImproperlyConfigured:
+            model = self.get_form_class().Meta.model
+        return model
+
     def get_success_url(self):
         """Return the URL to redirect to after processing a valid form."""
         if self.success_url:

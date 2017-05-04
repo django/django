@@ -298,6 +298,14 @@ Generic Views
 * The :class:`~django.views.generic.base.View` class can now be imported from
   ``django.views``.
 
+* The :class:`~django.views.generic.detail.SingleObjectMixin` now has a
+  :meth:`~django.views.generic.detail.SingleObjectMixin.get_model` method,
+  which is overridden by :class:`~django.views.generic.edit.ModelFormMixin`.
+  As a result, when specifying a :class:`~django.forms.ModelForm` as
+  :attr:`~django.views.generic.edit.FormMixin.form_class`, you no longer need
+  to specify :attr:`~django.views.generic.detail.SingleObjectMixin.model` or
+  :attr:`~django.views.generic.base.TemplateResponseMixin.template_name`.
+
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 

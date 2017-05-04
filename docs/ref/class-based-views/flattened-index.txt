@@ -110,6 +110,7 @@ Detail Views
 * :meth:`~django.views.generic.base.View.dispatch`
 * ``get()``
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data`
+* :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
@@ -222,6 +223,7 @@ Editing views
 * :meth:`~django.views.generic.edit.FormMixin.get_context_data`
 * :meth:`~django.views.generic.edit.FormMixin.get_form`
 * :meth:`~django.views.generic.edit.ModelFormMixin.get_form_kwargs`
+* :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
@@ -265,6 +267,7 @@ Editing views
 * :meth:`~django.views.generic.edit.FormMixin.get_context_data`
 * :meth:`~django.views.generic.edit.FormMixin.get_form`
 * :meth:`~django.views.generic.edit.ModelFormMixin.get_form_kwargs`
+* :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
@@ -301,6 +304,7 @@ Editing views
 * :meth:`~django.views.generic.base.View.dispatch`
 * ``get()``
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data`
+* :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
@@ -612,6 +616,7 @@ Date-based views
 * :meth:`~django.views.generic.base.View.dispatch`
 * ``get()``
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data`
+* :meth:`~django.views.generic.detail.SingleObjectMixin.get_model`
 * :meth:`~django.views.generic.dates.DayMixin.get_next_day`
 * :meth:`~django.views.generic.dates.MonthMixin.get_next_month`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
