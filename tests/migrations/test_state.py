@@ -832,6 +832,18 @@ class StateTests(SimpleTestCase):
             1,
         )
 
+    def test_missing_dependency_app(self):
+        """
+        #25616. Test that a proper error is raised when a dependency app is not installed.
+        """
+        project_state = ProjectState(real_apps=['does_not_exist'])
+        expected_message = ("No installed app with label 'does_not_exist'. You may be missing "
+                            "this app in your INSTALLED_APPS setting and have a migration which "
+                            "depends on it.")
+
+        with self.assertRaisesMessage(LookupError, expected_message):
+            project_state.apps
+
     def test_ignore_order_wrt(self):
         """
         Makes sure ProjectState doesn't include OrderWrt fields when

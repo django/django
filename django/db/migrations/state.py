@@ -260,7 +260,15 @@ class StateApps(Apps):
         # mess things up with partial states (due to lack of dependencies)
         self.real_models = []
         for app_label in real_apps:
-            app = global_apps.get_app_config(app_label)
+            try:
+                app = global_apps.get_app_config(app_label)
+            except LookupError as e:
+                new_exception = LookupError(e.args[0] + ' You may be missing this app in your '
+                                            'INSTALLED_APPS setting and have a migration which '
+                                            'depends on it.')
+                new_exception.__cause__ = e
+                raise new_exception
+
             for model in app.get_models():
                 self.real_models.append(ModelState.from_model(model, exclude_rels=True))
         # Populate the app registry with a stub for each application.
