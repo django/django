@@ -451,6 +451,46 @@ query spans multiple tables, it's possible to get duplicate results when a
     :meth:`values()` together, be careful when ordering by fields not in the
     :meth:`values()` call.
 
+    It will be possible to get distinct values by using the :meth:`annotate`
+    and :meth:`values` together replacing :meth:`distinct`
+    As a simple example let us consider I needed to get a list of blog 
+    objects that had Time objects attached to them that had been updated 
+    by a specific user (User object attached to them). 
+    I wanted the list to be ordered by the most recently updated Time object 
+    (as there are multiple time objects attached to one blog)
+    Models::
+        from django.db import models
+        from django.contrib import admin
+
+        class User(models.Model):
+            name = models.CharField(max_length=20)
+            state = models.CharField(max_length=20)          
+            def __unicode__(self):
+                return self.name
+
+        class Time(models.Model):
+            date_identiyfy = models.IntegerField()
+            date = models.DateTimeField(auto_now_add=True)
+            def __unicode__(self):
+                return u"%s " % self.date
+
+        class Blog(models.Model):
+            title = models.CharField(max_length=20)
+            author = models.CharField(max_length=20)                                                         
+            def __unicode__(self):
+                return self.title
+
+        class Entry(models.Model):
+            name = modiels.ForeignKey(User)
+            title = models.ForeignKey(Blog)
+            date = models.ForeignKey(Time)
+
+    Here, the expected result can be got by::
+        >>u = get_object_or_404(User, name='User1')
+        >>e = Entry.objects.filter(name=u).values('title').annotate(models.Max('date')).order_by('date')
+        >>e
+        [{'date__max': 2, 'title': 1L}, {'date__max': 5, 'title': 2L}]
+
 On PostgreSQL only, you can pass positional arguments (``*fields``) in order to
 specify the names of fields to which the ``DISTINCT`` should apply. This
 translates to a ``SELECT DISTINCT ON`` SQL query. Here's the difference. For a
