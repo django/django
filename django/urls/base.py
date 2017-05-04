@@ -173,6 +173,7 @@ def translate_url(url, lang_code):
         to_be_reversed = "%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name
         with override(lang_code):
             try:
+                match.kwargs = dict((k, v) for k, v in match.kwargs.items() if v is not None)
                 url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
             except NoReverseMatch:
                 pass
