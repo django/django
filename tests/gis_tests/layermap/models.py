@@ -8,7 +8,6 @@ class NamedModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
@@ -37,7 +36,6 @@ class City(NamedModel):
 
     class Meta:
         app_label = 'layermap'
-        required_db_features = ['gis_enabled']
 
 
 class Interstate(NamedModel):
@@ -46,7 +44,6 @@ class Interstate(NamedModel):
 
     class Meta:
         app_label = 'layermap'
-        required_db_features = ['gis_enabled']
 
 
 # Same as `City` above, but for testing model inheritance.
@@ -72,9 +69,6 @@ class ICity2(ICity1):
 
 class Invalid(models.Model):
     point = models.PointField()
-
-    class Meta:
-        required_db_features = ['gis_enabled']
 
 
 # Mapping dictionaries for the models above.

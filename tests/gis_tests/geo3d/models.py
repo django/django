@@ -10,7 +10,6 @@ class NamedModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
@@ -49,7 +48,6 @@ class SimpleModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
 
 class Point2D(SimpleModel):

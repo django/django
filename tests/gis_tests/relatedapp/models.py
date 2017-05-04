@@ -8,7 +8,6 @@ class SimpleModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
 
 @python_2_unicode_compatible

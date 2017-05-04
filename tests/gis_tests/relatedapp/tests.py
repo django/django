@@ -14,7 +14,6 @@ from .models import (
 )
 
 
-@skipUnlessDBFeature("gis_enabled")
 class RelatedGeoModelTest(TestCase):
     fixtures = ['initial']
 

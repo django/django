@@ -12,7 +12,6 @@ class NamedModel(models.Model):
 
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
@@ -31,7 +30,6 @@ class City(NamedModel):
 
     class Meta:
         app_label = 'geoapp'
-        required_db_features = ['gis_enabled']
 
 
 # This is an inherited model from City
@@ -41,7 +39,6 @@ class PennsylvaniaCity(City):
 
     class Meta:
         app_label = 'geoapp'
-        required_db_features = ['gis_enabled']
 
 
 class State(NamedModel):
@@ -49,7 +46,6 @@ class State(NamedModel):
 
     class Meta:
         app_label = 'geoapp'
-        required_db_features = ['gis_enabled']
 
 
 class Track(NamedModel):
@@ -61,9 +57,6 @@ class MultiFields(NamedModel):
     point = models.PointField()
     poly = models.PolygonField()
 
-    class Meta:
-        required_db_features = ['gis_enabled']
-
 
 class UniqueTogetherModel(models.Model):
     city = models.CharField(max_length=30)
@@ -71,14 +64,11 @@ class UniqueTogetherModel(models.Model):
 
     class Meta:
         unique_together = ('city', 'point')
-        required_db_features = ['gis_enabled', 'supports_geometry_field_unique_index']
+        required_db_features = ['supports_geometry_field_unique_index']
 
 
 class Truth(models.Model):
     val = models.BooleanField(default=False)
-
-    class Meta:
-        required_db_features = ['gis_enabled']
 
 
 class Feature(NamedModel):
@@ -87,9 +77,6 @@ class Feature(NamedModel):
 
 class MinusOneSRID(models.Model):
     geom = models.PointField(srid=-1)  # Minus one SRID.
-
-    class Meta:
-        required_db_features = ['gis_enabled']
 
 
 class NonConcreteField(models.IntegerField):

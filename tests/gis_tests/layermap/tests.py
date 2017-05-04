@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.db import connection
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 
 if HAS_GEOS and HAS_GDAL:
@@ -38,7 +38,6 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -335,7 +334,6 @@ class OtherRouter(object):
         return True
 
 
-@skipUnlessDBFeature("gis_enabled")
 @override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):
 

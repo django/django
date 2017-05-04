@@ -8,7 +8,6 @@ from ..utils import postgis
 from .models import City
 
 
-@skipUnlessDBFeature('gis_enabled')
 class GeoExpressionsTests(TestCase):
     fixtures = ['initial']
 

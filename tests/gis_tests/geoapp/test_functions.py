@@ -15,7 +15,6 @@ from ..utils import mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GISFunctionsTests(TestCase):
     """
     Testing functions from django/contrib/gis/db/models/functions.py.

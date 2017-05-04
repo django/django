@@ -19,7 +19,6 @@ from .models import (
 )
 
 
-@skipUnlessDBFeature("gis_enabled")
 class DistanceTest(TestCase):
     fixtures = ['initial']
 
@@ -463,7 +462,6 @@ Perimeter(geom1)                                |    OK              |      :-( 
 '''  # NOQA
 
 
-@skipUnlessDBFeature("gis_enabled")
 class DistanceFunctionsTests(TestCase):
     fixtures = ['initial']
 

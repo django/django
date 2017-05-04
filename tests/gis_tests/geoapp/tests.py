@@ -22,7 +22,6 @@ from .models import (
 )
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoModelTest(TestCase):
     fixtures = ['initial']
 
@@ -223,7 +222,6 @@ class GeoModelTest(TestCase):
             self.assertEqual(feature.geom.srid, g.srid)
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoLookupTest(TestCase):
     fixtures = ['initial']
 
@@ -450,7 +448,6 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
 
-@skipUnlessDBFeature("gis_enabled")
 @ignore_warnings(category=RemovedInDjango20Warning)
 class GeoQuerySetTest(TestCase):
     fixtures = ['initial']

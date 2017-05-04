@@ -10,7 +10,6 @@ ops = [
             ('geom', models.MultiPolygonField(srid=4326)),
         ],
         options={
-            'required_db_features': ['gis_enabled'],
         },
         bases=(models.Model,),
     ),
@@ -29,7 +28,6 @@ ops = [
             ('geom', models.PointField(srid=4326, geography=True)),
         ],
         options={
-            'required_db_features': ['gis_enabled'],
         },
         bases=(models.Model,),
     ),
@@ -51,7 +49,7 @@ ops = [
     )
 ]
 
-if connection.features.gis_enabled and connection.features.supports_raster:
+if connection.features.supports_raster:
     ops += [
         migrations.CreateModel(
             name='Heatmap',
