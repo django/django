@@ -15,7 +15,6 @@ from ..utils import oracle, postgis, spatialite
 from .models import City, County, Zipcode
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeographyTest(TestCase):
     fixtures = ['initial']
 
@@ -87,7 +86,6 @@ class GeographyTest(TestCase):
             self.assertEqual(state, c.state)
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeographyFunctionTests(TestCase):
     fixtures = ['initial']
 

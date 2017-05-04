@@ -12,15 +12,13 @@ from django.test import (
 
 from ..utils import mysql, spatialite
 
-if connection.features.gis_enabled:
-    try:
-        GeometryColumns = connection.ops.geometry_columns()
-        HAS_GEOMETRY_COLUMNS = True
-    except NotImplementedError:
-        HAS_GEOMETRY_COLUMNS = False
+try:
+    GeometryColumns = connection.ops.geometry_columns()
+    HAS_GEOMETRY_COLUMNS = True
+except NotImplementedError:
+    HAS_GEOMETRY_COLUMNS = False
 
 
-@skipUnlessDBFeature('gis_enabled')
 class OperationTestCase(TransactionTestCase):
     available_apps = ['gis_tests.gis_migrations']
 

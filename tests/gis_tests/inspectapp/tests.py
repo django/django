@@ -18,7 +18,6 @@ if HAS_GDAL:
     from .models import AllOGRFields
 
 
-@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
     def test_geom_columns(self):
         """
@@ -61,7 +60,6 @@ class InspectDbTests(TestCase):
             self.assertIn('poly = models.GeometryField(', output)
 
 
-@skipUnlessDBFeature("gis_enabled")
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )

@@ -2,12 +2,11 @@ import json
 
 from django.contrib.gis.geos import LinearRing, Point, Polygon
 from django.core import serializers
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase
 
 from .models import City, MultiFields, PennsylvaniaCity
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoJSONSerializerTests(TestCase):
     fixtures = ['initial']
 

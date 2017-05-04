@@ -9,7 +9,6 @@ from ..utils import postgis
 from .models import City, ManyPointModel
 
 
-@skipUnlessDBFeature('gis_enabled')
 class GeoExpressionsTests(TestCase):
     fixtures = ['initial']
 
