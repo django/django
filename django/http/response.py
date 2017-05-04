@@ -199,6 +199,8 @@ class HttpResponseBase:
         if httponly:
             self.cookies[key]['httponly'] = True
         if samesite:
+            if samesite.lower() not in ('lax', 'strict'):
+                raise ValueError('samesite must be "lax" or "strict"')
             self.cookies[key]['samesite'] = samesite
 
     def setdefault(self, key, value):
