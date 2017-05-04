@@ -2986,6 +2986,8 @@ session cookies from JavaScript, you're probably doing it wrong.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
+.. setting:: SESSION_COOKIE_SAMESITE
+
 ``SESSION_COOKIE_SAMESITE``
 ---------------------------
 
@@ -2997,7 +2999,7 @@ methods of stealing session cookie impossible.
 
 Possible values for the setting are ``'Lax'`` (default), ``'Strict'`` or ``None``.
 The latter disables the flag completely, resulting in a pre-SameSite behavior for
- the cookie.
+the cookie.
 
 The ``'Strict'`` value will prevent the cookie from being sent by the browser
 to the target site in all cross-site browsing context, even when following a regular
