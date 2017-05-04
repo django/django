@@ -194,7 +194,7 @@ south = ``π``; west = ``3π/2``.
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle <https://docs.oracle.com/database/121/SPATL/GUID-82A61626-BB64-4793-B53D-A0DBEC91831A.htm#SPATL1554>`_
+`Oracle <https://docs.oracle.com/database/121/SPATL/sdo_geom-sdo_mbc.htm#SPATL1554>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
