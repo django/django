@@ -205,7 +205,7 @@ class GISFunctionsTests(TestCase):
     @skipUnlessDBFeature("has_Difference_function", "has_Transform_function")
     def test_difference_mixed_srid(self):
         """Testing with mixed SRID (Country has default 4326)."""
-        geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
+        geom = Point(556597.4, 2632018.6, srid=3785)  # Spherical mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
         # Oracle does something screwy with the Texas geometry.
         if oracle:
