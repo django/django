@@ -986,7 +986,7 @@ Slightly complex built-in ``Field`` classes
         Once all fields are cleaned, the list of clean values is combined into
         a single value by :meth:`~MultiValueField.compress`.
 
-    Also takes one extra optional argument:
+    Also takes some optional arguments:
 
     .. attribute:: require_all_fields
 
