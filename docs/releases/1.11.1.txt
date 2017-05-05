@@ -58,3 +58,5 @@ Bugfixes
 
 * Fixed crash when overriding the template of
   ``django.views.static.directory_index()`` (:ticket:`28122`).
+
+* Fixed unexpected data loss when saving parent object after setting on child (:ticket:`28147`).
