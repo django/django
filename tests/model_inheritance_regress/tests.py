@@ -472,6 +472,12 @@ class ModelInheritanceTest(TestCase):
         jane = Supplier.objects.order_by("name").select_related("restaurant")[0]
         self.assertEqual(jane.restaurant.name, "Craft")
 
+    def test_filter_with_parent_fk(self):
+        r = Restaurant.objects.create()
+        s = Supplier.objects.create(restaurant=r)
+        # The mismatch between Restaurant and Place is intentional (#28175).
+        self.assertSequenceEqual(Supplier.objects.filter(restaurant__in=Place.objects.all()), [s])
+
     def test_ptr_accessor_assigns_db(self):
         r = Restaurant.objects.create()
         self.assertEqual(r.place_ptr._state.db, 'default')
