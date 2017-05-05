@@ -504,6 +504,7 @@ A number of settings can be used to control Django's CSRF behavior:
 * :setting:`CSRF_COOKIE_AGE`
 * :setting:`CSRF_COOKIE_DOMAIN`
 * :setting:`CSRF_COOKIE_HTTPONLY`
+* :setting:`CSRF_COOKIE_SAMESITE`
 * :setting:`CSRF_COOKIE_NAME`
 * :setting:`CSRF_COOKIE_PATH`
 * :setting:`CSRF_COOKIE_SECURE`

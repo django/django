@@ -4,7 +4,12 @@ Django 1.11.1 release notes
 
 *Under development*
 
-Django 1.11.1 fixes several bugs in 1.11.
+Django 1.11.1 adds support for ``SameSite`` in session cookies and fixes several bugs in 1.11.
+
+Features
+========
+
+* Added support for ``SameSite`` HTTP cookie flag for session cookies (:ticket:`27863`).
 
 Bugfixes
 ========

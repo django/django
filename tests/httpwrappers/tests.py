@@ -751,6 +751,13 @@ class CookieTests(unittest.TestCase):
         # document.cookie parses whitespace.
         self.assertEqual(parse_cookie('  =  b  ;  ;  =  ;   c  =  ;  '), {'': 'b', 'c': ''})
 
+    def test_samesite(self):
+        c = SimpleCookie('name=value; samesite=lax; httponly')
+        # this tests both the patched version of SimpleCookie and Morsel
+        # expected output:
+        # 'Set-Cookie: name=value; HttpOnly; SameSite=lax'
+        self.assertIn('SameSite', c.output())
+
     def test_httponly_after_load(self):
         c = SimpleCookie()
         c.load("name=val")
