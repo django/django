@@ -97,3 +97,6 @@ Bugfixes
 
 * Prevented hiding GDAL errors if it's not installed when using ``contrib.gis``
   (:ticket:`28160`). (It's a required dependency as of Django 1.11.)
+
+* Fixed a regression causing ``__in`` lookups on a foreign key to fail when
+  using the foreign key's parent model as the lookup value (:ticket:`28175`).
