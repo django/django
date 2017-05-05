@@ -5,12 +5,7 @@ if sys.version_info < (3, 7, 0):
     # Monkey patch the Morsel and SimpleCookie objects
     # to support SameSite attribute
     # added in 3.7 https://github.com/python/cpython/pull/214
-    class Morsel(cookies.Morsel):
-        def __init__(self):
-            self._reserved['samesite'] = 'SameSite'
-            super().__init__()
-
-    cookies.Morsel = Morsel
+    cookies.Morsel._reserved['samesite'] = 'SameSite'
 
     if sys.version_info < (3, 4, 3):
 
@@ -20,7 +15,7 @@ if sys.version_info < (3, 7, 0):
             # http://bugs.python.org/issue22775
 
                 def __setitem__(self, key, value):
-                    if isinstance(value, Morsel):
+                    if isinstance(value, cookies.Morsel):
                         # allow assignment of constructed Morsels (e.g. for pickling)
                         dict.__setitem__(self, key, value)
                     else:
