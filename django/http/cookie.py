@@ -7,8 +7,8 @@ if sys.version_info < (3, 7, 0):
     # added in 3.7 https://github.com/python/cpython/pull/214
     class Morsel(cookies.Morsel):
         def __init__(self):
-            super().__init__()
             self._reserved['samesite'] = 'SameSite'
+            super().__init__()
 
     class SimpleCookie(cookies.SimpleCookie):
 
