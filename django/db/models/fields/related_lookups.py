@@ -81,7 +81,8 @@ class RelatedIn(In):
                     AND)
             return root_constraint.as_sql(compiler, connection)
         else:
-            if getattr(self.rhs, '_forced_pk', False):
+            if (getattr(self.rhs, '_forced_pk', False) and
+                    not getattr(self.lhs.field.target_field, 'primary_key', False)):
                 self.rhs.clear_select_clause()
                 if (getattr(self.lhs.output_field, 'primary_key', False) and
                         self.lhs.output_field.model == self.rhs.model):
