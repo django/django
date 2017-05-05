@@ -80,11 +80,12 @@ CONTRIB_TESTS_TO_APPS = {
 
 def get_test_modules():
     modules = []
-    discovery_paths = [
-        (None, RUNTESTS_DIR),
+    discovery_paths = [(None, RUNTESTS_DIR)]
+    if connection.features.gis_enabled:
         # GIS tests are in nested apps
-        ('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests')),
-    ]
+        discovery_paths.append(('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests')))
+    else:
+        SUBDIRS_TO_SKIP.append('gis_tests')
 
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):
@@ -102,6 +103,16 @@ def get_installed():
 
 
 def setup(verbosity, test_labels, parallel):
+    # Reduce the given test labels to just the app module path.
+    test_labels_set = set()
+    for label in test_labels:
+        bits = label.split('.')[:1]
+        test_labels_set.add('.'.join(bits))
+
+    if 'gis_tests' in test_labels_set and not connection.features.gis_enabled:
+        print('Aborting: A GIS database backend is required to run gis_tests.')
+        sys.exit(1)
+
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
         max_parallel = default_test_processes() if parallel == 0 else parallel
@@ -168,12 +179,6 @@ def setup(verbosity, test_labels, parallel):
 
     # Load all the test model apps.
     test_modules = get_test_modules()
-
-    # Reduce given test labels to just the app module path
-    test_labels_set = set()
-    for label in test_labels:
-        bits = label.split('.')[:1]
-        test_labels_set.add('.'.join(bits))
 
     installed_app_names = set(get_installed())
     for modpath, module_name in test_modules:

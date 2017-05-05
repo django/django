@@ -9,7 +9,6 @@ from ..utils import no_oracle
 from .models import City, PennsylvaniaCity, State, Truth
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoRegressionTests(TestCase):
     fixtures = ['initial']
 

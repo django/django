@@ -2,7 +2,8 @@ import os
 import re
 from io import StringIO
 
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
+from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
@@ -10,15 +11,9 @@ from django.test.utils import modify_settings
 
 from ..test_data import TEST_DATA
 from ..utils import postgis
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, GDALException, GDAL_VERSION
-    from django.contrib.gis.utils.ogrinspect import ogrinspect
-
-    from .models import AllOGRFields
+from .models import AllOGRFields
 
 
-@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
     def test_geom_columns(self):
         """
@@ -61,7 +56,6 @@ class InspectDbTests(TestCase):
             self.assertIn('poly = models.GeometryField(', output)
 
 
-@skipUnlessDBFeature("gis_enabled")
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )

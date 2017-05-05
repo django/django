@@ -8,11 +8,11 @@ from django.core import exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.test import TransactionTestCase, override_settings
+from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
     NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
@@ -749,6 +749,8 @@ class TestSplitFormField(PostgreSQLTestCase):
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
+    # To locate the widget's template.
+    @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)
@@ -787,7 +789,63 @@ class TestSplitFormField(PostgreSQLTestCase):
         self.assertEqual(obj.field, [1, 2])
 
 
-class TestSplitFormWidget(PostgreSQLTestCase):
+class TestSplitFormWidget(PostgreSQLWidgetTestCase):
+
+    def test_get_context(self):
+        self.assertEqual(
+            SplitArrayWidget(forms.TextInput(), size=2).get_context('name', ['val1', 'val2']),
+            {
+                'widget': {
+                    'name': 'name',
+                    'is_hidden': False,
+                    'required': False,
+                    'value': "['val1', 'val2']",
+                    'attrs': {},
+                    'template_name': 'postgres/widgets/split_array.html',
+                    'subwidgets': [
+                        {
+                            'name': 'name_0',
+                            'is_hidden': False,
+                            'required': False,
+                            'value': 'val1',
+                            'attrs': {},
+                            'template_name': 'django/forms/widgets/text.html',
+                            'type': 'text',
+                        },
+                        {
+                            'name': 'name_1',
+                            'is_hidden': False,
+                            'required': False,
+                            'value': 'val2',
+                            'attrs': {},
+                            'template_name': 'django/forms/widgets/text.html',
+                            'type': 'text',
+                        },
+                    ]
+                }
+            }
+        )
+
+    def test_render(self):
+        self.check_html(
+            SplitArrayWidget(forms.TextInput(), size=2), 'array', None,
+            """
+            <input name="array_0" type="text" />
+            <input name="array_1" type="text" />
+            """
+        )
+
+    def test_render_attrs(self):
+        self.check_html(
+            SplitArrayWidget(forms.TextInput(), size=2),
+            'array', ['val1', 'val2'], attrs={'id': 'foo'},
+            html=(
+                """
+                <input id="foo_0" name="array_0" type="text" value="val1" />
+                <input id="foo_1" name="array_1" type="text" value="val2" />
+                """
+            )
+        )
 
     def test_value_omitted_from_data(self):
         widget = SplitArrayWidget(forms.TextInput(), size=2)

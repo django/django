@@ -106,7 +106,7 @@ Django's JavaScript tests use `QUnit`_. Here is an example test module:
 
 
 Please consult the QUnit documentation for information on the types of
-`assertions supported by QUnit <https://api.qunitjs.com/category/assert/>`_.
+`assertions supported by QUnit <https://api.qunitjs.com/assert/>`_.
 
 Running tests
 -------------

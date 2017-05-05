@@ -54,15 +54,15 @@ class SessionTestsMixin:
         self.session.delete()
 
     def test_new_session(self):
-        self.assertFalse(self.session.modified)
-        self.assertFalse(self.session.accessed)
+        self.assertIs(self.session.modified, False)
+        self.assertIs(self.session.accessed, False)
 
     def test_get_empty(self):
         self.assertIsNone(self.session.get('cat'))
 
     def test_store(self):
         self.session['cat'] = "dog"
-        self.assertTrue(self.session.modified)
+        self.assertIs(self.session.modified, True)
         self.assertEqual(self.session.pop('cat'), 'dog')
 
     def test_pop(self):
@@ -72,20 +72,20 @@ class SessionTestsMixin:
         self.modified = False
 
         self.assertEqual(self.session.pop('some key'), 'exists')
-        self.assertTrue(self.session.accessed)
-        self.assertTrue(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, True)
         self.assertIsNone(self.session.get('some key'))
 
     def test_pop_default(self):
         self.assertEqual(self.session.pop('some key', 'does not exist'),
                          'does not exist')
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, False)
 
     def test_pop_default_named_argument(self):
         self.assertEqual(self.session.pop('some key', default='does not exist'), 'does not exist')
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, False)
 
     def test_pop_no_default_keyerror_raised(self):
         with self.assertRaises(KeyError):
@@ -94,13 +94,13 @@ class SessionTestsMixin:
     def test_setdefault(self):
         self.assertEqual(self.session.setdefault('foo', 'bar'), 'bar')
         self.assertEqual(self.session.setdefault('foo', 'baz'), 'bar')
-        self.assertTrue(self.session.accessed)
-        self.assertTrue(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, True)
 
     def test_update(self):
         self.session.update({'update key': 1})
-        self.assertTrue(self.session.accessed)
-        self.assertTrue(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, True)
         self.assertEqual(self.session.get('update key', None), 1)
 
     def test_has_key(self):
@@ -108,34 +108,34 @@ class SessionTestsMixin:
         self.session.modified = False
         self.session.accessed = False
         self.assertIn('some key', self.session)
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, False)
 
     def test_values(self):
         self.assertEqual(list(self.session.values()), [])
-        self.assertTrue(self.session.accessed)
+        self.assertIs(self.session.accessed, True)
         self.session['some key'] = 1
         self.session.modified = False
         self.session.accessed = False
         self.assertEqual(list(self.session.values()), [1])
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, False)
 
     def test_keys(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
         self.assertEqual(list(self.session.keys()), ['x'])
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, False)
 
     def test_items(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
         self.assertEqual(list(self.session.items()), [('x', 1)])
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, False)
 
     def test_clear(self):
         self.session['x'] = 1
@@ -144,28 +144,28 @@ class SessionTestsMixin:
         self.assertEqual(list(self.session.items()), [('x', 1)])
         self.session.clear()
         self.assertEqual(list(self.session.items()), [])
-        self.assertTrue(self.session.accessed)
-        self.assertTrue(self.session.modified)
+        self.assertIs(self.session.accessed, True)
+        self.assertIs(self.session.modified, True)
 
     def test_save(self):
         self.session.save()
-        self.assertTrue(self.session.exists(self.session.session_key))
+        self.assertIs(self.session.exists(self.session.session_key), True)
 
     def test_delete(self):
         self.session.save()
         self.session.delete(self.session.session_key)
-        self.assertFalse(self.session.exists(self.session.session_key))
+        self.assertIs(self.session.exists(self.session.session_key), False)
 
     def test_flush(self):
         self.session['foo'] = 'bar'
         self.session.save()
         prev_key = self.session.session_key
         self.session.flush()
-        self.assertFalse(self.session.exists(prev_key))
+        self.assertIs(self.session.exists(prev_key), False)
         self.assertNotEqual(self.session.session_key, prev_key)
         self.assertIsNone(self.session.session_key)
-        self.assertTrue(self.session.modified)
-        self.assertTrue(self.session.accessed)
+        self.assertIs(self.session.modified, True)
+        self.assertIs(self.session.accessed, True)
 
     def test_cycle(self):
         self.session['a'], self.session['b'] = 'c', 'd'
@@ -173,7 +173,7 @@ class SessionTestsMixin:
         prev_key = self.session.session_key
         prev_data = list(self.session.items())
         self.session.cycle_key()
-        self.assertFalse(self.session.exists(prev_key))
+        self.assertIs(self.session.exists(prev_key), False)
         self.assertNotEqual(self.session.session_key, prev_key)
         self.assertEqual(list(self.session.items()), prev_data)
 
@@ -182,7 +182,7 @@ class SessionTestsMixin:
         self.session.save()
         prev_data = self.session.items()
         self.session = self.backend(self.session.session_key)
-        self.assertFalse(hasattr(self.session, '_session_cache'))
+        self.assertIs(hasattr(self.session, '_session_cache'), False)
         self.session.cycle_key()
         self.assertCountEqual(self.session.items(), prev_data)
 
@@ -286,23 +286,23 @@ class SessionTestsMixin:
         # set_expiry calls
         with override_settings(SESSION_EXPIRE_AT_BROWSER_CLOSE=False):
             self.session.set_expiry(10)
-            self.assertFalse(self.session.get_expire_at_browser_close())
+            self.assertIs(self.session.get_expire_at_browser_close(), False)
 
             self.session.set_expiry(0)
-            self.assertTrue(self.session.get_expire_at_browser_close())
+            self.assertIs(self.session.get_expire_at_browser_close(), True)
 
             self.session.set_expiry(None)
-            self.assertFalse(self.session.get_expire_at_browser_close())
+            self.assertIs(self.session.get_expire_at_browser_close(), False)
 
         with override_settings(SESSION_EXPIRE_AT_BROWSER_CLOSE=True):
             self.session.set_expiry(10)
-            self.assertFalse(self.session.get_expire_at_browser_close())
+            self.assertIs(self.session.get_expire_at_browser_close(), False)
 
             self.session.set_expiry(0)
-            self.assertTrue(self.session.get_expire_at_browser_close())
+            self.assertIs(self.session.get_expire_at_browser_close(), True)
 
             self.session.set_expiry(None)
-            self.assertTrue(self.session.get_expire_at_browser_close())
+            self.assertIs(self.session.get_expire_at_browser_close(), True)
 
     def test_decode(self):
         # Ensure we can decode what we encode
@@ -348,7 +348,8 @@ class SessionTestsMixin:
         session = self.backend('someunknownkey')
         session.load()
 
-        self.assertFalse(session.exists(session.session_key))
+        self.assertIsNone(session.session_key)
+        self.assertIs(session.exists(session.session_key), False)
         # provided unknown key was cycled, not reused
         self.assertNotEqual(session.session_key, 'someunknownkey')
 
@@ -481,7 +482,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     def test_exists_searches_cache_first(self):
         self.session.save()
         with self.assertNumQueries(0):
-            self.assertTrue(self.session.exists(self.session.session_key))
+            self.assertIs(self.session.exists(self.session.session_key), True)
 
     # Some backends might issue a warning
     @ignore_warnings(module="django.core.cache.backends.base")
@@ -637,8 +638,7 @@ class SessionMiddlewareTests(TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertTrue(
-            response.cookies[settings.SESSION_COOKIE_NAME]['secure'])
+        self.assertIs(response.cookies[settings.SESSION_COOKIE_NAME]['secure'], True)
 
     @override_settings(SESSION_COOKIE_HTTPONLY=True)
     def test_httponly_session_cookie(self):
@@ -652,8 +652,7 @@ class SessionMiddlewareTests(TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertTrue(
-            response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
+        self.assertIs(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'], True)
         self.assertIn(
             cookies.Morsel._reserved['httponly'],
             str(response.cookies[settings.SESSION_COOKIE_NAME])
@@ -671,10 +670,11 @@ class SessionMiddlewareTests(TestCase):
 
         # Handle the response through the middleware
         response = middleware.process_response(request, response)
-        self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
-
-        self.assertNotIn(cookies.Morsel._reserved['httponly'],
-                         str(response.cookies[settings.SESSION_COOKIE_NAME]))
+        self.assertEqual(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'], '')
+        self.assertNotIn(
+            cookies.Morsel._reserved['httponly'],
+            str(response.cookies[settings.SESSION_COOKIE_NAME])
+        )
 
     def test_session_save_on_500(self):
         request = RequestFactory().get('/')

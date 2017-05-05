@@ -1,10 +1,8 @@
 import unittest
-from unittest import skipUnless
 
-from django.contrib.gis.gdal import HAS_GDAL
-
-if HAS_GDAL:
-    from django.contrib.gis.gdal import SpatialReference, CoordTransform, GDALException, SRSException
+from django.contrib.gis.gdal import (
+    CoordTransform, GDALException, SpatialReference, SRSException,
+)
 
 
 class TestSRS:
@@ -148,7 +146,6 @@ bad_srlist = (
 )
 
 
-@skipUnless(HAS_GDAL, "GDAL is required")
 class SpatialRefTest(unittest.TestCase):
 
     def test01_wkt(self):

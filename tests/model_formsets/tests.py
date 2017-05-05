@@ -10,6 +10,7 @@ from django.forms.models import (
     BaseModelFormSet, _get_foreign_key, inlineformset_factory,
     modelformset_factory,
 )
+from django.http import QueryDict
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -699,7 +700,9 @@ class ModelFormsetTest(TestCase):
         AuthorBooksFormSet = inlineformset_factory(Author, Book, can_delete=False, extra=2, fields="__all__")
         Author.objects.create(name='Charles Baudelaire')
 
-        data = {
+        # An immutable QueryDict simulates request.POST.
+        data = QueryDict(mutable=True)
+        data.update({
             'book_set-TOTAL_FORMS': '3',  # the number of forms rendered
             'book_set-INITIAL_FORMS': '2',  # the number of forms with initial data
             'book_set-MAX_NUM_FORMS': '',  # the max number of forms
@@ -708,10 +711,12 @@ class ModelFormsetTest(TestCase):
             'book_set-1-id': '2',
             'book_set-1-title': 'Les Paradis Artificiels',
             'book_set-2-title': '',
-        }
+        })
+        data._mutable = False
 
         formset = AuthorBooksFormSet(data, instance=Author(), save_as_new=True)
         self.assertTrue(formset.is_valid())
+        self.assertIs(data._mutable, False)
 
         new_author = Author.objects.create(name='Charles Baudelaire')
         formset = AuthorBooksFormSet(data, instance=new_author, save_as_new=True)

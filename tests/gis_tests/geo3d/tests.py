@@ -93,7 +93,7 @@ class Geo3DLoadingHelper:
         Polygon3D.objects.create(name='3D BBox', poly=bbox_3d)
 
 
-@skipUnlessDBFeature("gis_enabled", "supports_3d_storage")
+@skipUnlessDBFeature("supports_3d_storage")
 class Geo3DTest(Geo3DLoadingHelper, TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
@@ -204,7 +204,7 @@ class Geo3DTest(Geo3DLoadingHelper, TestCase):
         self.assertIsNone(City3D.objects.none().aggregate(Extent3D('point'))['point__extent3d'])
 
 
-@skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
+@skipUnlessDBFeature("supports_3d_functions")
 class Geo3DFunctionsTests(Geo3DLoadingHelper, TestCase):
     def test_kml(self):
         """

@@ -13,15 +13,9 @@ class AllOGRFields(models.Model):
     geom = models.PolygonField()
     point = models.PointField()
 
-    class Meta:
-        required_db_features = ['gis_enabled']
-
 
 class Fields3D(models.Model):
     point = models.PointField(dim=3)
     pointg = models.PointField(dim=3, geography=True)
     line = models.LineStringField(dim=3)
     poly = models.PolygonField(dim=3)
-
-    class Meta:
-        required_db_features = ['gis_enabled']

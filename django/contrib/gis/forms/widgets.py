@@ -63,15 +63,16 @@ class BaseGeometryWidget(Widget):
         if attrs is None:
             attrs = {}
 
-        context.update(self.build_attrs(self.attrs, dict(
-            name=name,
-            module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
-            serialized=self.serialize(value),
-            geom_type=gdal.OGRGeomType(self.attrs['geom_type']),
-            STATIC_URL=settings.STATIC_URL,
-            LANGUAGE_BIDI=translation.get_language_bidi(),
-            **attrs
-        )))
+        build_attrs_kwargs = {
+            'name': name,
+            'module': 'geodjango_%s' % name.replace('-', '_'),  # JS-safe
+            'serialized': self.serialize(value),
+            'geom_type': gdal.OGRGeomType(self.attrs['geom_type']),
+            'STATIC_URL': settings.STATIC_URL,
+            'LANGUAGE_BIDI': translation.get_language_bidi(),
+        }
+        build_attrs_kwargs.update(attrs)
+        context.update(self.build_attrs(self.attrs, build_attrs_kwargs))
         return context
 
 

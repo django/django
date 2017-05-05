@@ -20,7 +20,6 @@ from .models import (
 )
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoModelTest(TestCase):
     fixtures = ['initial']
 
@@ -80,11 +79,10 @@ class GeoModelTest(TestCase):
         self.assertEqual(ply, ns.poly)
 
         # Testing the `ogr` and `srs` lazy-geometry properties.
-        if gdal.HAS_GDAL:
-            self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
-            self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
-            self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
-            self.assertEqual('WGS 84', ns.poly.srs.name)
+        self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
+        self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
+        self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
+        self.assertEqual('WGS 84', ns.poly.srs.name)
 
         # Changing the interior ring on the poly attribute.
         new_inner = LinearRing((30, 30), (30, 70), (70, 70), (70, 30), (30, 30))
@@ -224,7 +222,6 @@ class GeoModelTest(TestCase):
             self.assertEqual(feature.geom.srid, g.srid)
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoLookupTest(TestCase):
     fixtures = ['initial']
 
@@ -452,7 +449,6 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoQuerySetTest(TestCase):
     # TODO: GeoQuerySet is removed, organize these test better.
     fixtures = ['initial']

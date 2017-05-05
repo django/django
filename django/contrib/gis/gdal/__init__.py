@@ -25,32 +25,23 @@
  by setting `GDAL_LIBRARY_PATH` in your settings with the path to the GDAL C
  library on your system.
 """
+from django.contrib.gis.gdal.datasource import DataSource
+from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.envelope import Envelope
-from django.contrib.gis.gdal.error import (  # NOQA
+from django.contrib.gis.gdal.error import (
     GDALException, OGRException, OGRIndexError, SRSException, check_err,
 )
-from django.contrib.gis.gdal.geomtype import OGRGeomType  # NOQA
+from django.contrib.gis.gdal.geometries import OGRGeometry
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.libgdal import (
+    GDAL_VERSION, gdal_full_version, gdal_version,
+)
+from django.contrib.gis.gdal.raster.source import GDALRaster
+from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 
-__all__ = [
-    'check_err', 'Envelope', 'GDALException', 'OGRException', 'OGRIndexError',
-    'SRSException', 'OGRGeomType', 'HAS_GDAL',
-]
-
-# Attempting to import objects that depend on the GDAL library.  The
-# HAS_GDAL flag will be set to True if the library is present on
-# the system.
-try:
-    from django.contrib.gis.gdal.driver import Driver  # NOQA
-    from django.contrib.gis.gdal.datasource import DataSource  # NOQA
-    from django.contrib.gis.gdal.libgdal import gdal_version, gdal_full_version, GDAL_VERSION  # NOQA
-    from django.contrib.gis.gdal.raster.source import GDALRaster  # NOQA
-    from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform  # NOQA
-    from django.contrib.gis.gdal.geometries import OGRGeometry  # NOQA
-    HAS_GDAL = True
-    __all__ += [
-        'Driver', 'DataSource', 'gdal_version', 'gdal_full_version',
-        'GDALRaster', 'GDAL_VERSION', 'SpatialReference', 'CoordTransform',
-        'OGRGeometry',
-    ]
-except GDALException:
-    HAS_GDAL = False
+__all__ = (
+    'Driver', 'DataSource', 'CoordTransform', 'Envelope', 'GDALException',
+    'GDALRaster', 'GDAL_VERSION', 'OGRException', 'OGRGeometry', 'OGRGeomType',
+    'OGRIndexError', 'SpatialReference', 'SRSException',
+    'check_err', 'gdal_version', 'gdal_full_version',
+)

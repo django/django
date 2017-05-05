@@ -55,6 +55,19 @@ class SimpleTests(HStoreTestCase):
         instance = HStoreModel.objects.get(field__has_keys=[2, 'a', 'ï'])
         self.assertEqual(instance.field, expected_value)
 
+    def test_array_field(self):
+        value = [
+            {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê'},
+            {'a': 1, 'b': 'B', 2: 'c', 'ï': 'ê'},
+        ]
+        expected_value = [
+            {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê'},
+            {'a': '1', 'b': 'B', '2': 'c', 'ï': 'ê'},
+        ]
+        instance = HStoreModel.objects.create(array_field=value)
+        instance.refresh_from_db()
+        self.assertEqual(instance.array_field, expected_value)
+
 
 class TestQuerying(HStoreTestCase):
 
@@ -166,17 +179,27 @@ class TestQuerying(HStoreTestCase):
 
 
 class TestSerialization(HStoreTestCase):
-    test_data = ('[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, '
-                 '"model": "postgres_tests.hstoremodel", "pk": null}]')
+    test_data = json.dumps([{
+        'model': 'postgres_tests.hstoremodel',
+        'pk': None,
+        'fields': {
+            'field': json.dumps({'a': 'b'}),
+            'array_field': json.dumps([
+                json.dumps({'a': 'b'}),
+                json.dumps({'b': 'a'}),
+            ]),
+        },
+    }])
 
     def test_dumping(self):
-        instance = HStoreModel(field={'a': 'b'})
+        instance = HStoreModel(field={'a': 'b'}, array_field=[{'a': 'b'}, {'b': 'a'}])
         data = serializers.serialize('json', [instance])
         self.assertEqual(json.loads(data), json.loads(self.test_data))
 
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, {'a': 'b'})
+        self.assertEqual(instance.array_field, [{'a': 'b'}, {'b': 'a'}])
 
     def test_roundtrip_with_null(self):
         instance = HStoreModel(field={'a': 'b', 'c': None})

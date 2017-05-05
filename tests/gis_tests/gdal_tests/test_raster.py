@@ -43,21 +43,16 @@ Band 1 Block=163x50 Type=Byte, ColorInterp=Gray
 import os
 import struct
 import tempfile
-import unittest
 
-from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster
 from django.contrib.gis.gdal.error import GDALException
+from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
 from django.test import SimpleTestCase
 
 from ..data.rasters.textrasters import JSON_RASTER
 
-if HAS_GDAL:
-    from django.contrib.gis.gdal import GDALRaster, GDAL_VERSION
-    from django.contrib.gis.gdal.raster.band import GDALBand
 
-
-@unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class GDALRasterTests(SimpleTestCase):
     """
     Test a GDALRaster instance created from a file (GeoTiff).
@@ -383,7 +378,6 @@ class GDALRasterTests(SimpleTestCase):
         )
 
 
-@unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class GDALBandTests(SimpleTestCase):
     def setUp(self):
         self.rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')

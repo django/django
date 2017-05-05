@@ -33,6 +33,13 @@ class AuthorWithEvenLongerName(models.Model):
         apps = new_apps
 
 
+class AuthorWithIndexedName(models.Model):
+    name = models.CharField(max_length=255, db_index=True)
+
+    class Meta:
+        apps = new_apps
+
+
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100, db_index=True)
