@@ -874,6 +874,19 @@ class FormattingTests(SimpleTestCase):
                 # Suspicion that user entered dot as decimal separator (#22171)
                 self.assertEqual(sanitize_separators('10.10'), '10.10')
 
+        with self.settings(USE_L10N=False, DECIMAL_SEPARATOR=','):
+            self.assertEqual(sanitize_separators('1001,10'), '1001.10')
+            self.assertEqual(sanitize_separators('1001.10'), '1001.10')
+
+        with self.settings(
+            USE_L10N=False, DECIMAL_SEPARATOR=',', USE_THOUSAND_SEPARATOR=True,
+            THOUSAND_SEPARATOR='.'
+        ):
+            self.assertEqual(sanitize_separators('1.001,10'), '1001.10')
+            self.assertEqual(sanitize_separators('1001,10'), '1001.10')
+            self.assertEqual(sanitize_separators('1001.10'), '1001.10')
+            self.assertEqual(sanitize_separators('1,001.10'), '1.001.10')  # Invalid output
+
     def test_iter_format_modules(self):
         """
         Tests the iter_format_modules function.
