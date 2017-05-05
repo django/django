@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, timedelta
-from http import cookies
+from django.http import cookie
 from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
@@ -261,7 +261,7 @@ class RequestsTests(SimpleTestCase):
         example_cookie = response.cookies['example']
         # A compat cookie may be in use -- check that it has worked
         # both as an output string, and using the cookie attributes
-        self.assertIn('; %s' % cookies.Morsel._reserved['httponly'], str(example_cookie))
+        self.assertIn('; %s' % cookie.Morsel._reserved['httponly'], str(example_cookie))
         self.assertTrue(example_cookie['httponly'])
 
     def test_unicode_cookie(self):

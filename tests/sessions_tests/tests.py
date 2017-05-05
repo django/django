@@ -6,7 +6,7 @@ import sys
 import tempfile
 import unittest
 from datetime import timedelta
-from http import cookies
+from django.http import cookie
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
@@ -655,7 +655,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
         self.assertIn(
-            cookies.Morsel._reserved['httponly'],
+            cookie.Morsel._reserved['httponly'],
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
@@ -688,7 +688,7 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
         self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
-        self.assertNotIn(cookies.Morsel._reserved['httponly'],
+        self.assertNotIn(cookie.Morsel._reserved['httponly'],
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     def test_session_save_on_500(self):
