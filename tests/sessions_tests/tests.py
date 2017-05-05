@@ -659,7 +659,7 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
-    @override_settings(SESSION_COOKIE_SAMESITE='lax')
+    @override_settings(SESSION_COOKIE_SAMESITE='Lax')
     def test_samesite_session_cookie(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
