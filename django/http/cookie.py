@@ -21,7 +21,7 @@ if sys.version_info < (3, 7, 0):
 
         # Cookie pickling bug is fixed in Python 3.4.3+
         # http://bugs.python.org/issue22775
-        if sys.version_info >= (3, 4, 3):
+        if sys.version_info < (3, 4, 3):
             def __setitem__(self, key, value):
                 if isinstance(value, Morsel):
                     # allow assignment of constructed Morsels (e.g. for pickling)
