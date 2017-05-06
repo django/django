@@ -739,6 +739,9 @@ Miscellaneous
 
 * Support for IPython < 1.0 is removed from the ``shell`` command.
 
+* The signature of private API ``Widget.build_attrs()`` changed from
+  ``extra_attrs=None, **kwargs`` to ``base_attrs, extra_attrs=None``.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
