@@ -235,7 +235,15 @@ Use the ``django.test.Client`` class to make requests.
         file-processing code expects.)
 
         You may also provide any file-like object (e.g., :class:`~io.StringIO` or
-        :class:`~io.BytesIO`) as a file handle.
+        :class:`~io.BytesIO`) as a file handle. If you're uploading to an
+        :class:`~django.db.models.ImageField`, the object needs a ``name``
+        attribute that passes the
+        :data:`~django.core.validators.validate_image_file_extension` validator.
+        For example::
+
+            >>> from io import BytesIO
+            >>> img = BytesIO(b'mybinarydata')
+            >>> img.name = 'myimage.jpg'
 
         Note that if you wish to use the same file handle for multiple
         ``post()`` calls then you will need to manually reset the file
