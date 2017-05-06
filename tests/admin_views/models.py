@@ -979,3 +979,13 @@ class Author(models.Model):
 class Authorship(models.Model):
     book = models.ForeignKey(Book, models.CASCADE)
     author = models.ForeignKey(Author, models.CASCADE)
+
+
+# Model for #13091
+
+class TVSeries(models.Model):
+    title = models.CharField(max_length=255)
+    genre = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('title', 'genre')

@@ -50,8 +50,9 @@ from .models import (
     Recommendation, Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel,
     Report, Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
     ShortMessage, Simple, State, Story, SuperSecretHideout, SuperVillain,
-    Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
-    UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    Telegram, TitleTranslation, Topping, TVSeries, UnchangeableObject,
+    UndeletableObject, UnorderedObject, Villain, Vodcast, Whatsit, Widget,
+    Worker, WorkHour,
 )
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -3156,6 +3157,37 @@ class AdminViewListEditable(TestCase):
         )
         self.assertContains(response, '<th class="field-id"><a href="%s">%d</a></th>' % (link1, story1.id), 1)
         self.assertContains(response, '<th class="field-id"><a href="%s">%d</a></th>' % (link2, story2.id), 1)
+
+    def test_list_editable_with_unique_together(self):
+        series0 = TVSeries.objects.create(title='Scrubs', genre='comedy')
+        series1 = TVSeries.objects.create(title='Friends', genre='comedy')
+
+        data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "2",
+            "form-MAX_NUM_FORMS": "0",
+
+            "form-0-id": str(series0.id),
+            "form-0-title": "Scrubs",
+            "form-0-genre": "comedy",
+
+            "form-1-id": str(series1.id),
+            "form-1-title": "Scrubs",
+            "form-1-genre": "comedy",
+
+            "_save": "Save",
+        }
+        response = self.client.post(
+            reverse('admin:admin_views_tvseries_changelist'), data)
+
+        self.assertContains(
+            response,
+            '<ul class="errorlist nonfield"><li>'
+            'Tv series with this Title and Genre already exists.'
+            '</li></ul>',
+            1,
+            html=True
+        )
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

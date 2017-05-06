@@ -42,7 +42,7 @@ from .models import (
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
     Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
-    Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
+    Topping, TVSeries, UnchangeableObject, UndeletableObject, UnorderedObject,
     UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
 
@@ -941,6 +941,11 @@ class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
         return super().get_formsets_with_inlines(request, obj)
 
 
+class TVSeriesAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'title', 'genre')
+    list_editable = ('title', 'genre')
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
@@ -1055,6 +1060,10 @@ site.register(Ingredient)
 site.register(NotReferenced)
 site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
+
+
+# Admin for #13091
+site.register(TVSeries, TVSeriesAdmin)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)
