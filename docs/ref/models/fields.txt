@@ -440,14 +440,17 @@ include a ``BinaryField`` in a :class:`~django.forms.ModelForm`.
 
 A true/false field.
 
-The default form widget for this field is a
-:class:`~django.forms.CheckboxInput`.
-
-If you need to accept :attr:`~Field.null` values then use
-:class:`NullBooleanField` instead.
+The default form widget for this field is :class:`~django.forms.CheckboxInput`
+or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
+
+.. versionchanged:: 2.0
+
+    In older versions, this field didn't permit ``null=True``, so you had to
+    use :class:`NullBooleanField` instead. Using the latter is now discouraged
+    as it's likely to be deprecated in a future version of Django.
 
 ``CharField``
 -------------

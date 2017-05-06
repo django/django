@@ -236,6 +236,10 @@ Models
   function to truncate :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` to the first day of a quarter.
 
+* :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
+  encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
+  likely be deprecated in the future.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
