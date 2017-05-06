@@ -156,7 +156,7 @@ class AggregateTestModel(models.Model):
     """
     char_field = models.CharField(max_length=30, blank=True)
     integer_field = models.IntegerField(null=True)
-    boolean_field = models.NullBooleanField()
+    boolean_field = models.BooleanField(null=True)
 
 
 class StatTestModel(models.Model):

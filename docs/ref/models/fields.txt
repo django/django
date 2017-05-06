@@ -61,9 +61,6 @@ set ``blank=True`` if you wish to permit empty values in forms, as the
     When using the Oracle database backend, the value ``NULL`` will be stored to
     denote the empty string regardless of this attribute.
 
-If you want to accept :attr:`~Field.null` values with :class:`BooleanField`,
-use :class:`NullBooleanField` instead.
-
 ``blank``
 ---------
 
@@ -442,14 +439,17 @@ case it can't be included in a :class:`~django.forms.ModelForm`.
 
 A true/false field.
 
-The default form widget for this field is a
-:class:`~django.forms.CheckboxInput`.
-
-If you need to accept :attr:`~Field.null` values then use
-:class:`NullBooleanField` instead.
+The default form widget for this field is :class:`~django.forms.CheckboxInput`,
+or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
+
+.. versionchanged:: 2.1
+
+    In older versions, this field doesn't permit ``null=True``, so you have to
+    use :class:`NullBooleanField` instead. Using the latter is now discouraged
+    as it's likely to be deprecated in a future version of Django.
 
 ``CharField``
 -------------
@@ -1008,9 +1008,8 @@ values are stored as null.
 
 .. class:: NullBooleanField(**options)
 
-Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
-this instead of a :class:`BooleanField` with ``null=True``. The default form
-widget for this field is a :class:`~django.forms.NullBooleanSelect`.
+Like :class:`BooleanField` with ``null=True``. Use that instead of this field
+as it's likely to be deprecated in a future version of Django.
 
 ``PositiveIntegerField``
 ------------------------

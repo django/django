@@ -41,6 +41,7 @@ class BulkInsertMapper:
     types = {
         'BigIntegerField': NUMBER,
         'BinaryField': BLOB,
+        'BooleanField': NUMBER,
         'DateField': DATE,
         'DateTimeField': TIMESTAMP,
         'DecimalField': NUMBER,

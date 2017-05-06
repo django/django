@@ -988,41 +988,16 @@ class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("'%(value)s' value must be either True or False."),
+        'invalid_nullable': _("'%(value)s' value must be either True, False, or None."),
     }
     description = _("Boolean (Either True or False)")
-
-    def __init__(self, *args, **kwargs):
-        kwargs['blank'] = True
-        super().__init__(*args, **kwargs)
-
-    def check(self, **kwargs):
-        return [
-            *super().check(**kwargs),
-            *self._check_null(**kwargs),
-        ]
-
-    def _check_null(self, **kwargs):
-        if getattr(self, 'null', False):
-            return [
-                checks.Error(
-                    'BooleanFields do not accept null values.',
-                    hint='Use a NullBooleanField instead.',
-                    obj=self,
-                    id='fields.E110',
-                )
-            ]
-        else:
-            return []
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs['blank']
-        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "BooleanField"
 
     def to_python(self, value):
+        if self.null and value in self.empty_values:
+            return None
         if value in (True, False):
             # if value is 1 or 0 than it's equal to True or False, but we want
             # to return a true bool for semantic reasons.
@@ -1032,7 +1007,7 @@ class BooleanField(Field):
         if value in ('f', 'False', '0'):
             return False
         raise exceptions.ValidationError(
-            self.error_messages['invalid'],
+            self.error_messages['invalid_nullable' if self.null else 'invalid'],
             code='invalid',
             params={'value': value},
         )
@@ -1044,15 +1019,16 @@ class BooleanField(Field):
         return self.to_python(value)
 
     def formfield(self, **kwargs):
-        # Unlike most fields, BooleanField figures out include_blank from
-        # self.null instead of self.blank.
         if self.choices:
             include_blank = not (self.has_default() or 'initial' in kwargs)
             defaults = {'choices': self.get_choices(include_blank=include_blank)}
         else:
-            defaults = {'form_class': forms.BooleanField}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            form_class = forms.NullBooleanField if self.null else forms.BooleanField
+            # In HTML checkboxes, 'required' means "must be checked" which is
+            # different from the choices case ("must select some value").
+            # required=False allows unchecked checkboxes.
+            defaults = {'form_class': form_class, 'required': False}
+        return super().formfield(**{**defaults, **kwargs})
 
 
 class CharField(Field):

@@ -606,9 +606,8 @@ subclass::
       and add that method's name to ``list_display``. (See below for more
       on custom methods in ``list_display``.)
 
-    * If the field is a ``BooleanField`` or ``NullBooleanField``, Django
-      will display a pretty "on" or "off" icon instead of ``True`` or
-      ``False``.
+    * If the field is a ``BooleanField``, Django will display a pretty "on" or
+      "off" icon instead of ``True`` or ``False``.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
       callable, Django will HTML-escape the output by default. To escape

@@ -67,7 +67,9 @@ Model field                         Form field
                                     ``True`` on the model field, otherwise not
                                     represented in the form.
 
-:class:`BooleanField`               :class:`~django.forms.BooleanField`
+:class:`BooleanField`               :class:`~django.forms.BooleanField`, or
+                                    :class:`~django.forms.NullBooleanField` if
+                                    ``null=True``.
 
 :class:`CharField`                  :class:`~django.forms.CharField` with
                                     ``max_length`` set to the model field's
