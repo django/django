@@ -2026,6 +2026,11 @@ won't cache results after iterating over them. Oracle and :ref:`PostgreSQL
 <postgresql-server-side-cursors>` use server-side cursors to stream results
 from the database without loading the entire result set into memory.
 
+On PostgreSQL, server-side cursors will only be used when the
+:setting:`DISABLE_SERVER_SIDE_CURSORS <DATABASE-DISABLE_SERVER_SIDE_CURSORS>`
+setting is ``False``. Read :ref:`transaction-pooling-server-side-cursors` if
+you're using a connection pooler configured in transaction pooling mode.
+
 .. versionchanged:: 1.11
 
     PostgreSQL support for server-side cursors was added.

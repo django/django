@@ -306,7 +306,8 @@ class QuerySet:
         An iterator over the results from applying this QuerySet to the
         database.
         """
-        return iter(self._iterable_class(self, chunked_fetch=True))
+        use_chunked_fetch = not connections[self.db].settings_dict.get('DISABLE_SERVER_SIDE_CURSORS')
+        return iter(self._iterable_class(self, chunked_fetch=use_chunked_fetch))
 
     def aggregate(self, *args, **kwargs):
         """

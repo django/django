@@ -189,6 +189,41 @@ cursor query is controlled with the `cursor_tuple_fraction`_ option.
 
 .. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
 
+.. _transaction-pooling-server-side-cursors:
+
+Transaction pooling and server-side cursors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.11.1
+
+Using a connection pooler in transaction pooling mode (e.g. `pgBouncer`_)
+requires disabling server-side cursors for that connection.
+
+Server-side cursors are local to a connection and remain open at the end of a
+transaction when :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` is ``True``. A
+subsequent transaction may attempt to fetch more results from a server-side
+cursor. In transaction pooling mode, there's no guarantee that subsequent
+transactions will use the same connection. If a different connection is used,
+an error is raised when the transaction references the server-side cursor,
+because server-side cursors are only accessible in the connection in which they
+were created.
+
+One solution is to disable server-side cursors for a connection in
+:setting:`DATABASES` by setting :setting:`DISABLE_SERVER_SIDE_CURSORS
+<DATABASE-DISABLE_SERVER_SIDE_CURSORS>` to ``True``.
+
+To benefit from server-side cursors in transaction pooling mode, you could set
+up :doc:`another connection to the database </topics/db/multi-db>` in order to
+perform queries that use server-side cursors. This connection needs to either
+be directly to the database or to a connection pooler in session pooling mode.
+
+Another option is to wrap each ``QuerySet`` using server-side cursors in an
+:func:`~django.db.transaction.atomic` block, because it disables ``autocommit``
+for the duration of the transaction. This way, the server-side cursor will only
+live for the duration of the transaction.
+
+.. _pgBouncer: https://pgbouncer.github.io/
+
 Test database templates
 -----------------------
 

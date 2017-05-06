@@ -641,6 +641,21 @@ PostgreSQL), it is an error to set this option.
 
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
+.. setting:: DATABASE-DISABLE_SERVER_SIDE_CURSORS
+
+``DISABLE_SERVER_SIDE_CURSORS``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.11.1
+
+Default: ``False``
+
+Set this to ``True`` if you want to disable the use of server-side cursors with
+:meth:`.QuerySet.iterator`. :ref:`transaction-pooling-server-side-cursors`
+describes the use case.
+
+This is a PostgreSQL-specific setting.
+
 .. setting:: USER
 
 ``USER``
