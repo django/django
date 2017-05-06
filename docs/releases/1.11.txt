@@ -742,6 +742,12 @@ Miscellaneous
 * The signature of private API ``Widget.build_attrs()`` changed from
   ``extra_attrs=None, **kwargs`` to ``base_attrs, extra_attrs=None``.
 
+* File-like objects (e.g., :class:`~io.StringIO` and :class:`~io.BytesIO`)
+  uploaded to an :class:`~django.db.models.ImageField` using the test client
+  now require a ``name`` attribute with a value that passes the
+  :data:`~django.core.validators.validate_image_file_extension` validator.
+  See the note in :meth:`.Client.post`.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
