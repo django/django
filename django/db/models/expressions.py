@@ -713,24 +713,12 @@ class Col(Expression):
                 self.target.get_db_converters(connection))
 
 
-class IndexCol(Expression):
-    def __init__(self, field_name):
-        super().__init__()
-        self.field_name = field_name
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.field_name)
-
-    def as_sql(self, compiler, connection):
-        return "%s" % connection.ops.quote_name(self.field_name), []
-
-
 class Ref(Expression):
     """
     Reference to column alias of the query. For example, Ref('sum_cost') in
     qs.annotate(sum_cost=Sum('cost')) query.
     """
-    def __init__(self, refs, source):
+    def __init__(self, refs, source=None):
         super().__init__()
         self.refs, self.source = refs, source
 
@@ -738,6 +726,8 @@ class Ref(Expression):
         return "{}({}, {})".format(self.__class__.__name__, self.refs, self.source)
 
     def get_source_expressions(self):
+        if self.source is None:
+            return []
         return [self.source]
 
     def set_source_expressions(self, exprs):
