@@ -324,6 +324,26 @@ class AdminTextInputWidget(forms.TextInput):
             final_attrs.update(attrs)
         super().__init__(attrs=final_attrs)
 
+    @property
+    def media(self):
+        return forms.Media(css={'all': [static('admin/css/chars-remaining.css')]},
+                           js=[static('admin/js/chars-remaining.js')])
+
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = ''
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        if value != '':
+            final_attrs['value'] = force_text(self._format_value(value))
+        maxlength = final_attrs.get('maxlength')
+        if maxlength is None:
+            return format_html('<input{} />', flatatt(final_attrs))
+
+        current = int(maxlength) - len(value)
+        html = format_html('<input{} /><span><span class="count">{}</span>{}</span>',
+                           flatatt(final_attrs), current, _('character(s) remaining'))
+        return html
+
 
 class AdminEmailInputWidget(forms.EmailInput):
     def __init__(self, attrs=None):
