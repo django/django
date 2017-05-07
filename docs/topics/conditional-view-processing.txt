@@ -66,6 +66,10 @@ last time the resource was modified, or ``None`` if the resource doesn't
 exist. The function passed to the ``etag`` decorator should return a string
 representing the `ETag`_ for the resource, or ``None`` if it doesn't exist.
 
+The decorator sets the ``ETag`` and ``Last-Modified`` headers on the response
+if they are not already set by the view and if the request's method is safe
+(``GET`` or ``HEAD``).
+
 .. versionchanged:: 1.11
 
     In older versions, the return value from ``etag_func()`` was interpreted as
@@ -197,6 +201,14 @@ The important thing this example shows is that the same functions can be used
 to compute the ETag and last modification values in all situations. In fact,
 you **should** use the same functions, so that the same values are returned
 every time.
+
+.. admonition:: Validator headers with non-safe request methods
+
+    The ``condition`` decorator only sets validator headers (``ETag`` and
+    ``Last-Modified``) for safe HTTP methods, i.e. ``GET`` and ``HEAD``. If you
+    wish to return them in other cases, set them in your view. See
+    :rfc:`7231#section-4.3.4` to learn about the distinction between setting a
+    validator header in response to requests made with ``PUT`` versus ``POST``.
 
 Comparison with middleware conditional processing
 =================================================
