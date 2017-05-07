@@ -1,8 +1,8 @@
-/*global django:true, jQuery:false*/
-/* Puts the included jQuery into our own namespace using noConflict and passing
- * it 'true'. This ensures that the included jQuery doesn't pollute the global
- * namespace (i.e. this preserves pre-existing values for both window.$ and
- * window.jQuery).
- */
 var django = django || {};
-django.jQuery = jQuery.noConflict(true);
+django.jQuery = jQuery;
+
+var yl = yl || {};
+yl.jQuery = django.jQuery;
+
+// this file also prevents django.jQuery.noConflict
+// there's got to be a better way ...
