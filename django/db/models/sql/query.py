@@ -15,7 +15,7 @@ from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, Ref
+from django.db.models.expressions import Col, IndexCol, Ref
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
@@ -2088,4 +2088,4 @@ class ExpressionIndexQuery:
     def resolve_ref(self, name, *args, **kwargs):
         if not any(f.name == name for f in self.model._meta.concrete_fields):
             raise ValueError("Invalid reference to field '%s' on model '%s'" % (name, self.model._meta.label))
-        return Ref(name, None)
+        return IndexCol(name)
