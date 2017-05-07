@@ -79,12 +79,21 @@ depends on core.js for utility functions like removeChildren or quickElement
             var calDiv = document.getElementById(div_id);
             removeChildren(calDiv);
             var calTable = document.createElement('table');
-            quickElement('caption', calTable, CalendarNamespace.monthsOfYear[month - 1] + ' ' + year);
+            var calHeader = quickElement('caption', calTable, CalendarNamespace.monthsOfYear[month - 1] + ' ');
+            // Draw year select element
+            var selectYear = quickElement('select', calHeader);
+            for (var i = 1900; i < todayYear + 20; i++) {
+                var option = new Option(i);
+                selectYear.appendChild(option);
+                if (i === year) {
+                    option.selected = true;
+                }
+            }
             var tableBody = quickElement('tbody', calTable);
 
             // Draw days-of-week header
             var tableRow = quickElement('tr', tableBody);
-            for (var i = 0; i < 7; i++) {
+            for (i = 0; i < 7; i++) {
                 quickElement('th', tableRow, CalendarNamespace.daysOfWeek[(i + CalendarNamespace.firstDayOfWeek) % 7]);
             }
 
@@ -163,6 +172,12 @@ depends on core.js for utility functions like removeChildren or quickElement
     Calendar.prototype = {
         drawCurrent: function() {
             CalendarNamespace.draw(this.currentMonth, this.currentYear, this.div_id, this.callback, this.selected);
+            var year_select = document.querySelector("#" + this.div_id + " caption select");
+            year_select.onchange = (function(calendar) {
+                return function() {
+                    calendar.drawDate(calendar.currentMonth, parseInt(this.options[this.selectedIndex].value), calendar.selected);
+                };
+            })(this);
         },
         drawDate: function(month, year, selected) {
             this.currentMonth = month;
