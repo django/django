@@ -7,7 +7,7 @@ from django.contrib.admin.utils import (
     lookup_field,
 )
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields.related import ManyToManyRel
+from django.db.models.fields.related import ManyToManyRel, OneToOneField
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils.html import conditional_escape, format_html
@@ -333,6 +333,9 @@ class InlineAdminForm(AdminForm):
     def needs_explicit_pk_field(self):
         # Auto fields are editable (oddly), so need to check for auto or non-editable pk
         if self.form._meta.model._meta.auto_field or not self.form._meta.model._meta.pk.editable:
+            return True
+        # If the PK is a One-to-One field, it will be considered as editable, while it's not
+        if isinstance(self.form._meta.model._meta.pk, OneToOneField):
             return True
         # Also search any parents for an auto field. (The pk info is propagated to child
         # models so that does not need to be checked in parents.)

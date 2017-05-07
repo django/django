@@ -9,10 +9,10 @@ from django.urls import reverse
 from .admin import InnerInline, site as admin_site
 from .models import (
     Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
-    Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
+    Fashionista, FootNote, Holder, Holder15665, Holder2, Holder3, Holder4, Inner, Inner2,
     Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
     ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
-    Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
+    Question, Sighting, SomeChildModel, SomeParentModel, SubInner15665, Teacher,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
@@ -382,6 +382,19 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<div class="inline-related" id="inner_set-1">',
+            count=1
+        )
+
+    def test_stacked_inline_edit_form_contains_has_original_class(self):
+        holder = Holder15665.objects.create(dummy=1)
+        inner = SubInner15665.objects.create(dummy=1, holder=holder)
+        
+        response = self.client.get(reverse('admin:admin_inlines_holder15665_change', args=(holder.pk,)))
+        expected = '<input id="id_subinner15665_set-0-inner15665_ptr" name="subinner15665_set-0-inner15665_ptr" type="hidden" value="{}" />'.format(inner.id)
+        
+        self.assertContains(
+            response,
+            expected,
             count=1
         )
 
@@ -897,3 +910,34 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.wait_until_visible(field_name)
             hide_links[hide_index].click()
             self.wait_until_invisible(field_name)
+
+    def test_non_autofield_primary_key(self):
+        """
+        Test for #15665 where inline wouldn't work if using non-AutoField ids and inherinting the model
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_holder15665_add'))
+
+        # Enter some data and click 'Save'
+        self.selenium.find_element_by_name('inner15665_set-0-dummy').send_keys('111')
+        self.selenium.find_element_by_name('inner15665_set-1-dummy').send_keys('222')
+        self.selenium.find_element_by_name('inner15665_set-2-dummy').send_keys('333')
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        # Check that the objects have been created in the database
+        self.assertEqual(Holder15665.objects.all().count(), 1)
+        self.assertEqual(Inner15665.objects.all().count(), 3)
+
+        # Enter some more data and click 'Save'
+        self.selenium.find_element_by_name('inner15665_set-3-dummy').send_keys('444')
+        self.selenium.find_element_by_name('inner15665_set-4-dummy').send_keys('555')
+        self.selenium.find_element_by_name('inner15665_set-5-dummy').send_keys('666')
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        # Check that the objects have been created in the database
+        self.assertEqual(Holder15665.objects.all().count(), 1)
+        self.assertEqual(Inner15665.objects.all().count(), 6)

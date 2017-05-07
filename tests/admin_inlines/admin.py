@@ -4,10 +4,10 @@ from django.contrib import admin
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
-    Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
+    Holder2, Holder3, Holder4, Holder15665, Inner, Inner2, Inner3, Inner4Stacked,
     Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
     Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
-    Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
+    Sighting, SomeChildModel, SomeParentModel, SottoCapo, SubInner15665, Title,
     TitleCollection,
 )
 
@@ -150,6 +150,9 @@ class ProfileInline(admin.TabularInline):
     model = Profile
     extra = 1
 
+# admin for #15665
+class SubInner15665Inline(admin.StackedInline):
+    model = SubInner15665
 
 # admin for #18433
 class ChildModel1Inline(admin.TabularInline):
@@ -223,3 +226,4 @@ site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
 site.register([Question, Inner4Stacked, Inner4Tabular])
+site.register(Holder15665,inlines=[SubInner15665Inline])
