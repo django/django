@@ -271,3 +271,70 @@ This example is equivalent to::
         my_objects = list(MyModel.objects.filter(published=True))
         if not my_objects:
             raise Http404("No MyModel matches the given query.")
+
+``get_object_or_None()``
+========================
+
+.. function:: get_object_or_None(klass, *args, **kwargs)
+
+   Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
+   but it returns None if object does not exist.
+
+Required arguments
+------------------
+
+``klass``
+    A :class:`~django.db.models.Model` class,
+    a :class:`~django.db.models.Manager`,
+    or a :class:`~django.db.models.query.QuerySet` instance from which to get
+    the object.
+
+``**kwargs``
+    Lookup parameters, which should be in the format accepted by ``get()`` and
+    ``filter()``.
+
+Example
+-------
+
+The following example gets the object with the primary key of 1 from
+``MyModel``::
+
+    from django.shortcuts import get_object_or_None
+
+    def my_view(request):
+        my_object = get_object_or_None(MyModel, pk=1)
+
+This example is equivalent to::
+
+    def my_view(request):
+        my_object = MyModel.objects.filter(pk=1).first
+
+The most common use case is to pass a :class:`~django.db.models.Model`, as
+shown above. However, you can also pass a
+:class:`~django.db.models.query.QuerySet` instance::
+
+    queryset = Book.objects.filter(title__startswith='M')
+    get_object_or_None(queryset, pk=1)
+
+The above example is a bit contrived since it's equivalent to doing::
+
+    get_object_or_None(Book, title__startswith='M', pk=1)
+
+but it can be useful if you are passed the ``queryset`` variable from somewhere
+else.
+
+Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
+for example if you have a
+:ref:`custom manager<custom-managers>`::
+
+    get_object_or_None(Book.dahl_objects, title='Matilda')
+
+You can also use
+:class:`related managers<django.db.models.fields.related.RelatedManager>`::
+
+    author = Author.objects.get(name='Roald Dahl')
+    get_object_or_None(author.book_set, title='Matilda')
+
+Note: As with ``get()``, a
+:class:`~django.core.exceptions.MultipleObjectsReturned` exception
+will be raised if more than one object is found.

@@ -157,3 +157,30 @@ def resolve_url(to, *args, **kwargs):
 
     # Finally, fall back and assume it's a URL
     return to
+
+
+def get_object_or_None(klass, *args, **kwargs):
+    """
+    Use get() to return an object, or None if the object
+    does not exist.
+
+    This works as
+    Model.objects.filter().first()
+
+    klass may be a Model, Manager, or QuerySet object. All other passed
+    arguments and keyword arguments are used in the get() query.
+
+    Note: Like with get(), an MultipleObjectsReturned will be raised if more than one
+    object is found.
+    """
+    queryset = _get_queryset(klass)
+    try:
+        return queryset.get(*args, **kwargs)
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_object_or_None() must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
+    except queryset.model.DoesNotExist:
+        return None

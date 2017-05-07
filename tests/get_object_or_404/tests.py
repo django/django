@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404, get_object_or_None
 from django.test import TestCase
 
 from .models import Article, Author
@@ -76,6 +76,50 @@ class GetObjectOr404Tests(TestCase):
             [article]
         )
 
+        # Test for get_object_or_None
+        # No Articles yet, so we should get a Http404 error.
+
+        result = get_object_or_None(Article, title="Foo")
+        self.assertIsNone(result)
+
+        # get_object_or_None can be passed a Model to query.
+        self.assertEqual(
+            get_object_or_None(Article, title__contains="Run"),
+            article
+        )
+
+        # We can also use the Article manager through an Author object.
+        self.assertEqual(
+            get_object_or_None(a1.article_set, title__contains="Run"),
+            article
+        )
+
+        # No articles containing "Camelot".  This should return None.
+        result = get_object_or_None(a1.article_set, title__contains="Camelot")
+        self.assertIsNone(result)
+
+        # Custom managers can be used too.
+        self.assertEqual(
+            get_object_or_None(Article.by_a_sir, title="Run away!"),
+            article
+        )
+
+        # QuerySets can be used too.
+        self.assertEqual(
+            get_object_or_None(Article.objects.all(), title__contains="Run"),
+            article
+        )
+
+        # Just as when using a get() lookup, you will get an error if more than
+        # one object is returned.
+
+        with self.assertRaises(Author.MultipleObjectsReturned):
+            get_object_or_None(Author.objects.all())
+
+        # Using an empty QuerySet returns None.
+        result = get_object_or_None(Article.objects.none(), title__contains="Run")
+        self.assertIsNone(result)
+
     def test_bad_class(self):
         # Given an argument klass that is not a Model, Manager, or Queryset
         # raises a helpful ValueError message
@@ -94,3 +138,17 @@ class GetObjectOr404Tests(TestCase):
         msg = "First argument to get_list_or_404() must be a Model, Manager, or QuerySet, not 'list'."
         with self.assertRaisesMessage(ValueError, msg):
             get_list_or_404([Article], title__icontains="Run")
+
+        # For get_object_or_None
+        # Given an argument klass that is not a Model, Manager, or Queryset
+        # raises a helpful ValueError message
+        msg = "First argument to get_object_or_None() must be a Model, Manager, or QuerySet, not 'str'."
+        with self.assertRaisesMessage(ValueError, msg):
+            get_object_or_None("Article", title__icontains="Run")
+
+        class CustomClass:
+            pass
+
+        msg = "First argument to get_object_or_None() must be a Model, Manager, or QuerySet, not 'CustomClass'."
+        with self.assertRaisesMessage(ValueError, msg):
+            get_object_or_None(CustomClass, title__icontains="Run")
