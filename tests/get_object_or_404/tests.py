@@ -1,5 +1,7 @@
 from django.http import Http404
-from django.shortcuts import get_list_or_404, get_object_or_404, get_object_or_None
+from django.shortcuts import (
+    get_list_or_404, get_object_or_404, get_object_or_None,
+)
 from django.test import TestCase
 
 from .models import Article, Author
