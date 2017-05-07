@@ -431,6 +431,25 @@ subclass::
     side by side. See :attr:`~ModelAdmin.filter_vertical` to use a vertical
     interface.
 
+    .. admonition:: Note
+
+        If :attr:`~django.db.models.Field.verbose_name` contains non-ASCII
+        characters :attr:`~ModelAdmin.filter_horizontal` and
+        :attr:`~ModelAdmin.filter_vertical` widgets does not work in the
+        :doc:`Admin site <ref/contrib/admin/index>`.
+
+        Make :attr:`~django.db.models.Field.verbose_name` a unicode string and
+        give your ``models.py`` file a (:pep:`263`) encoding::
+
+            # -*- coding: utf-8 -*-
+            
+            from django.db import models
+
+            class Person(models.Model):
+                parents = models.ManyToManyField(
+                    "self", verbose_name=u'Paternità')
+
+
 .. attribute:: ModelAdmin.filter_vertical
 
     Same as :attr:`~ModelAdmin.filter_horizontal`, but uses a vertical display
