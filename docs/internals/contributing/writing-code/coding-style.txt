@@ -287,6 +287,9 @@ Miscellaneous
 * Mark all strings for internationalization; see the :doc:`i18n
   documentation </topics/i18n/index>` for details.
 
+* Use single quotes for strings instead of double quotes unless the string
+  contains single quotes.
+
 * Remove ``import`` statements that are no longer used when you change code.
   `flake8`_ will identify these imports for you. If an unused import needs to
   remain for backwards-compatibility, mark the end of with ``# NOQA`` to
