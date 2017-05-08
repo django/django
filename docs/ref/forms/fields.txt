@@ -1141,6 +1141,38 @@ method::
             # No empty label
             field2 = forms.ModelChoiceField(queryset=..., empty_label=None)
 
+    .. attribute:: to_field_name
+
+        This optional argument is used to specify the name of the field of the model
+        objects which will be used as the value of the choices in ``ModelChoiceField``
+        in the form. By default, it is set to ``None`` and uses the primary key
+        as value of the selected field.
+        We can see its usage in the following example::
+
+            # A test model
+            class Person(models.Model):
+                name = models.CharField(max_length=30)
+
+            # No custom to_field_name
+            field1 = forms.ModelChoiceField(queryset=...)
+
+            # Generated Result
+            <select id="id_field1" name="field1">
+            <option value="Person_object1.pk">Person_object1</option>
+            <option value="Person_object2.pk">Person_object2</option>
+            ...
+            </select>
+
+            # to_field_name provided
+            field2 = forms.ModelChoiceField(queryset=..., to_field_name="name")
+
+            # Generated Result
+            <select id="id_field2" name="field2">
+            <option value="Person_object1.name">Person_object1</option>
+            <option value="Person_object2.name">Person_object2</option>
+            ...
+            </select>
+
         Note that if a ``ModelChoiceField`` is required and has a default
         initial value, no empty choice is created (regardless of the value
         of ``empty_label``).
