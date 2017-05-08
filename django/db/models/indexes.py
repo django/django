@@ -62,7 +62,7 @@ class Index:
             columns.append(column_sql % params)
 
         fields_for_tablespace = [model._meta.get_field(field_name) for field_name in self.fields_names]
-        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields_for_tablespace)
+        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields_for_tablespace, self.db_tablespace)
 
         quote_name = schema_editor.quote_name
 

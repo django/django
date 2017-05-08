@@ -17,7 +17,7 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.db.models.functions import Lower
+from django.db.models.functions import ExtractMonth, Lower
 from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
@@ -1802,10 +1802,33 @@ class SchemaTests(TransactionTestCase):
         self.assertIn('TITLE', sql)
         self.assertIn('LOREM_IPSUM_IDX', sql)
 
+        with connection.schema_editor() as editor:
+            sql = func_index.remove_sql(Book, editor)
+
+        sql = sql.upper()
+        self.assertIn('LOREM_IPSUM_IDX', sql)
+
+    def test_func_index_source_field(self):
+        func_index = Index(fields=[ExtractMonth('pub_date')], name='lorem_ipsum_idx')
+        with connection.schema_editor() as editor:
+            sql = func_index.create_sql(Book, editor)
+
+        sql = sql.upper()
+        self.assertIn('MONTH', sql)
+        self.assertIn('PUB_DATE', sql)
+        self.assertIn('LOREM_IPSUM_IDX', sql)
+
+        with connection.schema_editor() as editor:
+            sql = func_index.remove_sql(Book, editor)
+
+        sql = sql.upper()
+        self.assertIn('LOREM_IPSUM_IDX', sql)
+
+    def test_func_index_invalid_field(self):
         func_index = Index(fields=[Lower('blub')], name='dolor_idx')
         with self.assertRaisesMessage(ValueError, "Invalid reference to field 'blub' on model 'schema.Book'"):
             with connection.schema_editor() as editor:
-                sql = func_index.create_sql(Book, editor)
+                func_index.create_sql(Book, editor)
 
     def test_primary_key(self):
         """

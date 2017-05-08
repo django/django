@@ -686,22 +686,25 @@ class Col(Expression):
 
     contains_column_references = True
 
-    def __init__(self, alias, target, output_field=None):
+    def __init__(self, alias, target, output_field=None, index_col=False):
         if output_field is None:
             output_field = target
         super().__init__(output_field=output_field)
-        self.alias, self.target = alias, target
+        self.alias, self.target, self.index_col = alias, target, index_col
 
     def __repr__(self):
         return "{}({}, {})".format(
             self.__class__.__name__, self.alias, self.target)
 
     def as_sql(self, compiler, connection):
+        if self.index_col:
+            return "%s" % connection.ops.quote_name(self.alias), []
+
         qn = compiler.quote_name_unless_alias
         return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
 
     def relabeled_clone(self, relabels):
-        return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field)
+        return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field, self.index_col)
 
     def get_group_by_cols(self):
         return [self]
@@ -718,7 +721,7 @@ class Ref(Expression):
     Reference to column alias of the query. For example, Ref('sum_cost') in
     qs.annotate(sum_cost=Sum('cost')) query.
     """
-    def __init__(self, refs, source=None):
+    def __init__(self, refs, source):
         super().__init__()
         self.refs, self.source = refs, source
 
@@ -726,8 +729,6 @@ class Ref(Expression):
         return "{}({}, {})".format(self.__class__.__name__, self.refs, self.source)
 
     def get_source_expressions(self):
-        if self.source is None:
-            return []
         return [self.source]
 
     def set_source_expressions(self, exprs):

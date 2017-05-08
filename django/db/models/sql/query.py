@@ -2088,4 +2088,5 @@ class ExpressionIndexQuery:
     def resolve_ref(self, name, *args, **kwargs):
         if not any(f.name == name for f in self.model._meta.concrete_fields):
             raise ValueError("Invalid reference to field '%s' on model '%s'" % (name, self.model._meta.label))
-        return Ref(name)
+        source_field = self.model._meta.get_field(name)
+        return Col(name, source_field, index_col=True)
