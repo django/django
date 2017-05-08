@@ -28,7 +28,7 @@ elif os.name == 'posix':
     # *NIX library names.
     lib_names = ['gdal', 'GDAL', 'gdal2.1.0', 'gdal2.0.0', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0']
 else:
-    raise GDALException('Unsupported OS "%s"' % os.name)
+    raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)
 
 # Using the ctypes `find_library` utility  to find the
 # path to the GDAL library from the list of library names.
@@ -39,9 +39,10 @@ if lib_names:
             break
 
 if lib_path is None:
-    raise GDALException(
-        'Could not find the GDAL library (tried "%s"). Try setting '
-        'GDAL_LIBRARY_PATH in your settings.' % '", "'.join(lib_names)
+    raise ImproperlyConfigured(
+        'Could not find the GDAL library (tried "%s"). Is GDAL installed? '
+        'If it is, try setting GDAL_LIBRARY_PATH in your settings.'
+        % '", "'.join(lib_names)
     )
 
 # This loads the GDAL/OGR C library
