@@ -39,7 +39,7 @@ At this point, you can work on the code. Use ``git rebase -i`` and ``git
 commit --amend`` to make sure the commits have the expected level of quality.
 Once you're ready:
 
-.. code-block:: console
+.. console::
 
     $ # Pull in the latest changes from master.
     $ git checkout master

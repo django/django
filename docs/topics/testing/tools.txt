@@ -857,7 +857,7 @@ To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:
 
-.. code-block:: console
+.. console::
 
     $ pip install selenium
 
@@ -900,7 +900,7 @@ The code for this test may look as follows::
 
 Finally, you may run the test as follows:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test myapp.tests.MySeleniumTests.test_login
 
@@ -1640,19 +1640,19 @@ class. Given::
 
 Then you can choose which tests to run. For example, to run only fast tests:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast
 
 Or to run fast tests and the core one (even though it's slow):
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=fast --tag=core
 
 You can also exclude tests by tag. To run core tests if they are not slow:
 
-.. code-block:: console
+.. console::
 
     $ ./manage.py test --tag=core --exclude-tag=slow
 

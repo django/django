@@ -58,14 +58,14 @@ Create a New Project
 Use the standard ``django-admin`` script to create a project called
 ``geodjango``:
 
-.. code-block:: console
+.. console::
 
     $ django-admin startproject geodjango
 
 This will initialize a new project. Now, create a ``world`` Django application
 within the ``geodjango`` project:
 
-.. code-block:: console
+.. console::
 
     $ cd geodjango
     $ python manage.py startapp world
@@ -111,7 +111,7 @@ The world borders data is available in this `zip file`__.  Create a ``data``
 directory in the ``world`` application, download the world borders data, and
 unzip. On GNU/Linux platforms, use the following commands:
 
-.. code-block:: console
+.. console::
 
     $ mkdir world/data
     $ cd world/data
@@ -140,7 +140,7 @@ Use ``ogrinfo`` to examine spatial data
 The GDAL ``ogrinfo`` utility allows examining the metadata of shapefiles or
 other vector data sources:
 
-.. code-block:: console
+.. console::
 
     $ ogrinfo world/data/TM_WORLD_BORDERS-0.3.shp
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -151,7 +151,7 @@ other vector data sources:
 layer contains polygon data.  To find out more, we'll specify the layer name
 and use the ``-so`` option to get only the important summary information:
 
-.. code-block:: console
+.. console::
 
     $ ogrinfo -so world/data/TM_WORLD_BORDERS-0.3.shp TM_WORLD_BORDERS-0.3
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -235,7 +235,7 @@ Run ``migrate``
 After defining your model, you need to sync it with the database. First,
 create a database migration:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py makemigrations
     Migrations for 'world':
@@ -245,13 +245,13 @@ create a database migration:
 Let's look at the SQL that will generate the table for the ``WorldBorder``
 model:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py sqlmigrate world 0001
 
 This command should produce the following output:
 
-.. code-block:: sql
+.. console::
 
     BEGIN;
     --
@@ -279,7 +279,7 @@ This command should produce the following output:
 If this looks correct, run :djadmin:`migrate` to create this table in the
 database:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
     Operations to perform:
@@ -316,7 +316,7 @@ library that can work with all the vector data sources that OGR supports.
 
 First, invoke the Django shell:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -483,7 +483,7 @@ A few notes about what's going on:
 
 Afterwards, invoke the Django shell from the ``geodjango`` project directory:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -505,7 +505,7 @@ and generates a model definition and ``LayerMapping`` dictionary automatically.
 
 The general usage of the command goes as follows:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py ogrinspect [options] <data_source> <model_name> [options]
 
@@ -516,7 +516,7 @@ be used to further define how the model is generated.
 For example, the following command nearly reproduces the ``WorldBorder`` model
 and mapping dictionary created above, automatically:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder \
         --srid=4326 --mapping --multi
@@ -576,7 +576,7 @@ GeoDjango adds spatial lookups to the Django ORM.  For example, you
 can find the country in the ``WorldBorder`` table that contains
 a particular point.  First, fire up the management shell:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -730,13 +730,13 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
 Create an admin user:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py createsuperuser
 
 Next, start up the Django development server:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py runserver
 

@@ -269,6 +269,50 @@ docs defines some extra description units:
 
         :ticket:`12345`
 
+Django's documentation uses a custom ``console`` directive for documenting
+command-line examples involving ``django-admin.py``, ``manage.py``, ``python``,
+etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
+a Unix-style command prompt and a second tab showing a Windows prompt.
+
+For example, you can replace this fragment::
+
+    use this command:
+
+    .. code-block:: console
+
+        $ python manage.py shell
+
+with this one::
+
+    use this command:
+
+    .. console::
+
+        $ python manage.py shell
+
+Notice two things:
+
+* You usually will replace occurrences of the ``.. code-block:: console``
+  directive.
+* You don't need to change the actual content of the code example. You still
+  write it assuming a Unix-y environment (i.e. a ``'$'`` prompt symbol,
+  ``'/'`` as filesystem path components separator, etc.)
+
+The example above will render a code example block with two tabs. The first
+one will show:
+
+.. code-block:: console
+
+    $ python manage.py shell
+
+(No changes from what ``.. code-block:: console`` would have rendered).
+
+The second one will show:
+
+.. code-block:: doscon
+
+    ...\> py manage.py shell
+
 .. _documenting-new-features:
 
 Documenting new features
@@ -337,7 +381,7 @@ AdvanceCOMP's ``advpng``:
 
 .. code-block:: console
 
-   $ cd docs/
+   $ cd docs
    $ optipng -o7 -zm1-9 -i0 -strip all `find . -type f -not -path "./_build/*" -name "*.png"`
    $ advpng -z4 `find . -type f -not -path "./_build/*" -name "*.png"`
 

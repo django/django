@@ -37,7 +37,7 @@ just as well.
 Usage
 =====
 
-.. code-block:: console
+.. console::
 
     $ django-admin <command> [options]
     $ manage.py <command> [options]

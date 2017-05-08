@@ -53,7 +53,7 @@ To simplify the process of providing optimized JavaScript code, Django
 includes a handy Python script which should be used to create a "minified"
 version. To run it:
 
-.. code-block:: console
+.. console::
 
     $ pip install closure
     $ python django/contrib/admin/bin/compress.py
@@ -134,13 +134,13 @@ To run the tests from the command line, you need to have `Node.js`_ installed.
 After installing `Node.js`, install the JavaScript test dependencies by running
 the following from the root of your Django checkout:
 
-.. code-block:: console
+.. console::
 
     $ npm install
 
 Then run the tests with:
 
-.. code-block:: console
+.. console::
 
     $ npm test
 

@@ -140,7 +140,7 @@ uninstalling is as simple as deleting the ``django`` directory from your Python
 ``site-packages``. To find the directory you need to remove, you can run the
 following at your shell prompt (not the interactive Python prompt):
 
-.. code-block:: console
+.. console::
 
     $ python -c "import django; print(django.__path__)"
 
@@ -218,7 +218,7 @@ latest bug fixes and improvements, follow these instructions:
 
 2. Check out Django's main development branch like so:
 
-   .. code-block:: console
+   .. console::
 
         $ git clone https://github.com/django/django.git
 
@@ -231,7 +231,7 @@ latest bug fixes and improvements, follow these instructions:
 
 4. After setting up and activating the virtualenv, run the following command:
 
-   .. code-block:: console
+   .. console::
 
         $ pip install -e django/
 
