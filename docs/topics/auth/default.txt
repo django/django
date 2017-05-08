@@ -161,6 +161,11 @@ permissions to specific users and groups of users.
 It's used by the Django admin site, but you're welcome to use it in your own
 code.
 
+.. note::
+
+        Make sure you have enabled `django.contrib.auth.backends.ModelBackend`
+        in the AUTHENTICATION_BACKENDS in your app's settings if you are using the default auth Models.
+
 The Django admin site uses permissions as follows:
 
 * Access to view the "add" form and add an object is limited to users with
