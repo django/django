@@ -1793,15 +1793,16 @@ class SchemaTests(TransactionTestCase):
         assertion('text_field', self.get_indexes(AuthorTextFieldWithIndex._meta.db_table))
 
     def test_func_index(self):
-        func_index = Index(fields=[Lower('title').desc()], name='title_lower_idx')
+        func_index = Index(fields=[Lower('title').desc()], name='lorem_ipsum_idx')
         with connection.schema_editor() as editor:
             sql = func_index.create_sql(Book, editor)
 
         sql = sql.upper()
-        self.assertIn('LOWER', sql)
+        self.assertIn('LOWER(', sql)
         self.assertIn('TITLE', sql)
+        self.assertIn('LOREM_IPSUM_IDX', sql)
 
-        func_index = Index(fields=[Lower('blub')], name='title_lower_idx')
+        func_index = Index(fields=[Lower('blub')], name='dolor_idx')
         with self.assertRaisesMessage(ValueError, "Invalid reference to field 'blub' on model 'schema.Book'"):
             with connection.schema_editor() as editor:
                 sql = func_index.create_sql(Book, editor)
