@@ -16,8 +16,8 @@ from ..urls import locale_dir
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class I18NTests(TestCase):
-    """ Tests django views in django/views/i18n.py """
+class SetLanguageTests(TestCase):
+    """Test the django.views.i18n.set_language view."""
 
     def _get_inactive_language_code(self):
         """Return language code for a language which is not activated."""
@@ -181,11 +181,8 @@ class I18NTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTests(SimpleTestCase):
-    """
-    Tests views in django/views/i18n.py that need to change
-    settings.LANGUAGE_CODE.
-    """
+class I18NViewTests(SimpleTestCase):
+    """Test django.views.i18n views other than set_language."""
     def test_jsi18n(self):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
@@ -327,13 +324,6 @@ class JsI18NTests(SimpleTestCase):
             self.assertContains(response, 'emoji')
             self.assertContains(response, '\\ud83d\\udca9')
 
-
-@override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTestsMultiPackage(SimpleTestCase):
-    """
-    Tests views in django/views/i18n.py that need to change
-    settings.LANGUAGE_CODE and merge JS translation from several packages.
-    """
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
     def test_i18n_language_english_default(self):
         """
@@ -384,7 +374,7 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JavascriptI18nTests(SeleniumTestCase):
+class I18nSeleniumTests(SeleniumTestCase):
 
     # The test cases use fixtures & translations from these apps.
     available_apps = [
