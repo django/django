@@ -1105,7 +1105,7 @@ class OperationTests(OperationTestBase):
         ])
         self.assertTableExists("test_rmflmmwt_ponystables")
 
-        operations = [migrations.RemoveField("Pony", "stables")]
+        operations = [migrations.RemoveField("Pony", "stables"), migrations.DeleteModel("PonyStables")]
         self.apply_operations("test_rmflmmwt", project_state, operations=operations)
 
     def test_remove_field(self):
