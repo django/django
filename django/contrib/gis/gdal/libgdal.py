@@ -21,10 +21,10 @@ if lib_path:
     lib_names = None
 elif os.name == 'nt':
     # Windows NT shared libraries
-    lib_names = ['gdal111', 'gdal110', 'gdal19', 'gdal18', 'gdal17']
+    lib_names = ['gdal21', 'gdal20', 'gdal111', 'gdal110', 'gdal19']
 elif os.name == 'posix':
     # *NIX library names.
-    lib_names = ['gdal', 'GDAL', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0', 'gdal1.8.0', 'gdal1.7.0']
+    lib_names = ['gdal', 'GDAL', 'gdal2.1.0', 'gdal2.0.0', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0']
 else:
     raise GDALException('Unsupported OS "%s"' % os.name)
 
