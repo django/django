@@ -270,6 +270,56 @@ class Collector:
         # number of objects deleted for each model label
         deleted_counter = Counter()
 
+        # caches query results of signals to avoid one hit per ['pre_', 'post_']
+        cached_pk_sets = dict()
+
+        def send_m2m_changed(model, obj, action):
+            """
+            Sends `m2m_changed` to all m2m relationships of this `model` that
+            contain at least one row in the table.
+            """
+            m2m_relations = [
+                f for f in model._meta.get_fields(include_hidden=True)
+                if f.many_to_many
+            ]
+
+            from django.db.models import ManyToManyField, ManyToManyRel
+            # for each relation, get all ids of the other side of
+            # the relation and send the signal with them
+            for m2m_relation in m2m_relations:
+
+                # fixme: find a simpler idiom to select the manager and sender.
+                # ATM is with isinstance and getattr(obj, attr_name):
+                if isinstance(m2m_relation, ManyToManyField):
+                    attr_name = m2m_relation.name
+                    sender = m2m_relation.remote_field.through
+                elif isinstance(m2m_relation, ManyToManyRel):
+                    attr_name = m2m_relation.get_accessor_name()
+                    sender = m2m_relation.through
+                else:
+                    # many_to_many fields from 3rd parties are ignored.
+                    continue
+
+                # don't send if no one is listening to avoid a db hit
+                if not signals.m2m_changed.has_listeners(sender):
+                    continue
+
+                key = (obj, attr_name)
+                if key not in cached_pk_sets:
+                    manager = getattr(obj, attr_name)
+
+                    # hit db and cache the results
+                    cached_pk_sets[key] = set(manager.values_list('id', flat=True))
+
+                if cached_pk_sets[(obj, attr_name)]:
+                    signals.m2m_changed.send(
+                        action=action, sender=sender,
+                        instance=obj, reverse=True,
+                        model=m2m_relation.related_model,
+                        pk_set=cached_pk_sets[key],
+                        using=self.using,
+                    )
+
         with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals
             for model, obj in self.instances_with_model():
@@ -277,6 +327,8 @@ class Collector:
                     signals.pre_delete.send(
                         sender=model, instance=obj, using=self.using
                     )
+
+                    send_m2m_changed(model, obj, 'pre_delete')
 
             # fast deletes
             for qs in self.fast_deletes:
@@ -306,6 +358,8 @@ class Collector:
                         signals.post_delete.send(
                             sender=model, instance=obj, using=self.using
                         )
+
+                        send_m2m_changed(model, obj, 'post_delete')
 
         # update collected instances
         for model, instances_for_fieldvalues in self.field_updates.items():

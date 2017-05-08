@@ -217,6 +217,11 @@ instance. Strictly speaking, this is not a model signal since it is sent by the
 :data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
 when it comes to tracking changes to models, it is included here.
 
+.. versionadded:: 1.10
+
+    Added actions ``pre_delete`` and ``post_delete``, sent when an object in
+    a relationship is deleted.
+
 Arguments sent with this signal:
 
 ``sender``
@@ -246,6 +251,10 @@ Arguments sent with this signal:
         Sent *before* the relation is cleared.
     ``"post_clear"``
         Sent *after* the relation is cleared.
+    ``"pre_delete"``
+        Sent *before* one or more objects in a relationship are deleted.
+    ``"post_delete"``
+        Sent *after* one or more objects in a relationship are deleted.
 
 ``reverse``
     Indicates which side of the relation is updated (i.e., if it is the

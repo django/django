@@ -439,6 +439,9 @@ Models
   <django.db.models.Options.default_manager_name>` options allow controlling
   the :attr:`~django.db.models.Model._base_manager` and
   :attr:`~django.db.models.Model._default_manager`, respectively.
+* When an object in a :class:`~django.db.models.ManyToManyField` is deleted,
+  the signal `~django.db.models.signals.m2m_changed` with actions ``pre_delete``
+  and ``post_delete`` is now emitted accordingly.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
