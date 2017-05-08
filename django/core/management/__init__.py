@@ -332,6 +332,7 @@ class ManagementUtility:
         self.autocomplete()
 
         if subcommand == 'help':
+            os.environ['DJANGO_COMMAND'] = 'help'
             if '--commands' in args:
                 sys.stdout.write(self.main_help_text(commands_only=True) + '\n')
             elif len(options.args) < 1:

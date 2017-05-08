@@ -198,3 +198,6 @@ class UserSettingsHolder:
 
 
 settings = LazySettings()
+if (os.environ['DJANGO_COMMAND'] is 'help'):
+    settings.configure()
+
