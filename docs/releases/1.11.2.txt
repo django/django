@@ -9,4 +9,5 @@ Django 1.11.2 fixes several bugs in 1.11.1.
 Bugfixes
 ========
 
-* ...
+* Added detection for GDAL 2.1 and 2.0, and removed detection for unsupported
+  versions 1.7 and 1.8 (:ticket:`28181`).
