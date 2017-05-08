@@ -323,8 +323,10 @@ class AssertNumQueriesContextManagerTests(TestCase):
         with self.assertRaises(AssertionError) as exc_info:
             with self.assertNumQueries(2):
                 Person.objects.count()
-        self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
-        self.assertIn("Captured queries were", str(exc_info.exception))
+        exc_lines = str(exc_info.exception).split('\n')
+        self.assertEqual(exc_lines[0], '1 != 2 : 1 queries executed, 2 expected')
+        self.assertEqual(exc_lines[1], 'Captured queries were:')
+        self.assertTrue(exc_lines[2].startswith('1.'))  # queries are numbered
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):

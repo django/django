@@ -78,7 +78,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
             "%d queries executed, %d expected\nCaptured queries were:\n%s" % (
                 executed, self.num,
                 '\n'.join(
-                    query['sql'] for query in self.captured_queries
+                    '%d. %s' % (i, query['sql']) for i, query in enumerate(self.captured_queries, start=1)
                 )
             )
         )
