@@ -31,6 +31,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         MySQL has the following field length restriction:
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
+        MySQL doesn't support a database index on some data types.
         """
         errors = []
         if (field_type.startswith('varchar') and field.unique and
@@ -40,6 +41,20 @@ class DatabaseValidation(BaseDatabaseValidation):
                     'MySQL does not allow unique CharFields to have a max_length > 255.',
                     obj=field,
                     id='mysql.E001',
+                )
+            )
+
+        if field.db_index and field_type.lower() in self.connection._limited_data_types:
+            errors.append(
+                checks.Warning(
+                    'MySQL does not support a database index on %s columns.'
+                    % field_type,
+                    hint=(
+                        "An index won't be created. Silence this warning if "
+                        "you don't care about it."
+                    ),
+                    obj=field,
+                    id='fields.W162',
                 )
             )
         return errors

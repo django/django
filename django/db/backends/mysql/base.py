@@ -143,6 +143,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             return self._data_types
 
+    # For these columns, MySQL doesn't:
+    # - accept default values and implicitly treats these columns as nullable
+    # - support a database index
+    _limited_data_types = (
+        'tinyblob', 'blob', 'mediumblob', 'longblob', 'tinytext', 'text',
+        'mediumtext', 'longtext', 'json',
+    )
+
     operators = {
         'exact': '= %s',
         'iexact': 'LIKE %s',

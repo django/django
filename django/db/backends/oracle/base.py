@@ -55,6 +55,7 @@ from .introspection import DatabaseIntrospection            # NOQA isort:skip
 from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime                          # NOQA isort:skip
+from .validation import DatabaseValidation                  # NOQA isort:skip
 
 
 class _UninitializedOperatorsDescriptor:
@@ -115,6 +116,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }
 
+    # Oracle doesn't support a database index on these columns.
+    _limited_data_types = ('clob', 'nclob', 'blob')
+
     operators = _UninitializedOperatorsDescriptor()
 
     _standard_operators = {
@@ -174,6 +178,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
+    validation_class = DatabaseValidation
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
