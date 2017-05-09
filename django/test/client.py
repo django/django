@@ -99,7 +99,6 @@ def conditional_content_removal(request, response):
             response.streaming_content = []
         else:
             response.content = b''
-        response['Content-Length'] = '0'
     if request.method == 'HEAD':
         if response.streaming:
             response.streaming_content = []
