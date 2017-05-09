@@ -5,7 +5,7 @@ import warnings
 from django.db import models
 from django.db.utils import DatabaseError
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -305,6 +305,7 @@ class TestManagerInheritance(TestCase):
 
 @isolate_apps('managers_regress')
 class TestManagerDeprecations(TestCase):
+    @skipUnlessDBFeature('gis_enabled')
     def test_use_for_related_fields_on_geomanager(self):
         from django.contrib.gis.db.models import GeoManager
 
