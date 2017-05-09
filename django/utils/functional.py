@@ -32,6 +32,8 @@ class cached_property(object):
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
+        # This calls the function and then assigns the returned value in place
+        # of THIS decorator instance, so this line is never called again
         res = instance.__dict__[self.name] = self.func(instance)
         return res
 

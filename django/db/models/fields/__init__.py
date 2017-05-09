@@ -92,10 +92,6 @@ def _empty(of_cls):
     return new
 
 
-def return_None():
-    return None
-
-
 @total_ordering
 @python_2_unicode_compatible
 class Field(RegisterLookupMixin):
@@ -775,17 +771,21 @@ class Field(RegisterLookupMixin):
         """
         Returns the default value for this field.
         """
-        return self._get_default()
+        # As much logic as possible is cached inside the _get_default method,
+        # but to avoid forcing the use of un-pickle-able lambdas, we must allow
+        # the value to be a non-callable
+        default = self._get_default
+        if callable(default):
+            return default()
+        return default
 
     @cached_property
     def _get_default(self):
         if self.has_default():
-            if callable(self.default):
-                return self.default
-            return lambda: self.default
+            return self.default
 
         if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
-            return return_None
+            return None
         return six.text_type  # returns empty string
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
