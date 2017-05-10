@@ -5,6 +5,7 @@ Move a file in the safest way possible::
     >>> file_move_safe("/tmp/old_file", "/tmp/new_file")
 """
 
+import errno
 import os
 from shutil import copystat
 
@@ -66,7 +67,15 @@ def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_ove
         finally:
             locks.unlock(fd)
             os.close(fd)
-    copystat(old_file_name, new_file_name)
+
+    try:
+        copystat(old_file_name, new_file_name)
+    except PermissionError as e:
+        # Certain filesystems (e.g. CIFS) fail to copy the file's metadata if
+        # the type of the destination filesystem isn't the same as the source
+        # filesystem; ignore that.
+        if e.errno != errno.EPERM:
+            raise
 
     try:
         os.remove(old_file_name)

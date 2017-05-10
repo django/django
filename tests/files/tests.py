@@ -1,3 +1,4 @@
+import errno
 import gzip
 import os
 import struct
@@ -339,6 +340,30 @@ class FileMoveSafeTests(unittest.TestCase):
 
         os.close(handle_a)
         os.close(handle_b)
+
+    def test_file_move_copystat_cifs(self):
+        """
+        file_move_safe() ignores a copystat() EPERM PermissionError. This
+        happens when the destination filesystem is CIFS, for example.
+        """
+        copystat_EACCES_error = PermissionError(errno.EACCES, 'msg')
+        copystat_EPERM_error = PermissionError(errno.EPERM, 'msg')
+        handle_a, self.file_a = tempfile.mkstemp()
+        handle_b, self.file_b = tempfile.mkstemp()
+        try:
+            # This exception is required to reach the copystat() call in
+            # file_safe_move().
+            with mock.patch('django.core.files.move.os.rename', side_effect=OSError()):
+                # An error besides EPERM isn't ignored.
+                with mock.patch('django.core.files.move.copystat', side_effect=copystat_EACCES_error):
+                    with self.assertRaises(PermissionError):
+                        file_move_safe(self.file_a, self.file_b, allow_overwrite=True)
+                # EPERM is ignored.
+                with mock.patch('django.core.files.move.copystat', side_effect=copystat_EPERM_error):
+                    self.assertIsNone(file_move_safe(self.file_a, self.file_b, allow_overwrite=True))
+        finally:
+            os.close(handle_a)
+            os.close(handle_b)
 
 
 class SpooledTempTests(unittest.TestCase):
