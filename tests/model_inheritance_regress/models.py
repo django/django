@@ -193,7 +193,7 @@ class MessyBachelorParty(BachelorParty):
 
 # Check concrete -> abstract -> concrete inheritance
 class SearchableLocation(models.Model):
-    keywords = models.CharField(max_length=256)
+    keywords = models.CharField(max_length=255)
 
 
 class Station(SearchableLocation):
