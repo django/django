@@ -694,6 +694,8 @@ includes it. This example produces the output ``"Hello, John!"``:
 * Template::
 
     {% include "name_snippet.html" %}
+    
+    Note that the above is referencing to an absolute path. If you need to look for ``name_snippet.html`` from the directory of the template referencing it, use ``{% include "name_snippet.html" %}``
 
 * The ``name_snippet.html`` template::
 
