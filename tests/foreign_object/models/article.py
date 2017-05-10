@@ -83,7 +83,7 @@ class ArticleTranslation(models.Model):
     lang = models.CharField(max_length=2)
     title = models.CharField(max_length=100)
     body = models.TextField()
-    abstract = models.CharField(max_length=400, null=True)
+    abstract = models.TextField(null=True)
 
     class Meta:
         unique_together = ('article', 'lang')

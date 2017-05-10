@@ -39,7 +39,7 @@ DoesNotExistBookManager = BaseManager.from_queryset(DoesNotExistQuerySet)
 
 
 class Book(models.Model):
-    name = models.CharField(max_length=300)
+    name = models.CharField(max_length=255)
     slug = models.SlugField()
     pages = models.IntegerField()
     authors = models.ManyToManyField(Author)
@@ -57,7 +57,7 @@ class Book(models.Model):
 
 class Page(models.Model):
     content = models.TextField()
-    template = models.CharField(max_length=300)
+    template = models.CharField(max_length=255)
 
 
 class BookSigning(models.Model):
