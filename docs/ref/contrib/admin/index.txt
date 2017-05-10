@@ -519,11 +519,13 @@ subclass::
         If you want to use a custom widget with a relation field (i.e.
         :class:`~django.db.models.ForeignKey` or
         :class:`~django.db.models.ManyToManyField`), make sure you haven't
-        included that field's name in ``raw_id_fields`` or ``radio_fields``.
+        included that field's name in ``raw_id_fields``, ``radio_fields``, or
+        ``autocomplete_fields``.
 
         ``formfield_overrides`` won't let you change the widget on relation
-        fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
-        because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
+        fields that have ``raw_id_fields``, ``radio_fields``, or
+        ``autocomplete_fields`` set. That's because ``raw_id_fields``,
+        ``radio_fields``, and ``autocomplete_fields`` imply custom widgets of
         their own.
 
 .. attribute:: ModelAdmin.inlines
@@ -1071,6 +1073,58 @@ subclass::
     Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or has
     ``choices`` set.
 
+.. attribute:: ModelAdmin.autocomplete_fields
+
+    .. versionadded:: 2.0
+
+    ``autocomplete_fields`` is a list of ``ForeignKey`` and/or
+    ``ManyToManyField`` fields you would like to change to `Select2
+    <https://select2.org/>`_ autocomplete inputs.
+
+    By default, the admin uses a select-box interface (``<select>``) for fields
+    that are . Sometimes you don't want to incur the overhead of selecting all
+    the related instances to display in the dropdown.
+
+    The Select2 input looks similar to the default input but comes with a
+    search feature that loads the options asynchronously. This is faster and
+    more user-friendly if the related model has many instances.
+
+    You must define :attr:`~ModelAdmin.search_fields` on the related object's
+    ``ModelAdmin`` because the autocomplete search uses it.
+
+    Ordering and pagination of the results are controlled by the related
+    ``ModelAdmin``'s :meth:`~ModelAdmin.get_ordering` and
+    :meth:`~ModelAdmin.get_paginator` methods.
+
+    In the following example, ``ChoiceAdmin`` has an autocomplete field for the
+    ``ForeignKey`` to the ``Question``. The results are filtered by the
+    ``question_text`` field and ordered by the ``date_created`` field::
+
+        class QuestionAdmin(admin.ModelAdmin):
+            ordering = ['date_created']
+            search_fields = ['question_text']
+
+        class ChoiceAdmin(admin.ModelAdmin):
+            autocomplete_fields = ['question']
+
+    .. admonition:: Performance considerations for large datasets
+
+        Ordering using :attr:`ModelAdmin.ordering` may cause performance
+        problems as sorting on a large queryset will be slow.
+
+        Also, if your search fields include fields that aren't indexed by the
+        database, you might encounter poor performance on extremely large
+        tables.
+
+        For those cases, it's a good idea to write your own
+        :func:`ModelAdmin.get_search_results` implementation using a
+        full-text indexed search.
+
+        You may also want to change the ``Paginator`` on very large tables
+        as the default paginator always performs a ``count()`` query.
+        For example, you could override the default implementation of the
+        ``Paginator.count`` property.
+
 .. attribute:: ModelAdmin.raw_id_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
@@ -1430,6 +1484,15 @@ templates used by the :class:`ModelAdmin` views:
     based on whether the parent is being added or changed. Here you can do any
     pre- or post-save operations for objects related to the parent. Note
     that at this point the parent object and its form have already been saved.
+
+.. method:: ModelAdmin.get_autocomplete_fields(request)
+
+    .. versionadded:: 2.0
+
+    The ``get_readonly_fields()`` method is given the ``HttpRequest`` and is
+    expected to return a ``list`` or ``tuple`` of field names that will be
+    displayed with an autocomplete widget as described above in the
+    :attr:`ModelAdmin.autocomplete_fields` section.
 
 .. method:: ModelAdmin.get_readonly_fields(request, obj=None)
 

@@ -66,7 +66,10 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
+  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using an
+  `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
+  ``ManyToManyField``.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

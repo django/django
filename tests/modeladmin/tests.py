@@ -7,14 +7,17 @@ from django.contrib.admin.options import (
     get_content_type_for_model,
 )
 from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.admin.widgets import (
+    AdminDateWidget, AdminRadioSelect, AutocompleteSelect,
+    AutocompleteSelectMultiple,
+)
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
 
-from .models import Band, Concert
+from .models import Band, Concert, Song
 
 
 class MockRequest:
@@ -637,6 +640,31 @@ class ModelAdminTests(TestCase):
                 else:
                     self.assertEqual(fetched.change_message, str(message))
                     self.assertEqual(fetched.object_repr, str(self.band))
+
+    def test_get_autocomplete_fields(self):
+        class NameAdmin(ModelAdmin):
+            search_fields = ['name']
+
+        class SongAdmin(ModelAdmin):
+            autocomplete_fields = ['featuring']
+            fields = ['featuring', 'band']
+
+        class OtherSongAdmin(SongAdmin):
+            def get_autocomplete_fields(self, request):
+                return ['band']
+
+        self.site.register(Band, NameAdmin)
+        try:
+            # Uses autocomplete_fields if not overridden.
+            model_admin = SongAdmin(Song, self.site)
+            form = model_admin.get_form(request)()
+            self.assertIsInstance(form.fields['featuring'].widget.widget, AutocompleteSelectMultiple)
+            # Uses overridden get_autocomplete_fields
+            model_admin = OtherSongAdmin(Song, self.site)
+            form = model_admin.get_form(request)()
+            self.assertIsInstance(form.fields['band'].widget.widget, AutocompleteSelect)
+        finally:
+            self.site.unregister(Band)
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

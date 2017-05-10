@@ -527,6 +527,15 @@ with the admin site:
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
+* **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
+  ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E038**: The value of ``autocomplete_fields[n]`` must be a foreign
+  key or a many-to-many field.
+* **admin.E039**: An admin for model ``<model>`` has to be registered to be
+  referenced by ``<modeladmin>.autocomplete_fields``.
+* **admin.E040**: ``<modeladmin>`` must define ``search_fields``, because
+  it's referenced by ``<other_modeladmin>.autocomplete_fields``.
 
 ``ModelAdmin``
 ~~~~~~~~~~~~~~

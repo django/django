@@ -19,6 +19,10 @@ from django.contrib.admin.utils import (
     get_deleted_objects, lookup_needs_distinct, model_format_dict,
     model_ngettext, quote, unquote,
 )
+from django.contrib.admin.views.autocomplete import AutocompleteJsonView
+from django.contrib.admin.widgets import (
+    AutocompleteSelect, AutocompleteSelectMultiple,
+)
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
     FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
@@ -94,6 +98,7 @@ csrf_protect_m = method_decorator(csrf_protect)
 class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
+    autocomplete_fields = ()
     raw_id_fields = ()
     fields = None
     exclude = None
@@ -213,7 +218,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Get a form Field for a ForeignKey.
         """
         db = kwargs.get('using')
-        if db_field.name in self.raw_id_fields:
+
+        if db_field.name in self.get_autocomplete_fields(request):
+            kwargs['widget'] = AutocompleteSelect(db_field.remote_field, using=db)
+        elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in self.radio_fields:
             kwargs['widget'] = widgets.AdminRadioSelect(attrs={
@@ -238,7 +246,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return None
         db = kwargs.get('using')
 
-        if db_field.name in self.raw_id_fields:
+        autocomplete_fields = self.get_autocomplete_fields(request)
+        if db_field.name in autocomplete_fields:
+            kwargs['widget'] = AutocompleteSelectMultiple(db_field.remote_field, using=db)
+        elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in list(self.filter_vertical) + list(self.filter_horizontal):
             kwargs['widget'] = widgets.FilteredSelectMultiple(
@@ -252,11 +263,19 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 kwargs['queryset'] = queryset
 
         form_field = db_field.formfield(**kwargs)
-        if isinstance(form_field.widget, SelectMultiple) and not isinstance(form_field.widget, CheckboxSelectMultiple):
+        if (isinstance(form_field.widget, SelectMultiple) and
+                not isinstance(form_field.widget, (CheckboxSelectMultiple, AutocompleteSelectMultiple))):
             msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
             help_text = form_field.help_text
             form_field.help_text = format_lazy('{} {}', help_text, msg) if help_text else msg
         return form_field
+
+    def get_autocomplete_fields(self, request):
+        """
+        Return a list of ForeignKey and/or ManyToMany fields which should use
+        an autocomplete widget.
+        """
+        return self.autocomplete_fields
 
     def get_view_on_site_url(self, obj=None):
         if obj is None or not self.view_on_site:
@@ -561,6 +580,7 @@ class ModelAdmin(BaseModelAdmin):
         urlpatterns = [
             url(r'^$', wrap(self.changelist_view), name='%s_%s_changelist' % info),
             url(r'^add/$', wrap(self.add_view), name='%s_%s_add' % info),
+            url(r'^autocomplete/$', wrap(self.autocomplete_view), name='%s_%s_autocomplete' % info),
             url(r'^(.+)/history/$', wrap(self.history_view), name='%s_%s_history' % info),
             url(r'^(.+)/delete/$', wrap(self.delete_view), name='%s_%s_delete' % info),
             url(r'^(.+)/change/$', wrap(self.change_view), name='%s_%s_change' % info),
@@ -1526,6 +1546,9 @@ class ModelAdmin(BaseModelAdmin):
         context.update(extra_context or {})
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
+
+    def autocomplete_view(self, request):
+        return AutocompleteJsonView.as_view(model_admin=self)(request)
 
     def add_view(self, request, form_url='', extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)
