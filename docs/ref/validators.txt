@@ -174,6 +174,15 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     An :class:`EmailValidator` instance without any customizations.
 
+``validate_email_utf8``
+------------------
+
+.. data:: validate_email_utf8
+
+    An :class:`EmailValidator` instance with support for utf-8
+    in the local-part of the address.
+
+
 ``validate_slug``
 -----------------
 

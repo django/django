@@ -10,7 +10,7 @@ from django.core.validators import (
     BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
     MinValueValidator, RegexValidator, URLValidator, int_list_validator,
-    validate_comma_separated_integer_list, validate_email,
+    validate_comma_separated_integer_list, validate_email, validate_email_utf8,
     validate_image_file_extension, validate_integer, validate_ipv4_address,
     validate_ipv6_address, validate_ipv46_address, validate_slug,
     validate_unicode_slug,
@@ -88,6 +88,15 @@ TEST_DATA = [
     (validate_email, 'a\n@b.com', ValidationError),
     (validate_email, '"test@test"\n@example.com', ValidationError),
     (validate_email, 'a@[127.0.0.1]\n', ValidationError),
+
+    (validate_email_utf8, 'normal_ascii_email@here.com', None),
+    (validate_email_utf8, 'ʬ你@here.com', None),
+    (validate_email_utf8, 'ʬ-ʬ你@好ʬ.com', None),
+    (validate_email_utf8, 'うえあいお@えあい.com', None),
+    (validate_email_utf8, 'test@うえあ.com', None),
+    # Emoji shouldn't be supported
+    (validate_email_utf8, '💩@domain.com', ValidationError),
+    (validate_email_utf8, 'えあい💩えあい@えあいdomain.com', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),

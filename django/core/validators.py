@@ -229,6 +229,13 @@ class EmailValidator:
 
 validate_email = EmailValidator()
 
+validate_email_utf8 = EmailValidator()
+validate_email_utf8.user_regex = _lazy_re_compile(
+    r"(^[-!#$%&'*+/=?^`{}|~\w]+(\.[-!#$%&'*+/=?^`{}|~\w]+)*\Z"  # dot-atom
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
+    re.IGNORECASE + (re.UNICODE if six.PY2 else 0)
+)
+
 slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,

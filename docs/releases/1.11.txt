@@ -435,6 +435,9 @@ Validators
   :data:`~django.core.validators.validate_image_file_extension` to validate
   image files.
 
+* Added :data:`django.core.validators.validate_email_utf8` to validate email
+  addresses that support utf-8 in the local-part of the address.
+
 .. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11
