@@ -1406,7 +1406,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class PersonAdmin(admin.ModelAdmin):
             list_display = ('name', 'age')
-            search_fields = ('name',)
+            search_fields = ('age',)
 
             def get_search_results(self, request, queryset, search_term):
                 queryset, use_distinct = super().get_search_results(request, queryset, search_term)
