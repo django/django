@@ -6,10 +6,10 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 from django.contrib.postgres.search import (
-    SearchQuery, SearchRank, SearchVector,
+    PhraseSearchQuery, RawSearchQuery, SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
-from django.test import modify_settings
+from django.test import modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
@@ -286,3 +286,20 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+
+@skipUnlessDBFeature('has_phraseto_tsquery')
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+class TestPhraseSearchQuery(GrailTestData, PostgreSQLTestCase):
+    def test_simple_phrase_search(self):
+        searched = Line.objects.filter(
+            dialogue__search=PhraseSearchQuery('body burned'))
+        self.assertSequenceEqual(searched, [self.verse1])
+
+
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+class TestRawSearchQuery(GrailTestData, PostgreSQLTestCase):
+    def test_simple_raw_search(self):
+        searched = Line.objects.filter(
+            dialogue__search=RawSearchQuery('shall & use'))
+        self.assertSequenceEqual(searched, [self.bedemir0])

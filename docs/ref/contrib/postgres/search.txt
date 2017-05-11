@@ -73,9 +73,9 @@ and ``weight`` parameters.
 .. class:: SearchQuery(value, config=None)
 
 ``SearchQuery`` translates the terms the user provides into a search query
-object that the database compares to a search vector. By default, all the words
-the user provides are passed through the stemming algorithms, and then it
-looks for matches for all of the resulting terms.
+object that the database compares to a search vector, ignoring punctuation.
+By default, all the words the user provides are passed through the stemming
+algorithms, and then it looks for matches for all of the resulting terms.
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
@@ -86,6 +86,50 @@ looks for matches for all of the resulting terms.
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
+
+``PhraseSearchQuery``
+=====================
+
+.. class:: PhraseSearchQuery(value, config=None)
+
+.. versionadded:: 2.0
+
+``PhraseSearchQuery`` translates the phrase the user provides into phrase search query,
+ignoring punctuation.
+
+    >>> from django.contrib.postgres.search import PhraseSearchQuery
+    >>> Entry.objects.annotate(
+    ...     search=SearchVector('body_text'),
+    ... ).filter(search=PhraseSearchQuery('toast recipe'))
+    [<Entry: Cheese on Toast recipes>]
+
+Note: it's important that when you search using phrase search, word order matter:
+
+    >>> from django.contrib.postgres.search import PhraseSearchQuery
+    >>> Entry.objects.annotate(
+    ...     search=SearchVector('body_text'),
+    ... ).filter(search=PhraseSearchQuery('recipe toast'))
+    []
+
+
+``RawSearchQuery``
+==================
+
+.. class:: RawSearchQuery(value, config=None)
+
+.. versionadded:: 2.0
+
+``RawSearchQuery`` translates the terms the user provides into a search query
+object that the database compares to a search vector. You can combine logical
+operators `&` (AND), `|` (OR), and `!` (NOT) as well as the phrase search operator
+`<->` (FOLLOWED BY) for better search results.
+
+    >>> from django.contrib.postgres.search import RawSearchQuery
+    >>> Entry.objects.annotate(
+    ...     search=SearchVector('body_text'),
+    ... ).filter(search=RawSearchQuery('toast <-> recipe'))
+    [<Entry: Cheese on Toast recipes>]
+
 
 ``SearchRank``
 ==============
