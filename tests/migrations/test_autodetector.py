@@ -832,9 +832,10 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["RenameModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name="Author", new_name="Writer")
-        # Now that RenameModel handles related fields too, there should be
-        # no AlterField for the related field.
-        self.assertNumberMigrations(changes, 'otherapp', 0)
+        # Now to maintain the migration state of related field
+        # their is AlterField for the related field.
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["AlterField"])
 
     def test_rename_m2m_through_model(self):
         """
@@ -848,7 +849,7 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ['RenameModel'])
+        self.assertOperationTypes(changes, 'testapp', 0, ['RenameModel',"AlterField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name='Contract', new_name='Deal')
 
     def test_rename_model_with_renamed_rel_field(self):
@@ -868,7 +869,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations for related field rename?
         # Alter is already taken care of.
         self.assertNumberMigrations(changes, 'otherapp', 1)
-        self.assertOperationTypes(changes, 'otherapp', 0, ["RenameField"])
+        self.assertOperationTypes(changes, 'otherapp', 0, ["RenameField","AlterField"])
         self.assertOperationAttributes(changes, 'otherapp', 0, 0, old_name="author", new_name="writer")
 
     def test_rename_model_with_fks_in_different_position(self):
@@ -900,6 +901,38 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["RenameModel"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, old_name="EntityB", new_name="RenamedEntityB")
+
+    def test_rename_model_with_fk_ref_in_diff_app(self):
+        """
+        #28056 - Reverse migration for model rename with cross-app 
+        ForeignKey fails.
+        """
+        before = [
+            ModelState("testapp", "EntityA", [
+                ("id", models.AutoField(primary_key=True)),
+            ]),
+            ModelState("otherapp", "EntityC", [
+                ("id", models.AutoField(primary_key=True)),
+                ("entity_a", models.ForeignKey("testapp.EntityA", models.CASCADE)),
+            ]),
+        ]
+        after = [
+            ModelState("testapp", "EntityB", [
+                ("id", models.AutoField(primary_key=True)),
+            ]),
+            ModelState("otherapp", "EntityC", [
+                ("id", models.AutoField(primary_key=True)),
+                ("entity_a", models.ForeignKey("testapp.EntityB", models.CASCADE)),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({"ask_rename_model": True}))
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["RenameModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, old_name="EntityA", new_name="EntityB")
+        # To maintain the current migration state of related field =
+        # we need to include AlterField migration in otherapp
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["AlterField"])
 
     def test_fk_dependency(self):
         """Having a ForeignKey automatically adds a dependency."""

@@ -875,22 +875,11 @@ class MigrationAutodetector:
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
             old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(old_field_name)
             new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+
             # Implement any model renames on relations; these are handled by RenameModel
-            # so we need to exclude them from the comparison
-            if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "model", None):
-                rename_key = (
-                    new_field.remote_field.model._meta.app_label,
-                    new_field.remote_field.model._meta.model_name,
-                )
-                if rename_key in self.renamed_models:
-                    new_field.remote_field.model = old_field.remote_field.model
-            if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "through", None):
-                rename_key = (
-                    new_field.remote_field.through._meta.app_label,
-                    new_field.remote_field.through._meta.model_name,
-                )
-                if rename_key in self.renamed_models:
-                    new_field.remote_field.through = old_field.remote_field.through
+            # but to maintain the migration states of the old app 
+            # we need to include them in the comparison
+            
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
