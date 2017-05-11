@@ -212,6 +212,8 @@ Templates
   apps, it now returns the first engine if multiple ``DjangoTemplates`` engines
   are configured in ``TEMPLATES`` rather than raising ``ImproperlyConfigured``.
 
+* Custom template tags may now accept keyword-only arguments.
+
 Tests
 ~~~~~
 

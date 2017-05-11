@@ -106,7 +106,7 @@ class Library:
             return 'world'
         """
         def dec(func):
-            params, varargs, varkw, defaults, _, _, _ = getfullargspec(func)
+            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
             function_name = (name or getattr(func, '_decorated_function', func).__name__)
 
             @functools.wraps(func)
@@ -118,7 +118,7 @@ class Library:
                     bits = bits[:-2]
                 args, kwargs = parse_bits(
                     parser, bits, params, varargs, varkw, defaults,
-                    takes_context, function_name
+                    kwonly, kwonly_defaults, takes_context, function_name,
                 )
                 return SimpleNode(func, takes_context, args, kwargs, target_var)
             self.tag(function_name, compile_func)
@@ -143,7 +143,7 @@ class Library:
             return {'choices': choices}
         """
         def dec(func):
-            params, varargs, varkw, defaults, _, _, _ = getfullargspec(func)
+            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(func)
             function_name = (name or getattr(func, '_decorated_function', func).__name__)
 
             @functools.wraps(func)
@@ -151,7 +151,7 @@ class Library:
                 bits = token.split_contents()[1:]
                 args, kwargs = parse_bits(
                     parser, bits, params, varargs, varkw, defaults,
-                    takes_context, function_name,
+                    kwonly, kwonly_defaults, takes_context, function_name,
                 )
                 return InclusionNode(
                     func, takes_context, args, kwargs, filename,
@@ -235,7 +235,7 @@ class InclusionNode(TagHelperNode):
 
 
 def parse_bits(parser, bits, params, varargs, varkw, defaults,
-               takes_context, name):
+               kwonly, kwonly_defaults, takes_context, name):
     """
     Parse bits for template tag helpers simple_tag and inclusion_tag, in
     particular by detecting syntax errors and by extracting positional and
@@ -251,13 +251,17 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
     args = []
     kwargs = {}
     unhandled_params = list(params)
+    unhandled_kwargs = [
+        kwarg for kwarg in kwonly
+        if not kwonly_defaults or kwarg not in kwonly_defaults
+    ]
     for bit in bits:
         # First we try to extract a potential kwarg from the bit
         kwarg = token_kwargs([bit], parser)
         if kwarg:
             # The kwarg was successfully extracted
             param, value = kwarg.popitem()
-            if param not in params and varkw is None:
+            if param not in params and param not in unhandled_kwargs and varkw is None:
                 # An unexpected keyword argument was supplied
                 raise TemplateSyntaxError(
                     "'%s' received unexpected keyword argument '%s'" %
@@ -274,6 +278,9 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
                     # If using the keyword syntax for a positional arg, then
                     # consume it.
                     unhandled_params.remove(param)
+                elif param in unhandled_kwargs:
+                    # Same for keyword-only arguments
+                    unhandled_kwargs.remove(param)
         else:
             if kwargs:
                 raise TemplateSyntaxError(
@@ -294,11 +301,11 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
         # Consider the last n params handled, where n is the
         # number of defaults.
         unhandled_params = unhandled_params[:-len(defaults)]
-    if unhandled_params:
+    if unhandled_params or unhandled_kwargs:
         # Some positional arguments were not supplied
         raise TemplateSyntaxError(
             "'%s' did not receive value(s) for the argument(s): %s" %
-            (name, ", ".join("'%s'" % p for p in unhandled_params)))
+            (name, ", ".join("'%s'" % p for p in unhandled_params + unhandled_kwargs)))
     return args, kwargs
 
 
