@@ -82,7 +82,7 @@ Form field classes
 Form widgets
 ============
 
-.. module:: django.contrib.gis.widgets
+.. module:: django.contrib.gis.forms.widgets
     :synopsis: GeoDjango widgets API.
 
 GeoDjango form widgets allow you to display and edit geographic data on a
