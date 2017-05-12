@@ -18,3 +18,5 @@ Bugfixes
 
 * Fixed ``django.utils.http.is_safe_url()`` crash on invalid IPv6 URLs
   (:ticket:`28142`).
+
+* Fixed regression causing pickling of model fields to crash (:ticket:`28188`).
