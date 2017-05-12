@@ -277,50 +277,55 @@ class HashedFilesMixin:
                 else:
                     hashed_name = hashed_files[hash_key]
 
-                # then get the original's file content..
-                if hasattr(original_file, 'seek'):
-                    original_file.seek(0)
-
                 hashed_file_exists = self.exists(hashed_name)
                 processed = False
 
-                # ..to apply each replacement pattern to the content
-                if name in adjustable_paths:
-                    old_hashed_name = hashed_name
-                    content = original_file.read().decode(settings.FILE_CHARSET)
-                    for extension, patterns in self._patterns.items():
-                        if matches_patterns(path, (extension,)):
-                            for pattern, template in patterns:
-                                converter = self.url_converter(name, hashed_files, template)
-                                try:
-                                    content = pattern.sub(converter, content)
-                                except ValueError as exc:
-                                    yield name, None, exc, False
-                    if hashed_file_exists:
-                        self.delete(hashed_name)
-                    # then save the processed result
-                    content_file = ContentFile(force_bytes(content))
-                    # Save intermediate file for reference
-                    saved_name = self._save(hashed_name, content_file)
-                    hashed_name = self.hashed_name(name, content_file)
+                if hashed_file_exists:
+                    # do not process files which already exist at the
+                    # storage destination
+                    substitutions = False
+                else:
+                    # then get the original's file content..
+                    if hasattr(original_file, 'seek'):
+                        original_file.seek(0)
 
-                    if self.exists(hashed_name):
-                        self.delete(hashed_name)
+                    # ..to apply each replacement pattern to the content
+                    if name in adjustable_paths:
+                        old_hashed_name = hashed_name
+                        content = original_file.read().decode(settings.FILE_CHARSET)
+                        for extension, patterns in self._patterns.items():
+                            if matches_patterns(path, (extension,)):
+                                for pattern, template in patterns:
+                                    converter = self.url_converter(name, hashed_files, template)
+                                    try:
+                                        content = pattern.sub(converter, content)
+                                    except ValueError as exc:
+                                        yield name, None, exc, False
+                        if hashed_file_exists:
+                            self.delete(hashed_name)
+                        # then save the processed result
+                        content_file = ContentFile(force_bytes(content))
+                        # Save intermediate file for reference
+                        saved_name = self._save(hashed_name, content_file)
+                        hashed_name = self.hashed_name(name, content_file)
 
-                    saved_name = self._save(hashed_name, content_file)
-                    hashed_name = self.clean_name(saved_name)
-                    # If the file hash stayed the same, this file didn't change
-                    if old_hashed_name == hashed_name:
-                        substitutions = False
-                    processed = True
+                        if self.exists(hashed_name):
+                            self.delete(hashed_name)
 
-                if not processed:
-                    # or handle the case in which neither processing nor
-                    # a change to the original file happened
-                    if not hashed_file_exists:
-                        processed = True
-                        saved_name = self._save(hashed_name, original_file)
+                        saved_name = self._save(hashed_name, content_file)
                         hashed_name = self.clean_name(saved_name)
+                        # If the file hash stayed the same, this file didn't change
+                        if old_hashed_name == hashed_name:
+                            substitutions = False
+                        processed = True
+
+                    if not processed:
+                        # or handle the case in which neither processing nor
+                        # a change to the original file happened
+                        if not hashed_file_exists:
+                            processed = True
+                            saved_name = self._save(hashed_name, original_file)
+                            hashed_name = self.clean_name(saved_name)
 
                 # and then set the cache accordingly
                 hashed_files[hash_key] = hashed_name
