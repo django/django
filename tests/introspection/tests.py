@@ -189,10 +189,14 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
         index = {}
+        index2 = {}
         for key, val in constraints.items():
             if val['columns'] == ['headline', 'pub_date']:
                 index = val
+            if val['columns'] == ['headline', 'response_to_id', 'pub_date', 'reporter_id']:
+                index2 = val
         self.assertEqual(index['type'], Index.suffix)
+        self.assertEqual(index2['type'], Index.suffix)
 
     @skipUnlessDBFeature('supports_index_column_ordering')
     def test_get_constraints_indexes_orders(self):
@@ -206,13 +210,14 @@ class IntrospectionTests(TransactionTestCase):
             ['reporter_id'],
             ['headline', 'pub_date'],
             ['response_to_id'],
+            ['headline', 'response_to_id', 'pub_date', 'reporter_id'],
         ]
         for key, val in constraints.items():
             if val['index'] and not (val['primary_key'] or val['unique']):
                 self.assertIn(val['columns'], expected_columns)
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))
                 indexes_verified += 1
-        self.assertEqual(indexes_verified, 3)
+        self.assertEqual(indexes_verified, 4)
 
 
 def datatype(dbtype, description):

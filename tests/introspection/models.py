@@ -47,6 +47,7 @@ class Article(models.Model):
         ordering = ('headline',)
         index_together = [
             ["headline", "pub_date"],
+            ['headline', 'response_to', 'pub_date', 'reporter'],
         ]
 
 

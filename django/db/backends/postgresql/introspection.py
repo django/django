@@ -191,13 +191,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "options": options,
             }
         # Now get indexes
+        # The row_number() function for ordering the index fields can be
+        # replaced by WITH ORDINALITY in the unnest() functions when support
+        # for PostgreSQL 9.3 is dropped.
         cursor.execute("""
             SELECT
-                indexname, array_agg(attname), indisunique, indisprimary,
-                array_agg(ordering), amname, exprdef, s2.attoptions
+                indexname, array_agg(attname ORDER BY rnum), indisunique, indisprimary,
+                array_agg(ordering ORDER BY rnum), amname, exprdef, s2.attoptions
             FROM (
                 SELECT
-                    c2.relname as indexname, idx.*, attr.attname, am.amname,
+                    row_number() OVER () as rnum, c2.relname as indexname,
+                    idx.*, attr.attname, am.amname,
                     CASE
                         WHEN idx.indexprs IS NOT NULL THEN
                             pg_get_indexdef(idx.indexrelid)
