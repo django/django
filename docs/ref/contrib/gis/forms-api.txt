@@ -185,6 +185,12 @@ Widget classes
         The default center latitude and longitude are ``47`` and ``5``,
         respectively, which is a location in eastern France.
 
+    .. attribute:: default_zoom
+
+        .. versionadded:: 2.0
+
+        The default map zoom is ``12``.
+
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map
     tiles.
