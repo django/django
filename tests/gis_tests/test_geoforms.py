@@ -326,6 +326,9 @@ class OSMWidgetTest(SimpleTestCase):
         self.assertIn("id: 'id_p',", rendered)
 
     def test_default_lat_lon(self):
+        self.assertEqual(forms.OSMWidget.default_lon, 5)
+        self.assertEqual(forms.OSMWidget.default_lat, 47)
+
         class PointForm(forms.Form):
             p = forms.PointField(
                 widget=forms.OSMWidget(attrs={
@@ -338,14 +341,6 @@ class OSMWidgetTest(SimpleTestCase):
 
         self.assertIn("options['default_lon'] = 20;", rendered)
         self.assertIn("options['default_lat'] = 30;", rendered)
-        if forms.OSMWidget.default_lon != 20:
-            self.assertNotIn(
-                "options['default_lon'] = %d;" % forms.OSMWidget.default_lon,
-                rendered)
-        if forms.OSMWidget.default_lat != 30:
-            self.assertNotIn(
-                "options['default_lat'] = %d;" % forms.OSMWidget.default_lat,
-                rendered)
 
 
 class GeometryWidgetTests(SimpleTestCase):
