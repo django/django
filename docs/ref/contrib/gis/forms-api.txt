@@ -173,7 +173,17 @@ Widget classes
 .. class:: OSMWidget
 
     This widget uses an OpenStreetMap base layer to display geographic objects
-    on. ``template_name`` is ``gis/openlayers-osm.html``.
+    on. Attributes are:
+
+    .. attribute:: template_name
+
+        ``gis/openlayers-osm.html``
+
+    .. attribute:: default_lat
+    .. attribute:: default_lon
+
+        The default center latitude and longitude are ``47`` and ``5``,
+        respectively, which is a location in eastern France.
 
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map
