@@ -6,7 +6,6 @@ import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
-from functools import total_ordering
 
 from django import forms
 from django.apps import apps
@@ -86,7 +85,6 @@ def return_None():
     return None
 
 
-@total_ordering
 class Field(RegisterLookupMixin):
     """Base class for all field types"""
 
@@ -94,12 +92,6 @@ class Field(RegisterLookupMixin):
     # database level.
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
-
-    # These track each time a Field instance is created. Used to retain order.
-    # The auto_creation_counter is used for fields that Django implicitly
-    # creates, creation_counter is used for all user-specified fields.
-    creation_counter = 0
-    auto_creation_counter = -1
     default_validators = []  # Default set of validators
     default_error_messages = {
         'invalid_choice': _('Value %(value)r is not a valid choice.'),
@@ -160,15 +152,6 @@ class Field(RegisterLookupMixin):
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
         self.auto_created = auto_created
-
-        # Adjust the appropriate creation counter, and save our local copy.
-        if auto_created:
-            self.creation_counter = Field.auto_creation_counter
-            Field.auto_creation_counter -= 1
-        else:
-            self.creation_counter = Field.creation_counter
-            Field.creation_counter += 1
-
         self._validators = list(validators)  # Store for deconstruction later
 
         messages = {}
@@ -467,21 +450,6 @@ class Field(RegisterLookupMixin):
         """
         name, path, args, kwargs = self.deconstruct()
         return self.__class__(*args, **kwargs)
-
-    def __eq__(self, other):
-        # Needed for @total_ordering
-        if isinstance(other, Field):
-            return self.creation_counter == other.creation_counter
-        return NotImplemented
-
-    def __lt__(self, other):
-        # This is needed because bisect does not take a comparison function.
-        if isinstance(other, Field):
-            return self.creation_counter < other.creation_counter
-        return NotImplemented
-
-    def __hash__(self):
-        return hash(self.creation_counter)
 
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not

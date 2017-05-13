@@ -247,16 +247,15 @@ class Options:
         self._expire_cache()
 
     def add_field(self, field, private=False):
-        # Insert the given field in the order in which it was created, using
-        # the "creation_counter" attribute of the field.
+        # Add the given field to the model.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
         if private:
             self.private_fields.append(field)
         elif field.is_relation and field.many_to_many:
-            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
+            self.local_many_to_many.append(field)
         else:
-            self.local_fields.insert(bisect(self.local_fields, field), field)
+            self.local_fields.append(field)
             self.setup_pk(field)
 
         # If the field being added is a relation to another known field,

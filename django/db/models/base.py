@@ -1,6 +1,7 @@
 import copy
 import inspect
 import warnings
+from collections import OrderedDict
 from itertools import chain
 
 from django.apps import apps
@@ -367,6 +368,16 @@ class ModelBase(type):
     @property
     def _default_manager(cls):
         return cls._meta.default_manager
+
+    @classmethod
+    def __prepare__(metacls, name, bases, **kwds):
+        """
+        Ensures field definitions maintain a guaranteed order.
+
+        Python 3.6 guarantees declared field order, so this can be removed once
+        support for < 3.6 is dropped.
+        """
+        return OrderedDict()
 
 
 class ModelState:
