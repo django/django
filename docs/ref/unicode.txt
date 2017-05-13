@@ -331,28 +331,6 @@ In your development environment, you might need to add a setting to your
 
     export LANG="en_US.UTF-8"
 
-Email
-=====
-
-Django's email framework (in ``django.core.mail``) supports Unicode
-transparently. You can use Unicode data in the message bodies and any headers.
-However, you're still obligated to respect the requirements of the email
-specifications, so, for example, email addresses should use only ASCII
-characters.
-
-The following code example demonstrates that everything except email addresses
-can be non-ASCII::
-
-    from django.core.mail import EmailMessage
-
-    subject = 'My visit to Sør-Trøndelag'
-    sender = 'Arnbjörg Ráðormsdóttir <arnbjorg@example.com>'
-    recipients = ['Fred <fred@example.com']
-    body = '...'
-    msg = EmailMessage(subject, body, sender, recipients)
-    msg.attach("Une pièce jointe.pdf", "%PDF-1.4.%...", mimetype="application/pdf")
-    msg.send()
-
 Form submission
 ===============
 

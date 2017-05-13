@@ -204,10 +204,6 @@ class EmailMessage:
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
-
-        All string arguments used to create the message can be strings
-        or UTF-8 bytestrings. The SafeMIMEText class will handle any
-        necessary encoding conversions.
         """
         if to:
             if isinstance(to, str):
@@ -427,10 +423,6 @@ class EmailMultiAlternatives(EmailMessage):
         """
         Initialize a single email message (which can be sent to multiple
         recipients).
-
-        All string arguments used to create the message can be strings or UTF-8
-        bytestrings. The SafeMIMEText class will handle any necessary encoding
-        conversions.
         """
         super().__init__(
             subject, body, from_email, to, bcc, connection, attachments,
