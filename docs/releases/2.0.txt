@@ -75,6 +75,9 @@ Minor features
 * Any :class:`~django.contrib.gis.geos.GEOSGeometry` imported from GeoJSON now
   has its SRID set.
 
+* Added the :attr:`.OSMWidget.default_zoom` attribute to customize the map's
+  default zoom level.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

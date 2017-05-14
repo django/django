@@ -328,11 +328,14 @@ class OSMWidgetTest(SimpleTestCase):
     def test_default_lat_lon(self):
         self.assertEqual(forms.OSMWidget.default_lon, 5)
         self.assertEqual(forms.OSMWidget.default_lat, 47)
+        self.assertEqual(forms.OSMWidget.default_zoom, 12)
 
         class PointForm(forms.Form):
             p = forms.PointField(
                 widget=forms.OSMWidget(attrs={
-                    'default_lon': 20, 'default_lat': 30
+                    'default_lon': 20,
+                    'default_lat': 30,
+                    'default_zoom': 17,
                 }),
             )
 
@@ -341,6 +344,7 @@ class OSMWidgetTest(SimpleTestCase):
 
         self.assertIn("options['default_lon'] = 20;", rendered)
         self.assertIn("options['default_lat'] = 30;", rendered)
+        self.assertIn("options['default_zoom'] = 17;", rendered)
 
 
 class GeometryWidgetTests(SimpleTestCase):

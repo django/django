@@ -103,10 +103,11 @@ class OSMWidget(OpenLayersWidget):
     template_name = 'gis/openlayers-osm.html'
     default_lon = 5
     default_lat = 47
+    default_zoom = 12
 
     def __init__(self, attrs=None):
         super().__init__()
-        for key in ('default_lon', 'default_lat'):
+        for key in ('default_lon', 'default_lat', 'default_zoom'):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)
