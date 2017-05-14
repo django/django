@@ -334,6 +334,11 @@ Miscellaneous
 * The ``FIRST_DAY_OF_WEEK`` and ``NUMBER_GROUPING`` format settings are now
   kept as integers in JavaScript and JSON i18n view outputs.
 
+* :meth:`~django.test.TransactionTestCase.assertNumQueries` now ignores
+  connection configuration queries. Previously, if a test opened a new database
+  connection, those queries could be included as part of the
+  ``assertNumQueries()`` count.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
