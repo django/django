@@ -50,3 +50,21 @@ class AcceptsRequestBackendTest(SimpleTestCase):
             "In %s.authenticate(), move the `request` keyword argument to the "
             "first positional argument." % self.request_not_positional_backend
         )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[request_not_positional_backend, no_request_backend])
+    def test_both_types_of_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            authenticate(mock_request, username='username', password='pass')
+
+        self.assertEqual(len(warns), 2)
+        self.assertEqual(
+            str(warns[0].message),
+            "In %s.authenticate(), move the `request` keyword argument to the "
+            "first positional argument." % self.request_not_positional_backend
+        )
+        self.assertEqual(
+            str(warns[1].message),
+            "Update %s.authenticate() to accept a positional `request` "
+            "argument." % self.no_request_backend
+        )

@@ -66,38 +66,8 @@ def authenticate(request=None, **credentials):
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
-        args = (request,)
-        # Does the backend accept a request argument?
         try:
-            inspect.getcallargs(backend.authenticate, request, **credentials)
-        except TypeError:
-            args = ()
-            # Does the backend accept a request keyword argument?
-            try:
-                inspect.getcallargs(backend.authenticate, request=request, **credentials)
-            except TypeError:
-                # Does the backend accept credentials without request?
-                try:
-                    inspect.getcallargs(backend.authenticate, **credentials)
-                except TypeError:
-                    # This backend doesn't accept these credentials as arguments. Try the next one.
-                    continue
-                else:
-                    warnings.warn(
-                        "Update %s.authenticate() to accept a positional "
-                        "`request` argument." % backend_path,
-                        RemovedInDjango21Warning
-                    )
-            else:
-                credentials['request'] = request
-                warnings.warn(
-                    "In %s.authenticate(), move the `request` keyword argument "
-                    "to the first positional argument." % backend_path,
-                    RemovedInDjango21Warning
-                )
-
-        try:
-            user = backend.authenticate(*args, **credentials)
+            user = _authenticate_with_backend(backend, backend_path, request, **credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             break
@@ -109,6 +79,39 @@ def authenticate(request=None, **credentials):
 
     # The credentials supplied are invalid to all backends, fire signal
     user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
+
+
+def _authenticate_with_backend(backend, backend_path, request, **credentials):
+    args = (request,)
+    # Does the backend accept a request argument?
+    try:
+        inspect.getcallargs(backend.authenticate, request, **credentials)
+    except TypeError:
+        args = ()
+        # Does the backend accept a request keyword argument?
+        try:
+            inspect.getcallargs(backend.authenticate, request=request, **credentials)
+        except TypeError:
+            # Does the backend accept credentials without request?
+            try:
+                inspect.getcallargs(backend.authenticate, **credentials)
+            except TypeError:
+                # This backend doesn't accept these credentials as arguments. Try the next one.
+                return None
+            else:
+                warnings.warn(
+                    "Update %s.authenticate() to accept a positional "
+                    "`request` argument." % backend_path,
+                    RemovedInDjango21Warning
+                )
+        else:
+            credentials['request'] = request
+            warnings.warn(
+                "In %s.authenticate(), move the `request` keyword argument "
+                "to the first positional argument." % backend_path,
+                RemovedInDjango21Warning
+            )
+    return backend.authenticate(*args, **credentials)
 
 
 def login(request, user, backend=None):
