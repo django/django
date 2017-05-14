@@ -20,3 +20,6 @@ Bugfixes
   (:ticket:`28142`).
 
 * Fixed regression causing pickling of model fields to crash (:ticket:`28188`).
+
+* Fixed ``django.contrib.auth.authenticate()`` when multiple authentication
+  backends don't accept a positional ``request`` argument (:ticket:`28207`).
