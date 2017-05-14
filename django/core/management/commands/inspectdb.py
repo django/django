@@ -55,7 +55,7 @@ class Command(BaseCommand):
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
             yield 'from %s import models' % self.db_module
             known_models = []
-            tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
+            tables_to_introspect = options.get('table', connection.introspection.table_names(cursor))
 
             for table_name in tables_to_introspect:
                 if table_name_filter is not None and callable(table_name_filter):
