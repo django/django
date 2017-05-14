@@ -26,32 +26,13 @@ class DatabaseValidation(BaseDatabaseValidation):
             )]
         return []
 
-    def check_field(self, field, **kwargs):
+    def check_field_type(self, field, field_type):
         """
         MySQL has the following field length restriction:
         No character (varchar) fields can have a length exceeding 255
         characters if they have a unique index on them.
         """
-        errors = super().check_field(field, **kwargs)
-
-        # Ignore any related fields.
-        if getattr(field, 'remote_field', None):
-            return errors
-
-        # Ignore fields with unsupported features.
-        db_supports_all_required_features = all(
-            getattr(self.connection.features, feature, False)
-            for feature in field.model._meta.required_db_features
-        )
-        if not db_supports_all_required_features:
-            return errors
-
-        field_type = field.db_type(self.connection)
-
-        # Ignore non-concrete fields.
-        if field_type is None:
-            return errors
-
+        errors = []
         if (field_type.startswith('varchar') and field.unique and
                 (field.max_length is None or int(field.max_length) > 255)):
             errors.append(
