@@ -307,6 +307,7 @@ class HashedFilesMixin:
                     if self.exists(hashed_name):
                         self.delete(hashed_name)
 
+                    content_file.seek(0, os.SEEK_SET)
                     saved_name = self._save(hashed_name, content_file)
                     hashed_name = self.clean_name(saved_name)
                     # If the file hash stayed the same, this file didn't change
