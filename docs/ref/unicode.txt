@@ -1,13 +1,13 @@
 ============
-Unicode data
+Encoded data
 ============
 
-Django natively supports Unicode data everywhere. Providing your database can
-somehow store the data, you can safely pass around strings to templates,
-models, and the database.
+Python uses the concepts of text and bytes when dealing with data.
+All text is Unicode by default. Providing your database can store the data,
+you can safely pass around string to templates, models, and the database.
 
 This document tells you what you need to know if you're writing applications
-that use data or templates that are encoded in something other than ASCII.
+that use data or templates that are encoded in something other than UTF-8.
 
 Creating the database
 =====================
@@ -35,58 +35,29 @@ able to store certain characters in the database, and information will be lost.
 .. _section 2: https://docs.oracle.com/database/121/NLSPG/ch2charset.htm#NLSPG002
 .. _section 11: https://docs.oracle.com/database/121/NLSPG/ch11charsetmig.htm#NLSPG011
 
-All of Django's database backends automatically convert strings into
-the appropriate encoding for talking to the database. They also automatically
-convert strings retrieved from the database into strings. You don't even need
-to tell Django what encoding your database uses: that is handled transparently.
-
-For more, see the section "The database API" below.
 
 General string handling
 =======================
 
-Whenever you use strings with Django -- e.g., in database lookups, template
-rendering or anywhere else -- you have two choices for encoding those strings.
-You can use normal strings or bytestrings (starting with a 'b').
+In database lookups, template rendering, or anywhere else -- you can use strings.
+If you have bytes, convert them to Unicode before passing it to Django.
 
 .. warning::
 
-    A bytestring does not carry any information with it about its encoding.
-    For that reason, we have to make an assumption, and Django assumes that all
-    bytestrings are in UTF-8.
-
-    If you pass a string to Django that has been encoded in some other format,
+    If you pass string to Django which contains invalid Unicode characters,
     things will go wrong in interesting ways. Usually, Django will raise a
     ``UnicodeDecodeError`` at some point.
-
-If your code only uses ASCII data, it's safe to use your normal strings,
-passing them around at will, because ASCII is a subset of UTF-8.
-
-Don't be fooled into thinking that if your :setting:`DEFAULT_CHARSET` setting is set
-to something other than ``'utf-8'`` you can use that other encoding in your
-bytestrings! :setting:`DEFAULT_CHARSET` only applies to the strings generated as
-the result of template rendering (and email). Django will always assume UTF-8
-encoding for internal bytestrings. The reason for this is that the
-:setting:`DEFAULT_CHARSET` setting is not actually under your control (if you are the
-application developer). It's under the control of the person installing and
-using your application -- and if that person chooses a different setting, your
-code must still continue to work. Ergo, it cannot rely on that setting.
-
-In most cases when Django is dealing with strings, it will convert them to
-strings before doing anything else. So, as a general rule, if you pass
-in a bytestring, be prepared to receive a string back in the result.
 
 Translated strings
 ------------------
 
-Aside from strings and bytestrings, there's a third type of string-like
-object you may encounter when using Django. The framework's
-internationalization features introduce the concept of a "lazy translation" --
-a string that has been marked as translated but whose actual translation result
-isn't determined until the object is used in a string. This feature is useful
-in cases where the translation locale is unknown until the string is used, even
-though the string might have originally been created when the code was first
-imported.
+Aside from strings and bytes, there's a third type of string-like object you may
+encounter when using Django. The framework's internationalization features
+introduce the concept of a "lazy translation" -- a string that has been marked
+as translated but whose actual translation result isn't determined until the
+object is used in a string. This feature is useful in cases where the
+translation locale is unknown until the string is used, even though the string
+might have originally been created when the code was first imported.
 
 Normally, you won't have to worry about lazy translations. Just be aware that
 if you examine an object and it claims to be a
@@ -150,19 +121,17 @@ Web frameworks have to deal with URLs (which are a type of IRI_). One
 requirement of URLs is that they are encoded using only ASCII characters.
 However, in an international environment, you might need to construct a
 URL from an IRI_ -- very loosely speaking, a URI_ that can contain Unicode
-characters. Quoting and converting an IRI to URI can be a little tricky, so
-Django provides some assistance.
+characters. Quoting and converting an IRI to URI can be a little tricky, you
+can use these functions.
 
 * The function :func:`django.utils.encoding.iri_to_uri()` implements the
   conversion from IRI to URI as required by the specification (:rfc:`3987#section-3.1`).
 
-* The functions ``django.utils.http.urlquote()`` and
-  ``django.utils.http.urlquote_plus()`` are versions of Python's standard
-  ``urllib.quote()`` and ``urllib.quote_plus()`` that work with non-ASCII
-  characters. (The data is converted to UTF-8 prior to encoding.)
+* The functions :meth:`~urllib.parse.quote()` and :meth:`~urllib.parse.quote_plus()`
+  from Python's standard library that work with Unicode characters.
 
 These two groups of functions have slightly different purposes, and it's
-important to keep them straight. Normally, you would use ``urlquote()`` on the
+important to keep them straight. Normally, you would use ``quote()`` on the
 individual portions of the IRI or URI path so that any reserved characters
 such as '&' or '%' are correctly encoded. Then, you apply ``iri_to_uri()`` to
 the full IRI and it converts any non-ASCII characters to the correct encoded
@@ -181,13 +150,13 @@ like that.
 
 An example might clarify things here::
 
-    >>> urlquote('Paris & Orléans')
+    >>> quote('Paris & Orléans')
     'Paris%20%26%20Orl%C3%A9ans'
-    >>> iri_to_uri('/favorites/François/%s' % urlquote('Paris & Orléans'))
+    >>> iri_to_uri('/favorites/François/%s' % quote('Paris & Orléans'))
     '/favorites/Fran%C3%A7ois/Paris%20%26%20Orl%C3%A9ans'
 
 If you look carefully, you can see that the portion that was generated by
-``urlquote()`` in the second example was not double-quoted when passed to
+``quote()`` in the second example was not double-quoted when passed to
 ``iri_to_uri()``. This is a very important and useful feature. It means that
 you can construct your IRI without worrying about whether it contains
 non-ASCII characters and then, right at the end, call ``iri_to_uri()`` on the
@@ -223,31 +192,27 @@ Models
 ======
 
 Because all strings are returned from the database as ``str`` objects, model
-fields that are character based (CharField, TextField, URLField, etc.) will
-contain Unicode values when Django retrieves data from the database. This
-is *always* the case, even if the data could fit into an ASCII bytestring.
-
-You can pass in bytestrings when creating a model or populating a field, and
-Django will convert it to strings when it needs to.
+fields that are character based (``CharField``, ``TextField``, ``URLField``,
+etc.) will contain Unicode values when Django retrieves data from the database.
 
 Taking care in ``get_absolute_url()``
 -------------------------------------
 
 URLs can only contain ASCII characters. If you're constructing a URL from
-pieces of data that might be non-ASCII, be careful to encode the results in a
-way that is suitable for a URL. The :func:`~django.urls.reverse` function
-handles this for you automatically.
+string, be careful to encode the results in a way that is suitable for a URL.
+The :func:`~django.urls.reverse` function handles this for you automatically.
 
 If you're constructing a URL manually (i.e., *not* using the ``reverse()``
 function), you'll need to take care of the encoding yourself. In this case,
-use the ``iri_to_uri()`` and ``urlquote()`` functions that were documented
+use the ``iri_to_uri()`` and ``quote()`` functions that were documented
 above_. For example::
 
+    from urllib.parse import quote
+
     from django.utils.encoding import iri_to_uri
-    from django.utils.http import urlquote
 
     def get_absolute_url(self):
-        url = '/person/%s/?x=0&y=0' % urlquote(self.location)
+        url = '/person/%s/?x=0&y=0' % quote(self.location)
         return iri_to_uri(url)
 
 This function returns a correctly encoded URL even if ``self.location`` is
@@ -257,24 +222,12 @@ non-ASCII characters would have been removed in quoting in the first line.)
 
 .. _above: `URI and IRI handling`_
 
-The database API
-================
-
-You can pass either strings or UTF-8 bytestrings as arguments to
-``filter()`` methods and the like in the database API. The following two
-querysets are identical::
-
-    qs = People.objects.filter(name__contains='Å')
-    qs = People.objects.filter(name__contains=b'\xc3\x85') # UTF-8 encoding of Å
-
 Templates
 =========
 
-You can use either strings or UTF-8 bytestrings when creating templates
-manually::
+You can use strings when creating templates manually::
 
     from django.template import Template
-    t1 = Template(b'This is a bytestring template.')
     t2 = Template('This is a string template.')
 
 But the common case is to read templates from the filesystem, and this creates
@@ -340,8 +293,8 @@ However, you're still obligated to respect the requirements of the email
 specifications, so, for example, email addresses should use only ASCII
 characters.
 
-The following code example demonstrates that everything except email addresses
-can be non-ASCII::
+The following code example demonstrates that everything can be string
+except email addresses which should use only ASCII characters::
 
     from django.core.mail import EmailMessage
 
