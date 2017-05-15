@@ -44,3 +44,6 @@ Bugfixes
   invalid SQL (:ticket:`28199`).
 
 * Corrected detection of GDAL 2.1 on Windows (:ticket:`28181`).
+
+* Made date-based generic views return a 404 rather than crash when given an
+  out of range date (:ticket:`28209`).
