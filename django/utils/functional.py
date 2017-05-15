@@ -27,8 +27,9 @@ class cached_property:
 
     def __get__(self, instance, cls=None):
         """
-        Call the function and replace this cached_property instance with the
-        return value so that the function and this method aren't called again.
+        Call the function and put the return value in instance.__dict__ so that
+        subsequent attribute access on the instance returns the cached value
+        instead of calling cached_property.__get__().
         """
         if instance is None:
             return self
