@@ -4,7 +4,7 @@ from time import sleep
 
 from django.contrib.postgres.functions import RandomUUID, TransactionNow
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLTestCase, skipUnlessPG94
 from .models import NowTestModel, UUIDTestModel
 
 
@@ -29,6 +29,7 @@ class TestTransactionNow(PostgreSQLTestCase):
         self.assertEqual(m1.when, m2.when)
 
 
+@skipUnlessPG94
 class TestRandomUUID(PostgreSQLTestCase):
 
     def test_random_uuid(self):
