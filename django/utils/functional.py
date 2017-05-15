@@ -26,6 +26,10 @@ class cached_property:
         self.name = name or func.__name__
 
     def __get__(self, instance, cls=None):
+        """
+        Call the function and replace this cached_property instance with the
+        return value so that the function and this method aren't called again.
+        """
         if instance is None:
             return self
         res = instance.__dict__[self.name] = self.func(instance)
