@@ -252,15 +252,24 @@ class JavaScriptCatalog(View):
         maxcnts = {}
         catalog = {}
         trans_cat = self.translation._catalog
-        trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
+        fallback_base = self.translation._fallback._catalog if self.translation._fallback else {}
+        # Only collect fallbacks for which the main catalog lacks a translation
+        trans_fallback_cat = {}
+        for key, value in fallback_base.items():
+            if key in trans_cat:
+                continue
+            if isinstance(key, tuple):
+                if (key[0], 0) in trans_cat:
+                    continue
+            trans_fallback_cat[key] = value
+
         for key, value in itertools.chain(iter(trans_cat.items()), iter(trans_fallback_cat.items())):
             if key == '' or key in catalog:
                 continue
             if isinstance(key, str):
                 catalog[key] = value
             elif isinstance(key, tuple):
-                msgid = key[0]
-                cnt = key[1]
+                msgid, cnt = key
                 maxcnts[msgid] = max(cnt, maxcnts.get(msgid, 0))
                 pdict.setdefault(msgid, {})[cnt] = value
             else:
