@@ -2,6 +2,7 @@
 SQLite3 backend for the sqlite3 module in the standard library.
 """
 import decimal
+import math
 import re
 import warnings
 from sqlite3 import dbapi2 as Database
@@ -309,6 +310,8 @@ def _sqlite_date_extract(lookup_type, dt):
         return (dt.isoweekday() % 7) + 1
     elif lookup_type == 'week':
         return dt.isocalendar()[1]
+    elif lookup_type == 'quarter':
+        return math.ceil(dt.month / 3)
     else:
         return getattr(dt, lookup_type)
 
@@ -320,6 +323,9 @@ def _sqlite_date_trunc(lookup_type, dt):
         return None
     if lookup_type == 'year':
         return "%i-01-01" % dt.year
+    elif lookup_type == 'quarter':
+        month_in_quarter = dt.month - (dt.month - 1) % 3
+        return '%i-%02i-01' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
         return "%i-%02i-01" % (dt.year, dt.month)
     elif lookup_type == 'day':
@@ -373,6 +379,8 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return (dt.isoweekday() % 7) + 1
     elif lookup_type == 'week':
         return dt.isocalendar()[1]
+    elif lookup_type == 'quarter':
+        return math.ceil(dt.month / 3)
     else:
         return getattr(dt, lookup_type)
 
@@ -383,6 +391,9 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return None
     if lookup_type == 'year':
         return "%i-01-01 00:00:00" % dt.year
+    elif lookup_type == 'quarter':
+        month_in_quarter = dt.month - (dt.month - 1) % 3
+        return '%i-%02i-01 00:00:00' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
         return "%i-%02i-01 00:00:00" % (dt.year, dt.month)
     elif lookup_type == 'day':

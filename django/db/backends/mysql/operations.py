@@ -39,6 +39,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         if lookup_type in fields:
             format_str = fields[lookup_type]
             return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
+        elif lookup_type == 'quarter':
+            return "MAKEDATE(YEAR(%s), 1) + INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER" % (
+                field_name, field_name
+            )
         else:
             return "DATE(%s)" % (field_name)
 
@@ -64,6 +68,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
         format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+        if lookup_type == 'quarter':
+            return (
+                "CAST(DATE_FORMAT(MAKEDATE(YEAR({field_name}), 1) + "
+                "INTERVAL QUARTER({field_name}) QUARTER - " +
+                "INTERVAL 1 QUARTER, '%%Y-%%m-01 00:00:00') AS DATETIME)"
+            ).format(field_name=field_name)
         try:
             i = fields.index(lookup_type) + 1
         except ValueError:

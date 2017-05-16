@@ -7,9 +7,9 @@ from django.db import connection
 from django.db.models import DateField, DateTimeField, IntegerField, TimeField
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
-    ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear, Trunc, TruncDate,
-    TruncDay, TruncHour, TruncMinute, TruncMonth, TruncSecond, TruncTime,
-    TruncYear,
+    ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear,
+    Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
+    TruncQuarter, TruncSecond, TruncTime, TruncYear,
 )
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -41,6 +41,11 @@ def truncate_to(value, kind, tzinfo=None):
             if isinstance(value, datetime):
                 return value.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             return value.replace(day=1)
+        if kind == 'quarter':
+            month_in_quarter = value.month - (value.month - 1) % 3
+            if isinstance(value, datetime):
+                return value.replace(month=month_in_quarter, day=1, hour=0, minute=0, second=0, microsecond=0)
+            return value.replace(month=month_in_quarter, day=1)
         # otherwise, truncate to year
         if isinstance(value, datetime):
             return value.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -153,6 +158,11 @@ class DateFunctionTests(TestCase):
         self.assertQuerysetEqual(
             DTModel.objects.annotate(extracted=Extract('start_datetime', 'year')).order_by('start_datetime'),
             [(start_datetime, start_datetime.year), (end_datetime, end_datetime.year)],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=Extract('start_datetime', 'quarter')).order_by('start_datetime'),
+            [(start_datetime, 2), (end_datetime, 2)],
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertQuerysetEqual(
@@ -278,6 +288,47 @@ class DateFunctionTests(TestCase):
         )
         # both dates are from the same week.
         self.assertEqual(DTModel.objects.filter(start_datetime__week=ExtractWeek('start_datetime')).count(), 2)
+
+    def test_extract_quarter_func(self):
+        start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
+        end_datetime = microsecond_support(datetime(2016, 8, 15, 14, 10, 50, 123))
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=ExtractQuarter('start_datetime')).order_by('start_datetime'),
+            [(start_datetime, 2), (end_datetime, 3)],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=ExtractQuarter('start_date')).order_by('start_datetime'),
+            [(start_datetime, 2), (end_datetime, 3)],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertEqual(DTModel.objects.filter(start_datetime__quarter=ExtractQuarter('start_datetime')).count(), 2)
+
+    def test_extract_quarter_func_boundaries(self):
+        end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
+        if settings.USE_TZ:
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+
+        last_quarter_2014 = microsecond_support(datetime(2014, 12, 31, 13, 0))
+        first_quarter_2015 = microsecond_support(datetime(2015, 1, 1, 13, 0))
+        if settings.USE_TZ:
+            last_quarter_2014 = timezone.make_aware(last_quarter_2014, is_dst=False)
+            first_quarter_2015 = timezone.make_aware(first_quarter_2015, is_dst=False)
+        dates = [last_quarter_2014, first_quarter_2015]
+        self.create_model(last_quarter_2014, end_datetime)
+        self.create_model(first_quarter_2015, end_datetime)
+        qs = DTModel.objects.filter(start_datetime__in=dates).annotate(
+            extracted=ExtractQuarter('start_datetime'),
+        ).order_by('start_datetime')
+        self.assertQuerysetEqual(qs, [
+            (last_quarter_2014, 4),
+            (first_quarter_2015, 1),
+        ], lambda m: (m.start_datetime, m.extracted))
 
     def test_extract_week_func_boundaries(self):
         end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
@@ -456,12 +507,14 @@ class DateFunctionTests(TestCase):
             )
 
         test_date_kind('year')
+        test_date_kind('quarter')
         test_date_kind('month')
         test_date_kind('day')
         test_time_kind('hour')
         test_time_kind('minute')
         test_time_kind('second')
         test_datetime_kind('year')
+        test_datetime_kind('quarter')
         test_datetime_kind('month')
         test_datetime_kind('day')
         test_datetime_kind('hour')
@@ -502,6 +555,47 @@ class DateFunctionTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncYear('start_time', output_field=TimeField())))
+
+    def test_trunc_quarter_func(self):
+        start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
+        end_datetime = truncate_to(microsecond_support(datetime(2016, 10, 15, 14, 10, 50, 123)), 'quarter')
+        last_quarter_2015 = truncate_to(microsecond_support(datetime(2015, 12, 31, 14, 10, 50, 123)), 'quarter')
+        first_quarter_2016 = truncate_to(microsecond_support(datetime(2016, 1, 1, 14, 10, 50, 123)), 'quarter')
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+            last_quarter_2015 = timezone.make_aware(last_quarter_2015, is_dst=False)
+            first_quarter_2016 = timezone.make_aware(first_quarter_2016, is_dst=False)
+        self.create_model(start_datetime=start_datetime, end_datetime=end_datetime)
+        self.create_model(start_datetime=end_datetime, end_datetime=start_datetime)
+        self.create_model(start_datetime=last_quarter_2015, end_datetime=end_datetime)
+        self.create_model(start_datetime=first_quarter_2016, end_datetime=end_datetime)
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=TruncQuarter('start_date')).order_by('start_datetime'),
+            [
+                (start_datetime, truncate_to(start_datetime.date(), 'quarter')),
+                (last_quarter_2015, truncate_to(last_quarter_2015.date(), 'quarter')),
+                (first_quarter_2016, truncate_to(first_quarter_2016.date(), 'quarter')),
+                (end_datetime, truncate_to(end_datetime.date(), 'quarter')),
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=TruncQuarter('start_datetime')).order_by('start_datetime'),
+            [
+                (start_datetime, truncate_to(start_datetime, 'quarter')),
+                (last_quarter_2015, truncate_to(last_quarter_2015, 'quarter')),
+                (first_quarter_2016, truncate_to(first_quarter_2016, 'quarter')),
+                (end_datetime, truncate_to(end_datetime, 'quarter')),
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+
+        with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
+            list(DTModel.objects.annotate(truncated=TruncQuarter('start_time')))
+
+        with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
+            list(DTModel.objects.annotate(truncated=TruncQuarter('start_time', output_field=TimeField())))
 
     def test_trunc_month_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
@@ -723,6 +817,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             week=Extract('start_datetime', 'week', tzinfo=melb),
             weekday=ExtractWeekDay('start_datetime'),
             weekday_melb=ExtractWeekDay('start_datetime', tzinfo=melb),
+            quarter=ExtractQuarter('start_datetime', tzinfo=melb),
             hour=ExtractHour('start_datetime'),
             hour_melb=ExtractHour('start_datetime', tzinfo=melb),
         ).order_by('start_datetime')
@@ -733,6 +828,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(utc_model.week, 25)
         self.assertEqual(utc_model.weekday, 2)
         self.assertEqual(utc_model.weekday_melb, 3)
+        self.assertEqual(utc_model.quarter, 2)
         self.assertEqual(utc_model.hour, 23)
         self.assertEqual(utc_model.hour_melb, 9)
 
@@ -743,6 +839,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(melb_model.day_melb, 16)
         self.assertEqual(melb_model.week, 25)
         self.assertEqual(melb_model.weekday, 3)
+        self.assertEqual(melb_model.quarter, 2)
         self.assertEqual(melb_model.weekday_melb, 3)
         self.assertEqual(melb_model.hour, 9)
         self.assertEqual(melb_model.hour_melb, 9)
@@ -836,12 +933,14 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             )
 
         test_date_kind('year')
+        test_date_kind('quarter')
         test_date_kind('month')
         test_date_kind('day')
         test_time_kind('hour')
         test_time_kind('minute')
         test_time_kind('second')
         test_datetime_kind('year')
+        test_datetime_kind('quarter')
         test_datetime_kind('month')
         test_datetime_kind('day')
         test_datetime_kind('hour')

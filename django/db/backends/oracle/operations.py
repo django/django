@@ -67,6 +67,8 @@ END;
         elif lookup_type == 'week':
             # IW = ISO week number
             return "TO_CHAR(%s, 'IW')" % field_name
+        elif lookup_type == 'quarter':
+            return "TO_CHAR(%s, 'Q')" % field_name
         else:
             # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
@@ -81,6 +83,8 @@ END;
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+        elif lookup_type == 'quarter':
+            return "TRUNC(%s, 'Q')" % field_name
         else:
             return "TRUNC(%s)" % field_name
 
@@ -117,6 +121,8 @@ END;
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
+        elif lookup_type == 'quarter':
+            sql = "TRUNC(%s, 'Q')" % field_name
         elif lookup_type == 'day':
             sql = "TRUNC(%s)" % field_name
         elif lookup_type == 'hour':
