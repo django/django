@@ -21,9 +21,6 @@ class Serializer(PythonSerializer):
     internal_use_only = False
 
     def _init_options(self):
-        if json.__version__.split('.') >= ['2', '1', '3']:
-            # Use JS strings to represent Python Decimal instances (ticket #16850)
-            self.options.update({'use_decimal': False})
         self._current = None
         self.json_kwargs = self.options.copy()
         self.json_kwargs.pop('stream', None)
