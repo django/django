@@ -82,7 +82,7 @@ class UserAdmin(admin.ModelAdmin):
     def get_urls(self):
         return [
             url(
-                r'^(.+)/password/$',
+                r'^(.+)/change/password/$',
                 self.admin_site.admin_view(self.user_change_password),
                 name='auth_user_password_change',
             ),
