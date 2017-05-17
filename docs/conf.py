@@ -48,6 +48,8 @@ extensions = [
 # Add it only if spelling check is requested so docs can be generated without it.
 if 'spelling' in sys.argv:
     extensions.append("sphinxcontrib.spelling")
+    # Workaround for https://bitbucket.org/dhellmann/sphinxcontrib-spelling/issues/13
+    html_use_smartypants = False
 
 # Spelling language.
 spelling_lang = 'en_US'
@@ -181,10 +183,6 @@ html_theme_path = ["_theme"]
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
-
-# If true, SmartyPants will be used to convert quotes and dashes to
-# typographically correct entities.
-html_use_smartypants = True
 
 # Content template for the index page.
 # html_index = ''
