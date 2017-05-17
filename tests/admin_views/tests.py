@@ -862,6 +862,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             msg_prefix='The "change password" link should not be displayed if a user does not have a usable password.'
         )
 
+    def test_template_change_password(self):
+        """
+        When more than one password is stored in the password manager of browser
+        of one single site, a confirm password dialog pops up when changing password.
+        To prevent this username needs to be part of the change password submit form.
+        """
+        user = User.objects.get(username='super')
+        response = self.client.get(reverse('admin:auth_user_password_change', args=(user.id,)))
+        self.assertContains(response, '<input type="text" name="username" value="super" style="display: none" />')
+
     def test_change_view_with_show_delete_extra_context(self):
         """
         The 'show_delete' context variable in the admin's change view controls
