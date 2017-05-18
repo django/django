@@ -11,6 +11,14 @@ class QTests(SimpleTestCase):
     def test_combine_and_both_empty(self):
         self.assertEqual(Q() & Q(), Q())
 
+    def test_combine_or_empty(self):
+        q = Q(x=1)
+        self.assertEqual(q | Q(), q)
+        self.assertEqual(Q() | q, q)
+
+    def test_combine_or_both_empty(self):
+        self.assertEqual(Q() | Q(), Q())
+
     def test_deconstruct(self):
         q = Q(price__gt=F('discounted_price'))
         path, args, kwargs = q.deconstruct()
