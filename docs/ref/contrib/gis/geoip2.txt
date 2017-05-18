@@ -167,5 +167,13 @@ The basename to use for the GeoIP country data file. Defaults to
 The basename to use for the GeoIP city data file. Defaults to
 ``'GeoLite2-City.mmdb'``.
 
+Exceptions
+==========
+
+.. exception:: GeoIP2Exception
+
+    The exception raised when an error occurs in a call to the underlying
+    ``geoip2`` library.
+
 .. rubric:: Footnotes
 .. [#] GeoIP(R) is a registered trademark of MaxMind, Inc.
