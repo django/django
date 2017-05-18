@@ -1,6 +1,7 @@
 import itertools
 import json
 import os
+import re
 from urllib.parse import unquote
 
 from django.apps import apps
@@ -234,12 +235,31 @@ class JavaScriptCatalog(View):
         # paths of requested packages
         return [os.path.join(app.path, 'locale') for app in app_configs]
 
-    def get_plural(self):
-        plural = None
+    @property
+    def _num_plurals(self):
+        """
+        Return the number of plurals for this catalog language, or 2 if no
+        plural string is available.
+        """
+        match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
+        if match:
+            return int(match.groups()[0])
+        return 2
+
+    @property
+    def _plural_string(self):
+        """
+        Return the plural string (including nplurals) for this catalog language,
+        or None if no plural string is available.
+        """
         if '' in self.translation._catalog:
             for line in self.translation._catalog[''].split('\n'):
                 if line.startswith('Plural-Forms:'):
-                    plural = line.split(':', 1)[1].strip()
+                    return line.split(':', 1)[1].strip()
+        return None
+
+    def get_plural(self):
+        plural = self._plural_string
         if plural is not None:
             # This should be a compiled function of a typical plural-form:
             # Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 :
@@ -249,7 +269,7 @@ class JavaScriptCatalog(View):
 
     def get_catalog(self):
         pdict = {}
-        maxcnts = {}
+        num_plurals = self._num_plurals
         catalog = {}
         trans_cat = self.translation._catalog
         trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
@@ -259,14 +279,12 @@ class JavaScriptCatalog(View):
             if isinstance(key, str):
                 catalog[key] = value
             elif isinstance(key, tuple):
-                msgid = key[0]
-                cnt = key[1]
-                maxcnts[msgid] = max(cnt, maxcnts.get(msgid, 0))
+                msgid, cnt = key
                 pdict.setdefault(msgid, {})[cnt] = value
             else:
                 raise TypeError(key)
         for k, v in pdict.items():
-            catalog[k] = [v.get(i, '') for i in range(maxcnts[k] + 1)]
+            catalog[k] = [v.get(i, '') for i in range(num_plurals)]
         return catalog
 
     def get_context_data(self, **kwargs):
