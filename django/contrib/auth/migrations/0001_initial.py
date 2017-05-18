@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ('content_type__app_label', 'content_type__model', 'codename'),
-                'unique_together': set([('content_type', 'codename')]),
+                'unique_together': {('content_type', 'codename')},
                 'verbose_name': 'permission',
                 'verbose_name_plural': 'permissions',
             },
