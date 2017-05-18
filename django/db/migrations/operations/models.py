@@ -31,9 +31,9 @@ class ModelOperation(Operation):
     def references_model(self, name, app_label=None):
         return name.lower() == self.name_lower
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, after, app_label=None):
         return (
-            super().reduce(operation, in_between, app_label=app_label) or
+            super().reduce(operation, in_between, after, app_label=app_label) or
             not operation.references_model(self.name, app_label)
         )
 
@@ -131,11 +131,30 @@ class CreateModel(ModelOperation):
         else:
             return model._meta.app_label, model._meta.object_name
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, after, app_label=None):
         if (isinstance(operation, DeleteModel) and
                 self.name_lower == operation.name_lower and
                 not self.options.get("proxy", False)):
             return []
+        elif (isinstance(operation, CreateModel) and
+                # Ensure the model does not inherit from others, to avoid
+                # moving it earlier than its parent.
+                operation.bases == (models.Model,) and
+                not operation.references_model(self.name, app_label)):
+            # Check if it's better to move the operation before the current one, to allow
+            # for later optimisation of ForeignKey AddField operations.
+            for later_operation in after:
+                if (isinstance(later_operation, AddField) and
+                        getattr(later_operation.field, "remote_field", None)):
+                    fk_target_name = self.model_to_key(later_operation.field.remote_field.model)[1]
+                    if (later_operation.references_model(operation.name) and
+                            self.references_model(fk_target_name)):
+                        # The current order already allows for optimisation.
+                        break
+                    if (later_operation.references_model(self.name) and
+                            operation.references_model(fk_target_name)):
+                        # Move the second CreateModel before the first.
+                        return [operation, self]
         elif isinstance(operation, RenameModel) and self.name_lower == operation.old_name_lower:
             return [
                 CreateModel(
@@ -221,7 +240,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, after, app_label=app_label)
 
 
 class DeleteModel(ModelOperation):
@@ -399,7 +418,7 @@ class RenameModel(ModelOperation):
     def describe(self):
         return "Rename model %s to %s" % (self.old_name, self.new_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, after, app_label=None):
         if (isinstance(operation, RenameModel) and
                 self.new_name_lower == operation.old_name_lower):
             return [
@@ -411,7 +430,7 @@ class RenameModel(ModelOperation):
         # Skip `ModelOperation.reduce` as we want to run `references_model`
         # against self.new_name.
         return (
-            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            super(ModelOperation, self).reduce(operation, in_between, after, app_label=app_label) or
             not operation.references_model(self.new_name, app_label)
         )
 
@@ -465,26 +484,26 @@ class AlterModelTable(ModelOperation):
             self.table if self.table is not None else "(default)"
         )
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, after, app_label=None):
         if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, after, app_label=app_label)
 
 
 class ModelOptionOperation(ModelOperation):
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, after, app_label=None):
         if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, after, app_label=app_label)
 
 
 class FieldRelatedOptionOperation(ModelOptionOperation):
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, after, app_label=None):
         if (isinstance(operation, FieldOperation) and
                 self.name_lower == operation.model_name_lower and
                 not self.references_field(operation.model_name, operation.name)):
             return [operation, self]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, after, app_label=app_label)
 
 
 class AlterUniqueTogether(FieldRelatedOptionOperation):
