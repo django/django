@@ -5,7 +5,7 @@ from psycopg2.extras import Json
 from django.contrib.postgres import forms, lookups
 from django.core import exceptions
 from django.db.models import (
-    Field, TextField, Transform, lookups as builtin_lookups,
+    Field, TextField, Transform, Value, lookups as builtin_lookups,
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -125,11 +125,16 @@ class KeyTransformTextLookupMixin:
     text and performing the lookup on the resulting representation.
     """
     def __init__(self, key_transform, *args, **kwargs):
-        assert isinstance(key_transform, KeyTransform)
-        key_text_transform = KeyTextTransform(
-            key_transform.key_name, *key_transform.source_expressions, **key_transform.extra
-        )
-        super().__init__(key_text_transform, *args, **kwargs)
+        # Cast lhs of a key transform text.
+        if isinstance(key_transform, KeyTransform):
+            key_transform = KeyTextTransform(
+                key_transform.key_name, *key_transform.source_expressions, **key_transform.extra
+            )
+        # Leave lhs of a bilateral transform alone.
+        # Anything else is unsupported.
+        else:
+            assert self.bilateral and isinstance(key_transform, Value)
+        super().__init__(key_transform, *args, **kwargs)
 
 
 class KeyTransformIExact(KeyTransformTextLookupMixin, builtin_lookups.IExact):
@@ -164,6 +169,18 @@ class KeyTransformIRegex(KeyTransformTextLookupMixin, builtin_lookups.IRegex):
     pass
 
 
+# TODO: duplicated here because importing it from .transforms breaks tests.
+
+class Unaccent(Transform):
+    bilateral = True
+    lookup_name = 'unaccent'
+    function = 'UNACCENT'
+
+
+class KeyTransformUnaccent(KeyTransformTextLookupMixin, Unaccent):
+    pass
+
+
 KeyTransform.register_lookup(KeyTransformIExact)
 KeyTransform.register_lookup(KeyTransformIContains)
 KeyTransform.register_lookup(KeyTransformStartsWith)
@@ -172,6 +189,7 @@ KeyTransform.register_lookup(KeyTransformEndsWith)
 KeyTransform.register_lookup(KeyTransformIEndsWith)
 KeyTransform.register_lookup(KeyTransformRegex)
 KeyTransform.register_lookup(KeyTransformIRegex)
+KeyTransform.register_lookup(KeyTransformUnaccent)
 
 
 class KeyTransformFactory:

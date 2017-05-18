@@ -261,6 +261,9 @@ class TestQuerying(PostgreSQLTestCase):
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
 
+    def test_unaccent(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__unaccent='bâr').exists())
+
 
 @skipUnlessDBFeature('has_jsonb_datatype')
 class TestSerialization(PostgreSQLTestCase):
