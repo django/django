@@ -32,6 +32,10 @@ class Coffee(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
+class MixedCaseIDColumn(models.Model):
+    id = models.AutoField(primary_key=True, db_column='MiXeD_CaSe_Id')
+
+
 class Reviewer(models.Model):
     reviewed = models.ManyToManyField(Book)
 
