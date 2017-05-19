@@ -132,7 +132,9 @@ Let's test it! Run ``runserver``, open a browser, navigate to a page on the serv
 (you can't use any page's console because of origin restrictions), and put the
 following into the JavaScript console to open a WebSocket and send some data
 down it (you might need to change the socket address if you're using a
-development VM or similar)::
+development VM or similar)
+
+.. code-block:: javascript
 
     // Note that the path doesn't matter for routing; any WebSocket
     // connection gets bumped over to WebSocket consumers
@@ -246,7 +248,9 @@ views.
 
 With all that code, you now have a working set of a logic for a chat server.
 Test time! Run ``runserver``, open a browser and use that same JavaScript
-code in the developer console as before::
+code in the developer console as before
+
+.. code-block:: javascript
 
     // Note that the path doesn't matter right now; any WebSocket
     // connection gets bumped over to WebSocket consumers
@@ -508,7 +512,9 @@ chat to people with the same first letter of their username::
 If you're just using ``runserver`` (and so Daphne), you can just connect
 and your cookies should transfer your auth over. If you were running WebSockets
 on a separate domain, you'd have to remember to provide the
-Django session ID as part of the URL, like this::
+Django session ID as part of the URL, like this
+
+.. code-block:: javascript
 
     socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
 

@@ -20,7 +20,9 @@ The library is deliberately quite low-level and generic; it's designed to
 be compatible with any JavaScript code or framework, so you can build more
 specific integration on top of it.
 
-To process messages::
+To process messages
+
+.. code-block:: javascript
 
     const webSocketBridge = new channels.WebSocketBridge();
     webSocketBridge.connect('/ws/');
@@ -28,11 +30,15 @@ To process messages::
       console.log(action, stream);
     });
 
-To send messages, use the `send` method::
+To send messages, use the `send` method
+
+.. code-block:: javascript
 
     webSocketBridge.send({prop1: 'value1', prop2: 'value1'});
 
-To demultiplex specific streams::
+To demultiplex specific streams
+
+.. code-block:: javascript
 
     webSocketBridge.connect();
     webSocketBridge.listen('/ws/');
@@ -43,11 +49,15 @@ To demultiplex specific streams::
       console.info(action, stream);
     });
 
-To send a message to a specific stream::
+To send a message to a specific stream
+
+.. code-block:: javascript
 
     webSocketBridge.stream('mystream').send({prop1: 'value1', prop2: 'value1'})
 
-The `WebSocketBridge` instance exposes the underlaying `ReconnectingWebSocket` as the `socket` property. You can use this property to add any custom behavior. For example::
+The `WebSocketBridge` instance exposes the underlaying `ReconnectingWebSocket` as the `socket` property. You can use this property to add any custom behavior. For example
+
+.. code-block:: javascript
 
     webSocketBridge.socket.addEventListener('open', function() {
         console.log("Connected to WebSocket");
