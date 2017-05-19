@@ -46,7 +46,7 @@ The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
 ``mysite.settings``. Note that the settings module should be on the
 Python `import search path`_.
 
-.. _import search path: http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html
+.. _import search path: http://www.diveintopython3.net/your-first-python-program.html#importsearchpath
 
 The ``django-admin`` utility
 ----------------------------
