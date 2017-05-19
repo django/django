@@ -401,7 +401,7 @@ class LazyStream:
             return
         self._update_unget_history(len(bytes))
         self.position -= len(bytes)
-        self._leftover = b''.join([bytes, self._leftover])
+        self._leftover = bytes + self._leftover
 
     def _update_unget_history(self, num_bytes):
         """
