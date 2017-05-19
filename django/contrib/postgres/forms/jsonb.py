@@ -15,6 +15,7 @@ class JSONString(str):
 
 
 class JSONField(forms.CharField):
+    empty_values = [None]
     default_error_messages = {
         'invalid': _("'%(value)s' value must be valid JSON."),
     }
