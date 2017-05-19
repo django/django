@@ -300,6 +300,8 @@ class HttpRequest:
                 raise
         elif self.content_type == 'application/x-www-form-urlencoded':
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
+        elif self.content_type == 'application/json':
+            self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()            
         else:
             self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
 
