@@ -32,3 +32,7 @@ Bugfixes
 
 * Allowed ``DjangoJSONEncoder`` to serialize
   ``django.utils.deprecation.CallableBool`` (:ticket:`28230`).
+
+* Relaxed the validation added in Django 1.11 of the fields in the ``defaults``
+  argument of ``QuerySet.get_or_create()`` and ``update_or_create()`` to
+  reallow settable model properties (:ticket:`28222`).
