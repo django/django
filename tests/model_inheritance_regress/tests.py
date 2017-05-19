@@ -478,8 +478,9 @@ class ModelInheritanceTest(TestCase):
         # The mismatch between Restaurant and Place is intentional (#28175).
         self.assertSequenceEqual(Supplier.objects.filter(restaurant__in=Place.objects.all()), [s])
 
-    def test_ptr_accessor_assigns_db(self):
+    def test_ptr_accessor_assigns_state(self):
         r = Restaurant.objects.create()
+        self.assertIs(r.place_ptr._state.adding, False)
         self.assertEqual(r.place_ptr._state.db, 'default')
 
     def test_related_filtering_query_efficiency_ticket_15844(self):
