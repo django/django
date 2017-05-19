@@ -640,3 +640,10 @@ class BaseDatabaseWrapper:
         if allow_thread_sharing is None:
             allow_thread_sharing = self.allow_thread_sharing
         return type(self)(settings_dict, alias, allow_thread_sharing)
+
+    def backend_info(self):
+        """
+        Returns a dict that contains the vendor and version tuple
+        from the current database.
+        """
+        return self._get_backend_info()

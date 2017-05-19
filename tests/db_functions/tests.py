@@ -675,3 +675,8 @@ class FunctionTests(TestCase):
             Author.objects.exclude(alias=Upper(V('smithj'))),
             ['Rhonda'], lambda x: x.name
         )
+
+    def test_backend_info(self):
+        backend_info = connection.backend_info()
+        self.assertIsInstance(backend_info['vendor'], str)
+        self.assertIsInstance(backend_info['version'], tuple)

@@ -4,7 +4,7 @@ SQLite3 backend for the sqlite3 module in the standard library.
 import decimal
 import re
 import warnings
-from sqlite3 import dbapi2 as Database
+from sqlite3 import dbapi2 as Database, sqlite_version
 
 import pytz
 
@@ -272,6 +272,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def is_in_memory_db(self):
         return self.creation.is_in_memory_db(self.settings_dict['NAME'])
+
+    def _get_backend_info(self):
+        kwargs = {
+            'vendor': self.vendor,
+            'version': tuple(map(lambda x: int(x), sqlite_version.split('.'))),
+        }
+        return kwargs
 
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')

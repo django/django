@@ -351,3 +351,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)
         return tuple(int(x) for x in match.groups())
+
+    def _get_backend_info(self):
+        kwargs = {
+            'vendor': self.vendor,
+            'version': self.mysql_version,
+        }
+        return kwargs

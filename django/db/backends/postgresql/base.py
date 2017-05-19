@@ -4,6 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+import re
 import threading
 import warnings
 
@@ -55,6 +56,10 @@ INETARRAY = psycopg2.extensions.new_array_type(
     psycopg2.extensions.UNICODE,
 )
 psycopg2.extensions.register_type(INETARRAY)
+
+# This should split the version number in a list of ints
+# '90602' becomes [9, 6, 2] and '100001' becomes [10, 0, 1]
+server_version_re = re.compile(r'(\d{1,})(\d{2})(\d{2}$)')
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -274,3 +279,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def pg_version(self):
         with self.temporary_connection():
             return self.connection.server_version
+
+    def _get_backend_info(self):
+        match = server_version_re.match(str(self.pg_version))
+        if not match:
+            raise Exception('Unable to determine PostgreSQL version from version string %r' % self.pg_version)
+        version = tuple(int(x) for x in match.groups())
+        kwargs = {
+            'vendor': self.vendor,
+            'version': version,
+        }
+        return kwargs

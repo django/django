@@ -574,3 +574,10 @@ def _rowfactory(row, cursor):
                 value = int(value)
         casted.append(value)
     return tuple(casted)
+
+    def _get_backend_info(self):
+        kwargs = {
+            'vendor': self.vendor,
+            'version': tuple(map(lambda x: int(x), self.oracle_full_version.split('.'))),
+        }
+        return kwargs
