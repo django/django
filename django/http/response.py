@@ -410,6 +410,16 @@ class HttpResponseRedirectBase(HttpResponse):
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
 
     url = property(lambda self: self['Location'])
+    
+    
+class JsonHttpResponse(HttpResponse):
+    """
+    Return a JSON serialized HTTP response
+    """
+    def __init__(self, data):
+        import json
+        serialized = json.dumps(data, sort_keys=settings.DEBUG)
+        super(JsonHttpResponse, self).__init__(content=serialized, content_type='application/json')
 
     def __repr__(self):
         return '<%(cls)s status_code=%(status_code)d%(content_type)s, url="%(url)s">' % {
