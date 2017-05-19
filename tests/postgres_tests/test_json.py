@@ -324,11 +324,11 @@ class TestFormField(PostgreSQLTestCase):
             jfield = forms.JSONField(disabled=True)
 
         form = JsonForm({'name': 'xyz', 'jfield': '["bar"]'}, initial={'jfield': ['foo']})
-        self.assertIn('[&quot;foo&quot;]</textarea>', form.as_p())
+        self.assertIn('[\n    &quot;foo&quot;\n]</textarea>', form.as_p())
 
     def test_prepare_value(self):
         field = forms.JSONField()
-        self.assertEqual(field.prepare_value({'a': 'b'}), '{"a": "b"}')
+        self.assertEqual(field.prepare_value({'a': 'b'}), '{\n    "a": "b"\n}')
         self.assertEqual(field.prepare_value(None), 'null')
         self.assertEqual(field.prepare_value('foo'), '"foo"')
 
@@ -343,7 +343,7 @@ class TestFormField(PostgreSQLTestCase):
 
         # JSONField input is fine, name is too long
         form = JsonForm({'name': 'xyz', 'jfield': '["foo"]'})
-        self.assertIn('[&quot;foo&quot;]</textarea>', form.as_p())
+        self.assertIn('[\n    &quot;foo&quot;\n]</textarea>', form.as_p())
 
         # This time, the JSONField input is wrong
         form = JsonForm({'name': 'xy', 'jfield': '{"foo"}'})
