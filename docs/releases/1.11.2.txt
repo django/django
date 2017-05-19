@@ -25,3 +25,7 @@ Bugfixes
   backends don't accept a positional ``request`` argument (:ticket:`28207`).
 
 * Fixed introspection of index field ordering on PostgreSQL (:ticket:`28197`).
+
+* Fixed a regression where ``Model._state.adding`` wasn't set correctly on
+  multi-table inheritance parent models after saving a child model
+  (:ticket:`28210`).
