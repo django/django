@@ -73,6 +73,11 @@ class GetOrCreateTests(TestCase):
         """
         Thing.objects.get_or_create(pk=1)
 
+    def test_get_or_create_with_model_property_defaults(self):
+        """Using a property with a setter implemented is allowed."""
+        t, _ = Thing.objects.get_or_create(defaults={'capitalized_name_property': 'annie'}, pk=1)
+        self.assertEqual(t.name, 'Annie')
+
     def test_get_or_create_on_related_manager(self):
         p = Publisher.objects.create(name="Acme Publishing")
         # Create a book through the publisher.
@@ -328,6 +333,11 @@ class UpdateOrCreateTests(TestCase):
         """
         Thing.objects.update_or_create(pk=1)
 
+    def test_update_or_create_with_model_property_defaults(self):
+        """Using a property with a setter implemented is allowed."""
+        t, _ = Thing.objects.get_or_create(defaults={'capitalized_name_property': 'annie'}, pk=1)
+        self.assertEqual(t.name, 'Annie')
+
     def test_error_contains_full_traceback(self):
         """
         update_or_create should raise IntegrityErrors with the full traceback.
@@ -514,3 +524,11 @@ class InvalidCreateArgumentsTests(SimpleTestCase):
     def test_multiple_invalid_fields(self):
         with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'invalid', 'nonexistent'"):
             Thing.objects.update_or_create(name='a', nonexistent='b', defaults={'invalid': 'c'})
+
+    def test_property_attribute_without_setter_defaults(self):
+        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'name_in_all_caps'"):
+            Thing.objects.update_or_create(name='a', defaults={'name_in_all_caps': 'FRANK'})
+
+    def test_property_attribute_without_setter_kwargs(self):
+        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'name_in_all_caps'"):
+            Thing.objects.update_or_create(name_in_all_caps='FRANK', defaults={'name': 'Frank'})

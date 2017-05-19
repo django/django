@@ -828,10 +828,7 @@ class Options:
 
     @cached_property
     def _property_names(self):
-        """
-        Return a set of the names of the properties defined on the model.
-        Internal helper for model initialization.
-        """
+        """Return a set of the names of the properties defined on the model."""
         return frozenset({
             attr for attr in
             dir(self.model) if isinstance(getattr(self.model, attr), property)

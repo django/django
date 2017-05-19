@@ -32,6 +32,18 @@ class Thing(models.Model):
     name = models.CharField(max_length=255)
     tags = models.ManyToManyField(Tag)
 
+    @property
+    def capitalized_name_property(self):
+        return self.name
+
+    @capitalized_name_property.setter
+    def capitalized_name_property(self, val):
+        self.name = val.capitalize()
+
+    @property
+    def name_in_all_caps(self):
+        return self.name.upper()
+
 
 class Publisher(models.Model):
     name = models.CharField(max_length=100)
