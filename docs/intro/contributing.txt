@@ -396,7 +396,7 @@ that passing a ``prefix`` parameter when creating an instance still works too.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the Python :mod:`unittest` documentation.
 
-__ http://www.diveintopython.net/unit_testing/index.html
+__ http://www.diveintopython3.net/unit-testing.html
 
 Running your new test
 ---------------------
