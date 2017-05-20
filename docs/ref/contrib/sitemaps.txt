@@ -8,7 +8,7 @@ The sitemap framework
 Django comes with a high-level sitemap-generating framework that makes
 creating sitemap_ XML files easy.
 
-.. _sitemap: http://www.sitemaps.org/
+.. _sitemap: https://www.sitemaps.org/
 
 Overview
 ========
@@ -226,7 +226,7 @@ Note:
         default priority of a page is ``0.5``. See the `sitemaps.org
         documentation`_ for more.
 
-        .. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
+        .. _sitemaps.org documentation: https://www.sitemaps.org/protocol.html#prioritydef
 
     .. attribute:: Sitemap.protocol
 
@@ -244,7 +244,7 @@ Note:
         This attribute defines the maximum number of URLs included on each page
         of the sitemap. Its value should not exceed the default value of
         ``50000``, which is the upper limit allowed in the `Sitemaps protocol
-        <http://www.sitemaps.org/protocol.html#index>`_.
+        <https://www.sitemaps.org/protocol.html#index>`_.
 
     .. attribute:: Sitemap.i18n
 
@@ -460,7 +460,7 @@ generate a Google News compatible sitemap:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
       xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     {% spaceless %}
     {% for url in urlset %}

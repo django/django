@@ -36,7 +36,7 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MySQL: https://www.mysql.com/
 .. _`SQLite 3`: https://www.sqlite.org/
-.. _Oracle: http://www.oracle.com/
+.. _Oracle: https://www.oracle.com/
 
 .. _faq-python-version-support:
 

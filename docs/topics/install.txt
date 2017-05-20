@@ -10,7 +10,7 @@ Install Python
 Being a Python Web framework, Django requires Python. See
 :ref:`faq-python-version-support` for details.
 
-Get the latest version of Python at https://www.python.org/download/ or with
+Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
 .. admonition:: Django on Jython
@@ -119,8 +119,8 @@ database queries, Django will need permission to create a test database.
 .. _MySQL: https://www.mysql.com/
 .. _psycopg2: http://initd.org/psycopg/
 .. _SQLite: https://www.sqlite.org/
-.. _cx_Oracle: http://cx-oracle.sourceforge.net/
-.. _Oracle: http://www.oracle.com/
+.. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
+.. _Oracle: https://www.oracle.com/
 
 .. _removing-old-versions-of-django:
 
@@ -243,4 +243,4 @@ When you want to update your copy of the Django source code, just run the
 command ``git pull`` from within the ``django`` directory. When you do this,
 Git will automatically download any changes.
 
-.. _Git: http://git-scm.com/
+.. _Git: https://git-scm.com/

@@ -145,8 +145,8 @@ Setting the token on the AJAX request
 
 Finally, you'll have to actually set the header on your AJAX request, while
 protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <https://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
-newer:
+`settings.crossDomain <https://api.jquery.com/jQuery.ajax/>`_ in jQuery 1.5.1
+and newer:
 
 .. code-block:: javascript
 

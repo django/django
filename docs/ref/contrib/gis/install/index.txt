@@ -257,7 +257,7 @@ Summary::
     $ brew install gdal
     $ brew install libgeoip
 
-__ http://brew.sh/
+__ https://brew.sh/
 .. _Xcode: https://developer.apple.com/xcode/
 
 .. _kyngchaos:
@@ -402,8 +402,8 @@ install :ref:`postgisasb`.
     and contains shortcuts for the ASB as well as the 'SQL Shell',
     which will launch a ``psql`` command window.
 
-__ http://www.enterprisedb.com/products-services-training/pgdownload
-__ http://www.enterprisedb.com
+__ https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+__ https://www.enterprisedb.com
 
 .. _postgisasb:
 

@@ -60,7 +60,7 @@ Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 Running tests using ``tox``
 ---------------------------
 
-`Tox <http://tox.testrun.org/>`_ is a tool for running tests in different
+`Tox <https://tox.readthedocs.io/>`_ is a tool for running tests in different
 virtual environments. Django includes a basic ``tox.ini`` that automates some
 checks that our build server performs on pull requests. To run the unit tests
 and other checks (such as :ref:`import sorting <coding-style-imports>`, the
@@ -272,7 +272,7 @@ associated tests will be skipped.
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
-.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide.html#requirements-files
+.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
 
 Code coverage
 -------------

@@ -369,5 +369,5 @@ epub_cover = ('', 'epub-cover.html')
 # epub_use_index = True
 
 # -- custom extension options --------------------------------------------------
-cve_url = 'https://web.nvd.nist.gov/view/vuln/detail?vulnId=%s'
+cve_url = 'https://nvd.nist.gov/view/vuln/detail?vulnId=%s'
 ticket_url = 'https://code.djangoproject.com/ticket/%s'

@@ -414,7 +414,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: Rss201rev2Feed(RssFeed)
 
-    Spec: https://cyber.law.harvard.edu/rss/rss.html
+    Spec: https://cyber.harvard.edu/rss/rss.html
 
 ``RssUserland091Feed``
 ----------------------

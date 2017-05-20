@@ -29,7 +29,7 @@ readability of your code. **All** of the suggestions below come with the caveat
 that in your circumstances the general principle might not apply, or might even
 be reversed.
 
-.. _django-debug-toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar/
+.. _django-debug-toolbar: https://github.com/jazzband/django-debug-toolbar/
 
 Use standard DB optimization techniques
 =======================================

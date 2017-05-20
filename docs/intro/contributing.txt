@@ -71,7 +71,7 @@ probably got the answers.
 .. admonition:: Python 3 required!
 
     The current development version of Django doesn't support Python 2.7. Get
-    Python 3 at `Python's download page <https://www.python.org/download/>`_ or
+    Python 3 at `Python's download page <https://www.python.org/downloads/>`_ or
     with your operating system's package manager.
 
 .. admonition:: For Windows users
@@ -105,7 +105,7 @@ have to download and install it, see `Git's download page`__.
 If you're not that familiar with Git, you can always find out more about its
 commands (once it's installed) by typing ``git help`` into the command line.
 
-__ http://git-scm.com/download
+__ https://git-scm.com/download
 
 Getting a copy of Django's development version
 ==============================================
@@ -299,7 +299,7 @@ present in Django's official builds. If you click to view a particular build,
 you can view the "Configuration Matrix" which shows failures broken down by
 Python version and database backend.
 
-__ http://djangoci.com
+__ https://djangoci.com
 
 .. note::
 

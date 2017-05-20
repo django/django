@@ -167,7 +167,7 @@ and the :setting:`SECRET_KEY` setting.
 
 .. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
-.. _`speed of your site`: http://yuiblog.com/blog/2007/03/01/performance-research-part-3/
+.. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
 =======================

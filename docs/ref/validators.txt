@@ -301,4 +301,4 @@ to, or in lieu of custom ``field.clean()`` methods.
     .. versionadded:: 1.11
 
     Uses Pillow to ensure that the ``value`` is `a valid image extension
-    <https://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html>`_.
+    <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`_.

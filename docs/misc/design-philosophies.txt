@@ -27,7 +27,7 @@ template system a programmer uses.
 Although Django comes with a full stack for convenience, the pieces of the
 stack are independent of another wherever possible.
 
-.. _`loose coupling and tight cohesion`: http://c2.com/cgi/wiki?CouplingAndCohesion
+.. _`loose coupling and tight cohesion`: http://wiki.c2.com/?CouplingAndCohesion
 
 .. _less-code:
 
@@ -66,7 +66,7 @@ as possible.
 
     The `discussion of DRY on the Portland Pattern Repository`__
 
-    __ http://c2.com/cgi/wiki?DontRepeatYourself
+    __ http://wiki.c2.com/?DontRepeatYourself
 
 .. _explicit-is-better-than-implicit:
 
@@ -110,7 +110,7 @@ it (its human-readable name, options like default ordering, etc.) are
 defined in the model class; all the information needed to understand a
 given model should be stored *in* the model.
 
-.. _`Active Record`: http://www.martinfowler.com/eaaCatalog/activeRecord.html
+.. _`Active Record`: https://www.martinfowler.com/eaaCatalog/activeRecord.html
 
 Database API
 ============

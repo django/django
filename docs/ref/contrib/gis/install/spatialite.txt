@@ -133,4 +133,4 @@ following to your ``settings.py``::
 
     SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
 
-.. _Homebrew: http://brew.sh/
+.. _Homebrew: https://brew.sh/

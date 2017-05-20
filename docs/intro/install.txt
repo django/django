@@ -16,7 +16,7 @@ database called SQLite_ so you won't need to set up a database just yet.
 
 .. _sqlite: https://sqlite.org/
 
-Get the latest version of Python at https://www.python.org/download/ or with
+Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
 .. admonition:: Django on Jython

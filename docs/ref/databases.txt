@@ -721,8 +721,8 @@ Oracle notes
 Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
 5.2 or higher of the `cx_Oracle`_ Python driver is required.
 
-.. _`Oracle Database Server`: http://www.oracle.com/
-.. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
+.. _`Oracle Database Server`: https://www.oracle.com/
+.. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/
 
 In order for the ``python manage.py migrate`` command to work, your Oracle
 database user must have privileges to run the following commands:

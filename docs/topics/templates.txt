@@ -831,4 +831,4 @@ Implementing a custom context processor is as simple as defining a function.
 
 .. _Jinja2: http://jinja.pocoo.org/
 .. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst
-.. _Django Debug Toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar
+.. _Django Debug Toolbar: https://github.com/jazzband/django-debug-toolbar

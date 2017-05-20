@@ -19,11 +19,10 @@ could save some of this repeated work?
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
 <https://pypi.python.org/pypi>`_ has a vast range of packages you can use in
 your own Python programs. Check out `Django Packages
-<https://www.djangopackages.com>`_ for existing reusable apps you could
-incorporate in your project. Django itself is also just a Python package. This
-means that you can take existing Python packages or Django apps and compose
-them into your own web project. You only need to write the parts that make
-your project unique.
+<https://djangopackages.org>`_ for existing reusable apps you could incorporate
+in your project. Django itself is also just a Python package. This means that
+you can take existing Python packages or Django apps and compose them into your
+own web project. You only need to write the parts that make your project unique.
 
 Let's say you were starting a new project that needed a polls app like the one
 we've been working on. How do you make this app reusable? Luckily, you're well
@@ -257,7 +256,7 @@ this. For a small app like polls, this process isn't too difficult.
    new package, ``django-polls-0.1.tar.gz``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
-Distributing Projects <https://packaging.python.org/en/latest/distributing.html>`_.
+Distributing Projects <https://packaging.python.org/distributing/>`_.
 
 Using your own package
 ======================
@@ -303,7 +302,7 @@ the world! If this wasn't just an example, you could now:
 
 * Post the package on a public repository, such as `the Python Package Index
   (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
-  tutorial <https://packaging.python.org/en/latest/distributing.html#uploading-your-project-to-pypi>`_
+  tutorial <https://packaging.python.org/distributing/#uploading-your-project-to-pypi>`_
   for doing this.
 
 Installing Python packages with virtualenv

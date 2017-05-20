@@ -155,7 +155,7 @@ OK, this is the fun part, where we actually push out a release!
 #. Check `Jenkins`__ is green for the version(s) you're putting out. You
    probably shouldn't issue a release until it's green.
 
-   __ http://djangoci.com
+   __ https://djangoci.com
 
 #. A release always begins from a release branch, so you should make sure
    you're on a stable branch and up-to-date. For example::

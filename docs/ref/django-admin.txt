@@ -955,7 +955,7 @@ Python interpreter, use ``python`` as the interface name, like so::
     django-admin shell -i python
 
 .. _IPython: https://ipython.org/
-.. _bpython: http://bpython-interpreter.org/
+.. _bpython: https://bpython-interpreter.org/
 
 .. django-admin-option:: --nostartup
 
