@@ -966,7 +966,7 @@ Python interpreter, use ``python`` as the interface name, like so::
    is deprecated and will be removed in Django 2.0.
 
 .. _IPython: https://ipython.org/
-.. _bpython: http://bpython-interpreter.org/
+.. _bpython: https://bpython-interpreter.org/
 
 .. django-admin-option:: --nostartup
 

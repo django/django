@@ -7,10 +7,10 @@ GeoDjango Forms API
 
 GeoDjango provides some specialized form fields and widgets in order to visually
 display and edit geolocalized data on a map. By default, they use
-`OpenLayers`_-powered maps, with a base WMS layer provided by `Metacarta`_.
+`OpenLayers`_-powered maps, with a base WMS layer provided by `NASA`_.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Metacarta: http://www.metacarta.com/
+.. _NASA: https://earthdata.nasa.gov/
 
 Field arguments
 ===============

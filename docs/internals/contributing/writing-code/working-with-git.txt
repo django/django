@@ -18,7 +18,7 @@ Installing Git
 ==============
 
 Django uses `Git`_ for its source control. You can `download
-<http://git-scm.com/download>`_ Git, but it's often easier to install with
+<https://git-scm.com/download>`_ Git, but it's often easier to install with
 your operating system's package manager.
 
 Django's `Git repository`_ is hosted on `GitHub`_, and it is recommended
@@ -34,7 +34,7 @@ Note that ``user.name`` should be your real name, not your GitHub nick. GitHub
 should know the email you use in the ``user.email`` field, as this will be
 used to associate your commits with your GitHub account.
 
-.. _Git: http://git-scm.com/
+.. _Git: https://git-scm.com/
 .. _Git repository: https://github.com/django/django/
 .. _GitHub: https://github.com/
 

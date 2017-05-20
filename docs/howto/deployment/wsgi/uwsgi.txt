@@ -7,7 +7,7 @@ How to use Django with uWSGI
 uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
 container server coded in pure C.
 
-.. _uWSGI: https://projects.unbit.it/uwsgi/
+.. _uWSGI: https://uwsgi-docs.readthedocs.io/
 
 .. seealso::
 
@@ -39,18 +39,14 @@ uWSGI model
 
 uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
 communicates with a `django-uwsgi` "worker" process to serve dynamic content.
-See uWSGI's `background documentation`_ for more detail.
-
-.. _background documentation: https://projects.unbit.it/uwsgi/wiki/Background
 
 Configuring and starting the uWSGI server for Django
 ----------------------------------------------------
 
 uWSGI supports multiple ways to configure the process. See uWSGI's
-`configuration documentation`_ and `examples`_.
+`configuration documentation`_.
 
 .. _configuration documentation: https://uwsgi.readthedocs.io/en/latest/Configuration.html
-.. _examples: https://projects.unbit.it/uwsgi/wiki/Example
 
 Here's an example command to start a uWSGI server::
 

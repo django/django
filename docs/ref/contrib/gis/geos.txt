@@ -18,7 +18,7 @@ and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
 
 __ https://trac.osgeo.org/geos/
-__ http://sourceforge.net/projects/jts-topo-suite/
+__ https://sourceforge.net/projects/jts-topo-suite/
 __ http://www.opengeospatial.org/standards/sfs
 __ http://www.refractions.net/
 

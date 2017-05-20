@@ -56,10 +56,10 @@ Django tools
 ~~~~~~~~~~~~
 
 `django-debug-toolbar
-<https://github.com/django-debug-toolbar/django-debug-toolbar/>`_ is a very
-handy tool that provides insights into what your code is doing and how much
-time it spends doing it. In particular it can show you all the SQL queries your
-page is generating, and how long each one has taken.
+<https://github.com/jazzband/django-debug-toolbar/>`_ is a very handy tool that
+provides insights into what your code is doing and how much time it spends
+doing it. In particular it can show you all the SQL queries your page is
+generating, and how long each one has taken.
 
 Third-party panels are also available for the toolbar, that can (for example)
 report on cache performance and template rendering times.

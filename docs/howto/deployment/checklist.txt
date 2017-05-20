@@ -234,7 +234,7 @@ See :doc:`/howto/error-reporting` for details on error reporting by email.
     Consider using an error monitoring system such as Sentry_ before your
     inbox is flooded by reports. Sentry can also aggregate logs.
 
-    .. _Sentry: https://docs.getsentry.com/
+    .. _Sentry: https://docs.sentry.io/
 
 Customize the default error views
 ---------------------------------

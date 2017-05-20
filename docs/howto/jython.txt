@@ -27,7 +27,7 @@ such as `Apache Tomcat`_. Full JavaEE applications servers such as `GlassFish`_
 or `JBoss`_ are also OK, if you need the extra features they include.
 
 .. _`Apache Tomcat`: https://tomcat.apache.org/
-.. _GlassFish: https://glassfish.java.net/
+.. _GlassFish: https://javaee.github.io/glassfish/
 .. _JBoss: https://www.jboss.org/
 
 Installing Django

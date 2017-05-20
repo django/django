@@ -179,7 +179,7 @@ If you are using a version of Apache older than 2.4, replace
 ``Require all granted`` with ``Allow from all`` and also add the line
 ``Order deny,allow`` above it.
 
-.. _Nginx: http://wiki.nginx.org/Main
+.. _Nginx: https://nginx.org/en/
 .. _Apache: https://httpd.apache.org/
 
 .. More details on configuring a mod_wsgi site to serve static files can be found

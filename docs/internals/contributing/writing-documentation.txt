@@ -427,7 +427,7 @@ Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install a couple packages first:
 
 * `pyenchant <https://pypi.python.org/pypi/pyenchant/>`_ (which requires
-  `enchant <http://www.abisource.com/projects/enchant/>`_)
+  `enchant <https://www.abisource.com/projects/enchant/>`_)
 
 * `sphinxcontrib-spelling
   <https://pypi.python.org/pypi/sphinxcontrib-spelling/>`_

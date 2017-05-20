@@ -73,7 +73,7 @@ type of web server -- faster but less full-featured. Some common choices are:
 * Nginx_
 * A stripped-down version of Apache_
 
-.. _Nginx: http://wiki.nginx.org/Main
+.. _Nginx: https://nginx.org/en/
 .. _Apache: https://httpd.apache.org/
 
 Configuring these servers is out of scope of this document; check each
@@ -142,8 +142,8 @@ as changing your :setting:`STATICFILES_STORAGE` setting.
 For details on how you'd write one of these backends, see
 :doc:`/howto/custom-file-storage`. There are 3rd party apps available that
 provide storage backends for many common file storage APIs. A good starting
-point is the `overview at djangopackages.com
-<https://www.djangopackages.com/grids/g/storage-backends/>`_.
+point is the `overview at djangopackages.org
+<https://djangopackages.org/grids/g/storage-backends/>`_.
 
 Learn more
 ==========

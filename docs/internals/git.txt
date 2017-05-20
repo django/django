@@ -52,8 +52,8 @@ The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_
 website can be found at `github.com/django/djangoproject.com
 <https://github.com/django/djangoproject.com>`_.
 
-.. _Git: http://git-scm.com/
-.. _documentation: http://git-scm.com/documentation
+.. _Git: https://git-scm.com/
+.. _documentation: https://git-scm.com/documentation
 .. _branches: https://github.com/django/django/branches
 .. _tags: https://github.com/django/django/tags
 

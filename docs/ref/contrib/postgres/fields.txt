@@ -278,7 +278,7 @@ A more useful index is a ``GIN`` index, which you should create using a
     similar to PostgreSQL's ``text`` type.
 
     .. _citext: https://www.postgresql.org/docs/current/static/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN169274
+    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN178177
 
 ``HStoreField``
 ===============
