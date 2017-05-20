@@ -85,7 +85,7 @@ class Loader(BaseLoader):
             if matching:
                 skip_prefix = self.generate_hash(matching)
 
-        return '-'.join(filter(bool, [str(template_name), skip_prefix, dirs_prefix]))
+        return '-'.join(s for s in (str(template_name), skip_prefix, dirs_prefix) if s)
 
     def generate_hash(self, values):
         return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()

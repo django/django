@@ -256,9 +256,9 @@ class EmailMessage:
         msg['From'] = self.extra_headers.get('From', self.from_email)
         msg['To'] = self.extra_headers.get('To', ', '.join(map(str, self.to)))
         if self.cc:
-            msg['Cc'] = ', '.join(map(str, self.cc))
+            msg['Cc'] = ', '.join(str(cc) for cc in self.cc)
         if self.reply_to:
-            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(map(str, self.reply_to)))
+            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(str(r) for r in self.reply_to))
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
