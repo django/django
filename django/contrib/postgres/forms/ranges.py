@@ -5,7 +5,10 @@ from django.core import exceptions
 from django.forms.widgets import MultiWidget
 from django.utils.translation import gettext_lazy as _
 
-__all__ = ['IntegerRangeField', 'FloatRangeField', 'DateTimeRangeField', 'DateRangeField']
+__all__ = [
+    'BaseRangeField', 'IntegerRangeField', 'FloatRangeField',
+    'DateTimeRangeField', 'DateRangeField', 'RangeWidget',
+]
 
 
 class BaseRangeField(forms.MultiValueField):
