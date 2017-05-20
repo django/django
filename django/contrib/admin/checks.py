@@ -560,7 +560,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_inlines_item(self, obj, model, inline, label):
         """ Check one inline model admin. """
-        inline_label = '.'.join([inline.__module__, inline.__name__])
+        inline_label = inline.__module__ + '.' + inline.__name__
 
         from django.contrib.admin.options import InlineModelAdmin
 

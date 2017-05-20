@@ -600,8 +600,8 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     Get a datetime.date object given a format string and a year, month, and day
     (only year is mandatory). Raise a 404 for an invalid date.
     """
-    format = delim.join((year_format, month_format, day_format))
-    datestr = delim.join((year, month, day))
+    format = year_format + delim + month_format + delim + day_format
+    datestr = year + delim + month + delim + day
     try:
         return datetime.datetime.strptime(datestr, format).date()
     except ValueError:

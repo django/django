@@ -41,10 +41,10 @@ class ResolverMatch:
 
         if not hasattr(func, '__name__'):
             # A class-based view
-            self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
+            self._func_path = func.__class__.__module__ + '.' + func.__class__.__name__
         else:
             # A function-based view
-            self._func_path = '.'.join([func.__module__, func.__name__])
+            self._func_path = func.__module__ + '.' + func.__name__
 
         view_path = url_name or self._func_path
         self.view_name = ':'.join(self.namespaces + [view_path])

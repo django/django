@@ -92,7 +92,7 @@ class HttpResponseBase:
             return val if isinstance(val, bytes) else val.encode(encoding)
 
         headers = [
-            (b': '.join([to_bytes(key, 'ascii'), to_bytes(value, 'latin-1')]))
+            (to_bytes(key, 'ascii') + b': ' + to_bytes(value, 'latin-1'))
             for key, value in self._headers.values()
         ]
         return b'\r\n'.join(headers)

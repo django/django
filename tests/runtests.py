@@ -183,7 +183,7 @@ def setup(verbosity, test_labels, parallel):
     installed_app_names = set(get_installed())
     for modpath, module_name in test_modules:
         if modpath:
-            module_label = '.'.join([modpath, module_name])
+            module_label = modpath + '.' + module_name
         else:
             module_label = module_name
         # if the module (or an ancestor) was named on the command line, or

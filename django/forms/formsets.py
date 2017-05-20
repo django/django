@@ -399,17 +399,17 @@ class BaseFormSet:
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join(form.as_table() for form in self)
-        return mark_safe('\n'.join([str(self.management_form), forms]))
+        return mark_safe(str(self.management_form) + '\n' + forms)
 
     def as_p(self):
         "Return this formset rendered as HTML <p>s."
         forms = ' '.join(form.as_p() for form in self)
-        return mark_safe('\n'.join([str(self.management_form), forms]))
+        return mark_safe(str(self.management_form) + '\n' + forms)
 
     def as_ul(self):
         "Return this formset rendered as HTML <li>s."
         forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe('\n'.join([str(self.management_form), forms]))
+        return mark_safe(str(self.management_form) + '\n' + forms)
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,

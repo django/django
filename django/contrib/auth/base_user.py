@@ -26,7 +26,7 @@ class BaseUserManager(models.Manager):
         except ValueError:
             pass
         else:
-            email = '@'.join([email_name, domain_part.lower()])
+            email = email_name + '@' + domain_part.lower()
         return email
 
     def make_random_password(self, length=10,
