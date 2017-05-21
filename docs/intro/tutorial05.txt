@@ -361,6 +361,7 @@ With that ready, we can ask the client to do some work for us::
 
     >>> # get a response from '/'
     >>> response = client.get('/')
+    Not Found: /
     >>> # we should expect a 404 from that address; if you instead see an
     >>> # "Invalid HTTP_HOST header" error and a 400 response, you probably
     >>> # omitted the setup_test_environment() call described earlier.
