@@ -100,6 +100,8 @@ def gen_filenames(only_new=False):
     new_filenames = clean_files(
         [filename.__file__ for filename in new_modules
          if hasattr(filename, '__file__')])
+    if hasattr(settings, 'WATCH_FILES'):
+        new_filenames = new_filenames + settings.WATCH_FILES
 
     if not _cached_filenames and settings.USE_I18N:
         # Add the names of the .mo files that can be generated
