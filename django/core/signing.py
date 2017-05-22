@@ -26,7 +26,7 @@ helps and only applies compression if the result is a shorter string:
 >>> signing.dumps(range(1, 20), compress=True)
 '.eJwFwcERACAIwLCF-rCiILN47r-GyZVJsNgkxaFxoDgxcOHGxMKD_T7vhAml:1QaUaL:BA0thEZrp4FQVXIXuOvYJtLJSrQ'
 
-The fact that the string is compressed is signalled by the prefixed '.' at the
+The fact that the string is compressed is signaled by the prefixed '.' at the
 start of the base64 JSON.
 
 There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
