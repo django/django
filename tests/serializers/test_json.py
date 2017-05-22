@@ -12,6 +12,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
+from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.translation import override, ugettext_lazy
 
 from .models import Score
@@ -315,3 +316,7 @@ class DjangoJSONEncoderTests(SimpleTestCase):
             json.dumps({'duration': duration}, cls=DjangoJSONEncoder),
             '{"duration": "P0DT00H00M00S"}'
         )
+
+    def test_callable_bool(self):
+        self.assertEqual(json.dumps(CallableTrue, cls=DjangoJSONEncoder), 'true')
+        self.assertEqual(json.dumps(CallableFalse, cls=DjangoJSONEncoder), 'false')
