@@ -35,3 +35,8 @@ Bugfixes
 
 * Prevented ``Paginator``’s unordered object list warning from evaluating a
   ``QuerySet`` (:ticket:`28284`).
+
+* Fixed the value of ``redirect_field_name`` in ``LoginView``’s template
+  context. It's now an empty string (as it is for the original function-based
+  ``login()`` view) if the corresponding parameter isn't sent in a request (in
+  particular, when the login page is accessed directly) (:ticket:`28229`).
