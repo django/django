@@ -67,7 +67,7 @@ def authenticate(request=None, **credentials):
     """
     for backend, backend_path in _get_backends(return_tuples=True):
         try:
-            user = _authenticate_with_backend(backend, backend_path, request, **credentials)
+            user = _authenticate_with_backend(backend, backend_path, request, credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
             break
@@ -81,13 +81,14 @@ def authenticate(request=None, **credentials):
     user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
 
 
-def _authenticate_with_backend(backend, backend_path, request, **credentials):
+def _authenticate_with_backend(backend, backend_path, request, credentials):
     args = (request,)
     # Does the backend accept a request argument?
     try:
         inspect.getcallargs(backend.authenticate, request, **credentials)
     except TypeError:
         args = ()
+        credentials.pop('request', None)
         # Does the backend accept a request keyword argument?
         try:
             inspect.getcallargs(backend.authenticate, request=request, **credentials)
