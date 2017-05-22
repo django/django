@@ -2,6 +2,7 @@ from datetime import date, datetime, time
 
 from django import forms
 from django.test import SimpleTestCase, override_settings
+from django.utils.timezone import utc
 from django.utils.translation import activate, deactivate
 
 
@@ -917,3 +918,43 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         # The parsed result does a round trip to default format
         text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:00")
+
+    def test_djangojsonencoder_input_format_with_microseconds(self):
+        """
+        The datetime format favoured by Django's internal JSON encoder
+        is to call `.isoformat()` and trim the microseconds to 3 digits,
+        which means some loss of resolution, so `input` != `output` but
+        is close.
+        """
+        input_data = datetime(2010, 12, 21, 13, 30, 5, 123456)
+        isoformatted = input_data.isoformat()
+        isoformatted = isoformatted[:23] + isoformatted[26:]
+        f = forms.DateTimeField()
+        result = f.clean(value=isoformatted)
+        expected = datetime(2010, 12, 21, 13, 30, 5, 123000)
+        self.assertEqual(expected, result)
+
+    def test_djangojsonencoder_input_format(self):
+        """
+        The datetime format favoured by Django's internal JSON encoder
+        is to call `.isoformat()`
+        """
+        input_data = datetime(2010, 12, 21, 13, 30, 5)
+        isoformatted = input_data.isoformat()
+        f = forms.DateTimeField()
+        result = f.clean(value=isoformatted)
+        self.assertEqual(input_data, result)
+
+    def test_djangojsonencoder_input_format_with_tzinfo(self):
+        """
+        Without special-casing "Z" as a trailing character indicating UTC,
+        it's not possible to restore the tzinfo for a datetime object, so
+        it cannot be added to DATETIME_INPUT_FORMATS and validation will
+        continue to fail.
+        """
+        input_data = datetime(2010, 12, 21, 13, 30, 5).replace(tzinfo=utc)
+        isoformatted = input_data.isoformat()
+        isoformatted = isoformatted[:-6] + 'Z'
+        f = forms.DateTimeField()
+        with self.assertRaises(forms.ValidationError):
+            f.clean(value=isoformatted)
