@@ -562,7 +562,6 @@ class Func(Expression):
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = self.extra.copy()
-        data.update(**extra_context)
         # Use the first supplied value in this order: the parameter to this
         # method, a value supplied in __init__()'s **extra (the value in
         # `data`), or the value defined on the class.
@@ -573,6 +572,7 @@ class Func(Expression):
         template = template or data.get('template', self.template)
         arg_joiner = arg_joiner or data.get('arg_joiner', self.arg_joiner)
         data['expressions'] = data['field'] = arg_joiner.join(sql_parts)
+        data.update(**extra_context)
         return template % data, params
 
     def as_sqlite(self, compiler, connection, **extra_context):

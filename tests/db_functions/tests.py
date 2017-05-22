@@ -7,7 +7,7 @@ from django.db.models import CharField, TextField, Value as V
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
     Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now, Substr,
-    Upper,
+    Upper, StrIndex
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import timezone
@@ -25,6 +25,49 @@ def truncate_microseconds(value):
 
 
 class FunctionTests(TestCase):
+
+    def test_strindex(self):
+        Author.objects.create(name='G. R. R. Martin')
+        Author.objects.create(name='J. R. R. Tolkien')
+        Author.objects.create(name='Terry Pratchett')
+        authors = Author.objects.annotate(fullstop=StrIndex('name', '.'))
+        self.assertQuerysetEqual(
+            authors.order_by('name'),
+            [2, 2, 0],
+            lambda a: a.fullstop
+        )
+
+    def test_strindex_ordering(self):
+        Author.objects.create(name='G. R. R. Martin')
+        Author.objects.create(name='Dr. J. R. R. Tolkien')
+        Author.objects.create(name='Terry Pratchett')
+
+        self.assertQuerysetEqual(
+            Author.objects.order_by(StrIndex('name', '.')), [
+                'Terry Pratchett',
+                'G. R. R. Martin',
+                'Dr. J. R. R. Tolkien',
+            ],
+            lambda a: a.name
+        )
+
+        self.assertQuerysetEqual(
+            Author.objects.order_by(StrIndex('name', '.').asc()), [
+                'Terry Pratchett',
+                'G. R. R. Martin',
+                'Dr. J. R. R. Tolkien',
+            ],
+            lambda a: a.name
+        )
+
+        self.assertQuerysetEqual(
+            Author.objects.order_by(StrIndex('name', '.').desc()), [
+                'Dr. J. R. R. Tolkien',
+                'G. R. R. Martin',
+                'Terry Pratchett',
+            ],
+            lambda a: a.name
+        )
 
     def test_coalesce(self):
         Author.objects.create(name='John Smith', alias='smithj')

@@ -231,6 +231,37 @@ class Substr(Func):
         return super().as_sql(compiler, connection, function='SUBSTR')
 
 
+class StrIndex(Func):
+    """
+    Returns a positive integer corresponding to the 1-indexed position of the
+    first occurrence of a substring inside another string.
+    If the substring is not found, 0 is returned.
+    """
+    function = 'INSTR'
+    arity = 2
+
+    def __init__(self, expression, substr, **extra):
+        """
+        :param expression: the name of a field, or an expression returning a string
+        :param substr: a string to find inside @expression
+        """
+        if not hasattr(substr, 'resolve_expression'):
+            substr = Value(substr)
+        expressions = [expression, substr]
+
+        super(StrIndex, self).__init__(*expressions, **extra)
+
+    def as_mysql(self, compiler, connection):
+        """
+        Argument order is reversed for MySql, e.g. LOCATE(substring, string).
+        """
+        return super(StrIndex, self).as_sql(
+            compiler, connection, function='LOCATE', expressions=reversed(self.source_expressions))
+
+    def as_postgresql (self, compiler, connection):
+        return super(StrIndex, self).as_sql(compiler, connection, function='STRPOS')
+
+
 class Upper(Transform):
     function = 'UPPER'
     lookup_name = 'upper'

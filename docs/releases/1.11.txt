@@ -248,6 +248,9 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
+* Modified `Func.as_sql()` so that `**extra_context` is applied later, making it more useful.
+* Added the StrIndex function.
+
 * Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update()`
   on PostgreSQL 9.5+ and Oracle to execute queries with
   ``FOR UPDATE SKIP LOCKED``.
