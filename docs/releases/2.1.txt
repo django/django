@@ -206,7 +206,7 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added test :class:`~django.test.Client` support for 307 and 308 redirects.
 
 URLs
 ~~~~
