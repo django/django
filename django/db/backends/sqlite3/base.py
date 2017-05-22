@@ -45,6 +45,7 @@ Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'
+    display_name = 'SQLite'
     # SQLite doesn't actually support most of these types, but it "does the right
     # thing" given more verbose field definitions, so leave them as is so that
     # schema inspection is more useful.
