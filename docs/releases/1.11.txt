@@ -533,6 +533,8 @@ to support it.
 Also, the minimum supported version of psycopg2 is increased from 2.4.5 to
 2.5.4.
 
+.. _liveservertestcase-port-zero-change:
+
 ``LiveServerTestCase`` binds to port zero
 -----------------------------------------
 
@@ -541,6 +543,9 @@ Rather than taking a port range and iterating to find a free port,
 to assign a free port. The ``DJANGO_LIVE_TEST_SERVER_ADDRESS`` environment
 variable is no longer used, and as it's also no longer used, the
 ``manage.py test --liveserver`` option is removed.
+
+If you need to bind ``LiveServerTestCase`` to a specific port, use the ``port``
+attribute added in Django 1.11.2.
 
 Protection against insecure redirects in :mod:`django.contrib.auth` and ``i18n`` views
 --------------------------------------------------------------------------------------
