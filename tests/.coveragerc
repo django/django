@@ -10,5 +10,16 @@ omit =
     */django/conf/locale/*
     */tests/*
 
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
 [html]
 directory = coverage_html
