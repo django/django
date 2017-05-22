@@ -35,3 +35,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # Oracle doesn't ignore quoted identifiers case but the current backend
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
+    supports_index_on_text_field = False
