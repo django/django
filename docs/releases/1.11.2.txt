@@ -4,7 +4,14 @@ Django 1.11.2 release notes
 
 *Under development*
 
-Django 1.11.2 fixes several bugs in 1.11.1.
+Django 1.11.2 adds a minor feature and fixes several bugs in 1.11.1.
+
+Minor feature
+=============
+
+The new ``LiveServerTestCase.port`` attribute reallows the use case of binding
+to a specific port following the :ref:`bind to port zero
+<liveservertestcase-port-zero-change>` change in Django 1.11.
 
 Bugfixes
 ========

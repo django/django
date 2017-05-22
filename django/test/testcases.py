@@ -1257,9 +1257,9 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, host, static_handler, connections_override=None):
+    def __init__(self, host, static_handler, connections_override=None, port=0):
         self.host = host
-        self.port = None
+        self.port = port
         self.is_ready = threading.Event()
         self.error = None
         self.static_handler = static_handler
@@ -1279,8 +1279,10 @@ class LiveServerThread(threading.Thread):
         try:
             # Create the handler for serving static and media files
             handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
-            self.httpd = self._create_server(0)
-            self.port = self.httpd.server_address[1]
+            self.httpd = self._create_server()
+            # If binding to port zero, assign the port allocated by the OS.
+            if self.port == 0:
+                self.port = self.httpd.server_address[1]
             self.httpd.set_app(handler)
             self.is_ready.set()
             self.httpd.serve_forever()
@@ -1290,8 +1292,8 @@ class LiveServerThread(threading.Thread):
         finally:
             connections.close_all()
 
-    def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
+    def _create_server(self):
+        return WSGIServer((self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1313,6 +1315,7 @@ class LiveServerTestCase(TransactionTestCase):
     other thread can see the changes.
     """
     host = 'localhost'
+    port = 0
     server_thread_class = LiveServerThread
     static_handler = _StaticFilesHandler
 
@@ -1354,6 +1357,7 @@ class LiveServerTestCase(TransactionTestCase):
             cls.host,
             cls.static_handler,
             connections_override=connections_override,
+            port=cls.port,
         )
 
     @classmethod
