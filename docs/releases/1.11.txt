@@ -435,6 +435,9 @@ Validators
   :data:`~django.core.validators.validate_image_file_extension` to validate
   image files.
 
+* :class:`~django.core.validators.EmailValidator` now allows non-ASCII
+  characters in the local part of the email address (as per :rfc:`6530`).
+
 .. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11

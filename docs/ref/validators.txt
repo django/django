@@ -125,6 +125,10 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param whitelist: If not ``None``, overrides :attr:`whitelist`.
 
+    .. versionchanged:: 1.11
+
+        Non-ASCII characters are now allowed in the local part of the address.
+
     .. attribute:: message
 
         The error message used by
