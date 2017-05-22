@@ -205,11 +205,11 @@ A basic migration file looks like this::
 
     class Migration(migrations.Migration):
 
-        dependencies = [("migrations", "0001_initial")]
+        dependencies = [('migrations', '0001_initial')]
 
         operations = [
-            migrations.DeleteModel("Tribble"),
-            migrations.AddField("Author", "rating", models.IntegerField(default=0)),
+            migrations.DeleteModel('Tribble'),
+            migrations.AddField('Author', 'rating', models.IntegerField(default=0)),
         ]
 
 What Django looks for when it loads a migration file (as a Python module) is
@@ -486,9 +486,9 @@ need to do is use the historical model and iterate over the rows::
     def combine_names(apps, schema_editor):
         # We can't import the Person model directly as it may be a newer
         # version than this migration expects. We use the historical version.
-        Person = apps.get_model("yourappname", "Person")
+        Person = apps.get_model('yourappname', 'Person')
         for person in Person.objects.all():
-            person.name = "%s %s" % (person.first_name, person.last_name)
+            person.name = '%s %s' % (person.first_name, person.last_name)
             person.save()
 
     class Migration(migrations.Migration):
