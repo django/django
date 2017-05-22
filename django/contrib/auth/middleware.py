@@ -21,7 +21,6 @@ class AuthenticationMiddleware(MiddlewareMixin):
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         ) % ("_CLASSES" if settings.MIDDLEWARE is None else "")
-        request.user = SimpleLazyObject(lambda: get_user(request))
 
 
 class RemoteUserMiddleware(MiddlewareMixin):

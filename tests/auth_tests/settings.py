@@ -2,7 +2,6 @@ import os
 
 AUTH_MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]
 
 AUTH_TEMPLATES = [{
