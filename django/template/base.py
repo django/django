@@ -677,6 +677,9 @@ class FilterExpression:
             except VariableDoesNotExist:
                 if ignore_failures:
                     obj = None
+                elif (len(self.filters) and
+                      self.filters[0][0]._filter_name == 'default'):
+                    obj = None
                 else:
                     string_if_invalid = context.template.engine.string_if_invalid
                     if string_if_invalid:
