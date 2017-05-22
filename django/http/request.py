@@ -280,7 +280,7 @@ class HttpRequest:
             self._mark_post_parse_error()
             return
 
-        if self.content_type == 'multipart/form-data':
+        if self.content_type.startswith('multipart/form-data'):
             if hasattr(self, '_body'):
                 # Use already read data
                 data = BytesIO(self._body)
