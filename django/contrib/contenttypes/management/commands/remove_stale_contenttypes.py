@@ -26,8 +26,6 @@ class Command(BaseCommand):
 
         for app_config in apps.get_app_configs():
             content_types, app_models = get_contenttypes_and_models(app_config, db, ContentType)
-            if not app_models:
-                continue
             to_remove = [
                 ct for (model_name, ct) in content_types.items()
                 if model_name not in app_models
