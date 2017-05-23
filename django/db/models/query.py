@@ -22,7 +22,7 @@ from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
 from django.utils import timezone
-from django.utils.functional import cached_property, partition
+from django.utils.functional import batches, cached_property, partition
 from django.utils.version import get_version
 
 # The maximum number of items to display in a QuerySet.__repr__
@@ -418,21 +418,27 @@ class QuerySet:
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.concrete_fields
-        objs = list(objs)
-        self._populate_pk_values(objs)
+        batch_size = (batch_size or max(connection.ops.bulk_batch_size(fields, objs), 1))
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
-            if objs_with_pk:
-                self._batched_insert(objs_with_pk, fields, batch_size)
-            if objs_without_pk:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
-                ids = self._batched_insert(objs_without_pk, fields, batch_size)
-                if connection.features.can_return_ids_from_bulk_insert:
-                    assert len(ids) == len(objs_without_pk)
-                for obj_without_pk, pk in zip(objs_without_pk, ids):
-                    obj_without_pk.pk = pk
-                    obj_without_pk._state.adding = False
-                    obj_without_pk._state.db = self.db
+            for objs_batch in batches(objs, batch_size):
+                objs_batch = list(objs_batch)
+                self._populate_pk_values(objs_batch)
+                objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs_batch)
+                if objs_with_pk:
+                    self._insert(objs_with_pk, fields)
+                if objs_without_pk:
+                    fields = [f for f in fields if not isinstance(f, AutoField)]
+                    if connection.features.can_return_ids_from_bulk_insert:
+                        ids = self._insert(objs_without_pk, fields, return_id=True)
+                        if not isinstance(ids, list):
+                            ids = [ids]
+                        assert len(ids) == len(objs_without_pk)
+                        for obj_without_pk, pk in zip(objs_without_pk, ids):
+                            obj_without_pk.pk = pk
+                            obj_without_pk._state.adding = False
+                            obj_without_pk._state.db = self.db
+                    else:
+                        self._insert(objs_without_pk, fields)
 
         return objs
 
