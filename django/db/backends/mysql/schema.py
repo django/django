@@ -29,20 +29,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         import MySQLdb.converters
         return MySQLdb.escape(value, MySQLdb.converters.conversions)
 
-    def skip_default(self, field):
-        """
-        MySQL doesn't accept default values for some data types and implicitly
-        treats these columns as nullable.
-        """
+    def _is_limited_data_type(self, field):
         db_type = field.db_type(self.connection)
-        return (
-            db_type is not None and
-            db_type.lower() in {
-                'tinyblob', 'blob', 'mediumblob', 'longblob',
-                'tinytext', 'text', 'mediumtext', 'longtext',
-                'json',
-            }
-        )
+        return db_type is not None and db_type.lower() in self.connection._limited_data_types
+
+    def skip_default(self, field):
+        return self._is_limited_data_type(field)
 
     def add_field(self, model, field):
         super().add_field(model, field)
@@ -68,6 +60,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 create_index and
                 field.get_internal_type() == 'ForeignKey' and
                 field.db_constraint):
+            return False
+        if self._is_limited_data_type(field):
             return False
         return create_index
 

@@ -2,7 +2,7 @@ import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.timezone import now
 
@@ -646,3 +646,26 @@ class TimeFieldTests(TestCase):
     @override_settings(USE_TZ=True)
     def test_fix_default_value_tz(self):
         self.test_fix_default_value()
+
+
+@isolate_apps('invalid_models_tests')
+class TextFieldTests(TestCase):
+
+    @skipIfDBFeature('supports_index_on_text_field')
+    def test_max_length_warning(self):
+        class Model(models.Model):
+            value = models.TextField(db_index=True)
+        field = Model._meta.get_field('value')
+        field_type = field.db_type(connection)
+        self.assertEqual(field.check(), [
+            DjangoWarning(
+                '%s does not support a database index on %s columns.'
+                % (connection.display_name, field_type),
+                hint=(
+                    "An index won't be created. Silence this warning if you "
+                    "don't care about it."
+                ),
+                obj=field,
+                id='fields.W162',
+            )
+        ])

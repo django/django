@@ -227,6 +227,9 @@ class BaseDatabaseFeatures:
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
 
+    # Does the backend support indexing a TextField?
+    supports_index_on_text_field = True
+
     def __init__(self, connection):
         self.connection = connection
 
