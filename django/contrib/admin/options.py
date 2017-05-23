@@ -893,7 +893,12 @@ class ModelAdmin(BaseModelAdmin):
             if field_name.startswith('^'):
                 return "%s__istartswith" % field_name[1:]
             elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
+                field_name = field_name[1:]
+                # Only strings care about case-sensitivity.
+                if isinstance(queryset.model._meta.get_field(field_name),
+                              (models.CharField, models.TextField)):
+                        return "%s__iexact" % field_name
+                return "%s__exact" % field_name
             elif field_name.startswith('@'):
                 return "%s__search" % field_name[1:]
             else:
@@ -905,8 +910,14 @@ class ModelAdmin(BaseModelAdmin):
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
             for bit in search_term.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
+                or_queries = []
+                for orm_lookup in orm_lookups:
+                    if orm_lookup.endswith('__exact'):
+                        try:
+                            bit = self.model._meta.get_field(orm_lookup[:-7]).get_prep_value(bit)
+                        except ValueError:
+                            break
+                    or_queries.append(models.Q(**{orm_lookup: bit}))
                 queryset = queryset.filter(reduce(operator.or_, or_queries))
             if not use_distinct:
                 for search_spec in orm_lookups:
