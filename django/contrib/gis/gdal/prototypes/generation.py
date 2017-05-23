@@ -2,7 +2,7 @@
  This module contains functions that generate ctypes prototypes for the
  GDAL routines.
 """
-from ctypes import c_char_p, c_double, c_int, c_int64, c_void_p
+from ctypes import POINTER, c_char_p, c_double, c_int, c_int64, c_void_p
 from functools import partial
 
 from django.contrib.gis.gdal.prototypes.errcheck import (
@@ -144,6 +144,15 @@ def voidptr_output(func, argtypes, errcheck=True):
     "For functions that return c_void_p."
     func.argtypes = argtypes
     func.restype = c_void_p
+    if errcheck:
+        func.errcheck = check_pointer
+    return func
+
+
+def chararray_output(func, argtypes, errcheck=True):
+    """For functions that return a c_char_p array."""
+    func.argtypes = argtypes
+    func.restype = POINTER(c_char_p)
     if errcheck:
         func.errcheck = check_pointer
     return func

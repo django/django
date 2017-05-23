@@ -1,45 +1,3 @@
-"""
-gdalinfo tests/gis_tests/data/rasters/raster.tif:
-
-Driver: GTiff/GeoTIFF
-Files: tests/gis_tests/data/rasters/raster.tif
-Size is 163, 174
-Coordinate System is:
-PROJCS["NAD83 / Florida GDL Albers",
-    GEOGCS["NAD83",
-        DATUM["North_American_Datum_1983",
-            SPHEROID["GRS 1980",6378137,298.2572221010002,
-                AUTHORITY["EPSG","7019"]],
-            TOWGS84[0,0,0,0,0,0,0],
-            AUTHORITY["EPSG","6269"]],
-        PRIMEM["Greenwich",0],
-        UNIT["degree",0.0174532925199433],
-        AUTHORITY["EPSG","4269"]],
-    PROJECTION["Albers_Conic_Equal_Area"],
-    PARAMETER["standard_parallel_1",24],
-    PARAMETER["standard_parallel_2",31.5],
-    PARAMETER["latitude_of_center",24],
-    PARAMETER["longitude_of_center",-84],
-    PARAMETER["false_easting",400000],
-    PARAMETER["false_northing",0],
-    UNIT["metre",1,
-        AUTHORITY["EPSG","9001"]],
-    AUTHORITY["EPSG","3086"]]
-Origin = (511700.468070655711927,435103.377123198588379)
-Pixel Size = (100.000000000000000,-100.000000000000000)
-Metadata:
-  AREA_OR_POINT=Area
-Image Structure Metadata:
-  INTERLEAVE=BAND
-Corner Coordinates:
-Upper Left  (  511700.468,  435103.377) ( 82d51'46.16"W, 27d55' 1.53"N)
-Lower Left  (  511700.468,  417703.377) ( 82d51'52.04"W, 27d45'37.50"N)
-Upper Right (  528000.468,  435103.377) ( 82d41'48.81"W, 27d54'56.30"N)
-Lower Right (  528000.468,  417703.377) ( 82d41'55.54"W, 27d45'32.28"N)
-Center      (  519850.468,  426403.377) ( 82d46'50.64"W, 27d50'16.99"N)
-Band 1 Block=163x50 Type=Byte, ColorInterp=Gray
-  NoData Value=15
-"""
 import os
 import struct
 import tempfile
@@ -254,6 +212,103 @@ class GDALRasterTests(SimpleTestCase):
             result = result.flatten().tolist()
         # Band data is equal to zero becaues no nodata value has been specified.
         self.assertEqual(result, [0] * 4)
+
+    def test_raster_metadata_property(self):
+        # Check for required gdal version.
+        if GDAL_VERSION < (1, 11):
+            msg = 'GDAL ≥ 1.11 is required for using the metadata property.'
+            with self.assertRaisesMessage(ValueError, msg):
+                self.rs.metadata
+            return
+
+        self.assertEqual(
+            self.rs.metadata,
+            {'DEFAULT': {'AREA_OR_POINT': 'Area'}, 'IMAGE_STRUCTURE': {'INTERLEAVE': 'BAND'}},
+        )
+
+        # Create file-based raster from scratch
+        source = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'data': range(4), 'nodata_value': 99}],
+        })
+        # Set metadata on raster and on a band.
+        metadata = {
+            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point', },
+        }
+        source.metadata = metadata
+        source.bands[0].metadata = metadata
+        self.assertEqual(source.metadata['DEFAULT'], metadata['DEFAULT'])
+        self.assertEqual(source.bands[0].metadata['DEFAULT'], metadata['DEFAULT'])
+        # Update metadata on raster.
+        metadata = {
+            'DEFAULT': {'VERSION': '2.0', },
+        }
+        source.metadata = metadata
+        self.assertEqual(source.metadata['DEFAULT']['VERSION'], '2.0')
+        # Remove metadata on raster.
+        metadata = {
+            'DEFAULT': {'OWNER': None, },
+        }
+        source.metadata = metadata
+        self.assertNotIn('OWNER', source.metadata['DEFAULT'])
+
+    def test_raster_info_accessor(self):
+        if GDAL_VERSION < (2, 1):
+            msg = 'GDAL ≥ 2.1 is required for using the info property.'
+            with self.assertRaisesMessage(ValueError, msg):
+                self.rs.info
+            return
+        gdalinfo = """
+        Driver: GTiff/GeoTIFF
+        Files: {0}
+        Size is 163, 174
+        Coordinate System is:
+        PROJCS["NAD83 / Florida GDL Albers",
+            GEOGCS["NAD83",
+                DATUM["North_American_Datum_1983",
+                    SPHEROID["GRS 1980",6378137,298.257222101,
+                        AUTHORITY["EPSG","7019"]],
+                    TOWGS84[0,0,0,0,0,0,0],
+                    AUTHORITY["EPSG","6269"]],
+                PRIMEM["Greenwich",0,
+                    AUTHORITY["EPSG","8901"]],
+                UNIT["degree",0.0174532925199433,
+                    AUTHORITY["EPSG","9122"]],
+                AUTHORITY["EPSG","4269"]],
+            PROJECTION["Albers_Conic_Equal_Area"],
+            PARAMETER["standard_parallel_1",24],
+            PARAMETER["standard_parallel_2",31.5],
+            PARAMETER["latitude_of_center",24],
+            PARAMETER["longitude_of_center",-84],
+            PARAMETER["false_easting",400000],
+            PARAMETER["false_northing",0],
+            UNIT["metre",1,
+                AUTHORITY["EPSG","9001"]],
+            AXIS["X",EAST],
+            AXIS["Y",NORTH],
+            AUTHORITY["EPSG","3086"]]
+        Origin = (511700.468070655711927,435103.377123198588379)
+        Pixel Size = (100.000000000000000,-100.000000000000000)
+        Metadata:
+          AREA_OR_POINT=Area
+        Image Structure Metadata:
+          INTERLEAVE=BAND
+        Corner Coordinates:
+        Upper Left  (  511700.468,  435103.377) ( 82d51'46.16"W, 27d55' 1.53"N)
+        Lower Left  (  511700.468,  417703.377) ( 82d51'52.04"W, 27d45'37.50"N)
+        Upper Right (  528000.468,  435103.377) ( 82d41'48.81"W, 27d54'56.30"N)
+        Lower Right (  528000.468,  417703.377) ( 82d41'55.54"W, 27d45'32.28"N)
+        Center      (  519850.468,  426403.377) ( 82d46'50.64"W, 27d50'16.99"N)
+        Band 1 Block=163x50 Type=Byte, ColorInterp=Gray
+          NoData Value=15
+        """.format(self.rs_path)
+        # Data
+        info_dyn = [line.strip() for line in self.rs.info.split('\n') if line.strip() != '']
+        info_ref = [line.strip() for line in gdalinfo.split('\n') if line.strip() != '']
+        self.assertEqual(info_dyn, info_ref)
 
     def test_raster_warp(self):
         # Create in memory raster

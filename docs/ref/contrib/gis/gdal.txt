@@ -1391,6 +1391,40 @@ blue.
             >>> target.origin
             [-82.98492744885776, 27.601924753080144]
 
+    .. attribute:: info
+
+        .. versionadded:: 2.0
+
+        Returns a string with a summary of the raster. This is equivalent to
+        the `gdalinfo`__ command line utility.
+
+        __ http://www.gdal.org/gdalinfo.html
+
+    .. attribute:: metadata
+
+        .. versionadded:: 2.0
+
+        The metadata of this raster, represented as a nested dictionary. The
+        first-level key is the metadata domain. The second-level contains the
+        metadata item names and values from each domain.
+
+        To set or update a metadata item, pass the corresponding metadata item
+        to the method using the nested structure described above. Only keys
+        that are in the specified dictionary are updated; the rest of the
+        metadata remains unchanged.
+
+        To remove a metadata item, use ``None`` as the metadata value.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.metadata
+            {}
+            >>> rst.metadata = {'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0'}}
+            >>> rst.metadata
+            {'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0'}}
+            >>> rst.metadata = {'DEFAULT': {'OWNER': None, 'VERSION': '2.0'}}
+            >>> rst.metadata
+            {'DEFAULT': {'VERSION': '2.0'}}
+
 ``GDALBand``
 ------------
 
@@ -1538,6 +1572,13 @@ blue.
                    [1, 1, 1, 1],
                    [2, 2, 2, 2],
                    [3, 3, 3, 3]], dtype=uint8)
+
+    .. attribute:: metadata
+
+        .. versionadded:: 2.0
+
+        The metadata of this band. The functionality is identical to
+        :attr:`GDALRaster.metadata`.
 
 .. _gdal-raster-ds-input:
 

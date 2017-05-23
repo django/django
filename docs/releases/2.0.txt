@@ -78,6 +78,11 @@ Minor features
 * Added the :attr:`.OSMWidget.default_zoom` attribute to customize the map's
   default zoom level.
 
+* Made metadata readable and editable on rasters through the
+  :attr:`~django.contrib.gis.gdal.GDALRaster.metadata`,
+  :attr:`~django.contrib.gis.gdal.GDALRaster.info`, and
+  :attr:`~django.contrib.gis.gdal.GDALBand.metadata` attributes.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
