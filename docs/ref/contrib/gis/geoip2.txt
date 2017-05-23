@@ -39,7 +39,8 @@ Here is an example of its usage::
     'latitude': 37.419200897216797,
     'longitude': -122.05740356445312,
     'postal_code': '94043',
-    'region': 'CA'}
+    'region': 'CA',
+    'time_zone': 'America/Los_Angeles'}
     >>> g.lat_lon('salon.com')
     (39.0437, -77.4875)
     >>> g.lon_lat('uh.edu')
