@@ -51,10 +51,12 @@ class RegexValidator:
 
     def __call__(self, value):
         """
-        Validate that the input contains a match for the regular expression
-        if inverse_match is False, otherwise raise ValidationError.
+        Validate that the input contains (or does *not* contain, if
+        inverse_match is True) a match for the regular expression.
         """
-        if not (self.inverse_match is not bool(self.regex.search(str(value)))):
+        regex_matches = bool(self.regex.search(str(value)))
+        invalid_input = regex_matches if self.inverse_match else not regex_matches
+        if invalid_input:
             raise ValidationError(self.message, code=self.code)
 
     def __eq__(self, other):
