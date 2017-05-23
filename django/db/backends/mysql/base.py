@@ -103,6 +103,7 @@ class CursorWrapper:
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
+    display_name = 'MySQL'
     # This dictionary maps Field objects to their associated MySQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.

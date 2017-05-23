@@ -31,6 +31,7 @@ class BaseDatabaseWrapper:
     data_type_check_constraints = {}
     ops = None
     vendor = 'unknown'
+    display_name = 'unknown'
     SchemaEditorClass = None
     # Classes instantiated in __init__().
     client_class = None

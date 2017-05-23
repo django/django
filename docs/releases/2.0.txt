@@ -258,6 +258,10 @@ Database backend API
   ``datetime_extract_sql()`` methods now return only the SQL to perform the
   operation instead of SQL and a list of parameters.
 
+* Third-party database backends should add a ``DatabaseWrapper.display_name``
+  attribute with the name of the database that your backend works with. Django
+  may use it in various messages, such as in system checks.
+
 Dropped support for Oracle 11.2
 -------------------------------
 

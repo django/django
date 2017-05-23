@@ -72,6 +72,7 @@ class _UninitializedOperatorsDescriptor:
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'oracle'
+    display_name = 'Oracle'
     # This dictionary maps Field objects to their associated Oracle column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
