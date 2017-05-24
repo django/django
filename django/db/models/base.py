@@ -726,6 +726,11 @@ class Model(metaclass=ModelBase):
         is used by fixture loading.
         """
         using = using or router.db_for_write(self.__class__, instance=self)
+        # The database the instance will be saved on is not stored yet if it
+        # was previously saved to another database. This allows Django to read
+        # the old instance prior to saving.
+        if not self._state.db:
+            self._state.db = using
         assert not (force_insert and (force_update or update_fields))
         assert update_fields is None or len(update_fields) > 0
         cls = origin = self.__class__
