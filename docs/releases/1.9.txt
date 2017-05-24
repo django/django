@@ -161,6 +161,9 @@ Forms
   :attr:`~django.forms.Form.field_order` attribute, the ``field_order``
   constructor argument , or the :meth:`~django.forms.Form.order_fields` method.
 
+* A form prefix can be specified inside a form class, not only when
+  instantiating a form. See :ref:`form-prefix` for details.
+
 Generic Views
 ^^^^^^^^^^^^^
 
