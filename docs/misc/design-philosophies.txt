@@ -56,7 +56,7 @@ Don't repeat yourself (DRY)
    single: DRY
    single: Don't repeat yourself
 
-Every distinct concept and/or piece of data should live in one, and only one,
+Every distinct concept and/or piece of data should live in one, and only one 
 place. Redundancy is bad. Normalization is good.
 
 The framework, within reason, should deduce as much as possible from as little
