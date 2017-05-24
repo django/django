@@ -34,13 +34,26 @@ class Serializer(base.Serializer):
         self.objects.append(self.get_dump_object(obj))
         self._current = None
 
+    def get_dump_pk(self, obj, level):
+        pk = obj._meta.pk
+        if pk.rel:
+            if self.use_natural_foreign_keys:
+                return self.get_dump_pk(getattr(obj, pk.rel.field.name), level+1)
+            else:
+                return force_text(obj.pk, strings_only=True)
+        elif self.use_natural_primary_keys and hasattr(obj, "natural_key"):
+            return None if level==0 else obj.natural_key()
+        else:
+            return force_text(obj.pk, strings_only=True)
+
     def get_dump_object(self, obj):
         data = {
             "model": force_text(obj._meta),
             "fields": self._current,
         }
-        if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
-            data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
+        pk = self.get_dump_pk(obj, 0)
+        if pk is not None:
+            data["pk"] = pk
 
         return data
 
@@ -80,6 +93,15 @@ class Serializer(base.Serializer):
         return self.objects
 
 
+def _get_by_natural_pk(model, npk):
+    while True:
+        pk = model._meta.pk
+        if pk.rel:
+            model = pk.rel.to
+        else:
+            return model._default_manager.get_by_natural_key(*npk).pk
+
+
 def Deserializer(object_list, **options):
     """
     Deserialize simple Python objects back into Django ORM instances.
@@ -101,7 +123,12 @@ def Deserializer(object_list, **options):
                 raise
         data = {}
         if 'pk' in d:
-            data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
+            pk = d.get("pk", None)
+            if isinstance(pk, (list,tuple)):
+                pk = _get_by_natural_pk(Model, pk)
+            else:
+                pk = Model._meta.pk.to_python(pk)
+            data[Model._meta.pk.attname] = pk
         m2m_data = {}
         field_names = {f.name for f in Model._meta.get_fields()}
 
