@@ -124,6 +124,15 @@ class ContentTypeManager(models.Manager):
 
     def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
+        if not isinstance(ct, ContentType):
+            # If the passed-in object is not an actual ContentType, do nothing.
+            # This could occur when any of the cache-utilizing functions is called
+            # during migrations, where the models aren't actually the same model as
+            # in "real life".
+            # This, then, will cause problems during post-migrate hooks (such as
+            # those creating `permissions`; the ORM will complain about the objects
+            # that were cached during migrations not actually being ContentTypes.
+            return
         # Note it's possible for ContentType objects to be stale; model_class() will return None.
         # Hence, there is no reliance on model._meta.app_label here, just using the model fields instead.
         key = (ct.app_label, ct.model)
