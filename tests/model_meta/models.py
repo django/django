@@ -19,7 +19,7 @@ class AbstractPerson(models.Model):
     friends_abstract = models.ManyToManyField('self', related_name='friends_abstract', symmetrical=True)
     following_abstract = models.ManyToManyField('self', related_name='followers_abstract', symmetrical=False)
 
-    # VIRTUAL fields
+    # Private fields
     data_not_concrete_abstract = models.ForeignObject(
         Relation,
         on_delete=models.CASCADE,
@@ -50,7 +50,7 @@ class BasePerson(AbstractPerson):
     friends_base = models.ManyToManyField('self', related_name='friends_base', symmetrical=True)
     following_base = models.ManyToManyField('self', related_name='followers_base', symmetrical=False)
 
-    # VIRTUAL fields
+    # Private fields
     data_not_concrete_base = models.ForeignObject(
         Relation,
         on_delete=models.CASCADE,
@@ -78,7 +78,7 @@ class Person(BasePerson):
     friends_inherited = models.ManyToManyField('self', related_name='friends_concrete', symmetrical=True)
     following_inherited = models.ManyToManyField('self', related_name='followers_concrete', symmetrical=False)
 
-    # VIRTUAL fields
+    # Private fields
     data_not_concrete_inherited = models.ForeignObject(
         Relation,
         on_delete=models.CASCADE,
