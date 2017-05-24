@@ -1843,7 +1843,9 @@ This has a number of caveats though:
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
-  does not retrieve and set the primary key attribute, as ``save()`` does.
+  does not retrieve and set the primary key attribute, as ``save()`` does,
+  unless the db backend also has the feature ``can_return_ids_from_bulk_insert``
+  (currently ``postgresql_psycopg2``).
 * It does not work with many-to-many relationships.
 
 The ``batch_size`` parameter controls how many objects are created in single

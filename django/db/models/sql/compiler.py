@@ -967,14 +967,18 @@ class SQLInsertCompiler(SQLCompiler):
             ]
 
     def execute_sql(self, return_id=False):
-        assert not (return_id and len(self.query.objs) != 1)
+        assert not (return_id and len(self.query.objs) != 1 and
+                    not self.connection.features.can_return_ids_from_bulk_insert)
         self.return_id = return_id
         with self.connection.cursor() as cursor:
             for sql, params in self.as_sql():
                 cursor.execute(sql, params)
             if not (return_id and cursor):
                 return
+            if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
+                return self.connection.ops.fetch_returned_insert_ids(cursor)
             if self.connection.features.can_return_id_from_insert:
+                assert len(self.query.objs) == 1
                 return self.connection.ops.fetch_returned_insert_id(cursor)
             return self.connection.ops.last_insert_id(cursor,
                     self.query.get_meta().db_table, self.query.get_meta().pk.column)

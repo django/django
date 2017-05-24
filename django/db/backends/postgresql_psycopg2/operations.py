@@ -7,6 +7,8 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.postgresql_psycopg2.compiler"
+
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
@@ -58,6 +60,14 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
+
+    def fetch_returned_insert_ids(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table that has an auto-incrementing ID, returns the
+        list of newly created IDs.
+        """
+        return [item[0] for item in cursor.fetchall()]
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
@@ -221,9 +231,16 @@ class DatabaseOperations(BaseDatabaseOperations):
     def return_insert_id(self):
         return "RETURNING %s", ()
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
-        return "VALUES " + ", ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, num_values, placeholders=None):
+        # This allows non-`%s` placeholders; for example the placeholder DEFAULT
+        if placeholders:
+            items_sql = []
+            for placeholders_for_value in placeholders:
+                items_sql.append("(%s)" % ", ".join(placeholders_for_value))
+            return "VALUES " + ", ".join(items_sql)
+        else:
+            items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
+            return "VALUES " + ", ".join([items_sql] * num_values)
 
     def value_to_db_date(self, value):
         return value
