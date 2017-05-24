@@ -221,7 +221,7 @@ class FormsModelTestCase(TestCase):
 
         f = ExcludingForm({'name': 'Hello', 'value': 99, 'def_date': datetime.date(1999, 3, 2)})
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['name'], 'Hello')
+        self.assertNotIn('name', f.cleaned_data)
         obj = f.save()
         self.assertEqual(obj.name, 'class default value')
         self.assertEqual(obj.value, 99)
@@ -282,7 +282,7 @@ class ManyToManyExclusionTestCase(TestCase):
         instance.multi_choice = instance.multi_choice_int = [opt2, opt3]
         form = ChoiceFieldExclusionForm(data=data, instance=instance)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['multi_choice'], data['multi_choice'])
+        self.assertNotIn('multi_choice', form.cleaned_data)
         form.save()
         self.assertEqual(form.instance.choice.pk, data['choice'])
         self.assertEqual(form.instance.choice_int.pk, data['choice_int'])

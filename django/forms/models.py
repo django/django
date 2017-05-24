@@ -294,8 +294,14 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                                      opts.model.__name__)
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
-            # (plus, include all the other declared fields).
-            fields.update(new_class.declared_fields)
+            # (plus, include all the other declared fields), skipping excluded
+            # and non-included fields.
+            for field_name, field in new_class.declared_fields.iteritems():
+                if opts.exclude and field_name in opts.exclude:
+                    continue
+                if opts.fields and field_name not in opts.fields:
+                    continue
+                fields[field_name] = field
         else:
             fields = new_class.declared_fields
 
