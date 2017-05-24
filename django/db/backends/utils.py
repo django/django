@@ -3,6 +3,7 @@ import decimal
 import hashlib
 import logging
 import re
+import traceback
 from time import time
 
 from django.conf import settings
@@ -82,6 +83,7 @@ class CursorDebugWrapper(CursorWrapper):
             self.db.queries_log.append({
                 'sql': sql,
                 'time': "%.3f" % duration,
+                'traceback': traceback.format_stack(),
             })
             logger.debug(
                 '(%.3f) %s; args=%s', duration, sql, params,

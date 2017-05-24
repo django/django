@@ -345,6 +345,11 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
             self.client.get("/test_utils/get_person/%s/" % person.pk)
 
+    def test_callstack_captured(self):
+        with self.assertNumQueries(1) as queries:
+            Person.objects.count()
+        self.assertIn('traceback', queries.connection.queries[0])
+
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertTemplateUsedContextManagerTests(SimpleTestCase):
