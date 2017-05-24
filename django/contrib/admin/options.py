@@ -679,7 +679,8 @@ class ModelAdmin(BaseModelAdmin):
             exclude = []
         else:
             exclude = list(self.exclude)
-        exclude.extend(self.get_readonly_fields(request, obj))
+        readonly_fields = self.get_readonly_fields(request, obj)
+        exclude.extend(readonly_fields)
         if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # ModelAdmin doesn't define its own.
@@ -687,8 +688,14 @@ class ModelAdmin(BaseModelAdmin):
         # if exclude is an empty list we pass None to be consistent with the
         # default on modelform_factory
         exclude = exclude or None
+
+        # Cancel out overridden form fields which are in readonly_fields.
+        new_attrs = OrderedDict([(f, None) for f in readonly_fields
+            if f in self.form.declared_fields])
+        form = type(self.form.__name__, (self.form,), new_attrs)
+
         defaults = {
-            "form": self.form,
+            "form": form,
             "fields": fields,
             "exclude": exclude,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),

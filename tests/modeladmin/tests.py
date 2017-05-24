@@ -224,6 +224,29 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'opening_band', 'id', 'DELETE'])
 
+    def test_custom_formfield_override_readonly(self):
+        class AdminBandForm(forms.ModelForm):
+            name = forms.CharField()
+
+            class Meta:
+                exclude = tuple()
+                model = Band
+
+        class BandAdmin(ModelAdmin):
+            form = AdminBandForm
+            readonly_fields = ['name']
+
+        ma = BandAdmin(Band, self.site)
+
+        self.assertEqual(list(ma.get_form(request).base_fields),
+            ['bio', 'sign_date'])
+
+        self.assertEqual(list(ma.get_fields(request)),
+            ['bio', 'sign_date', 'name'])
+
+        self.assertEqual(list(ma.get_fieldsets(request)),
+            [(None, {'fields': ['bio', 'sign_date', 'name']})])
+
     def test_custom_form_meta_exclude(self):
         """
         Ensure that the custom ModelForm's `Meta.exclude` is overridden if
