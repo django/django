@@ -5,7 +5,7 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
@@ -695,7 +695,7 @@ class HostValidationTests(SimpleTestCase):
 
         # Poisoned host headers are rejected as suspicious
         for host in chain(self.poisoned_hosts, ['other.com', 'example.com..']):
-            with self.assertRaises(SuspiciousOperation):
+            with self.assertRaises(DisallowedHost):
                 request = HttpRequest()
                 request.META = {
                     'HTTP_HOST': host,
@@ -759,7 +759,7 @@ class HostValidationTests(SimpleTestCase):
             request.get_host()
 
         for host in self.poisoned_hosts:
-            with self.assertRaises(SuspiciousOperation):
+            with self.assertRaises(DisallowedHost):
                 request = HttpRequest()
                 request.META = {
                     'HTTP_HOST': host,
@@ -810,8 +810,8 @@ class HostValidationTests(SimpleTestCase):
             request.META = {'HTTP_HOST': host}
             self.assertEqual(request.get_host(), host)
 
-        # Other hostnames raise a SuspiciousOperation.
-        with self.assertRaises(SuspiciousOperation):
+        # Other hostnames raise a DisallowedHost.
+        with self.assertRaises(DisallowedHost):
             request = HttpRequest()
             request.META = {'HTTP_HOST': 'example.com'}
             request.get_host()
@@ -831,7 +831,7 @@ class HostValidationTests(SimpleTestCase):
         ]:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
-            with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion % (host, host)):
+            with self.assertRaisesMessage(DisallowedHost, msg_suggestion % (host, host)):
                 request.get_host()
 
         for domain, port in [  # Valid-looking hosts with a port number
@@ -842,18 +842,18 @@ class HostValidationTests(SimpleTestCase):
             host = '%s:%s' % (domain, port)
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
-            with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion % (host, domain)):
+            with self.assertRaisesMessage(DisallowedHost, msg_suggestion % (host, domain)):
                 request.get_host()
 
         for host in self.poisoned_hosts:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
-            with self.assertRaisesMessage(SuspiciousOperation, msg_invalid_host % host):
+            with self.assertRaisesMessage(DisallowedHost, msg_invalid_host % host):
                 request.get_host()
 
         request = HttpRequest()
         request.META = {'HTTP_HOST': "invalid_hostname.com"}
-        with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion2 % "invalid_hostname.com"):
+        with self.assertRaisesMessage(DisallowedHost, msg_suggestion2 % "invalid_hostname.com"):
             request.get_host()
 
     def test_split_domain_port_removes_trailing_dot(self):

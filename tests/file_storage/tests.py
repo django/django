@@ -10,7 +10,7 @@ from io import StringIO
 from urllib.request import urlopen
 
 from django.core.cache import cache
-from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
+from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import (
@@ -384,9 +384,9 @@ class FileStorageTests(SimpleTestCase):
         File storage prevents directory traversal (files can only be accessed if
         they're below the storage location).
         """
-        with self.assertRaises(SuspiciousOperation):
+        with self.assertRaises(SuspiciousFileOperation):
             self.storage.exists('..')
-        with self.assertRaises(SuspiciousOperation):
+        with self.assertRaises(SuspiciousFileOperation):
             self.storage.exists('/etc/passwd')
 
     def test_file_storage_preserves_filename_case(self):

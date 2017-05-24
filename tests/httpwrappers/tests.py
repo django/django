@@ -5,7 +5,7 @@ import pickle
 import unittest
 import uuid
 
-from django.core.exceptions import DisallowedRedirect, SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
@@ -441,9 +441,9 @@ class HttpResponseTests(unittest.TestCase):
             'file:///etc/passwd',
         ]
         for url in bad_urls:
-            with self.assertRaises(SuspiciousOperation):
+            with self.assertRaises(DisallowedRedirect):
                 HttpResponseRedirect(url)
-            with self.assertRaises(SuspiciousOperation):
+            with self.assertRaises(DisallowedRedirect):
                 HttpResponsePermanentRedirect(url)
 
 
