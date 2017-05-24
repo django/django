@@ -35,7 +35,7 @@ def pass_resolver_match_view(request, *args, **kwargs):
     response.resolver_match = request.resolver_match
     return response
 
-uncallable = "Can I be a view? Pleeeease?"
+uncallable = None  # neither a callable nor a string
 
 
 class ViewClass(object):

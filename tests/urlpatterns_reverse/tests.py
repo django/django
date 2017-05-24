@@ -735,7 +735,8 @@ class ErroneousViewTests(TestCase):
         self.assertRaises(ImportError, self.client.get, '/erroneous_outer/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_inner/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_outer/')
-        self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable/')
+        self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable-dotted/')
+        self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable-object/')
 
         # Regression test for #21157
         self.assertRaises(ImportError, self.client.get, '/erroneous_unqualified/')

@@ -11,6 +11,7 @@ import functools
 import re
 import warnings
 from importlib import import_module
+from six import string_types
 from threading import local
 
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
@@ -91,6 +92,11 @@ def get_callable(lookup_view, can_fail=False):
     """
     if callable(lookup_view):
         return lookup_view
+
+    if not isinstance(lookup_view, string_types):
+        raise ViewDoesNotExist(
+            "'%s' was not a callable or a dot-notation path" % lookup_view
+        )
 
     mod_name, func_name = get_mod_func(lookup_view)
     if not func_name:  # No '.' in lookup_view
