@@ -6,13 +6,13 @@ import os
 import re
 
 from docutils import nodes
-from docutils.parsers.rst import directives
+from docutils.parsers.rst import Directive, directives
 from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.domains.std import Cmdoption
-from sphinx.util.compat import Directive
 from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
+
 try:
     from sphinx.writers.html import SmartyPantsHTMLTranslator as HTMLTranslator
 except ImportError:  # Sphinx 1.6+
