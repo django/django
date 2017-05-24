@@ -505,6 +505,13 @@ class Select(Widget):
         # more than once.
         self.choices = list(choices)
 
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.attrs = self.attrs.copy()
+        obj.choices = copy.copy(self.choices)
+        memo[id(self)] = obj
+        return obj
+
     def render(self, name, value, attrs=None, choices=()):
         if value is None:
             value = ''
