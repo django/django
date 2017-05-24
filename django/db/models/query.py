@@ -1032,28 +1032,6 @@ class QuerySet:
     _insert.alters_data = True
     _insert.queryset_only = False
 
-    def _batched_insert(self, objs, fields, batch_size):
-        """
-        A helper method for bulk_create() to insert the bulk one batch at a
-        time. Insert recursively a batch from the front of the bulk and then
-        _batched_insert() the remaining objects again.
-        """
-        if not objs:
-            return
-        ops = connections[self.db].ops
-        batch_size = batch_size or ops.bulk_batch_size(fields, objs) or len(objs)
-        inserted_ids = []
-        for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if connections[self.db].features.can_return_ids_from_bulk_insert:
-                inserted_id = self._insert(item, fields=fields, using=self.db, return_id=True)
-                if isinstance(inserted_id, list):
-                    inserted_ids.extend(inserted_id)
-                else:
-                    inserted_ids.append(inserted_id)
-            else:
-                self._insert(item, fields=fields, using=self.db)
-        return inserted_ids
-
     def _clone(self, **kwargs):
         query = self.query.clone()
         if self._sticky_filter:
