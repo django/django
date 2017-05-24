@@ -443,5 +443,41 @@ WHEN (new.%(col_name)s IS NULL)
         return '%s_TR' % truncate_name(table, name_length).upper()
 
     def bulk_insert_sql(self, fields, num_values):
-        items_sql = "SELECT %s FROM DUAL" % ", ".join(["%s"] * len(fields))
+        MAPPER = {
+            'CharField': 'to_nchar(%s)',
+            'CommaSeparatedIntegerField': 'to_nchar(%s)',
+            'EmailField': 'to_nchar(%s)',
+            'FileField': 'to_nchar(%s)',
+            'FilePathField': 'to_nchar(%s)',
+            'ImageField': 'to_nchar(%s)',
+            'SlugField': 'to_nchar(%s)',
+            'URLField': 'to_nchar(%s)',
+ 
+            'IPAddressField': 'to_char(%s)',
+            'GenericIPAddressField': 'to_char(%s)',
+ 
+            'AutoField': 'to_number(%s)',
+            'BigIntegerField': 'to_number(%s)',
+            'BooleanField': 'to_number(%s)',
+            'DecimalField': 'to_number(%s)',
+            'FloatField': 'to_number(%s)',
+            'IntegerField': 'to_number(%s)',
+            'NullBooleanField': 'to_number(%s)',
+            'PositiveIntegerField': 'to_number(%s)',
+            'PositiveSmallIntegerField': 'to_number(%s)',
+            'SmallIntegerField': 'to_number(%s)',
+            'ForeignKey': 'to_number(%s)',
+            'ManyToManyField': 'to_number(%s)',
+            'OneToOneField': 'to_number(%s)',
+ 
+            'DateField': 'to_date(%s)',
+ 
+            'DateTimeField': 'to_timestamp(%s)',
+            'TimeField': 'to_timestamp(%s)',
+ 
+            'BinaryField': 'to_blob(%s)',
+ 
+            'TextField': 'to_nclob(%s)'
+        }
+        items_sql = "SELECT %s FROM DUAL" % ", ".join([MAPPER.get(field.get_internal_type(), '%s') for field in fields])    
         return " UNION ALL ".join([items_sql] * num_values)
