@@ -909,7 +909,7 @@ the components work together, but is not intended to be copied directly into
 projects for production use.
 
 This code would all live in a ``models.py`` file for a custom
-authentication app::
+authentication app ``customauth``::
 
     from django.db import models
     from django.contrib.auth.models import (
@@ -1084,4 +1084,4 @@ code would be required in the app's ``admin.py`` file::
 Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
-    AUTH_USER_MODEL = 'customauth.MyUser'
+    AUTH_USER_MODEL = 'customauth.models.MyUser'
