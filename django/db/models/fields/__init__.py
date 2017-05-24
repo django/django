@@ -66,6 +66,11 @@ def _load_field(app_label, model_name, field_name):
     return apps.get_model(app_label, model_name)._meta.get_field(field_name)
 
 
+def _load_field_for_abstract(app_label, model_name, field_name):
+    from django.utils.module_loading import import_string
+    return import_string('%s.models.%s' % (app_label, model_name))._meta.get_field(field_name)
+
+
 # A guide to Field parameters:
 #
 #   * name:      The name of the field specified in the model.
@@ -503,8 +508,13 @@ class Field(RegisterLookupMixin):
             # Deferred model will not be found from the app registry. This
             # could be fixed by reconstructing the deferred model on unpickle.
             raise RuntimeError("Fields of deferred models can't be reduced")
-        return _load_field, (self.model._meta.app_label, self.model._meta.object_name,
-                             self.name)
+        if self.model._meta.abstract:
+            func = _load_field_for_abstract
+        else:
+            func = _load_field
+        return func, (
+            self.model._meta.app_label, self.model._meta.object_name, self.name
+        )
 
     def get_pk_value_on_save(self, instance):
         """
