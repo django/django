@@ -9,7 +9,6 @@ from docutils import nodes
 from docutils.parsers.rst import Directive, directives
 from sphinx import __version__ as sphinx_ver, addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinx.util.compat import Directive
 from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
 from sphinx.writers.html import SmartyPantsHTMLTranslator
