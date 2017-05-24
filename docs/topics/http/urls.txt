@@ -627,7 +627,7 @@ way to tell these named URLs apart.
 Django applications that make proper use of URL namespacing can be deployed more
 than once for a particular site. For example :mod:`django.contrib.admin` has an
 :class:`~django.contrib.admin.AdminSite` class which allows you to easily
-:ref:`deploy more than once instance of the admin <multiple-admin-sites>`.
+:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.
 In a later example, we'll discuss the idea of deploying the polls application
 from the tutorial in two different locations so we can serve the same
 functionality to two different audiences (authors and publishers).
