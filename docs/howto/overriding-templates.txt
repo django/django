@@ -50,7 +50,7 @@ Overriding from an app's template directory
 ===========================================
 
 Since you're overriding templates that exist outside one of your project's apps,
-it's somewhat cleaner to have the ovveride templates in the project's template
+it's somewhat cleaner to have the override templates in the project's template
 directory, rather than an app template directory. If you'd prefer to have the
 overrides in the app template directory, that's still possible.
 
