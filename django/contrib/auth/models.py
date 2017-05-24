@@ -383,14 +383,14 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     Username, password and email are required. Other fields are optional.
     """
     username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, digits and '
-                    '@/./+/-/_ only.'),
-        validators=[
-            validators.RegexValidator(r'^[\w.@+-]+$',
-                                      _('Enter a valid username. '
-                                        'This value may contain only letters, numbers '
-                                        'and @/./+/-/_ characters.'), 'invalid'),
-        ],
+        # help_text=_('Required. 30 characters or fewer. Letters, digits and '
+        #             '@/./+/-/_ only.'),
+        # validators=[
+        #     validators.RegexValidator(r'^[\w.@+-]+$',
+        #                               _('Enter a valid username. '
+        #                                 'This value may contain only letters, numbers '
+        #                                 'and @/./+/-/_ characters.'), 'invalid'),
+        # ],
         error_messages={
             'unique': _("A user with that username already exists."),
         })
