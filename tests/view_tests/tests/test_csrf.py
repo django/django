@@ -55,6 +55,13 @@ class CsrfViewTests(SimpleTestCase):
             'HTTPS connections, or for &#39;same-origin&#39; requests.',
             status_code=403,
         )
+        self.assertContains(
+            response,
+            'If you are using the &lt;meta name=&quot;referrer&quot; '
+            'content=&quot;no-referrer&quot;&gt; tag or including the '
+            '&#39;Referrer-Policy: no-referrer&#39; header, please remove them.',
+            status_code=403,
+        )
 
     def test_no_cookies(self):
         """

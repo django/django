@@ -41,6 +41,7 @@ CSRF_FAILURE_TEMPLATE = """
 {% if no_referer %}
   <p>{{ no_referer1 }}</p>
   <p>{{ no_referer2 }}</p>
+  <p>{{ no_referer3 }}</p>
 {% endif %}
 {% if no_cookie %}
   <p>{{ no_cookie1 }}</p>
@@ -119,6 +120,13 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
             "If you have configured your browser to disable 'Referer' headers, "
             "please re-enable them, at least for this site, or for HTTPS "
             "connections, or for 'same-origin' requests."),
+        'no_referer3': _(
+            "If you are using the <meta name=\"referrer\" "
+            "content=\"no-referrer\"> tag or including the 'Referrer-Policy: "
+            "no-referrer' header, please remove them. The CSRF protection "
+            "requires the 'Referer' header to do strict referer checking. If "
+            "you're concerned about privacy, use alternatives like "
+            "<a rel=\"noreferrer\" ...> for links to third-party sites."),
         'no_cookie': reason == REASON_NO_CSRF_COOKIE,
         'no_cookie1': _(
             "You are seeing this message because this site requires a CSRF "
