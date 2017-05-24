@@ -62,7 +62,7 @@ class Permission(models.Model):
     created for each Django model.
     """
     name = models.CharField(_('name'), max_length=255)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, verbose_name=_('content type'))
     codename = models.CharField(_('codename'), max_length=100)
     objects = PermissionManager()
 
