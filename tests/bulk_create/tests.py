@@ -192,6 +192,30 @@ class BulkCreateTests(TestCase):
         TwoFields.objects.all().delete()
         TwoFields.objects.bulk_create(objs, batch_size=num_objs)
         self.assertEqual(TwoFields.objects.count(), num_objs)
+        TwoFields.objects.all().delete()
+        TwoFields.objects.bulk_create(objs, batch_size=num_objs + 1)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
+
+    def test_batch_size_generators(self):
+        objs = (TwoFields(f1=i, f2=i) for i in range(0, 4))
+        num_objs = 4  # this has to be hardcoded
+        TwoFields.objects.bulk_create(objs, batch_size=1)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
+        TwoFields.objects.all().delete()
+        objs = (TwoFields(f1=i, f2=i) for i in range(0, 4))
+        num_objs = 4  # this has to be hardcoded
+        TwoFields.objects.bulk_create(objs, batch_size=3)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
+        TwoFields.objects.all().delete()
+        objs = (TwoFields(f1=i, f2=i) for i in range(0, 4))
+        num_objs = 4  # this has to be hardcoded
+        TwoFields.objects.bulk_create(objs, batch_size=num_objs)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
+        TwoFields.objects.all().delete()
+        objs = (TwoFields(f1=i, f2=i) for i in range(0, 4))
+        num_objs = 4  # this has to be hardcoded
+        TwoFields.objects.bulk_create(objs, batch_size=num_objs + 1)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
 
     def test_empty_model(self):
         NoFields.objects.bulk_create([NoFields() for i in range(2)])
