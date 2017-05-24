@@ -319,7 +319,7 @@ class DeletionTests(TestCase):
         objs = [Avatar() for i in range(0, TEST_SIZE)]
         Avatar.objects.bulk_create(objs)
         # Calculate the number of queries needed.
-        batch_size = connection.ops.bulk_batch_size(['pk'], objs)
+        batch_size = connection.ops.bulk_batch_size(['pk'], objs) or len(objs)
         # The related fetches are done in batches.
         batches = int(ceil(float(len(objs)) / batch_size))
         # One query for Avatar.objects.all() and then one related fast delete for
@@ -336,7 +336,7 @@ class DeletionTests(TestCase):
         for i in range(TEST_SIZE):
             T.objects.create(s=s)
 
-        batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
+        batch_size = connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)) or TEST_SIZE
 
         # TEST_SIZE // batch_size (select related `T` instances)
         # + 1 (select related `U` instances)

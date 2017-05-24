@@ -418,7 +418,7 @@ class QuerySet:
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.concrete_fields
-        batch_size = (batch_size or max(connection.ops.bulk_batch_size(fields, objs), 1))
+        batch_size = batch_size or connection.ops.bulk_batch_size(fields, objs)
         with transaction.atomic(using=self.db, savepoint=False):
             for objs_batch in batches(objs, batch_size):
                 objs_batch = list(objs_batch)
@@ -1041,7 +1041,7 @@ class QuerySet:
         if not objs:
             return
         ops = connections[self.db].ops
-        batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
+        batch_size = batch_size or ops.bulk_batch_size(fields, objs) or len(objs)
         inserted_ids = []
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if connections[self.db].features.can_return_ids_from_bulk_insert:

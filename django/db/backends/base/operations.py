@@ -47,11 +47,12 @@ class BaseDatabaseOperations:
 
     def bulk_batch_size(self, fields, objs):
         """
-        Return the maximum allowed batch size for the backend. The fields
-        are the fields going to be inserted in the batch, the objs contains
-        all the objects to be inserted.
+        Return the maximum allowed batch size for the backend, or None for
+        unlimited. The fields are the fields going to be inserted in the
+        batch, the objs contains all the objects to be inserted.
+        This must always return either a positive integer or None.
         """
-        return len(objs)
+        return None
 
     def cache_key_culling_sql(self):
         """
