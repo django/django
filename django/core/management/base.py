@@ -349,7 +349,7 @@ class BaseCommand(object):
                 help='Raise on CommandError exceptions')
             parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
                 help="Don't colorize the command output.")
-            if self.args:
+            if self.args and not isinstance(self, LabelCommand) and not isinstance(self, AppCommand):
                 # Keep compatibility and always accept positional arguments, like optparse when args is set
                 parser.add_argument('args', nargs='*')
             self.add_arguments(parser)
