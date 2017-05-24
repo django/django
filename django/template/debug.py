@@ -90,8 +90,6 @@ class DebugVariableNode(VariableNode):
             output = template_localtime(output, use_tz=context.use_tz)
             output = localize(output, use_l10n=context.use_l10n)
             output = force_text(output)
-        except UnicodeDecodeError:
-            return ''
         except Exception as e:
             if not hasattr(e, 'django_template_source'):
                 e.django_template_source = self.source
