@@ -1,4 +1,4 @@
-import subprocess
+import os
 
 from django.db.backends.base.client import BaseDatabaseClient
 
@@ -16,4 +16,4 @@ class DatabaseClient(BaseDatabaseClient):
         if settings_dict['PORT']:
             args.extend(["-p", str(settings_dict['PORT'])])
         args += [settings_dict['NAME']]
-        subprocess.call(args)
+        os.execvp(self.executable_name, args)
