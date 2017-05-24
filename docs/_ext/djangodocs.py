@@ -11,8 +11,13 @@ from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
-from sphinx.writers.html import SmartyPantsHTMLTranslator
 
+try:
+    from sphinx.writers.html import SmartyPantsHTMLTranslator as HTMLTranslator
+except ImportError:  # Sphinx 1.6+
+    from sphinx.writers.html import HTMLTranslator
+
+option_desc_re = re.compile(r'((?:/|--|-|\+)?[-+\.?@#_a-zA-Z0-9]+)(=?\s*.*)')
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
     r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
@@ -229,7 +234,7 @@ class VersionDirective(Directive):
         return ret
 
 
-class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
+class DjangoHTMLTranslator(HTMLTranslator):
     """
     Django-specific reST to HTML tweaks.
     """
@@ -290,7 +295,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         old_ids = node.get('ids', [])
         node['ids'] = ['s-' + i for i in old_ids]
         node['ids'].extend(old_ids)
-        SmartyPantsHTMLTranslator.visit_section(self, node)
+        HTMLTranslator.visit_section(self, node)
         node['ids'] = old_ids
 
 
@@ -304,7 +309,6 @@ def parse_django_admin_node(env, sig, signode):
 
 def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
-    from sphinx.domains.std import option_desc_re
     count = 0
     firstname = ''
     for m in option_desc_re.finditer(sig):
