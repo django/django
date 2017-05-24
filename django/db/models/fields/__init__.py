@@ -244,8 +244,13 @@ class Field(RegisterLookupMixin):
 
     def _check_choices(self):
         if self.choices:
-            if (isinstance(self.choices, six.string_types) or
-                    not is_iterable(self.choices)):
+            if callable(self.choices):
+                choices = self.choices()
+            else:
+                choices = self.choices
+
+            if (isinstance(choices, six.string_types) or
+                    not is_iterable(choices)):
                 return [
                     checks.Error(
                         "'choices' must be an iterable (e.g., a list or tuple).",
@@ -256,7 +261,7 @@ class Field(RegisterLookupMixin):
                 ]
             elif any(isinstance(choice, six.string_types) or
                      not is_iterable(choice) or len(choice) != 2
-                     for choice in self.choices):
+                     for choice in choices):
                 return [
                     checks.Error(
                         ("'choices' must be an iterable containing "
