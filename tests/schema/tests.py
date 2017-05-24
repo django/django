@@ -29,11 +29,11 @@ from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
 )
 from .models import (
-    Author, AuthorTextFieldWithIndex, AuthorWithDefaultHeight,
-    AuthorWithEvenLongerName, AuthorWithIndexedName, Book, BookForeignObj,
-    BookWeak, BookWithLongName, BookWithO2O, BookWithoutAuthor, BookWithSlug,
-    IntegerPK, Node, Note, NoteRename, Tag, TagIndexed, TagM2MTest,
-    TagUniqueRename, Thing, UniqueTest, new_apps,
+    Author, AuthorCharFieldWithIndex, AuthorTextFieldWithIndex,
+    AuthorWithDefaultHeight, AuthorWithEvenLongerName, AuthorWithIndexedName,
+    Book, BookForeignObj, BookWeak, BookWithLongName, BookWithO2O,
+    BookWithoutAuthor, BookWithSlug, IntegerPK, Node, Note, NoteRename, Tag,
+    TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
 
@@ -49,9 +49,10 @@ class SchemaTests(TransactionTestCase):
     available_apps = []
 
     models = [
-        Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
-        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Node,
-        Note, Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
+        Author, AuthorCharFieldWithIndex, AuthorTextFieldWithIndex,
+        AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
+        BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Node, Note,
+        Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
     ]
 
     # Utility functions
@@ -221,6 +222,49 @@ class SchemaTests(TransactionTestCase):
                 break
         else:
             self.fail("No FK constraint for author_id found")
+
+    @skipUnlessDBFeature('supports_foreign_keys')
+    def test_char_field_with_db_index_to_fk(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(AuthorCharFieldWithIndex)
+        # Change CharField to FK
+        old_field = AuthorCharFieldWithIndex._meta.get_field('char_field')
+        new_field = ForeignKey(Author, CASCADE, blank=True)
+        new_field.set_attributes_from_name('char_field')
+        with connection.schema_editor() as editor:
+            editor.alter_field(AuthorCharFieldWithIndex, old_field, new_field, strict=True)
+        # The new FK constraint is present
+        constraints = self.get_constraints(AuthorCharFieldWithIndex._meta.db_table)
+        constraint_fk = None
+        for name, details in constraints.items():
+            if details['columns'] == ['char_field_id'] and details['foreign_key']:
+                constraint_fk = details['foreign_key']
+                break
+        self.assertEqual(constraint_fk, ('schema_author', 'id'))
+
+    @skipUnlessDBFeature('supports_foreign_keys')
+    @skipUnlessDBFeature('supports_index_on_text_field')
+    def test_text_field_with_db_index_to_fk(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(AuthorTextFieldWithIndex)
+        # Change TextField to FK
+        old_field = AuthorTextFieldWithIndex._meta.get_field('text_field')
+        new_field = ForeignKey(Author, CASCADE, blank=True)
+        new_field.set_attributes_from_name('text_field')
+        with connection.schema_editor() as editor:
+            editor.alter_field(AuthorTextFieldWithIndex, old_field, new_field, strict=True)
+        # The new FK constraint is present
+        constraints = self.get_constraints(AuthorTextFieldWithIndex._meta.db_table)
+        constraint_fk = None
+        for name, details in constraints.items():
+            if details['columns'] == ['text_field_id'] and details['foreign_key']:
+                constraint_fk = details['foreign_key']
+                break
+        self.assertEqual(constraint_fk, ('schema_author', 'id'))
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_to_proxy(self):

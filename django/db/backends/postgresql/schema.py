@@ -104,6 +104,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
+        # Drop indexes on varchar/text columns that are changing to a different
+        # type.
+        if (old_field.db_index or old_field.unique) and (
+            (old_type.startswith('varchar') and not new_type.startswith('varchar')) or
+            (old_type.startswith('text') and not new_type.startswith('text'))
+        ):
+            index_name = self._create_index_name(model, [old_field.column], suffix='_like')
+            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+
         super()._alter_field(
             model, old_field, new_field, old_type, new_type, old_db_params,
             new_db_params, strict,
