@@ -75,6 +75,22 @@ window.SelectFilter = {
         var title_chosen = quickElement('h2', selector_chosen, interpolate(gettext('Chosen %s') + ' ', [field_name]));
         quickElement('img', title_chosen, '', 'src', admin_static_prefix + 'img/icon-unknown.gif', 'width', '10', 'height', '10', 'class', 'help help-tooltip', 'title', interpolate(gettext('This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the "Remove" arrow between the two boxes.'), [field_name]));
 
+        // Addition start
+        var filter_p = quickElement('p', selector_chosen, '', 'id', field_id + '_to' + '_filter');
+        filter_p.className = 'selector-filter';
+
+        var search_filter_label = quickElement('label', filter_p, '', 'for', field_id + '_to' + "_input");
+
+        var search_selector_img = quickElement('img', search_filter_label, '', 'src', admin_static_prefix + 'img/selector-search.gif', 'class', 'help-tooltip', 'alt', '', 'title', interpolate(gettext("Type into this box to filter down the list of available %s."), [field_name]));
+
+        filter_p.appendChild(document.createTextNode(' '));
+
+        var filter_input2 = quickElement('input', filter_p, '', 'type', 'text', 'placeholder', gettext("Filter"));
+        filter_input2.id = field_id + '_to_input';
+        filter_input2.style = 'width: 360px;';
+
+        // Addition end
+
         var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
         to_box.className = 'filtered';
         var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', 'javascript: (function() { SelectBox.move_all("' + field_id + '_to", "' + field_id + '_from"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_all_link');
@@ -83,18 +99,29 @@ window.SelectFilter = {
         from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
 
         // Set up the JavaScript event handlers for the select box filter interface
-        addEvent(filter_input, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id); });
-        addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id); });
-        addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id); });
+        addEvent(filter_input, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id, 'from'); });
+        addEvent(filter_input, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id, 'from'); });
+        addEvent(filter_input, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id, 'from'); });
+
+        addEvent(filter_input2, 'keypress', function(e) { SelectFilter.filter_key_press(e, field_id, 'to'); });
+        addEvent(filter_input2, 'keyup', function(e) { SelectFilter.filter_key_up(e, field_id, 'to'); });
+        addEvent(filter_input2, 'keydown', function(e) { SelectFilter.filter_key_down(e, field_id, 'to'); });
+
         addEvent(from_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
         addEvent(to_box, 'change', function(e) { SelectFilter.refresh_icons(field_id) });
         addEvent(from_box, 'dblclick', function() { SelectBox.move(field_id + '_from', field_id + '_to'); SelectFilter.refresh_icons(field_id); });
         addEvent(to_box, 'dblclick', function() { SelectBox.move(field_id + '_to', field_id + '_from'); SelectFilter.refresh_icons(field_id); });
-        addEvent(findForm(from_box), 'submit', function() { SelectBox.select_all(field_id + '_to'); });
+        addEvent(findForm(from_box), 'submit', function() {
+            filter_input2.value = '';
+            var event = new Event('keyup');
+            filter_input2.dispatchEvent(event);
+            SelectBox.select_all(field_id + '_to');
+        });
         SelectBox.init(field_id + '_from');
         SelectBox.init(field_id + '_to');
         // Move selected from_box options to to_box
         SelectBox.move(field_id + '_from', field_id + '_to');
+
 
         if (!is_stacked) {
             // In horizontal mode, give the same height to the two boxes.
@@ -124,43 +151,59 @@ window.SelectFilter = {
         $('#' + field_id + '_add_all_link').toggleClass('active', from.find('option').length > 0);
         $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
     },
-    filter_key_press: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
+    filter_key_press: function(event, field_id, type) {
+        if (type == 'from') {
+            var to = 'to';
+        } else if (type == 'to') {
+            var to = 'from';
+        }
+
+        var field = document.getElementById(field_id + '_' + type);
         // don't submit form if user pressed Enter
         if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)) {
-            from.selectedIndex = 0;
-            SelectBox.move(field_id + '_from', field_id + '_to');
-            from.selectedIndex = 0;
+            field.selectedIndex = 0;
+            SelectBox.move(field_id + '_' + type, field_id + '_' + to);
+            field.selectedIndex = 0;
             event.preventDefault()
             return false;
         }
     },
-    filter_key_up: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
-        var temp = from.selectedIndex;
-        SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
-        from.selectedIndex = temp;
+    filter_key_up: function(event, field_id, type) {
+        var field = document.getElementById(field_id + '_' + type);
+        if (type == 'from') {
+            var input_id = field_id + '_input';
+        } else if (type == 'to') {
+            var input_id = field_id + '_to_input';
+        }
+
+        var temp = field.selectedIndex;
+        SelectBox.filter(field_id + '_' + type, document.getElementById(input_id).value);
+        field.selectedIndex = temp;
         return true;
     },
-    filter_key_down: function(event, field_id) {
-        var from = document.getElementById(field_id + '_from');
+    filter_key_down: function(event, field_id, type) {
+        if (type == 'from') {
+            var to = 'to';
+        } else if (type == 'to') {
+            var to = 'from';
+        }
+        var field = document.getElementById(field_id + '_' + type);
         // right arrow -- move across
         if ((event.which && event.which == 39) || (event.keyCode && event.keyCode == 39)) {
-            var old_index = from.selectedIndex;
-            SelectBox.move(field_id + '_from', field_id + '_to');
-            from.selectedIndex = (old_index == from.length) ? from.length - 1 : old_index;
+            var old_index = field.selectedIndex;
+            SelectBox.move(field_id + '_' + type, field_id + '_' + to);
+            field.selectedIndex = (old_index == field.length) ? field.length - 1 : old_index;
             return false;
         }
         // down arrow -- wrap around
         if ((event.which && event.which == 40) || (event.keyCode && event.keyCode == 40)) {
-            from.selectedIndex = (from.length == from.selectedIndex + 1) ? 0 : from.selectedIndex + 1;
+            field.selectedIndex = (field.length == field.selectedIndex + 1) ? 0 : field.selectedIndex + 1;
         }
         // up arrow -- wrap around
         if ((event.which && event.which == 38) || (event.keyCode && event.keyCode == 38)) {
-            from.selectedIndex = (from.selectedIndex == 0) ? from.length - 1 : from.selectedIndex - 1;
+            field.selectedIndex = (field.selectedIndex == 0) ? field.length - 1 : field.selectedIndex - 1;
         }
         return true;
     }
 }
-
 })(django.jQuery);
