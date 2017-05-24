@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.urlresolvers import NoReverseMatch, reverse, get_script_prefix
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
 from django.template.engine import Engine
@@ -295,10 +295,11 @@ class AdminSite(object):
         Returns a dictionary of variables to put in the template context for
         *every* page in the admin site.
         """
+        site_url = get_script_prefix() if self.site_url == '/' else self.site_url
         return {
             'site_title': self.site_title,
             'site_header': self.site_header,
-            'site_url': self.site_url,
+            'site_url': site_url,
             'has_permission': self.has_permission(request),
         }
 
