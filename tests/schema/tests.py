@@ -171,6 +171,23 @@ class SchemaTests(TransactionTestCase):
         index_orders = constraints[index]['orders']
         self.assertTrue(all([(val == expected) for val, expected in zip(index_orders, order)]))
 
+    def assertForeignKeyExists(self, model, column, expected_fk_table):
+        """
+        Fail if the FK constraint on `model.Meta.db_table`.`column` to
+        `expected_fk_table`.id doesn't exist.
+        """
+        constraints = self.get_constraints(model._meta.db_table)
+        constraint_fk = None
+        for name, details in constraints.items():
+            if details['columns'] == [column] and details['foreign_key']:
+                constraint_fk = details['foreign_key']
+                break
+        self.assertEqual(constraint_fk, (expected_fk_table, 'id'))
+
+    def assertForeignKeyNotExists(self, model, column, expected_fk_table):
+        with self.assertRaises(AssertionError):
+            self.assertForeignKeyExists(model, column, expected_fk_table)
+
     # Tests
     def test_creation_deletion(self):
         """
@@ -212,14 +229,7 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("author")
         with connection.schema_editor() as editor:
             editor.alter_field(Book, old_field, new_field, strict=True)
-        # Make sure the new FK constraint is present
-        constraints = self.get_constraints(Book._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["author_id"] and details['foreign_key']:
-                self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
-                break
-        else:
-            self.fail("No FK constraint for author_id found")
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_tag')
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_to_proxy(self):
@@ -243,13 +253,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(AuthorRef)
-        constraints = self.get_constraints(AuthorRef._meta.db_table)
-        for details in constraints.values():
-            if details['columns'] == ['author_id'] and details['foreign_key']:
-                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
-                break
-        else:
-            self.fail('No FK constraint for author_id found')
+        self.assertForeignKeyExists(AuthorRef, 'author_id', 'schema_author')
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_db_constraint(self):
@@ -263,44 +267,25 @@ class SchemaTests(TransactionTestCase):
         list(Author.objects.all())
         list(Tag.objects.all())
         list(BookWeak.objects.all())
-        # BookWeak doesn't have an FK constraint
-        constraints = self.get_constraints(BookWeak._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["author_id"] and details['foreign_key']:
-                self.fail("FK constraint for author_id found")
+        self.assertForeignKeyNotExists(BookWeak, 'author_id', 'schema_author')
         # Make a db_constraint=False FK
         new_field = ForeignKey(Tag, CASCADE, db_constraint=False)
         new_field.set_attributes_from_name("tag")
         with connection.schema_editor() as editor:
             editor.add_field(Author, new_field)
-        # No FK constraint is present
-        constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["tag_id"] and details['foreign_key']:
-                self.fail("FK constraint for tag_id found")
+        self.assertForeignKeyNotExists(Author, 'tag_id', 'schema_tag')
         # Alter to one with a constraint
         new_field2 = ForeignKey(Tag, CASCADE)
         new_field2.set_attributes_from_name("tag")
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, new_field2, strict=True)
-        # The new FK constraint is present
-        constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["tag_id"] and details['foreign_key']:
-                self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
-                break
-        else:
-            self.fail("No FK constraint for tag_id found")
+        self.assertForeignKeyExists(Author, 'tag_id', 'schema_tag')
         # Alter to one without a constraint again
         new_field2 = ForeignKey(Tag, CASCADE)
         new_field2.set_attributes_from_name("tag")
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field2, new_field, strict=True)
-        # No FK constraint is present
-        constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["tag_id"] and details['foreign_key']:
-                self.fail("FK constraint for tag_id found")
+        self.assertForeignKeyNotExists(Author, 'tag_id', 'schema_tag')
 
     def _test_m2m_db_constraint(self, M2MFieldClass):
         class LocalAuthorWithM2M(Model):
@@ -325,11 +310,7 @@ class SchemaTests(TransactionTestCase):
         # Add the field
         with connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
-        # No FK constraint is present
-        constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["tag_id"] and details['foreign_key']:
-                self.fail("FK constraint for tag_id found")
+        self.assertForeignKeyNotExists(new_field.remote_field.through, 'tag_id', 'schema_tag')
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_m2m_db_constraint(self):
@@ -723,14 +704,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right to begin with
         columns = self.column_classes(Book)
         self.assertEqual(columns['author_id'][0], "IntegerField")
-        # Make sure the FK constraint is present
-        constraints = self.get_constraints(Book._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["author_id"] and details['foreign_key']:
-                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
-                break
-        else:
-            self.fail("No FK constraint for author_id found")
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
         # Alter the FK
         old_field = Book._meta.get_field("author")
         new_field = ForeignKey(Author, CASCADE, editable=False)
@@ -740,14 +714,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Book)
         self.assertEqual(columns['author_id'][0], "IntegerField")
-        # Make sure the FK constraint is present
-        constraints = self.get_constraints(Book._meta.db_table)
-        for name, details in constraints.items():
-            if details['columns'] == ["author_id"] and details['foreign_key']:
-                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
-                break
-        else:
-            self.fail("No FK constraint for author_id found")
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_to_fk(self):
@@ -779,14 +746,7 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("author")
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBook, old_field, new_field, strict=True)
-        constraints = self.get_constraints(LocalBook._meta.db_table)
-        # Ensure FK constraint exists
-        for name, details in constraints.items():
-            if details['foreign_key'] and details['columns'] == ["author_id"]:
-                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
-                break
-        else:
-            self.fail("No FK constraint for author_id found")
+        self.assertForeignKeyExists(LocalBook, 'author_id', 'schema_author')
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_o2o_to_fk(self):
@@ -806,14 +766,7 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             BookWithO2O.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
         BookWithO2O.objects.all().delete()
-        # Make sure the FK constraint is present
-        constraints = self.get_constraints(BookWithO2O._meta.db_table)
-        author_is_fk = False
-        for name, details in constraints.items():
-            if details['columns'] == ['author_id']:
-                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
-                    author_is_fk = True
-        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertForeignKeyExists(BookWithO2O, 'author_id', 'schema_author')
         # Alter the OneToOneField to ForeignKey
         old_field = BookWithO2O._meta.get_field("author")
         new_field = ForeignKey(Author, CASCADE)
@@ -826,14 +779,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is not unique anymore
         Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
         Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
-        # Make sure the FK constraint is still present
-        constraints = self.get_constraints(Book._meta.db_table)
-        author_is_fk = False
-        for name, details in constraints.items():
-            if details['columns'] == ['author_id']:
-                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
-                    author_is_fk = True
-        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_fk_to_o2o(self):
@@ -852,14 +798,7 @@ class SchemaTests(TransactionTestCase):
         Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
         Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
         Book.objects.all().delete()
-        # Make sure the FK constraint is present
-        constraints = self.get_constraints(Book._meta.db_table)
-        author_is_fk = False
-        for name, details in constraints.items():
-            if details['columns'] == ['author_id']:
-                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
-                    author_is_fk = True
-        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
         # Alter the ForeignKey to OneToOneField
         old_field = Book._meta.get_field("author")
         new_field = OneToOneField(Author, CASCADE)
@@ -873,14 +812,7 @@ class SchemaTests(TransactionTestCase):
         BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
         with self.assertRaises(IntegrityError):
             BookWithO2O.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
-        # Make sure the FK constraint is present
-        constraints = self.get_constraints(BookWithO2O._meta.db_table)
-        author_is_fk = False
-        for name, details in constraints.items():
-            if details['columns'] == ['author_id']:
-                if details['foreign_key'] and details['foreign_key'] == ('schema_author', 'id'):
-                    author_is_fk = True
-        self.assertTrue(author_is_fk, "No FK constraint for author_id found")
+        self.assertForeignKeyExists(BookWithO2O, 'author_id', 'schema_author')
 
     def test_alter_field_fk_to_o2o(self):
         with connection.schema_editor() as editor:
@@ -1318,16 +1250,12 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(UniqueTest)
         # Ensure the M2M exists and points to TagM2MTest
-        constraints = self.get_constraints(
-            LocalBookWithM2M._meta.get_field("tags").remote_field.through._meta.db_table
-        )
         if connection.features.supports_foreign_keys:
-            for name, details in constraints.items():
-                if details['columns'] == ["tagm2mtest_id"] and details['foreign_key']:
-                    self.assertEqual(details['foreign_key'], ('schema_tagm2mtest', 'id'))
-                    break
-            else:
-                self.fail("No FK constraint for tagm2mtest_id found")
+            self.assertForeignKeyExists(
+                LocalBookWithM2M._meta.get_field("tags").remote_field.through,
+                'tagm2mtest_id',
+                'schema_tagm2mtest',
+            )
         # Repoint the M2M
         old_field = LocalBookWithM2M._meta.get_field("tags")
         new_field = M2MFieldClass(UniqueTest)
@@ -1342,14 +1270,8 @@ class SchemaTests(TransactionTestCase):
         opts = LocalBookWithM2M._meta
         opts.local_many_to_many.remove(old_field)
         # Ensure the new M2M exists and points to UniqueTest
-        constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         if connection.features.supports_foreign_keys:
-            for name, details in constraints.items():
-                if details['columns'] == ["uniquetest_id"] and details['foreign_key']:
-                    self.assertEqual(details['foreign_key'], ('schema_uniquetest', 'id'))
-                    break
-            else:
-                self.fail("No FK constraint for uniquetest_id found")
+            self.assertForeignKeyExists(new_field.remote_field.through, 'uniquetest_id', 'schema_uniquetest')
 
     def test_m2m_repoint(self):
         self._test_m2m_repoint(ManyToManyField)
