@@ -203,7 +203,7 @@ example database configuration::
             },
         },
         'diamonds': {
-             ... db settings
+            # ... db settings
             'TEST': {
                 'DEPENDENCIES': [],
             },
