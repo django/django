@@ -214,14 +214,8 @@ different contexts.
 
 .. class:: Context(dict_=None)
 
-    This class lives at ``django.template.Context``. The constructor takes
-    two optional arguments:
-
-    * A dictionary mapping variable names to variable values.
-
-    * The name of the current application. This application name is used
-      to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
-      If you're not using namespaced URLs, you can ignore this argument.
+    The constructor of ``django.template.Context`` takes an optional argument —
+    a dictionary mapping variable names to variable values.
 
     For details, see :ref:`playing-with-context` below.
 
