@@ -1,7 +1,7 @@
 Contributing to Channels
 ========================
 
-As an open source project, Channels welcomes contributions of many forms.By participating in this project, you
+As an open source project, Channels welcomes contributions of many forms. By participating in this project, you
 agree to abide by the Django `code of conduct <https://www.djangoproject.com/conduct/>`_.
 
 Examples of contributions include:
