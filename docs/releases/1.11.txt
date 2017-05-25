@@ -360,6 +360,10 @@ Models
 * Added :meth:`.QuerySet.union`, :meth:`~.QuerySet.intersection`, and
   :meth:`~.QuerySet.difference`.
 
+* Added optional support for passing the list of excluded fields into model's
+  own clean methods to make it possible to add errors to individual model form
+  fields if these fields are available on a particular form instance.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

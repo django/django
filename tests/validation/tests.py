@@ -1,6 +1,11 @@
+import warnings
+
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.db import models
 from django.test import TestCase
+from django.test.utils import isolate_apps
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import lazy
 
 from . import ValidationTestCase
@@ -193,3 +198,49 @@ class GenericIPAddressFieldTests(ValidationTestCase):
         self.assertIsNone(giptm.full_clean())
         giptm = GenericIPAddressTestModel(generic_ip=None)
         self.assertIsNone(giptm.full_clean())
+
+
+class CleanWithExcludeTests(ValidationTestCase):
+    @isolate_apps('validation')
+    def test_clean_with_exclude(self):
+        class CleanWithExcludeModel(models.Model):
+            stuff = models.BooleanField(default=False)
+
+            def clean(self, exclude):
+                self._excluded = exclude
+
+        instance = CleanWithExcludeModel()
+        instance.full_clean(exclude=('stuff',))
+        # The exclude list should have been passed to our clean() method.
+        # Also, Django converts ``exclude`` to a list, always.
+        self.assertEqual(instance._excluded, ['stuff'])
+
+    @isolate_apps('validation')
+    def test_clean_without_exclude(self):
+        deprecation_messages = [
+            # Python 3
+            "Add the `exclude` argument to the clean() method of <class "
+            "'validation.tests.CleanWithExcludeTests."
+            "test_clean_without_exclude.<locals>.CleanWithoutExcludeModel'>. "
+            "It will be mandatory in Django 2.1",
+            # Python 2
+            "Add the `exclude` argument to the clean() method of <class "
+            "'validation.tests.CleanWithoutExcludeModel'>. "
+            "It will be mandatory in Django 2.1",
+        ]
+
+        class CleanWithoutExcludeModel(models.Model):
+            stuff = models.BooleanField(default=False)
+
+            def clean(self):
+                pass
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+
+            instance = CleanWithoutExcludeModel()
+            instance.full_clean()
+
+            self.assertEqual(1, len(warns))
+            self.assertIsInstance(warns[0].message, RemovedInDjango21Warning)
+            self.assertIn(str(warns[0].message), deprecation_messages)

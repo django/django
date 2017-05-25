@@ -31,7 +31,7 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-    def clean(self):
+    def clean(self, exclude=None):
         # Ensure author is always accessible in clean method
         assert self.author.name is not None
 

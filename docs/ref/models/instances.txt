@@ -251,7 +251,11 @@ validation.
 The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
 This method should be overridden to perform custom validation on your model.
 
-.. method:: Model.clean()
+.. method:: Model.clean(exclude=exclude)
+
+.. versionchanged:: 1.11
+
+   Older versions of Django did not pass the ``exclude`` parameter.
 
 This method should be used to provide custom model validation, and to modify
 attributes on your model if desired. For instance, you could use it to
@@ -265,7 +269,7 @@ access to more than a single field::
 
     class Article(models.Model):
         ...
-        def clean(self):
+        def clean(self, exclude):
             # Don't allow draft entries to have a pub_date.
             if self.status == 'draft' and self.pub_date is not None:
                 raise ValidationError(_('Draft entries may not have a publication date.'))
@@ -295,7 +299,7 @@ error to the ``pub_date`` field::
 
     class Article(models.Model):
         ...
-        def clean(self):
+        def clean(self, exclude):
             # Don't allow draft entries to have a pub_date.
             if self.status == 'draft' and self.pub_date is not None:
                 raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
@@ -308,6 +312,21 @@ pass a dictionary mapping field names to errors::
         'title': ValidationError(_('Missing title.'), code='required'),
         'pub_date': ValidationError(_('Invalid date.'), code='invalid'),
     })
+
+Note that you must not attempt to add errors to fields listed in the
+``exclude`` parameter. For example, if an error is related to a field that
+may not be part of some form you're using to update the model instance,
+you'll have to tie the error to the entire model instead::
+
+    class Article(models.Model):
+        ...
+        def clean(self, exclude):
+            if self.status == 'draft' and self.pub_date is not None:
+                if exclude and 'pub_date' in exclude:
+                    raise ValidationError(_('Draft entries may not have a publication date.'))
+                else:
+                    raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
+            ...
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
 

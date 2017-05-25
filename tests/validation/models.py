@@ -32,8 +32,8 @@ class ModelToValidate(models.Model):
                                                         validators=(validate_answer_to_universe,))
     slug = models.SlugField(blank=True)
 
-    def clean(self):
-        super().clean()
+    def clean(self, exclude=None):
+        super().clean(exclude=exclude)
         if self.number == 11:
             raise ValidationError('Invalid number supplied!')
 
@@ -83,7 +83,7 @@ class Article(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     pub_date = models.DateTimeField(blank=True)
 
-    def clean(self):
+    def clean(self, exclude=None):
         if self.pub_date is None:
             self.pub_date = datetime.now()
 
