@@ -71,7 +71,7 @@ create a real version. Add the following to ``polls/views.py``:
 
     from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect, HttpResponse
-    from django.urls import reverse
+    from django.core.urlresolvers import reverse
 
     from .models import Choice, Question
     # ...
@@ -264,7 +264,7 @@ views and use Django's generic views instead. To do so, open the
 
     from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect
-    from django.urls import reverse
+    from django.core.urlresolvers import reverse
     from django.views import generic
 
     from .models import Choice, Question
