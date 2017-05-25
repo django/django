@@ -331,7 +331,8 @@ A *channel layer* must provide an object with these attributes
 * ``receive(channels, block=False)``, a callable that takes a list of channel
   names as unicode strings, and returns with either ``(None, None)``
   or ``(channel, message)`` if a message is available. If ``block`` is True, then
-  it will not return until after a built-in timeout or a message arrives; if
+  it will not return a message arrives (or optionally, a built-in timeout,
+  but it is valid to block forever if there are no messages); if
   ``block`` is false, it will always return immediately. It is perfectly
   valid to ignore ``block`` and always return immediately, or after a delay;
   ``block`` means that the call can take as long as it likes before returning
@@ -409,21 +410,15 @@ A channel layer implementing the ``twisted`` extension must also provide:
 * ``receive_twisted(channels)``, a function that behaves
   like ``receive`` but that returns a Twisted Deferred that eventually
   returns either ``(channel, message)`` or ``(None, None)``. It is not possible
-  to run it in nonblocking mode; use the normal ``receive`` for that. The
-  channel layer must be able to deal with this function being called from
-  many different places in a codebase simultaneously - likely once from each
-  Twisted Protocol instance - and so it is recommended that implementations
-  use internal connection pooling and call merging or similar.
+  to run it in nonblocking mode; use the normal ``receive`` for that.
 
-A channel layer implementing the ``asyncio`` extension must also provide:
+A channel layer implementing the ``async`` extension must also provide:
 
-* ``receive_asyncio(channels)``, a function that behaves
+* ``receive_async(channels)``, a function that behaves
   like ``receive`` but that fulfills the asyncio coroutine contract to
   block until either a result is available or an internal timeout is reached
-  and ``(None, None)`` is returned. The channel layer must be able to deal
-  with this function being called from many different places in a codebase
-  simultaneously, and so it is recommended that implementations
-  use internal connection pooling and call merging or similar.
+  and ``(None, None)`` is returned. It is not possible
+  to run it in nonblocking mode; use the normal ``receive`` for that.
 
 Channel Semantics
 -----------------
