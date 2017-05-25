@@ -37,8 +37,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         with self.connection.cursor() as cursor:
-            cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
-            result = cursor.fetchone()
+            #cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
+            cursor.execute("SHOW ENGINES")
+            #result = cursor.fetchone()
+            result =  [ i for i in cursor if i[1].lower() == 'default' ]
         return result[0]
 
     @cached_property
