@@ -11,6 +11,7 @@ class PasswordResetTokenGenerator:
     reset mechanism.
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
+    secret = settings.SECRET_KEY
 
     def make_token(self, user):
         """
@@ -61,6 +62,7 @@ class PasswordResetTokenGenerator:
         hash = salted_hmac(
             self.key_salt,
             self._make_hash_value(user, timestamp),
+            secret=self.secret,
         ).hexdigest()[::2]
         return "%s-%s" % (ts_b36, hash)
 
