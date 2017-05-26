@@ -20,6 +20,10 @@ class JSONField(forms.CharField):
     }
     widget = forms.Textarea
 
+    def __init__(self, invalidate_empty=False, *args, **kwargs):
+        self.invalidate_empty = invalidate_empty
+        super().__init__(*args, **kwargs)
+
     def to_python(self, value):
         if self.disabled:
             return value
@@ -52,3 +56,12 @@ class JSONField(forms.CharField):
         if isinstance(value, InvalidJSONInput):
             return value
         return json.dumps(value)
+
+    def validate(self, value):
+        super().validate(value)
+        if self.invalidate_empty and value is None:
+            raise forms.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )

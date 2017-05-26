@@ -74,7 +74,11 @@ class JSONField(Field):
         return self.value_from_object(obj)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.JSONField}
+        defaults = {'form_class': forms.JSONField, 'required': not self.blank}
+        if self.blank and not self.null:
+            defaults['initial'] = {}
+            defaults['invalidate_empty'] = True
+
         defaults.update(kwargs)
         return super().formfield(**defaults)
 
