@@ -29,7 +29,7 @@ class FieldOperation(Operation):
     def references_field(self, model_name, name, app_label=None):
         return self.references_model(model_name) and name.lower() == self.name_lower
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, app_label=None, all_operations=None):
         return (
             super().reduce(operation, in_between, app_label=app_label) or
             not operation.references_field(self.model_name, self.name, app_label)
@@ -92,7 +92,7 @@ class AddField(FieldOperation):
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, app_label=None, all_operations=None):
         if isinstance(operation, FieldOperation) and self.is_same_field_operation(operation):
             if isinstance(operation, AlterField):
                 return [
@@ -217,7 +217,7 @@ class AlterField(FieldOperation):
     def describe(self):
         return "Alter field %s on %s" % (self.name, self.model_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, app_label=None, all_operations=None):
         if isinstance(operation, RemoveField) and self.is_same_field_operation(operation):
             return [operation]
         elif isinstance(operation, RenameField) and self.is_same_field_operation(operation):
@@ -311,7 +311,7 @@ class RenameField(FieldOperation):
             name.lower() == self.new_name_lower
         )
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, in_between, app_label=None, all_operations=None):
         if (isinstance(operation, RenameField) and
                 self.is_same_model_operation(operation) and
                 self.new_name_lower == operation.old_name_lower):
