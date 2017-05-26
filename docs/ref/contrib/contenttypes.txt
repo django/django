@@ -85,7 +85,7 @@ The ``ContentType`` model
 Let's look at an example to see how this works. If you already have
 the :mod:`~django.contrib.contenttypes` application installed, and then add
 :mod:`the sites application <django.contrib.sites>` to your
-:setting:`INSTALLED_APPS` setting and run ``manage.py migrate`` to install it,
+:setting:`INSTALLED_APPS` setting and run ``./manage.py migrate`` to install it,
 the model :class:`django.contrib.sites.models.Site` will be installed into
 your database. Along with it a new instance of
 :class:`~django.contrib.contenttypes.models.ContentType` will be

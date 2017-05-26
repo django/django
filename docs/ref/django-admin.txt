@@ -40,7 +40,7 @@ Usage
 .. code-block:: console
 
     $ django-admin <command> [options]
-    $ manage.py <command> [options]
+    $ ./manage.py <command> [options]
     $ python -m django <command> [options]
 
 ``command`` should be one of the commands listed in this document.

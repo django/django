@@ -291,7 +291,7 @@ can or cannot do with Task instances, specific to your application::
             )
 
 The only thing this does is create those extra permissions when you run
-:djadmin:`manage.py migrate <migrate>` (the function that creates permissions
+:djadmin:`./manage.py migrate <migrate>` (the function that creates permissions
 is connected to the :data:`~django.db.models.signals.post_migrate` signal).
 Your code is in charge of checking the value of these permissions when a user
 is trying to access the functionality provided by the application (viewing
@@ -404,7 +404,7 @@ model, but you'll be able to customize it in the future if the need arises::
         pass
 
 Don't forget to point :setting:`AUTH_USER_MODEL` to it. Do this before creating
-any migrations or running ``manage.py migrate`` for the first time.
+any migrations or running :djadmin:`./manage.py migrate` for the first time.
 
 Also, register the model in the app's ``admin.py``::
 

@@ -85,8 +85,8 @@ function is used when creating a user.
 
 To change a user's password, you have several options:
 
-:djadmin:`manage.py changepassword *username* <changepassword>` offers a method
-of changing a user's password from the command line. It prompts you to
+:djadmin:`./manage.py changepassword *username* <changepassword>` offers a
+method of changing a user's password from the command line. It prompts you to
 change the password of a given user which you must enter twice. If
 they both match, the new password will be changed immediately. If you
 do not supply a user, the command will attempt to change the password
@@ -202,12 +202,12 @@ setting, it will ensure that three default permissions -- add, change and
 delete -- are created for each Django model defined in one of your installed
 applications.
 
-These permissions will be created when you run :djadmin:`manage.py migrate
+These permissions will be created when you run :djadmin:`./manage.py migrate
 <migrate>`; the first time you run ``migrate`` after adding
 ``django.contrib.auth`` to :setting:`INSTALLED_APPS`, the default permissions
 will be created for all previously-installed models, as well as for any new
 models being installed at that time. Afterward, it will create default
-permissions for new models each time you run :djadmin:`manage.py migrate
+permissions for new models each time you run :djadmin:`./manage.py migrate
 <migrate>` (the function that creates permissions is connected to the
 :data:`~django.db.models.signals.post_migrate` signal).
 

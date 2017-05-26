@@ -1037,7 +1037,7 @@ database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
 The most straightforward way of creating a fixture is to use the
-:djadmin:`manage.py dumpdata <dumpdata>` command. This assumes you
+:djadmin:`./manage.py dumpdata <dumpdata>` command. This assumes you
 already have some data in your database. See the :djadmin:`dumpdata
 documentation<dumpdata>` for more details.
 

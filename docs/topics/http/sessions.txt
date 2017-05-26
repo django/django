@@ -44,7 +44,7 @@ Using database-backed sessions
 If you want to use a database-backed session, you need to add
 ``'django.contrib.sessions'`` to your :setting:`INSTALLED_APPS` setting.
 
-Once you have configured your installation, run ``manage.py migrate``
+Once you have configured your installation, run ``./manage.py migrate``
 to install the single database table that stores session data.
 
 .. _cached-sessions-backend:

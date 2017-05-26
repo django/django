@@ -67,7 +67,7 @@ your ``models.py``.
 
 For example, if the models for your application live in the module
 ``myapp.models`` (the package structure that is created for an
-application by the :djadmin:`manage.py startapp <startapp>` script),
+application by the :djadmin:`./manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = [
@@ -77,8 +77,8 @@ application by the :djadmin:`manage.py startapp <startapp>` script),
     ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
-:djadmin:`manage.py migrate <migrate>`, optionally making migrations
-for them first with :djadmin:`manage.py makemigrations <makemigrations>`.
+:djadmin:`./manage.py migrate <migrate>`, optionally making migrations
+for them first with :djadmin:`./manage.py makemigrations <makemigrations>`.
 
 Fields
 ======
@@ -1411,7 +1411,7 @@ any model field in any ancestor model.
 Organizing models in a package
 ==============================
 
-The :djadmin:`manage.py startapp <startapp>` command creates an application
+The :djadmin:`./manage.py startapp <startapp>` command creates an application
 structure that includes a ``models.py`` file. If you have many models,
 organizing them in separate files may be useful.
 

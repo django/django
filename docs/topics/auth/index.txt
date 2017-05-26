@@ -67,9 +67,9 @@ and these items in your :setting:`MIDDLEWARE` setting:
 2. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` associates
    users with requests using sessions.
 
-With these settings in place, running the command ``manage.py migrate`` creates
-the necessary database tables for auth related models and permissions for any
-models defined in your installed apps.
+With these settings in place, running the command :djadmin:`./manage.py migrate`
+creates the necessary database tables for auth related models and permissions
+for any models defined in your installed apps.
 
 Usage
 =====
