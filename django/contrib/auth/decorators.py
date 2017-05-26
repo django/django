@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 
 
-def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
+def user_passes_test(test_func, login_url=settings.LOGIN_URL, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
@@ -20,7 +20,7 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
             path = request.build_absolute_uri()
-            resolved_login_url = resolve_url(login_url or settings.LOGIN_URL)
+            resolved_login_url = resolve_url(login_url)
             # If the login url is the same scheme and net location then just
             # use the path as the "next" url.
             login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
@@ -35,7 +35,7 @@ def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIE
     return decorator
 
 
-def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=settings.LOGIN_URL):
     """
     Decorator for views that checks that the user is logged in, redirecting
     to the log-in page if necessary.
@@ -50,7 +50,7 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     return actual_decorator
 
 
-def permission_required(perm, login_url=None, raise_exception=False):
+def permission_required(perm, login_url=settings.LOGIN_URL, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission
     enabled, redirecting to the log-in page if necessary.
@@ -70,4 +70,4 @@ def permission_required(perm, login_url=None, raise_exception=False):
             raise PermissionDenied
         # As the last resort, show the login form
         return False
-    return user_passes_test(check_perms, login_url=login_url)
+    return user_passes_test(check_perms, login_url)
