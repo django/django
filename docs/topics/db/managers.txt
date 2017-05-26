@@ -453,3 +453,50 @@ However, if you're overriding ``__getattr__`` or some other private
 method of your ``Manager`` object that controls object state, you
 should ensure that you don't affect the ability of your ``Manager`` to
 be copied.
+
+Custom Managers with queries through relations
+----------------------------------------------
+
+Please consider that custom managers don't apply to intermediate joins.
+See following example::
+
+    class ItemManager(Manager):
+        def get_queryset(self):
+            return super(ItemManager, self).get_queryset().filter(deleted=False)
+
+    class Item(Model):
+        deleted = BooleanField()
+
+        objects = ItemManager()
+        all_items = Manager()
+
+        class Meta:
+            base_manager_name = 'objects'
+
+        def __str__(self):
+            return "deleted" if self.deleted else "active"
+
+    class Customer(Model):
+        items = ManyToManyField(Item)
+
+    Item.objects.create(deleted=False)
+    Item.objects.create(deleted=True)
+
+    >>> Item.all_items.all()
+    [<Item: active>, <Item: deleted>]
+    >>> Item.objects.all()
+    [<Item: active>]
+    >>> Item.objects.filter(deleted=True)
+    []
+
+In this case everything works as expected.
+
+However, if we query through a related model field as shown below the default ``Manager`` will be used::
+
+    c = Customer.objects.create()
+    c.items.add(*Item.all_items.all())
+
+    >>> Customer.objects.filter(items__deleted=True)
+    [<Customer: Customer object>]
+
+The custom ``ItemManager`` did not apply to the query when it was performed through a related model field.
