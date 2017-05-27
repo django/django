@@ -1215,8 +1215,8 @@ by setting the name of the field to ``None`` on the subclass. For example::
     >>> class ChildForm(ParentForm):
     ...     name = None
 
-    >>> ChildForm().fields.keys()
-    ... ['age']
+    >>> list(ChildForm().fields)
+    ['age']
 
 .. _form-prefix:
 
