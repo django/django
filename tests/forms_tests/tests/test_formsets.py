@@ -1178,6 +1178,24 @@ class FormsFormsetTestCase(SimpleTestCase):
         finally:
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
+    def test_can_create_false(self):
+        """A formset can disallow the addition of extra forms."""
+        ChoiceFormSet = formset_factory(Choice, can_create=False)
+        initial = [{'choice': 'Calexico', 'votes': 100}]
+        formset = ChoiceFormSet(
+            {
+                'choices-TOTAL_FORMS': '2',
+                'choices-INITIAL_FORMS': '2',
+                'choices-0-choice': 'Calexico',
+                'choices-0-votes': '100',
+                'choices-1-choice': 'Calexico',
+                'choices-1-votes': '200',
+            },
+            prefix='choices',
+            initial=initial,
+        )
+        self.assertFalse(formset.is_valid())
+
     def test_increase_hard_limit(self):
         """Can increase the built-in forms limit via a higher max_num."""
         # reduce the default limit of 1000 temporarily for testing
