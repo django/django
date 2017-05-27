@@ -3,7 +3,9 @@ import time
 import warnings
 
 from asgiref.sync import sync_to_async
+from urllib import parse
 
+from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
@@ -386,6 +388,23 @@ class BaseCache:
 
     async def aclose(self, **kwargs):
         pass
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = parse_url(url)
+        returner = {"BACKEND": engine}
+        if result["hostname"]:
+            returner["LOCATION"] = result["hostname"]
+            if result["port"]:
+                returner["LOCATION"] += ":%s" % result["port"]
+
+        for key in ("timeout", "key_prefix", "version"):
+            if key in result["options"]:
+                timeout = result["options"].pop(key)
+                returner[key.upper()] = timeout
+
+        returner["OPTIONS"] = result["options"]
+        return returner
 
 
 def memcache_key_warnings(key):

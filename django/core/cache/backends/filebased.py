@@ -7,10 +7,12 @@ import tempfile
 import time
 import zlib
 
+from django.conf.service_url import parse_url
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files import locks
 from django.core.files.move import file_move_safe
 from django.utils.crypto import md5
+from django.utils.url_config import parse_url
 
 
 class FileBasedCache(BaseCache):
@@ -167,3 +169,18 @@ class FileBasedCache(BaseCache):
             os.path.join(self._dir, fname)
             for fname in glob.glob1(self._dir, "*%s" % self.cache_suffix)
         ]
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        parsed = parse_url(url)
+        result = super().config_from_url(engine, scheme, parsed)
+
+        path = "/" + parsed["path"]
+
+        # On windows a path like C:/a/b is parsed with C as the hostname
+        # and a/b/ as the path. Reconstruct the windows path here.
+        if parsed["hostname"]:
+            path = "{0}:{1}".format(parsed["hostname"], path)
+
+        result["LOCATION"] = path
+        return result

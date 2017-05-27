@@ -203,6 +203,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_database_version(self):
         return self.mysql_version
 
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = super().config_from_url(engine, scheme, url)
+
+        if "ssl-ca" in result["OPTIONS"]:
+            value = result["OPTIONS"].pop("ssl")
+            result["OPTIONS"]["ssl"] = {"ca": value}
+
+        return result
+
     def get_connection_params(self):
         kwargs = {
             "conv": django_conversions,

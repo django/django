@@ -8,8 +8,10 @@ import asyncio
 import threading
 import warnings
 from contextlib import contextmanager
+from urllib import parse
 
 from django.conf import settings
+from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError as WrappedDatabaseError
 from django.db import connections
@@ -18,6 +20,7 @@ from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrappe
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
+from django.utils.url_config import parse_url
 from django.utils.version import get_version_tuple
 
 try:
@@ -164,6 +167,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         E.g. for pg_version 120004, return (12, 4).
         """
         return divmod(self.pg_version, 10000)
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        parsed = parse_url(url)
+        host = parsed["hostname"]
+
+        # Handle postgres percent-encoded paths.
+        if "%2f" in host.lower():
+            host = parse.unquote(host)
+            parsed = parsed._replace(hostname=host)
+
+        result = super().config_from_url(engine, scheme, parsed)
+
+        if "currentSchema" in result["OPTIONS"]:
+            value = result["OPTIONS"].pop("currentSchema")
+            result["OPTIONS"]["options"] = "-c search_path={0}".format(value)
+
+        return result
 
     def get_connection_params(self):
         settings_dict = self.settings_dict

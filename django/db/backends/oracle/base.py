@@ -243,6 +243,36 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_database_version(self):
         return self.oracle_version
 
+    def _connect_string(self):
+        settings_dict = self.settings_dict
+        if not settings_dict["HOST"].strip():
+            settings_dict["HOST"] = "localhost"
+        if settings_dict["PORT"]:
+            dsn = Database.makedsn(
+                settings_dict["HOST"], int(settings_dict["PORT"]), settings_dict["NAME"]
+            )
+        else:
+            dsn = settings_dict["NAME"]
+        return "%s/%s@%s" % (settings_dict["USER"], settings_dict["PASSWORD"], dsn)
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = super().config_from_url(engine, scheme, url)
+        result["PORT"] = str(result["PORT"])
+        return result
+
+    def _connect_string(self):
+        settings_dict = self.settings_dict
+        if not settings_dict["HOST"].strip():
+            settings_dict["HOST"] = "localhost"
+        if settings_dict["PORT"]:
+            dsn = Database.makedsn(
+                settings_dict["HOST"], int(settings_dict["PORT"]), settings_dict["NAME"]
+            )
+        else:
+            dsn = settings_dict["NAME"]
+        return "%s/%s@%s" % (settings_dict["USER"], settings_dict["PASSWORD"], dsn)
+
     def get_connection_params(self):
         conn_params = self.settings_dict["OPTIONS"].copy()
         if "use_returning_into" in conn_params:

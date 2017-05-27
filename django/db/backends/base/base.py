@@ -7,6 +7,7 @@ import time
 import warnings
 from collections import deque
 from contextlib import contextmanager
+from urllib import parse
 
 from django.db.backends.utils import debug_transaction
 
@@ -16,6 +17,7 @@ except ImportError:
     from backports import zoneinfo
 
 from django.conf import settings
+from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, NotSupportedError
 from django.db.backends import utils
@@ -137,6 +139,21 @@ class BaseDatabaseWrapper:
             f"<{self.__class__.__qualname__} "
             f"vendor={self.vendor!r} alias={self.alias!r}>"
         )
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        parsed = parse_url(url)
+        result = {
+            "ENGINE": engine,
+            "NAME": parse.unquote(parsed["path"] or ""),
+            "USER": parse.unquote(parsed["username"] or ""),
+            "PASSWORD": parse.unquote(parsed["password"] or ""),
+            "HOST": parsed["hostname"],
+            "PORT": parsed["port"] or "",
+            "OPTIONS": parsed["options"],
+        }
+
+        return result
 
     def ensure_timezone(self):
         """
