@@ -43,11 +43,12 @@ class TokenGeneratorTest(TestCase):
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
-        p1 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
+        p1 = Mocked(date.today() + timedelta(days=settings.PASSWORD_RESET_TIMEOUT_DAYS, seconds=-1))
         self.assertTrue(p1.check_token(user, tk1))
-
-        p2 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
+        p2 = Mocked(date.today() + timedelta(days=settings.PASSWORD_RESET_TIMEOUT_DAYS))
         self.assertFalse(p2.check_token(user, tk1))
+        p3 = Mocked(date.today() + timedelta(days=settings.PASSWORD_RESET_TIMEOUT_DAYS, seconds=1))
+        self.assertFalse(p3.check_token(user, tk1))
 
     def test_check_token_with_nonexistent_token_and_user(self):
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
