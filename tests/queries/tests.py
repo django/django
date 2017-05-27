@@ -550,7 +550,7 @@ class Queries1Tests(TestCase):
         # normal. A normal dict would thus fail.)
         s = [('a', '%s'), ('b', '%s')]
         params = ['one', 'two']
-        if {'a': 1, 'b': 2}.keys() == ['a', 'b']:
+        if list({'a': 1, 'b': 2}) == ['a', 'b']:
             s.reverse()
             params.reverse()
 
