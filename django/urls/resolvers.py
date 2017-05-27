@@ -436,8 +436,7 @@ class RegexURLResolver(LocaleRegexProvider):
                         continue
                     candidate_subs = dict(zip(params, text_args))
                 else:
-                    if (set(kwargs.keys()) | set(defaults.keys()) != set(params) |
-                            set(defaults.keys())):
+                    if set(kwargs) | set(defaults) != set(params) | set(defaults):
                         continue
                     matches = True
                     for k, v in defaults.items():

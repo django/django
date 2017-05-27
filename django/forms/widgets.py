@@ -63,7 +63,7 @@ class Media:
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
-        media = sorted(self._css.keys())
+        media = sorted(self._css)
         return chain.from_iterable([
             format_html(
                 '<link href="{}" type="text/css" media="{}" rel="stylesheet" />',

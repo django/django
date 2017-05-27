@@ -120,11 +120,9 @@ class DataSourceTest(unittest.TestCase):
                     layer.__getitem__(50000)
 
                 if hasattr(source, 'field_values'):
-                    fld_names = source.field_values.keys()
-
                     # Testing `Layer.get_fields` (which uses Layer.__iter__)
-                    for fld_name in fld_names:
-                        self.assertEqual(source.field_values[fld_name], layer.get_fields(fld_name))
+                    for fld_name, fld_value in source.field_values.items():
+                        self.assertEqual(fld_value, layer.get_fields(fld_name))
 
                     # Testing `Layer.__getitem__`.
                     for i, fid in enumerate(source.fids):
@@ -132,8 +130,8 @@ class DataSourceTest(unittest.TestCase):
                         self.assertEqual(fid, feat.fid)
                         # Maybe this should be in the test below, but we might as well test
                         # the feature values here while in this loop.
-                        for fld_name in fld_names:
-                            self.assertEqual(source.field_values[fld_name][i], feat.get(fld_name))
+                        for fld_name, fld_value in source.field_values.items():
+                            self.assertEqual(fld_value[i], feat.get(fld_name))
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."
@@ -194,7 +192,7 @@ class DataSourceTest(unittest.TestCase):
 
                     # Testing Feature.__iter__
                     for fld in feat:
-                        self.assertIn(fld.name, source.fields.keys())
+                        self.assertIn(fld.name, source.fields)
 
     def test05_geometries(self):
         "Testing Geometries from Data Source Features."

@@ -2783,7 +2783,7 @@ class ModelFormInheritanceTests(SimpleTestCase):
                 model = Writer
                 fields = '__all__'
 
-        self.assertEqual(list(ModelForm().fields.keys()), ['name', 'age'])
+        self.assertEqual(list(ModelForm().fields), ['name', 'age'])
 
     def test_field_removal(self):
         class ModelForm(forms.ModelForm):
@@ -2800,13 +2800,13 @@ class ModelFormInheritanceTests(SimpleTestCase):
         class Form2(forms.Form):
             foo = forms.IntegerField()
 
-        self.assertEqual(list(ModelForm().fields.keys()), ['name'])
-        self.assertEqual(list(type('NewForm', (Mixin, Form), {})().fields.keys()), [])
-        self.assertEqual(list(type('NewForm', (Form2, Mixin, Form), {})().fields.keys()), ['foo'])
-        self.assertEqual(list(type('NewForm', (Mixin, ModelForm, Form), {})().fields.keys()), ['name'])
-        self.assertEqual(list(type('NewForm', (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
-        self.assertEqual(list(type('NewForm', (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
-        self.assertEqual(list(type('NewForm', (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
+        self.assertEqual(list(ModelForm().fields), ['name'])
+        self.assertEqual(list(type('NewForm', (Mixin, Form), {})().fields), [])
+        self.assertEqual(list(type('NewForm', (Form2, Mixin, Form), {})().fields), ['foo'])
+        self.assertEqual(list(type('NewForm', (Mixin, ModelForm, Form), {})().fields), ['name'])
+        self.assertEqual(list(type('NewForm', (ModelForm, Mixin, Form), {})().fields), ['name'])
+        self.assertEqual(list(type('NewForm', (ModelForm, Form, Mixin), {})().fields), ['name', 'age'])
+        self.assertEqual(list(type('NewForm', (ModelForm, Form), {'age': None})().fields), ['name'])
 
     def test_field_removal_name_clashes(self):
         """
@@ -2974,7 +2974,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         class InheritedForm(NewForm):
             pass
 
-        for name in NewForm.base_fields.keys():
+        for name in NewForm.base_fields:
             self.assertEqual(
                 type(InheritedForm.base_fields[name].widget),
                 type(NewForm.base_fields[name].widget)

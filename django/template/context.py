@@ -70,7 +70,7 @@ class BaseContext:
         """
         context = self.dicts[-1]
         for d in reversed(self.dicts):
-            if key in d.keys():
+            if key in d:
                 context = d
                 break
         context[key] = value

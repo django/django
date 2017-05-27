@@ -207,7 +207,7 @@ class OperationTests(OperationTestBase):
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "CreateModel")
         self.assertEqual(definition[1], [])
-        self.assertEqual(sorted(definition[2].keys()), ["fields", "name"])
+        self.assertEqual(sorted(definition[2]), ["fields", "name"])
         # And default manager not in set
         operation = migrations.CreateModel("Foo", fields=[], managers=[("objects", models.Manager())])
         definition = operation.deconstruct()
@@ -430,7 +430,7 @@ class OperationTests(OperationTestBase):
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "CreateModel")
         self.assertEqual(definition[1], [])
-        self.assertEqual(sorted(definition[2].keys()), ["bases", "fields", "name", "options"])
+        self.assertEqual(sorted(definition[2]), ["bases", "fields", "name", "options"])
 
     def test_create_unmanaged_model(self):
         """

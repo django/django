@@ -248,8 +248,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in fields.items() if not v]
-            missing_fields = (set(none_model_fields) -
-                              set(new_class.declared_fields.keys()))
+            missing_fields = set(none_model_fields) - set(new_class.declared_fields)
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
                 message = message % (', '.join(missing_fields),
@@ -317,7 +316,7 @@ class BaseModelForm(BaseForm):
 
             # Exclude fields that failed form validation. There's no need for
             # the model fields to validate them as well.
-            elif field in self._errors.keys():
+            elif field in self._errors:
                 exclude.append(f.name)
 
             # Exclude empty fields that are not required by the form, if the

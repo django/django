@@ -94,8 +94,8 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(sorted(d.keys()), sorted(mvd.keys()))
-        for key in mvd.keys():
+        self.assertEqual(sorted(d), sorted(mvd))
+        for key in mvd:
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())

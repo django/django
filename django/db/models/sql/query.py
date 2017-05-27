@@ -756,7 +756,7 @@ class Query:
                 # Join type of 'alias' changed, so re-examine all aliases that
                 # refer to this one.
                 aliases.extend(
-                    join for join in self.alias_map.keys()
+                    join for join in self.alias_map
                     if self.alias_map[join].parent_alias == alias and join not in aliases
                 )
 
@@ -794,7 +794,7 @@ class Query:
         relabelling any references to them in select columns and the where
         clause.
         """
-        assert set(change_map.keys()).intersection(set(change_map.values())) == set()
+        assert set(change_map).intersection(set(change_map.values())) == set()
 
         # 1. Update references in "select" (normal columns plus aliases),
         # "group by" and "where".

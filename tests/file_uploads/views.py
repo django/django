@@ -125,7 +125,7 @@ def file_upload_getlist_count(request):
     """
     file_counts = {}
 
-    for key in request.FILES.keys():
+    for key in request.FILES:
         file_counts[key] = len(request.FILES.getlist(key))
     return JsonResponse(file_counts)
 

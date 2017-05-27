@@ -24,7 +24,7 @@ class OrderedSet:
             pass
 
     def __iter__(self):
-        return iter(self.dict.keys())
+        return iter(self.dict)
 
     def __contains__(self, item):
         return item in self.dict

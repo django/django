@@ -133,7 +133,7 @@ class MigrationAutodetector:
         self.new_model_keys = []
         self.new_proxy_keys = []
         self.new_unmanaged_keys = []
-        for al, mn in sorted(self.from_state.models.keys()):
+        for al, mn in sorted(self.from_state.models):
             model = self.old_apps.get_model(al, mn)
             if not model._meta.managed:
                 self.old_unmanaged_keys.append((al, mn))
@@ -143,7 +143,7 @@ class MigrationAutodetector:
                 else:
                     self.old_model_keys.append((al, mn))
 
-        for al, mn in sorted(self.to_state.models.keys()):
+        for al, mn in sorted(self.to_state.models):
             model = self.new_apps.get_model(al, mn)
             if not model._meta.managed:
                 self.new_unmanaged_keys.append((al, mn))
@@ -249,7 +249,7 @@ class MigrationAutodetector:
             # try to chop it off from the rest and continue, but we only
             # do this if we've already been through the list once before
             # without any chopping and nothing has changed.
-            for app_label in sorted(self.generated_operations.keys()):
+            for app_label in sorted(self.generated_operations):
                 chopped = []
                 dependencies = set()
                 for operation in list(self.generated_operations[app_label]):
@@ -1193,7 +1193,7 @@ class MigrationAutodetector:
             for app_label in list(required_apps):
                 required_apps.update(app_dependencies.get(app_label, set()))
         # Remove all migrations that aren't needed
-        for app_label in list(changes.keys()):
+        for app_label in list(changes):
             if app_label not in required_apps:
                 del changes[app_label]
         return changes

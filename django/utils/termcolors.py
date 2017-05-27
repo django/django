@@ -199,7 +199,7 @@ def parse_color_setting(config_string):
                 definition['bg'] = colors[-1]
 
             # All remaining instructions are options
-            opts = tuple(s for s in styles if s in opt_dict.keys())
+            opts = tuple(s for s in styles if s in opt_dict)
             if opts:
                 definition['opts'] = opts
 

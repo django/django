@@ -1140,7 +1140,7 @@ class Model(metaclass=ModelBase):
 
         # Run unique checks, but only for fields that passed validation.
         if validate_unique:
-            for name in errors.keys():
+            for name in errors:
                 if name != NON_FIELD_ERRORS and name not in exclude:
                     exclude.append(name)
             try:
@@ -1594,7 +1594,7 @@ class Model(metaclass=ModelBase):
         db_alias = None
 
         # Find the minimum max allowed length among all specified db_aliases.
-        for db in settings.DATABASES.keys():
+        for db in settings.DATABASES:
             # skip databases where the model won't be created
             if not router.allow_migrate_model(db, cls):
                 continue

@@ -1558,19 +1558,19 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
                 self.order_fields(field_order=TestForm.field_order)
 
         p = TestFormParent()
-        self.assertEqual(list(p.fields.keys()), TestFormParent.field_order)
+        self.assertEqual(list(p.fields), TestFormParent.field_order)
         p = TestFormRemove()
-        self.assertEqual(list(p.fields.keys()), TestForm.field_order)
+        self.assertEqual(list(p.fields), TestForm.field_order)
         p = TestFormMissing()
-        self.assertEqual(list(p.fields.keys()), TestForm.field_order)
+        self.assertEqual(list(p.fields), TestForm.field_order)
         p = TestForm()
-        self.assertEqual(list(p.fields.keys()), TestFormMissing.field_order)
+        self.assertEqual(list(p.fields), TestFormMissing.field_order)
         p = TestFormInit()
         order = list(TestForm.field_order) + ['field1']
-        self.assertEqual(list(p.fields.keys()), order)
+        self.assertEqual(list(p.fields), order)
         TestForm.field_order = ['unknown']
         p = TestForm()
-        self.assertEqual(list(p.fields.keys()), ['field1', 'field2', 'field4', 'field5', 'field6', 'field3'])
+        self.assertEqual(list(p.fields), ['field1', 'field2', 'field4', 'field5', 'field6', 'field3'])
 
     def test_form_html_attributes(self):
         # Some Field classes have an effect on the HTML attributes of their associated

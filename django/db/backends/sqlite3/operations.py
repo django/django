@@ -132,10 +132,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             if isinstance(params, (list, tuple)):
                 params = self._quote_params_for_last_executed_query(params)
             else:
-                keys = params.keys()
                 values = tuple(params.values())
                 values = self._quote_params_for_last_executed_query(values)
-                params = dict(zip(keys, values))
+                params = dict(zip(params, values))
             return sql % params
         # For consistency with SQLiteCursorWrapper.execute(), just return sql
         # when there are no parameters. See #13648 and #17158.

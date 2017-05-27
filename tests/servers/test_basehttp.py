@@ -46,7 +46,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                     self.assertIn('GET A %d' % status_code, messages[0])
 
                     # Incorrect levels shouldn't have any messages.
-                    for wrong_level in level_status_codes.keys():
+                    for wrong_level in level_status_codes:
                         if wrong_level != level:
                             messages = _log_level_code(wrong_level, status_code)
                             self.assertEqual(len(messages), 0)

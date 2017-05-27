@@ -21,10 +21,10 @@ from django.utils.timezone import utc
 class RequestsTests(SimpleTestCase):
     def test_httprequest(self):
         request = HttpRequest()
-        self.assertEqual(list(request.GET.keys()), [])
-        self.assertEqual(list(request.POST.keys()), [])
-        self.assertEqual(list(request.COOKIES.keys()), [])
-        self.assertEqual(list(request.META.keys()), [])
+        self.assertEqual(list(request.GET), [])
+        self.assertEqual(list(request.POST), [])
+        self.assertEqual(list(request.COOKIES), [])
+        self.assertEqual(list(request.META), [])
 
         # .GET and .POST should be QueryDicts
         self.assertEqual(request.GET.urlencode(), '')
@@ -76,11 +76,11 @@ class RequestsTests(SimpleTestCase):
             'CONTENT_TYPE': 'text/html; charset=utf8',
             'wsgi.input': BytesIO(b''),
         })
-        self.assertEqual(list(request.GET.keys()), [])
-        self.assertEqual(list(request.POST.keys()), [])
-        self.assertEqual(list(request.COOKIES.keys()), [])
+        self.assertEqual(list(request.GET), [])
+        self.assertEqual(list(request.POST), [])
+        self.assertEqual(list(request.COOKIES), [])
         self.assertEqual(
-            set(request.META.keys()),
+            set(request.META),
             {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'CONTENT_TYPE', 'wsgi.input'}
         )
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
