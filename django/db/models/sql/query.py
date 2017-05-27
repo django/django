@@ -201,6 +201,7 @@ class Query:
         self.deferred_loading = (frozenset(), True)
 
         self.context = {}
+        self._filtered_relations = {}
 
     @property
     def extra(self):
@@ -330,6 +331,7 @@ class Query:
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         obj.context = self.context.copy()
+        obj._filtered_relations = self._filtered_relations.copy()
         return obj
 
     def add_context(self, key, value):
@@ -692,7 +694,7 @@ class Query:
             for model, values in seen.items():
                 callback(target, model, values)
 
-    def table_alias(self, table_name, create=False):
+    def table_alias(self, table_name, create=False, filtered_relation=None):
         """
         Return a table alias for the given table_name and whether this is a
         new alias or not.
@@ -712,8 +714,8 @@ class Query:
             alias_list.append(alias)
         else:
             # The first occurrence of a table uses the table name directly.
-            alias = table_name
-            self.table_map[alias] = [alias]
+            alias = filtered_relation.alias if filtered_relation is not None else table_name
+            self.table_map[table_name] = [alias]
         self.alias_refcount[alias] = 1
         self.tables += (alias,)
         return alias, True
@@ -893,7 +895,7 @@ class Query:
         """
         return len([1 for count in self.alias_refcount.values() if count])
 
-    def join(self, join, reuse=None):
+    def join(self, join, reuse=None, force_reuse=None):
         """
         Return an alias for the join in 'connection', either reusing an
         existing alias for that join or creating a new one. 'connection' is a
@@ -908,6 +910,9 @@ class Query:
         (matching the connection) are reusable, or it can be a set containing
         the aliases that can be reused.
 
+        The 'force_reuse' parameter is the same type of 'reuse' but with difference
+        that it bypasses the 'reuse' paramter. It is used when computing.
+
         A join is always created as LOUTER if the lhs alias is LOUTER to make
         sure we do not generate chains like t1 LOUTER t2 INNER t3. All new
         joins are created as LOUTER if nullable is True.
@@ -917,14 +922,18 @@ class Query:
 
         The 'join_field' is the field we are joining along (if any).
         """
-        reuse = [a for a, j in self.alias_map.items()
-                 if (reuse is None or a in reuse) and j == join]
+        if force_reuse:
+            reuse = [a for a, j in self.alias_map.items()
+                     if (a in force_reuse) and j.equals(join, with_filtered_relation=False)]
+        else:
+            reuse = [a for a, j in self.alias_map.items()
+                     if (reuse is None or a in reuse) and j == join]
         if reuse:
             self.ref_alias(reuse[0])
             return reuse[0]
 
         # No reuse is possible, so we need a new alias.
-        alias, _ = self.table_alias(join.table_name, create=True)
+        alias, _ = self.table_alias(join.table_name, create=True, filtered_relation=join.filtered_relation)
         if join.join_type:
             if self.alias_map[join.parent_alias].join_type == LOUTER or join.nullable:
                 join_type = LOUTER
@@ -1124,7 +1133,7 @@ class Query:
                 (name, lhs.output_field.__class__.__name__))
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
-                     can_reuse=None, allow_joins=True, split_subq=True):
+                     can_reuse=None, force_reuse=None, allow_joins=True, split_subq=True):
         """
         Build a WhereNode for a single filter clause but don't add it
         to this Query. Query.add_q() will then add this filter to the where
@@ -1145,6 +1154,8 @@ class Query:
         upper in the code by add_q().
 
         The 'can_reuse' is a set of reusable joins for multijoins.
+
+        If 'force_reuse' is not None, then only joins in that set will be reused.
 
         The method will create a filter clause that can be added to the current
         query. However, if the filter isn't added to the query then the caller
@@ -1175,7 +1186,8 @@ class Query:
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
-                parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
+                parts, opts, alias, can_reuse=can_reuse, force_reuse=force_reuse,
+                allow_many=allow_many)
 
             # Prevent iterator from being consumed by check_related_objects()
             if isinstance(value, Iterator):
@@ -1240,7 +1252,7 @@ class Query:
     def add_filter(self, filter_clause):
         self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
 
-    def add_q(self, q_object):
+    def add_q(self, q_object, where=None, used_aliases=None):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1251,11 +1263,15 @@ class Query:
         # (Consider case where rel_a is LOUTER and rel_a__col=1 is added - if
         # rel_a doesn't produce any rows, then the whole condition must fail.
         # So, demotion is OK.
+        if where is None:
+            where = self.where
+        if used_aliases is None:
+            used_aliases = self.used_aliases
         existing_inner = set(
             (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        clause, _ = self._add_q(q_object, used_aliases)
         if clause:
-            self.where.add(clause, AND)
+            where.add(clause, AND)
         self.demote_joins(existing_inner)
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
@@ -1285,6 +1301,39 @@ class Query:
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
+    def build_filtered_relation_q(self, q_object, force_reuse, branch_negated=False, current_negated=False):
+        """
+        Adds a Q-object to the current filter.
+        """
+        connector = q_object.connector
+        current_negated = current_negated ^ q_object.negated
+        branch_negated = branch_negated or q_object.negated
+        target_clause = self.where_class(connector=connector,
+                                         negated=q_object.negated)
+        for child in q_object.children:
+            if isinstance(child, Node):
+                child_clause, _ = self._build_filtered_relation_q(
+                    child, force_reuse=force_reuse, branch_negated=branch_negated,
+                    current_negated=current_negated)
+            else:
+                child_clause, _ = self.build_filter(
+                    child, force_reuse=force_reuse, branch_negated=branch_negated,
+                    current_negated=current_negated,
+                    allow_joins=True, split_subq=False,
+                )
+            if child_clause:
+                target_clause.add(child_clause, connector)
+        return target_clause
+
+    def add_filtered_relation(self, filtered_relation):
+        for lookup in chain((filtered_relation.relation_name,),
+                            dict(filtered_relation.condition.children).keys()):
+            lookups, parts, _ = self.solve_lookup_type(lookup)
+            if len(parts) > (1 + len(lookups)):
+                raise FieldError("Filtered relation %r cannot operate on foreign key %r." % (
+                    filtered_relation.alias, lookup))
+        self._filtered_relations[filtered_relation.alias] = filtered_relation
+
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
         Walk the list of names and turns them into PathInfo tuples. A single
@@ -1307,12 +1356,15 @@ class Query:
                 name = opts.pk.name
 
             field = None
+            filtered_relation = None
             try:
                 field = opts.get_field(name)
             except FieldDoesNotExist:
                 if name in self.annotation_select:
                     field = self.annotation_select[name].output_field
-
+                elif name in self._filtered_relations and pos == 0:
+                    filtered_relation = self._filtered_relations[name]
+                    field = opts.get_field(filtered_relation.relation_name)
             if field is not None:
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
@@ -1336,7 +1388,8 @@ class Query:
                 pos -= 1
                 if pos == -1 or fail_on_missing:
                     field_names = list(get_field_names_from_opts(opts))
-                    available = sorted(field_names + list(self.annotation_select))
+                    available = sorted(field_names + list(self.annotation_select) +
+                                       list(self._filtered_relations))
                     raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
@@ -1350,7 +1403,7 @@ class Query:
                     cur_names_with_path[1].extend(path_to_parent)
                     opts = path_to_parent[-1].to_opts
             if hasattr(field, 'get_path_info'):
-                pathinfos = field.get_path_info()
+                pathinfos = field.get_path_info(filtered_relation)
                 if not allow_many:
                     for inner_pos, p in enumerate(pathinfos):
                         if p.m2m:
@@ -1375,7 +1428,8 @@ class Query:
                 break
         return path, final_field, targets, names[pos + 1:]
 
-    def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
+    def setup_joins(self, names, opts, alias, can_reuse=None, force_reuse=None,
+                    allow_many=True):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1386,6 +1440,9 @@ class Query:
         can be None in which case all joins are reusable or a set of aliases
         that can be reused. Note that non-reverse foreign keys are always
         reusable when using setup_joins().
+
+        The 'force_reuse' can be used to skip 'can_reuse' parameter and force the relation
+        on given connections.
 
         If 'allow_many' is False, then any reverse foreign key seen will
         generate a MultiJoin exception.
@@ -1409,15 +1466,25 @@ class Query:
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
         for join in path:
+            if join.filtered_relation:
+                filtered_relation = join.filtered_relation.clone()
+                table_alias = filtered_relation.alias
+            else:
+                filtered_relation = None
+                table_alias = None
             opts = join.to_opts
             if join.direct:
                 nullable = self.is_nullable(join.join_field)
             else:
                 nullable = True
-            connection = Join(opts.db_table, alias, None, INNER, join.join_field, nullable)
+            connection = Join(
+                opts.db_table, alias, table_alias, INNER, join.join_field, nullable,
+                filtered_relation=filtered_relation)
             reuse = can_reuse if join.m2m else None
-            alias = self.join(connection, reuse=reuse)
+            alias = self.join(connection, reuse=reuse, force_reuse=force_reuse)
             joins.append(alias)
+            if filtered_relation:
+                filtered_relation.path = joins[:]
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):
@@ -1436,6 +1503,8 @@ class Query:
         joins = joins[:]
         for pos, info in enumerate(reversed(path)):
             if len(joins) == 1 or not info.direct:
+                break
+            if info.filtered_relation:
                 break
             join_targets = set(t.column for t in info.join_field.foreign_related_fields)
             cur_targets = set(t.column for t in targets)
@@ -1462,7 +1531,7 @@ class Query:
             field_list = name.split(LOOKUP_SEP)
             field, sources, opts, join_list, path = self.setup_joins(
                 field_list, self.get_meta(),
-                self.get_initial_alias(), reuse)
+                self.get_initial_alias(), can_reuse=reuse)
             targets, _, join_list = self.trim_joins(sources, join_list, path)
             if len(targets) > 1:
                 raise FieldError("Referencing multicolumn fields with F() objects "
@@ -1493,6 +1562,13 @@ class Query:
         """
         # Generate the inner query.
         query = Query(self.model)
+        if self._filtered_relations:
+            query.alias_map = self.alias_map.copy()
+            query.alias_refcount = self.alias_refcount.copy()
+            query.table_map = self.table_map.copy()
+            query.tables = self.tables[:]
+            query._filtered_relations = self._filtered_relations.copy()
+
         query.add_filter(filter_expr)
         query.clear_ordering(True)
         # Try to have as simple as possible subquery -> trim leading joins from
@@ -1636,7 +1712,8 @@ class Query:
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra) + list(self.annotation_select))
+                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra) +
+                               list(self.annotation_select) + list(self._filtered_relations))
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
 

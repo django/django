@@ -562,6 +562,7 @@ class ManagerTest(SimpleTestCase):
         'create',
         'bulk_create',
         'filter',
+        'filtered_relation',
         'aggregate',
         'annotate',
         'complex_filter',

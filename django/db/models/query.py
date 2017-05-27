@@ -52,6 +52,7 @@ class ModelIterable(BaseIterable):
                                                   compiler.annotation_col_map)
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
+        attr_name = klass_info.get('attr_name', '')
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
         init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
@@ -986,6 +987,14 @@ class QuerySet:
         clone._db = alias
         return clone
 
+    def filtered_relation(self, relation_name, alias=None, condition=None):
+        """
+        Allows to add extra filter on relations.
+        """
+        clone = self._clone()
+        clone.query.add_filtered_relation(FilteredRelation(relation_name, alias, condition))
+        return clone
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
@@ -1654,15 +1663,8 @@ class RelatedPopulator:
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
         field = klass_info['field']
-        reverse = klass_info['reverse']
-        self.reverse_cache_name = None
-        if reverse:
-            self.cache_name = field.remote_field.get_cache_name()
-            self.reverse_cache_name = field.get_cache_name()
-        else:
-            self.cache_name = field.get_cache_name()
-            if field.unique:
-                self.reverse_cache_name = field.remote_field.get_cache_name()
+        self.cache_name = klass_info['cache_name']
+        self.reverse_cache_name = klass_info['reverse_cache_name']
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:
@@ -1688,3 +1690,36 @@ def get_related_populators(klass_info, select, db):
         rel_cls = RelatedPopulator(rel_klass_info, select, db)
         iterators.append(rel_cls)
     return iterators
+
+
+class FilteredRelation(object):
+    def __init__(self, relation_name, alias, condition):
+        if not relation_name:
+            raise exceptions.FieldError("FilterRelation expects a non-empty relation_name")
+        if not alias:
+            raise exceptions.FieldError("FilterRelation expects a non-empty alias")
+        if relation_name == alias:
+            raise exceptions.FieldError("FilterRelation must be used with an alias %r"
+                                        " different from relation_name %r" % (alias, relation_name))
+        self.relation_name = relation_name
+        self.alias = alias
+        self.condition = condition
+        self.path = []
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (self.relation_name == other.relation_name and
+                    self.alias == other.alias and
+                    self.condition == other.condition)
+        return False
+
+    def clone(self):
+        clone = FilteredRelation(self.relation_name, self.alias, self.condition)
+        clone.path = self.path[:]
+        return clone
+
+    def as_sql(self, compiler, connection):
+        # The condition in self.filtered_relation needs to be resolved.
+        query = compiler.query
+        where = query.build_filtered_relation_q(self.condition, force_reuse=set(self.path))
+        return compiler.compile(where)

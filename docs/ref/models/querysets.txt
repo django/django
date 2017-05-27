@@ -1234,6 +1234,37 @@ where prefetching with a custom ``QuerySet`` is useful:
     specific order to avoid creating extra queries; therefore it's recommended
     to always carefully order ``prefetch_related`` arguments.
 
+``filtered_relation()``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.0
+
+.. method:: filtered_relation(relation_name, alias=None, condition=None)
+
+This method allows to pass filtering options inside the the ``ON`` clause when
+a ``JOIN`` is performed.
+It does not act on the default relationship but on the given alias only.
+``alias`` and ``condition`` are required and must be passed as named argument.
+
+
+Example::
+
+    >>> Restaurant.objects.filtered_relation(
+    ...    'pizzas',
+    ...    alias='pizzas_vegetarian',
+    ...    condition=Q(pizzas__vegetarian=True)).filter(pizzas_vegetarian__name__icontains='Mozzarella')
+
+This query will join the model Restaurant only to Pizzas that have vegetarian
+flag to True.  This results into a performance improvement, noticeable if the
+join is performed through a large number of rows.  Because the filtering from
+the ``WHERE`` clause will only operate on a subset of Pizzas (the vegetarian
+ones).
+
+You need to be aware of some limitations.
+The :meth:`filtered_relation()` can not have condition that
+span over deep relations. The condition can only apply on fields that have
+``Field.is_relation is False``.
+
 ``extra()``
 ~~~~~~~~~~~
 

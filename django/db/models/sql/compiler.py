@@ -767,8 +767,9 @@ class SQLCompiler:
             klass_info = {
                 'model': f.remote_field.model,
                 'field': f,
-                'reverse': False,
                 'from_parent': False,
+                'cache_name': f.get_cache_name(),
+                'reverse_cache_name': f.remote_field.get_cache_name() if f.unique else None
             }
             related_klass_infos.append(klass_info)
             select_fields = []
@@ -804,8 +805,9 @@ class SQLCompiler:
                 klass_info = {
                     'model': model,
                     'field': f,
-                    'reverse': True,
                     'from_parent': from_parent,
+                    'cache_name': f.remote_field.get_cache_name(),
+                    'reverse_cache_name': f.get_cache_name()
                 }
                 related_klass_infos.append(klass_info)
                 select_fields = []
@@ -820,6 +822,37 @@ class SQLCompiler:
                     select, model._meta, alias, cur_depth + 1,
                     next, restricted)
                 get_related_klass_infos(klass_info, next_klass_infos)
+            for name in list(requested.keys()):
+                # filtered relations work only on topmost level
+                if cur_depth > 1:
+                    break
+                if name in self.query._filtered_relations:
+                    fields_found.add(name)
+                    f, _, join_opts, joins, _ = self.query.setup_joins([name], opts, root_alias)
+                    model = join_opts.model
+                    alias = joins[-1]
+                    from_parent = issubclass(model, opts.model) and model is not opts.model
+                    klass_info = {
+                        'model': model,
+                        'field': f,
+                        'from_parent': from_parent,
+                        'cache_name': name,
+                        'reverse_cache_name': f.remote_field.get_cache_name()
+                    }
+                    related_klass_infos.append(klass_info)
+                    select_fields = []
+                    columns = self.get_default_columns(
+                        start_alias=alias, opts=model._meta, from_parent=opts.model)
+                    for col in columns:
+                        select_fields.append(len(select))
+                        select.append((col, None))
+                    klass_info['select_fields'] = select_fields
+                    next = requested.get(name, {})
+                    next_klass_infos = self.get_related_selections(
+                        select, model._meta, alias, cur_depth + 1,
+                        next, restricted)
+                    get_related_klass_infos(klass_info, next_klass_infos)
+            # somehow check query.filtered_relation...
             fields_not_found = set(requested.keys()).difference(fields_found)
             if fields_not_found:
                 invalid_fields = ("'%s'" % s for s in fields_not_found)
