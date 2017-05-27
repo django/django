@@ -486,7 +486,7 @@ msgstr "Tarix (vaxt ilə)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' dəyişəninin dəyəri rəqəm olmalıdır."
 
 msgid "Decimal number"
 msgstr "Rasional ədəd"
@@ -521,7 +521,7 @@ msgstr "IP ünvan"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' dəyişəninin qiymədi doğru və ya yanlış olmalıdır."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Bul (Ya Doğru, ya Yalan, ya da Heç nə)"
