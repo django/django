@@ -41,7 +41,7 @@ class KeysValidator:
             self.messages.update(messages)
 
     def __call__(self, value):
-        keys = set(value.keys())
+        keys = set(value)
         missing_keys = self.keys - keys
         if missing_keys:
             raise ValidationError(

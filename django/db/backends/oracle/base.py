@@ -452,7 +452,7 @@ class FormatStylePlaceholderCursor:
             query = query
         elif hasattr(params, 'keys'):
             # Handle params as dict
-            args = {k: ":%s" % k for k in params.keys()}
+            args = {k: ":%s" % k for k in params}
             query = query % args
         elif unify_by_values and len(params) > 0:
             # Handle params as a dict with unified query parameters by their

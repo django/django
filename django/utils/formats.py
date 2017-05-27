@@ -131,7 +131,7 @@ def get_format(format_type, lang=None, use_l10n=None):
         if format_type not in FORMAT_SETTINGS:
             return format_type
         val = getattr(settings, format_type)
-    elif format_type in ISO_INPUT_FORMATS.keys():
+    elif format_type in ISO_INPUT_FORMATS:
         # If a list of input formats from one of the format_modules was
         # retrieved, make sure the ISO_INPUT_FORMATS are in this list.
         val = list(val)

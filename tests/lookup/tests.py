@@ -136,7 +136,7 @@ class LookupTests(TestCase):
         Author.objects.bulk_create([Author() for i in range(test_range - Author.objects.count())])
         authors = {author.pk: author for author in Author.objects.all()}
         with self.assertNumQueries(expected_num_queries):
-            self.assertEqual(Author.objects.in_bulk(authors.keys()), authors)
+            self.assertEqual(Author.objects.in_bulk(authors), authors)
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
@@ -207,7 +207,7 @@ class LookupTests(TestCase):
             'id_plus_eight': 'id+8',
         }
         self.assertSequenceEqual(
-            Article.objects.filter(id=self.a1.id).extra(select=data).values(*data.keys()),
+            Article.objects.filter(id=self.a1.id).extra(select=data).values(*data),
             [{
                 'id_plus_one': self.a1.id + 1,
                 'id_plus_two': self.a1.id + 2,

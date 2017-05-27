@@ -192,7 +192,7 @@ class Options:
 
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
-                raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys()))
+                raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs))
         else:
             self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
         del self.meta

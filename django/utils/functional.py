@@ -82,7 +82,7 @@ def lazy(func, *resultclasses):
         def __prepare_class__(cls):
             for resultclass in resultclasses:
                 for type_ in resultclass.mro():
-                    for method_name in type_.__dict__.keys():
+                    for method_name in type_.__dict__:
                         # All __promise__ return the same wrapper method, they
                         # look up the correct implementation when called.
                         if hasattr(cls, method_name):

@@ -232,7 +232,7 @@ class HashedFilesMixin:
         # build a list of adjustable files
         adjustable_paths = [
             path for path in paths
-            if matches_patterns(path, self._patterns.keys())
+            if matches_patterns(path, self._patterns)
         ]
         # Do a single pass first. Post-process all files once, then repeat for
         # adjustable files.
@@ -261,7 +261,7 @@ class HashedFilesMixin:
         def path_level(name):
             return len(name.split(os.sep))
 
-        for name in sorted(paths.keys(), key=path_level, reverse=True):
+        for name in sorted(paths, key=path_level, reverse=True):
             substitutions = True
             # use the original, local file, not the copied-but-unprocessed
             # file, which might be somewhere far away, like S3

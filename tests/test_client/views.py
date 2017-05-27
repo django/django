@@ -330,4 +330,4 @@ def django_project_redirect(request):
 
 def upload_view(request):
     """Prints keys of request.FILES to the response."""
-    return HttpResponse(', '.join(request.FILES.keys()))
+    return HttpResponse(', '.join(request.FILES))

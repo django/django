@@ -138,7 +138,7 @@ class ManagementUtility:
     def main_help_text(self, commands_only=False):
         """Return the script's main help text, as a string."""
         if commands_only:
-            usage = sorted(get_commands().keys())
+            usage = sorted(get_commands())
         else:
             usage = [
                 "",
@@ -154,7 +154,7 @@ class ManagementUtility:
                     app = app.rpartition('.')[-1]
                 commands_dict[app].append(name)
             style = color_style()
-            for app in sorted(commands_dict.keys()):
+            for app in sorted(commands_dict):
                 usage.append("")
                 usage.append(style.NOTICE("[%s]" % app))
                 for name in sorted(commands_dict[app]):

@@ -334,7 +334,7 @@ class QuerySet:
             query.add_annotation(aggregate_expr, alias, is_summary=True)
             if not query.annotations[alias].contains_aggregate:
                 raise TypeError("%s is not an aggregate expression" % alias)
-        return query.get_aggregation(self.db, kwargs.keys())
+        return query.get_aggregation(self.db, kwargs)
 
     def count(self):
         """

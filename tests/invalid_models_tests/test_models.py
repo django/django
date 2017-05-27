@@ -14,7 +14,7 @@ def get_max_column_name_length():
     allowed_len = None
     db_alias = None
 
-    for db in settings.DATABASES.keys():
+    for db in settings.DATABASES:
         connection = connections[db]
         max_name_length = connection.ops.max_name_length()
         if max_name_length is None or connection.features.truncates_names:
