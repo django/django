@@ -3,7 +3,7 @@ import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings, mock
 from django.test.utils import require_jinja2
 from django.urls import resolve
 from django.views.generic import RedirectView, TemplateView, View
@@ -232,6 +232,21 @@ class ViewTest(unittest.TestCase):
         view = PostOnlyView()
         response = view.dispatch(self.rf.head('/'))
         self.assertEqual(response.status_code, 405)
+
+    def test_pre_handler_called_options(self):
+        view = SimpleView()
+        view.pre_handler = mock.Mock()
+        response = view.dispatch(self.rf.options('/'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(view.pre_handler.call_count, 1)
+
+    def test_pre_handler_called_get(self):
+        view = SimpleView()
+        view.pre_handler = mock.Mock()
+        response = view.dispatch(self.rf.get('/'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'This is a simple view')
+        self.assertEqual(view.pre_handler.call_count, 1)
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')

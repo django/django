@@ -25,8 +25,9 @@ MRO is an acronym for Method Resolution Order.
     **Method Flowchart**
 
     1. :meth:`dispatch()`
-    2. :meth:`http_method_not_allowed()`
-    3. :meth:`options()`
+    2. :meth:`pre_handler()``
+    3. :meth:`http_method_not_allowed()`
+    4. :meth:`options()`
 
     **Example views.py**::
 
@@ -76,12 +77,27 @@ MRO is an acronym for Method Resolution Order.
 
         The default implementation will inspect the HTTP method and attempt to
         delegate to a method that matches the HTTP method; a ``GET`` will be
-        delegated to ``get()``, a ``POST`` to ``post()``, and so on.
+        delegated to ``get()``, a ``POST`` to ``post()``, and so on. Before
+        calling the respective method, it will execute the method
+        ``pre_handler()``, for any common logic shared across different methods.
 
         By default, a ``HEAD`` request will be delegated to ``get()``.
         If you need to handle ``HEAD`` requests in a different way than ``GET``,
         you can override the ``head()`` method. See
         :ref:`supporting-other-http-methods` for an example.
+
+        .. versionadded:: 1.10
+
+        New ``pre_handler()`` method gets called before the HTTP method handler.
+
+    .. method:: pre_handler(request, *args, **kwargs)
+
+        Empty method that can be overridden to write logic shared across different
+        handlers without having to override the ``dispatch()`` method.
+
+        .. versionadded:: 1.10
+
+        Added method
 
     .. method:: http_method_not_allowed(request, *args, **kwargs)
 

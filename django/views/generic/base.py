@@ -81,9 +81,16 @@ class View:
         # request method isn't on the approved list.
         if request.method.lower() in self.http_method_names:
             handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+            # Common code to get executed regardless the handler we'll use
+            self.pre_handler(request, *args, **kwargs)
         else:
             handler = self.http_method_not_allowed
         return handler(request, *args, **kwargs)
+
+    def pre_handler(self, request, *args, **kwargs):
+        # To be overriden in child classes to add common logic between
+        # different handlers without having to override the dispatch method
+        pass
 
     def http_method_not_allowed(self, request, *args, **kwargs):
         logger.warning(
