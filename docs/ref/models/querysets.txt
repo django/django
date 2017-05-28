@@ -2036,15 +2036,32 @@ evaluated will force it to evaluate again, repeating the query.
 Also, use of ``iterator()`` causes previous ``prefetch_related()`` calls to be
 ignored since these two optimizations do not make sense together.
 
-Some Python database drivers still load the entire result set into memory, but
-won't cache results after iterating over them. Oracle and :ref:`PostgreSQL
-<postgresql-server-side-cursors>` use server-side cursors to stream results
-from the database without loading the entire result set into memory.
+Depending on the database backend, query results will either be loaded all at
+once or streamed from the database using server-side cursors.
+
+With server-side cursors
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Oracle and :ref:`PostgreSQL <postgresql-server-side-cursors>` use server-side
+cursors to stream results from the database without loading the entire result
+set into memory.
+
+The Oracle database driver always uses server-side cursors.
 
 On PostgreSQL, server-side cursors will only be used when the
 :setting:`DISABLE_SERVER_SIDE_CURSORS <DATABASE-DISABLE_SERVER_SIDE_CURSORS>`
 setting is ``False``. Read :ref:`transaction-pooling-server-side-cursors` if
-you're using a connection pooler configured in transaction pooling mode.
+you're using a connection pooler configured in transaction pooling mode. When
+server-side cursors are disabled, the behavior is the same as databases that
+don't support server-side cursors.
+
+Without server-side cursors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+MySQL and SQLite don't support streaming results, hence the Python database
+drivers load the entire result set into memory. The result set is then
+transformed into Python row objects by the database adapter using the
+``fetchmany()`` method defined in :pep:`249`.
 
 .. versionchanged:: 1.11
 
