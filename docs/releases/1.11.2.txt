@@ -58,3 +58,7 @@ Bugfixes
 
 * Fixed a regression where ``file_move_safe()`` crashed when moving files to a
   CIFS mount (:ticket:`28170`).
+
+* Moved the ``ImageField`` file extension validation added in Django 1.11 from
+  the model field to the form field to reallow the use case of storing images
+  without an extension (:ticket:`28242`).

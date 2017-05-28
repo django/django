@@ -610,6 +610,7 @@ class FileField(Field):
 
 
 class ImageField(FileField):
+    default_validators = [validators.validate_image_file_extension]
     default_error_messages = {
         'invalid_image': _(
             "Upload a valid image. The file you uploaded was either not an "
