@@ -1905,6 +1905,25 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             )
             self.assertFalse(os.path.exists(testproject_dir))
 
+    def test_importable_project_name(self):
+        """
+        startproject validates that project name doesn't clash with existing
+        Python modules.
+        """
+        bad_name = 'os'
+        args = ['startproject', bad_name]
+        testproject_dir = os.path.join(self.test_dir, bad_name)
+        self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(
+            err,
+            "CommandError: 'os' conflicts with the name of an existing "
+            "Python module and cannot be used as a project name. Please try "
+            "another name."
+        )
+        self.assertFalse(os.path.exists(testproject_dir))
+
     def test_simple_project_different_directory(self):
         "Make sure the startproject management command creates a project in a specific directory"
         args = ['startproject', 'testproject', 'othertestproject']
@@ -2083,6 +2102,43 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             self.assertEqual(f.read().splitlines(False), [
                 'Some non-ASCII text for testing ticket #18091:',
                 'üäö €'])
+
+
+class StartApp(AdminScriptTestCase):
+
+    def test_invalid_name(self):
+        """startapp validates that app name is a valid Python identifier."""
+        for bad_name in ('7testproject', '../testproject'):
+            args = ['startapp', bad_name]
+            testproject_dir = os.path.join(self.test_dir, bad_name)
+            self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+            out, err = self.run_django_admin(args)
+            self.assertOutput(
+                err,
+                "CommandError: '{}' is not a valid app name. Please make "
+                "sure the name is a valid identifier.".format(bad_name)
+            )
+            self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_importable_name(self):
+        """
+        startapp validates that app name doesn't clash with existing Python
+        modules.
+        """
+        bad_name = 'os'
+        args = ['startapp', bad_name]
+        testproject_dir = os.path.join(self.test_dir, bad_name)
+        self.addCleanup(shutil.rmtree, testproject_dir, True)
+
+        out, err = self.run_django_admin(args)
+        self.assertOutput(
+            err,
+            "CommandError: 'os' conflicts with the name of an existing "
+            "Python module and cannot be used as an app name. Please try "
+            "another name."
+        )
+        self.assertFalse(os.path.exists(testproject_dir))
 
 
 class DiffSettings(AdminScriptTestCase):
