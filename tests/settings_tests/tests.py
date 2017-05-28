@@ -238,7 +238,7 @@ class SettingsTests(SimpleTestCase):
             getattr(settings, 'TEST')
 
     def test_settings_delete_wrapped(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaisesMessage(TypeError, "can't delete _wrapped."):
             delattr(settings, '_wrapped')
 
     def test_override_settings_delete(self):

@@ -319,7 +319,8 @@ class BilateralTransformTests(TestCase):
 
     def test_bilateral_inner_qs(self):
         with register_lookup(models.CharField, UpperBilateralTransform):
-            with self.assertRaises(NotImplementedError):
+            msg = 'Bilateral transformations on nested querysets are not supported.'
+            with self.assertRaisesMessage(NotImplementedError, msg):
                 Author.objects.filter(name__upper__in=Author.objects.values_list('name'))
 
     def test_bilateral_multi_value(self):
@@ -501,13 +502,14 @@ class LookupTransformCallOrderTests(TestCase):
     def test_call_order(self):
         with register_lookup(models.DateField, TrackCallsYearTransform):
             # junk lookup - tries lookup, then transform, then fails
-            with self.assertRaises(FieldError):
+            msg = "Unsupported lookup 'junk' for IntegerField or join on the field not permitted."
+            with self.assertRaisesMessage(FieldError, msg):
                 Author.objects.filter(birthdate__testyear__junk=2012)
             self.assertEqual(TrackCallsYearTransform.call_order,
                              ['lookup', 'transform'])
             TrackCallsYearTransform.call_order = []
             # junk transform - tries transform only, then fails
-            with self.assertRaises(FieldError):
+            with self.assertRaisesMessage(FieldError, msg):
                 Author.objects.filter(birthdate__testyear__junk__more_junk=2012)
             self.assertEqual(TrackCallsYearTransform.call_order,
                              ['transform'])

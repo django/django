@@ -212,7 +212,8 @@ class AssertQuerysetEqualTests(TestCase):
     def test_undefined_order(self):
         # Using an unordered queryset with more than one ordered value
         # is an error.
-        with self.assertRaises(ValueError):
+        msg = 'Trying to compare non-ordered queryset against more than one ordered values'
+        with self.assertRaisesMessage(ValueError, msg):
             self.assertQuerysetEqual(
                 Person.objects.all(),
                 [repr(self.p1), repr(self.p2)]
@@ -415,23 +416,29 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             self.assertTemplateUsed(response, 'template_used/base.html')
 
     def test_failure(self):
-        with self.assertRaises(TypeError):
+        msg = 'response and/or template_name argument must be provided'
+        with self.assertRaisesMessage(TypeError, msg):
             with self.assertTemplateUsed():
                 pass
 
-        with self.assertRaises(AssertionError):
+        msg = 'No templates used to render the response'
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed(''):
                 pass
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed(''):
                 render_to_string('template_used/base.html')
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed(template_name=''):
                 pass
 
-        with self.assertRaises(AssertionError):
+        msg = (
+            'template_used/base.html was not rendered. Following '
+            'templates were rendered: template_used/alternative.html'
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 

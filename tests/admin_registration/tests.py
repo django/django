@@ -30,7 +30,8 @@ class TestRegistration(SimpleTestCase):
 
     def test_prevent_double_registration(self):
         self.site.register(Person)
-        with self.assertRaises(admin.sites.AlreadyRegistered):
+        msg = 'The model Person is already registered'
+        with self.assertRaisesMessage(admin.sites.AlreadyRegistered, msg):
             self.site.register(Person)
 
     def test_registration_with_star_star_options(self):
@@ -55,7 +56,8 @@ class TestRegistration(SimpleTestCase):
         Exception is raised when trying to register an abstract model.
         Refs #12004.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = 'The model Location is abstract, so it cannot be registered with admin.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.site.register(Location)
 
     def test_is_registered_model(self):

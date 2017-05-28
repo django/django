@@ -246,7 +246,8 @@ class BasicExpressionsTests(TestCase):
         )
 
         with transaction.atomic():
-            with self.assertRaises(FieldError):
+            msg = "Joined field references are not permitted in this query"
+            with self.assertRaisesMessage(FieldError, msg):
                 Company.objects.exclude(
                     ceo__firstname=F('point_of_contact__firstname')
                 ).update(name=F('point_of_contact__lastname'))
@@ -293,13 +294,15 @@ class BasicExpressionsTests(TestCase):
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
-        with self.assertRaises(ValueError):
+        msg = 'F(ceo)": "Company.point_of_contact" must be a "Employee" instance.'
+        with self.assertRaisesMessage(ValueError, msg):
             test()
 
         test_gmbh.point_of_contact = test_gmbh.ceo
         test_gmbh.save()
         test_gmbh.name = F("ceo__last_name")
-        with self.assertRaises(FieldError):
+        msg = 'Joined field references are not permitted in this query'
+        with self.assertRaisesMessage(FieldError, msg):
             test_gmbh.save()
 
     def test_object_update_unsaved_objects(self):

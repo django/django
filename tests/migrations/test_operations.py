@@ -1945,7 +1945,7 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_runpython", editor, project_state, new_state)
         self.assertEqual(project_state.apps.get_model("test_runpython", "Pony").objects.count(), 0)
         # Now test we can't use a string
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'RunPython must be supplied with a callable'):
             migrations.RunPython("print 'ahahaha'")
         # And deconstruction
         definition = operation.deconstruct()

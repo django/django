@@ -321,27 +321,39 @@ class QueryTestCase(TestCase):
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
         # Set a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<Person: Marty Alchin>": the current database '
+            'router prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.edited.set([pro, dive])
 
         # Add to an m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot add "<Book: Dive into Python>": instance is on '
+            'database "default", value is on database "other"'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.book_set.add(dive)
 
         # Set a m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.book_set.set([pro, dive])
 
         # Add to a reverse m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot add "<Person: Marty Alchin>": instance is on '
+            'database "other", value is on database "default"'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='other'):
                 dive.authors.add(marty)
 
         # Set a reverse m2m with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='other'):
                 dive.authors.set([mark, marty])
 
@@ -537,16 +549,20 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
 
         # Set a foreign key with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<Person: Marty Alchin>": the current database '
+            'router prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             dive.editor = marty
 
         # Set a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.edited.set([pro, dive])
 
         # Add to a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='default'):
                 marty.edited.add(dive)
 
@@ -655,7 +671,11 @@ class QueryTestCase(TestCase):
 
         # Set a one-to-one relation with an object from a different database
         alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<UserProfile: UserProfile object (1)>": the '
+            'current database router prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             bob.userprofile = alice_profile
 
         # BUT! if you assign a FK object when the base object hasn't
@@ -810,11 +830,19 @@ class QueryTestCase(TestCase):
         Review.objects.using('other').create(source="Python Weekly", content_object=dive)
 
         # Set a foreign key with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<ContentType: book>": the current database router '
+            'prevents this relation.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             review1.content_object = dive
 
         # Add to a foreign key set with an object from a different database
-        with self.assertRaises(ValueError):
+        msg = (
+            "<Review: Python Monthly> instance isn't saved. "
+            "Use bulk=False or save the object first."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             with transaction.atomic(using='other'):
                 dive.reviews.add(review1)
 
@@ -913,11 +941,15 @@ class QueryTestCase(TestCase):
         # When you call __str__ on the query object, it doesn't know about using
         # so it falls back to the default. If the subquery explicitly uses a
         # different database, an error should be raised.
-        with self.assertRaises(ValueError):
+        msg = (
+            "Subqueries aren't allowed across different databases. Force the "
+            "inner query to be evaluated using `list(inner_query)`."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             str(qs.query)
 
         # Evaluating the query shouldn't work, either
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             for obj in qs:
                 pass
 

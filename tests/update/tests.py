@@ -123,7 +123,8 @@ class AdvancedTests(TestCase):
         We do not support update on already sliced query sets.
         """
         method = DataPoint.objects.all()[:2].update
-        with self.assertRaises(AssertionError):
+        msg = 'Cannot update a query once a slice has been taken.'
+        with self.assertRaisesMessage(AssertionError, msg):
             method(another_value='another thing')
 
     def test_update_respects_to_field(self):

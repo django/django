@@ -175,7 +175,11 @@ class DetailViewTest(TestCase):
             self.client.get('/detail/author/invalid/url/')
 
     def test_invalid_queryset(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'AuthorDetail is missing a QuerySet. Define AuthorDetail.model, '
+            'AuthorDetail.queryset, or override AuthorDetail.get_queryset().'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/detail/author/invalid/qs/')
 
     def test_non_model_object_with_meta(self):

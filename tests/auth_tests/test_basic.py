@@ -97,13 +97,18 @@ class BasicTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='badsetting')
     def test_swappable_user_bad_setting(self):
         "The alternate user setting must point to something in the format app.model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = "AUTH_USER_MODEL must be of the form 'app_label.model_name'"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
     def test_swappable_user_nonexistent_model(self):
         "The current user model must point to an installed model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "AUTH_USER_MODEL refers to model 'thismodel.doesntexist' "
+            "that has not been installed"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     def test_user_verbose_names_translatable(self):

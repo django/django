@@ -452,7 +452,11 @@ class SyndicationFeedTest(FeedTestCase):
         An ImproperlyConfigured is raised if no link could be found for the
         item(s).
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'Give your Article class a get_absolute_url() method, or define '
+            'an item_link() method in your Feed class.'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/syndication/articles/')
 
     def test_template_feed(self):

@@ -315,7 +315,11 @@ class LookupTests(TestCase):
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a nonexistent field name in values() (a field that is neither in the
         # model nor in extra(select)).
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'id_plus_two' into field. Choices are: "
+            "author, author_id, headline, id, id_plus_one, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
         self.assertSequenceEqual(
@@ -733,11 +737,16 @@ class LookupTests(TestCase):
         """
         A lookup query containing non-fields raises the proper exception.
         """
-        with self.assertRaises(FieldError):
+        msg = "Unsupported lookup 'blahblah' for CharField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah=99)
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah__exact=99)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'blahblah' into field. Choices are: "
+            "author, author_id, headline, id, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(blahblah=99)
 
     def test_lookup_collision(self):

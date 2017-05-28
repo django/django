@@ -1338,7 +1338,8 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 class TestIsBoundBehavior(SimpleTestCase):
     def test_no_data_raises_validation_error(self):
-        with self.assertRaises(ValidationError):
+        msg = 'ManagementForm data is missing or has been tampered with'
+        with self.assertRaisesMessage(ValidationError, msg):
             ArticleFormSet({}).is_valid()
 
     def test_with_management_data_attrs_work_fine(self):

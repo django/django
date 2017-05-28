@@ -246,7 +246,8 @@ class SelectForUpdateTests(TransactionTestCase):
         A TransactionManagementError is raised
         when a select_for_update query is executed outside of a transaction.
         """
-        with self.assertRaises(transaction.TransactionManagementError):
+        msg = 'select_for_update cannot be used outside of a transaction.'
+        with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
             list(Person.objects.all().select_for_update())
 
     @skipUnlessDBFeature('has_select_for_update')
@@ -257,7 +258,8 @@ class SelectForUpdateTests(TransactionTestCase):
         only when the query is executed.
         """
         people = Person.objects.all().select_for_update()
-        with self.assertRaises(transaction.TransactionManagementError):
+        msg = 'select_for_update cannot be used outside of a transaction.'
+        with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
             list(people)
 
     @skipUnlessDBFeature('supports_select_for_update_with_limit')

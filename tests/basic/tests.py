@@ -335,8 +335,8 @@ class ModelTest(TestCase):
         self.assertEqual(article.headline, notlazy)
 
     def test_emptyqs(self):
-        # Can't be instantiated
-        with self.assertRaises(TypeError):
+        msg = "EmptyQuerySet can't be instantiated"
+        with self.assertRaisesMessage(TypeError, msg):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
         self.assertNotIsInstance('', EmptyQuerySet)
@@ -397,7 +397,8 @@ class ModelTest(TestCase):
     def test_hash(self):
         # Value based on PK
         self.assertEqual(hash(Article(id=1)), hash(1))
-        with self.assertRaises(TypeError):
+        msg = 'Model instances without primary key value are unhashable'
+        with self.assertRaisesMessage(TypeError, msg):
             # No PK value -> unhashable (because save() would then change
             # hash)
             hash(Article())
@@ -618,7 +619,7 @@ class SelectOnSaveTests(TestCase):
         with self.assertNumQueries(1):
             asos.save(force_update=True)
         Article.objects.all().delete()
-        with self.assertRaises(DatabaseError):
+        with self.assertRaisesMessage(DatabaseError, 'Forced update did not affect any rows.'):
             with self.assertNumQueries(1):
                 asos.save(force_update=True)
 
@@ -653,9 +654,13 @@ class SelectOnSaveTests(TestCase):
             # This is not wanted behavior, but this is how Django has always
             # behaved for databases that do not return correct information
             # about matched rows for UPDATE.
-            with self.assertRaises(DatabaseError):
+            with self.assertRaisesMessage(DatabaseError, 'Forced update did not affect any rows.'):
                 asos.save(force_update=True)
-            with self.assertRaises(DatabaseError):
+            msg = (
+                "An error occurred in the current transaction. You can't "
+                "execute queries until the end of the 'atomic' block."
+            )
+            with self.assertRaisesMessage(DatabaseError, msg):
                 asos.save(update_fields=['pub_date'])
         finally:
             Article._base_manager._queryset_class = orig_class
@@ -688,7 +693,8 @@ class ModelRefreshTests(TestCase):
 
     def test_unknown_kwarg(self):
         s = SelfRef.objects.create()
-        with self.assertRaises(TypeError):
+        msg = "refresh_from_db() got an unexpected keyword argument 'unknown_kwarg'"
+        with self.assertRaisesMessage(TypeError, msg):
             s.refresh_from_db(unknown_kwarg=10)
 
     def test_refresh_fk(self):

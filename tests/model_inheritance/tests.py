@@ -43,7 +43,7 @@ class ModelInheritanceTests(TestCase):
 
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesMessage(AttributeError, "'CommonInfo' has no attribute 'objects'"):
             CommonInfo.objects.all()
 
     def test_reverse_relation_for_different_hierarchy_tree(self):
@@ -51,7 +51,12 @@ class ModelInheritanceTests(TestCase):
         # Restaurant object cannot access that reverse relation, since it's not
         # part of the Place-Supplier Hierarchy.
         self.assertQuerysetEqual(Place.objects.filter(supplier__name="foo"), [])
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'supplier' into field. Choices are: "
+            "address, chef, chef_id, id, italianrestaurant, lot, name, "
+            "place_ptr, place_ptr_id, provider, rating, serves_hot_dogs, serves_pizza"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Restaurant.objects.filter(supplier__name="foo")
 
     def test_model_with_distinct_accessors(self):
@@ -65,7 +70,8 @@ class ModelInheritanceTests(TestCase):
 
         # The Post model doesn't have an attribute called
         # 'attached_%(class)s_set'.
-        with self.assertRaises(AttributeError):
+        msg = "'Post' object has no attribute 'attached_%(class)s_set'"
+        with self.assertRaisesMessage(AttributeError, msg):
             getattr(post, "attached_%(class)s_set")
 
     def test_model_with_distinct_related_query_name(self):

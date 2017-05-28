@@ -1067,7 +1067,12 @@ class NoRootUrlConfTests(SimpleTestCase):
     """Tests for handler404 and handler500 if ROOT_URLCONF is None"""
 
     def test_no_handler_exception(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "The included URLconf 'None' does not appear to have any patterns "
+            "in it. If you see valid patterns in the file then the issue is "
+            "probably caused by a circular import."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/test/me/')
 
 

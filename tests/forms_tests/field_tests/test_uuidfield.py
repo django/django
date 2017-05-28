@@ -18,9 +18,8 @@ class UUIDFieldTest(SimpleTestCase):
 
     def test_uuidfield_3(self):
         field = UUIDField()
-        with self.assertRaises(ValidationError) as cm:
+        with self.assertRaisesMessage(ValidationError, 'Enter a valid UUID.'):
             field.clean('550e8400')
-        self.assertEqual(cm.exception.messages[0], 'Enter a valid UUID.')
 
     def test_uuidfield_4(self):
         field = UUIDField()

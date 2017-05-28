@@ -40,7 +40,8 @@ class ParserTests(SimpleTestCase):
 
         # Filtered variables should reject access of attributes beginning with
         # underscores.
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "Variables and attributes may not begin with underscores: 'article._hidden'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             FilterExpression("article._hidden|upper", p)
 
     def test_variable_parsing(self):
@@ -64,7 +65,8 @@ class ParserTests(SimpleTestCase):
 
         # Variables should reject access of attributes beginning with
         # underscores.
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "Variables and attributes may not begin with underscores: 'article._hidden'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Variable("article._hidden")
 
         # Variables should raise on non string type

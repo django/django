@@ -214,7 +214,8 @@ class TestConnectionOnCommit(TransactionTestCase):
 
         try:
             connection.set_autocommit(False)
-            with self.assertRaises(transaction.TransactionManagementError):
+            msg = 'on_commit() cannot be used in manual transaction management'
+            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
                 transaction.on_commit(should_never_be_called)
         finally:
             connection.set_autocommit(True)

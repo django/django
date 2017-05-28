@@ -222,7 +222,7 @@ class UtilsTests(SimpleTestCase):
             "article"
         )
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesMessage(AttributeError, "Unable to lookup 'unknown' on Article"):
             label_for_field("unknown", Article)
 
         def test_callable(obj):

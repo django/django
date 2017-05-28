@@ -200,7 +200,11 @@ class ListViewTests(TestCase):
         self.assertTemplateUsed(res, 'generic_views/author_list.html')
 
     def test_missing_items(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'AuthorList is missing a QuerySet. Define AuthorList.model, '
+            'AuthorList.queryset, or override AuthorList.get_queryset().'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/list/authors/invalid/')
 
     def test_paginated_list_view_does_not_load_entire_table(self):

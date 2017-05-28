@@ -2957,7 +2957,8 @@ class WhereNodeTest(TestCase):
 class QuerySetExceptionTests(TestCase):
     def test_iter_exceptions(self):
         qs = ExtraInfo.objects.only('author')
-        with self.assertRaises(AttributeError):
+        msg = "'ManyToOneRel' object has no attribute 'attname'"
+        with self.assertRaisesMessage(AttributeError, msg):
             list(qs)
 
     def test_invalid_qs_list(self):
@@ -3735,9 +3736,10 @@ class TestTicket24279(TestCase):
 
 class TestInvalidValuesRelation(TestCase):
     def test_invalid_values(self):
-        with self.assertRaises(ValueError):
+        msg = "invalid literal for int() with base 10: 'abc'"
+        with self.assertRaisesMessage(ValueError, msg):
             Annotation.objects.filter(tag='abc')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             Annotation.objects.filter(tag__in=[123, 'abc'])
 
 

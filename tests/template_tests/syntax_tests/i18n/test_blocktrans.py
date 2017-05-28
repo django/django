@@ -332,11 +332,13 @@ class TranslationBlockTransTagTests(SimpleTestCase):
             self.assertEqual(rendered, '2 andere Super-Ergebnisse')
 
             # Misuses
-            with self.assertRaises(TemplateSyntaxError):
+            msg = "Unknown argument for 'blocktrans' tag: %r."
+            with self.assertRaisesMessage(TemplateSyntaxError, msg % 'month="May"'):
                 Template('{% load i18n %}{% blocktrans context with month="May" %}{{ month }}{% endblocktrans %}')
-            with self.assertRaises(TemplateSyntaxError):
+            msg = '"context" in %r tag expected exactly one argument.' % 'blocktrans'
+            with self.assertRaisesMessage(TemplateSyntaxError, msg):
                 Template('{% load i18n %}{% blocktrans context %}{% endblocktrans %}')
-            with self.assertRaises(TemplateSyntaxError):
+            with self.assertRaisesMessage(TemplateSyntaxError, msg):
                 Template(
                     '{% load i18n %}{% blocktrans count number=2 context %}'
                     '{{ number }} super result{% plural %}{{ number }}'

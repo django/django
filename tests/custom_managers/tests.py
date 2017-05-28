@@ -58,7 +58,8 @@ class CustomManagerTests(TestCase):
                 # Methods with queryset_only=False are copied even if they are private.
                 manager._optin_private_method()
                 # Methods with queryset_only=True aren't copied even if they are public.
-                with self.assertRaises(AttributeError):
+                msg = "%r object has no attribute 'optout_public_method'" % manager.__class__.__name__
+                with self.assertRaisesMessage(AttributeError, msg):
                     manager.optout_public_method()
 
     def test_manager_use_queryset_methods(self):
@@ -93,7 +94,8 @@ class CustomManagerTests(TestCase):
         querysets.
         """
         Person.custom_queryset_custom_manager.manager_only()
-        with self.assertRaises(AttributeError):
+        msg = "'CustomQuerySet' object has no attribute 'manager_only'"
+        with self.assertRaisesMessage(AttributeError, msg):
             Person.custom_queryset_custom_manager.all().manager_only()
 
     def test_queryset_and_manager(self):
@@ -116,7 +118,8 @@ class CustomManagerTests(TestCase):
         The default manager, "objects", doesn't exist, because a custom one
         was provided.
         """
-        with self.assertRaises(AttributeError):
+        msg = "type object 'Book' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             Book.objects
 
     def test_filtering(self):
