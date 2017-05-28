@@ -192,6 +192,17 @@ try:
 
         def __str__(self):
             return self.description
+
+    class NoExtensionImageFile(models.Model):
+        def upload_to(self, filename):
+            return 'tests/no_extension'
+
+        description = models.CharField(max_length=20)
+        image = models.ImageField(storage=temp_storage, upload_to=upload_to)
+
+        def __str__(self):
+            return self.description
+
 except ImportError:
     test_images = False
 

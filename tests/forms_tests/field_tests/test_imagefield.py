@@ -2,7 +2,7 @@ import os
 import unittest
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ImageField
+from django.forms import ImageField, ValidationError
 from django.test import SimpleTestCase
 
 try:
@@ -55,3 +55,12 @@ class ImageFieldTest(SimpleTestCase):
             self.assertIsNone(uploaded_file.content_type)
         finally:
             Image.register_mime(BmpImageFile.format, 'image/bmp')
+
+    def test_file_extension_validation(self):
+        f = ImageField()
+        img_path = get_img_path('filepath_test_files/1x1.png')
+        with open(img_path, 'rb') as img_file:
+            img_data = img_file.read()
+        img_file = SimpleUploadedFile('1x1.txt', img_data)
+        with self.assertRaisesMessage(ValidationError, "File extension 'txt' is not allowed."):
+            f.clean(img_file)

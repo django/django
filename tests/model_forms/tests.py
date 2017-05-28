@@ -32,7 +32,7 @@ from .models import (
 )
 
 if test_images:
-    from .models import ImageFile, OptionalImageFile
+    from .models import ImageFile, OptionalImageFile, NoExtensionImageFile
 
     class ImageFileForm(forms.ModelForm):
         class Meta:
@@ -42,6 +42,11 @@ if test_images:
     class OptionalImageFileForm(forms.ModelForm):
         class Meta:
             model = OptionalImageFile
+            fields = '__all__'
+
+    class NoExtensionImageFileForm(forms.ModelForm):
+        class Meta:
+            model = NoExtensionImageFile
             fields = '__all__'
 
 
@@ -2460,6 +2465,19 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.image.name, 'foo/test4.png')
         instance.delete()
+
+        # Editing an instance that has an image without an extension shouldn't
+        # fail validation. First create:
+        f = NoExtensionImageFileForm(
+            data={'description': 'An image'},
+            files={'image': SimpleUploadedFile('test.png', image_data)},
+        )
+        self.assertTrue(f.is_valid())
+        instance = f.save()
+        self.assertEqual(instance.image.name, 'tests/no_extension')
+        # Then edit:
+        f = NoExtensionImageFileForm(data={'description': 'Edited image'}, instance=instance)
+        self.assertTrue(f.is_valid())
 
 
 class ModelOtherFieldTests(SimpleTestCase):

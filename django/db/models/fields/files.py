@@ -6,7 +6,6 @@ from django.core import checks
 from django.core.files.base import File
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
-from django.core.validators import validate_image_file_extension
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.utils.translation import gettext_lazy as _
@@ -355,7 +354,6 @@ class ImageFieldFile(ImageFile, FieldFile):
 
 
 class ImageField(FileField):
-    default_validators = [validate_image_file_extension]
     attr_class = ImageFieldFile
     descriptor_class = ImageFileDescriptor
     description = _("Image")
