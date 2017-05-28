@@ -17,8 +17,8 @@ project.
 Python compatibility
 ====================
 
-Django 2.0 supports Python 3.5+. Since Django 1.11, support for Python 2.7 and
-3.4 is removed. We **highly recommend** and only officially support the latest
+Django 2.0 supports Python 3.4+. Since Django 1.11, support for Python 2.7
+is removed. We **highly recommend** and only officially support the latest
 release of each series.
 
 Third-party library support for older version of Django
