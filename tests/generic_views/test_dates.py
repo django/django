@@ -661,6 +661,12 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['book'], b)
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
+    def test_year_out_of_range(self):
+        res = self.client.get('/dates/books/9999/')
+        self.assertEqual(res.status_code, 404)
+        res = self.client.get('/dates/books/9999/12/')
+        self.assertEqual(res.status_code, 404)
+
     def test_invalid_url(self):
         with self.assertRaises(AttributeError):
             self.client.get("/dates/books/2008/oct/01/nopk/")
