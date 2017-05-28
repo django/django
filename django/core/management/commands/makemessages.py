@@ -188,7 +188,7 @@ def write_pot_file(potfile, msgs):
                 header_read = True
             lines.append(line)
     msgs = '\n'.join(lines)
-    with open(potfile, 'a', encoding='utf-8') as fp:
+    with open(potfile, 'a', encoding='utf-8', newline='\n') as fp:
         fp.write(msgs)
 
 
@@ -436,7 +436,7 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
             msgs = normalize_eols(msgs)
-            with open(potfile, 'w', encoding='utf-8') as fp:
+            with open(potfile, 'w', encoding='utf-8', newline='\n') as fp:
                 fp.write(msgs)
             potfiles.append(potfile)
         return potfiles
@@ -643,7 +643,7 @@ class Command(BaseCommand):
         msgs = normalize_eols(msgs)
         msgs = msgs.replace(
             "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain, "")
-        with open(pofile, 'w', encoding='utf-8') as fp:
+        with open(pofile, 'w', encoding='utf-8', newline='\n') as fp:
             fp.write(msgs)
 
         if self.no_obsolete:
