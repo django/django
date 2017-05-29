@@ -164,11 +164,8 @@ class WorkerGroup(Worker):
         self.workers = [Worker(*args, **kwargs) for ii in range(n_threads)]
 
     def sigterm_handler(self, signo, stack_frame):
-        self.termed = True
-        for wkr in self.workers:
-            wkr.termed = True
-        logger.info("Shutdown signal received while busy, waiting for "
-                    "loop termination")
+        logger.info("Shutdown signal received by WorkerGroup, terminating immediately.")
+        sys.exit(0)
 
     def ready(self):
         super(WorkerGroup, self).ready()
@@ -182,8 +179,6 @@ class WorkerGroup(Worker):
         self.threads = [threading.Thread(target=self.workers[ii].run)
                         for ii in range(len(self.workers))]
         for t in self.threads:
+            t.daemon = True
             t.start()
         super(WorkerGroup, self).run()
-        # Join threads once completed.
-        for t in self.threads:
-            t.join()
