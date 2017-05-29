@@ -4,8 +4,8 @@ Move a file in the safest way possible::
     >>> from django.core.files.move import file_move_safe
     >>> file_move_safe("/tmp/old_file", "/tmp/new_file")
 """
-
 import os
+from io import open
 from shutil import copystat
 
 from django.core.files import locks
