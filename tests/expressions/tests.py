@@ -24,7 +24,8 @@ from django.test import (
 from django.test.utils import Approximate
 
 from .models import (
-    UUID, Company, Employee, Experiment, Number, Result, SimulationRun, Time,
+    UUID, UUIDPK, Company, Employee, Experiment, Number, Result, SimulationRun,
+    Time,
 )
 
 
@@ -478,6 +479,12 @@ class BasicExpressionsTests(TestCase):
         self.assertCountEqual(subquery_test, [self.foobar_ltd, self.gmbh])
         subquery_test2 = Company.objects.filter(pk=Subquery(small_companies.filter(num_employees=3)))
         self.assertCountEqual(subquery_test2, [self.foobar_ltd])
+
+    def test_uuid_pk_subquery(self):
+        u = UUIDPK.objects.create()
+        UUID.objects.create(uuid_fk=u)
+        qs = UUIDPK.objects.filter(id__in=Subquery(UUID.objects.values('uuid_fk__id')))
+        self.assertCountEqual(qs, [u])
 
     def test_nested_subquery(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
