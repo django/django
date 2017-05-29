@@ -85,7 +85,9 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
       which can be used to display a detailed report for any exception raised
       during template rendering.
 
-      It defaults to ``False``.
+       If you create your own instance of an Engine, ``debug`` defaults to
+       ``False``. If not, it defaults to :setting:`DEBUG` in settings, which
+       defaults to ``True``.
 
     * ``loaders`` is a list of template loader classes, specified as strings.
       Each ``Loader`` class knows how to import templates from a particular
