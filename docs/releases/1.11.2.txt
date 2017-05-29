@@ -36,3 +36,6 @@ Bugfixes
 * Relaxed the validation added in Django 1.11 of the fields in the ``defaults``
   argument of ``QuerySet.get_or_create()`` and ``update_or_create()`` to
   reallow settable model properties (:ticket:`28222`).
+
+* Fixed ``MultipleObjectMixin.paginate_queryset()`` crash on Python 2 if the
+  ``InvalidPage`` message contains non-ASCII (:ticket:`28204`).
