@@ -132,6 +132,5 @@ class WorkerGroupTests(ChannelTestCase):
             t = threading.Thread(target=wkr.run)
             t.start()
             threads.append(t)
-        self.worker.sigterm_handler(None, None)
-        for t in threads:
-            t.join()
+        with self.assertRaises(SystemExit):
+            self.worker.sigterm_handler(None, None)
