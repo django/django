@@ -229,7 +229,8 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* The ``~django.core.validators.FileExtensionValidator`` now performs
+  case-insensitive extension matching.
 
 .. _backwards-incompatible-2.0:
 

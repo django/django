@@ -285,7 +285,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'invalid_extension'`` if the ``value`` cannot be found in
-    ``allowed_extensions``.
+    ``allowed_extensions``. A case-insensitive comparison is used to compare
+    ``value`` to the ``allowed_extensions``.
 
     .. warning::
 
