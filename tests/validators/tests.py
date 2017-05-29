@@ -254,18 +254,9 @@ TEST_DATA = [
     (FileExtensionValidator([]), ContentFile('contents', name='file.txt'), ValidationError),
 
     (FileExtensionValidator(['']), ContentFile('contents', name='fileWithNoExtension'), None),
-
     (FileExtensionValidator(['txt']), ContentFile('contents', name='file.txt'), None),
-    (FileExtensionValidator(['txt']), ContentFile('contents', name='file.tXt'), None),
     (FileExtensionValidator(['txt']), ContentFile('contents', name='file.TXT'), None),
-
-    (FileExtensionValidator(['tXt']), ContentFile('contents', name='file.txt'), None),
-    (FileExtensionValidator(['tXt']), ContentFile('contents', name='file.tXt'), None),
-    (FileExtensionValidator(['tXt']), ContentFile('contents', name='file.TXT'), None),
-
     (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.txt'), None),
-    (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.tXt'), None),
-    (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.TXT'), None),
     (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
 
     (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
