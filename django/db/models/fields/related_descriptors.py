@@ -583,6 +583,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 setattr(obj, self.field.name, self.instance)
 
             if bulk:
+                signals.pre_add.send(
+                    sender=self.model, instance=self.instance, field=self.field.name,
+                    using=db,
+                )
+
                 pks = []
                 for obj in objs:
                     check_and_update_obj(obj)
@@ -595,6 +600,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 self.model._base_manager.using(db).filter(pk__in=pks).update(**{
                     self.field.name: self.instance,
                 })
+
+                signals.post_add.send(
+                    sender=self.model, instance=self.instance, field=self.field.name,
+                    using=db,
+                )
             else:
                 with transaction.atomic(using=db, savepoint=False):
                     for obj in objs:

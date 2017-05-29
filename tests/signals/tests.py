@@ -19,6 +19,7 @@ class BaseSignalTest(TestCase):
             len(signals.post_save.receivers),
             len(signals.pre_delete.receivers),
             len(signals.post_delete.receivers),
+            len(signals.pre_add.receivers),
         )
 
     def tearDown(self):
@@ -28,6 +29,7 @@ class BaseSignalTest(TestCase):
             len(signals.post_save.receivers),
             len(signals.pre_delete.receivers),
             len(signals.post_delete.receivers),
+            len(signals.pre_add.receivers),
         )
         self.assertEqual(self.pre_signals, post_signals)
 
@@ -166,6 +168,36 @@ class SignalTests(BaseSignalTest):
         finally:
             signals.pre_delete.disconnect(pre_delete_handler)
             signals.post_delete.disconnect(post_delete_handler)
+
+    def test_add_signals(self):
+        data = []
+
+        def pre_add_handler(signal, sender, instance, **kwargs):
+            data.append(instance)
+
+        def post_add_handler(signal, sender, instance, **kwargs):
+            data.append(instance)
+
+        signals.pre_add.connect(pre_add_handler, weak=False)
+
+        try:
+            p1 = Person.objects.create(first_name="John", last_name="Smith")
+            c1 = Car.objects.create(make="Volkswagen", model="Passat")
+
+            p1.car_set.add(c1)
+            self.assertEqual(data, [p1])
+            data[:] = []
+
+            signals.pre_add.disconnect(pre_add_handler)
+            signals.post_add.connect(post_add_handler, weak=False)
+
+            c2 = Car.objects.create(make="Volkswagen", model="Golf")
+
+            p1.car_set.add(c2)
+            self.assertEqual(data, [p1])
+        finally:
+            signals.pre_add.disconnect(pre_add_handler)
+            signals.post_add.disconnect(post_add_handler)
 
     def test_decorators(self):
         data = []
