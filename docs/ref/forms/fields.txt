@@ -124,7 +124,7 @@ We've specified ``auto_id=False`` to simplify the output::
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" required /></td></tr>
-    <tr><th>Your website:</th><td><input type="url" name="url" required /></td></tr>
+    <tr><th>Your website:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" required /></td></tr>
 
 ``label_suffix``
