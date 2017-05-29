@@ -103,6 +103,9 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(self.rs.skew.y, 0)
         # Create in-memory rasters and change gtvalues
         rsmem = GDALRaster(JSON_RASTER)
+        # geotransform accepts both floats and ints
+        rsmem.geotransform = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+        self.assertEqual(rsmem.geotransform, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
         rsmem.geotransform = range(6)
         self.assertEqual(rsmem.geotransform, [float(x) for x in range(6)])
         self.assertEqual(rsmem.origin, [0, 3])
@@ -116,6 +119,18 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(rsmem.skew.y, 4)
         self.assertEqual(rsmem.width, 5)
         self.assertEqual(rsmem.height, 5)
+
+    def test_geotransform_bad_inputs(self):
+        rsmem = GDALRaster(JSON_RASTER)
+        error_geotransforms = [
+            [1, 2],
+            [1, 2, 3, 4, 5, 'foo'],
+            [1, 2, 3, 4, 5, 6, 'foo'],
+        ]
+        msg = 'Geotransform must consist of 6 numeric values.'
+        for geotransform in error_geotransforms:
+            with self.subTest(i=geotransform), self.assertRaisesMessage(ValueError, msg):
+                rsmem.geotransform = geotransform
 
     def test_rs_extent(self):
         self.assertEqual(
