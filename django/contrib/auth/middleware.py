@@ -4,7 +4,6 @@ from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import SimpleLazyObject
 
 
 def get_user(request):
