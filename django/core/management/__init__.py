@@ -122,7 +122,8 @@ def call_command(command_name, *args, **options):
     args = defaults.pop('args', ())
     if 'skip_checks' not in options:
         defaults['skip_checks'] = True
-
+    if defaults.get('noinput', False) and not defaults.get('interactive', True):
+        raise CommandError('interactive=False should be passed rather noinput=True')
     return command.execute(*args, **defaults)
 
 
