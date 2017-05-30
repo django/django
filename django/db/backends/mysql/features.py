@@ -22,7 +22,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False
-    uses_savepoints = True
     can_release_savepoints = True
     atomic_transactions = False
     supports_column_check_constraints = False
@@ -80,3 +79,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute('SELECT @@LOWER_CASE_TABLE_NAMES')
             result = cursor.fetchone()
             return result and result[0] != 0
+
+    @cached_property
+    def uses_savepoints(self):
+        """
+        All storage engines supporting transactions do support savepoints, except NDB/NDBCLUSTER.
+        But allow the user to overwrite explicitly if some new engine got used.
+        """
+        if self.connection.settings_dict.get('USES_SAVEPOINTS', None) is None:
+            return self._mysql_storage_engine.lower() not in ('ndbcluster', 'ndb')
+        else:
+            return self.connection.settings_dict['USES_SAVEPOINTS']
