@@ -109,10 +109,6 @@ def setup(verbosity, test_labels, parallel):
         bits = label.split('.')[:1]
         test_labels_set.add('.'.join(bits))
 
-    if 'gis_tests' in test_labels_set and not connection.features.gis_enabled:
-        print('Aborting: A GIS database backend is required to run gis_tests.')
-        sys.exit(1)
-
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
         max_parallel = default_test_processes() if parallel == 0 else parallel
@@ -176,6 +172,14 @@ def setup(verbosity, test_labels, parallel):
 
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
+
+    # It would be nice to put this validation earlier but it must come after
+    # django.setup() so that connection.features.gis_enabled can be accessed
+    # without raising AppRegistryNotReady when running gis_tests in isolation
+    # on some backends (e.g. PostGIS).
+    if 'gis_tests' in test_labels_set and not connection.features.gis_enabled:
+        print('Aborting: A GIS database backend is required to run gis_tests.')
+        sys.exit(1)
 
     # Load all the test model apps.
     test_modules = get_test_modules()
