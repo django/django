@@ -1,9 +1,9 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import models as model_forms
+from django.forms import Form, models as model_forms
 from django.http import HttpResponseRedirect
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
-    BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
+    SingleObjectMixin, SingleObjectTemplateResponseMixin,
 )
 
 
@@ -39,7 +39,7 @@ class FormMixin(ContextMixin):
             'prefix': self.get_prefix(),
         }
 
-        if self.request.method in ('POST', 'PUT'):
+        if self.request.method in ('POST', 'PUT', 'DELETE'):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
@@ -203,15 +203,18 @@ class DeletionMixin:
     """Provide the ability to delete objects."""
     success_url = None
 
+    def delete_object(self):
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
+
     def delete(self, request, *args, **kwargs):
         """
         Call the delete() method on the fetched object and then redirect to the
         success URL.
         """
         self.object = self.get_object()
-        success_url = self.get_success_url()
-        self.object.delete()
-        return HttpResponseRedirect(success_url)
+        return self.delete_object()
 
     # Add support for browsers which only accept GET and POST for now.
     def post(self, request, *args, **kwargs):
@@ -225,12 +228,24 @@ class DeletionMixin:
                 "No URL to redirect to. Provide a success_url.")
 
 
-class BaseDeleteView(DeletionMixin, BaseDetailView):
+class BaseDeleteView(DeletionMixin, FormMixin, SingleObjectMixin, ProcessFormView):
     """
     Base view for deleting an object.
 
     Using this base class requires subclassing to provide a response mixin.
     """
+    form_class = Form
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().delete(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        return self.delete_object()
 
 
 class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView):

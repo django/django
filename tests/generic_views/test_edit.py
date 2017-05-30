@@ -408,3 +408,93 @@ class DeleteViewTests(TestCase):
         # get_absolute_url provided
         with self.assertRaises(ImproperlyConfigured):
             self.client.post('/edit/author/%d/delete/naive/' % a.pk)
+
+    def test_delete_with_form_as_post(self):
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+
+        res = self.client.get('/edit/author/%d/delete/form/' % a.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertTemplateUsed(res, 'generic_views/author_confirm_delete.html')
+
+        res = self.client.post('/edit/author/%d/delete/form/' % a.pk, data={"confirm": True})
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, '/list/authors/')
+        self.assertQuerysetEqual(Author.objects.all(), [])
+
+    def test_delete_with_form_as_post_with_validation_error(self):
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+
+        res = self.client.get('/edit/author/%d/delete/form/' % a.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertTemplateUsed(res, 'generic_views/author_confirm_delete.html')
+
+        res = self.client.post('/edit/author/%d/delete/form/' % a.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.context_data["form"].errors), 2)
+        self.assertEqual(
+            res.context_data["form"].errors["__all__"],
+            ['You must confirm the delete.']
+        )
+        self.assertEqual(
+            res.context_data["form"].errors["confirm"],
+            ['This field is required.']
+        )
+
+    def test_delete_with_form_as_delete(self):
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+
+        res = self.client.get('/edit/author/%d/delete/form/' % a.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertTemplateUsed(res, 'generic_views/author_confirm_delete.html')
+
+        res = self.client.delete('/edit/author/%d/delete/form/' % a.pk, data={"confirm": True})
+        # data cannot be sent with a delete method.
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.context_data["form"].errors), 2)
+        self.assertEqual(
+            res.context_data["form"].errors["__all__"],
+            ['You must confirm the delete.']
+        )
+        self.assertEqual(
+            res.context_data["form"].errors["confirm"],
+            ['This field is required.']
+        )
+
+    def test_delete_with_form_as_delete_with_validation_error(self):
+        a = Author.objects.create(
+            name='Randall Munroe',
+            slug='randall-munroe',
+        )
+
+        res = self.client.get('/edit/author/%d/delete/form/' % a.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Author.objects.get(pk=a.pk))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=a.pk))
+        self.assertTemplateUsed(res, 'generic_views/author_confirm_delete.html')
+
+        res = self.client.delete('/edit/author/%d/delete/form/' % a.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.context_data["form"].errors), 2)
+        self.assertEqual(
+            res.context_data["form"].errors["__all__"],
+            ['You must confirm the delete.']
+        )
+        self.assertEqual(
+            res.context_data["form"].errors["confirm"],
+            ['This field is required.']
+        )
