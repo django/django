@@ -26,6 +26,6 @@ install:
 
 script:
   - python runtests.py
-  - cd js_client && npm install --progress=false && npm test && cd ..
+#  - cd js_client && npm install --progress=false && npm test && cd ..
   - flake8
   - isort --check-only --recursive channels
