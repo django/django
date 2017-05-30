@@ -1800,7 +1800,7 @@ To call a management command from code use ``call_command``.
 ``*args``
   a list of arguments accepted by the command. Arguments are passed to the
   argument parser, so you can use the same style as you would on the command
-  line. For example, ``call_command('flush', 'verbosity=0')``.
+  line. For example, ``call_command('flush', '--verbosity=0')``.
 
 ``**options``
   named options accepted on the command-line. Options are passed to the command
