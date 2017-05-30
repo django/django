@@ -39,3 +39,6 @@ Bugfixes
 
 * Fixed ``MultipleObjectMixin.paginate_queryset()`` crash on Python 2 if the
   ``InvalidPage`` message contains non-ASCII (:ticket:`28204`).
+
+* Prevented ``Subquery`` from adding an unnecessary ``CAST`` which resulted in
+  invalid SQL (:ticket:`28199`).

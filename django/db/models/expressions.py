@@ -977,7 +977,6 @@ class Subquery(Expression):
 
         template = template or template_params.get('template', self.template)
         sql = template % template_params
-        sql = connection.ops.unification_cast_sql(self.output_field) % sql
         return sql, sql_params
 
     def _prepare(self, output_field):
