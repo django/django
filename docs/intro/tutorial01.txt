@@ -20,6 +20,16 @@ in a shell prompt (indicated by the $ prefix):
 
     $ python -m django --version
 
+.. note::
+
+    The ``$`` before the command is special. It indicates that you are supposed
+    to type the command into your shell prompt, as opposed to a Python terminal.
+    The ``$`` is not part of the command, and you should not type it.
+    
+    This tutorial will consistently use the ``$`` to indicate a shell prompt,
+    and ``>>>`` to indicate something you should type into a Python terminal
+    (you will come across that soon).
+
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
