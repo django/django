@@ -460,7 +460,7 @@ class FileExtensionValidator:
 
     def __init__(self, allowed_extensions=None, message=None, code=None):
         if allowed_extensions is not None:
-            self.allowed_extensions = sorted(allowed_extension.casefold() for allowed_extension in allowed_extensions)
+            self.allowed_extensions = sorted(allowed_extension.lower() for allowed_extension in allowed_extensions)
         else:
             self.allowed_extensions = allowed_extensions
         if message is not None:
@@ -469,7 +469,7 @@ class FileExtensionValidator:
             self.code = code
 
     def __call__(self, value):
-        extension = os.path.splitext(value.name)[1][1:].casefold()
+        extension = os.path.splitext(value.name)[1][1:].lower()
         if self.allowed_extensions is not None and extension not in self.allowed_extensions:
             raise ValidationError(
                 self.message,
