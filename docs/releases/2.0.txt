@@ -108,6 +108,9 @@ Minor features
   :class:`~django.contrib.postgres.operations.CryptoExtension` migration
   operation.
 
+* :class:`django.contrib.postgres.indexes.GinIndex` now supports the
+  ``fast_update`` and ``gin_pending_list_limit`` parameters.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

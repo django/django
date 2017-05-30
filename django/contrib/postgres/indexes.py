@@ -33,5 +33,27 @@ class BrinIndex(Index):
 class GinIndex(Index):
     suffix = 'gin'
 
+    def __init__(self, fields=[], name=None, fastupdate=None, gin_pending_list_limit=None):
+        self.fastupdate = fastupdate
+        self.gin_pending_list_limit = gin_pending_list_limit
+        super().__init__(fields, name)
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        kwargs['fastupdate'] = self.fastupdate
+        kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
+        return path, args, kwargs
+
+    def get_sql_create_template_values(self, model, schema_editor, using):
+        parameters = super().get_sql_create_template_values(model, schema_editor, using=' USING gin')
+        with_params = []
+        if self.gin_pending_list_limit is not None:
+            with_params.append('gin_pending_list_limit = %d' % self.gin_pending_list_limit)
+        if self.fastupdate is not None:
+            with_params.append('fastupdate = {}'.format('on' if self.fastupdate else 'off'))
+        if with_params:
+            parameters['extra'] = 'WITH ({}) {}'.format(', '.join(with_params), parameters['extra'])
+        return parameters
+
     def create_sql(self, model, schema_editor):
         return super().create_sql(model, schema_editor, using=' USING gin')

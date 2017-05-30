@@ -22,7 +22,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``GinIndex``
 ============
 
-.. class:: GinIndex()
+.. class:: GinIndex(fields=[], name=None, fastupdate=None, gin_pending_list_limit=None)
 
     Creates a `gin index
     <https://www.postgresql.org/docs/current/static/gin.html>`_.
@@ -34,3 +34,17 @@ available from the ``django.contrib.postgres.indexes`` module.
     PostgreSQL. You can install it using the
     :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
     operation.
+
+    Set the ``fastupdate`` parameter to ``False`` to disable the `GIN Fast
+    Update Technique`_ that's enabled by default in PostgreSQL.
+
+    Provide an integer number of bytes to the gin_pending_list_limit_ parameter
+    to tune the maximum size of the GIN pending list which is used when
+    ``fastupdate`` is enabled. This parameter requires PostgreSQL ≥ 9.5.
+
+    .. _GIN Fast Update Technique: https://www.postgresql.org/docs/current/static/gin-implementation.html#GIN-FAST-UPDATE
+    .. _gin_pending_list_limit: https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT
+
+    .. versionchanged:: 2.0
+
+        The ``fastupdate`` and ``gin_pending_list_limit`` parameters were added.
