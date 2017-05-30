@@ -7,6 +7,7 @@ import shutil
 import stat
 import sys
 import tempfile
+from importlib import import_module
 from os import path
 from urllib.request import urlretrieve
 
@@ -210,14 +211,35 @@ class TemplateCommand(BaseCommand):
                            (self.app_or_project, template))
 
     def validate_name(self, name, app_or_project):
+        a_or_an = 'an' if app_or_project == 'app' else 'a'
         if name is None:
-            raise CommandError("you must provide %s %s name" % (
-                "an" if app_or_project == "app" else "a", app_or_project))
-        # If it's not a valid directory name.
+            raise CommandError('you must provide {an} {app} name'.format(
+                an=a_or_an,
+                app=app_or_project,
+            ))
+        # Check it's a valid directory name.
         if not name.isidentifier():
             raise CommandError(
-                "%r is not a valid %s name. Please make sure the name is "
-                "a valid identifier." % (name, app_or_project)
+                "'{name}' is not a valid {app} name. Please make sure the "
+                "name is a valid identifier.".format(
+                    name=name,
+                    app=app_or_project,
+                )
+            )
+        # Check it cannot be imported.
+        try:
+            import_module(name)
+        except ImportError:
+            pass
+        else:
+            raise CommandError(
+                "'{name}' conflicts with the name of an existing Python "
+                "module and cannot be used as {an} {app} name. Please try "
+                "another name.".format(
+                    name=name,
+                    an=a_or_an,
+                    app=app_or_project,
+                )
             )
 
     def download(self, url):
