@@ -66,7 +66,7 @@ class GeoModelTest(TestCase):
         nullcity.delete()
 
         # Testing on a Polygon
-        shell = LinearRing((0, 0), (0, 100), (100, 100), (100, 0), (0, 0))
+        shell = LinearRing((0, 0), (0, 90), (100, 90), (100, 0), (0, 0))
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 
         # Creating a State object using a built Polygon
