@@ -326,7 +326,7 @@ class ExecutorTests(MigrationTestBase):
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:
             migration = executor.loader.get_migration("auth", "0001_initial")
-            self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
+            self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], True)
         finally:
             connection.introspection.table_names = old_table_names
             del global_apps.get_app_config("migrations").models["author"]
@@ -343,7 +343,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_detect_soft_applied_add_field_manytomanyfield(self):
         """
-        executor.detect_soft_applied() detects ManyToManyField tables from an
+        loader.detect_soft_applied() detects ManyToManyField tables from an
         AddField operation. This checks the case of AddField in a migration
         with other operations (0001) and the case of AddField in its own
         migration (0002).
@@ -365,9 +365,9 @@ class ExecutorTests(MigrationTestBase):
             self.assertTableExists(table)
         # Table detection sees 0001 is applied but not 0002.
         migration = executor.loader.get_migration("migrations", "0001_initial")
-        self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
+        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], True)
         migration = executor.loader.get_migration("migrations", "0002_initial")
-        self.assertIs(executor.detect_soft_applied(None, migration)[0], False)
+        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], False)
 
         # Create the tables for both migrations but make it look like neither
         # has been applied.
@@ -378,7 +378,7 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)], fake=True)
         # Table detection sees 0002 is applied.
         migration = executor.loader.get_migration("migrations", "0002_initial")
-        self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
+        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], True)
 
         # Leave the tables for 0001 except the many-to-many table. That missing
         # table should cause detect_soft_applied() to return False.
@@ -386,7 +386,7 @@ class ExecutorTests(MigrationTestBase):
             for table in tables[2:]:
                 editor.execute(editor.sql_delete_table % {"table": table})
         migration = executor.loader.get_migration("migrations", "0001_initial")
-        self.assertIs(executor.detect_soft_applied(None, migration)[0], False)
+        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], False)
 
         # Cleanup by removing the remaining tables.
         with connection.schema_editor() as editor:
