@@ -2333,7 +2333,19 @@ Password: <input type="password" name="password" required />
         self.assertTrue(p.is_valid())
         self.assertEqual(p.cleaned_data['first_name'], 'John')
         self.assertEqual(p.cleaned_data['last_name'], 'Lennon')
-        self.assertEqual(p.cleaned_data['birthday'], datetime.date(1940, 10, 9))
+        self.assertEqual(p.cleaned_data['birthday'], datetime.date(1940, 10, 9))\
+
+    def test_class_prefix(self):
+    # Prefix can be also specified at the class level.
+        class Person(Form):
+            first_name = CharField()
+            prefix = 'foo'
+
+        p = Person()
+        self.assertEqual(p.prefix, 'foo')
+
+        p = Person(prefix='bar')
+        self.assertEqual(p.prefix, 'bar')
 
     def test_class_prefix(self):
         # Prefix can be also specified at the class level.
