@@ -42,3 +42,5 @@ Bugfixes
 
 * Prevented ``Subquery`` from adding an unnecessary ``CAST`` which resulted in
   invalid SQL (:ticket:`28199`).
+
+* Corrected detection of GDAL 2.1 on Windows (:ticket:`28181`).
