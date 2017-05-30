@@ -17,6 +17,7 @@ class Command(BaseCommand):
         "Output the contents of the database as a fixture of the given format "
         "(using each model's default manager unless --all is specified)."
     )
+    private_options = ('stdout', 'stderr')
 
     def add_arguments(self, parser):
         parser.add_argument(

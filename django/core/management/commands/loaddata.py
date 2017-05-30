@@ -35,6 +35,7 @@ class Command(BaseCommand):
         "No database fixture specified. Please provide the path of at least "
         "one fixture in the command line."
     )
+    private_options = ('stdout', 'stderr', 'commit', 'using')
 
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')

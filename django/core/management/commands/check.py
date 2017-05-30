@@ -8,6 +8,7 @@ class Command(BaseCommand):
     help = "Checks the entire Django project for potential problems."
 
     requires_system_checks = False
+    private_options = ('stderr', 'stdout')
 
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='app_label', nargs='*')

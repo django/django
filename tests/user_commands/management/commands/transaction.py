@@ -5,6 +5,7 @@ class Command(BaseCommand):
     help = "Say hello."
     args = ''
     output_transaction = True
+    private_options = ('stdout', )
 
     def handle(self, *args, **options):
         return 'Hello!'

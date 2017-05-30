@@ -13,6 +13,7 @@ class Command(BaseCommand):
     help = "Change a user's password for django.contrib.auth."
     requires_migrations_checks = True
     requires_system_checks = False
+    private_options = ('stderr', 'stdout')
 
     def _get_pass(self, prompt="Password: "):
         p = getpass.getpass(prompt=prompt)

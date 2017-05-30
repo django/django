@@ -5,6 +5,7 @@ from django.utils import translation
 class Command(BaseCommand):
 
     leave_locale_alone = False
+    private_options = ('stdout', )
 
     def handle(self, *args, **options):
         return translation.get_language()

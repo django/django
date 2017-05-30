@@ -1538,6 +1538,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_custom_stdout(self):
         class Command(BaseCommand):
             requires_system_checks = False
+            private_options = ('stdout', )
 
             def handle(self, *args, **options):
                 self.stdout.write("Hello, World!")
@@ -1555,6 +1556,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_custom_stderr(self):
         class Command(BaseCommand):
             requires_system_checks = False
+            private_options = ('stderr', )
 
             def handle(self, *args, **options):
                 self.stderr.write("Hello, World!")

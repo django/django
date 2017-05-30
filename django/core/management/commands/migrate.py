@@ -18,6 +18,7 @@ from django.utils.module_loading import module_has_submodule
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
+    private_options = ('stdout', 'skip_checks')
 
     def add_arguments(self, parser):
         parser.add_argument(
