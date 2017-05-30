@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 import copy
-import time
 import threading
+import time
 
 from .channel import Channel
 from .signals import consumer_finished, consumer_started
