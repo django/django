@@ -108,7 +108,7 @@ class SQLCompiler:
             for col in cols:
                 expressions.append(col)
         for expr, (sql, params, is_ref) in order_by:
-            if expr.contains_aggregate:
+            if not expr.contributes_to_group_by:
                 continue
             # We can skip References to select clause, as all expressions in
             # the select clause are already part of the group by.

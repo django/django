@@ -843,6 +843,37 @@ class AggregateTestCase(TestCase):
             max_books_per_rating,
             {'books_per_rating__max': 3})
 
+    def test_ticket26390(self):
+        """
+        Check that the random call does not break GROUP BY clause when
+        used as ordering.
+        """
+        qs = Author.objects.annotate(contact_count=Count('book'))
+
+        self.assertQuerysetEqual(qs.order_by('contact_count'), [
+            ('Adrian Holovaty', 1),
+            ('Jacob Kaplan-Moss', 1),
+            ('Brad Dayley', 1),
+            ('James Bennett', 1),
+            ('Jeffrey Forcier', 1),
+            ('Paul Bissex', 1),
+            ('Wesley J. Chun', 1),
+            ('Stuart Russell', 1),
+            ('Peter Norvig', 2),
+        ], lambda o: (o.name, o.contact_count), ordered=False)
+
+        self.assertQuerysetEqual(qs.order_by('?'), [
+            ('Adrian Holovaty', 1),
+            ('Jacob Kaplan-Moss', 1),
+            ('Brad Dayley', 1),
+            ('James Bennett', 1),
+            ('Jeffrey Forcier', 1),
+            ('Paul Bissex', 1),
+            ('Wesley J. Chun', 1),
+            ('Stuart Russell', 1),
+            ('Peter Norvig', 2),
+        ], lambda o: (o.name, o.contact_count), ordered=False)
+
     def test_ticket17424(self):
         """
         Doing exclude() on a foreign model after annotate() doesn't crash.
