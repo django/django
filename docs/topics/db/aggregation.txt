@@ -324,6 +324,22 @@ title that starts with "Django" using the query::
 
     >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
 
+When filtering against :ref:`multiple values
+<spanning-multi-valued-relationships>`, be careful to structure your filters
+according to the behavior you desire::
+
+    # Annotated list of all authors with books with between 100 and 200 pages.
+    >>> Author.objects.filter(
+    ...    books__pages__lt=200,
+    ...    books__pages__gt=100
+    ...).annotate(num_books=Count('books'))
+    # Annotated list of all authors with books with more than 100 pages *and*
+    # all authors with books with fewer than 200 pages.
+    >>> Author.objects.filter(
+    ...    books__pages__lt=200).filter(
+    ...    books__pages__gt=100
+    ...).annotate(num_books=Count('books'))
+
 Filtering on annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
