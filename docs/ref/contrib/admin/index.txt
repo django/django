@@ -2955,6 +2955,11 @@ if you specifically wanted the admin view from the admin instance named
 
     >>> change_url = reverse('admin:polls_choice_change', args=(c.id,), current_app='custom')
 
+If you want to change the password of a user, the URL can be resolved by::
+
+    >>> urlresolvers.reverse('admin:auth_user_password_change', args=(1,))
+    u'/admin/auth/user/1/password/'
+
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.
 
