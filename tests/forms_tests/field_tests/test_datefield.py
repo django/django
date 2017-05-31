@@ -103,7 +103,7 @@ class DateFieldTest(SimpleTestCase):
         a = GetDate({'mydate_month': '2', 'mydate_day': '31', 'mydate_year': '2010'})
         self.assertFalse(a.is_valid())
         # 'Geef een geldige datum op.' = 'Enter a valid date.'
-        self.assertEqual(a.errors, {'mydate': ['Geef een geldige datum op.']})
+        self.assertEqual(a.errors, {'mydate': ['Voer een geldige datum in.']})
 
     @override_settings(USE_L10N=True)
     @translation.override('nl')
