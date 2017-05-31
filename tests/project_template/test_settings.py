@@ -1,22 +1,24 @@
 import os
 import shutil
+import tempfile
 
 from django import conf
 from django.test import TestCase
+from django.test.utils import extend_sys_path
 
 
 class TestStartProjectSettings(TestCase):
     def setUp(self):
-        # Ensure settings.py exists
-        project_dir = os.path.join(
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        template_settings_py = os.path.join(
             os.path.dirname(conf.__file__),
             'project_template',
             'project_name',
+            'settings.py-tpl',
         )
-        template_settings_py = os.path.join(project_dir, 'settings.py-tpl')
-        test_settings_py = os.path.join(project_dir, 'settings.py')
+        test_settings_py = os.path.join(self.temp_dir.name, 'test_settings.py')
         shutil.copyfile(template_settings_py, test_settings_py)
-        self.addCleanup(os.remove, test_settings_py)
 
     def test_middleware_headers(self):
         """
@@ -24,7 +26,8 @@ class TestStartProjectSettings(TestCase):
         change. For example, we never want "Vary: Cookie" to appear in the list
         since it prevents the caching of responses.
         """
-        from django.conf.project_template.project_name.settings import MIDDLEWARE
+        with extend_sys_path(self.temp_dir.name):
+            from test_settings import MIDDLEWARE
 
         with self.settings(
             MIDDLEWARE=MIDDLEWARE,
