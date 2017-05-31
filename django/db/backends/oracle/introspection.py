@@ -180,29 +180,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("""
             SELECT
                 user_constraints.constraint_name,
-                LOWER(cols.column_name) AS column_name,
+                LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.position),
                 CASE user_constraints.constraint_type
                     WHEN 'P' THEN 1
                     ELSE 0
                 END AS is_primary_key,
                 CASE
-                    WHEN EXISTS (
-                        SELECT 1
-                        FROM user_indexes
-                        WHERE user_indexes.index_name = user_constraints.index_name
-                        AND user_indexes.uniqueness = 'UNIQUE'
-                    )
-                    THEN 1
+                    WHEN user_constraints.constraint_type IN ('P', 'U') THEN 1
                     ELSE 0
                 END AS is_unique,
                 CASE user_constraints.constraint_type
                     WHEN 'C' THEN 1
                     ELSE 0
-                END AS is_check_constraint,
-                CASE
-                    WHEN user_constraints.constraint_type IN ('P', 'U') THEN 1
-                    ELSE 0
-                END AS has_index
+                END AS is_check_constraint
             FROM
                 user_constraints
             LEFT OUTER JOIN
@@ -210,57 +200,51 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 user_constraints.constraint_type = ANY('P', 'U', 'C')
                 AND user_constraints.table_name = UPPER(%s)
-            ORDER BY cols.position
+            GROUP BY user_constraints.constraint_name, user_constraints.constraint_type
         """, [table_name])
-        for constraint, column, pk, unique, check, index in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "primary_key": pk,
-                    "unique": unique,
-                    "foreign_key": None,
-                    "check": check,
-                    "index": index,  # All P and U come with index
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
+        for constraint, columns, pk, unique, check in cursor.fetchall():
+            constraints[constraint] = {
+                'columns': columns.split(','),
+                'primary_key': pk,
+                'unique': unique,
+                'foreign_key': None,
+                'check': check,
+                'index': unique,  # All uniques come with an index
+            }
         # Foreign key constraints
         cursor.execute("""
             SELECT
                 cons.constraint_name,
-                LOWER(cols.column_name) AS column_name,
+                LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.position),
                 LOWER(rcols.table_name),
                 LOWER(rcols.column_name)
             FROM
                 user_constraints cons
             INNER JOIN
-                user_cons_columns rcols ON rcols.constraint_name = cons.r_constraint_name
+                user_cons_columns rcols ON rcols.constraint_name = cons.r_constraint_name AND rcols.position = 1
             LEFT OUTER JOIN
                 user_cons_columns cols ON cons.constraint_name = cols.constraint_name
             WHERE
                 cons.constraint_type = 'R' AND
                 cons.table_name = UPPER(%s)
-            ORDER BY cols.position
+            GROUP BY cons.constraint_name, rcols.table_name, rcols.column_name
         """, [table_name])
-        for constraint, column, other_table, other_column in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "primary_key": False,
-                    "unique": False,
-                    "foreign_key": (other_table, other_column),
-                    "check": False,
-                    "index": False,
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
+        for constraint, columns, other_table, other_column in cursor.fetchall():
+            constraints[constraint] = {
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': (other_table, other_column),
+                'check': False,
+                'index': False,
+                'columns': columns.split(','),
+            }
         # Now get indexes
         cursor.execute("""
             SELECT
-                cols.index_name, LOWER(cols.column_name), cols.descend,
-                LOWER(ind.index_type)
+                ind.index_name,
+                LOWER(ind.index_type),
+                LISTAGG(LOWER(cols.column_name), ',') WITHIN GROUP (ORDER BY cols.column_position),
+                LISTAGG(cols.descend, ',') WITHIN GROUP (ORDER BY cols.column_position)
             FROM
                 user_ind_columns cols, user_indexes ind
             WHERE
@@ -268,24 +252,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 NOT EXISTS (
                     SELECT 1
                     FROM user_constraints cons
-                    WHERE cols.index_name = cons.index_name
+                    WHERE ind.index_name = cons.index_name
                 ) AND cols.index_name = ind.index_name
-            ORDER BY cols.column_position
+            GROUP BY ind.index_name, ind.index_type
         """, [table_name])
-        for constraint, column, order, type_ in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "orders": [],
-                    "primary_key": False,
-                    "unique": False,
-                    "foreign_key": None,
-                    "check": False,
-                    "index": True,
-                    "type": 'idx' if type_ == 'normal' else type_,
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
-            constraints[constraint]['orders'].append(order)
+        for constraint, type_, columns, orders in cursor.fetchall():
+            constraints[constraint] = {
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': None,
+                'check': False,
+                'index': True,
+                'type': 'idx' if type_ == 'normal' else type_,
+                'columns': columns.split(','),
+                'orders': orders.split(','),
+            }
         return constraints
