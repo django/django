@@ -12,16 +12,6 @@ def get_user(request):
     return request._cached_user
 
 
-class AuthenticationMiddleware(MiddlewareMixin):
-    def process_request(self, request):
-        assert hasattr(request, 'session'), (
-            "The Django authentication middleware requires session middleware "
-            "to be installed. Edit your MIDDLEWARE%s setting to insert "
-            "'django.contrib.sessions.middleware.SessionMiddleware' before "
-            "'django.contrib.auth.middleware.AuthenticationMiddleware'."
-        ) % ("_CLASSES" if settings.MIDDLEWARE is None else "")
-
-
 class RemoteUserMiddleware(MiddlewareMixin):
     """
     Middleware for utilizing Web-server-provided authentication.
@@ -43,14 +33,6 @@ class RemoteUserMiddleware(MiddlewareMixin):
     force_logout_if_no_header = True
 
     def process_request(self, request):
-        # AuthenticationMiddleware is required so that request.user exists.
-        if not hasattr(request, 'user'):
-            raise ImproperlyConfigured(
-                "The Django remote user auth middleware requires the"
-                " authentication middleware to be installed.  Edit your"
-                " MIDDLEWARE setting to insert"
-                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
-                " before the RemoteUserMiddleware class.")
         try:
             username = request.META[self.header]
         except KeyError:

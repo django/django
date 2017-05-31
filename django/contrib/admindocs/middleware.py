@@ -14,13 +14,6 @@ class XViewMiddleware(MiddlewareMixin):
         header indicating the view function. This is used to lookup the view
         function for an arbitrary page.
         """
-        assert hasattr(request, 'user'), (
-            "The XView middleware requires authentication middleware to be "
-            "installed. Edit your MIDDLEWARE%s setting to insert "
-            "'django.contrib.auth.middleware.AuthenticationMiddleware'." % (
-                "_CLASSES" if settings.MIDDLEWARE is None else ""
-            )
-        )
         if request.method == 'HEAD' and (request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or
                                          (request.user.is_active and request.user.is_staff)):
             response = HttpResponse()
