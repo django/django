@@ -399,7 +399,7 @@ def partition(predicate, values):
     return results
 
 
-def batches(iterable, size):
+def batches(iterable, size=None):
     """
     Split an iterable object into multiple generator objects, each with up to
     `size` items. This is handy to perform batch operations without first converting

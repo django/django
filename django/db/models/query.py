@@ -425,11 +425,11 @@ class QuerySet:
                 self._populate_pk_values(objs_batch)
                 objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs_batch)
                 if objs_with_pk:
-                    self._insert(objs_with_pk, fields)
+                    self._insert(objs_with_pk, fields, using=self.db)
                 if objs_without_pk:
                     fields = [f for f in fields if not isinstance(f, AutoField)]
                     if connection.features.can_return_ids_from_bulk_insert:
-                        ids = self._insert(objs_without_pk, fields, return_id=True)
+                        ids = self._insert(objs_without_pk, fields, return_id=True, using=self.db)
                         if not isinstance(ids, list):
                             ids = [ids]
                         assert len(ids) == len(objs_without_pk)
@@ -438,7 +438,7 @@ class QuerySet:
                             obj_without_pk._state.adding = False
                             obj_without_pk._state.db = self.db
                     else:
-                        self._insert(objs_without_pk, fields)
+                        self._insert(objs_without_pk, fields, using=self.db)
 
         return objs
 
