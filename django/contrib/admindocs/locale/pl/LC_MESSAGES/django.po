@@ -9,13 +9,14 @@
 # m_aciek <maciej.olko@gmail.com>, 2014
 # p <inactive+poczciwiec@transifex.com>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
+# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-04-22 12:15+0000\n"
+"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,10 +27,10 @@ msgstr ""
 "%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 msgid "Administrative Documentation"
-msgstr "Dokumentacja administratora"
+msgstr "Dokumentacja administracyjna"
 
 msgid "Home"
-msgstr "Początek"
+msgstr "Strona główna"
 
 msgid "Documentation"
 msgstr "Dokumentacja"
@@ -46,8 +47,9 @@ msgid ""
 "bookmarklet from any page in the site."
 msgstr ""
 "Aby zainstalować skryptozakładkę, przeciągnij jej link do paska zakładek lub "
-"kliknij prawym przyciskiem na link i wybierz opcję zapisania do zakładek. Po "
-"tym możesz użyć tak zapisanej zakładki na dowolnej podstronie tego serwisu."
+"kliknij prawym przyciskiem na link i wybierz opcję zapisania do zakładek. Od "
+"tego momentu możesz użyć tak zapisanej zakładki na dowolnej podstronie tego "
+"serwisu."
 
 msgid "Documentation for this page"
 msgstr "Dokumentacja dla tej strony"
@@ -63,7 +65,7 @@ msgid "Tags"
 msgstr "Tagi"
 
 msgid "List of all the template tags and their functions."
-msgstr "Lista wszystkich tagów i ich funkcji w szablonie."
+msgstr "Lista wszystkich templatetagów i ich funkcji."
 
 msgid "Filters"
 msgstr "Filtry"
@@ -83,8 +85,8 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
-"Modele to opisy wszystkich obiektów w systemie i związanych z nimi dziedzin. "
-"Każdy model ma listę pól, które mogą być dostępne w zmiennych szablonu"
+"Modele to opisy wszystkich obiektów w systemie i związanych z nimi pól. "
+"Każdy model ma listę pól, które mogą być dostępne jako zmienne szablonu"
 
 msgid "Views"
 msgstr "Widoki"
@@ -138,13 +140,13 @@ msgid "Description"
 msgstr "Opis"
 
 msgid "Methods with arguments"
-msgstr "Metody z parametrami"
+msgstr "Metody z argumentami"
 
 msgid "Method"
 msgstr "Metoda"
 
 msgid "Arguments"
-msgstr "Parametry"
+msgstr "Argumenty"
 
 msgid "Back to Model documentation"
 msgstr "Powrót do dokumentacji modelu"
@@ -228,17 +230,17 @@ msgid "View documentation"
 msgstr "Zobacz dokumentację"
 
 msgid "Jump to namespace"
-msgstr "Przeskocz do nazwy"
+msgstr "Przejdź do przestrzeni nazw"
 
 msgid "Empty namespace"
-msgstr "Pusta nazwa"
+msgstr "Pusta przestrzeń nazw"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr "Widoki po nazwie %(name)s"
+msgstr "Widoki według przestrzeni nazw %(name)s"
 
 msgid "Views by empty namespace"
-msgstr "Widoki po pustej nazwie"
+msgstr "Widoki po pustej przestrzeni nazw"
 
 #, python-format
 msgid ""
@@ -261,7 +263,7 @@ msgstr "widok:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr "Aplikacja %(app_label)r nie została znaleziona"
+msgstr "Nie znaleziono aplikacji %(app_label)r"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

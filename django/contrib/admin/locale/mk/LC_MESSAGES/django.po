@@ -3,15 +3,15 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-15 11:14+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-04-05 09:11+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -172,31 +172,39 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"Ставката  {name} \"{obj}\" беше успешно додадена. Подолу можете повторно да "
+"ја уредите."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"Ставката {name} \"{obj}\" беше успешно додадена. Можете да додадете нов "
+"{name} подолу."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "Ставката {name} \"{obj}\" беше успешно додадена."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"Ставката {name} \"{obj}\" беше успешно уредена. Подолу можете повторно да ја "
+"уредите."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"Ставката {name} \"{obj}\" беше успешно додадена. Можете да додадете нов "
+"{name} подолу."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr " {name} \"{obj}\" беше успешно изменета."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -213,8 +221,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Ставаката %(name)s \"%(obj)s\" беше успешно избришана."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Објект %(name)s со примарен клуч %(key)r не постои."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s со клуч \"%(key)s\" не постои. Можеби е избришан?"
 
 #, python-format
 msgid "Add %s"

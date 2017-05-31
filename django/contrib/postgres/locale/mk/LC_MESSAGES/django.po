@@ -2,15 +2,15 @@
 #
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2015-2016
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2015-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-04-05 09:18+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -29,12 +29,12 @@ msgstr "Членот %(nth)s на низата не помина валидац�
 msgid "Nested arrays must have the same length."
 msgstr "Вгнездени низи мораат да имаат иста должина."
 
-msgid "Map of strings to strings"
-msgstr "Асоцијативна низа на текстуален податок со текстуален податок."
+msgid "Map of strings to strings/nulls"
+msgstr ""
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Вредноста за \"%(key)s\" не е низа од знаци."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Вредноста за \"%(key)s\" не е низа од знаци или ништо (null)."
 
 msgid "A JSON object"
 msgstr "JSON објект"

@@ -3,7 +3,7 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-04-05 09:39+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -298,13 +298,13 @@ msgid "Syndication"
 msgstr "Синдикација"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Тој број на страна не е цел број"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Тој број на страна е помал од 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Таа страна не содржи резултати"
 
 msgid "Enter a valid value."
 msgstr "Внесете правилна вредност."
@@ -414,6 +414,8 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"Еџтензијата '%(extension)s' не е дозволена. Дозволени екстензии се: "
+"'%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "и"
@@ -1158,6 +1160,8 @@ msgid ""
 "Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
 msgstr ""
+"Наредно, направете ја вашата прва апликација со повикување на командата "
+"<code>python manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "

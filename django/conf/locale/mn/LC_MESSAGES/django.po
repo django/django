@@ -9,15 +9,15 @@
 # Tsolmon <mnts26@gmail.com>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2013-2014,2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2015,2017
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-04-13 07:03+0000\n"
+"Last-Translator: Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -303,13 +303,13 @@ msgid "Syndication"
 msgstr "Нэгтгэл"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Хуудасны дугаар бүхэл тоо / Integer / биш байна"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Хуудасны дугаар 1-ээс байга байна"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Хуудас үр дүн агуулаагүй байна"
 
 msgid "Enter a valid value."
 msgstr "Зөв утга оруулна уу."
@@ -413,6 +413,8 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"Файлын '%(extension)s' өргөтгөл зөвшөөрөгдөөгүй байна. Дараах өргөтгөлүүд "
+"зөвшөөрөгдсөн: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "ба"
@@ -1146,6 +1148,8 @@ msgid ""
 "Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
 msgstr ""
+"Одоо Та анхныхаа програмыг дараах командыг хийж ажиллуулна уу <code>python "
+"manage.py startapp [app_label]</code>."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
