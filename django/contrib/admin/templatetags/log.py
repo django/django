@@ -13,7 +13,7 @@ class AdminLogNode(template.Node):
 
     def render(self, context):
         if self.user is None:
-            context[self.varname] = LogEntry.objects.all().select_related('content_type', 'user')[:self.limit]
+            context[self.varname] = LogEntry.objects.all().select_related('content_type', 'user')[:int(self.limit)]
         else:
             user_id = self.user
             if not user_id.isdigit():
