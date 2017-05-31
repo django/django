@@ -89,7 +89,7 @@ class Command(BaseCommand):
                     for app_label in consistency_check_labels
                     for model in apps.get_app_config(app_label).get_models()
             )):
-                loader.check_consistent_history(connection)
+                loader.check_consistent_history(connection, fake_initial=True)
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge

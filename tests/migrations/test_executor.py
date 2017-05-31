@@ -297,6 +297,66 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
 
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations_first",
+        "migrations2": "migrations2.test_migrations_2_first",
+    })
+    def test_create_project_state_soft_applied(self):
+        """
+        _create_project_state(with_applied_migrations=True) should apply
+        soft-applied migrations to the project state.
+        """
+        executor = MigrationExecutor(connection)
+        # Were the tables there before?
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        # Run it normally
+        self.assertEqual(
+            executor.migration_plan([("migrations2", "0002_second")]),
+            [
+                (executor.loader.graph.nodes["migrations", "thefirst"], False),
+                (executor.loader.graph.nodes["migrations2", "0001_initial"], False),
+                (executor.loader.graph.nodes["migrations2", "0002_second"], False),
+            ],
+        )
+        executor.migrate([("migrations2", "0002_second")])
+        # Are the tables there now?
+        self.assertTableExists("migrations_author")
+        self.assertTableExists("migrations_tribble")
+        # Fake-revert the initial migration in "migrations". We can't
+        # fake-migrate backwards as that would revert other migrations
+        # as well.
+        recorder = MigrationRecorder(connection)
+        recorder.record_unapplied("migrations", "thefirst")
+        # Check if models in soft-applied migrations are in the project state.
+        executor.loader.build_graph()
+        project_state = executor._create_project_state(with_applied_migrations=True)
+        self.assertIn(("migrations", "author"), project_state.models)
+        self.assertIn(("migrations", "tribble"), project_state.models)
+        # Apply migration with --fake-initial
+        executor.loader.build_graph()
+        self.assertEqual(
+            executor.migration_plan([("migrations", "thefirst")]),
+            [
+                (executor.loader.graph.nodes["migrations", "thefirst"], False),
+            ],
+        )
+        executor.migrate([("migrations", "thefirst")], fake_initial=True)
+        # And migrate back to clean up the database
+        executor.loader.build_graph()
+        self.assertEqual(
+            executor.migration_plan([("migrations", None)]),
+            [
+                (executor.loader.graph.nodes["migrations2", "0002_second"], True),
+                (executor.loader.graph.nodes["migrations2", "0001_initial"], True),
+                (executor.loader.graph.nodes["migrations", "thefirst"], True),
+            ],
+        )
+        executor.migrate([("migrations", None)])
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        executor.loader.build_graph()
+
     @override_settings(
         MIGRATION_MODULES={
             "migrations": "migrations.test_migrations_custom_user",
@@ -326,7 +386,7 @@ class ExecutorTests(MigrationTestBase):
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:
             migration = executor.loader.get_migration("auth", "0001_initial")
-            self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], True)
+            self.assertIs(executor.loader.detect_soft_applied(connection, None, migration)[0], True)
         finally:
             connection.introspection.table_names = old_table_names
             del global_apps.get_app_config("migrations").models["author"]
@@ -365,9 +425,9 @@ class ExecutorTests(MigrationTestBase):
             self.assertTableExists(table)
         # Table detection sees 0001 is applied but not 0002.
         migration = executor.loader.get_migration("migrations", "0001_initial")
-        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], True)
+        self.assertIs(executor.loader.detect_soft_applied(connection, None, migration)[0], True)
         migration = executor.loader.get_migration("migrations", "0002_initial")
-        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], False)
+        self.assertIs(executor.loader.detect_soft_applied(connection, None, migration)[0], False)
 
         # Create the tables for both migrations but make it look like neither
         # has been applied.
@@ -378,7 +438,7 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)], fake=True)
         # Table detection sees 0002 is applied.
         migration = executor.loader.get_migration("migrations", "0002_initial")
-        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], True)
+        self.assertIs(executor.loader.detect_soft_applied(connection, None, migration)[0], True)
 
         # Leave the tables for 0001 except the many-to-many table. That missing
         # table should cause detect_soft_applied() to return False.
@@ -386,7 +446,7 @@ class ExecutorTests(MigrationTestBase):
             for table in tables[2:]:
                 editor.execute(editor.sql_delete_table % {"table": table})
         migration = executor.loader.get_migration("migrations", "0001_initial")
-        self.assertIs(executor.loader.detect_soft_applied(None, migration)[0], False)
+        self.assertIs(executor.loader.detect_soft_applied(connection, None, migration)[0], False)
 
         # Cleanup by removing the remaining tables.
         with connection.schema_editor() as editor:

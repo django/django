@@ -267,13 +267,14 @@ class MigrationLoader:
                     ) from exc
             raise exc
 
-    def check_consistent_history(self, connection):
+    def check_consistent_history(self, connection, fake_initial=False):
         """
         Raise InconsistentMigrationHistory if any applied migrations have
         unapplied dependencies.
         """
         recorder = MigrationRecorder(connection)
         applied = recorder.applied_migrations()
+        msg = "Migration {}.{} is applied before its dependency {}.{} on database '{}'."
         for migration in applied:
             # If the migration is unknown, skip it.
             if migration not in self.graph.nodes:
@@ -285,9 +286,22 @@ class MigrationLoader:
                     if parent in self.replacements:
                         if all(m in applied for m in self.replacements[parent].replaces):
                             continue
+                    # Skip initial migration that is going to be fake-applied
+                    # unless a later migration in the same app has been
+                    # applied.
+                    if migration[0] != parent[0]:
+                        if self.detect_soft_applied(connection, None, self.graph.nodes[parent])[0]:
+                            if fake_initial:
+                                continue
+                            else:
+                                raise InconsistentMigrationHistory(
+                                    (msg + " The migration {}.{} may be faked using '--fake-initial'.").format(
+                                        migration[0], migration[1], parent[0], parent[1],
+                                        connection.alias, parent[0], parent[1],
+                                    )
+                                )
                     raise InconsistentMigrationHistory(
-                        "Migration {}.{} is applied before its dependency "
-                        "{}.{} on database '{}'.".format(
+                        msg.format(
                             migration[0], migration[1], parent[0], parent[1],
                             connection.alias,
                         )
@@ -316,7 +330,12 @@ class MigrationLoader:
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
 
-    def detect_soft_applied(self, project_state, migration):
+    def is_initial_migration(self, migration):
+        if migration.initial is None:
+            return all(app != migration.app_label for app, name in migration.dependencies)
+        return migration.initial
+
+    def detect_soft_applied(self, connection, project_state, migration):
         """
         Test whether a migration has been implicitly applied - that the
         tables or columns it would create exist. This is intended only for use
@@ -330,17 +349,12 @@ class MigrationLoader:
             return (
                 model._meta.proxy or not model._meta.managed or not
                 router.allow_migrate(
-                    self.connection.alias, migration.app_label,
+                    connection.alias, migration.app_label,
                     model_name=model._meta.model_name,
                 )
             )
 
-        if migration.initial is None:
-            # Bail if the migration isn't the first one in its app
-            if any(app == migration.app_label for app, name in migration.dependencies):
-                return False, project_state
-        elif migration.initial is False:
-            # Bail if it's NOT an initial migration
+        if not self.is_initial_migration(migration):
             return False, project_state
 
         if project_state is None:
@@ -350,7 +364,7 @@ class MigrationLoader:
         apps = after_state.apps
         found_create_model_migration = False
         found_add_field_migration = False
-        existing_table_names = self.connection.introspection.table_names(self.connection.cursor())
+        existing_table_names = connection.introspection.table_names(connection.cursor())
         # Make sure all create model and add field operations are done
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
@@ -386,7 +400,7 @@ class MigrationLoader:
 
                 column_names = [
                     column.name for column in
-                    self.connection.introspection.get_table_description(self.connection.cursor(), table)
+                    connection.introspection.get_table_description(connection.cursor(), table)
                 ]
                 if field.column not in column_names:
                     return False, project_state

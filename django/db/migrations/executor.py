@@ -1,3 +1,5 @@
+from collections import deque
+
 from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
@@ -74,6 +76,24 @@ class MigrationExecutor:
             for migration, _ in full_plan:
                 if migration in applied_migrations:
                     migration.mutate_state(state, preserve=False)
+                elif self.loader.is_initial_migration(migration):
+                    fake_initial = False
+                    queue = deque([migration])
+                    while queue and not fake_initial:
+                        m = queue.popleft()
+                        for child in self.loader.graph.node_map[m.app_label, m.name].children:
+                            child_migration = self.loader.graph.nodes[child]
+                            if child_migration in applied_migrations:
+                                fake_initial = True
+                                break
+                            if self.loader.is_initial_migration(child_migration):
+                                queue.append(child_migration)
+                    if fake_initial:
+                        _, state = self.loader.detect_soft_applied(self.connection, state, migration)
+                        # detect_soft_applied may touch state.apps, reset it
+                        # to speed up further state changes.
+                        if 'apps' in state.__dict__:
+                            del state.__dict__['apps']
         return state
 
     def migrate(self, targets, plan=None, state=None, fake=False, fake_initial=False):
@@ -228,7 +248,7 @@ class MigrationExecutor:
         if not fake:
             if fake_initial:
                 # Test to see if this is an already-applied initial migration
-                applied, state = self.loader.detect_soft_applied(state, migration)
+                applied, state = self.loader.detect_soft_applied(self.connection, state, migration)
                 if applied:
                     fake = True
             if not fake:

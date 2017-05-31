@@ -79,7 +79,7 @@ class Command(BaseCommand):
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
         # Raise an error if any migrations are applied before their dependencies.
-        executor.loader.check_consistent_history(connection)
+        executor.loader.check_consistent_history(connection, fake_initial=options['fake_initial'])
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any

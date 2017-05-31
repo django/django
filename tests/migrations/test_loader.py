@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
@@ -411,6 +413,31 @@ class LoaderTests(TestCase):
         loader.check_consistent_history(connection)
         recorder.record_applied('migrations', '0003_third')
         loader.check_consistent_history(connection)
+
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations_first",
+        "migrations2": "migrations2.test_migrations_2_first",
+    })
+    @modify_settings(INSTALLED_APPS={'append': 'migrations2'})
+    @mock.patch.object(MigrationLoader, 'detect_soft_applied', return_value=(True, None))
+    def test_check_consistent_history_fake_initial(self, mock_detect_soft_applied):
+        """
+        MigrationLoader.check_consistent_history() should ignore soft-applied
+        initial migrations unless a later migration in the same app has been
+        applied.
+        """
+        loader = MigrationLoader(connection=None)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations2', '0001_initial')
+        recorder.record_applied('migrations2', '0002_second')
+        loader.check_consistent_history(connection, fake_initial=True)
+        recorder.record_applied('migrations', 'second')
+        msg = (
+            "Migration migrations.second is applied before its dependency "
+            "migrations.thefirst on database 'default'."
+        )
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
+            loader.check_consistent_history(connection, fake_initial=True)
 
     @override_settings(MIGRATION_MODULES={
         "app1": "migrations.test_migrations_squashed_ref_squashed.app1",
