@@ -35,8 +35,10 @@ However, RFC 7230 and RFC 6265 make it clear that this rule does not apply to
 the various headers used by HTTP cookies (``Cookie`` and ``Set-Cookie``). The
 ``Cookie`` header must only be sent once by a user-agent, but the
 ``Set-Cookie`` header may appear repeatedly and cannot be joined by commas.
-For this reason, we can safely make the request ``headers`` a ``dict``, but
-the response ``headers`` must be sent as a list of tuples, which matches WSGI.
+The ASGI design decision is to transport both request and response headers as
+lists of 2-element ``[name, value]`` lists and preserve headers exactly as they
+were provided.
+
 
 Request
 '''''''
