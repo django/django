@@ -5,14 +5,14 @@
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Vasiliy Anikin <anikin.vasya@gmail.com>, 2017
-# Алексей Борискин <sun.void@gmail.com>, 2015-2016
+# Алексей Борискин <sun.void@gmail.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-25 07:13+0000\n"
-"Last-Translator: Vasiliy Anikin <anikin.vasya@gmail.com>\n"
+"PO-Revision-Date: 2017-04-08 15:22+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -35,12 +35,12 @@ msgstr "Вложенные массивы должны иметь одинако
 
 msgid "Map of strings to strings/nulls"
 msgstr ""
-"Ассоциативный массив, со строковыми ключами и строковыми или отсутствующими "
+"Ассоциативный массив со строковыми ключами и строковыми или отсутствующими "
 "значениями."
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Значение \"%(key)s\", не является строкой или отсутствующим значением."
+msgstr "Значение \"%(key)s\" не является строкой или отсутствующим значением."
 
 msgid "A JSON object"
 msgstr "JSON-объект"

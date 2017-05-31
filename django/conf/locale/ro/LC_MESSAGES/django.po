@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Abel Radac <abelradac@gmail.com>, 2017
 # mihneasim <contact@mesimian.com>, 2011
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-05-31 08:00+0000\n"
+"Last-Translator: Abel Radac <abelradac@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -319,7 +320,7 @@ msgid "Enter a valid integer."
 msgstr "Introduceți un întreg valid."
 
 msgid "Enter a valid email address."
-msgstr "Introduceți o adresă de email validaă."
+msgstr "Introduceți o adresă de email validă."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."

@@ -3,7 +3,7 @@
 # Translators:
 # Bas Peschier <bas.peschier@gmail.com>, 2011,2013
 # Blue <alexandervanratingen@gmail.com>, 2011-2012
-# Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Bouke Haarsma <bouke@haarsma.eu>, 2013
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Erik Romijn <transifex@solidlinks.nl>, 2013
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
@@ -12,15 +12,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012,2014
 # Michiel Overtoom <motoom@xs4all.nl>, 2014
-# Sander Steffann <sander@steffann.nl>, 2014-2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2013
+# Tonnes <tonnes.mb@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:03+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-05-02 10:55+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,7 +39,7 @@ msgid "Asturian"
 msgstr "Asturisch"
 
 msgid "Azerbaijani"
-msgstr "Azerbaijani"
+msgstr "Azerbeidzjaans"
 
 msgid "Bulgarian"
 msgstr "Bulgaars"
@@ -59,7 +60,7 @@ msgid "Catalan"
 msgstr "Catalaans"
 
 msgid "Czech"
-msgstr "Tjechisch"
+msgstr "Tsjechisch"
 
 msgid "Welsh"
 msgstr "Welsh"
@@ -92,10 +93,10 @@ msgid "Spanish"
 msgstr "Spaans"
 
 msgid "Argentinian Spanish"
-msgstr "Argentijns-Spaans"
+msgstr "Argentijns Spaans"
 
 msgid "Colombian Spanish"
-msgstr "Columbiaans Spaans"
+msgstr "Colombiaans Spaans"
 
 msgid "Mexican Spanish"
 msgstr "Mexicaans Spaans"
@@ -197,7 +198,7 @@ msgid "Malayalam"
 msgstr "Malayalam"
 
 msgid "Mongolian"
-msgstr "Mongolisch"
+msgstr "Mongools"
 
 msgid "Marathi"
 msgstr "Marathi"
@@ -206,7 +207,7 @@ msgid "Burmese"
 msgstr "Birmaans"
 
 msgid "Norwegian Bokmål"
-msgstr "Noorse Bokmål"
+msgstr "Noors Bokmål"
 
 msgid "Nepali"
 msgstr "Nepalees"
@@ -215,7 +216,7 @@ msgid "Dutch"
 msgstr "Nederlands"
 
 msgid "Norwegian Nynorsk"
-msgstr "Noorse Nynorsk"
+msgstr "Noors Nynorsk"
 
 msgid "Ossetic"
 msgstr "Ossetisch"
@@ -266,7 +267,7 @@ msgid "Telugu"
 msgstr "Telegu"
 
 msgid "Thai"
-msgstr "Thais"
+msgstr "Thai"
 
 msgid "Turkish"
 msgstr "Turks"
@@ -305,50 +306,50 @@ msgid "Syndication"
 msgstr "Syndicatie"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Dat paginanummer is geen geheel getal"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Dat paginanummer is kleiner dan 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Die pagina bevat geen resultaten"
 
 msgid "Enter a valid value."
-msgstr "Geef een geldige waarde."
+msgstr "Voer een geldige waarde in."
 
 msgid "Enter a valid URL."
-msgstr "Geef een geldige URL op."
+msgstr "Voer een geldige URL in."
 
 msgid "Enter a valid integer."
-msgstr "Geef een geldig geheel getal op."
+msgstr "Voer een geldig geheel getal in."
 
 msgid "Enter a valid email address."
-msgstr "Vul een geldig emailadres in."
+msgstr "Voer een geldig e-mailadres in."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Vul een geldigde 'slug' in, bestaande uit letters, cijfers, liggende "
+"Voer een geldige 'slug' in, bestaande uit letters, cijfers, liggende "
 "streepjes en verbindingsstreepjes."
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Vul een geldigde 'slug' in, bestaande uit Unicode letters, cijfers, liggende "
-"streepjes of verbindingsstreepjes."
+"Voer een geldige 'slug' in, bestaande uit Unicode-letters, cijfers, liggende "
+"streepjes en verbindingsstreepjes."
 
 msgid "Enter a valid IPv4 address."
-msgstr "Geef een geldig IPv4-adres op."
+msgstr "Voer een geldig IPv4-adres in."
 
 msgid "Enter a valid IPv6 address."
 msgstr "Voer een geldig IPv6-adres in."
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Voer een geldig IPv4 of IPv6-adres in."
+msgstr "Voer een geldig IPv4- of IPv6-adres in."
 
 msgid "Enter only digits separated by commas."
-msgstr "Geef alleen cijfers op, gescheiden door komma's."
+msgstr "Voer alleen cijfers in, gescheiden door komma's."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
@@ -417,6 +418,8 @@ msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"Bestandsextensie '%(extension)s' is niet toegestaan. Toegestane extensies "
+"zijn: '%(allowed_extensions)s'."
 
 msgid "and"
 msgstr "en"
@@ -456,21 +459,21 @@ msgstr "Geheel getal"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' waarde moet een geheel getal zijn."
+msgstr "Waarde van '%(value)s' moet een geheel getal zijn."
 
 msgid "Big (8 byte) integer"
 msgstr "Groot (8 byte) geheel getal"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' waarde moet True of False zijn."
+msgstr "Waarde van '%(value)s' moet True of False zijn."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (True danwel False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "Karakterreeks (hooguit %(max_length)s)"
+msgstr "Tekenreeks (hooguit %(max_length)s)"
 
 msgid "Comma-separated integers"
 msgstr "Komma-gescheiden gehele getallen"
@@ -480,15 +483,15 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' waarde heeft een ongeldige datumnotatie. Deze moet in de YYYY-MM-"
-"DD notatie opgegeven worden."
+"Waarde van '%(value)s' heeft een ongeldige datumnotatie. De juiste notatie "
+"is YYYY-MM-DD."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s' waarde heeft een geldige notatie (YYYY-MM-DD) maar is een "
+"Waarde van '%(value)s' heeft de juiste notatie (YYYY-MM-DD), maar het is een "
 "ongeldige datum."
 
 msgid "Date (without time)"
@@ -499,23 +502,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' waarde heeft een ongeldige notatie. Deze moet in de YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] notatie opgegeven worden."
+"Waarde van '%(value)s' heeft een ongeldige notatie. De juiste notatie is "
+"YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' waarde heeft een geldige notatie (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]) maar is een ongeldige datum/tijd."
+"Waarde van '%(value)s' heeft de juiste notatie (YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]), maar is een ongeldige datum/tijd."
 
 msgid "Date (with time)"
 msgstr "Datum (met tijd)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' waarde moet een decimaal getal zijn."
+msgstr "Waarde van '%(value)s' moet een decimaal getal zijn."
 
 msgid "Decimal number"
 msgstr "Decimaal getal"
@@ -525,8 +528,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' waarde heeft een ongeldig formaat. Het juiste formaat is [DD] "
-"[HH:[MM:]]ss[.uuuuuu]."
+"Waarde van '%(value)s' heeft een ongeldige notatie. De juiste notatie is "
+"[DD] [HH:[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "Tijdsduur"
@@ -539,20 +542,20 @@ msgstr "Bestandspad"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' waarde moet een decimaal getal zijn."
+msgstr "Waarde van '%(value)s' moet een drijvende-kommagetal zijn."
 
 msgid "Floating point number"
-msgstr "Decimaal getal"
+msgstr "Drijvende-kommagetal"
 
 msgid "IPv4 address"
-msgstr "IPv4 address"
+msgstr "IPv4-adres"
 
 msgid "IP address"
 msgstr "IP-adres"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' waarde moet None, True of False zijn."
+msgstr "Waarde van '%(value)s' moet None, True of False zijn."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False of None)"
@@ -578,16 +581,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' waarde heeft een ongeldige notatie. Deze moet in de HH:MM[:ss[."
-"uuuuuu]] notatie opgegeven worden."
+"Waarde van '%(value)s' heeft een ongeldige notatie. De juiste notatie is HH:"
+"MM[:ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' waarde heeft een geldige notatie (HH:MM[:ss[.uuuuuu]]) maar is "
-"een ongeldige tijd."
+"Waarde van '%(value)s' heeft de juiste notatie (HH:MM[:ss[.uuuuuu]]), maar "
+"het is een ongeldige tijd."
 
 msgid "Time"
 msgstr "Tijd"
@@ -596,7 +599,7 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr "Ruwe binaire data"
+msgstr "Onbewerkte binaire gegevens"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
@@ -606,28 +609,28 @@ msgid "File"
 msgstr "Bestand"
 
 msgid "Image"
-msgstr "Plaatje"
+msgstr "Afbeelding"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr "%(model)s-instantie met %(field)s %(value)r bestaat niet."
 
 msgid "Foreign Key (type determined by related field)"
-msgstr "Refererende sleutel (type wordt bepaalde door gerelateerde veld)"
+msgstr "Refererende sleutel (type wordt bepaald door gerelateerde veld)"
 
 msgid "One-to-one relationship"
-msgstr "Één-op-één relatie"
+msgstr "Een-op-een-relatie"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr "%(from)s-%(to)s relatie"
+msgstr "%(from)s-%(to)s-relatie"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr "%(from)s-%(to)s relaties"
+msgstr "%(from)s-%(to)s-relaties"
 
 msgid "Many-to-many relationship"
-msgstr "Veel-op-veel relatie"
+msgstr "Veel-op-veel-relatie"
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
@@ -639,22 +642,22 @@ msgid "This field is required."
 msgstr "Dit veld is verplicht."
 
 msgid "Enter a whole number."
-msgstr "Geef een geheel getal op."
+msgstr "Voer een geheel getal in."
 
 msgid "Enter a number."
-msgstr "Geef een getal op."
+msgstr "Voer een getal in."
 
 msgid "Enter a valid date."
-msgstr "Geef een geldige datum op."
+msgstr "Voer een geldige datum in."
 
 msgid "Enter a valid time."
-msgstr "Geef een geldige tijd op."
+msgstr "Voer een geldige tijd in."
 
 msgid "Enter a valid date/time."
-msgstr "Geef een geldige datum/tijd op."
+msgstr "Voer een geldige datum/tijd in."
 
 msgid "Enter a valid duration."
-msgstr "Geef een geldige tijdsduur op."
+msgstr "Voer een geldige tijdsduur in."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -679,7 +682,7 @@ msgstr[1] ""
 "nu %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr "Upload a.u.b. een bestand of vink de verwijder vink, niet allebei."
+msgstr "Upload een bestand of vink het vakje Wissen aan, niet allebei."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
@@ -693,13 +696,13 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Selecteer een geldige keuze. %(value)s is geen beschikbare keuze."
 
 msgid "Enter a list of values."
-msgstr "Geef een lijst op met waardes."
+msgstr "Voer een lijst met waarden in."
 
 msgid "Enter a complete value."
-msgstr "Geef een volledige waarde op."
+msgstr "Voer een volledige waarde in."
 
 msgid "Enter a valid UUID."
-msgstr "Geef een geldige UUID op."
+msgstr "Voer een geldige UUID in."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -721,8 +724,8 @@ msgstr[1] "Verstuur niet meer dan %d formulieren."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] "Geef alstublieft %d of meer formulieren op."
-msgstr[1] "Geef alstublieft %d of meer formulieren op."
+msgstr[0] "Verstuur %d of meer formulieren."
+msgstr[1] "Verstuur %d of meer formulieren."
 
 msgid "Order"
 msgstr "Volgorde"
@@ -759,7 +762,7 @@ msgstr "Selecteer een geldige keuze. Deze keuze is niet beschikbaar."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" is geen geldige waarde voor een primaire sleutel."
+msgstr "'%(pk)s' is geen geldige waarde voor een primaire sleutel."
 
 #, python-format
 msgid ""
@@ -767,10 +770,10 @@ msgid ""
 "may be ambiguous or it may not exist."
 msgstr ""
 "%(datetime)s kon niet worden geïnterpreteerd in tijdzone "
-"%(current_timezone)s. Waarschijnlijk is deze ambigu of bestaat niet."
+"%(current_timezone)s; mogelijk is deze dubbelzinnig of bestaat deze niet."
 
 msgid "Clear"
-msgstr "Verwijder"
+msgstr "Wissen"
 
 msgid "Currently"
 msgstr "Huidige"
@@ -862,19 +865,19 @@ msgid "Tue"
 msgstr "di"
 
 msgid "Wed"
-msgstr "woe"
+msgstr "wo"
 
 msgid "Thu"
-msgstr "don"
+msgstr "do"
 
 msgid "Fri"
-msgstr "vrij"
+msgstr "vr"
 
 msgid "Sat"
-msgstr "zat"
+msgstr "za"
 
 msgid "Sun"
-msgstr "zon"
+msgstr "zo"
 
 msgid "January"
 msgstr "januari"
@@ -1063,7 +1066,7 @@ msgstr ", "
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d jaar"
-msgstr[1] "%d jaren"
+msgstr[1] "%d jaar"
 
 #, python-format
 msgid "%d month"
@@ -1087,7 +1090,7 @@ msgstr[1] "%d dagen"
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d uur"
-msgstr[1] "%d uren"
+msgstr[1] "%d uur"
 
 #, python-format
 msgid "%d minute"
@@ -1102,7 +1105,7 @@ msgid "Forbidden"
 msgstr "Verboden"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF verificatie mislukt. Verzoek afgebroken."
+msgstr "CSRF-verificatie mislukt. Aanvraag afgebroken."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1110,37 +1113,36 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"U ziet deze melding omdat deze HTTPS website vereist dat uw webbrowser een "
-"'Referer header' meestuurt, maar deze ontbreekt. Deze header is noodzakelijk "
-"om veiligheidsredenen om er zeker van te zijn dat uw browser niet door "
-"derden gekaapt wordt."
+"U ziet deze melding, omdat deze HTTPS-website vereist dat uw webbrowser een "
+"'Referer header' meestuurt, maar deze ontbreekt. Deze header is om "
+"veiligheidsredenen vereist om er zeker van te zijn dat uw browser niet door "
+"derden wordt gekaapt."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"Als u uw webbrowser ingesteld heeft om geen 'Referer headers' mee te sturen, "
-"schakelt u deze dan alstublieft weer in, op zijn minst voor deze website, "
-"voor HTTPS verbindingen, of voor 'same-origin' verzoeken."
+"Als u uw webbrowser hebt ingesteld heeft om geen 'Referer headers' mee te "
+"sturen, schakelt u deze dan weer in, op zijn minst voor deze website, of "
+"voor HTTPS-verbindingen, of voor 'same-origin'-aanvragen."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"U ziet deze melding omdat deze website vereist dat een CSRF cookie wordt "
-"meegestuurd bij het versturen van formulieren. Dit cookie is vereist om "
-"veiligheidsredenen om er zeker van te zijn dat uw browser niet door derden "
-"gekaapt wordt."
+"U ziet deze melding, omdat deze website vereist dat een CSRF-cookie wordt "
+"meegestuurd bij het verzenden van formulieren. Dit cookie is om "
+"veiligheidsredenen vereist om er zeker van te zijn dat uw browser niet door "
+"derden wordt gekaapt."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
-"Als u cookies in uw webbrowser heeft uitgeschakeld, schakel deze dan "
-"alstublieft weer in, op zijn minst voor deze website of voor 'same-origin' "
-"verzoeken."
+"Als u cookies in uw webbrowser hebt uitgeschakeld, schakel deze dan weer in, "
+"op zijn minst voor deze website, of voor 'same-origin'-aanvragen."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Meer informatie is beschikbaar met DEBUG=True."
@@ -1158,13 +1160,16 @@ msgid ""
 "Next, start your first app by running <code>python manage.py startapp "
 "[app_label]</code>."
 msgstr ""
+"Start nu uw eerste app door <code>python manage.py startapp [app_label]</"
+"code> uit te voeren."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
-"U ziet dit bericht omdat u <code>DEBUG = True</code> in uw Django settings "
-"bestand heeft staan en u nog geen URLs geconfigureerd heeft. Aan het werk!"
+"U ziet dit bericht, omdat u <code>DEBUG = True</code> in uw Django-"
+"instellingenbestand hebt staan en u nog geen URL's hebt geconfigureerd. Aan "
+"het werk!"
 
 msgid "No year specified"
 msgstr "Geen jaar opgegeven"
@@ -1187,12 +1192,12 @@ msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
-"Geen toekomstige %(verbose_name_plural)s beschikbaar omdat %(class_name)s."
+"Geen toekomstige %(verbose_name_plural)s beschikbaar, omdat %(class_name)s."
 "allow_future de waarde False (Onwaar) heeft."
 
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Ongeldige datum tekst '%(datestr)s' op basis van formaat '%(format)s'"
+msgstr "Ongeldige datumtekst '%(datestr)s' op basis van notatie '%(format)s'"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
@@ -1200,7 +1205,8 @@ msgstr "Geen %(verbose_name)s gevonden die voldoet aan de query"
 
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr ""
-"Pagina is niet 'last' en kan ook niet geconverteerd worden naar een int."
+"Pagina is niet 'last' en kan ook niet naar een geheel getal worden "
+"geconverteerd."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1212,12 +1218,12 @@ msgstr ""
 "Lege lijst en %(class_name)s.allow_empty heeft de waarde False (Onwaar)."
 
 msgid "Directory indexes are not allowed here."
-msgstr "Directory overzicht is hier niet toegestaan"
+msgstr "Directoryindexen zijn hier niet toegestaan."
 
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" bestaat niet"
+msgstr "'%(path)s' bestaat niet"
 
 #, python-format
 msgid "Index of %(directory)s"
-msgstr "Overzicht van %(directory)s"
+msgstr "Index van %(directory)s"

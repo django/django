@@ -2,13 +2,13 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2011-2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-20 13:36+0000\n"
+"PO-Revision-Date: 2017-05-22 21:47+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -22,7 +22,7 @@ msgid "Advanced options"
 msgstr "Altnivelaj elektoj"
 
 msgid "Flat Pages"
-msgstr "Plataj paĝoj"
+msgstr "Simplaj paĝoj"
 
 msgid "URL"
 msgstr "URL"
@@ -47,7 +47,7 @@ msgstr "La streka karaktero \"/\" ne ĉeestas en fino de ĉeno."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr "Platpaĝo kun URL %(url)s jam ekzistas for la retejo %(site)s"
+msgstr "Simpla paĝo kun URL %(url)s jam ekzistas por la retejo %(site)s"
 
 msgid "title"
 msgstr "titolo"
@@ -59,14 +59,14 @@ msgid "enable comments"
 msgstr "ebligu rimarkoj"
 
 msgid "template name"
-msgstr "nomo de ŝablono"
+msgstr "ŝablono nomo"
 
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Ekzemplo: 'platpaĝoj/kontakto_paĝo.html'. Se ĉi tiu ne provizas, la sistemo "
-"uzos 'platpaĝoj/defaŭlto.html'."
+"Ekzemplo: 'flatpages/contact_page.html'. Se ĉi tiu ne provizas, la sistemo "
+"uzos 'flatpages/default.html'."
 
 msgid "registration required"
 msgstr "registrado postulita"
@@ -79,7 +79,7 @@ msgid "sites"
 msgstr "retejoj"
 
 msgid "flat page"
-msgstr "plata paĝo"
+msgstr "simpla paĝo"
 
 msgid "flat pages"
-msgstr "plataj paĝoj"
+msgstr "simplaj paĝoj"

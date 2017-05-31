@@ -9,6 +9,7 @@
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Francisco Petry Rauber <xico.petry@gmail.com>, 2016
 # Gladson <gladsonbrito@gmail.com>, 2013
+# Guilherme Ferreira <guilherme@uft.edu.br>, 2017
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
@@ -21,8 +22,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-06 02:29+0000\n"
-"Last-Translator: Luiz Boaretto <lboaretto@gmail.com>\n"
+"PO-Revision-Date: 2017-04-19 17:11+0000\n"
+"Last-Translator: Guilherme Ferreira <guilherme@uft.edu.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -232,7 +233,7 @@ msgstr "%(name)s \"%(obj)s\": excluído com sucesso."
 
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s com o ID \"%(key)s\" não existe. Talvez ele foi excluído?"
+msgstr "%(name)s com o ID \"%(key)s\" não existe. Talvez tenha sido excluído?"
 
 #, python-format
 msgid "Add %s"

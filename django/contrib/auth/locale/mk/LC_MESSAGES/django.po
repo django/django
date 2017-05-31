@@ -3,7 +3,7 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2012
 msgid ""
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-08 09:39+0000\n"
+"PO-Revision-Date: 2017-04-05 09:16+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -189,6 +189,7 @@ msgstr "корисничко име"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Задолжително. 150 или помалку знаци. Единствено букви, бројки и  @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Веќе постои корисник со тоа корисничко име."

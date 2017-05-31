@@ -3,14 +3,15 @@
 # Translators:
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
-# Sander Steffann <sander@steffann.nl>, 2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
+# Tonnes <tonnes.mb@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 09:32+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-05-02 10:48+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "PostgreSQL extensions"
-msgstr "PostgreSQL uitbreidingen"
+msgstr "PostgreSQL-extensies"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate: "
@@ -29,46 +30,46 @@ msgid "Nested arrays must have the same length."
 msgstr "Lijsten met meerdere lagen moeten allemaal dezelfde lengte hebben."
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "Toewijzing van tekenreeksen naar tekenreeksen/nulwaarden"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string or null."
-msgstr ""
+msgstr "De waarde van '%(key)s' is geen tekenreeks of nul."
 
 msgid "A JSON object"
-msgstr "Een JSON object"
+msgstr "Een JSON-object"
 
 msgid "Value must be valid JSON."
 msgstr "De waarde moet valide JSON zijn."
 
 msgid "Could not load JSON data."
-msgstr "Kon de JSON gegevens niet inlezen."
+msgstr "Kon JSON-gegevens niet laden."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Invoer moet een JSON-bibliotheek zijn."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' waarde moet valide JSON zijn."
+msgstr "Waarde '%(value)s' moet geldige JSON zijn."
 
 msgid "Enter two valid values."
-msgstr "Geef twee geldige waarden op."
+msgstr "Voer twee geldige waarden in."
 
 msgid "The start of the range must not exceed the end of the range."
 msgstr ""
-"Het begin van het bereik mag niet groter zijn dan het eind van het bereik."
+"Het begin van het bereik mag niet groter zijn dan het einde van het bereik."
 
 msgid "Enter two whole numbers."
-msgstr "Geef twee gehele getallen op."
+msgstr "Voer twee gehele getallen in."
 
 msgid "Enter two numbers."
-msgstr "Geef twee getallen op."
+msgstr "Voer twee getallen in."
 
 msgid "Enter two valid date/times."
-msgstr "Geef twee geldige datums/tijden op."
+msgstr "Voer twee geldige datums/tijden in."
 
 msgid "Enter two valid dates."
-msgstr "Geef twee geldige datums op."
+msgstr "Voer twee geldige datums in."
 
 #, python-format
 msgid ""
@@ -78,10 +79,10 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"Lijst bevat %(show_value)d element maar mag niet meer dan %(limit_value)d "
+"Lijst bevat %(show_value)d element, maar mag niet meer dan %(limit_value)d "
 "elementen bevatten."
 msgstr[1] ""
-"Lijst bevat %(show_value)d elementen maar mag niet meer dan %(limit_value)d "
+"Lijst bevat %(show_value)d elementen, maar mag niet meer dan %(limit_value)d "
 "elementen bevatten."
 
 #, python-format
@@ -92,27 +93,29 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"Lijst bevat %(show_value)d element maar mag niet minder dan %(limit_value)d "
+"Lijst bevat %(show_value)d element, maar mag niet minder dan %(limit_value)d "
 "elementen bevatten."
 msgstr[1] ""
-"Lijst bevat %(show_value)d elementen maar mag niet minder dan "
+"Lijst bevat %(show_value)d elementen, maar mag niet minder dan "
 "%(limit_value)d elementen bevatten."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr "Sommige sleutels missen: %(keys)s"
+msgstr "Sommige sleutels ontbreken: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr "Een aantal onbekende sleutels werden opgegeven: %(keys)s"
+msgstr "Er zijn enkele onbekende sleutels opgegeven: %(keys)s"
 
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Controleer dat dit bereik minder dan of gelijk is aan %(limit_value)s."
+msgstr ""
+"Zorg ervoor dat dit bereik minder dan of gelijk is aan %(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
-msgstr "Controleer dat dit bereik groter dan of gelijk is aan %(limit_value)s."
+msgstr ""
+"Zorg ervoor dat dit bereik groter dan of gelijk is aan %(limit_value)s."

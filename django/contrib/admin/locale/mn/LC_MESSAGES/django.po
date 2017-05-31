@@ -6,14 +6,14 @@
 # jargalan <jargalanch@gmail.com>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2016
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 08:14+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-04-13 07:10+0000\n"
+"Last-Translator: Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -147,7 +147,7 @@ msgstr "ба"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\"-ны {fields} өөрчилөгдсөн."
 
 #, python-brace-format
 msgid "Changed {fields}."
@@ -172,13 +172,15 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" амжилттай нэмэгдлээ. Та дахин засах боломжтой."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" амжилттай нэмэгдлээ. Доорх хэсгээс {name} өөрийн нэмэх "
+"боломжтой."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
@@ -187,13 +189,15 @@ msgstr " {name} \"{obj}\" амжилттай нэмэгдлээ."
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" амжилттай өөрчилөгдлөө. Та дахин засах боломжтой."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" амжилттай өөрчилөгдлөө. Доорх хэсгээс {name} өөрийн нэмэх "
+"боломжтой."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
@@ -215,6 +219,7 @@ msgstr " %(name)s \"%(obj)s\" амжилттай устгагдлаа."
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
 msgstr ""
+"\"%(key)s\" дугаартай %(name)s байхгүй байна. Устсан байсан юм болов уу?"
 
 #, python-format
 msgid "Add %s"

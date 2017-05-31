@@ -7,13 +7,13 @@
 # konryd <inactive+konryd@transifex.com>, 2011
 # m_aciek <maciej.olko@gmail.com>, 2016
 # Roman Barczyński <rombar@gmail.com>, 2012
-# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
+# Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-11-12 12:15+0000\n"
+"PO-Revision-Date: 2017-04-22 11:32+0000\n"
 "Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,7 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Zmiany w niektórych polach nie zostały zachowane. Po wykonaniu akcji zmiany "
+"Zmiany w niektórych polach nie zostały zachowane. Po wykonaniu akcji, zmiany "
 "te zostaną utracone."
 
 msgid ""
@@ -94,7 +94,7 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Wybrano akcję, lecz część zmian w polach nie została zachowana. Kliknij OK "
+"Wybrano akcję, lecz część zmian w polach nie została zachowana. Kliknij OK, "
 "aby zapisać. Aby wykonać akcję, należy ją ponownie uruchomić."
 
 msgid ""
@@ -102,8 +102,8 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Wybrano akcję, lecz nie dokonano żadnych zmian. Prawdopodobnie szukasz "
-"przycisku „Wykonaj” (a nie „Zapisz”)"
+"Wybrano akcję, lecz nie dokonano żadnych zmian w polach. Prawdopodobnie "
+"szukasz przycisku „Wykonaj”, a nie „Zapisz”."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
