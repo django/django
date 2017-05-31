@@ -194,7 +194,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         """
         # Loop through the frame's callers to see if the sensitive_variables
         # decorator was used.
-        current_frame = tb_frame.f_back
+        current_frame = getattr(tb_frame, 'f_back', None)
         sensitive_variables = None
         while current_frame is not None:
             if (current_frame.f_code.co_name == 'sensitive_variables_wrapper' and
