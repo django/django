@@ -263,8 +263,14 @@ class Command(BaseCommand):
                     "and cannot be listed in settings.FIXTURE_DIRS." % (app_dir, app_label)
                 )
 
-            if self.app_label and app_label != self.app_label:
-                continue
+            if self.app_label:
+                # Passing app_label as a set is a temporary hack for Django 1.8
+                # to speedup Django's test suite on django-mssql.
+                if isinstance(self.app_label, set):
+                    if app_label not in self.app_label:
+                        continue
+                elif app_label != self.app_label:
+                    continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
         dirs.extend(list(fixture_dirs))

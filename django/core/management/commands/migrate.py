@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import itertools
+import os
 import time
 import traceback
 import warnings
@@ -358,6 +359,11 @@ class Command(BaseCommand):
 
         # Load initial_data fixtures (unless that has been disabled)
         if self.load_initial_data:
+            # Passing app_label as a set is a temporary hack for Django 1.8
+            # to speedup Django's test suite on django-mssql.
+            if os.environ.get('BULK_LOAD_INITIAL_DATA'):
+                app_labels = [app_labels]
+
             for app_label in app_labels:
                 call_command(
                     'loaddata', 'initial_data', verbosity=self.verbosity,
