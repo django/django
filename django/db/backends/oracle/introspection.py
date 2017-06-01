@@ -1,11 +1,14 @@
 import warnings
+from collections import namedtuple
 
 import cx_Oracle
 
 from django.db.backends.base.introspection import (
-    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+    BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
+
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -32,9 +35,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             precision, scale = description[4:6]
             if scale == 0:
                 if precision > 11:
-                    return 'BigIntegerField'
+                    return 'BigAutoField' if description.is_autofield else 'BigIntegerField'
                 elif precision == 1:
                     return 'BooleanField'
+                elif description.is_autofield:
+                    return 'AutoField'
                 else:
                     return 'IntegerField'
             elif scale == -127:
@@ -61,12 +66,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 CASE
                     WHEN char_used IS NULL THEN data_length
                     ELSE char_length
-                END as internal_size
+                END as internal_size,
+                CASE
+                    WHEN identity_column = 'YES' THEN 1
+                    ELSE 0
+                END as is_autofield
             FROM user_tab_cols
             WHERE table_name = UPPER(%s)""", [table_name])
         field_map = {
-            column: (internal_size, default if default != 'NULL' else None)
-            for column, default, internal_size in cursor.fetchall()
+            column: (internal_size, default if default != 'NULL' else None, is_autofield)
+            for column, default, internal_size, is_autofield in cursor.fetchall()
         }
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
@@ -75,14 +84,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         description = []
         for desc in cursor.description:
             name = desc[0]
-            internal_size, default = field_map[name]
+            internal_size, default, is_autofield = field_map[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(FieldInfo(*(
                 (name.lower(),) +
                 desc[1:3] +
                 (internal_size, desc[4] or 0, desc[5] or 0) +
                 desc[6:] +
-                (default,)
+                (default, is_autofield)
             )))
         return description
 

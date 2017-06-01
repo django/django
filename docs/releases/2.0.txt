@@ -195,6 +195,9 @@ Management Commands
 * The new :option:`diffsettings --output` option allows formatting the output
   in a unified diff format.
 
+* On Oracle, :djadmin:`inspectdb` can now introspect ``AutoField`` if the
+  column is created as an identity column.
+
 Migrations
 ~~~~~~~~~~
 
