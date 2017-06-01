@@ -564,14 +564,14 @@ class ManyToManyRawIdWidgetTest(TestCase):
             w.render('test', [m1.pk, m2.pk], attrs={}), (
                 '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" />'
                 '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            ) % dict(m1pk=m1.pk, m2pk=m2.pk)
+            ) % {'m1pk': m1.pk, 'm2pk': m2.pk}
         )
 
         self.assertHTMLEqual(
             w.render('test', [m1.pk]), (
                 '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField">'
                 '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-            ) % dict(m1pk=m1.pk)
+            ) % {'m1pk': m1.pk}
         )
 
     def test_m2m_related_model_not_in_admin(self):

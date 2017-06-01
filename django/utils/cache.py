@@ -287,7 +287,7 @@ def patch_vary_headers(response, newheaders):
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
-    existing_headers = set(header.lower() for header in vary_headers)
+    existing_headers = {header.lower() for header in vary_headers}
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
     response['Vary'] = ', '.join(vary_headers + additional_headers)
@@ -300,7 +300,7 @@ def has_vary_header(response, header_query):
     if not response.has_header('Vary'):
         return False
     vary_headers = cc_delim_re.split(response['Vary'])
-    existing_headers = set(header.lower() for header in vary_headers)
+    existing_headers = {header.lower() for header in vary_headers}
     return header_query.lower() in existing_headers
 
 

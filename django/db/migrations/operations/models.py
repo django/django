@@ -496,7 +496,7 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
 
     def __init__(self, name, unique_together):
         unique_together = normalize_together(unique_together)
-        self.unique_together = set(tuple(cons) for cons in unique_together)
+        self.unique_together = {tuple(cons) for cons in unique_together}
         super().__init__(name)
 
     def deconstruct(self):
@@ -550,7 +550,7 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
 
     def __init__(self, name, index_together):
         index_together = normalize_together(index_together)
-        self.index_together = set(tuple(cons) for cons in index_together)
+        self.index_together = {tuple(cons) for cons in index_together}
         super().__init__(name)
 
     def deconstruct(self):

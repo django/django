@@ -235,7 +235,7 @@ class Command(BaseCommand):
             '.'.join(ext for ext in combo if ext)
             for combo in product(databases, ser_fmts, cmp_fmts)
         )
-        targets = set('.'.join((fixture_name, suffix)) for suffix in suffixes)
+        targets = {'.'.join((fixture_name, suffix)) for suffix in suffixes}
 
         fixture_files = []
         for fixture_dir in fixture_dirs:

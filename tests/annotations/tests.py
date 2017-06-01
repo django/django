@@ -197,7 +197,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             name_lower=Lower('last_name'),
         ).distinct('name_lower')
 
-        self.assertEqual(set(p.last_name for p in people), {'Stark', 'Roosevelt'})
+        self.assertEqual({p.last_name for p in people}, {'Stark', 'Roosevelt'})
         self.assertEqual(len(people), 2)
 
         people2 = Employee.objects.annotate(

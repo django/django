@@ -143,7 +143,7 @@ class Command(BaseCommand):
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
-                    (", ".join(sorted(set(a for a, n in targets))) or "(none)")
+                    (", ".join(sorted({a for a, n in targets})) or "(none)")
                 )
             else:
                 if targets[0][1] is None:

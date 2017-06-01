@@ -873,8 +873,8 @@ class MultipleChoiceField(ChoiceField):
             data = []
         if len(initial) != len(data):
             return True
-        initial_set = set(str(value) for value in initial)
-        data_set = set(str(value) for value in data)
+        initial_set = {str(value) for value in initial}
+        data_set = {str(value) for value in data}
         return data_set != initial_set
 
 

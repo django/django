@@ -47,10 +47,10 @@ class BoundField:
         id_ = self.field.widget.attrs.get('id') or self.auto_id
         attrs = {'id': id_} if id_ else {}
         attrs = self.build_widget_attrs(attrs)
-        return list(
+        return [
             BoundWidget(self.field.widget, widget, self.form.renderer)
             for widget in self.field.widget.subwidgets(self.html_name, self.value(), attrs=attrs)
-        )
+        ]
 
     def __bool__(self):
         # BoundField evaluates to True even if it doesn't have subwidgets.

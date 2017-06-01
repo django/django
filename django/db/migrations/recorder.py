@@ -55,7 +55,7 @@ class MigrationRecorder:
     def applied_migrations(self):
         """Return a set of (app, name) of applied migrations."""
         self.ensure_schema()
-        return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
+        return {tuple(x) for x in self.migration_qs.values_list("app", "name")}
 
     def record_applied(self, app, name):
         """Record that a migration was applied."""

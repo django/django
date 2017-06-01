@@ -559,7 +559,7 @@ class ModelState:
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
-        meta = type("Meta", tuple(), meta_contents)
+        meta = type("Meta", (), meta_contents)
         # Then, work out our bases
         try:
             bases = tuple(

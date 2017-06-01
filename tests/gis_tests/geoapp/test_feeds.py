@@ -17,7 +17,7 @@ class GeoFeedTest(TestCase):
 
     def assertChildNodes(self, elem, expected):
         "Taken from syndication/tests.py."
-        actual = set(n.nodeName for n in elem.childNodes)
+        actual = {n.nodeName for n in elem.childNodes}
         expected = set(expected)
         self.assertEqual(actual, expected)
 

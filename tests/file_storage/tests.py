@@ -66,7 +66,7 @@ class FileSystemStorageTests(unittest.TestCase):
     def test_deconstruction(self):
         path, args, kwargs = temp_storage.deconstruct()
         self.assertEqual(path, "django.core.files.storage.FileSystemStorage")
-        self.assertEqual(args, tuple())
+        self.assertEqual(args, ())
         self.assertEqual(kwargs, {'location': temp_storage_location})
 
         kwargs_orig = {

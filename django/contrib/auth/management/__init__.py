@@ -50,7 +50,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
 
     # This will hold the permissions we're looking for as
     # (content_type, (codename, name))
-    searched_perms = list()
+    searched_perms = []
     # The codenames and ctypes that should exist.
     ctypes = set()
     for klass in app_config.get_models():

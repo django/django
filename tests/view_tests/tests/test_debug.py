@@ -313,7 +313,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
     def test_eol_support(self):
         """The ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
-        LINES = list('print %d' % i for i in range(1, 6))
+        LINES = ['print %d' % i for i in range(1, 6)]
         reporter = ExceptionReporter(None, None, None, None)
 
         for newline in ['\n', '\r\n', '\r']:
