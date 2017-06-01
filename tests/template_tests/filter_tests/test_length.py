@@ -43,6 +43,12 @@ class LengthTests(SimpleTestCase):
         output = self.engine.render_to_string('length07', {'None': None})
         self.assertEqual(output, '0')
 
+    @setup({'length08': '{{ missing_var|length }}'})
+    def test_length08(self):
+        """Missing variables have a length of zero."""
+        output = self.engine.render_to_string('length08', {})
+        self.assertEqual(output, '0')
+
 
 class FunctionTests(SimpleTestCase):
 

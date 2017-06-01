@@ -20,12 +20,9 @@ class ExceptionsTests(SimpleTestCase):
         """
         Raise exception for invalid variable template name
         """
-        if self.engine.string_if_invalid:
-            with self.assertRaises(TemplateDoesNotExist):
-                self.engine.render_to_string('exception02')
-        else:
-            with self.assertRaises(TemplateSyntaxError):
-                self.engine.render_to_string('exception02')
+        with self.assertRaisesRegexp(TemplateSyntaxError,
+                                     "Got this from the 'nonexistent' variable"):
+            self.engine.render_to_string('exception02')
 
     @setup(
         {'exception03': "{% extends 'inheritance01' %}"

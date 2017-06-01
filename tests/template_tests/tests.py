@@ -22,7 +22,7 @@ class TemplateTests(SimpleTestCase):
         #9005 -- url tag shouldn't require settings.SETTINGS_MODULE to
         be set.
         """
-        t = Engine(debug=True).from_string('{% url will_not_match %}')
+        t = Engine(debug=True).from_string('{% url "will_not_match" %}')
         c = Context()
         with self.assertRaises(NoReverseMatch):
             t.render(c)
@@ -33,7 +33,7 @@ class TemplateTests(SimpleTestCase):
         exception.
         """
         t = Engine().from_string('{% url will_not_match %}')
-        c = Context()
+        c = Context({"will_not_match": "not_reversible"})
         try:
             t.render(c)
         except NoReverseMatch:
