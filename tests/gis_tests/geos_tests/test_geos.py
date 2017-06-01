@@ -1,10 +1,11 @@
-import ctypes
 import json
 import pickle
 import random
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 from unittest import mock
+
+import ctypes
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import (

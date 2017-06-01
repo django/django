@@ -1,6 +1,5 @@
 import datetime
 import decimal
-import enum
 import functools
 import math
 import os
@@ -11,6 +10,7 @@ from unittest import mock
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
+import enum
 
 from django import get_version
 from django.conf import settings

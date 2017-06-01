@@ -8,7 +8,6 @@ from django.db import models
 from django.db.models.query import ModelIterable, QuerySet
 from django.utils.functional import cached_property
 
-
 # Basic tests
 
 class Author(models.Model):

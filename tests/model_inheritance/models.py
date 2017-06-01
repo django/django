@@ -13,7 +13,6 @@ Both styles are demonstrated here.
 """
 from django.db import models
 
-
 #
 # Abstract base classes
 #

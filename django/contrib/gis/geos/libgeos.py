@@ -9,6 +9,7 @@
 import logging
 import os
 import re
+
 from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 

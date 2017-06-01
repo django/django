@@ -6,8 +6,9 @@ file upload handlers for processing.
 """
 import base64
 import binascii
-import cgi
 from urllib.parse import unquote
+
+import cgi
 
 from django.conf import settings
 from django.core.exceptions import (

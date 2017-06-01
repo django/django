@@ -1,5 +1,3 @@
-import cgi
-import mimetypes
 import os
 import posixpath
 import re
@@ -10,6 +8,9 @@ import tempfile
 from importlib import import_module
 from os import path
 from urllib.request import urlretrieve
+
+import cgi
+import mimetypes
 
 import django
 from django.conf import settings

@@ -1,4 +1,3 @@
-import ctypes
 import itertools
 import logging
 import multiprocessing
@@ -9,6 +8,8 @@ import unittest
 import warnings
 from importlib import import_module
 from io import StringIO
+
+import ctypes
 
 from django.core.management import call_command
 from django.db import connections

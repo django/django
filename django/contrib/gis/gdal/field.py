@@ -1,5 +1,6 @@
-from ctypes import byref, c_int
 from datetime import date, datetime, time
+
+from ctypes import byref, c_int
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException

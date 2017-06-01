@@ -1,5 +1,7 @@
-import mimetypes
 import os
+from io import BytesIO, StringIO
+
+import mimetypes
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
@@ -12,7 +14,6 @@ from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, getaddresses, make_msgid, parseaddr
-from io import BytesIO, StringIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME

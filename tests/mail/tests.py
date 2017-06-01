@@ -1,6 +1,5 @@
 import asyncore
 import base64
-import mimetypes
 import os
 import shutil
 import smtpd
@@ -8,12 +7,14 @@ import socket
 import sys
 import tempfile
 import threading
+from io import StringIO
+from smtplib import SMTP, SMTPAuthenticationError, SMTPException
+
+import mimetypes
 from email import message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr
-from io import StringIO
-from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
 from django.core import mail

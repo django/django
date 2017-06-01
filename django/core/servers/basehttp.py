@@ -9,9 +9,10 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 
 import logging
 import socket
-import socketserver
 import sys
 from wsgiref import simple_server
+
+import socketserver
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application

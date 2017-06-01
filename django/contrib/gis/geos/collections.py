@@ -3,6 +3,7 @@
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 import json
+
 from ctypes import byref, c_int, c_uint
 
 from django.contrib.gis.geos import prototypes as capi

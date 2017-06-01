@@ -1,6 +1,7 @@
 "Misc. utility functions/classes for admin documentation generator."
 
 import re
+
 from email.errors import HeaderParseError
 from email.parser import HeaderParser
 

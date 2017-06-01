@@ -1,8 +1,9 @@
 """SMTP email backend class."""
 import smtplib
 import socket
-import ssl
 import threading
+
+import ssl
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend

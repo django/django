@@ -1,5 +1,6 @@
 import json
 import os
+
 from ctypes import addressof, byref, c_double, c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
