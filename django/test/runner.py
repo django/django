@@ -14,6 +14,7 @@ from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
+    duplicate_database as _duplicate_database,
     setup_databases as _setup_databases, setup_test_environment,
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
@@ -536,10 +537,27 @@ class DiscoverRunner:
         return suite
 
     def setup_databases(self, **kwargs):
+        result = self.prepare_databases(**kwargs)
+        self.populate_databases(**kwargs)
+        self.duplicate_databases_if_necessary()
+        return result
+
+    def prepare_databases(self, **kwargs):
         return _setup_databases(
-            self.verbosity, self.interactive, self.keepdb, self.debug_sql,
-            self.parallel, **kwargs
+            self.verbosity, self.interactive, self.keepdb, self.debug_sql, **kwargs
         )
+
+    def populate_databases(self, **kwargs):
+        """
+        No Op. Override this function to populate your test databases.
+
+        This function it called before the DBs are duplicated in case tests are
+        executed in parallel. Therefore all DBs will have the same data.
+        """
+        pass
+
+    def duplicate_databases_if_necessary(self):
+        _duplicate_database(self.verbosity, keepdb=self.keepdb, parallel=self.parallel)
 
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
