@@ -2,7 +2,7 @@
 Django 1.11.2 release notes
 ===========================
 
-*Under development*
+*June 1, 2017*
 
 Django 1.11.2 adds a minor feature and fixes several bugs in 1.11.1. Also, the
 latest string translations from Transifex are incorporated.
