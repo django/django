@@ -5,8 +5,9 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.mail.backends.console import \
-    EmailBackend as ConsoleEmailBackend
+from django.core.mail.backends.console import (
+    EmailBackend as ConsoleEmailBackend,
+)
 from django.utils import six
 
 

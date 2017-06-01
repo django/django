@@ -10,8 +10,9 @@ from subprocess import Popen
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
 )
-from django.core.management.commands.makemessages import \
-    Command as MakeMessagesCommand
+from django.core.management.commands.makemessages import (
+    Command as MakeMessagesCommand,
+)
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout

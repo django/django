@@ -1,5 +1,6 @@
-from django.core.checks.compatibility.django_1_8_0 import \
-    check_duplicate_template_settings
+from django.core.checks.compatibility.django_1_8_0 import (
+    check_duplicate_template_settings,
+)
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 

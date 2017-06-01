@@ -6,7 +6,6 @@ is generated for the table on various manage.py operations.
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-
 #  All of these models are created in the database by Django.
 
 

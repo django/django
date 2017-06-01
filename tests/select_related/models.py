@@ -14,7 +14,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-
 # Who remembers high school biology?
 
 

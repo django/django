@@ -10,8 +10,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 
 
-# Basic tests
-
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)

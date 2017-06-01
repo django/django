@@ -1,8 +1,9 @@
 import re
 
 from django.conf import settings
-from django.contrib.gis.db.backends.base.operations import \
-    BaseSpatialOperations
+from django.contrib.gis.db.backends.base.operations import (
+    BaseSpatialOperations,
+)
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.measure import Distance

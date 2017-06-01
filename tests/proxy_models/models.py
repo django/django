@@ -7,7 +7,6 @@ providing a modified interface to the data from the base class.
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-
 # A couple of managers for testing managing overriding in proxy model cases.
 
 

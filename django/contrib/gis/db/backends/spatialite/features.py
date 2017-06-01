@@ -1,6 +1,7 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
-from django.db.backends.sqlite3.features import \
-    DatabaseFeatures as SQLiteDatabaseFeatures
+from django.db.backends.sqlite3.features import (
+    DatabaseFeatures as SQLiteDatabaseFeatures,
+)
 from django.utils.functional import cached_property
 
 
