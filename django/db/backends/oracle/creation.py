@@ -189,12 +189,12 @@ class DatabaseCreation(BaseDatabaseCreation):
             print("_create_test_db(): dbname = %s" % parameters['user'])
         statements = [
             """CREATE TABLESPACE %(tblspace)s
-               DATAFILE '%(datafile)s' SIZE 20M
-               REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize)s
+               DATAFILE '%(datafile)s' SIZE %(size)s
+               REUSE AUTOEXTEND ON NEXT %(extsize)s MAXSIZE %(maxsize)s
             """,
             """CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
-               TEMPFILE '%(datafile_tmp)s' SIZE 20M
-               REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize_tmp)s
+               TEMPFILE '%(datafile_tmp)s' SIZE %(size_tmp)s
+               REUSE AUTOEXTEND ON NEXT %(extsize_tmp)s MAXSIZE %(maxsize_tmp)s
             """,
         ]
         # Ignore "tablespace already exists" error when keepdb is on.
@@ -287,8 +287,12 @@ class DatabaseCreation(BaseDatabaseCreation):
             'tblspace_temp': self._test_database_tblspace_tmp(),
             'datafile': self._test_database_tblspace_datafile(),
             'datafile_tmp': self._test_database_tblspace_tmp_datafile(),
-            'maxsize': self._test_database_tblspace_size(),
-            'maxsize_tmp': self._test_database_tblspace_tmp_size(),
+            'maxsize': self._test_database_tblspace_maxsize(),
+            'maxsize_tmp': self._test_database_tblspace_tmp_maxsize(),
+            'size': self._test_database_tblspace_size(),
+            'size_tmp': self._test_database_tblspace_tmp_size(),
+            'extsize': self._test_database_tblspace_extsize(),
+            'extsize_tmp': self._test_database_tblspace_tmp_extsize(),
         }
 
     def _test_settings_get(self, key, default=None, prefixed=None):
@@ -337,11 +341,23 @@ class DatabaseCreation(BaseDatabaseCreation):
         tblspace = '%s.dbf' % self._test_database_tblspace_tmp()
         return self._test_settings_get('DATAFILE_TMP', default=tblspace)
 
-    def _test_database_tblspace_size(self):
+    def _test_database_tblspace_maxsize(self):
         return self._test_settings_get('DATAFILE_MAXSIZE', default='500M')
 
-    def _test_database_tblspace_tmp_size(self):
+    def _test_database_tblspace_tmp_maxsize(self):
         return self._test_settings_get('DATAFILE_TMP_MAXSIZE', default='500M')
+
+    def _test_database_tblspace_size(self):
+        return self._test_settings_get('DATAFILE_SIZE', default='50M')
+
+    def _test_database_tblspace_tmp_size(self):
+        return self._test_settings_get('DATAFILE_TMP_SIZE', default='50M')
+
+    def _test_database_tblspace_extsize(self):
+        return self._test_settings_get('DATAFILE_EXTSIZE', default='25M')
+
+    def _test_database_tblspace_tmp_extsize(self):
+        return self._test_settings_get('DATAFILE_TMP_EXTSIZE', default='25M')
 
     def _get_test_db_name(self):
         """

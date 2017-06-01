@@ -234,6 +234,10 @@ Tests
 
 * Added threading support to :class:`~django.test.LiveServerTestCase`.
 
+* Added settings that allow customizing the test tablespace parameters for
+  Oracle: :setting:`DATAFILE_SIZE`, :setting:`DATAFILE_TMP_SIZE`,
+  :setting:`DATAFILE_EXTSIZE`, and :setting:`DATAFILE_TMP_EXTSIZE`.
+
 URLs
 ~~~~
 
@@ -360,6 +364,9 @@ Miscellaneous
   longer than expected. For example, with the default of
   ``PASSWORD_RESET_TIMEOUT_DAYS = 3``, password reset tokens are now valid for
   72 hours rather than 96 hours.
+
+* The default size of the Oracle test tablespace is increased from 20M to 50M
+  and the default autoextend size is increased from 10M to 25M.
 
 .. _deprecated-features-2.0:
 
