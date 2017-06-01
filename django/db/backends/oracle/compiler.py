@@ -35,7 +35,11 @@ class SQLCompiler(compiler.SQLCompiler):
             if self.query.low_mark is not None:
                 sql_where_list.append('"_RN" > %d' % (self.query.low_mark,))
             sql_where += ' AND '.join(sql_where_list)
-            sql = ('SELECT "__SUB".* FROM (SELECT "_SUB".*,ROWNUM AS "_RN" FROM (%s) "_SUB") "__SUB" %s' % (sql, sql_where))
+            sql = (
+                'SELECT "__SUB".* FROM (SELECT "_SUB".*,ROWNUM AS "_RN" FROM (%s) "_SUB") "__SUB" %s' % (
+                    sql, sql_where
+                )
+            )
 
         return sql, params
 
