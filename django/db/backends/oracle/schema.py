@@ -31,10 +31,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             return str(value)
 
+    def remove_field(self, model, field):
+        # If the column is an identity column, drop the identity before
+        # removing the field.
+        if self._is_identity_column(model._meta.db_table, field.column):
+            self._drop_identity(model._meta.db_table, field.column)
+        super().remove_field(model, field)
+
     def delete_model(self, model):
         # Run superclass action
         super().delete_model(model)
-        # Clean up any autoincrement trigger
+        # Clean up manually created sequence.
         self.execute("""
             DECLARE
                 i INTEGER;
@@ -45,7 +52,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     EXECUTE IMMEDIATE 'DROP SEQUENCE "%(sq_name)s"';
                 END IF;
             END;
-        /""" % {'sq_name': self.connection.ops._get_sequence_name(model._meta.db_table)})
+        /""" % {'sq_name': self.connection.ops._get_no_autofield_sequence_name(model._meta.db_table)})
 
     def alter_field(self, model, old_field, new_field, strict=False):
         try:
@@ -56,6 +63,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # SQLite-ish workaround
             if 'ORA-22858' in description or 'ORA-22859' in description:
                 self._alter_field_type_workaround(model, old_field, new_field)
+            # If an identity column is changing to a non-numeric type, drop the
+            # identity first.
+            elif 'ORA-30675' in description:
+                self._drop_identity(model._meta.db_table, old_field.column)
+                self.alter_field(model, old_field, new_field, strict)
+            # If a primary key column is changing to an identity column, drop
+            # the primary key first.
+            elif 'ORA-30673' in description and old_field.primary_key:
+                self._delete_primary_key(model, strict=True)
+                self._alter_field_type_workaround(model, old_field, new_field)
             else:
                 raise
 
@@ -63,7 +80,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Oracle refuses to change from some type to other type.
         What we need to do instead is:
-        - Add a nullable version of the desired field with a temporary name
+        - Add a nullable version of the desired field with a temporary name. If
+          the new column is an auto field, then the temporary column can't be
+          nullable.
         - Update the table to transfer values from old to new
         - Drop old column
         - Rename the new column and possibly drop the nullable property
@@ -71,7 +90,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make a new field that's like the new one but with a temporary
         # column name.
         new_temp_field = copy.deepcopy(new_field)
-        new_temp_field.null = True
+        new_temp_field.null = (new_field.get_internal_type() not in ('AutoField', 'BigAutoField'))
         new_temp_field.column = self._generate_temp_name(new_field.column)
         # Add it
         self.add_field(model, new_temp_field)
@@ -126,3 +145,21 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if db_type is not None and db_type.lower() in self.connection._limited_data_types:
             return False
         return create_index
+
+    def _is_identity_column(self, table_name, column_name):
+        with self.connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    CASE WHEN identity_column = 'YES' THEN 1 ELSE 0 END
+                FROM user_tab_cols
+                WHERE table_name = %s AND
+                      column_name = %s
+            """, [self.normalize_name(table_name), self.normalize_name(column_name)])
+            row = cursor.fetchone()
+            return row[0] if row else False
+
+    def _drop_identity(self, table_name, column_name):
+        self.execute('ALTER TABLE %(table)s MODIFY %(column)s DROP IDENTITY' % {
+            'table': self.quote_name(table_name),
+            'column': self.quote_name(column_name),
+        })

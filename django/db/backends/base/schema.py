@@ -710,14 +710,7 @@ class BaseDatabaseSchemaEditor:
         # will always come along and replace it.
         if not old_field.primary_key and new_field.primary_key:
             # First, drop the old PK
-            constraint_names = self._constraint_names(model, primary_key=True)
-            if strict and len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of PK constraints for %s" % (
-                    len(constraint_names),
-                    model._meta.db_table,
-                ))
-            for constraint_name in constraint_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))
+            self._delete_primary_key(model, strict)
             # Make the new one
             self.execute(
                 self.sql_create_pk % {
@@ -978,3 +971,13 @@ class BaseDatabaseSchemaEditor:
                     continue
                 result.append(name)
         return result
+
+    def _delete_primary_key(self, model, strict=False):
+        constraint_names = self._constraint_names(model, primary_key=True)
+        if strict and len(constraint_names) != 1:
+            raise ValueError('Found wrong number (%s) of PK constraints for %s' % (
+                len(constraint_names),
+                model._meta.db_table,
+            ))
+        for constraint_name in constraint_names:
+            self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))

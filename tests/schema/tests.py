@@ -10,9 +10,9 @@ from django.db import (
 from django.db.models import Model
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
-    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
-    DateField, DateTimeField, IntegerField, PositiveIntegerField, SlugField,
-    TextField, TimeField,
+    AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
+    CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
+    SlugField, TextField, TimeField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
@@ -532,6 +532,30 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(bool(columns['name'][1][6]), bool(connection.features.interprets_empty_strings_as_nulls))
 
+    def test_alter_auto_field_to_integer_field(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Change AutoField to IntegerField
+        old_field = Author._meta.get_field('id')
+        new_field = IntegerField(primary_key=True)
+        new_field.set_attributes_from_name('id')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+    def test_alter_auto_field_to_char_field(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Change AutoField to CharField
+        old_field = Author._meta.get_field('id')
+        new_field = CharField(primary_key=True, max_length=50)
+        new_field.set_attributes_from_name('id')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
     def test_alter_text_field(self):
         # Regression for "BLOB/TEXT column 'info' can't have a default value")
         # on MySQL.
@@ -997,6 +1021,22 @@ class SchemaTests(TransactionTestCase):
 
         old_field = IntegerPK._meta.get_field('i')
         new_field = AutoField(primary_key=True)
+        new_field.model = IntegerPK
+        new_field.set_attributes_from_name('i')
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(IntegerPK, old_field, new_field, strict=True)
+
+    def test_alter_int_pk_to_bigautofield_pk(self):
+        """
+        Should be able to rename an IntegerField(primary_key=True) to
+        BigAutoField(primary_key=True).
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(IntegerPK)
+
+        old_field = IntegerPK._meta.get_field('i')
+        new_field = BigAutoField(primary_key=True)
         new_field.model = IntegerPK
         new_field.set_attributes_from_name('i')
 
