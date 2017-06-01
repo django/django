@@ -28,20 +28,14 @@ class SQLCompiler(compiler.SQLCompiler):
             # Wrap the base query in an outer SELECT * with boundaries on
             # the "_RN" column.  This is the canonical way to emulate LIMIT
             # and OFFSET on Oracle.
-            high_where = ''
+            sql_where = 'WHERE '
+            sql_where_list = []
             if self.query.high_mark is not None:
-                high_where = 'WHERE ROWNUM <= %d' % (self.query.high_mark,)
-
-            if self.query.low_mark:
-                sql = (
-                    'SELECT * FROM (SELECT "_SUB".*, ROWNUM AS "_RN" FROM (%s) '
-                    '"_SUB" %s) WHERE "_RN" > %d' % (sql, high_where, self.query.low_mark)
-                )
-            else:
-                # Simplify the query to support subqueries if there's no offset.
-                sql = (
-                    'SELECT * FROM (SELECT "_SUB".* FROM (%s) "_SUB" %s)' % (sql, high_where)
-                )
+                sql_where_list.append('"_RN" <= %d' % (self.query.high_mark,))
+            if self.query.low_mark is not None:
+                sql_where_list.append('"_RN" > %d' % (self.query.low_mark,))
+            sql_where += ' AND '.join(sql_where_list)
+            sql = ('SELECT "__SUB".* FROM (SELECT "_SUB".*,ROWNUM AS "_RN" FROM (%s) "_SUB") "__SUB" %s' % (sql, sql_where))
 
         return sql, params
 
