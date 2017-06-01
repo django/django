@@ -29,7 +29,6 @@ from .models import (
 )
 from .tests import register_tests
 
-
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
 # The save method is a raw base model save, to make

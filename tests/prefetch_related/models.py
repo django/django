@@ -9,8 +9,6 @@ from django.db.models.query import ModelIterable, QuerySet
 from django.utils.functional import cached_property
 
 
-# Basic tests
-
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)
     first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors')
