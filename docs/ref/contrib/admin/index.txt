@@ -806,6 +806,54 @@ subclass::
             list_display = ('timestamp', 'message')
             list_display_links = None
 
+.. attribute:: ModelAdmin.list_aggregates
+
+    .. versionadded:: 1.11
+
+    Set ``list_aggregates`` to control which aggregations are displayed on the change
+    list page of the admin.
+    The aggregations will be performed on the displayed results (i.e. not on the full queryset).
+
+    For example, let’s consider the following model::
+
+        from django.db import models
+
+        class Employee(models.Model):
+            name = models.CharField(max_length=64)
+            age = models.PositiveIntegerField()
+            monthly_salary = models.DecimalField(decimal_places=2, max_digits=7)
+
+    If you want to display the average age of your employees along with the sum of their
+    salaries, you would specify ``list_aggregates`` like this::
+
+        from django.contrib import admin
+        from django.db.models import Avg, Sum
+
+        class EmployeeAdmin(admin.ModelAdmin):
+            list_display = ('name', 'age', 'monthly_salary')
+            list_aggregates = (('age', Avg), ('monthly_salary', Sum))
+
+    You can use the same four possible value types as in ``list_display``.
+    However, if you do not specify a field of the model, you must set ``admin_aggregate_field``
+    to the actual name of the model field to aggregate::
+
+        class EmployeeAdmin(admin.ModelAdmin):
+            list_display = ('name', 'age', 'formatted_monthly_salary')
+            list_aggregates = (('age', Avg), ('formatted_monthly_salary', Sum))
+
+            def formatted_monthly_salary(self, employee_or_salary):
+                salary = getattr(employee_or_salary, 'monthly_salary', employee_or_salary)
+                return '${0:,.2f}'.format(salary)
+
+            formatted_monthly_salary.admin_aggregate_field = 'monthly_salary'
+
+    .. note::
+
+        * Only one aggregate result can be displayed for a field.
+
+        * Any field in ``list_aggregates`` must also be in ``list_display``.
+          You can't display an aggregate result for a field that's not displayed!
+
 .. _admin-list-editable:
 
 .. attribute:: ModelAdmin.list_editable

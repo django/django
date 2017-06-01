@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.utils import formats
 
 from .admin import (
-    BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
+    BandAdmin, ChildAdmin, ChildAggregateAdmin, ChordsBandAdmin, ConcertAdmin,
     CustomPaginationAdmin, CustomPaginator, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
     DynamicSearchFieldsChildAdmin, EmptyValueChildAdmin, EventAdmin,
@@ -108,6 +108,24 @@ class ChangeListTests(TestCase):
             *get_changelist_args(ia, list_select_related=ia.get_list_select_related(request))
         )
         self.assertEqual(cl.queryset.query.select_related, {'player': {}, 'band': {}})
+
+    def test_result_list_aggregate_html(self):
+        """
+        Test for #27229: a cell with an aggregate result should be present
+        in the output HTML.
+        """
+        child1 = Child.objects.create(name='name', age=10)
+        child2 = Child.objects.create(name='name', age=20)
+        children_age_avg = (child1.age + child2.age) / 2
+        m = ChildAggregateAdmin(Child, custom_site)
+        request = self.factory.get('/child/')
+        cl = ChangeList(request, Child, *get_changelist_args(m))
+        cl.formset = None
+        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
+        context = Context({'cl': cl})
+        table_output = template.render(context)
+        avg_th_html = '<th title="Avg">{}</th>'.format(children_age_avg)
+        self.assertInHTML(avg_th_html, table_output, msg_prefix='Failed to find aggregate cell')
 
     def test_result_list_empty_changelist_value(self):
         """

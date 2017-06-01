@@ -8,7 +8,8 @@ from django.contrib.admin.options import (
     IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
 )
 from django.contrib.admin.utils import (
-    get_fields_from_path, lookup_needs_distinct, prepare_lookup_value, quote,
+    get_fields_from_path, label_for_field, lookup_needs_distinct,
+    prepare_lookup_value, quote,
 )
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
@@ -197,9 +198,36 @@ class ChangeList:
         self.show_admin_actions = not self.show_full_result_count or bool(full_result_count)
         self.full_result_count = full_result_count
         self.result_list = result_list
+        self.result_list_aggregates = self.get_result_aggregates(result_list)
         self.can_show_all = can_show_all
         self.multi_page = multi_page
         self.paginator = paginator
+
+    def get_result_aggregates(self, result_queryset):
+        fields = {}
+        aggregate_funcs = {}
+
+        # Build the arguments for the QuerySet.aggregate() method.
+        for field_name, aggregate_class in self.model_admin.list_aggregates:
+            _, field_attr = label_for_field(field_name, self.model, self.model_admin, True)
+            model_field_name = getattr(field_attr, 'admin_aggregate_field', field_name) if field_attr else field_name
+
+            fields[model_field_name] = (field_name, field_attr)
+            aggregate_funcs[model_field_name] = aggregate_class(model_field_name)
+
+        result_aggregates = {}
+
+        # Call QuerySet.aggregate() and process the results.
+        if aggregate_funcs:
+            for model_field_name, result in result_queryset.aggregate(**aggregate_funcs).items():
+                if result:
+                    field_name, field_attr = fields[model_field_name]
+                    result_aggregates[field_name] = (
+                        aggregate_funcs[model_field_name].name,
+                        field_attr(result) if callable(field_attr) else result
+                    )
+
+        return result_aggregates
 
     def _get_default_ordering(self):
         ordering = []

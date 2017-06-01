@@ -87,6 +87,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :attr:`.ModelAdmin.date_hierarchy` can now reference fields across relations.
+* Added :attr:`.ModelAdmin.list_aggregates` to display aggregation results in change lists.
 
 * The new :meth:`ModelAdmin.get_exclude()
   <django.contrib.admin.ModelAdmin.get_exclude>` hook allows specifying the

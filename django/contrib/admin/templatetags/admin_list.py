@@ -173,6 +173,17 @@ def result_headers(cl):
         }
 
 
+def result_footers(cl):
+    """
+    Generates the list footer aggregates.
+    """
+    for i, field_name in enumerate(cl.list_display):
+        fn_name, val = '', ''
+        if field_name in cl.result_list_aggregates:
+            fn_name, val = cl.result_list_aggregates[field_name]
+        yield {'text': val, 'fn_name': fn_name}
+
+
 def _boolean_icon(field_val):
     icon_url = static('admin/img/icon-%s.svg' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
@@ -322,6 +333,7 @@ def result_list(cl):
     return {'cl': cl,
             'result_hidden_fields': list(result_hidden_fields(cl)),
             'result_headers': headers,
+            'result_footers': list(result_footers(cl)),
             'num_sorted_fields': num_sorted_fields,
             'results': list(results(cl))}
 
