@@ -20,7 +20,7 @@ from django.db.models.expressions import F
 from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
-from django.db.models.sql.constants import CURSOR
+from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.utils import timezone
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
@@ -33,9 +33,10 @@ EmptyResultSet = sql.EmptyResultSet
 
 
 class BaseIterable:
-    def __init__(self, queryset, chunked_fetch=False):
+    def __init__(self, queryset, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
         self.queryset = queryset
         self.chunked_fetch = chunked_fetch
+        self.chunk_size = chunk_size
 
 
 class ModelIterable(BaseIterable):
@@ -47,7 +48,7 @@ class ModelIterable(BaseIterable):
         compiler = queryset.query.get_compiler(using=db)
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
-        results = compiler.execute_sql(chunked_fetch=self.chunked_fetch)
+        results = compiler.execute_sql(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
         select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
                                                   compiler.annotation_col_map)
         model_cls = klass_info['model']
@@ -301,13 +302,15 @@ class QuerySet:
     # METHODS THAT DO DATABASE QUERIES #
     ####################################
 
-    def iterator(self):
+    def iterator(self, chunk_size=2000):
         """
         An iterator over the results from applying this QuerySet to the
         database.
         """
+        if chunk_size <= 0:
+            raise ValueError('Chunk size must be strictly positive.')
         use_chunked_fetch = not connections[self.db].settings_dict.get('DISABLE_SERVER_SIDE_CURSORS')
-        return iter(self._iterable_class(self, chunked_fetch=use_chunked_fetch))
+        return iter(self._iterable_class(self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size))
 
     def aggregate(self, *args, **kwargs):
         """

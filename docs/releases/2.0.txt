@@ -214,6 +214,11 @@ Models
 
   .. _`identity columns`: https://docs.oracle.com/database/121/DRDAA/migr_tools_feat.htm#DRDAA109
 
+* The new ``chunk_size`` parameter of :meth:`.QuerySet.iterator` controls the
+  number of rows fetched by the Python database client when streaming results
+  from the database. For databases that don't support server-side cursors, it
+  controls the number of results Django fetches from the database adapter.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -279,6 +284,13 @@ Database backend API
 * Third-party database backends should add a ``DatabaseWrapper.display_name``
   attribute with the name of the database that your backend works with. Django
   may use it in various messages, such as in system checks.
+
+* To improve performance when streaming large result sets from the database,
+  :meth:`.QuerySet.iterator` now fetches 2000 rows at a time instead of 100.
+  The old behavior can be restored using the ``chunk_size`` parameter. For
+  example::
+
+      Book.objects.iterator(chunk_size=100)
 
 Dropped support for Oracle 11.2
 -------------------------------

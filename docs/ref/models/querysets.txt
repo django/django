@@ -2004,7 +2004,7 @@ If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 ``iterator()``
 ~~~~~~~~~~~~~~
 
-.. method:: iterator()
+.. method:: iterator(chunk_size=2000)
 
 Evaluates the ``QuerySet`` (by performing the query) and returns an iterator
 (see :pep:`234`) over the results. A ``QuerySet`` typically caches its results
@@ -2033,6 +2033,11 @@ set into memory.
 
 The Oracle database driver always uses server-side cursors.
 
+With server-side cursors, the ``chunk_size`` parameter specifies the number of
+results to cache at the database driver level. Fetching bigger chunks
+diminishes the number of round trips between the database driver and the
+database, at the expense of memory.
+
 On PostgreSQL, server-side cursors will only be used when the
 :setting:`DISABLE_SERVER_SIDE_CURSORS <DATABASE-DISABLE_SERVER_SIDE_CURSORS>`
 setting is ``False``. Read :ref:`transaction-pooling-server-side-cursors` if
@@ -2048,10 +2053,25 @@ drivers load the entire result set into memory. The result set is then
 transformed into Python row objects by the database adapter using the
 ``fetchmany()`` method defined in :pep:`249`.
 
+The ``chunk_size`` parameter controls the size of batches Django retrieves from
+the database driver. Larger batches decrease the overhead of communicating with
+the database driver at the expense of a slight increase in memory consumption.
+
+The default value of ``chunk_size``, 2000, comes from `a calculation on the
+psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40dndg.it>`_:
+
+    Assuming rows of 10-20 columns with a mix of textual and numeric data, 2000
+    is going to fetch less than 100KB of data, which seems a good compromise
+    between the number of rows transferred and the data discarded if the loop
+    is exited early.
+
 .. versionchanged:: 1.11
 
     PostgreSQL support for server-side cursors was added.
 
+.. versionchanged:: 2.0
+
+    The ``chunk_size`` parameter was added.
 
 ``latest()``
 ~~~~~~~~~~~~

@@ -883,7 +883,7 @@ class SQLCompiler:
         self.query.set_extra_mask(['a'])
         return bool(self.execute_sql(SINGLE))
 
-    def execute_sql(self, result_type=MULTI, chunked_fetch=False):
+    def execute_sql(self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
         """
         Run the query against the database and return the result(s). The
         return value is a single data item if result_type is SINGLE, or an
@@ -937,7 +937,8 @@ class SQLCompiler:
 
         result = cursor_iter(
             cursor, self.connection.features.empty_fetchmany_value,
-            self.col_count
+            self.col_count,
+            chunk_size,
         )
         if not chunked_fetch and not self.connection.features.can_use_chunked_reads:
             try:
@@ -1298,14 +1299,13 @@ class SQLAggregateCompiler(SQLCompiler):
         return sql, params
 
 
-def cursor_iter(cursor, sentinel, col_count):
+def cursor_iter(cursor, sentinel, col_count, itersize):
     """
     Yield blocks of rows from a cursor and ensure the cursor is closed when
     done.
     """
     try:
-        for rows in iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
-                         sentinel):
+        for rows in iter((lambda: cursor.fetchmany(itersize)), sentinel):
             yield [r[0:col_count] for r in rows]
     finally:
         cursor.close()
