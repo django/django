@@ -1,7 +1,8 @@
-import mimetypes
 import unittest
 from os import path
 from urllib.parse import quote
+
+import mimetypes
 
 from django.conf.urls.static import static
 from django.core.exceptions import ImproperlyConfigured

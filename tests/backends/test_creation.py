@@ -8,10 +8,12 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
-from django.db.backends.mysql.creation import \
-    DatabaseCreation as MySQLDatabaseCreation
-from django.db.backends.oracle.creation import \
-    DatabaseCreation as OracleDatabaseCreation
+from django.db.backends.mysql.creation import (
+    DatabaseCreation as MySQLDatabaseCreation,
+)
+from django.db.backends.oracle.creation import (
+    DatabaseCreation as OracleDatabaseCreation,
+)
 from django.db.utils import DatabaseError
 from django.test import SimpleTestCase, TestCase
 

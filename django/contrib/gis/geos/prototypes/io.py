@@ -1,4 +1,5 @@
 import threading
+
 from ctypes import POINTER, Structure, byref, c_char, c_char_p, c_int, c_size_t
 
 from django.contrib.gis.geos.base import GEOSBase

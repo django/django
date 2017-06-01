@@ -13,7 +13,6 @@ from .models import (
     Group, Membership, NewsArticle, Person,
 )
 
-
 # Note that these tests are testing internal implementation details.
 # ForeignObject is not part of public API.
 

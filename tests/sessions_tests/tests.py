@@ -11,12 +11,14 @@ from http import cookies
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
-from django.contrib.sessions.backends.cached_db import \
-    SessionStore as CacheDBSession
+from django.contrib.sessions.backends.cached_db import (
+    SessionStore as CacheDBSession,
+)
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
-from django.contrib.sessions.backends.signed_cookies import \
-    SessionStore as CookieSession
+from django.contrib.sessions.backends.signed_cookies import (
+    SessionStore as CookieSession,
+)
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session

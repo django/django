@@ -2,11 +2,12 @@
 Views and functions for serving static files. These are only to be used
 during development, and SHOULD NOT be used in a production setting.
 """
-import mimetypes
 import os
 import posixpath
 import re
 import stat
+
+import mimetypes
 
 from django.http import (
     FileResponse, Http404, HttpResponse, HttpResponseNotModified,

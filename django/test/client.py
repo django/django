@@ -1,5 +1,4 @@
 import json
-import mimetypes
 import os
 import re
 import sys
@@ -7,6 +6,8 @@ from copy import copy
 from importlib import import_module
 from io import BytesIO
 from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
+
+import mimetypes
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler

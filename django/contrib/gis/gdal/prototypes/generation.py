@@ -2,8 +2,9 @@
  This module contains functions that generate ctypes prototypes for the
  GDAL routines.
 """
-from ctypes import c_char_p, c_double, c_int, c_int64, c_void_p
 from functools import partial
+
+from ctypes import c_char_p, c_double, c_int, c_int64, c_void_p
 
 from django.contrib.gis.gdal.prototypes.errcheck import (
     check_arg_errcode, check_const_string, check_errcode, check_geom,

@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.contrib.staticfiles.handlers import StaticFilesHandler
-from django.core.management.commands.runserver import \
-    Command as RunserverCommand
+from django.core.management.commands.runserver import (
+    Command as RunserverCommand,
+)
 
 
 class Command(RunserverCommand):

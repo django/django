@@ -40,6 +40,7 @@
 """
 import sys
 from binascii import a2b_hex, b2a_hex
+
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
 from django.contrib.gis.gdal.base import GDALBase

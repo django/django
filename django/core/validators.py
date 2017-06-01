@@ -1,7 +1,8 @@
-import ipaddress
 import os
 import re
 from urllib.parse import urlsplit, urlunsplit
+
+import ipaddress
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible

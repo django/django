@@ -2,12 +2,13 @@ import builtins
 import collections
 import datetime
 import decimal
-import enum
 import functools
 import math
 import re
 import types
 import uuid
+
+import enum
 
 from django.db import models
 from django.db.migrations.operations.base import Operation

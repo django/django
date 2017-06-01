@@ -1,7 +1,8 @@
-import cgi
 import codecs
 import re
 from io import BytesIO
+
+import cgi
 
 from django.conf import settings
 from django.core import signals

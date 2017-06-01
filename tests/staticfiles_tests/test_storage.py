@@ -7,8 +7,9 @@ from io import StringIO
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands.collectstatic import \
-    Command as CollectstaticCommand
+from django.contrib.staticfiles.management.commands.collectstatic import (
+    Command as CollectstaticCommand,
+)
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
 from django.test import override_settings

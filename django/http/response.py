@@ -3,9 +3,10 @@ import json
 import re
 import sys
 import time
-from email.header import Header
 from http.client import responses
 from urllib.parse import urlparse
+
+from email.header import Header
 
 from django.conf import settings
 from django.core import signals, signing
