@@ -10,7 +10,7 @@ from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
-from django.utils.inspect import func_supports_parameter
+from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -112,7 +112,7 @@ class BoundField(object):
             name = self.html_initial_name
 
         kwargs = {}
-        if func_supports_parameter(widget.render, 'renderer'):
+        if func_supports_parameter(widget.render, 'renderer') or func_accepts_kwargs(widget.render):
             kwargs['renderer'] = self.form.renderer
         else:
             warnings.warn(
