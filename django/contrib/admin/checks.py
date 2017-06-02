@@ -251,8 +251,7 @@ class BaseModelAdminChecks:
 
     def _check_form(self, obj):
         """ Check that form subclasses BaseModelForm. """
-
-        if hasattr(obj, 'form') and not issubclass(obj.form, BaseModelForm):
+        if not issubclass(obj.form, BaseModelForm):
             return must_inherit_from(parent='BaseModelForm', option='form',
                                      obj=obj, id='admin.E016')
         else:
@@ -260,10 +259,7 @@ class BaseModelAdminChecks:
 
     def _check_filter_vertical(self, obj):
         """ Check that filter_vertical is a sequence of field names. """
-
-        if not hasattr(obj, 'filter_vertical'):
-            return []
-        elif not isinstance(obj.filter_vertical, (list, tuple)):
+        if not isinstance(obj.filter_vertical, (list, tuple)):
             return must_be('a list or tuple', option='filter_vertical', obj=obj, id='admin.E017')
         else:
             return list(chain.from_iterable(
@@ -273,10 +269,7 @@ class BaseModelAdminChecks:
 
     def _check_filter_horizontal(self, obj):
         """ Check that filter_horizontal is a sequence of field names. """
-
-        if not hasattr(obj, 'filter_horizontal'):
-            return []
-        elif not isinstance(obj.filter_horizontal, (list, tuple)):
+        if not isinstance(obj.filter_horizontal, (list, tuple)):
             return must_be('a list or tuple', option='filter_horizontal', obj=obj, id='admin.E018')
         else:
             return list(chain.from_iterable(
@@ -301,10 +294,7 @@ class BaseModelAdminChecks:
 
     def _check_radio_fields(self, obj):
         """ Check that `radio_fields` is a dictionary. """
-
-        if not hasattr(obj, 'radio_fields'):
-            return []
-        elif not isinstance(obj.radio_fields, dict):
+        if not isinstance(obj.radio_fields, dict):
             return must_be('a dictionary', option='radio_fields', obj=obj, id='admin.E021')
         else:
             return list(chain.from_iterable(
@@ -354,27 +344,21 @@ class BaseModelAdminChecks:
             return []
 
     def _check_view_on_site_url(self, obj):
-        if hasattr(obj, 'view_on_site'):
-            if not callable(obj.view_on_site) and not isinstance(obj.view_on_site, bool):
-                return [
-                    checks.Error(
-                        "The value of 'view_on_site' must be a callable or a boolean value.",
-                        obj=obj.__class__,
-                        id='admin.E025',
-                    )
-                ]
-            else:
-                return []
+        if not callable(obj.view_on_site) and not isinstance(obj.view_on_site, bool):
+            return [
+                checks.Error(
+                    "The value of 'view_on_site' must be a callable or a boolean value.",
+                    obj=obj.__class__,
+                    id='admin.E025',
+                )
+            ]
         else:
             return []
 
     def _check_prepopulated_fields(self, obj):
         """ Check that `prepopulated_fields` is a dictionary containing allowed
         field types. """
-
-        if not hasattr(obj, 'prepopulated_fields'):
-            return []
-        elif not isinstance(obj.prepopulated_fields, dict):
+        if not isinstance(obj.prepopulated_fields, dict):
             return must_be('a dictionary', option='prepopulated_fields', obj=obj, id='admin.E026')
         else:
             return list(chain.from_iterable(
