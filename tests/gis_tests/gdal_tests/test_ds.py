@@ -1,4 +1,5 @@
 import os
+import re
 import unittest
 
 from django.contrib.gis.gdal import (
@@ -9,17 +10,26 @@ from django.contrib.gis.gdal.field import OFTInteger, OFTReal, OFTString
 
 from ..test_data import TEST_DATA, TestDS, get_ds_file
 
+wgs_84_wkt = (
+    'GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",'
+    '6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",'
+    '0.017453292519943295]]'
+)
+# Using a regex because of small differences depending on GDAL versions.
+# AUTHORITY part has been added in GDAL 2.2.
+wgs_84_wkt_regex = (
+    r'^GEOGCS\["GCS_WGS_1984",DATUM\["WGS_1984",SPHEROID\["WGS_(19)?84",'
+    r'6378137,298.257223563\]\],PRIMEM\["Greenwich",0\],UNIT\["Degree",'
+    r'0.017453292519943295\](,AUTHORITY\["EPSG","4326"\])?\]$'
+)
+
 # List of acceptable data sources.
 ds_list = (
     TestDS(
         'test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, driver='ESRI Shapefile',
         fields={'dbl': OFTReal, 'int': OFTInteger, 'str': OFTString},
         extent=(-1.35011, 0.166623, -0.524093, 0.824508),  # Got extent from QGIS
-        srs_wkt=(
-            'GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",'
-            '6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",'
-            '0.017453292519943295]]'
-        ),
+        srs_wkt=wgs_84_wkt,
         field_values={
             'dbl': [float(i) for i in range(1, 6)],
             'int': list(range(1, 6)),
@@ -48,11 +58,7 @@ ds_list = (
         driver='ESRI Shapefile',
         fields={'float': OFTReal, 'int': OFTInteger, 'str': OFTString},
         extent=(-1.01513, -0.558245, 0.161876, 0.839637),  # Got extent from QGIS
-        srs_wkt=(
-            'GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",'
-            '6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",'
-            '0.017453292519943295]]'
-        ),
+        srs_wkt=wgs_84_wkt,
     )
 )
 
@@ -210,11 +216,7 @@ class DataSourceTest(unittest.TestCase):
 
                     # Making sure the SpatialReference is as expected.
                     if hasattr(source, 'srs_wkt'):
-                        self.assertEqual(
-                            source.srs_wkt,
-                            # Depending on lib versions, WGS_84 might be WGS_1984
-                            g.srs.wkt.replace('SPHEROID["WGS_84"', 'SPHEROID["WGS_1984"')
-                        )
+                        self.assertIsNotNone(re.match(wgs_84_wkt_regex, g.srs.wkt))
 
     def test06_spatial_filter(self):
         "Testing the Layer.spatial_filter property."
