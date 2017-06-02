@@ -2639,6 +2639,19 @@ Templates can override or extend base admin templates as described in
 ``AdminSite`` methods
 ---------------------
 
+.. method:: AdminSite.register(model_or_iterable, admin_class=None, **options)
+    Registers the given model(s) with the given admin class.
+
+    The model(s) should be Model classes, not instances.
+
+    If an admin class isn't given, it will use ModelAdmin (the default
+    admin options). If keyword arguments are given -- e.g., list_display --
+    they'll be applied as options to the admin class.
+
+    If a model is already registered, this will raise AlreadyRegistered.
+
+    If a model is abstract, this will raise ImproperlyConfigured.
+
 .. method:: AdminSite.each_context(request)
 
     Returns a dictionary of variables to put in the template context for
