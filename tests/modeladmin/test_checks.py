@@ -366,6 +366,17 @@ class RadioFieldsCheckTests(CheckTestCase):
 
 class PrepopulatedFieldsCheckTests(CheckTestCase):
 
+    def test_not_list_or_tuple(self):
+        class TestModelAdmin(ModelAdmin):
+            prepopulated_fields = {'slug': 'test'}
+
+        self.assertIsInvalid(
+            TestModelAdmin, ValidationTestModel,
+            'The value of \'prepopulated_fields["slug"]\' must be a list '
+            'or tuple.',
+            'admin.E029'
+        )
+
     def test_not_dictionary(self):
         class TestModelAdmin(ModelAdmin):
             prepopulated_fields = ()
@@ -1129,4 +1140,16 @@ class ListDisplayEditableTests(CheckTestCase):
             "in 'list_display' ('name'), which cannot be used unless "
             "'list_display_links' is set.",
             id='admin.E124',
+        )
+
+    def test_both_list_editable_and_list_display_links(self):
+        class ProductAdmin(ModelAdmin):
+            list_editable = ('name',)
+            list_display = ('name',)
+            list_display_links = ('name',)
+        self.assertIsInvalid(
+            ProductAdmin, ValidationTestModel,
+            "The value of 'name' cannot be in both 'list_editable' and "
+            "'list_display_links'.",
+            id='admin.E123',
         )

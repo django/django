@@ -64,6 +64,10 @@ class SystemChecksTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    @override_settings(TEMPLATES=[])
+    def test_no_template_engines(self):
+        self.assertEqual(admin.checks.check_dependencies(), [])
+
     @override_settings(
         INSTALLED_APPS=[
             'django.contrib.admin',
@@ -137,6 +141,31 @@ class SystemChecksTestCase(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_list_editable_not_a_list_or_tuple(self):
+        class SongAdmin(admin.ModelAdmin):
+            list_editable = 'test'
+
+        self.assertEqual(SongAdmin(Song, AdminSite()).check(), [
+            checks.Error(
+                "The value of 'list_editable' must be a list or tuple.",
+                obj=SongAdmin,
+                id='admin.E120',
+            )
+        ])
+
+    def test_list_editable_missing_field(self):
+        class SongAdmin(admin.ModelAdmin):
+            list_editable = ('test',)
+
+        self.assertEqual(SongAdmin(Song, AdminSite()).check(), [
+            checks.Error(
+                "The value of 'list_editable[0]' refers to 'test', which is "
+                "not an attribute of 'admin_checks.Song'.",
+                obj=SongAdmin,
+                id='admin.E121',
+            )
+        ])
 
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):
@@ -571,6 +600,18 @@ class SystemChecksTestCase(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_readonly_fields_not_list_or_tuple(self):
+        class SongAdmin(admin.ModelAdmin):
+            readonly_fields = 'test'
+
+        self.assertEqual(SongAdmin(Song, AdminSite()).check(), [
+            checks.Error(
+                "The value of 'readonly_fields' must be a list or tuple.",
+                obj=SongAdmin,
+                id='admin.E034',
+            )
+        ])
 
     def test_extra(self):
         class SongAdmin(admin.ModelAdmin):
