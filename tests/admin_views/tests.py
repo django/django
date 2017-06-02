@@ -3200,7 +3200,7 @@ class AdminActionsTest(TestCase):
     def test_model_admin_custom_action(self):
         "Tests a custom action defined in a ModelAdmin method"
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'mail_admin',
             'index': 0,
         }
@@ -3211,12 +3211,12 @@ class AdminActionsTest(TestCase):
     def test_model_admin_default_delete_action(self):
         "Tests the default delete action defined as a ModelAdmin method"
         action_data = {
-            ACTION_CHECKBOX_NAME: [1, 2],
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
             'action': 'delete_selected',
             'index': 0,
         }
         delete_confirmation_data = {
-            ACTION_CHECKBOX_NAME: [1, 2],
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
             'action': 'delete_selected',
             'post': 'yes',
         }
@@ -3236,18 +3236,17 @@ class AdminActionsTest(TestCase):
         the objects selected for deletion are rendered without separators.
         Refs #14895.
         """
-        subscriber = Subscriber.objects.get(id=1)
-        subscriber.id = 9999
-        subscriber.save()
+        self.s1.id = 9999
+        self.s1.save()
         action_data = {
-            ACTION_CHECKBOX_NAME: [9999, 2],
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
             'action': 'delete_selected',
             'index': 0,
         }
         response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
         self.assertTemplateUsed(response, 'admin/delete_selected_confirmation.html')
         self.assertContains(response, 'value="9999"')  # Instead of 9,999
-        self.assertContains(response, 'value="2"')
+        self.assertContains(response, 'value="%s"' % self.s2.pk)
 
     def test_model_admin_default_delete_action_protected(self):
         """
@@ -3308,7 +3307,7 @@ class AdminActionsTest(TestCase):
     def test_custom_function_mail_action(self):
         "Tests a custom action defined in a function"
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'external_mail',
             'index': 0,
         }
@@ -3319,7 +3318,7 @@ class AdminActionsTest(TestCase):
     def test_custom_function_action_with_redirect(self):
         "Tests a custom action defined in a function"
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'redirect_to',
             'index': 0,
         }
@@ -3333,7 +3332,7 @@ class AdminActionsTest(TestCase):
         information).
         """
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'external_mail',
             'index': 0,
         }
@@ -3344,7 +3343,7 @@ class AdminActionsTest(TestCase):
     def test_custom_function_action_streaming_response(self):
         """Tests a custom action that returns a StreamingHttpResponse."""
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'download',
             'index': 0,
         }
@@ -3356,7 +3355,7 @@ class AdminActionsTest(TestCase):
     def test_custom_function_action_no_perm_response(self):
         """Tests a custom action that returns an HttpResponse with 403 code."""
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'no_perm',
             'index': 0,
         }
@@ -3410,7 +3409,7 @@ action)</option>
         Actions come from the form whose submit button was pressed (#10618).
         """
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             # Two different actions selected on the two forms...
             'action': ['external_mail', 'delete_selected'],
             # ...but we clicked "go" on the top form.
@@ -3455,7 +3454,7 @@ action)</option>
         User should see a warning when 'Go' is pressed and no action is selected.
         """
         action_data = {
-            ACTION_CHECKBOX_NAME: [1, 2],
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
             'action': '',
             'index': 0,
         }
@@ -5225,7 +5224,7 @@ class CSSTest(TestCase):
         delete_selected_confirmation template
         """
         action_data = {
-            ACTION_CHECKBOX_NAME: [1],
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
             'action': 'delete_selected',
             'index': 0,
         }
