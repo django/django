@@ -9,4 +9,6 @@ Django 1.11.3 fixes several bugs in 1.11.2.
 Bugfixes
 ========
 
-* ...
+* Removed an incorrect deprecation warning about a missing ``renderer``
+  argument if a ``Widget.render()`` method accepts ``**kwargs``
+  (:ticket:`28265`).
