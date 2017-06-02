@@ -151,6 +151,18 @@ class AssertNumQueriesTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
         self.assertNumQueries(2, test_func)
 
+    def test_for_max_query_limit(self):
+        person = Person.objects.create(name="test")
+        with self.assertNumQueries(4000):
+            for i in range(0, 4000):
+                self.client.get("/test_utils/get_person/%s/" % person.pk)
+
+    def test_for_max_query_limit_2(self):
+        person = Person.objects.create(name="test")
+        with self.assertNumQueries(5000):
+            for i in range(0, 5000):
+                self.client.get("/test_utils/get_person/%s/" % person.pk)
+
 
 class AssertQuerysetEqualTests(TestCase):
     def setUp(self):
