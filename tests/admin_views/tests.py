@@ -3236,10 +3236,10 @@ class AdminActionsTest(TestCase):
         the objects selected for deletion are rendered without separators.
         Refs #14895.
         """
-        self.s1.id = 9999
-        self.s1.save()
+        new_pk = 9999
+        ExternalSubscriber.objects.filter(id=self.s1.id).update(id=new_pk)
         action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
+            ACTION_CHECKBOX_NAME: [new_pk, self.s2.pk],
             'action': 'delete_selected',
             'index': 0,
         }
