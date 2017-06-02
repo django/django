@@ -911,6 +911,58 @@ This is an Oracle-specific setting.
 
 The maximum size that the DATAFILE_TMP is allowed to grow to.
 
+.. setting:: DATAFILE_SIZE
+
+``DATAFILE_SIZE``
+^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 2.0
+
+Default: ``'50M'``
+
+This is an Oracle-specific setting.
+
+The initial size of the DATAFILE.
+
+.. setting:: DATAFILE_TMP_SIZE
+
+``DATAFILE_TMP_SIZE``
+^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 2.0
+
+Default: ``'50M'``
+
+This is an Oracle-specific setting.
+
+The initial size of the DATAFILE_TMP.
+
+.. setting:: DATAFILE_EXTSIZE
+
+``DATAFILE_EXTSIZE``
+^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 2.0
+
+Default: ``'25M'``
+
+This is an Oracle-specific setting.
+
+The amount by which the DATAFILE is extended when more space is required.
+
+.. setting:: DATAFILE_TMP_EXTSIZE
+
+``DATAFILE_TMP_EXTSIZE``
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 2.0
+
+Default: ``'25M'``
+
+This is an Oracle-specific setting.
+
+The amount by which the DATAFILE_TMP is extended when more space is required.
+
 .. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
 
 DATA_UPLOAD_MAX_MEMORY_SIZE
