@@ -189,12 +189,12 @@ class DatabaseCreation(BaseDatabaseCreation):
             print("_create_test_db(): dbname = %s" % parameters['user'])
         statements = [
             """CREATE TABLESPACE %(tblspace)s
-               DATAFILE '%(datafile)s' SIZE 20M
-               REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize)s
+               DATAFILE '%(datafile)s' SIZE 50M
+               REUSE AUTOEXTEND ON NEXT 20M MAXSIZE %(maxsize)s
             """,
             """CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
-               TEMPFILE '%(datafile_tmp)s' SIZE 20M
-               REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize_tmp)s
+               TEMPFILE '%(datafile_tmp)s' SIZE 50M
+               REUSE AUTOEXTEND ON NEXT 20M MAXSIZE %(maxsize_tmp)s
             """,
         ]
         # Ignore "tablespace already exists" error when keepdb is on.
