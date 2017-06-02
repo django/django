@@ -230,6 +230,9 @@ In ``template.html``, the following paths would be valid::
     {% extends "./base2.html" %}
     {% extends "../base1.html" %}
     {% extends "./my/base3.html" %}
+    
+Note that, by default, the string argument would be relative to the directory 
+specified by the template loader and not the current template's directory.
 
 .. templatetag:: filter
 
@@ -695,7 +698,10 @@ includes it. This example produces the output ``"Hello, John!"``:
 
     {% include "name_snippet.html" %}
     
-    Note that the above is referencing to an absolute path. If you need to look for ``name_snippet.html`` from the directory of the template referencing it, use ``{% include "name_snippet.html" %}``
+Note that, as discussed above in ``{% extends %}`` tag section, the above is 
+_not_ referencing the same path that the parent template is in. If you need to 
+look for ``name_snippet.html`` from the directory of the template referencing 
+it, use the relative path: ``{% include "./name_snippet.html" %}``
 
 * The ``name_snippet.html`` template::
 
