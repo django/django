@@ -215,8 +215,9 @@ This tag can be used in two ways:
 
 See :ref:`template-inheritance` for more information.
 
-A string argument may be a relative path starting with ``./`` or ``../``. For
-example, assume the following directory structure::
+Normally the template name is relative to the template loader's root directory.
+A string argument may also be a relative path starting with ``./`` or ``../``.
+For example, assume the following directory structure::
 
     dir1/
         template.html
@@ -230,9 +231,6 @@ In ``template.html``, the following paths would be valid::
     {% extends "./base2.html" %}
     {% extends "../base1.html" %}
     {% extends "./my/base3.html" %}
-    
-Note that, by default, the string argument would be relative to the directory 
-specified by the template loader and not the current template's directory.
 
 .. templatetag:: filter
 
@@ -677,8 +675,9 @@ This example includes the contents of the template ``"foo/bar.html"``::
 
     {% include "foo/bar.html" %}
 
-A string argument may be a relative path starting with ``./`` or ``../`` as
-described in the :ttag:`extends` tag.
+Normally the template name is relative to the template loader's root directory.
+A string argument may also be a relative path starting with ``./`` or ``../``
+as described in the :ttag:`extends` tag.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
@@ -697,11 +696,6 @@ includes it. This example produces the output ``"Hello, John!"``:
 * Template::
 
     {% include "name_snippet.html" %}
-    
-Note that, as discussed above in ``{% extends %}`` tag section, the above is 
-_not_ referencing the same path that the parent template is in. If you need to 
-look for ``name_snippet.html`` from the directory of the template referencing 
-it, use the relative path: ``{% include "./name_snippet.html" %}``
 
 * The ``name_snippet.html`` template::
 
