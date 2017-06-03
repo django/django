@@ -409,7 +409,7 @@ For each field, we describe the default widget used if you don't specify
     The ``invalid_choice`` error message may contain ``%(value)s``, which will be
     replaced with the selected choice.
 
-    Takes one extra required argument:
+    Takes one extra argument:
 
     .. attribute:: choices
 
@@ -419,6 +419,7 @@ For each field, we describe the default widget used if you don't specify
         model field. See the :ref:`model field reference documentation on
         choices <field-choices>` for more details. If the argument is a
         callable, it is evaluated each time the field's form is initialized.
+        Defaults to an emtpy list.
 
 ``TypedChoiceField``
 --------------------
