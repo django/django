@@ -16,10 +16,10 @@ class SimpleArrayField(forms.CharField):
         'item_invalid': _('Item %(nth)s in the array did not validate: '),
     }
 
-    def __init__(self, base_field, delimiter=',', max_length=None, min_length=None, *args, **kwargs):
+    def __init__(self, base_field, *, delimiter=',', max_length=None, min_length=None, **kwargs):
         self.base_field = base_field
         self.delimiter = delimiter
-        super().__init__(*args, **kwargs)
+        super().__init__(**kwargs)
         if min_length is not None:
             self.min_length = min_length
             self.validators.append(ArrayMinLengthValidator(int(min_length)))
@@ -156,7 +156,7 @@ class SplitArrayField(forms.Field):
         'item_invalid': _('Item %(nth)s in the array did not validate: '),
     }
 
-    def __init__(self, base_field, size, remove_trailing_nulls=False, **kwargs):
+    def __init__(self, base_field, size, *, remove_trailing_nulls=False, **kwargs):
         self.base_field = base_field
         self.size = size
         self.remove_trailing_nulls = remove_trailing_nulls

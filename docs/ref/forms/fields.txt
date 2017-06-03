@@ -1006,7 +1006,7 @@ Slightly complex built-in ``Field`` classes
             from django.core.validators import RegexValidator
 
             class PhoneField(MultiValueField):
-                def __init__(self, *args, **kwargs):
+                def __init__(self, **kwargs):
                     # Define one message for all fields.
                     error_messages = {
                         'incomplete': 'Enter a country calling code and a phone number.',
@@ -1030,7 +1030,7 @@ Slightly complex built-in ``Field`` classes
                     )
                     super().__init__(
                         error_messages=error_messages, fields=fields,
-                        require_all_fields=False, *args, **kwargs
+                        require_all_fields=False, **kwargs
                     )
 
     .. attribute:: MultiValueField.widget

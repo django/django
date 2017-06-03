@@ -31,13 +31,13 @@ class ComplexMultiWidget(MultiWidget):
 
 
 class ComplexField(MultiValueField):
-    def __init__(self, required=True, widget=None, label=None, initial=None):
+    def __init__(self, **kwargs):
         fields = (
             CharField(),
             MultipleChoiceField(choices=beatles),
             SplitDateTimeField(),
         )
-        super().__init__(fields, required, widget, label, initial)
+        super().__init__(fields, **kwargs)
 
     def compress(self, data_list):
         if data_list:

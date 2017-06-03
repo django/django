@@ -73,7 +73,8 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             CharField(min_length='a')
         with self.assertRaises(ValueError):
             CharField(max_length='a')
-        with self.assertRaises(ValueError):
+        msg = '__init__() takes 1 positional argument but 2 were given'
+        with self.assertRaisesMessage(TypeError, msg):
             CharField('a')
 
     def test_charfield_widget_attrs(self):

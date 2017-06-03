@@ -351,6 +351,19 @@ now prohibited, e.g.::
     ...
     TypeError: Cannot reverse a query once a slice has been taken.
 
+Form fields no longer accept optional arguments as positional arguments
+-----------------------------------------------------------------------
+
+To help prevent runtime errors due to incorrect ordering of form field
+arguments, optional arguments of built-in form fields are no longer accepted
+as positional arguments. For example::
+
+    forms.IntegerField(25, 10)
+
+raises an exception and should be replaced with::
+
+    forms.IntegerField(max_value=25, min_value=10)
+
 Miscellaneous
 -------------
 
