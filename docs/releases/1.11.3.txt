@@ -18,3 +18,6 @@ Bugfixes
 
 * Fixed an incorrect ``DisallowedModelAdminLookup`` exception when using
   a nested reverse relation in ``list_filter`` (:ticket:`28262`).
+
+* Fixed admin's ``FieldListFilter.get_queryset()`` crash on invalid input
+  (:ticket:`28202`).
