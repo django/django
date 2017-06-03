@@ -9,7 +9,6 @@ import math
 import uuid
 import warnings
 from base64 import b64decode, b64encode
-from itertools import tee
 
 from django.apps import apps
 from django.db import connection
@@ -155,7 +154,11 @@ class Field(RegisterLookupMixin):
         self.unique_for_date = unique_for_date
         self.unique_for_month = unique_for_month
         self.unique_for_year = unique_for_year
-        self._choices = choices or []
+        if isinstance(choices, collections.Iterator):
+            # consume and store result
+            self.choices = list(choices)
+        else:
+            self.choices = choices or []
         self.help_text = help_text
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
@@ -408,7 +411,6 @@ class Field(RegisterLookupMixin):
         }
         attr_overrides = {
             "unique": "_unique",
-            "choices": "_choices",
             "error_messages": "_error_messages",
             "validators": "_validators",
             "verbose_name": "_verbose_name",
@@ -556,7 +558,7 @@ class Field(RegisterLookupMixin):
             # Skip validation for non-editable fields.
             return
 
-        if self._choices and value not in self.empty_values:
+        if self.choices and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
@@ -850,14 +852,6 @@ class Field(RegisterLookupMixin):
         This is used by the serialization framework.
         """
         return smart_text(self._get_val_from_obj(obj))
-
-    def _get_choices(self):
-        if isinstance(self._choices, collections.Iterator):
-            choices, self._choices = tee(self._choices)
-            return choices
-        else:
-            return self._choices
-    choices = property(_get_choices)
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""

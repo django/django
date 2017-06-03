@@ -712,6 +712,28 @@ class StateTests(TestCase):
         self.assertIsNot(old_model.food_mgr.model, new_model.food_mgr.model)
         self.assertIsNot(old_model.food_qs.model, new_model.food_qs.model)
 
+    def test_choices_iterator(self):
+        """
+        #24483 ProjectState.from_apps should not destructively consume choice
+        iterators
+        """
+
+        new_apps = Apps(["migrations"])
+
+        choices = [('a', 'A'), ('b', 'B')]
+
+        class Author(models.Model):
+            name = models.CharField(max_length=255)
+            choice = models.CharField(max_length=255, choices=iter(choices))
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        ProjectState.from_apps(new_apps)
+        choices_field = Author._meta.get_field('choice')
+        self.assertEqual(list(choices_field.choices), choices)
+
 
 class ModelStateTests(TestCase):
     def test_custom_model_base(self):
