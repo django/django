@@ -1120,7 +1120,9 @@ it is recommended to use :attr:`~Field.default`::
         # other fields
 
 Note that a callable (with the parentheses omitted) is passed to ``default``,
-not an instance of ``UUID``.
+not an instance of ``UUID``. Note also that :ref:`copying a model instance
+<_topics-db-queries-copy>` will not work simply by setting `instance.pk = None`
+in this case, you must manually set the new value.
 
 Relationship fields
 ===================
