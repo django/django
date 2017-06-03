@@ -27,6 +27,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             # other database backends.
             # Mode 3: Monday, 1-53, with 4 or more days this year.
             return "WEEK(%s, 3)" % field_name
+        elif lookup_type == 'week_day_index':
+            return "WEEKDAY(%s)" % field_name
         else:
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)

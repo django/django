@@ -100,6 +100,13 @@ class ExtractWeekDay(Extract):
     """
     lookup_name = 'week_day'
 
+class ExtractWeekDayIndex(Extract):
+    """
+    Return Sunday=1 through Saturday=7.
+
+    To replicate this in Python: (mydatetime.isoweekday() % 7) + 1
+    """
+    lookup_name = 'week_day_index'
 
 class ExtractHour(Extract):
     lookup_name = 'hour'
@@ -117,6 +124,7 @@ DateField.register_lookup(ExtractYear)
 DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
+DateField.register_lookup(ExtractWeekDayIndex)
 DateField.register_lookup(ExtractWeek)
 
 TimeField.register_lookup(ExtractHour)
