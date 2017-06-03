@@ -215,8 +215,9 @@ This tag can be used in two ways:
 
 See :ref:`template-inheritance` for more information.
 
-A string argument may be a relative path starting with ``./`` or ``../``. For
-example, assume the following directory structure::
+Normally the template name is relative to the template loader's root directory.
+A string argument may also be a relative path starting with ``./`` or ``../``.
+For example, assume the following directory structure::
 
     dir1/
         template.html
@@ -674,8 +675,9 @@ This example includes the contents of the template ``"foo/bar.html"``::
 
     {% include "foo/bar.html" %}
 
-A string argument may be a relative path starting with ``./`` or ``../`` as
-described in the :ttag:`extends` tag.
+Normally the template name is relative to the template loader's root directory.
+A string argument may also be a relative path starting with ``./`` or ``../``
+as described in the :ttag:`extends` tag.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
