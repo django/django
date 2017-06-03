@@ -418,7 +418,7 @@ For each field, we describe the default widget used if you don't specify
         model field. See the :ref:`model field reference documentation on
         choices <field-choices>` for more details. If the argument is a
         callable, it is evaluated each time the field's form is initialized.
-        Defaults to an emtpy list.
+        Defaults to an empty list.
 
 ``TypedChoiceField``
 --------------------
