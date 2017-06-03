@@ -29,11 +29,12 @@ def subview(request):
 
 
 def subview_calling_view(request):
-    response = urlopen(request.GET['url'] + '/subview/')
-    return HttpResponse('subview calling view: {}'.format(response.read().decode()))
+    with urlopen(request.GET['url'] + '/subview/') as response:
+        return HttpResponse('subview calling view: {}'.format(response.read().decode()))
 
 
 def check_model_instance_from_subview(request):
-    urlopen(request.GET['url'] + '/create_model_instance/')
-    response = urlopen(request.GET['url'] + '/model_view/')
-    return HttpResponse('subview calling view: {}'.format(response.read().decode()))
+    with urlopen(request.GET['url'] + '/create_model_instance/'):
+        pass
+    with urlopen(request.GET['url'] + '/model_view/') as response:
+        return HttpResponse('subview calling view: {}'.format(response.read().decode()))
