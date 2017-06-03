@@ -205,6 +205,15 @@ with ``code``\s and ``params`` but a list of strings will also work::
         _('Error 2'),
     ])
 
+If you detect multiple errors in multiple fields in your form during
+``Model.clean()``, it is also possible to pass a dictionary mapping field names
+to errors::
+
+    raise ValidationError({
+        'name': ValidationError(_('Error 1'), code='error1'),
+        'age': ValidationError(_('Error 2'), code='error2'),
+    })
+
 Using validation in practice
 ============================
 
