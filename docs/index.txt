@@ -151,6 +151,7 @@ to know about views via the links below:
   :doc:`Built-in display views <topics/class-based-views/generic-display>` |
   :doc:`Built-in editing views <topics/class-based-views/generic-editing>` |
   :doc:`Using mixins <topics/class-based-views/mixins>` |
+  :doc:`Advanced customization <topics/class-based-views/advanced>` |
   :doc:`API reference <ref/class-based-views/index>` |
   :doc:`Flattened index<ref/class-based-views/flattened-index>`
 

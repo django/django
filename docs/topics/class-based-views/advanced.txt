@@ -1,0 +1,694 @@
+===========================================
+Advanced customization of class-based views
+===========================================
+
+.. caution::
+
+    This is an advanced topic. A working knowledge of :doc:`Django's
+    class-based views<index>` is advised before exploring these
+    techniques.
+
+This section is meant to provide the following:
+
+* a number of ready-to-use customized class-based view examples
+
+* a walk-through of the process of creation and design of provided examples
+
+* a discussion of pro's and con's of different approaches when customizing
+  class-based views
+
+* a specific focus on a few areas of class-based generic view hierarchy that
+  can be complex and / or daunting to tweak
+
+There are two possible uses for customized class-based generic views: they may
+serve as parent classes for future inheritance, or they may be used as "Leaf
+Classes" to serve actual views in your application.
+
+In the former case, the general approach should be to override all of the
+methods where functionality needs to be added by the custom class. The
+resulting class should be as consistent with existing generic hierarchy as
+possible. This allows for maximum flexibility in future reuse and further
+customization by the "Leaf Classes".
+
+In the latter case, when using a class as actual view, you may find it useful
+to use an almost exactly opposite approach:
+
+  * flatten and simplify the hierarchy when possible
+
+  * reduce the number of methods called when class is used
+
+  * prefer to methods directly instead of indirectly through intermediary methods
+
+The idea being that the operation of the view should be explicit and easy to
+follow, to debug and modify (albeit at the cost of allowing less flexibility
+for future reuse through inheritance).
+
+In this section, we will mostly focus on the latter approach -- customizing
+classes to be used as actual views.
+
+Combined detail / list view
+===========================
+
+It's a common pattern to show details of an object while at the same time
+listing related objects (for example, a blog post with a list of comments).
+
+The first step when combining multiple views is to consider what we need to
+reuse from each view.
+
+In this case, we need the Detail view to get an object based on the ``pk``
+argument and insert the object into context. All of this is handled in
+:meth:`SingleObjectMixin.get_context_data <django.views.generic.detail.SingleObjectMixin.get_context_data>`.
+This method relies on the ``object`` instance variable.
+
+We also need to insert the list object into the context and to
+handle pagination -- all of this is similarly handled in ``get_context_data()``
+and relies on the ``object_list`` instance variable.
+
+Looking at ``get_context_data()`` implementations we can see that the logic
+creates the context and adds it to the context of the super class (this will be
+covered in more detail later). In other words, all of the required contexts are
+combined automatically as long as we create the needed instance objects.
+
+Therefore, we have to set up the instance variables in ``get()`` method, call
+``get_context_data()`` on the super class and render context to response.
+
+Note that we're skipping the ``allow_empty`` logic in ``ListView.get()``
+because it makes no sense to disallow empty listings for this view.
+
+We also need to decide what we should inherit from. We have the following
+options:
+
+* ``SingleObjectMixin``, ``MultipleObjectMixin`` and ``View``
+  (to provide view rendering methods).
+
+* ``DetailView`` and ``ListView``.
+
+* One of the views above and one of the Mixins for the other class.
+
+The two first options are both good, but the 3rd option is problematic because
+it makes it appear that we are using one of the view classes preferentially
+where in fact we just need the view methods available from either class. We'll
+use the first option in our example.
+
+We'll demonstrate this with the ``Author`` model we used in the
+:doc:`generic class-based views introduction<generic-display>`.
+
+.. snippet::
+    :filename: views.py
+
+    from django.views.generic import TemplateView
+    from django.views.generic.detail import SingleObjectMixin
+    from django.views.generic.list import MultipleObjectMixin
+    from books.models import Author
+
+    class AuthorDetail(SingleObjectMixin, MultipleObjectMixin, TemplateView):
+        """Combined detail / list view."""
+        model = Author
+        paginate_by = 2
+        template_name = "author.html"
+
+        def get(self, request, *args, **kwargs):
+            self.object = self.get_object()
+            self.object_list = self.object.books.all()
+            return self.render_to_response(self.get_context_data())
+
+We'll also have a ``Book`` model defined, linked to ``Author``:
+
+.. snippet::
+    :filename: models.py
+
+    from django import models
+
+    class Book(models.Model):
+        name = models.CharField(max_length=50, unique=True)
+        author = models.ForeignKey(Author, related_name="books")
+
+Note that when using ``context_object_name`` property or an automatically added
+context variable with the name based on model name, we need to be mindful of
+the inheritance order: in this case we'll use the ``author`` context variable
+which is set up in ``SingleObjectMixin.get_context_data()`` so we have to put
+``SingleObjectMixin`` first.
+
+.. code-block:: html+django
+
+    <h2>Author {{ author }}</h2>
+
+    <ol>
+      {% for book in page_obj %}
+        <li>{{ book.name }}</li>
+      {% endfor %}
+    </ol>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>
+
+Combined Detail and Form Views
+==============================
+
+As with the last example, let's look at what we need to reuse:
+``get_context_data()`` methods from both classes, and the ``post()`` method
+from ``FormView``.
+
+Unlike the last example, there is no clash between ``get()`` methods:
+``FormView``'s method does not need to do any special setup, therefore we can
+simply skip it by putting ``SingleObjectMixin`` first in the order of inheritance.
+
+As such, we don't need to override any methods at all! However, we may
+sometimes wish to override ``form_valid()`` to do some processing of the form
+(but would have to do the same in a stand-alone ``FormView``):
+
+.. snippet::
+    :filename: views.py
+
+    from django.views.generic import FormView
+    from django.shortcuts import redirect
+    from django import forms
+
+    class AuthorInterestForm(forms.Form):
+        message = forms.CharField()
+
+    class AuthorDetail2(SingleObjectMixin, FormView):
+        model = Author
+        form_class = AuthorInterestForm
+        template_name = "author2.html"
+
+        def form_valid(self, form):
+            # Here, we would have some logic based on user's form inputs
+            return redirect('author2', pk=self.get_object().pk)
+
+The template can use the ``author`` context variable and display the form:
+
+.. code-block:: html+django
+
+    <h2>Author {{ author.name }}</h2>
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table border="0" cellpadding="2" cellspacing="2">
+            {{ form.as_table }}
+        </table>
+    <p><input type="submit" value="Submit" /></p>
+    </form>
+
+Combined List View with a Form
+==============================
+
+This combined view is very similar to the last example. We need
+``MultipleObjectMixin`` to get the listing object into context and we need
+``FormView`` for ``post()`` method logic and adding the form to context. Since
+``FormView`` already provides a ``get()`` method, we don't need any additional
+classes:
+
+.. snippet::
+    :filename: views.py
+
+    class BooksFormView(MultipleObjectMixin, FormView):
+        model = Book
+        form_class = AuthorInterestForm
+        paginate_by = 2
+        template_name = "books.html"
+
+        def form_valid(self, form):
+            # Here, we would have some logic based on user's form inputs
+            return redirect('books-form')
+
+The template is also straightforward (pagination links could also be added as
+in the first example):
+
+.. code-block:: html+django
+
+    <h2>Books</h2>
+
+    <ol>
+      {% for book in page_obj %}
+        <li>{{ book.name }}</li>
+      {% endfor %}
+    </ol>
+
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table border="0" cellpadding="2" cellspacing="2">
+            {{ form.as_table }}
+        </table>
+    <p><input type="submit" value="Submit" /></p>
+    </form>
+
+A View with Arbitrary Number of Forms
+=====================================
+
+The following view will display an arbitrary number of forms where the user
+will only submit one of the forms, which is going to be validated while the
+other forms will be loaded in initial state. This may be useful, for example,
+when you want to show a search box on a page that already has a form.
+
+This should not be confused with an implementation where multiple django forms
+are within a single ``form`` tag and are all processed on submission -- this is
+trivially implemented because there's no need to track which form was used and
+to special-case it.
+
+We'll need to override the ``get()`` and ``post()`` methods to load initial
+forms into the context and to determine which form was used. Note that we are
+only instantiating and validating the form that was used and ignoring the rest.
+
+The ``get()`` method is a good example of flattening and simplifying the method
+hierarchy: we only need to get the forms into the context, so we can ignore
+``get_context_data()`` and all form-related methods and render the dictionary
+of forms directly to response.
+
+In ``post()`` we're getting the name of the form, instantiating it, and passing
+both the name and form to ``form_valid()`` or ``form_invalid()`` methods.
+
+In ``form_valid()`` we may wish to do custom processing based on the form name.
+Note that we've also flattened the method hierarchy by redirecting directly the
+the success url.
+
+The ``form_invalid()`` method requires a bit of explanation: it's very similar
+to the ``get()`` method but we need to create fresh instances of all forms
+except for the submitted one, which is inserted into context as a bound form.
+
+.. snippet::
+    :filename: views.py
+
+    class CommentForm(forms.Form):
+        comment = forms.CharField()
+
+    class NFormsView(FormView):
+        form_classes = dict(
+                            comment_form = CommentForm,
+                            author_form = AuthorInterestForm,
+                            )
+        template_name = "two-forms.html"
+
+        def get(self, request, *args, **kwargs):
+            context = {n: cls() for n, cls in self.form_classes.items()}
+            return self.render_to_response(context)
+
+        def post(self, request, *args, **kwargs):
+            for name, cls in self.form_classes.items():
+                if name in request.POST:
+                    form = self.get_form(cls)
+                    break
+
+            if form.is_valid():
+                return self.form_valid(name, form)
+            else:
+                return self.form_invalid(name, form)
+
+        def form_valid(self, name, form):
+            # Here, we would have some logic based on user's form inputs
+            return redirect('two-forms')
+
+        def form_invalid(self, name, form):
+            context = {n: cls() for n, cls in self.form_classes.items()}
+            context.update({name: form})
+            return self.render_to_response(context)
+
+The key change in the template is that each form's ``input`` tag needs to
+specify the form's name:
+
+.. code-block:: html+django
+
+    <h2>Author form</h2>
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table border="0" cellpadding="2" cellspacing="2">
+            {{ author_form.as_table }}
+        </table>
+    <p><input type="submit" name="author_form" value="Submit" /></p>
+    </form>
+
+    <h2>Comment form</h2>
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table border="0" cellpadding="2" cellspacing="2">
+            {{ comment_form.as_table }}
+        </table>
+    <p><input type="submit" name="comment_form" value="Submit" /></p>
+    </form>
+
+Create / Update View
+====================
+
+If we look at the ``CreateView`` and ``UpdateView``, there are only two methods
+that are different: ``get()`` and ``post()``, where ``CreateView``'s methods
+set the ``object`` property to ``None`` instead of using ``get_object()``
+method.
+
+If we made the choice to customize ``CreateView``, we'd have to override both
+methods since they explicitly set the value; with ``UpdateView`` the change can
+be simpler because both methods delegate to ``get_object()``.
+
+Looking at ``get_object()`` we can see that a view missing ``pk`` and ``slug``
+(as a ``CreateView`` will not have these) arguments will raise an
+``AttributeError``.
+
+Therefore, all we have to do is return ``None`` on ``AttributeError`` in
+``get_object()``:
+
+.. snippet::
+    :filename: views.py
+
+    from django.core.urlresolvers import reverse_lazy
+    from django.views.generic import UpdateView
+
+    class CreateUpdateBook(UpdateView):
+        model = Book
+        fields = ["name", "author"]
+        success_url = reverse_lazy("books-form")
+        template_name = "update-book.html"
+
+        def get_object(self):
+            try:
+                return super(CreateUpdateBook, self).get_object()
+            except AttributeError:
+                return None
+
+In the template, you may check for the type of view by checking the
+``form.instance`` variable:
+
+.. code-block:: html+django
+
+    <h2>Book form</h2>
+
+    <p>
+    {% if form.instance %} edit {% else %} create {% endif %} a book
+    </p>
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table border="0" cellpadding="2" cellspacing="2">
+            {{ form.as_table }}
+        </table>
+    <p><input type="submit" name="author_form" value="Submit" /></p>
+    </form>
+
+Combined Detail, List and Form View
+===================================
+
+This view is a bit more involved than previous examples because we need to
+consider three different paths of execution:
+
+* get request
+* post request with invalid form (similar to get, render bound form with errors)
+* post request with a valid form (redirect to success url)
+
+The logic that we need to reuse is in the respective ``get_context_data()``
+methods and should all 'just work' as long as we set up the needed instance
+variables.
+
+The ``object_list`` needs to be set up in a custom way, by using
+``RelatedManager`` on ``object`` variable, therefore we need to initialize both
+instance variables before calling the ``get_context_data()`` methods.
+
+We could do that in ``get()`` and ``post()`` methods but if we look at
+execution paths, we can see that the first and second paths go through one
+common method: ``get_context_data()``, while third path does not need context
+data.
+
+All we have to do is override ``get_context_data()`` and set up the instance
+variables before making the ``super()`` call. This may seem a bit unusual
+because these variables are normally set up in ``get()`` or ``post()``, but in
+this case they have to be set up in both, and ``get_context_data()`` is the
+common execution path we can use to avoid duplicate logic.
+
+You may wish to access the object in ``form_valid()`` (e.g. for redirection);
+if you do, you have to use the ``get_object()`` method because
+``get_context_data()`` is not used in this execution path.
+
+(As a general note, it's good to remember the difference between
+``form_valid()`` and ``form_invalid()`` whenever you're working with FormView:
+though similarly named, their logic is completely different and it's useful to
+think of ``form_invalid()`` as 'retry get()' method).
+
+.. snippet::
+    :filename: views.py
+
+    class AuthorBooksView(SingleObjectMixin, MultipleObjectMixin, FormView):
+        model = Author
+        form_class = AuthorInterestForm
+        paginate_by = 2
+        template_name = "author-books.html"
+
+        def get_context_data(self, **kwargs):
+            self.object = self.get_object()
+            self.object_list = self.object.books.all()
+            return super(AuthorBooksView, self).get_context_data(**kwargs)
+
+        def form_valid(self, form):
+            # Here, we would have some logic based on user's form inputs
+            return redirect("author-books", pk=self.get_object().pk)
+
+
+.. code-block:: html+django
+
+    <h2>Author: {{ author.name }}</h2>
+
+    <ol>
+      {% for book in page_obj %}
+        <li>{{ book.name }}</li>
+      {% endfor %}
+    </ol>
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table border="0" cellpadding="2" cellspacing="2">
+            {{ form.as_table }}
+        </table>
+    <p><input type="submit" name="author_form" value="Submit" /></p>
+    </form>
+
+Combined Create and List Views
+==============================
+
+This view is quite simple: we're just pulling in the listing from
+``MultipleObjectMixin.get_context_data()``:
+
+.. snippet::
+    :filename: views.py
+
+    from django.views.generic import CreateView
+
+    class BooksCreateView(MultipleObjectMixin, CreateView):
+        """
+        We're overriding get_context_data() to set up `self.object` and `self.object_list` to
+        be used in respective parent get_context_data() methods.
+
+        Note: we cannot rely on ListView.get() to create `self.object_list` because we also need it on POST,
+        when form_invalid() calls get_context_data().
+        """
+        model         = Book
+        paginate_by   = 10
+        fields        = ["name", "author"]
+        success_url   = reverse_lazy("list-books-create")
+        template_name = "books.html"
+
+The template is the same ``books.html`` we've used before.
+
+Formset View
+============
+
+Formset handling in a view is generally the same as Form handling: the same
+exact operations apply to multiple forms instead of a single one, the only
+difference being that you may wish to iterate over all forms to process
+each of them:
+
+.. snippet::
+    :filename: views.py
+
+    from django.forms.formsets import formset_factory
+
+    CommentFormSet = formset_factory(CommentForm, extra=5)
+
+    class CommentFormsetView(FormView):
+        form_class    = CommentFormSet
+        template_name = "comment-formset.html"
+
+        def form_valid(self, formset):
+            for form in formset:
+                # do something with form
+                pass
+            return redirect("comment-formset")
+
+.. code-block:: html+django
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+
+    <table border="0" cellpadding="2" cellspacing="2">
+    {% with form as formset %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+        {{ form.id }}
+        <tr>
+            <td>{{ form.comment }} {{ form.comment.errors }}</td>
+        </tr>
+    {% endfor %}
+    {% endwith %}
+    </table>
+    <p><input type="submit" value="Submit" /></p>
+    </form>
+
+Inline Formset
+==============
+
+This view is similar to the last except for substituting an ``UpdateView`` for
+``FormView``. In addition, there's one small detail we need to address if we
+need to use the 'parent' object in ``get_success_url()`` (e.g. for
+redirection): ``UpdateView`` sets ``self.object = form.save()`` which is going
+to be a list of saved objects returned by the formset, which is probably not
+what we want.
+
+The solution is to use ``get_object()`` method directly (note that this results
+in a duplicate db query which is something you may want to further optimize):
+
+.. snippet::
+    :filename: views.py
+
+    from django.forms.models import inlineformset_factory
+
+    InlineBookFormSet = inlineformset_factory(Author, Book, fields=('name',))
+
+    class BookInlineFormsetView(UpdateView):
+        model = Author
+        form_class = InlineBookFormSet
+        template_name = "book-formset.html"
+
+        def get_success_url(self):
+            return reverse("book-inline-formset", kwargs=dict(pk=self.get_object().pk))
+
+.. code-block:: html+django
+
+    <form action="" method="post" accept-charset="utf-8">{% csrf_token %}
+    <table border="0" cellpadding="2" cellspacing="2">
+    <tr><td></td><td></td><td>remove</td></tr>
+    {% with form as formset %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+        {{ form.id }}
+        <tr>
+            <td>{{ form.name }} {{ form.name.errors }}</td>
+            <td>{{ form.author }} {{ form.author.errors }}</td>
+            <td>{{ form.DELETE }}</td>
+        </tr>
+    {% endfor %}
+    {% endwith %}
+    </table>
+    <p><input type="submit" value="Submit" /></p>
+    </form>
+
+ModelFormset View
+=================
+
+FormView is not well suited to be customized as a ModelFormset View. It's not
+recommended; instead, you should use directly or inherit from on of the
+available third-party ModelFormset class-based views.
+
+Use of get_context_data() method in custom views
+================================================
+
+For the most part, you can inherit from multiple views and the context will be
+automatically populated using each view's ``get_context_data()``.
+
+The only exception is having a name clash between classes' context variables --
+for instance, between ``DetailView``'s and ``ModelFormMixin``'s ``object``
+variable.
+
+You may also overload one of the context variables by calling
+``get_context_data()`` from your ``get()`` or ``post()``.
+
+Consider the following example:
+
+.. snippet::
+    :filename: views.py
+
+    class MyView(ParentClass1, ParentClass2, ParentClass3):
+        def get(self, request, *args, **kwargs):
+            context = self.get_context_data(x=1)
+            return self.render_to_response(context)
+
+In the template's context, variables defined in ``ParentClass2`` will take
+precedence over ``ParentClass1`` and ``ParentClass1``'s variables will override
+both.
+
+Context variable ``x`` passed as an argument will take precedence over all
+subsequent variables of the same name, so you can be certain that provided
+value will be in the template context.
+
+The following is an outline of logic and requirements of all
+``get_context_data()`` methods:
+
+  * ``SingleObjectMixin``: requires the ``object`` instance variable; if the
+    variable does not exist, it will be initialized using ``get_object()``
+    method.  The object will be inserted into context under the name ``object``
+    and the name derived from ``model`` class variable or the value of
+    ``context_object_name``.
+
+  * ``MultipleObjectMixin``: the logic is similar to ``SingleObjectMixin``
+    except that ``object_list`` instance variable is used and optional
+    pagination is applied. The template context variable name is also
+    ``object_list`` and ``page_obj`` if pagination is enabled.
+
+  * ``FormMixin``: form is initialized and inserted into context under the name
+    'form'.
+
+  * ``UpdateView``: combined effect of ``SingleObjectMixin.get_context_data()``
+    and ``FormMixin.get_context_data()``.
+
+  * ``CreateView``: similar to ``UpdateView`` but the object is not added to
+    the context because the ``object`` instance variable is set to None.
+
+Use of get() methods in custom views
+====================================
+
+  * ``TemplateView``: get context with ``get_context_data()`` and call
+    ``render_to_response()``. All of the following classes contain the same logic.
+
+  * ``BaseDetailView``: initialize object with ``self.object =
+    self.get_object()`` statement.
+
+  * ``BaseListView``: initialize object_list with ``self.object_list =
+    self.get_queryset()`` statement; also contains ``allow_empty`` logic.
+
+  * ``ProcessFormView``: no special logic.
+
+  * ``BaseCreateView``: initialize object with ``self.object = None``
+    statement.
+
+  * ``BaseUpdateView``: initialize object with ``self.object =
+    self.get_object()`` statement.
+
+When combining multiple views, the most straightforward approach is to create a
+new ``get()`` method which contains all logic from respective ``get()`` methods,
+calls ``get_context_data()`` once (which should handle context data for all
+classes), and return ``render_to_response(context)``.
+
+Keep in mind that you can fall back on object initialization logic done in
+``get_context_data()`` -- typically you'll only need to override ``get()``
+method if you're doing some kind of custom initialization.
+
+Use of post() methods in custom views
+=====================================
+
+  * ``ProcessFormView``: if form is valid, call ``form_valid()``, else call
+    ``form_invalid()``.
+
+  * ``BaseCreateView``: object instance variable is initialized to ``None``
+    value, then ``ProcessFormView.post()`` is called.
+
+  * ``BaseUpdateView``: object instance variable is initialized to value
+    returned by ``get_object()``, then ``ProcessFormView.post()`` is called.
+
+When customizing ``post()`` methods, you have to keep in mind that failed form
+validation results in different execution path that contains a call to
+``get_context_data()``, therefore if you have any customization related to
+``get_context_data()``, you need to test it with both ``GET`` method and ``POST`` with
+invalid form input.
