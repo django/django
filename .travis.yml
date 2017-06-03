@@ -1,0 +1,7 @@
+language: python
+python:
+  - 2.6
+  - 2.7
+script: python ./tests/runtests.py --settings=test_sqlite
+install:
+  - python setup.py install &> /dev/null
