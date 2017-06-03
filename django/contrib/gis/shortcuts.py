@@ -38,8 +38,3 @@ def render_to_kmz(*args, **kwargs):
         compress_kml(loader.render_to_string(*args, **kwargs)),
         content_type='application/vnd.google-earth.kmz',
     )
-
-
-def render_to_text(*args, **kwargs):
-    "Render the response using the MIME type for plain text."
-    return HttpResponse(loader.render_to_string(*args, **kwargs), content_type='text/plain')
