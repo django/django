@@ -918,7 +918,7 @@ class ComboField(Field):
     """
     A Field whose clean() method calls multiple Field clean() methods.
     """
-    def __init__(self, fields=(), *args, **kwargs):
+    def __init__(self, fields, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Set 'required' to False on the individual fields, because the
         # required validation will be handled by ComboField, not by those
@@ -960,7 +960,7 @@ class MultiValueField(Field):
         'incomplete': _('Enter a complete value.'),
     }
 
-    def __init__(self, fields=(), *args, require_all_fields=True, **kwargs):
+    def __init__(self, fields, *args, require_all_fields=True, **kwargs):
         self.require_all_fields = require_all_fields
         super().__init__(*args, **kwargs)
         for f in fields:
