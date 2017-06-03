@@ -688,15 +688,6 @@ class CookieTests(unittest.TestCase):
         c3 = parse_cookie(c.output()[12:])
         self.assertEqual(c['test'].value, c3['test'])
 
-    def test_decode_2(self):
-        c = SimpleCookie()
-        c['test'] = b"\xf0"
-        c2 = SimpleCookie()
-        c2.load(c.output()[12:])
-        self.assertEqual(c['test'].value, c2['test'].value)
-        c3 = parse_cookie(c.output()[12:])
-        self.assertEqual(c['test'].value, c3['test'])
-
     def test_nonstandard_keys(self):
         """
         A single non-standard cookie name doesn't affect all cookies (#13007).
