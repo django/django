@@ -52,6 +52,10 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean('6')
 
+    def test_choicefield_choices_default(self):
+        f = ChoiceField()
+        self.assertEqual(f.choices, [])
+
     def test_choicefield_callable(self):
         def choices():
             return [('J', 'John'), ('P', 'Paul')]
