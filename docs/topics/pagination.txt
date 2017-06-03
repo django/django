@@ -9,6 +9,13 @@ Django provides a few classes that help you manage paginated data -- that is,
 data that's split across several pages, with "Previous/Next" links. These
 classes live in :file:`django/core/paginator.py`.
 
+There are 3rd party apps available with more fancy pagination helpers. A good starting
+point is the `comparison grid at djangopackages.com 
+<https://www.djangopackages.com/grids/g/pagination/>`_.
+
+The pagination in Django provides the basics. If you want more fancy pagination
+you might want to have a look here: 
+
 Example
 =======
 
