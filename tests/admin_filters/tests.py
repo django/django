@@ -6,6 +6,7 @@ from django.contrib.admin import (
     AllValuesFieldListFilter, BooleanFieldListFilter, ModelAdmin,
     RelatedOnlyFieldListFilter, SimpleListFilter, site,
 )
+from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -762,6 +763,13 @@ class ListFiltersTests(TestCase):
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(list(queryset), [self.bio_book, self.djangonaut_book])
+
+    def test_fieldlistfilter_invalid_lookup_parameters(self):
+        """Filtering by an invalid value."""
+        modeladmin = BookAdmin(Book, site)
+        request = self.request_factory.get('/', {'author__id__exact': 'StringNotInteger!'})
+        with self.assertRaises(IncorrectLookupParameters):
+            self.get_changelist(request, Book, modeladmin)
 
     def test_simplelistfilter(self):
         modeladmin = DecadeFilterBookAdmin(Book, site)
