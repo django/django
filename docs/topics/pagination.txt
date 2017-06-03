@@ -153,6 +153,11 @@ Required arguments
         the resulting ``LIMIT``/``OFFSET`` query needs to count the number of
         ``OFFSET`` records which takes longer as the page number gets higher.
 
+        In Django's database layer, the ``QuerySet`` translates into a
+        ``LIMIT`` clause with an ``offset`` argument. While running on most
+        database  backends, this query needs to count off the first ``offset``
+        number of records, which takes longer as the page number gets higher.
+
 ``per_page``
     The maximum number of items to include on a page, not including orphans
     (see the ``orphans`` optional argument below).
