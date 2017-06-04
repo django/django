@@ -77,6 +77,7 @@ class Book(models.Model):
 class Promo(models.Model):
     name = models.CharField(max_length=100, verbose_name='¿Name?')
     book = models.ForeignKey(Book, models.CASCADE)
+    author = models.ForeignKey(User, models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -100,6 +101,7 @@ class Chapter(models.Model):
 class ChapterXtra1(models.Model):
     chap = models.OneToOneField(Chapter, models.CASCADE, verbose_name='¿Chap?')
     xtra = models.CharField(max_length=100, verbose_name='¿Xtra?')
+    guest_author = models.ForeignKey(User, models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return '¿Xtra1: %s' % self.xtra

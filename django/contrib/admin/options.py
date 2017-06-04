@@ -360,7 +360,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             # It is allowed to filter on values that would be found from local
             # model anyways. For example, if you filter on employee__department__id,
             # then the id value would be found already from employee__department_id.
-            if not prev_field or (prev_field.concrete and
+            if not prev_field or (prev_field.is_relation and
                                   field not in prev_field.get_path_info()[-1].target_fields):
                 relation_parts.append(part)
             if not getattr(field, 'get_path_info', None):

@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed a regression causing ``Model.__init__()`` to crash if a field has an
   instance only descriptor (:ticket:`28269`).
+
+* Fixed an incorrect ``DisallowedModelAdminLookup`` exception when using
+  a nested reverse relation in ``list_filter`` (:ticket:`28262`).
