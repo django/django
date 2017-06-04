@@ -12,7 +12,8 @@ from django.core.files.base import ContentFile
 from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import (
-    InMemoryUploadedFile, SimpleUploadedFile, UploadedFile,
+    InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
+    UploadedFile,
 )
 
 try:
@@ -212,6 +213,13 @@ class InMemoryUploadedFileTests(unittest.TestCase):
         uf.read()
         with uf.open() as f:
             self.assertEqual(f.read(), '1')
+
+
+class TemporaryUploadedFileTests(unittest.TestCase):
+    def test_extension_kept(self):
+        """The temporary file name has the same suffix as the original file."""
+        with TemporaryUploadedFile('test.txt', 'text/plain', 1, 'utf8') as temp_file:
+            self.assertTrue(temp_file.file.name.endswith('.upload.txt'))
 
 
 class DimensionClosingBug(unittest.TestCase):
