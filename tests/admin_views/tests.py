@@ -609,6 +609,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                 'values': [p.name for p in Promo.objects.all()],
                 'test': lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists(),
             },
+            # A forward relation (book) after a reverse relation (promo).
+            'guest_author__promo__book__id__exact': {
+                'values': [p.id for p in Book.objects.all()],
+                'test': lambda obj, value: obj.guest_author.promo_set.filter(book=value).exists(),
+            },
         }
         for filter_path, params in filters.items():
             for value in params['values']:

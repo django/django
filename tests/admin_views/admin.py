@@ -79,12 +79,15 @@ class ChapterInline(admin.TabularInline):
 
 
 class ChapterXtra1Admin(admin.ModelAdmin):
-    list_filter = ('chap',
-                   'chap__title',
-                   'chap__book',
-                   'chap__book__name',
-                   'chap__book__promo',
-                   'chap__book__promo__name',)
+    list_filter = (
+        'chap',
+        'chap__title',
+        'chap__book',
+        'chap__book__name',
+        'chap__book__promo',
+        'chap__book__promo__name',
+        'guest_author__promo__book',
+    )
 
 
 class ArticleAdmin(admin.ModelAdmin):
