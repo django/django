@@ -1233,8 +1233,8 @@ Creating custom fields
 
 If the built-in ``Field`` classes don't meet your needs, you can easily create
 custom ``Field`` classes. To do this, just create a subclass of
-``django.forms.Field``. Its only requirements are that it implement a
-``clean()`` method and that its ``__init__()`` method accept the core arguments
+``django.forms.Field``. Its only requirements are that it implements a
+``clean()`` method and that its ``__init__()`` method accepts the core arguments
 mentioned above (``required``, ``label``, ``initial``, ``widget``,
 ``help_text``).
 
