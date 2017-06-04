@@ -882,7 +882,13 @@ class Options(object):
     @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
-        return frozenset({
-            attr for attr in
-            dir(self.model) if isinstance(getattr(self.model, attr), property)
-        })
+        names = []
+        for name in dir(self.model):
+            try:
+                attr = getattr(self.model, name)
+            except AttributeError:
+                pass
+            else:
+                if isinstance(attr, property):
+                    names.append(name)
+        return frozenset(names)
