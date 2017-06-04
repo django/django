@@ -1,4 +1,5 @@
 import copy
+import inspect
 import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
@@ -829,7 +830,9 @@ class Options:
     @cached_property
     def _property_names(self):
         """Return a set of the names of the properties defined on the model."""
-        return frozenset({
-            attr for attr in
-            dir(self.model) if isinstance(getattr(self.model, attr), property)
-        })
+        names = []
+        for name in dir(self.model):
+            attr = inspect.getattr_static(self.model, name)
+            if isinstance(attr, property):
+                names.append(name)
+        return frozenset(names)

@@ -12,3 +12,6 @@ Bugfixes
 * Removed an incorrect deprecation warning about a missing ``renderer``
   argument if a ``Widget.render()`` method accepts ``**kwargs``
   (:ticket:`28265`).
+
+* Fixed a regression causing ``Model.__init__()`` to crash if a field has an
+  instance only descriptor (:ticket:`28269`).

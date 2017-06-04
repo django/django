@@ -276,4 +276,6 @@ class ParentListTests(SimpleTestCase):
 
 class PropertyNamesTests(SimpleTestCase):
     def test_person(self):
+        # Instance only descriptors don't appear in _property_names.
+        self.assertEqual(AbstractPerson().test_instance_only_descriptor, 1)
         self.assertEqual(AbstractPerson._meta._property_names, frozenset(['pk', 'test_property']))
