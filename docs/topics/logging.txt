@@ -730,7 +730,16 @@ logging module.
 Django's default logging configuration
 ======================================
 
-By default, Django configures the following logging:
+The ``django`` default logger processes only messages in the ``django`` namespace:
+
+.. code-block:: python
+
+  import logging
+
+  logger = logging.getLogger('django')
+  logger.info(...)
+
+and, by default, Django configures the following logging:
 
 When :setting:`DEBUG` is ``True``:
 
