@@ -21,3 +21,5 @@ Bugfixes
 
 * Fixed admin's ``FieldListFilter.get_queryset()`` crash on invalid input
   (:ticket:`28202`).
+
+* Fixed invalid HTML for a required ``AdminFileWidget`` (:ticket:`28278`).
