@@ -956,10 +956,24 @@ class Model(metaclass=ModelBase):
             exclude = []
         unique_checks = []
 
-        unique_togethers = [(self.__class__, self._meta.unique_together)]
+        unique_togethers = []
+
+        _unique_togethers = list(self._meta.unique_together)
+        for index in self._meta.indexes:
+            index_unique_checks = index.get_unique_checks()
+            if index_unique_checks:
+                _unique_togethers.append(index_unique_checks)
+        if _unique_togethers:
+            unique_togethers.append((self.__class__, _unique_togethers))
+
         for parent_class in self._meta.get_parent_list():
-            if parent_class._meta.unique_together:
-                unique_togethers.append((parent_class, parent_class._meta.unique_together))
+            _unique_togethers = list(parent_class._meta.unique_together)
+            for index in parent_class._meta.indexes:
+                index_unique_checks = index.get_unique_checks()
+                if index_unique_checks:
+                    _unique_togethers.append(index_unique_checks)
+            if _unique_togethers:
+                unique_togethers.append((parent_class, _unique_togethers))
 
         for model_class, unique_together in unique_togethers:
             for check in unique_together:

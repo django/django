@@ -92,3 +92,11 @@ class IndexesTests(SimpleTestCase):
         self.assertEqual(index_names, ['model_index_name_440998_idx'])
         index_names = [index.name for index in ChildModel2._meta.indexes]
         self.assertEqual(index_names, ['model_index_name_b6c374_idx'])
+
+    def test_unique_checks(self):
+        index = models.Index(fields=['title'])
+        self.assertEqual(index.get_unique_checks(), ())
+        index = models.Unique(fields=['title'])
+        self.assertEqual(index.get_unique_checks(), ('title',))
+        index = models.UniqueDeferred(fields=['title'])
+        self.assertEqual(index.get_unique_checks(), ('title',))

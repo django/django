@@ -57,6 +57,18 @@ class UniqueTogetherModel(models.Model):
         unique_together = (('ifield', 'cfield',), ['ifield', 'efield'])
 
 
+class UniqueIndexesModel(models.Model):
+    cfield = models.CharField(max_length=100)
+    ifield = models.IntegerField()
+    efield = models.EmailField()
+
+    class Meta:
+        indexes = [
+            models.Unique(fields=['ifield', 'cfield']),
+            models.Unique(fields=['efield']),
+        ]
+
+
 class UniqueForDateModel(models.Model):
     start_date = models.DateField()
     end_date = models.DateTimeField()
