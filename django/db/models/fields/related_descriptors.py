@@ -319,7 +319,7 @@ class ReverseOneToOneDescriptor:
         rel_obj_attr = attrgetter(self.related.field.attname)
 
         def instance_attr(obj):
-            return obj._get_pk_val()
+            return obj.pk
 
         instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {'%s__in' % self.related.field.name: instances}
@@ -354,7 +354,7 @@ class ReverseOneToOneDescriptor:
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
-            related_pk = instance._get_pk_val()
+            related_pk = instance.pk
             if related_pk is None:
                 rel_obj = None
             else:

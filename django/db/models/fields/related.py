@@ -1604,7 +1604,7 @@ class ManyToManyField(RelatedField):
             initial = defaults['initial']
             if callable(initial):
                 initial = initial()
-            defaults['initial'] = [i._get_pk_val() for i in initial]
+            defaults['initial'] = [i.pk for i in initial]
         return super().formfield(**defaults)
 
     def db_check(self, connection):

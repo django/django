@@ -799,7 +799,7 @@ class Field(RegisterLookupMixin):
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
         else:
-            lst = [(x._get_pk_val(), smart_text(x))
+            lst = [(x.pk, smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
         return first_choice + lst

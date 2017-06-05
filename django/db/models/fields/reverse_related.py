@@ -122,7 +122,7 @@ class ForeignObjectRel:
         initially for utilization by RelatedFieldListFilter.
         """
         return (blank_choice if include_blank else []) + [
-            (x._get_pk_val(), str(x)) for x in self.related_model._default_manager.all()
+            (x.pk, str(x)) for x in self.related_model._default_manager.all()
         ]
 
     def is_hidden(self):
