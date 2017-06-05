@@ -39,6 +39,10 @@ class AbstractPerson(models.Model):
     class Meta:
         abstract = True
 
+    @property
+    def test_property(self):
+        return 1
+
 
 class BasePerson(AbstractPerson):
     # DATA fields
