@@ -93,9 +93,11 @@ Using this renderer along with the built-in widget templates requires either:
 #. ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
    with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
 
-#. Adding the built-in widgets templates directory (``django/forms/templates``
-   or ``django/forms/jinja2``) in :setting:`DIRS <TEMPLATES-DIRS>` of one of
-   your template engines.
+#. Adding the built-in widgets templates directory in :setting:`DIRS
+   <TEMPLATES-DIRS>` of one of your template engines. To generate that path::
+
+    import django
+    django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
 
 Using this renderer requires you to make sure the form templates your project
 needs can be located.
