@@ -188,11 +188,13 @@ class BooleanPKData(models.Model):
 class CharPKData(models.Model):
     data = models.CharField(max_length=30, primary_key=True)
 
-# class DatePKData(models.Model):
-#    data = models.DateField(primary_key=True)
 
-# class DateTimePKData(models.Model):
-#    data = models.DateTimeField(primary_key=True)
+class DatePKData(models.Model):
+    data = models.DateField(primary_key=True)
+
+
+class DateTimePKData(models.Model):
+    data = models.DateTimeField(primary_key=True)
 
 
 class DecimalPKData(models.Model):
