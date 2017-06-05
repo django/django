@@ -4,7 +4,6 @@ import json
 import six
 from django.apps import apps
 from django.conf import settings
-
 from django.http.cookie import SimpleCookie
 
 from ..sessions import session_for_reply_channel

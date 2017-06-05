@@ -138,6 +138,7 @@ class RunServerTests(TestCase):
             channel_layer=mock.ANY,
             ws_protocols=None,
             root_path='',
+            websocket_handshake_timeout=5,
         )
 
     @mock.patch('channels.management.commands.runserver.sys.stdout', new_callable=StringIO)
@@ -158,6 +159,7 @@ class RunServerTests(TestCase):
                 channel_layer=mock.ANY,
                 ws_protocols=None,
                 root_path='',
+                websocket_handshake_timeout=5,
             )
 
             call_command('runserver', '--noreload', 'localhost:8001')
@@ -169,6 +171,7 @@ class RunServerTests(TestCase):
                 channel_layer=mock.ANY,
                 ws_protocols=None,
                 root_path='',
+                websocket_handshake_timeout=5,
             )
 
         self.assertFalse(
@@ -192,6 +195,7 @@ class RunServerTests(TestCase):
             channel_layer=mock.ANY,
             ws_protocols=None,
             root_path='',
+            websocket_handshake_timeout=5,
         )
         self.assertFalse(
             mocked_worker.called,
