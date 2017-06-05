@@ -69,6 +69,7 @@ class LiveServerViews(LiveServerBase):
     def test_404(self):
         with self.assertRaises(HTTPError) as err:
             self.urlopen('/')
+        err.exception.close()
         self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_view(self):
@@ -87,6 +88,7 @@ class LiveServerViews(LiveServerBase):
         """
         with self.assertRaises(HTTPError) as err:
             self.urlopen('/static/another_app/another_app_static_file.txt')
+        err.exception.close()
         self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_media_files(self):
@@ -111,7 +113,8 @@ class LiveServerDatabase(LiveServerBase):
         """
         Data written to the database by a view can be read.
         """
-        self.urlopen('/create_model_instance/')
+        with self.urlopen('/create_model_instance/'):
+            pass
         self.assertQuerysetEqual(
             Person.objects.all().order_by('pk'),
             ['jane', 'robert', 'emily'],
