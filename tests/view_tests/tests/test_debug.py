@@ -1079,6 +1079,11 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
         with self.settings(DEBUG=False):
             self.verify_unsafe_response(custom_exception_reporter_filter_view, check_for_vars=False)
 
+    @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
+    def test_ajax_response_encoding(self):
+        response = self.client.get('/raises500/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response['Content-Type'], 'text/plain; charset=utf-8')
+
 
 class HelperFunctionTests(SimpleTestCase):
 

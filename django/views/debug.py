@@ -86,7 +86,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
     if request.is_ajax():
         text = reporter.get_traceback_text()
-        return HttpResponse(text, status=status_code, content_type='text/plain')
+        return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
     else:
         html = reporter.get_traceback_html()
         return HttpResponse(html, status=status_code, content_type='text/html')
