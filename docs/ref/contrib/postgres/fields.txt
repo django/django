@@ -374,6 +374,19 @@ field. It uses the SQL operator ``@>``. For example::
     >>> Dog.objects.filter(data__contains={'breed': 'collie'})
     <QuerySet [<Dog: Meg>]>
 
+If you want to search for objects where the title contains a substring instead of an
+exact match, you'll have to cast your JSON field to text with :class:`~django.db.models.functions.Cast`
+before hand. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={'hobby': 'Hanging around with cats'})
+
+    >>> from django.db import models
+    >>> from django.db.models.functions import Cast
+    >>> Dog.objects.annotate(
+    ...     text=Cast('data', models.TextField())
+    ... ).filter(text__contains="cat")
+    <QuerySet [<Dog: Rufus>]>
+
 .. fieldlookup:: hstorefield.contained_by
 
 ``contained_by``
