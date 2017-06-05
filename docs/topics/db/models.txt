@@ -1072,7 +1072,9 @@ of the model name::
 However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
 referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
-exception.
+exception. Note also that this accessor isn't allowed to clash with fields
+on any child model class - for example, adding a model field called 
+``restaurant`` to the ``Restaurant`` class would cause an error.
 
 The automatically-created :class:`~django.db.models.OneToOneField` on
 ``Restaurant`` that links it to ``Place`` looks like this::
