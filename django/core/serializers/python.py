@@ -8,7 +8,7 @@ from collections import OrderedDict
 from django.apps import apps
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils.encoding import force_text, is_protected_type
+from django.utils.encoding import is_protected_type
 
 
 class Serializer(base.Serializer):
@@ -33,21 +33,21 @@ class Serializer(base.Serializer):
         self._current = None
 
     def get_dump_object(self, obj):
-        data = OrderedDict([('model', force_text(obj._meta))])
+        data = OrderedDict([('model', str(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
-            data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
+            data["pk"] = self._value_from_field(obj, obj._meta.pk)
         data['fields'] = self._current
         return data
 
-    def handle_field(self, obj, field):
+    def _value_from_field(self, obj, field):
         value = field.value_from_object(obj)
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
         # converted to string first.
-        if is_protected_type(value):
-            self._current[field.name] = value
-        else:
-            self._current[field.name] = field.value_to_string(obj)
+        return value if is_protected_type(value) else field.value_to_string(obj)
+
+    def handle_field(self, obj, field):
+        self._current[field.name] = self._value_from_field(obj, field)
 
     def handle_fk_field(self, obj, field):
         if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
@@ -57,9 +57,7 @@ class Serializer(base.Serializer):
             else:
                 value = None
         else:
-            value = getattr(obj, field.get_attname())
-            if not is_protected_type(value):
-                value = field.value_to_string(obj)
+            value = self._value_from_field(obj, field)
         self._current[field.name] = value
 
     def handle_m2m_field(self, obj, field):
@@ -69,7 +67,7 @@ class Serializer(base.Serializer):
                     return value.natural_key()
             else:
                 def m2m_value(value):
-                    return force_text(value._get_pk_val(), strings_only=True)
+                    return self._value_from_field(value, value._meta.pk)
             self._current[field.name] = [
                 m2m_value(related) for related in getattr(obj, field.name).iterator()
             ]
@@ -125,10 +123,10 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                         if hasattr(value, '__iter__') and not isinstance(value, str):
                             return model._default_manager.db_manager(using).get_by_natural_key(*value).pk
                         else:
-                            return force_text(model._meta.pk.to_python(value), strings_only=True)
+                            return model._meta.pk.to_python(value)
                 else:
                     def m2m_convert(v):
-                        return force_text(model._meta.pk.to_python(v), strings_only=True)
+                        return model._meta.pk.to_python(v)
 
                 try:
                     m2m_data[field.name] = []
