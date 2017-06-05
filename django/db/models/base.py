@@ -511,15 +511,15 @@ class Model(metaclass=ModelBase):
             return False
         if self._meta.concrete_model != other._meta.concrete_model:
             return False
-        my_pk = self._get_pk_val()
+        my_pk = self.pk
         if my_pk is None:
             return self is other
-        return my_pk == other._get_pk_val()
+        return my_pk == other.pk
 
     def __hash__(self):
-        if self._get_pk_val() is None:
+        if self.pk is None:
             raise TypeError("Model instances without primary key value are unhashable")
-        return hash(self._get_pk_val())
+        return hash(self.pk)
 
     def __reduce__(self):
         data = self.__dict__
@@ -867,7 +867,7 @@ class Model(metaclass=ModelBase):
 
     def delete(self, using=None, keep_parents=False):
         using = using or router.db_for_write(self.__class__, instance=self)
-        assert self._get_pk_val() is not None, (
+        assert self.pk is not None, (
             "%s object can't be deleted because its %s attribute is set to None." %
             (self._meta.object_name, self._meta.pk.attname)
         )

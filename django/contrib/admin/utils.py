@@ -145,7 +145,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                                     % (admin_site.name,
                                        opts.app_label,
                                        opts.model_name),
-                                    None, (quote(obj._get_pk_val()),))
+                                    None, (quote(obj.pk),))
             except NoReverseMatch:
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link

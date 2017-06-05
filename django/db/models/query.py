@@ -583,7 +583,7 @@ class QuerySet:
                 qs = self.filter(pk__in=id_list).order_by()
         else:
             qs = self._clone()
-        return {obj._get_pk_val(): obj for obj in qs}
+        return {obj.pk: obj for obj in qs}
 
     def delete(self):
         """Delete the records in the current QuerySet."""
