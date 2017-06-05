@@ -272,3 +272,8 @@ class ParentListTests(SimpleTestCase):
         self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])
         self.assertEqual(SecondParent._meta.get_parent_list(), [CommonAncestor])
         self.assertEqual(Child._meta.get_parent_list(), [FirstParent, SecondParent, CommonAncestor])
+
+
+class PropertyNamesTests(SimpleTestCase):
+    def test_person(self):
+        self.assertEqual(AbstractPerson._meta._property_names, frozenset(['pk', 'test_property']))
