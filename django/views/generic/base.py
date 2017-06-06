@@ -33,6 +33,8 @@ class View:
 
     http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
 
+    view_decorators = []
+
     def __init__(self, **kwargs):
         """
         Constructor. Called in the URLconf; can contain helpful extra
@@ -73,6 +75,10 @@ class View:
         # and possible attributes set by decorators
         # like csrf_exempt from dispatch
         update_wrapper(view, cls.dispatch, assigned=())
+
+        for decorator in reversed(self.view_decorators):
+            view = decorator(view)
+
         return view
 
     def dispatch(self, request, *args, **kwargs):
