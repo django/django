@@ -70,9 +70,9 @@ def condition(etag_func=None, last_modified_func=None):
 
     This decorator will either pass control to the wrapped view function or
     return an HTTP 304 response (unmodified) or 412 response (precondition
-    failed), depending upon the request method. In either case, it will add the
-    generated ETag and Last-Modified headers to the response if it doesn't
-    already have them.
+    failed), depending upon the request method. In either case, the decorator
+    will add the generated ETag and Last-Modified headers to the response if
+    the headers aren't already set and if the request's method is safe.
     """
     def decorator(func):
         @wraps(func)
@@ -98,11 +98,13 @@ def condition(etag_func=None, last_modified_func=None):
             if response is None:
                 response = func(request, *args, **kwargs)
 
-            # Set relevant headers on the response if they don't already exist.
-            if res_last_modified and not response.has_header('Last-Modified'):
-                response['Last-Modified'] = http_date(res_last_modified)
-            if res_etag and not response.has_header('ETag'):
-                response['ETag'] = res_etag
+            # Set relevant headers on the response if they don't already exist
+            # and if the request method is safe.
+            if request.method in ('GET', 'HEAD'):
+                if res_last_modified and not response.has_header('Last-Modified'):
+                    response['Last-Modified'] = http_date(res_last_modified)
+                if res_etag and not response.has_header('ETag'):
+                    response['ETag'] = res_etag
 
             return response
 
