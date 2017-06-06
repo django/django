@@ -248,13 +248,20 @@ TEST_DATA = [
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
 
     (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExt.jpg'), ValidationError),
-    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtenstion'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExt.JPG'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtension'), ValidationError),
+    (FileExtensionValidator(['']), ContentFile('contents', name='fileWithAnExtension.txt'), ValidationError),
     (FileExtensionValidator([]), ContentFile('contents', name='file.txt'), ValidationError),
+
+    (FileExtensionValidator(['']), ContentFile('contents', name='fileWithNoExtension'), None),
     (FileExtensionValidator(['txt']), ContentFile('contents', name='file.txt'), None),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='file.TXT'), None),
+    (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.txt'), None),
     (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
 
     (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
+    (validate_image_file_extension, ContentFile('contents', name='file.PNG'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
     (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
 ]
@@ -451,6 +458,18 @@ class TestValidatorEquality(TestCase):
         self.assertEqual(
             FileExtensionValidator(['txt']),
             FileExtensionValidator(['txt'])
+        )
+        self.assertEqual(
+            FileExtensionValidator(['TXT']),
+            FileExtensionValidator(['txt'])
+        )
+        self.assertEqual(
+            FileExtensionValidator(['TXT', 'png']),
+            FileExtensionValidator(['txt', 'png'])
+        )
+        self.assertEqual(
+            FileExtensionValidator(['png', 'txt']),
+            FileExtensionValidator(['txt', 'png'])
         )
         self.assertEqual(
             FileExtensionValidator(['txt']),
