@@ -52,8 +52,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
         return None
 
-    def _alter_column_type_sql(self, table, old_field, new_field, new_type):
+    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
         """Make ALTER TYPE with SERIAL make sense."""
+        table = model._meta.db_table
         if new_type.lower() in ("serial", "bigserial"):
             column = new_field.column
             sequence_name = "%s_%s_seq" % (table, column)
@@ -100,7 +101,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 ],
             )
         else:
-            return super()._alter_column_type_sql(table, old_field, new_field, new_type)
+            return super()._alter_column_type_sql(model, old_field, new_field, new_type)
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
