@@ -68,6 +68,12 @@ class BookForm(forms.ModelForm):
         fields = '__all__'
 
 
+class BookTitleForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ('title',)
+
+
 class DerivedBookForm(forms.ModelForm):
     class Meta:
         model = DerivedBook
@@ -889,6 +895,14 @@ class UniqueTest(TestCase):
         form.save()
         form = BookForm({'title': title})
         self.assertTrue(form.is_valid())
+
+    def test_unique_together_without_related_field(self):
+        title = 'I May Be Wrong But I Doubt It'
+        Book.objects.create(title=title, author=self.writer)
+        book = Book.objects.create(title='A Very Different Title', author=self.writer)
+        form = BookTitleForm(instance=book, data={'title': title})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['__all__'], ['Book with this Title and Author already exists.'])
 
     def test_inherited_unique(self):
         title = 'Boss'

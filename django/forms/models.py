@@ -296,6 +296,17 @@ class BaseModelForm(BaseForm):
         For backwards-compatibility, exclude several types of fields from model
         validation. See tickets #12507, #12521, #12553.
         """
+        from django.db import models
+        # Build up a list of ForeignKey fields that can't be excluded due to
+        # their use in one or more unique_together declarations. Not doing so
+        # will result in referential integrity constraint violations at the
+        # database.
+        unique_together_fk = set([
+            field_name
+            for together in self.instance._meta.unique_together
+            for field_name in together
+            if isinstance(self.instance._meta.get_field(field_name), models.ForeignKey)
+        ])
         exclude = []
         # Build up a list of fields that should be excluded from model field
         # validation and unique checks.
@@ -304,7 +315,8 @@ class BaseModelForm(BaseForm):
             # Exclude fields that aren't on the form. The developer may be
             # adding these values to the model after form validation.
             if field not in self.fields:
-                exclude.append(f.name)
+                if field not in unique_together_fk:
+                    exclude.append(f.name)
 
             # Don't perform model validation on fields that were defined
             # manually on the form and excluded via the ModelForm's Meta
