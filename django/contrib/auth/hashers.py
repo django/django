@@ -405,7 +405,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def salt(self):
         bcrypt = self._load_library()
-        return bcrypt.gensalt(self.rounds)
+        return bcrypt.gensalt(rounds=self.rounds)
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
