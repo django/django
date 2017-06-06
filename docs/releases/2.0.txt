@@ -280,6 +280,9 @@ bytestrings in certain code paths.
 Database backend API
 --------------------
 
+This section describes changes that may be needed in third-party database
+backends.
+
 * The ``DatabaseOperations.datetime_cast_date_sql()``,
   ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``, and
   ``datetime_extract_sql()`` methods now return only the SQL to perform the
@@ -291,13 +294,6 @@ Database backend API
 
 * The first argument of ``SchemaEditor._alter_column_type_sql()`` is now
   ``model`` rather than ``table``.
-
-* To improve performance when streaming large result sets from the database,
-  :meth:`.QuerySet.iterator` now fetches 2000 rows at a time instead of 100.
-  The old behavior can be restored using the ``chunk_size`` parameter. For
-  example::
-
-      Book.objects.iterator(chunk_size=100)
 
 Dropped support for Oracle 11.2
 -------------------------------
@@ -416,6 +412,13 @@ Miscellaneous
 
 * The default size of the Oracle test tablespace is increased from 20M to 50M
   and the default autoextend size is increased from 10M to 25M.
+
+* To improve performance when streaming large result sets from the database,
+  :meth:`.QuerySet.iterator` now fetches 2000 rows at a time instead of 100.
+  The old behavior can be restored using the ``chunk_size`` parameter. For
+  example::
+
+      Book.objects.iterator(chunk_size=100)
 
 .. _deprecated-features-2.0:
 

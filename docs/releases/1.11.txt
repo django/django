@@ -490,6 +490,9 @@ Backwards incompatible changes in 1.11
 Database backend API
 --------------------
 
+This section describes changes that may be needed in third-party database
+backends.
+
 * The ``DatabaseOperations.time_trunc_sql()`` method is added to support
   ``TimeField`` truncation. It accepts a ``lookup_type`` and ``field_name``
   arguments and returns the appropriate SQL to truncate the given time field
