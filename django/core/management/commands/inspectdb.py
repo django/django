@@ -265,18 +265,29 @@ class Command(BaseCommand):
         to the given database table name.
         """
         unique_together = []
+        has_unsupported_constraint_columns = False
         for index, params in constraints.items():
             if params['unique']:
-                columns = params['columns']
+                constraint_columns = params['columns']
+                has_unsupported_constraint_columns = None in constraint_columns
+                columns = [x for x in constraint_columns if x is not None]
                 if len(columns) > 1:
                     # we do not want to include the u"" or u'' prefix
                     # so we build the string rather than interpolate the tuple
                     tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
                     unique_together.append(tup)
-        meta = ["",
-                "    class Meta:",
-                "        managed = False",
-                "        db_table = '%s'" % table_name]
+
+        meta = [""]
+
+        if has_unsupported_constraint_columns:
+            unsupported_warning_comments = ["    # " + table_name + " contains unsupported constraints. ",
+                                            "    # You may need to add the constraints' logic to application layer"]
+            meta += unsupported_warning_comments
+
+        meta += ["    class Meta:",
+                 "        managed = False",
+                 "        db_table = '%s'" % table_name]
+
         if unique_together:
             tup = '(' + ', '.join(unique_together) + ',)'
             meta += ["        unique_together = %s" % tup]
