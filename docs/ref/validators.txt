@@ -286,6 +286,7 @@ to, or in lieu of custom ``field.clean()`` methods.
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'invalid_extension'`` if the extension of ``value.name`` (``value`` is
     a :class:`~django.core.files.File`) isn't found in ``allowed_extensions``.
+    The extension is compared case-insensitively with ``allowed_extensions``.
 
     .. warning::
 
