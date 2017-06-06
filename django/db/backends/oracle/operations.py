@@ -295,7 +295,7 @@ END;
             if recursive:
                 cursor.execute("""
                     SELECT
-                        user_tables.table_name, rcons.constraint_name, MAX(level)
+                        user_tables.table_name, rcons.constraint_name
                     FROM
                         user_tables
                     JOIN
@@ -314,16 +314,14 @@ END;
             else:
                 cursor.execute("""
                     SELECT
-                        cons.table_name, cons.constraint_name, 1
+                        cons.table_name, cons.constraint_name
                     FROM
                         user_constraints cons
                     WHERE
                         cons.constraint_type = 'R'
                         AND cons.table_name = UPPER(%s)
                 """, (table_name,))
-            return [
-                (foreign_table, constraint) for foreign_table, constraint, _ in cursor.fetchall()
-            ]
+            return cursor.fetchall()
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         if tables:
