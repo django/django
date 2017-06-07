@@ -23,3 +23,6 @@ Bugfixes
   (:ticket:`28202`).
 
 * Fixed invalid HTML for a required ``AdminFileWidget`` (:ticket:`28278`).
+
+* Fixed model initialization to set the name of class-based model indexes
+  for models that only inherit ``models.Model`` (:ticket:`28282`).

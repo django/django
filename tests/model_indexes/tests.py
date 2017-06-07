@@ -83,6 +83,10 @@ class IndexesTests(SimpleTestCase):
         self.assertIsNot(index, new_index)
         self.assertEqual(index.fields, new_index.fields)
 
+    def test_name_set(self):
+        index_names = [index.name for index in Book._meta.indexes]
+        self.assertEqual(index_names, ['model_index_title_196f42_idx'])
+
     def test_abstract_children(self):
         index_names = [index.name for index in ChildModel1._meta.indexes]
         self.assertEqual(index_names, ['model_index_name_440998_idx'])
