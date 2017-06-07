@@ -166,6 +166,7 @@ class QuerySet:
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
+        self.is_unsafe = False
 
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
@@ -756,6 +757,11 @@ class QuerySet:
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
     ##################################################################
 
+    def unsafe(self):
+        self.is_unsafe = True
+        self.query.is_unsafe = True
+        return self
+
     def all(self):
         """
         Return a new QuerySet that is a copy of the current one. This allows a
@@ -1056,6 +1062,8 @@ class QuerySet:
         return inserted_ids
 
     def _clone(self, **kwargs):
+        if self.is_unsafe:
+            return self
         query = self.query.clone()
         if self._sticky_filter:
             query.filter_is_sticky = True

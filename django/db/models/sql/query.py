@@ -201,6 +201,7 @@ class Query:
         self.deferred_loading = (frozenset(), True)
 
         self.context = {}
+        self.is_unsafe = False
 
     @property
     def extra(self):
@@ -237,6 +238,8 @@ class Query:
         return self.get_compiler(DEFAULT_DB_ALIAS).as_sql()
 
     def __deepcopy__(self, memo):
+        if self.is_unsafe:
+            return self
         result = self.clone(memo=memo)
         memo[id(self)] = result
         return result
@@ -264,7 +267,10 @@ class Query:
         Create a copy of the current instance. The 'kwargs' parameter can be
         used by clients to update attributes after copying has taken place.
         """
+        if self.is_unsafe:
+            return self
         obj = Empty()
+        obj.is_unsafe = self.is_unsafe
         obj.__class__ = klass or self.__class__
         obj.model = self.model
         obj.alias_refcount = self.alias_refcount.copy()
