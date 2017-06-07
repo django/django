@@ -116,7 +116,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'CharField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'datetime',
-        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'DurationField': 'bigint',
         'FileField': 'varchar(%(max_length)s)',
         'FilePathField': 'varchar(%(max_length)s)',
