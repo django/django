@@ -128,6 +128,10 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # we just start with an empty list.
             names = []
 
+            # Don't fail if `self.object` is not defined and keep searching for the templates
+            if not hasattr(self, 'object'):
+                self.object = None
+
             # If self.template_name_field is set, grab the value of the field
             # of that name from the object; this is the most specific template
             # name, if given.
