@@ -314,7 +314,7 @@ msgid "That page number is less than 1"
 msgstr "页号少于1"
 
 msgid "That page contains no results"
-msgstr "本页结果未空"
+msgstr "本页结果为空"
 
 msgid "Enter a valid value."
 msgstr "输入一个有效的值。"
