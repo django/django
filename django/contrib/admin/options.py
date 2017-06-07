@@ -290,7 +290,11 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Hook for specifying fields.
         """
-        return self.fields
+        if self.fields:
+            return self.fields
+        # _get_form_for_get_fields() is implemented in subclasses.
+        form = self._get_form_for_get_fields(request, obj)
+        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -598,11 +602,8 @@ class ModelAdmin(BaseModelAdmin):
             'delete': self.has_delete_permission(request),
         }
 
-    def get_fields(self, request, obj=None):
-        if self.fields:
-            return self.fields
-        form = self.get_form(request, obj, fields=None)
-        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
+    def _get_form_for_get_fields(self, request, obj):
+        return self.get_form(request, obj, fields=None)
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -1942,11 +1943,8 @@ class InlineModelAdmin(BaseModelAdmin):
 
         return inlineformset_factory(self.parent_model, self.model, **defaults)
 
-    def get_fields(self, request, obj=None):
-        if self.fields:
-            return self.fields
-        form = self.get_formset(request, obj, fields=None).form
-        return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
+    def _get_form_for_get_fields(self, request, obj=None):
+        return self.get_formset(request, obj, fields=None).form
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
