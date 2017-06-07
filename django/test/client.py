@@ -518,6 +518,13 @@ class Client(RequestFactory):
             response = self._handle_redirects(response, **extra)
         return response
 
+    def get_ajax(self, path, data=None, follow=False, secure=False, **extra):
+        """
+        Requests an ajax response from the server using GET.
+        """
+        extra['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+        return self.get(path, data, follow, secure, **extra)
+
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              follow=False, secure=False, **extra):
         """Request a response from the server using POST."""
@@ -525,6 +532,14 @@ class Client(RequestFactory):
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
+
+    def post_ajax(self, path, data=None, content_type=MULTIPART_CONTENT,
+                  follow=False, secure=False, **extra):
+        """
+        Requests an ajax response from the server using POST.
+        """
+        extra['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+        self.post(path, data, content_type, follow, secure, **extra)
 
     def head(self, path, data=None, follow=False, secure=False, **extra):
         """Request a response from the server using HEAD."""
