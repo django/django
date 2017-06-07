@@ -3,6 +3,7 @@ from pkgutil import walk_packages
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.template import TemplateDoesNotExist
 from django.template.context import make_context
 from django.template.engine import Engine
@@ -19,11 +20,15 @@ class DjangoTemplates(BaseEngine):
         params = params.copy()
         options = params.pop('OPTIONS').copy()
         options.setdefault('autoescape', True)
-        options.setdefault('debug', settings.DEBUG)
-        options.setdefault('file_charset', settings.FILE_CHARSET)
+        try:
+            options.setdefault('debug', settings.DEBUG)
+            options.setdefault('file_charset', settings.FILE_CHARSET)
+        except ImproperlyConfigured:
+            options.setdefault('debug', False)
+            options.setdefault('file_charset', 'utf-8')
         libraries = options.get('libraries', {})
         options['libraries'] = self.get_templatetag_libraries(libraries)
-        super().__init__(params)
+        super(DjangoTemplates, self).__init__(params)
         self.engine = Engine(self.dirs, self.app_dirs, **options)
 
     def from_string(self, template_code):
@@ -40,7 +45,10 @@ class DjangoTemplates(BaseEngine):
         Return a collation of template tag libraries from installed
         applications and the supplied custom_libraries argument.
         """
-        libraries = get_installed_libraries()
+        try:
+            libraries = get_installed_libraries()
+        except AppRegistryNotReady:
+            libraries = {}
         libraries.update(custom_libraries)
         return libraries
 
@@ -61,6 +69,11 @@ class Template:
             return self.template.render(context)
         except TemplateDoesNotExist as exc:
             reraise(exc, self.backend)
+        except AppRegistryNotReady as exc:
+            raise ImproperlyConfigured(
+                "Requested %s, but settings are not configured. "
+                "You must either define the environment variable %s "
+                "or call settings.configure() before accessing settings.")
 
 
 def copy_exception(exc, backend=None):
