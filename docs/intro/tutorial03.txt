@@ -228,7 +228,7 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
         context = {
             'latest_question_list': latest_question_list,
         }
-        return HttpResponse(template.render(context, request))
+        return HttpResponse(template.render(context))
 
 That code loads the template called  ``polls/index.html`` and passes it a
 context. The context is a dictionary mapping template variable names to Python
