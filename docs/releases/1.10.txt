@@ -1284,6 +1284,9 @@ to remove usage of these features.
   * ``TEMPLATE_LOADERS``
   * ``TEMPLATE_STRING_IF_INVALID``
 
+* To migrate keeping similar functionality from Django 1.8-9: add a :setting:`TEMPLATES` setting. For more info: 
+  :doc:`/ref/templates/upgrading`
+
 * The backwards compatibility alias ``django.template.loader.BaseLoader`` is
   removed.
 
