@@ -6,6 +6,9 @@ class Book(models.Model):
     author = models.CharField(max_length=50)
     pages = models.IntegerField(db_column='page_count')
 
+    class Meta:
+        indexes = [models.indexes.Index(fields=['title'])]
+
 
 class AbstractModel(models.Model):
     name = models.CharField(max_length=50)
