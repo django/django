@@ -1,15 +1,20 @@
 import unittest
 
+from django import forms
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
 from django.forms import modelformset_factory
-
-from .forms import ProcessForm
-from .models import (
-    AuditLog, CustomSaveModel, Document, ExplicitAlterDataModel, GenericModel,
-    Host, Process,
-)
+from django.http import QueryDict
+from django.test.utils import isolate_apps
+from django.utils.alteration import AltersDataBase
 
 
-class AltersDataTestCase(unittest.TestCase):
+class CustomQueryDict(QueryDict, metaclass=AltersDataBase):
+    data_altering_methods = ('popitem',)
+
+
+@isolate_apps('utils_tests')
+class AltersDataTestCaseBase(unittest.TestCase):
     def assert_alters_data_true(self, obj, method):
         """
         test if object's method has alters_data set to True
@@ -26,31 +31,42 @@ class AltersDataTestCase(unittest.TestCase):
         self.assertTrue(hasattr(meth, 'alters_data'))
         self.assertFalse(meth.alters_data)
 
-    def test_legacy_alters_data(self):
-        """
-        test all the methods on which alters_data is manually set
-        before AltersDataMixin is introduced.
-        """
+
+class AltersDataBaseTestCase(AltersDataTestCaseBase):
+
+    def test_dynamic_alters_data(self):
+        self.assert_alters_data_true(CustomQueryDict, 'popitem')
+
+    def test_subclass_alters_data(self):
+        class SubQueryDict(CustomQueryDict):
+            pass
+
+        self.assert_alters_data_true(SubQueryDict, 'popitem')
+
+    def test_explicit_alters_data(self):
+        class SubQueryDict(CustomQueryDict):
+            def popitem(self):
+                return super(SubQueryDict, self).popitem()
+            popitem.alters_data = False
+
+        self.assert_alters_data_false(SubQueryDict, 'popitem')
 
 
-class TestModelAltersData(AltersDataTestCase):
+class TestModelAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
+        class GenericModel(models.Model):
+            pass
+
         self.assert_alters_data_true(GenericModel, 'save')
         self.assert_alters_data_true(GenericModel, 'save_base')
         self.assert_alters_data_true(GenericModel, 'delete')
 
-    def test_dynamic_alters_data(self):
-        self.assert_alters_data_true(GenericModel, 'save')
 
-    def test_subclass_alters_data(self):
-        self.assert_alters_data_true(CustomSaveModel, 'save')
-
-    def test_explicit_alters_data(self):
-        self.assert_alters_data_false(ExplicitAlterDataModel, 'save')
-
-
-class TestQuerySetAltersData(AltersDataTestCase):
+class TestQuerySetAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
+        class GenericModel(models.Model):
+            pass
+
         qs = GenericModel.objects.all()
         self.assert_alters_data_true(qs, 'delete')
         self.assert_alters_data_true(qs, '_raw_delete')
@@ -59,22 +75,37 @@ class TestQuerySetAltersData(AltersDataTestCase):
         self.assert_alters_data_true(qs, '_insert')
 
 
-class TestFieldFileAltersData(AltersDataTestCase):
+class TestFieldFileAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
-        document = Document.objects.create(file_path='random/doc')
+        class Document(models.Model):
+            file_path = models.FileField()
+
+        document = Document(file_path='random/doc')
         doc = document.file_path
         self.assert_alters_data_true(doc, 'open')
         self.assert_alters_data_true(doc, 'save')
         self.assert_alters_data_true(doc, 'delete')
 
 
-class TestReverseManyToOneDescriptorAltersData(AltersDataTestCase):
+class TestReverseManyToOneDescriptorAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
-        self._test_not_null_descriptor()
-        self._test_null_descriptor()
+        class Host(models.Model):
+            pass
 
-    def _test_not_null_descriptor(self):
-        host = Host.objects.create(name='production')
+        class Document(models.Model):
+            pass
+
+        class AuditLog(models.Model):
+            host = models.ForeignKey(
+                to=Host, on_delete=models.PROTECT, related_name='logs'
+            )
+            log_file = models.ForeignKey(
+                to=Document, on_delete=models.PROTECT, related_name='audits',
+                null=True
+            )
+
+        host = Host()
+        # not null descriptor
         reverse_descriptor = host.logs
         self.assert_alters_data_true(reverse_descriptor, 'add')
         self.assert_alters_data_true(reverse_descriptor, 'create')
@@ -82,8 +113,8 @@ class TestReverseManyToOneDescriptorAltersData(AltersDataTestCase):
         self.assert_alters_data_true(reverse_descriptor, 'update_or_create')
         self.assert_alters_data_true(reverse_descriptor, 'set')
 
-    def _test_null_descriptor(self):
-        document = Document.objects.create(file_path='random/doc')
+        document = Document()
+        # null descriptor
         reverse_descriptor = document.audits
         self.assert_alters_data_true(reverse_descriptor, 'add')
         self.assert_alters_data_true(reverse_descriptor, 'create')
@@ -95,11 +126,15 @@ class TestReverseManyToOneDescriptorAltersData(AltersDataTestCase):
         self.assert_alters_data_true(reverse_descriptor, '_clear')
 
 
-class TestManyToManyDescriptorAltersData(AltersDataTestCase):
+class TestManyToManyDescriptorAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
-        host = Host.objects.create(name='production')
-        document = Document.objects.create(file_path='random/doc')
-        log = AuditLog.objects.create(host=host, log_file=document)
+        class AuditLog(models.Model):
+            pass
+
+        class Process(models.Model):
+            logs = models.ManyToManyField(AuditLog, related_name='processes')
+
+        log = AuditLog(id=0)
         m2m_descriptor = log.processes
         self.assert_alters_data_true(m2m_descriptor, 'add')
         self.assert_alters_data_true(m2m_descriptor, 'remove')
@@ -110,9 +145,15 @@ class TestManyToManyDescriptorAltersData(AltersDataTestCase):
         self.assert_alters_data_true(m2m_descriptor, 'update_or_create')
 
 
-class TestReverseGenericManyToOneDescriptorAltersData(AltersDataTestCase):
+class TestReverseGenericManyToOneDescriptorAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
-        process = Process.objects.create(name='django')
+        class GenericModel(models.Model):
+            pass
+
+        class Process(models.Model):
+            tags = GenericRelation(GenericModel, related_query_name='processes')
+
+        process = Process()
         generic_descriptor = process.tags
         self.assert_alters_data_true(generic_descriptor, 'add')
         self.assert_alters_data_true(generic_descriptor, 'remove')
@@ -124,12 +165,28 @@ class TestReverseGenericManyToOneDescriptorAltersData(AltersDataTestCase):
         self.assert_alters_data_true(generic_descriptor, 'update_or_create')
 
 
-class TestModelFormAltersData(AltersDataTestCase):
+class TestModelFormAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
+        class Process(models.Model):
+            pass
+
+        class ProcessForm(forms.ModelForm):
+            class Meta:
+                model = Process
+                fields = forms.ALL_FIELDS
+
         self.assert_alters_data_true(ProcessForm, 'save')
 
 
-class TestModelFormSetAltersData(AltersDataTestCase):
+class TestModelFormSetAltersData(AltersDataTestCaseBase):
     def test_legacy_alters_data(self):
+        class Process(models.Model):
+            pass
+
+        class ProcessForm(forms.ModelForm):
+            class Meta:
+                model = Process
+                fields = forms.ALL_FIELDS
+
         formset = modelformset_factory(Process, form=ProcessForm)
         self.assert_alters_data_true(formset, 'save')

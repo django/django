@@ -66,8 +66,8 @@ and two directions (forward and reverse) for a total of six combinations.
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
+from django.utils.alteration import AltersDataBase
 from django.utils.functional import cached_property
-from django.utils.mixin import AltersDataMixin
 
 
 class ForwardManyToOneDescriptor:
@@ -541,7 +541,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
     the related model, and adds behaviors specific to many-to-one relations.
     """
 
-    class RelatedManager(superclass, metaclass=AltersDataMixin):
+    class RelatedManager(superclass, metaclass=AltersDataBase):
         data_altering_methods = (
             'add', 'create', 'get_or_create', 'update_or_create', 'set',
         )
@@ -775,7 +775,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
     the related model, and adds behaviors specific to many-to-many relations.
     """
 
-    class ManyRelatedManager(superclass, metaclass=AltersDataMixin):
+    class ManyRelatedManager(superclass, metaclass=AltersDataBase):
         data_altering_methods = (
             'add', 'remove', 'clear', 'set', 'create',
             'get_or_create', 'update_or_create',

@@ -27,8 +27,8 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
+from django.utils.alteration import update_alters_data
 from django.utils.encoding import force_text
-from django.utils.mixin import AltersDataMixin
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -47,7 +47,7 @@ DEFERRED = Deferred()
 
 def subclass_exception(name, bases, module, attached_to):
     """
-    Create exception subclass. Used by ModelMetaclass below.
+    Create exception subclass. Used by ModelBase below.
 
     The exception is created in a way that allows it to be pickled, assuming
     that the returned exception class will be added as an attribute to the
@@ -59,7 +59,7 @@ def subclass_exception(name, bases, module, attached_to):
     })
 
 
-class ModelMetaclass(type):
+class ModelBase(type):
     """Metaclass for all models."""
     def __new__(cls, name, bases, attrs, **kwargs):
         super_new = super().__new__
@@ -288,6 +288,9 @@ class ModelMetaclass(type):
         # abstract model.
         new_class._meta.indexes = [copy.deepcopy(idx) for idx in new_class._meta.indexes]
 
+        # set alters_data attribute on the updated method definitions
+        update_alters_data(cls=new_class)
+
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a
@@ -360,15 +363,6 @@ class ModelMetaclass(type):
     @property
     def _default_manager(cls):
         return cls._meta.default_manager
-
-
-class ModelBase(AltersDataMixin, ModelMetaclass):
-    """
-    We can't have ModelMetaclass inherit from AltersDataMixin.
-    ModelMetaclass does not pass all the attrs to it's super class.
-    So, AltersDataMixin will not be able set alters_data attribute
-    on the updated definition of subclass methods
-    """
 
 
 class ModelStateFieldsCacheDescriptor:

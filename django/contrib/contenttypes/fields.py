@@ -12,8 +12,8 @@ from django.db.models.fields.related import (
     lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
+from django.utils.alteration import AltersDataBase
 from django.utils.functional import cached_property
-from django.utils.mixin import AltersDataMixin
 
 
 class GenericForeignKey(FieldCacheMixin):
@@ -500,7 +500,7 @@ def create_generic_related_manager(superclass, rel):
     specific to generic relations.
     """
 
-    class GenericRelatedObjectManager(superclass, metaclass=AltersDataMixin):
+    class GenericRelatedObjectManager(superclass, metaclass=AltersDataBase):
         data_altering_methods = (
             'add', 'remove', 'clear', '_clear', 'set',
             'create', 'get_or_create', 'update_or_create',

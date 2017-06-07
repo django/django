@@ -25,12 +25,11 @@ class Apps:
             raise RuntimeError("You must supply an installed_apps argument.")
 
         # Mapping of app labels => model names => model classes. Every time a
-        # model is imported, ModelMetaclass.__new__ calls apps.register_model
-        # which creates an entry in all_models.
-        # All imported models are registered, regardless of whether they're
-        # defined in an installed application and whether the registry
-        # has been populated. Since it isn't possible to reimport a module
-        # safely (it could reexecute initialization code)
+        # model is imported, ModelBase.__new__ calls apps.register_model which
+        # creates an entry in all_models. All imported models are registered,
+        # regardless of whether they're defined in an installed application
+        # and whether the registry has been populated. Since it isn't possible
+        # to reimport a module safely (it could reexecute initialization code)
         # all_models is never overridden or reset.
         self.all_models = defaultdict(OrderedDict)
 

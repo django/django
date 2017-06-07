@@ -16,7 +16,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
-from django.utils.mixin import AltersDataMixin
+from django.utils.alteration import AltersDataBase
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -204,7 +204,7 @@ class ModelFormOptions:
         self.field_classes = getattr(options, 'field_classes', None)
 
 
-class ModelFormBaseMetaclass(DeclarativeFieldsMetaclass):
+class ModelFormMetaclass(DeclarativeFieldsMetaclass, AltersDataBase):
     def __new__(mcs, name, bases, attrs):
         base_formfield_callback = None
         for b in bases:
@@ -276,7 +276,7 @@ class ModelFormBaseMetaclass(DeclarativeFieldsMetaclass):
         return new_class
 
 
-class BaseModelForm(BaseForm, metaclass=AltersDataMixin):
+class BaseModelForm(BaseForm, metaclass=AltersDataBase):
     data_altering_methods = ('save',)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -465,10 +465,6 @@ class BaseModelForm(BaseForm, metaclass=AltersDataMixin):
         return self.instance
 
 
-class ModelFormMetaclass(ModelFormBaseMetaclass, AltersDataMixin):
-    """This is just to prevent metaclass conflict in ModelForm."""
-
-
 class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
     pass
 
@@ -556,7 +552,7 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
 # ModelFormSets ##############################################################
 
-class BaseModelFormSet(BaseFormSet, metaclass=AltersDataMixin):
+class BaseModelFormSet(BaseFormSet, metaclass=AltersDataBase):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
