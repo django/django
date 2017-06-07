@@ -260,6 +260,17 @@ Properties
     * the maximum dimension of its elements for non-empty
       :class:`GeometryCollection`\s
 
+.. attribute:: GEOSGeometry.dims
+
+Returns the dimension of the geometry:
+
+* ``0`` for :class:`Point`\s and :class:`MultiPoint`\s
+* ``1`` for :class:`LineString`\s and :class:`MultiLineString`\s
+* ``2`` for :class:`Polygon`\s and :class:`MultiPolygon`\s
+* ``-1`` for empty :class:`GeometryCollection`\s
+* the maximum dimension of its elements for non-empty
+  :class:`GeometryCollection`\s
+
 .. attribute:: GEOSGeometry.empty
 
     Returns whether or not the set of points in the geometry is empty.
