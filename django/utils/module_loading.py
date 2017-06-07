@@ -31,7 +31,7 @@ def autodiscover_modules(*args, **kwargs):
     """
     Auto-discover INSTALLED_APPS modules and fail silently when
     not present. This forces an import on them to register any admin bits they
-    may want.
+    may want. Supports dotted paths.
 
     You may provide a register_to keyword parameter as a way to access a
     registry. This register_to object must have a _registry instance variable
@@ -76,7 +76,15 @@ if six.PY3:
             return False
 
         full_module_name = package_name + '.' + module_name
-        return importlib_find(full_module_name, package_path) is not None
+        try:
+            return importlib_find(full_module_name, package_path) is not None
+        except (ImportError, AttributeError):
+            # when module_name is an invalid dotted path, python 3 will raise
+            # ImportError (or ModuleNotFoundError in python 3.6+).
+            # in python < 3.6, AttributeError may be raised if the penultimate
+            # part of the path is not a package (see
+            # http://bugs.python.org/issue30436)
+            return False
 
 else:
     import imp
@@ -135,9 +143,10 @@ else:
                     # Try the implicit import machinery if searching a directory.
                     if os.path.isdir(entry):
                         try:
-                            file_, _, _ = imp.find_module(module_name, [entry])
-                            if file_:
-                                file_.close()
+                            for child_name in module_name.split('.'):
+                                file_, entry, _ = imp.find_module(child_name, [entry])
+                                if file_:
+                                    file_.close()
                             return True
                         except ImportError:
                             pass
