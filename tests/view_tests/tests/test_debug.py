@@ -214,6 +214,18 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             status_code=404
         )
 
+    def test_cleanse_setting(self):
+        self.assertEqual('TEST', cleanse_setting('TEST', 'TEST'))
+        self.assertEqual(CLEANSED_SUBSTITUTE, cleanse_setting('PASSWORD', 'super_secret'))
+
+    def test_cleanse_setting_ignore_case(self):
+        self.assertEqual(CLEANSED_SUBSTITUTE, cleanse_setting('password', 'super_secret'))
+
+    def test_cleanse_setting_recurses_in_dictionary(self):
+        initial = {'login': 'cooper', 'password': 'secret'}
+        expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
+        self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
+
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
     # May need a query to initialize MySQL connection
