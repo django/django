@@ -1,5 +1,5 @@
+from django.contrib.postgres.aggregates import PostgresAggregate
 from django.db.models import FloatField, IntegerField
-from django.db.models.aggregates import Aggregate
 
 __all__ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-class StatAggregate(Aggregate):
+class StatAggregate(PostgresAggregate):
     def __init__(self, y, x, output_field=FloatField()):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')

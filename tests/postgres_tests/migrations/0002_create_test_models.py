@@ -171,6 +171,11 @@ class Migration(migrations.Migration):
                 ('boolean_field', models.NullBooleanField()),
                 ('char_field', models.CharField(max_length=30, blank=True)),
                 ('integer_field', models.IntegerField(null=True)),
+                ('related_field', models.ForeignKey(
+                    'postgres_tests.AggregateTestModel',
+                    models.SET_NULL,
+                    null=True,
+                )),
             ]
         ),
         migrations.CreateModel(

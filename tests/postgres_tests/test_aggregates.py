@@ -17,6 +17,56 @@ except ImportError:
     pass  # psycopg2 is not installed
 
 
+class TestFilteredAggregates(PostgreSQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        related = AggregateTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
+        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo2',
+                                          integer_field=1, related_field=related)
+        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo3',
+                                          integer_field=2, related_field=related)
+
+    def test_filtered_agg_filter(self):
+        query = ArrayAgg('char_field').filter(char_field='Foo1')
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo1']})
+
+    def test_filtered_agg_multiple_filter(self):
+        query = ArrayAgg('char_field').filter(boolean_field=True).filter(char_field='Foo1')
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo1']})
+
+    def test_filtered_agg_empty_filter(self):
+        query = ArrayAgg('char_field').filter()
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo1', 'Foo2', 'Foo3']})
+
+    def test_filtered_agg_exclude(self):
+        query = ArrayAgg('char_field').exclude(char_field='Foo1')
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo2', 'Foo3']})
+
+    def test_filtered_agg_multiple_exclude(self):
+        query = ArrayAgg('char_field').exclude(char_field='Foo1').exclude(char_field='Foo2')
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo3']})
+
+    def test_filtered_agg_empty_exclude(self):
+        query = ArrayAgg('char_field').exclude()
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo1', 'Foo2', 'Foo3']})
+
+    def test_filtered_agg_filter_and_exclude(self):
+        query = ArrayAgg('char_field').filter(boolean_field=False).exclude(char_field='Foo2')
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo3']})
+
+    def test_filtered_agg_related_filter(self):
+        query = ArrayAgg('char_field').filter(related_field__boolean_field=True)
+        values = AggregateTestModel.objects.aggregate(arrayagg=query)
+        self.assertEqual(values, {'arrayagg': ['Foo2', 'Foo3']})
+
+
 class TestGeneralAggregate(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
