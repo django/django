@@ -59,7 +59,7 @@ options that make it very powerful.
     Where did the name of the ``Person`` table come from in that example?
 
     By default, Django figures out a database table name by joining the
-    model's "app label" -- the name you used in ``manage.py startapp`` -- to
+    model's "app label" -- the name you used in ``./manage.py startapp`` -- to
     the model's class name, with an underscore between them. In the example
     we've assumed that the ``Person`` model lives in an app named ``myapp``,
     so its table would be ``myapp_person``.

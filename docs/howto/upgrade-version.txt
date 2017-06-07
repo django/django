@@ -103,7 +103,7 @@ Testing
 When the new environment is set up, :doc:`run the full test suite
 </topics/testing/overview>` for your application. Again, it's useful to turn
 on deprecation warnings on so they're shown in the test output (you can also
-use the flag if you test your app manually using ``manage.py runserver``):
+use the flag if you test your app manually using ``./manage.py runserver``):
 
 .. code-block:: console
 

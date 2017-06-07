@@ -103,7 +103,7 @@ database bindings are installed.
 * If you're using an unofficial 3rd party backend, please consult the
   documentation provided for any additional requirements.
 
-If you plan to use Django's ``manage.py migrate`` command to automatically
+If you plan to use Django's ``./manage.py migrate`` command to automatically
 create database tables for your models (after first installing Django and
 creating a project), you'll need to ensure that Django has permission to create
 and alter tables in the database you're using; if you plan to manually create

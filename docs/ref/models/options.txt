@@ -58,11 +58,11 @@ Table names
 To save you time, Django automatically derives the name of the database table
 from the name of your model class and the app that contains it. A model's
 database table name is constructed by joining the model's "app label" -- the
-name you used in :djadmin:`manage.py startapp <startapp>` -- to the model's
+name you used in :djadmin:`./manage.py startapp <startapp>` -- to the model's
 class name, with an underscore between them.
 
 For example, if you have an app ``bookstore`` (as created by
-``manage.py startapp bookstore``), a model defined as ``class Book`` will have
+``./manage.py startapp bookstore``), a model defined as ``class Book`` will have
 a database table named ``bookstore_book``.
 
 To override the database table name, use the ``db_table`` parameter in

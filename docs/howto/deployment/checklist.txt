@@ -29,7 +29,7 @@ you're releasing the source code for your project, a common practice is to
 publish suitable settings for development, and to use a private settings
 module for production.
 
-Run ``manage.py check --deploy``
+Run ``python manage.py check --deploy``
 ================================
 
 Some of the checks described below can be automated using the :option:`check

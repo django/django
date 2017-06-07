@@ -19,13 +19,14 @@ To install the redirects app, follow these steps:
 2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
 3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE` setting.
-4. Run the command :djadmin:`manage.py migrate <migrate>`.
+4. Run the command :djadmin:`./manage.py migrate <migrate>`.
 
 How it works
 ============
 
-``manage.py migrate`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+``./manage.py migrate`` creates a ``django_redirect`` table in your database.
+This is a simple lookup table with ``site_id``, ``old_path`` and ``new_path``
+fields.
 
 The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404

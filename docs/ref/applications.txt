@@ -281,7 +281,7 @@ Methods
         also raw SQL queries via ``django.db.connection``. Your
         :meth:`ready()` method will run during startup of every management
         command. For example, even though the test database configuration is
-        separate from the production settings, ``manage.py test`` would still
+        separate from the production settings, ``./manage.py test`` would still
         execute some queries against your **production** database!
 
     .. note::
