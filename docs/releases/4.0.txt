@@ -47,6 +47,12 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   260,000 to 320,000.
 
+* The new
+  :attr:`LoginView.next_page <django.contrib.auth.views.LoginView.next_page>`
+  attribute and
+  :meth:`~django.contrib.auth.views.LoginView.get_default_redirect_url` method
+  allow customizing the redirect after login.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

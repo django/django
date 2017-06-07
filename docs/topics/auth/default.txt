@@ -996,17 +996,26 @@ implementation details see :ref:`using-the-views`.
     See :doc:`the URL documentation </topics/http/urls>` for details on using
     named URL patterns.
 
-    **Attributes:**
+    **Methods and Attributes**
 
     .. attribute:: template_name
 
         The name of a template to display for the view used to log the user in.
         Defaults to :file:`registration/login.html`.
 
+    .. attribute:: next_page
+
+        .. versionadded:: 4.0
+
+        The URL to redirect to after login. Defaults to
+        :setting:`LOGIN_REDIRECT_URL`.
+
     .. attribute:: redirect_field_name
 
         The name of a ``GET`` field containing the URL to redirect to after
-        login. Defaults to ``next``.
+        login. Defaults to ``next``. Overrides the
+        :meth:`get_default_redirect_url` URL if the given ``GET`` parameter is
+        passed.
 
     .. attribute:: authentication_form
 
@@ -1042,6 +1051,14 @@ implementation details see :ref:`using-the-views`.
         A :class:`set` of hosts, in addition to :meth:`request.get_host()
         <django.http.HttpRequest.get_host>`, that are safe for redirecting
         after login. Defaults to an empty :class:`set`.
+
+    .. method:: get_default_redirect_url()
+
+        .. versionadded:: 4.0
+
+        Returns the URL to redirect to after login. The default implementation
+        resolves and returns :attr:`next_page` if set, or
+        :setting:`LOGIN_REDIRECT_URL` otherwise.
 
     Here's what ``LoginView`` does:
 

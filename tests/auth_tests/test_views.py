@@ -52,8 +52,8 @@ class AuthViewsTestCase(TestCase):
         cls.u1 = User.objects.create_user(username='testclient', password='password', email='testclient@example.com')
         cls.u3 = User.objects.create_user(username='staff', password='password', email='staffmember@example.com')
 
-    def login(self, username='testclient', password='password'):
-        response = self.client.post('/login/', {
+    def login(self, username='testclient', password='password', url='/login/'):
+        response = self.client.post(url, {
             'username': username,
             'password': password,
         })
@@ -725,6 +725,31 @@ class LoginTest(AuthViewsTestCase):
 
         self.login()
         self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_login_get_default_redirect_url(self):
+        response = self.login(url='/login/get_default_redirect_url/')
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    def test_login_next_page(self):
+        response = self.login(url='/login/next_page/')
+        self.assertRedirects(response, '/somewhere/', fetch_redirect_response=False)
+
+    def test_login_named_next_page_named(self):
+        response = self.login(url='/login/next_page/named/')
+        self.assertRedirects(response, '/password_reset/', fetch_redirect_response=False)
+
+    @override_settings(LOGIN_REDIRECT_URL='/custom/')
+    def test_login_next_page_overrides_login_redirect_url_setting(self):
+        response = self.login(url='/login/next_page/')
+        self.assertRedirects(response, '/somewhere/', fetch_redirect_response=False)
+
+    def test_login_redirect_url_overrides_next_page(self):
+        response = self.login(url='/login/next_page/?next=/test/')
+        self.assertRedirects(response, '/test/', fetch_redirect_response=False)
+
+    def test_login_redirect_url_overrides_get_default_redirect_url(self):
+        response = self.login(url='/login/get_default_redirect_url/?next=/test/')
+        self.assertRedirects(response, '/test/', fetch_redirect_response=False)
 
 
 class LoginURLSettings(AuthViewsTestCase):
