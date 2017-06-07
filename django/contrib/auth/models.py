@@ -16,7 +16,10 @@ def update_last_login(sender, user, **kwargs):
     A signal receiver which updates the last_login date for
     the user logging in.
     """
-    user.last_login = timezone.now()
+    try:
+        user.last_login = timezone.now()
+    except AttributeError:
+        return
     user.save(update_fields=['last_login'])
 
 
