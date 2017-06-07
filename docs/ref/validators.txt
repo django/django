@@ -284,8 +284,8 @@ to, or in lieu of custom ``field.clean()`` methods.
     .. versionadded:: 1.11
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'invalid_extension'`` if the ``value`` cannot be found in
-    ``allowed_extensions``.
+    ``'invalid_extension'`` if the extension of ``value.name`` (``value`` is
+    a :class:`~django.core.files.File`) isn't found in ``allowed_extensions``.
 
     .. warning::
 
@@ -300,5 +300,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. versionadded:: 1.11
 
-    Uses Pillow to ensure that the ``value`` is `a valid image extension
+    Uses Pillow to ensure that ``value.name`` (``value`` is a
+    :class:`~django.core.files.File`) has `a valid image extension
     <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`_.
