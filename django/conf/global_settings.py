@@ -491,6 +491,17 @@ CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHE_MIDDLEWARE_SECONDS = 600
 CACHE_MIDDLEWARE_ALIAS = 'default'
 
+#########
+# TASKS #
+#########
+
+# The task backends to use.
+TASKS = {
+    'default': {
+        'BACKEND': 'django.tasks.backends.DummyTaskBackend',
+    }
+}
+
 ##################
 # AUTHENTICATION #
 ##################
