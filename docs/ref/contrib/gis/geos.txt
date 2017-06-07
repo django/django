@@ -242,6 +242,10 @@ isn't provided, the SRID defaults to 4326.
 
     Constructs a :class:`GEOSGeometry` from the given GML string.
 
+.. note::
+
+    Initializing from JSON input requires GDAL.
+
 Properties
 ~~~~~~~~~~
 
