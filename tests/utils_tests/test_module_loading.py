@@ -55,6 +55,19 @@ class DefaultLoader(unittest.TestCase):
         with self.assertRaises(ImportError):
             import_module('utils_tests.test_no_submodule.anything')
 
+    def test_has_sumbodule_with_dotted_path(self):
+        "Nested module existence can be tested (#28241)"
+        test_module = import_module('utils_tests.test_module')
+
+        # a grand-child that exists
+        self.assertTrue(module_has_submodule(test_module, 'child_module.grandchild_module'))
+
+        # a grand-child that does not exist
+        self.assertFalse(module_has_submodule(test_module, 'child_module.no_such_module'))
+
+        # a grand-child which parent does not exist
+        self.assertFalse(module_has_submodule(test_module, 'no_such_module.grandchild_module'))
+
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
