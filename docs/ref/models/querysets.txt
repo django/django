@@ -2830,6 +2830,28 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
+.. fieldlookup:: quarter
+
+``quarter``
+~~~~~~~~~~~
+
+.. versionadded:: 2.0
+
+For date and datetime fields, a 'quarter of the year' match. Allows chaining
+additional field lookups. Takes an integer value between 1 and 4 representing
+the quarter of the year.
+
+Example to retrieve entries in the second quarter (April 1 to June 30)::
+
+    Entry.objects.filter(pub_date__quarter=2)
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
+
 .. fieldlookup:: time
 
 ``time``

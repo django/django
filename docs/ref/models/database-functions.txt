@@ -342,6 +342,7 @@ Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 ``lookup_name``\s return:
 
 * "year": 2015
+* "quarter": 2
 * "month": 6
 * "day": 15
 * "week": 25
@@ -428,6 +429,12 @@ Usage example::
 
     .. attribute:: lookup_name = 'week'
 
+.. class:: ExtractQuarter(expression, tzinfo=None, **extra)
+
+    .. versionadded:: 2.0
+
+    .. attribute:: lookup_name = 'quarter'
+
 These are logically equivalent to ``Extract('date_field', lookup_name)``. Each
 class is also a ``Transform`` registered on ``DateField`` and ``DateTimeField``
 as ``__(lookup_name)``, e.g. ``__year``.
@@ -438,7 +445,8 @@ that deal with date-parts can be used with ``DateField``::
     >>> from datetime import datetime
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
-    ...     ExtractDay, ExtractMonth, ExtractWeek, ExtractWeekDay, ExtractYear,
+    ...     ExtractDay, ExtractMonth, ExtractQuarter, ExtractWeek,
+    ...     ExtractWeekDay, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -447,14 +455,15 @@ that deal with date-parts can be used with ``DateField``::
     ...    end_datetime=end_2015, end_date=end_2015.date())
     >>> Experiment.objects.annotate(
     ...     year=ExtractYear('start_date'),
+    ...     quarter=ExtractQuarter('start_date'),
     ...     month=ExtractMonth('start_date'),
     ...     week=ExtractWeek('start_date'),
     ...     day=ExtractDay('start_date'),
     ...     weekday=ExtractWeekDay('start_date'),
-    ... ).values('year', 'month', 'week', 'day', 'weekday').get(
+    ... ).values('year', 'quarter', 'month', 'week', 'day', 'weekday').get(
     ...     end_date__year=ExtractYear('start_date'),
     ... )
-    {'year': 2015, 'month': 6, 'week': 25, 'day': 15, 'weekday': 2}
+    {'year': 2015, 'quarter': 2, 'month': 6, 'week': 25, 'day': 15, 'weekday': 2}
 
 ``DateTimeField`` extracts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -483,8 +492,9 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> from datetime import datetime
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
-    ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth, ExtractSecond,
-    ...     ExtractWeek, ExtractWeekDay, ExtractYear,
+    ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
+    ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
+    ...     ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -493,6 +503,7 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     ...    end_datetime=end_2015, end_date=end_2015.date())
     >>> Experiment.objects.annotate(
     ...     year=ExtractYear('start_datetime'),
+    ...     quarter=ExtractQuarter('start_datetime'),
     ...     month=ExtractMonth('start_datetime'),
     ...     week=ExtractWeek('start_datetime'),
     ...     day=ExtractDay('start_datetime'),
@@ -503,8 +514,8 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     ... ).values(
     ...     'year', 'month', 'week', 'day', 'weekday', 'hour', 'minute', 'second',
     ... ).get(end_datetime__year=ExtractYear('start_datetime'))
-    {'year': 2015, 'month': 6, 'week': 25, 'day': 15, 'weekday': 2, 'hour': 23,
-     'minute': 30, 'second': 1}
+    {'year': 2015, 'quarter': 2, 'month': 6, 'week': 25, 'day': 15, 'weekday': 2,
+     'hour': 23, 'minute': 30, 'second': 1}
 
 When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
 in UTC. If a different timezone is active in Django, the datetime is converted
@@ -564,6 +575,7 @@ Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
 
 * "year": 2015-01-01 00:00:00+00:00
+* "quarter": 2015-04-01 00:00:00+00:00
 * "month": 2015-06-01 00:00:00+00:00
 * "day": 2015-06-15 00:00:00+00:00
 * "hour": 2015-06-15 14:00:00+00:00
@@ -576,6 +588,7 @@ The timezone offset for Melbourne in the example date above is +10:00. The
 values returned when this timezone is active will be:
 
 * "year": 2015-01-01 00:00:00+11:00
+* "quarter": 2015-04-01 00:00:00+10:00
 * "month": 2015-06-01 00:00:00+10:00
 * "day": 2015-06-16 00:00:00+10:00
 * "hour": 2015-06-16 00:00:00+10:00
@@ -628,6 +641,12 @@ Usage example::
 .. class:: TruncMonth(expression, output_field=None, tzinfo=None, **extra)
 
     .. attribute:: kind = 'month'
+
+.. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
+
+    .. versionadded:: 2.0
+
+    .. attribute:: kind = 'quarter'
 
 These are logically equivalent to ``Trunc('date_field', kind)``. They truncate
 all parts of the date up to ``kind`` which allows grouping or filtering dates

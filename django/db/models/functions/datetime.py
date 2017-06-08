@@ -101,6 +101,10 @@ class ExtractWeekDay(Extract):
     lookup_name = 'week_day'
 
 
+class ExtractQuarter(Extract):
+    lookup_name = 'quarter'
+
+
 class ExtractHour(Extract):
     lookup_name = 'hour'
 
@@ -118,6 +122,7 @@ DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
 DateField.register_lookup(ExtractWeek)
+DateField.register_lookup(ExtractQuarter)
 
 TimeField.register_lookup(ExtractHour)
 TimeField.register_lookup(ExtractMinute)
@@ -179,7 +184,7 @@ class TruncBase(TimezoneMixin, Transform):
                 field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
             ))
         elif isinstance(field, TimeField) and (
-                isinstance(output_field, DateTimeField) or copy.kind in ('year', 'month', 'day', 'date')):
+                isinstance(output_field, DateTimeField) or copy.kind in ('year', 'quarter', 'month', 'day', 'date')):
             raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
                 field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
             ))
@@ -212,6 +217,10 @@ class Trunc(TruncBase):
 
 class TruncYear(TruncBase):
     kind = 'year'
+
+
+class TruncQuarter(TruncBase):
+    kind = 'quarter'
 
 
 class TruncMonth(TruncBase):

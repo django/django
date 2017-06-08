@@ -227,6 +227,15 @@ Models
   from the database. For databases that don't support server-side cursors, it
   controls the number of results Django fetches from the database adapter.
 
+* Added the :class:`~django.db.models.functions.datetime.ExtractQuarter`
+  function to extract the quarter from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField`, and exposed it through the
+  :lookup:`quarter` lookup.
+
+* Added the :class:`~django.db.models.functions.datetime.TruncQuarter`
+  function to truncate :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField` to the first day of a quarter.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
