@@ -24,9 +24,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if len(fields) == 1:
             return 500
         elif len(fields) > 1:
-            return self.connection.features.max_query_params // len(fields)
+            return max(self.connection.features.max_query_params // len(fields), 1)
         else:
-            return len(objs)
+            return None
 
     def check_expression_support(self, expression):
         bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)

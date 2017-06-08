@@ -22,7 +22,7 @@ from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.utils import timezone
-from django.utils.functional import cached_property, partition
+from django.utils.functional import batches, cached_property, partition
 from django.utils.version import get_version
 
 # The maximum number of items to display in a QuerySet.__repr__
@@ -421,21 +421,27 @@ class QuerySet:
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.concrete_fields
-        objs = list(objs)
-        self._populate_pk_values(objs)
+        batch_size = batch_size or connection.ops.bulk_batch_size(fields, objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
-            if objs_with_pk:
-                self._batched_insert(objs_with_pk, fields, batch_size)
-            if objs_without_pk:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
-                ids = self._batched_insert(objs_without_pk, fields, batch_size)
-                if connection.features.can_return_ids_from_bulk_insert:
-                    assert len(ids) == len(objs_without_pk)
-                for obj_without_pk, pk in zip(objs_without_pk, ids):
-                    obj_without_pk.pk = pk
-                    obj_without_pk._state.adding = False
-                    obj_without_pk._state.db = self.db
+            for objs_batch in batches(objs, batch_size):
+                objs_batch = list(objs_batch)
+                self._populate_pk_values(objs_batch)
+                objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs_batch)
+                if objs_with_pk:
+                    self._insert(objs_with_pk, fields, using=self.db)
+                if objs_without_pk:
+                    fields = [f for f in fields if not isinstance(f, AutoField)]
+                    if connection.features.can_return_ids_from_bulk_insert:
+                        ids = self._insert(objs_without_pk, fields, return_id=True, using=self.db)
+                        if not isinstance(ids, list):
+                            ids = [ids]
+                        assert len(ids) == len(objs_without_pk)
+                        for obj_without_pk, pk in zip(objs_without_pk, ids):
+                            obj_without_pk.pk = pk
+                            obj_without_pk._state.adding = False
+                            obj_without_pk._state.db = self.db
+                    else:
+                        self._insert(objs_without_pk, fields, using=self.db)
 
         return objs
 
@@ -1032,28 +1038,6 @@ class QuerySet:
         return query.get_compiler(using=using).execute_sql(return_id)
     _insert.alters_data = True
     _insert.queryset_only = False
-
-    def _batched_insert(self, objs, fields, batch_size):
-        """
-        A helper method for bulk_create() to insert the bulk one batch at a
-        time. Insert recursively a batch from the front of the bulk and then
-        _batched_insert() the remaining objects again.
-        """
-        if not objs:
-            return
-        ops = connections[self.db].ops
-        batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
-        inserted_ids = []
-        for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if connections[self.db].features.can_return_ids_from_bulk_insert:
-                inserted_id = self._insert(item, fields=fields, using=self.db, return_id=True)
-                if isinstance(inserted_id, list):
-                    inserted_ids.extend(inserted_id)
-                else:
-                    inserted_ids.append(inserted_id)
-            else:
-                self._insert(item, fields=fields, using=self.db)
-        return inserted_ids
 
     def _clone(self, **kwargs):
         query = self.query.clone()

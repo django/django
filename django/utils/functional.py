@@ -1,6 +1,7 @@
 import copy
 import operator
 from functools import total_ordering, wraps
+from itertools import chain, islice
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -396,3 +397,24 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
+
+
+def batches(iterable, size=None):
+    """
+    Split an iterable object into multiple generator objects, each with up to
+    `size` items. This is handy to perform batch operations without first converting
+    entire generators to a list, and does not interfere with list input handling.
+    e.g.:
+
+        >>> b = batches(range(10), 3)
+
+        >>> map(list, b)
+        [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]]
+    """
+    assert size is None or size > 0
+    if size is None:
+        yield iterable
+    else:
+        iterator = iter(iterable)
+        for first in iterator:
+            yield chain([first], islice(iterator, size - 1))
