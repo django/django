@@ -122,6 +122,7 @@ class MigrationAutodetector:
         # resolve dependencies caused by M2Ms and FKs.
         self.generated_operations = {}
         self.altered_indexes = {}
+        self.altered_unique_togethers = {}
 
         # Prepare some old/new state and model lists, separating
         # proxy models and ignoring unmigrated apps.
@@ -175,14 +176,19 @@ class MigrationAutodetector:
         # This avoids the same computation in generate_removed_indexes()
         # and generate_added_indexes().
         self.create_altered_indexes()
-        # Generate index removal operations before field is removed
+        # Similarly for unique_togethers
+        self.create_altered_unique_togethers()
+
+        # Generate index/constraints removal operations before field is removed
         self.generate_removed_indexes()
+        self.generate_removed_unique_togethers()
         # Generate field operations
         self.generate_renamed_fields()
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
-        self.generate_altered_unique_together()
+        self.generate_added_unique_togethers()
+        # self.generate_altered_unique_together()
         self.generate_altered_index_together()
         self.generate_added_indexes()
         self.generate_altered_db_table()
@@ -981,6 +987,50 @@ class MigrationAutodetector:
             ))
         return dependencies
 
+    def create_altered_unique_togethers(self):
+        # option_name = operations.AddUniqueTogether.option_name
+        option_name = 'unique_together'
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+
+            old_value = set(old_model_state.options.get(option_name) or ())
+            new_value = set(new_model_state.options.get(option_name) or ())
+
+            added = new_value.difference(old_value)
+            removed = old_value.difference(new_value)
+
+            self.altered_unique_togethers[(app_label, model_name)] = {'added': added, 'removed': removed}
+
+    def generate_added_unique_togethers(self):
+        for (app_label, model_name), alt_ut in self.altered_unique_togethers.items():
+            for fields in alt_ut['added']:
+                dependencies = []
+                for field_name in fields:
+                    field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+                    if field.remote_field and field.remote_field.model:
+                        dependencies.extend(self._get_dependencies_for_foreign_key(field))
+                self.add_operation(
+                    app_label,
+                    operations.AddUniqueTogether(
+                        name=model_name,
+                        fields=fields,
+                    ),
+                    dependencies=dependencies,
+                )
+
+    def generate_removed_unique_togethers(self):
+        for (app_label, model_name), alt_ut in self.altered_unique_togethers.items():
+            for fields in alt_ut['removed']:
+                self.add_operation(
+                    app_label,
+                    operations.RemoveUniqueTogether(
+                        name=model_name,
+                        fields=fields,
+                    )
+                )
+
     def _generate_altered_foo_together(self, operation):
         option_name = operation.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
@@ -1021,6 +1071,7 @@ class MigrationAutodetector:
                 )
 
     def generate_altered_unique_together(self):
+        # TODO: Add deprecation warnings here.
         self._generate_altered_foo_together(operations.AlterUniqueTogether)
 
     def generate_altered_index_together(self):

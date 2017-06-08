@@ -487,6 +487,75 @@ class FieldRelatedOptionOperation(ModelOptionOperation):
         return super().reduce(operation, in_between, app_label=app_label)
 
 
+class AddUniqueTogether(FieldRelatedOptionOperation):
+    """
+    Add new unique_together constraint
+    """
+    option_name = 'unique_together'
+
+    def __init__(self, name, fields):
+        self.fields = fields
+        super(AddUniqueTogether, self).__init__(name)
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name_lower]
+        model_state.options[self.option_name].add(self.fields)
+        state.reload_model(app_label, self.name_lower)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        new_model = to_state.apps.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
+            schema_editor.add_unique_together(
+                new_model,
+                self.fields,
+            )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_field(self, model_name, name, app_label=None):
+        return (
+            self.references_model(model_name, app_label) and
+            name in self.fields
+        )
+
+    def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'fields': self.fields,
+        }
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
+    def describe(self):
+        return "Add unique together constraint on %s for %s" % (self.fields, self.name)
+
+
+class RemoveUniqueTogether(AddUniqueTogether):
+    """
+    Remove a unique_together constraint
+    """
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name_lower]
+        model_state.options[self.option_name].remove(self.fields)
+        state.reload_model(app_label, self.name_lower)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        new_model = to_state.apps.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
+            schema_editor.remove_unique_together(
+                new_model,
+                self.fields,
+            )
+
+    def describe(self):
+        return "Remove unique together constraint on %s for %s" % (self.fields, self.name)
+
+
 class AlterUniqueTogether(FieldRelatedOptionOperation):
     """
     Change the value of unique_together to the target one.

@@ -1202,8 +1202,8 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([self.author_empty, self.book], [self.author_empty, self.book_foo_together])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("author", "title")})
+        self.assertOperationTypes(changes, "otherapp", 0, ["AddUniqueTogether", "AlterIndexTogether"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", fields=("author", "title"))
         self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("author", "title")})
 
     def test_remove_foo_together(self):
@@ -1211,8 +1211,8 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([self.author_empty, self.book_foo_together], [self.author_empty, self.book])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together=set())
+        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveUniqueTogether", "AlterIndexTogether"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", fields=("author", "title"))
         self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together=set())
 
     def test_foo_together_remove_fk(self):
@@ -1223,9 +1223,9 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
         self.assertOperationTypes(changes, "otherapp", 0, [
-            "AlterUniqueTogether", "AlterIndexTogether", "RemoveField"
+            "RemoveUniqueTogether", "AlterIndexTogether", "RemoveField"
         ])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together=set())
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", fields=("author", "title"))
         self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together=set())
         self.assertOperationAttributes(changes, "otherapp", 0, 2, model_name="book", name="author")
 
@@ -1249,9 +1249,12 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("title", "author")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("title", "author")})
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["RemoveUniqueTogether", "AddUniqueTogether", "AlterIndexTogether"]
+        )
+        # self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", fields=("author", "title"))
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", fields=("title", "author"))
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("title", "author")})
 
     def test_add_field_and_foo_together(self):
         """
@@ -1260,8 +1263,8 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([self.author_empty, self.book], [self.author_empty, self.book_foo_together_3])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["AddField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("title", "newfield")})
+        self.assertOperationTypes(changes, "otherapp", 0, ["AddField", "AddUniqueTogether", "AlterIndexTogether"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", fields=("title", "newfield"))
         self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("title", "newfield")})
 
     def test_create_model_and_unique_together(self):
@@ -1286,7 +1289,7 @@ class AutodetectorTests(TestCase):
         # Right actions order?
         self.assertOperationTypes(
             changes, 'otherapp', 0,
-            ['CreateModel', 'AddField', 'AlterUniqueTogether', 'AlterIndexTogether']
+            ['CreateModel', 'AddField', 'AddUniqueTogether', 'AlterIndexTogether']
         )
 
     def test_remove_field_and_foo_together(self):
@@ -1298,10 +1301,13 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, model_name="book", name="newfield")
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("author", "title")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("author", "title")})
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["RemoveUniqueTogether", "RemoveField", "AddUniqueTogether", "AlterIndexTogether"]
+        )
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", fields=("title", "newfield"))
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, model_name="book", name="newfield")
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", fields=("author", "title"))
+        self.assertOperationAttributes(changes, "otherapp", 0, 3, name="book", index_together={("author", "title")})
 
     def test_rename_field_and_foo_together(self):
         """
@@ -1314,11 +1320,13 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RenameField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={
-            ("title", "newfield2")
-        })
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("title", "newfield2")})
+        self.assertOperationTypes(
+            changes, "otherapp", 0, ["RemoveUniqueTogether", "RenameField", "AddUniqueTogether", "AlterIndexTogether"]
+        )
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", fields=("title", "newfield"))
+        # self.assertOperationAttributes(changes, "otherapp", 0, 1)
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", fields=("title", "newfield2"))
+        self.assertOperationAttributes(changes, "otherapp", 0, 3, name="book", index_together={("title", "newfield2")})
 
     def test_proxy(self):
         """The autodetector correctly deals with proxy models."""
@@ -1328,7 +1336,8 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(
-            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": []}
+            changes, "testapp", 0, 0,
+            name="AuthorProxy", options={"proxy": True, "indexes": [], "unique_together": set()}
         )
         # Now, we test turning a proxy model into a non-proxy model
         # It should delete the proxy then make the real one

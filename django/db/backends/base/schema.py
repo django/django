@@ -318,6 +318,19 @@ class BaseDatabaseSchemaEditor:
         """Remove an index from a model."""
         self.execute(index.remove_sql(model, self))
 
+    def add_unique_together(self, model, fields):
+        """
+        Add a unique together constraint
+        """
+        columns = [model._meta.get_field(field).column for field in fields]
+        self.execute(self._create_unique_sql(model, columns))
+
+    def remove_unique_together(self, model, fields):
+        """
+        Remove a unique together constraint
+        """
+        self._delete_composed_index(model, fields, {'unique': True}, self.sql_delete_unique)
+
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
         Deal with a model changing its unique_together. The input
