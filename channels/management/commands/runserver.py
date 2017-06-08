@@ -17,6 +17,8 @@ from channels.worker import Worker
 
 
 class Command(RunserverCommand):
+    protocol = 'http'
+    server_cls = Server
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
@@ -58,12 +60,13 @@ class Command(RunserverCommand):
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting Channels development server at http://%(addr)s:%(port)s/\n"
+            "Starting Channels development server at %(protocol)s://%(addr)s:%(port)s/\n"
             "Channel layer %(layer)s\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
+            "protocol": self.protocol,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
@@ -84,7 +87,7 @@ class Command(RunserverCommand):
         # build the endpoint description string from host/port options
         endpoints = build_endpoint_description_strings(host=self.addr, port=self.port)
         try:
-            Server(
+            self.server_cls(
                 channel_layer=self.channel_layer,
                 endpoints=endpoints,
                 signal_handlers=not options['use_reloader'],

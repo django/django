@@ -122,7 +122,7 @@ class RunServerTests(TestCase):
         channels.log.handler = logging.StreamHandler(self.stream)
 
     @mock.patch('channels.management.commands.runserver.sys.stdout', new_callable=StringIO)
-    @mock.patch('channels.management.commands.runserver.Server')
+    @mock.patch('channels.management.commands.runserver.Command.server_cls')
     @mock.patch('channels.management.commands.runworker.Worker')
     def test_runserver_basic(self, mocked_worker, mocked_server, mock_stdout):
         # Django's autoreload util uses threads and this is not needed
@@ -142,7 +142,7 @@ class RunServerTests(TestCase):
         )
 
     @mock.patch('channels.management.commands.runserver.sys.stdout', new_callable=StringIO)
-    @mock.patch('channels.management.commands.runserver.Server')
+    @mock.patch('channels.management.commands.runserver.Command.server_cls')
     @mock.patch('channels.management.commands.runworker.Worker')
     def test_runserver_debug(self, mocked_worker, mocked_server, mock_stdout):
         """
@@ -180,7 +180,7 @@ class RunServerTests(TestCase):
         )
 
     @mock.patch('channels.management.commands.runserver.sys.stdout', new_callable=StringIO)
-    @mock.patch('channels.management.commands.runserver.Server')
+    @mock.patch('channels.management.commands.runserver.Command.server_cls')
     @mock.patch('channels.management.commands.runworker.Worker')
     def test_runserver_noworker(self, mocked_worker, mocked_server, mock_stdout):
         '''
