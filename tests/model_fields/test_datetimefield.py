@@ -2,7 +2,7 @@ import datetime
 
 from django.db import models
 from django.test import (
-    SimpleTestCase, TestCase, override_settings, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, mock, override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
 from django.utils import timezone
@@ -68,6 +68,69 @@ class DateTimeFieldTests(TestCase):
         with self.settings(TIME_ZONE='UTC'):
             # But in UTC, the __date only matches one of them.
             self.assertQuerysetEqual(DateTimeModel.objects.filter(dt__date=d), [repr(m1)])
+
+    def test_to_python_mock_support(self):
+        """
+        to_python() method of DateField, DateTimeField and TimeField should
+        handle mocked values (#21523).
+        """
+        class FakeDate(datetime.date):
+            """
+            Mock date class.
+            """
+            pass
+
+        with mock.patch('datetime.date', FakeDate):
+            # this will create a mock date
+            fake_date = datetime.date.today()
+            # this will force the creation of a 'real' date (i.e. not the mock)
+            real_date = fake_date + datetime.timedelta(days=1)
+            # DateField.to_python does an isinstance(value, datetime.date) check -
+            # when we are mocking out datetime.date with our FakeDate class
+            # then this test will FAIL if value is a real date object, which
+            # is the case with issue #21523.
+            self.assertIsInstance(fake_date, datetime.date)
+            self.assertNotIsInstance(real_date, datetime.date)
+
+            # if #21523 is not fixed, a call to to_python with a real date,
+            # e.g. the 'tomorrow' value, will raise a TypeError.
+            # What we want is for both FakeDate and real datetime.date objects
+            # to pass through unchanged.
+            f = models.DateField()
+            self.assertEqual(f.to_python(fake_date), fake_date)
+            self.assertEqual(f.to_python(real_date), real_date)
+
+        class FakeDateTime(datetime.datetime):
+            """
+            Mock datetime class.
+            """
+            pass
+
+        with mock.patch('datetime.datetime', FakeDateTime):
+            fake_dt = datetime.datetime.today()
+            real_dt = fake_dt + datetime.timedelta(days=1)
+            self.assertIsInstance(fake_dt, datetime.datetime)
+            self.assertNotIsInstance(real_dt, datetime.datetime)
+
+            f = models.DateTimeField()
+            self.assertEqual(f.to_python(fake_dt), fake_dt)
+            self.assertEqual(f.to_python(real_dt), real_dt)
+
+        class FakeTime(datetime.time):
+            """
+            Mock time class.
+            """
+            pass
+
+        real_time = datetime.time(1, 3, 2)
+        with mock.patch('datetime.time', FakeTime):
+            fake_time = datetime.time(1, 3, 2)
+            self.assertIsInstance(fake_time, datetime.time)
+            self.assertNotIsInstance(real_time, datetime.time)
+
+            f = models.TimeField()
+            self.assertEqual(f.to_python(fake_time), fake_time)
+            self.assertEqual(f.to_python(real_time), real_time)
 
 
 class ValidationTest(SimpleTestCase):
