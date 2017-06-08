@@ -32,3 +32,6 @@ Bugfixes
 
 * Fixed ``QuerySet.union()``, ``intersection()``, and ``difference()`` when
   combining with an ``EmptyQuerySet`` (:ticket:`28293`).
+
+* Prevented ``Paginator``’s unordered object list warning from evaluating a
+  ``QuerySet`` (:ticket:`28284`).
