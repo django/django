@@ -1,6 +1,6 @@
 import json
 import os
-from ctypes import addressof, byref, c_double, c_void_p
+from ctypes import addressof, byref, c_char_p, c_double, c_void_p
 
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
@@ -92,6 +92,16 @@ class GDALRaster(GDALRasterBase):
             if 'srid' not in ds_input:
                 raise GDALException('Specify srid for JSON or dict input.')
 
+            # Create null terminated gdal options array.
+            papsz_options = []
+            for key, val in ds_input.get('papsz_options', {}).items():
+                option = '{}={}'.format(key, val)
+                papsz_options.append(option.upper().encode())
+            papsz_options.append(None)
+
+            # Convert papszlist to ctypes array.
+            papsz_options = (c_char_p * len(papsz_options))(*papsz_options)
+
             # Create GDAL Raster
             self._ptr = capi.create_ds(
                 driver._ptr,
@@ -100,7 +110,7 @@ class GDALRaster(GDALRasterBase):
                 ds_input['height'],
                 ds_input.get('nr_of_bands', len(ds_input.get('bands', []))),
                 ds_input.get('datatype', 6),
-                None
+                byref(papsz_options),
             )
 
             # Set band data if provided

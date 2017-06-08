@@ -1619,21 +1619,22 @@ the others are described below.
 The following table describes all keys that can be set in the ``ds_input``
 dictionary.
 
-=============== ======== ==================================================
-Key             Default  Usage
-=============== ======== ==================================================
-``srid``        required Mapped to the :attr:`~GDALRaster.srid` attribute
-``width``       required Mapped to the :attr:`~GDALRaster.width` attribute
-``height``      required Mapped to the :attr:`~GDALRaster.height` attribute
-``driver``      ``MEM``  Mapped to the :attr:`~GDALRaster.driver` attribute
-``name``        ``''``   See below
-``origin``      ``0``    Mapped to the :attr:`~GDALRaster.origin` attribute
-``scale``       ``0``    Mapped to the :attr:`~GDALRaster.scale` attribute
-``skew``        ``0``    Mapped to the :attr:`~GDALRaster.width` attribute
-``bands``       ``[]``   See below
-``nr_of_bands`` ``0``    See below
-``datatype``    ``6``    See below
-=============== ======== ==================================================
+================= ======== ==================================================
+Key               Default  Usage
+================= ======== ==================================================
+``srid``          required Mapped to the :attr:`~GDALRaster.srid` attribute
+``width``         required Mapped to the :attr:`~GDALRaster.width` attribute
+``height``        required Mapped to the :attr:`~GDALRaster.height` attribute
+``driver``        ``MEM``  Mapped to the :attr:`~GDALRaster.driver` attribute
+``name``          ``''``   See below
+``origin``        ``0``    Mapped to the :attr:`~GDALRaster.origin` attribute
+``scale``         ``0``    Mapped to the :attr:`~GDALRaster.scale` attribute
+``skew``          ``0``    Mapped to the :attr:`~GDALRaster.width` attribute
+``bands``         ``[]``   See below
+``nr_of_bands``   ``0``    See below
+``datatype``      ``6``    See below
+``papsz_options`` ``{}``   See below
+================= ======== ==================================================
 
 .. object:: name
 
@@ -1672,6 +1673,41 @@ Key             Default  Usage
     band input dictionary is given below. If band data isn't provided, the
     raster bands values are instantiated as an array of zeros and the "no
     data" value is set to ``None``.
+
+.. object:: papsz_options
+
+    .. versionadded:: 2.0
+
+    A dictionary with raster creation options. The key-value pairs of the
+    input dictionary are passed to the driver on creation of the raster.
+
+    The available options are driver-specific and are described in the
+    documentation of each driver.
+
+    The values in the dictionary are not case-sensitive and are automatically
+    converted to the correct string format upon creation.
+
+    The following example uses some of the options available for the
+    `GTiff driver`__. The result is a compressed signed byte raster with an
+    internal tiling scheme. The internal tiles have a block size of 23 by 23::
+
+        >>> GDALRaster({
+        ...    'driver': 'GTiff',
+        ...    'name': '/path/to/new/file.tif',
+        ...    'srid': 4326,
+        ...    'width': 255,
+        ...    'height': 255,
+        ...    'nr_of_bands': 1,
+        ...    'papsz_options': {
+        ...        'compress': 'packbits',
+        ...        'pixeltype': 'signedbyte',
+        ...        'tiled': 'yes',
+        ...        'blockxsize': 23,
+        ...        'blockysize': 23,
+        ...    }
+        ... })
+
+__ http://www.gdal.org/frmt_gtiff.html
 
 The ``band_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

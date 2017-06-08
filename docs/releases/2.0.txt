@@ -83,6 +83,9 @@ Minor features
   :attr:`~django.contrib.gis.gdal.GDALRaster.info`, and
   :attr:`~django.contrib.gis.gdal.GDALBand.metadata` attributes.
 
+* Allowed passing driver-specific creation options to
+  :class:`~django.contrib.gis.gdal.GDALRaster` objects using ``papsz_options``.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
