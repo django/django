@@ -438,7 +438,7 @@ that deal with date-parts can be used with ``DateField``::
     >>> from datetime import datetime
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
-    ...    ExtractYear, ExtractMonth, ExtractDay, ExtractWeekDay
+    ...     ExtractDay, ExtractMonth, ExtractWeek, ExtractWeekDay, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -448,12 +448,13 @@ that deal with date-parts can be used with ``DateField``::
     >>> Experiment.objects.annotate(
     ...     year=ExtractYear('start_date'),
     ...     month=ExtractMonth('start_date'),
+    ...     week=ExtractWeek('start_date'),
     ...     day=ExtractDay('start_date'),
     ...     weekday=ExtractWeekDay('start_date'),
-    ... ).values('year', 'month', 'day', 'weekday').get(
+    ... ).values('year', 'month', 'week', 'day', 'weekday').get(
     ...     end_date__year=ExtractYear('start_date'),
     ... )
-    {'year': 2015, 'month': 6, 'day': 15, 'weekday': 2}
+    {'year': 2015, 'month': 6, 'week': 25, 'day': 15, 'weekday': 2}
 
 ``DateTimeField`` extracts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -482,8 +483,8 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> from datetime import datetime
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
-    ...    ExtractYear, ExtractMonth, ExtractDay, ExtractWeekDay,
-    ...    ExtractHour, ExtractMinute, ExtractSecond,
+    ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth, ExtractSecond,
+    ...     ExtractWeek, ExtractWeekDay, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -493,15 +494,17 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> Experiment.objects.annotate(
     ...     year=ExtractYear('start_datetime'),
     ...     month=ExtractMonth('start_datetime'),
+    ...     week=ExtractWeek('start_datetime'),
     ...     day=ExtractDay('start_datetime'),
     ...     weekday=ExtractWeekDay('start_datetime'),
     ...     hour=ExtractHour('start_datetime'),
     ...     minute=ExtractMinute('start_datetime'),
     ...     second=ExtractSecond('start_datetime'),
     ... ).values(
-    ...     'year', 'month', 'day', 'weekday', 'hour', 'minute', 'second',
+    ...     'year', 'month', 'week', 'day', 'weekday', 'hour', 'minute', 'second',
     ... ).get(end_datetime__year=ExtractYear('start_datetime'))
-    {'year': 2015, 'month': 6, 'day': 15, 'weekday': 2, 'hour': 23, 'minute': 30, 'second': 1}
+    {'year': 2015, 'month': 6, 'week': 25, 'day': 15, 'weekday': 2, 'hour': 23,
+     'minute': 30, 'second': 1}
 
 When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
 in UTC. If a different timezone is active in Django, the datetime is converted
