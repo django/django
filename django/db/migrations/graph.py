@@ -143,7 +143,7 @@ class MigrationGraph:
     def add_dependency(self, migration, child, parent, skip_validation=False):
         """
         This may create dummy nodes if they don't yet exist. If
-        `skip_validation=True`, validate_consistency() should be called
+        `skip_validation=False`, validate_consistency() should be called
         afterwards.
         """
         if child not in self.nodes:

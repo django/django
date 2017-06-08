@@ -246,7 +246,7 @@ The ``dependencies`` property is declared like this::
 
 Usually this will be enough, but from time to time you may need to
 ensure that your migration runs *before* other migrations. This is
-useful, for example, to make third-party apps' migrations run *after*
+useful, for example, to make third-party app migrations run *after*
 your :setting:`AUTH_USER_MODEL` replacement.
 
 To achieve this, place all migrations that should depend on yours in
