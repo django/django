@@ -328,11 +328,25 @@ class ModelPaginationTests(TestCase):
         warning = warns[0]
         self.assertEqual(str(warning.message), (
             "Pagination may yield inconsistent results with an unordered "
-            "object_list: <QuerySet [<Article: Article 1>, "
-            "<Article: Article 2>, <Article: Article 3>, <Article: Article 4>, "
-            "<Article: Article 5>, <Article: Article 6>, <Article: Article 7>, "
-            "<Article: Article 8>, <Article: Article 9>]>"
+            "object_list: <class 'pagination.models.Article'> QuerySet."
         ))
         # The warning points at the Paginator caller (i.e. the stacklevel
         # is appropriate).
         self.assertEqual(warning.filename, __file__)
+
+    def test_paginating_unordered_object_list_raises_warning(self):
+        """
+        Unordered object list warning with an object that has an orderd
+        attribute but not a model attribute.
+        """
+        class ObjectList():
+            ordered = False
+        object_list = ObjectList()
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
+            Paginator(object_list, 5)
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(str(warns[0].message), (
+            "Pagination may yield inconsistent results with an unordered "
+            "object_list: {!r}.".format(object_list)
+        ))
