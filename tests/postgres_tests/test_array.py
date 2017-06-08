@@ -24,6 +24,7 @@ try:
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+    from psycopg2.extras import NumericRange
 except ImportError:
     pass
 
@@ -96,6 +97,12 @@ class TestSaveLoad(PostgreSQLTestCase):
             uuids=[uuid.uuid4()],
             decimals=[decimal.Decimal(1.25), 1.75],
             tags=[Tag(1), Tag(2), Tag(3)],
+            json=[{'a': 1}, {'b': 2}],
+            int_ranges=[NumericRange(10, 20), NumericRange(30, 40)],
+            bigint_ranges=[
+                NumericRange(7000000000, 10000000000),
+                NumericRange(50000000000, 70000000000),
+            ]
         )
         instance.save()
         loaded = OtherTypesArrayModel.objects.get()
@@ -103,6 +110,9 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(instance.uuids, loaded.uuids)
         self.assertEqual(instance.decimals, loaded.decimals)
         self.assertEqual(instance.tags, loaded.tags)
+        self.assertEqual(instance.json, loaded.json)
+        self.assertEqual(instance.int_ranges, loaded.int_ranges)
+        self.assertEqual(instance.bigint_ranges, loaded.bigint_ranges)
 
     def test_null_from_db_value_handling(self):
         instance = OtherTypesArrayModel.objects.create(
@@ -113,6 +123,9 @@ class TestSaveLoad(PostgreSQLTestCase):
         )
         instance.refresh_from_db()
         self.assertIsNone(instance.tags)
+        self.assertEqual(instance.json, [])
+        self.assertIsNone(instance.int_ranges)
+        self.assertIsNone(instance.bigint_ranges)
 
     def test_model_set_on_base_field(self):
         instance = IntegerArrayModel()
