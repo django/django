@@ -21,7 +21,7 @@ from django.db.models.query_utils import (
     Q, check_rel_lookup_compatibility, refs_expression,
 )
 from django.db.models.sql.constants import (
-    INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
+    INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, SINGLE,
 )
 from django.db.models.sql.datastructures import (
     BaseTable, Empty, EmptyResultSet, Join, MultiJoin,
@@ -113,7 +113,6 @@ class Query:
 
     alias_prefix = 'T'
     subq_aliases = frozenset([alias_prefix])
-    query_terms = QUERY_TERMS
 
     compiler = 'SQLCompiler'
 
