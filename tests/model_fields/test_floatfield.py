@@ -21,9 +21,9 @@ class TestFloatField(TestCase):
         instance.size = instance
         msg = (
             'Tried to update field model_fields.FloatModel.size with a model '
-            'instance, <FloatModel: FloatModel object>. Use a value '
+            'instance, %r. Use a value '
             'compatible with FloatField.'
-        )
+        ) % instance
         with transaction.atomic():
             with self.assertRaisesMessage(TypeError, msg):
                 instance.save()

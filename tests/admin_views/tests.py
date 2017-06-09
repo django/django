@@ -891,11 +891,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         ModelAdmin.changelist_view shouldn't result in a NoReverseMatch if url
         for change_view is removed from get_urls (#20934).
         """
-        UnchangeableObject.objects.create()
+        o = UnchangeableObject.objects.create()
         response = self.client.get(reverse('admin:admin_views_unchangeableobject_changelist'))
         self.assertEqual(response.status_code, 200)
         # Check the format of the shown object -- shouldn't contain a change link
-        self.assertContains(response, '<th class="field-__str__">UnchangeableObject object</th>', html=True)
+        self.assertContains(response, '<th class="field-__str__">%s</th>' % o, html=True)
 
     def test_invalid_appindex_url(self):
         """
@@ -3306,7 +3306,7 @@ class AdminActionsTest(TestCase):
         # No 500 caused by NoReverseMatch
         self.assertEqual(response.status_code, 200)
         # The page shouldn't display a link to the nonexistent change page
-        self.assertContains(response, "<li>Unchangeable object: UnchangeableObject object</li>", 1, html=True)
+        self.assertContains(response, "<li>Unchangeable object: %s</li>" % obj, 1, html=True)
 
     def test_custom_function_mail_action(self):
         "Tests a custom action defined in a function"
@@ -3692,12 +3692,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name
-        pk = ShortMessage.objects.all()[0].pk
+        sm = ShortMessage.objects.all()[0]
         self.assertContains(
             response,
             '<li class="success">The short message "<a href="%s">'
-            'ShortMessage object</a>" was added successfully.</li>' %
-            reverse('admin:admin_views_shortmessage_change', args=(pk,)), html=True
+            '%s</a>" was added successfully.</li>' %
+            (reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), sm), html=True
         )
 
     def test_add_model_modeladmin_only_qs(self):
@@ -3733,12 +3733,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name
-        pk = Paper.objects.all()[0].pk
+        p = Paper.objects.all()[0]
         self.assertContains(
             response,
             '<li class="success">The paper "<a href="%s">'
-            'Paper object</a>" was added successfully.</li>' %
-            reverse('admin:admin_views_paper_change', args=(pk,)), html=True
+            '%s</a>" was added successfully.</li>' %
+            (reverse('admin:admin_views_paper_change', args=(p.pk,)), p), html=True
         )
 
     def test_edit_model_modeladmin_defer_qs(self):
@@ -3786,8 +3786,8 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(
             response,
             '<li class="success">The short message "<a href="%s">'
-            'ShortMessage object</a>" was changed successfully.</li>' %
-            reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), html=True
+            '%s</a>" was changed successfully.</li>' %
+            (reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), sm), html=True
         )
 
     def test_edit_model_modeladmin_only_qs(self):
@@ -3833,8 +3833,8 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertContains(
             response,
             '<li class="success">The paper "<a href="%s">'
-            'Paper object</a>" was changed successfully.</li>' %
-            reverse('admin:admin_views_paper_change', args=(p.pk,)), html=True
+            '%s</a>" was changed successfully.</li>' %
+            (reverse('admin:admin_views_paper_change', args=(p.pk,)), p), html=True
         )
 
     def test_history_view_custom_qs(self):

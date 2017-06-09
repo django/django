@@ -520,8 +520,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render('honeycomb_widget', big_honeycomb.pk, attrs={}),
             '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />'
-            '&nbsp;<strong>Honeycomb object</strong>'
-            % {'hcombpk': big_honeycomb.pk}
+            '&nbsp;<strong>%(hcomb)s</strong>'
+            % {'hcombpk': big_honeycomb.pk, 'hcomb': big_honeycomb}
         )
 
     def test_fk_to_self_model_not_in_admin(self):
@@ -535,8 +535,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         self.assertHTMLEqual(
             w.render('individual_widget', subject1.pk, attrs={}),
             '<input type="text" name="individual_widget" value="%(subj1pk)s" />'
-            '&nbsp;<strong>Individual object</strong>'
-            % {'subj1pk': subject1.pk}
+            '&nbsp;<strong>%(subj1)s</strong>'
+            % {'subj1pk': subject1.pk, 'subj1': subject1}
         )
 
     def test_proper_manager_for_label_lookup(self):

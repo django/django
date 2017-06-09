@@ -18,6 +18,9 @@ class Article(models.Model):
     hist = models.CharField(max_length=100, verbose_name=_("History"))
     created = models.DateTimeField(null=True)
 
+    def __str__(self):
+        return self.title
+
     def test_from_model(self):
         return "nothing"
 

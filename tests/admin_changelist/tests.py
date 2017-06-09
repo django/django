@@ -186,7 +186,7 @@ class ChangeListTests(TestCase):
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = (
             '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
-            '<td class="field-parent nowrap">Parent object</td></tr></tbody>' % link
+            '<td class="field-parent nowrap">%s</td></tr></tbody>' % (link, new_parent)
         )
         self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
 
