@@ -1,17 +1,13 @@
 from django.contrib.postgres.fields import JSONField
-from django.db.models.aggregates import Aggregate
+from django.db.models.aggregates import Aggregate, DistinctAggregate
 
 __all__ = [
     'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
 ]
 
 
-class ArrayAgg(Aggregate):
+class ArrayAgg(DistinctAggregate):
     function = 'ARRAY_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s)'
-
-    def __init__(self, expression, distinct=False, **extra):
-        super().__init__(expression, distinct='DISTINCT ' if distinct else '', **extra)
 
     def convert_value(self, value, expression, connection, context):
         if not value:
@@ -35,7 +31,7 @@ class BoolOr(Aggregate):
     function = 'BOOL_OR'
 
 
-class JSONBAgg(Aggregate):
+class JSONBAgg(DistinctAggregate):
     function = 'JSONB_AGG'
     _output_field = JSONField()
 
@@ -45,13 +41,12 @@ class JSONBAgg(Aggregate):
         return value
 
 
-class StringAgg(Aggregate):
+class StringAgg(DistinctAggregate):
     function = 'STRING_AGG'
     template = "%(function)s(%(distinct)s%(expressions)s, '%(delimiter)s')"
 
-    def __init__(self, expression, delimiter, distinct=False, **extra):
-        distinct = 'DISTINCT ' if distinct else ''
-        super().__init__(expression, delimiter=delimiter, distinct=distinct, **extra)
+    def __init__(self, expression, delimiter, **extra):
+        super().__init__(expression, delimiter=delimiter, **extra)
 
     def convert_value(self, value, expression, connection, context):
         if not value:

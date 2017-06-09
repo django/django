@@ -6,7 +6,7 @@ from django.db.models.expressions import Func, Star
 from django.db.models.fields import DecimalField, FloatField, IntegerField
 
 __all__ = [
-    'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
+    'Aggregate', 'DistinctAggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
 ]
 
 
@@ -37,6 +37,13 @@ class Aggregate(Func):
         return []
 
 
+class DistinctAggregate(Aggregate):
+    template = '%(function)s(%(distinct)s%(expressions)s)'
+
+    def __init__(self, expression, distinct=False, **extra):
+        super().__init__(expression, distinct='DISTINCT ' if distinct else '', **extra)
+
+
 class Avg(Aggregate):
     function = 'AVG'
     name = 'Avg'
@@ -57,17 +64,16 @@ class Avg(Aggregate):
         return super().as_sql(compiler, connection)
 
 
-class Count(Aggregate):
+class Count(DistinctAggregate):
     function = 'COUNT'
     name = 'Count'
     template = '%(function)s(%(distinct)s%(expressions)s)'
 
-    def __init__(self, expression, distinct=False, **extra):
+    def __init__(self, expression, **extra):
         if expression == '*':
             expression = Star()
         super().__init__(
-            expression, distinct='DISTINCT ' if distinct else '',
-            output_field=IntegerField(), **extra
+            expression, output_field=IntegerField(), **extra
         )
 
     def __repr__(self):
