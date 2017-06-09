@@ -3217,7 +3217,7 @@ as the string based lookups passed to
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
-    <QuerySet [<Question: Question object>]>
+    <QuerySet [<Question: What's up?>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
 This is useful to further filter down the prefetch operation, or to call
