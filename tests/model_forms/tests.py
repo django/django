@@ -1666,7 +1666,7 @@ class ModelChoiceFieldTests(TestCase):
             category = forms.ModelChoiceField(queryset=None)
 
             def __init__(self, *args, **kwargs):
-                super(ModelChoiceForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['category'].queryset = Category.objects.filter(slug__contains='test')
 
         form = ModelChoiceForm()

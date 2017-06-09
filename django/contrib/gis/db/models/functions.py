@@ -101,7 +101,7 @@ class GeomOutputGeoFunc(GeoFunc):
     def __init__(self, *expressions, **extra):
         if 'output_field' not in extra:
             extra['output_field'] = GeometryField()
-        super(GeomOutputGeoFunc, self).__init__(*expressions, **extra)
+        super().__init__(*expressions, **extra)
 
     def resolve_expression(self, *args, **kwargs):
         res = super().resolve_expression(*args, **kwargs)

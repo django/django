@@ -1301,7 +1301,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
         if (hasattr(value, '__iter__') and
                 not isinstance(value, str) and
                 not hasattr(value, '_meta')):
-            return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
+            prepare_value = super().prepare_value
+            return [prepare_value(v) for v in value]
         return super().prepare_value(value)
 
     def has_changed(self, initial, data):
