@@ -559,7 +559,7 @@ name::
 Multiple keys can be chained together to form a path lookup::
 
     >>> Dog.objects.filter(data__owner__name='Bob')
-    <QuerySet [<QuerySet <Dog: Rufus>]>
+    <QuerySet [<Dog: Rufus>]>
 
 If the key is an integer, it will be interpreted as an index lookup in an
 array::
