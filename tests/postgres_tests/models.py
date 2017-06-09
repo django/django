@@ -51,6 +51,8 @@ class NullableIntegerArrayModel(PostgreSQLModel):
 class CharArrayModel(PostgreSQLModel):
     field = ArrayField(models.CharField(max_length=10))
 
+class JSONArrayModel(PostgreSQLModel):
+    field = ArrayField(JSONField(default=dict))
 
 class DateTimeArrayModel(PostgreSQLModel):
     datetimes = ArrayField(models.DateTimeField())

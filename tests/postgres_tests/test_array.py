@@ -15,8 +15,8 @@ from django.utils import timezone
 from . import PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel, Tag,
+    JSONArrayModel, NestedIntegerArrayModel, NullableIntegerArrayModel,
+    OtherTypesArrayModel, PostgreSQLModel, Tag,
 )
 
 try:
@@ -53,6 +53,13 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(instance.datetimes, loaded.datetimes)
         self.assertEqual(instance.dates, loaded.dates)
         self.assertEqual(instance.times, loaded.times)
+
+    def test_json(self):
+        instance = JSONArrayModel(field=[{'a': 1 }, {'b': 2}])
+        instance.save()
+        loaded = JSONArrayModel.objects.get()
+        self.assertEqual(instance.field, loaded.field)
+        self.assertEqual(len(loaded.field), 2)
 
     def test_tuples(self):
         instance = IntegerArrayModel(field=(1,))
