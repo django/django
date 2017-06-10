@@ -355,6 +355,21 @@ class TestInline(TestDataMixin, TestCase):
             html=True
         )
 
+    def test_inline_nonauto_noneditable_inherited_pk(self):
+        response = self.client.get(reverse('admin:admin_inlines_author_add'))
+        self.assertContains(
+            response,
+            '<input id="id_nonautopkbookchild_set-0-nonautopkbook_ptr" '
+            'name="nonautopkbookchild_set-0-nonautopkbook_ptr" type="hidden" />',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<input id="id_nonautopkbookchild_set-2-nonautopkbook_ptr" '
+            'name="nonautopkbookchild_set-2-nonautopkbook_ptr" type="hidden" />',
+            html=True
+        )
+
     def test_inline_editable_pk(self):
         response = self.client.get(reverse('admin:admin_inlines_author_add'))
         self.assertContains(
@@ -886,7 +901,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # One field is in a stacked inline, other in a tabular one.
         test_fields = ['#id_nonautopkbook_set-0-title', '#id_nonautopkbook_set-2-0-title']
         show_links = self.selenium.find_elements_by_link_text('SHOW')
-        self.assertEqual(len(show_links), 2)
+        self.assertEqual(len(show_links), 3)
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
             show_links[show_index].click()
