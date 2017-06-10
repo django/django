@@ -147,3 +147,14 @@ class AbstractBaseUser(models.Model):
     @classmethod
     def normalize_username(cls, username):
         return unicodedata.normalize('NFKC', force_text(username))
+
+    @classmethod
+    def get_anonymous_user(cls):
+        """Return an instance of AnonymousUser. Alternative implementations
+        for AUTH_USER_MODEL may override this to use an alternative
+        AnonymousUser class or add custom initialization.
+
+        """
+        from .models import AnonymousUser
+        return AnonymousUser()
+
