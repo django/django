@@ -63,6 +63,10 @@ class NonAutoPKBook(models.Model):
         super(NonAutoPKBook, self).save(*args, **kwargs)
 
 
+class NonAutoPKBookChild(NonAutoPKBook):
+    pass
+
+
 class EditablePKBook(models.Model):
     manual_pk = models.IntegerField(primary_key=True)
     author = models.ForeignKey(Author, models.CASCADE)

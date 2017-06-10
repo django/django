@@ -5,10 +5,10 @@ from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
     Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
-    Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
-    Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
-    Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
-    TitleCollection,
+    Inner4Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
+    ParentModelWithCustomPk, Poll, Profile, ProfileCollection, Question,
+    ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
+    SomeParentModel, SottoCapo, Title, TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -20,6 +20,11 @@ class BookInline(admin.TabularInline):
 
 class NonAutoPKBookTabularInline(admin.TabularInline):
     model = NonAutoPKBook
+    classes = ('collapse',)
+
+
+class NonAutoPKBookChildTabularInline(admin.TabularInline):
+    model = NonAutoPKBookChild
     classes = ('collapse',)
 
 
@@ -40,6 +45,7 @@ class AuthorAdmin(admin.ModelAdmin):
     inlines = [
         BookInline, NonAutoPKBookTabularInline, NonAutoPKBookStackedInline,
         EditablePKBookTabularInline, EditablePKBookStackedInline,
+        NonAutoPKBookChildTabularInline,
     ]
 
 

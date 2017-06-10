@@ -26,3 +26,6 @@ Bugfixes
 
 * Fixed model initialization to set the name of class-based model indexes
   for models that only inherit ``models.Model`` (:ticket:`28282`).
+
+* Fixed crash in admin's inlines when a model has an inherited non-editable
+  primary key (:ticket:`27967`).
