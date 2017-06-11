@@ -52,14 +52,6 @@ class Worker(models.Model):
         return self.name
 
 
-class BrokenStrMethod(models.Model):
-    name = models.CharField(max_length=7)
-
-    def __str__(self):
-        # Intentionally broken (invalid start byte in byte string).
-        return b'Name\xff: %s'.decode() % self.name
-
-
 class NonAutoPK(models.Model):
     name = models.CharField(max_length=10, primary_key=True)
 
