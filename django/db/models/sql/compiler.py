@@ -390,7 +390,7 @@ class SQLCompiler:
         features = self.connection.features
         compilers = [
             query.get_compiler(self.using, self.connection)
-            for query in self.query.combined_queries
+            for query in self.query.combined_queries if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
             for query, compiler in zip(self.query.combined_queries, compilers):
