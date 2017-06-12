@@ -1,5 +1,6 @@
 from unittest import skipIf
 
+from django import forms
 from django.db import connection, models
 from django.test import TestCase
 
@@ -17,6 +18,11 @@ class TextFieldTests(TestCase):
         tf2 = models.TextField(max_length=2345)
         self.assertIsNone(tf1.formfield().max_length)
         self.assertEqual(2345, tf2.formfield().max_length)
+
+    def test_choices_generates_select_widget(self):
+        """A TextField with choices uses a Select widget."""
+        f = models.TextField(choices=[('A', 'A'), ('B', 'B')])
+        self.assertIsInstance(f.formfield().widget, forms.Select)
 
     def test_to_python(self):
         """TextField.to_python() should return a string."""
