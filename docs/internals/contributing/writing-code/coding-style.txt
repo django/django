@@ -33,6 +33,27 @@ Python style
 
 * Use four spaces for indentation.
 
+* Use four space hanging indentation rather than vertical alignment::
+
+    raise AttributeError(
+        'Here is a multine error message '
+        'shortened for clarity.'
+    )
+
+  Instead of::
+
+      raise AttributeError('Here is a multine error message '
+                           'shortened for clarity.')
+
+  This makes better use of space and avoids having to realign strings if the
+  length of the first line changes.
+
+* Use single quotes for strings, or a double quote if the the string contains a
+  single quote. Don't waste time doing unrelated refactoring of existing code
+  to conform to this style.
+
+* Avoid use of "we" in comments, e.g. "Loop over" rather than "We loop over".
+
 * Use underscores, not camelCase, for variable, function and method names
   (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters()``).
 
