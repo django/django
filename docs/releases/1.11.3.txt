@@ -51,3 +51,6 @@ Bugfixes
   1.11.1, casting was added in Python to avoid localization of numeric values
   in Django templates, but this made some use cases more difficult. Casting is
   now done in the template using the ``|stringformat:'s'`` filter.
+
+* Prevented a primary key alteration from adding a foreign key constraint if
+  ``db_constraint=False`` (:ticket:`28298`).
