@@ -653,7 +653,7 @@ class Employment(models.Model):
 
 
 class School(models.Model):
-    pass
+    name = models.CharField(default='Springfield Elementary', max_length=100)
 
 
 class Student(models.Model):
