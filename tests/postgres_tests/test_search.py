@@ -6,7 +6,7 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 from django.contrib.postgres.search import (
-    SearchQuery, SearchRank, SearchVector,
+    Lexeme, RawSearchQuery, SearchQuery, SearchRank, SearchVector,
 )
 from django.db.models import F
 from django.test import modify_settings
@@ -285,4 +285,37 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.filter(character=self.minstrel).annotate(
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
+        self.assertSequenceEqual(searched, [self.verse0])
+
+
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+class TestPrefixMatching(GrailTestData, PostgreSQLTestCase):
+
+    def test_prefix_searching(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(Lexeme('hear', prefix=True))
+        )
+
+        self.assertSequenceEqual(searched, [self.verse2])
+
+    def test_inverse_prefix_searching(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(Lexeme('Robi', prefix=True, invert=True))
+        )
+        self.assertEqual(set(searched), {self.verse2, self.bedemir0, self.bedemir1, self.french,
+                                         self.crowd, self.witch, self.duck})
+
+    def test_lexemes_multiple_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(
+                Lexeme('Robi', prefix=True) & Lexeme('Camel', prefix=True)
+            )
+        )
+
         self.assertSequenceEqual(searched, [self.verse0])
