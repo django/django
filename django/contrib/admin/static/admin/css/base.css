@@ -423,7 +423,7 @@ textarea {
 }
 
 input[type=text], input[type=password], input[type=email], input[type=url],
-input[type=number], textarea, select, .vTextField {
+input[type=number], input[type=tel], textarea, select, .vTextField {
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 5px 6px;
@@ -431,8 +431,8 @@ input[type=number], textarea, select, .vTextField {
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
-input[type=url]:focus, input[type=number]:focus, textarea:focus, select:focus,
-.vTextField:focus {
+input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
+textarea:focus, select:focus, .vTextField:focus {
     border-color: #999;
 }
 
