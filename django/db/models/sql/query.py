@@ -907,6 +907,13 @@ class Query:
         """
         reuse = [a for a, j in self.alias_map.items()
                  if (reuse is None or a in reuse) and j == join]
+
+        if len(reuse) > 1:
+            # In some cases more than one suitable alias can be found. Join.__eq__
+            # only compares on table_name, join_field and parent_alias.
+            # Find the alias with a matching join_type.
+            reuse = [r for r in reuse if self.alias_map[r].join_type == join.join_type]
+
         if reuse:
             self.ref_alias(reuse[0])
             return reuse[0]

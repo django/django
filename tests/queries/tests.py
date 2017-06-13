@@ -1172,6 +1172,16 @@ class Queries1Tests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(unknown_field__name='generic')
 
+    def test_ticket_28297(self):
+        # https://code.djangoproject.com/ticket/28297
+        queryset = School.objects.all()
+        queryset = queryset.annotate(total=Count('classroom__students', distinct=True))
+        queryset = queryset.filter(classroom__students__school__name__in=['Shelbyville High'])
+        queryset = queryset.annotate(available=Count('classroom__students', distinct=True))
+        annotation = queryset.query.annotations['available']
+        col = annotation.get_source_expressions()[0]
+        self.assertEqual(col.alias, 'T6')
+
 
 class Queries2Tests(TestCase):
     @classmethod
