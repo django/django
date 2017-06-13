@@ -1,3 +1,4 @@
+from django.utils.functional import SimpleLazyObject
 # PermWrapper and PermLookupDict proxy the permissions system into objects that
 # the template system can understand.
 
@@ -51,11 +52,7 @@ def auth(request):
     If there is no 'user' attribute in the request, use AnonymousUser (from
     django.contrib.auth).
     """
-    if hasattr(request, 'user'):
-        user = request.user
-    else:
-        from django.contrib.auth.models import AnonymousUser
-        user = AnonymousUser()
+    user = SimpleLazyObject(lambda: request.user)
 
     return {
         'user': user,

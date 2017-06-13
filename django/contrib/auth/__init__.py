@@ -205,6 +205,11 @@ def get_user(request):
     If no user is retrieved, return an instance of `AnonymousUser`.
     """
     from .models import AnonymousUser
+    assert hasattr(request, 'session'), (
+        "The Django authentication app must be installed to use this feature."
+        " Edit your INSTALLED_APPS setting to include `django.contrib.auth`."
+    )
+
     user = None
     try:
         user_id = _get_user_session_key(request)

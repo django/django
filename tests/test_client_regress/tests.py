@@ -1389,7 +1389,7 @@ class RequestFactoryStateTest(SimpleTestCase):
     def common_test_that_should_always_pass(self):
         request = RequestFactory().get('/')
         request.session = {}
-        self.assertFalse(hasattr(request, 'user'))
+        self.assertTrue(hasattr(request, 'user'))
 
     def test_request(self):
         self.common_test_that_should_always_pass()

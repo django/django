@@ -44,7 +44,6 @@ class TestDataMixin:
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ],
@@ -109,7 +108,6 @@ class FlatpageViewTests(TestDataMixin, TestCase):
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ],
