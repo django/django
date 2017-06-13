@@ -1,0 +1,21 @@
+/* global QUnit, URLify */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
+
+QUnit.module('admin.URLify');
+
+QUnit.test('empty string', function(assert) {
+    assert.strictEqual(URLify('', 8, true), '');
+});
+
+QUnit.test('strip nonessential words', function(assert) {
+    assert.strictEqual(URLify('the D is silent', 8, true), 'd-silent');
+});
+
+QUnit.test('strip non-URL characters', function(assert) {
+    assert.strictEqual(URLify('D#silent@', 7, true), 'dsilent');
+});
+
+QUnit.test('merge adjacent whitespace', function(assert) {
+    assert.strictEqual(URLify('D   silent', 8, true), 'd-silent');
+});
