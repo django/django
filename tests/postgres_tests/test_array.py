@@ -686,6 +686,12 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
+    def test_model_field_formfield_choices(self):
+        model_field = ArrayField(models.IntegerField(choices=((1, 'One'), (2, 'Two'))))
+        form_field = model_field.formfield()
+        vals = form_field.clean('1,2')
+        model_field.clean(vals, None)
+
     def test_already_converted_value(self):
         field = SimpleArrayField(forms.CharField())
         vals = ['a', 'b', 'c']

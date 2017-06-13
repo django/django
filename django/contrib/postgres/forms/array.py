@@ -43,7 +43,7 @@ class SimpleArrayField(forms.CharField):
         values = []
         for index, item in enumerate(items):
             try:
-                values.append(self.base_field.to_python(item))
+                values.append(self.base_field.clean(item))
             except ValidationError as error:
                 errors.append(prefix_validation_error(
                     error,
