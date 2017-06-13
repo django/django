@@ -571,6 +571,12 @@ LOGGING = {}
 DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFilter'
 
 ###########
+#  SITES  #
+###########
+
+SITES_SITE_MODEL = 'sites.Site'
+
+###########
 # TESTING #
 ###########
 

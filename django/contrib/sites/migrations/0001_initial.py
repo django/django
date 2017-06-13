@@ -1,5 +1,6 @@
 import django.contrib.sites.models
-from django.contrib.sites.models import _simple_domain_name_validator
+from django.contrib.sites.base_site import AbstractBaseSite
+from django.contrib.sites.validators import _simple_domain_name_validator
 from django.db import migrations, models
 
 
@@ -18,12 +19,13 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, verbose_name='display name')),
             ],
             options={
+                'swappable': 'SITES_SITE_MODEL',
                 'ordering': ('domain',),
                 'db_table': 'django_site',
                 'verbose_name': 'site',
                 'verbose_name_plural': 'sites',
             },
-            bases=(models.Model,),
+            bases=(AbstractBaseSite,),
             managers=[
                 ('objects', django.contrib.sites.models.SiteManager()),
             ],

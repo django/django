@@ -276,7 +276,11 @@ class StateApps(Apps):
 
         # There shouldn't be any operations pending at this point.
         from django.core.checks.model_checks import _check_lazy_references
-        ignore = {make_model_tuple(settings.AUTH_USER_MODEL)} if ignore_swappable else set()
+        if ignore_swappable:
+            ignore = {make_model_tuple(settings.AUTH_USER_MODEL), make_model_tuple(settings.SITES_SITE_MODEL)}
+        else:
+            ignore = set()
+
         errors = _check_lazy_references(self, ignore=ignore)
         if errors:
             raise ValueError("\n".join(error.msg for error in errors))

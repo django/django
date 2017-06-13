@@ -1,27 +1,14 @@
-import string
-
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save
 from django.http.request import split_domain_port
-from django.utils.translation import gettext_lazy as _
+
+from .base_site import AbstractBaseSite
+
+__all__ = ('Site', 'SiteManager')
+
 
 SITE_CACHE = {}
-
-
-def _simple_domain_name_validator(value):
-    """
-    Validate that the given value contains no whitespaces to prevent common
-    typos.
-    """
-    if not value:
-        return
-    checks = ((s in value) for s in string.whitespace)
-    if any(checks):
-        raise ValidationError(
-            _("The domain name cannot contain any spaces or tabs."),
-            code='invalid',
-        )
 
 
 class SiteManager(models.Manager):
@@ -50,7 +37,7 @@ class SiteManager(models.Manager):
     def get_current(self, request=None):
         """
         Return the current Site based on the SITE_ID in the project's settings.
-        If SITE_ID isn't defined, return the site with domain matching
+        If SITE_ID isn't defined, it return the site with domain matching
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
@@ -77,28 +64,13 @@ class SiteManager(models.Manager):
         return self.get(domain=domain)
 
 
-class Site(models.Model):
-
-    domain = models.CharField(
-        _('domain name'),
-        max_length=100,
-        validators=[_simple_domain_name_validator],
-        unique=True,
-    )
-    name = models.CharField(_('display name'), max_length=50)
+class Site(AbstractBaseSite):
     objects = SiteManager()
 
-    class Meta:
+    class Meta(AbstractBaseSite.Meta):
+        app_label = 'sites'
         db_table = 'django_site'
-        verbose_name = _('site')
-        verbose_name_plural = _('sites')
-        ordering = ('domain',)
-
-    def __str__(self):
-        return self.domain
-
-    def natural_key(self):
-        return (self.domain,)
+        swappable = 'SITES_SITE_MODEL'
 
 
 def clear_site_cache(sender, **kwargs):
