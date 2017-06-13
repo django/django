@@ -19,3 +19,7 @@ QUnit.test('strip non-URL characters', function(assert) {
 QUnit.test('merge adjacent whitespace', function(assert) {
     assert.strictEqual(URLify('D   silent', 8, true), 'd-silent');
 });
+
+QUnit.test('trim trailing hyphens', function(assert) {
+    assert.strictEqual(URLify('D silent always', 9, true), 'd-silent');
+});
