@@ -57,8 +57,8 @@ def auth(request):
     if hasattr(request, 'user'):
         user = request.user
     else:
-        from django.contrib.auth.models import AnonymousUser
-        user = AnonymousUser()
+        from django.contrib.auth import get_user_model
+        user = get_user_model().get_anonymous_user()
 
     return {
         'user': user,
