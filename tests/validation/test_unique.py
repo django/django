@@ -8,7 +8,8 @@ from django.test import TestCase
 
 from .models import (
     CustomPKModel, FlexibleDatePost, ModelToValidate, Post, UniqueErrorsModel,
-    UniqueFieldsModel, UniqueForDateModel, UniqueTogetherModel,
+    UniqueFieldsModel, UniqueForDateModel, UniqueIndexesModel,
+    UniqueTogetherModel,
 )
 
 
@@ -29,6 +30,16 @@ class GetUniqueCheckTests(unittest.TestCase):
             ([(UniqueTogetherModel, ('ifield', 'cfield')),
               (UniqueTogetherModel, ('ifield', 'efield')),
               (UniqueTogetherModel, ('id',)), ],
+             []),
+            m._get_unique_checks()
+        )
+
+    def test_unique_indexes_get_collected(self):
+        m = UniqueIndexesModel()
+        self.assertEqual(
+            ([(UniqueIndexesModel, ('ifield', 'cfield')),
+              (UniqueIndexesModel, ('efield',)),
+              (UniqueIndexesModel, ('id',)), ],
              []),
             m._get_unique_checks()
         )

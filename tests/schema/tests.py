@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import itertools
 import unittest
@@ -5,7 +6,8 @@ from copy import copy
 from unittest import mock
 
 from django.db import (
-    DatabaseError, IntegrityError, OperationalError, connection,
+    DatabaseError, IntegrityError, NotSupportedError, OperationalError,
+    connection,
 )
 from django.db.models import Model
 from django.db.models.deletion import CASCADE, PROTECT
@@ -17,7 +19,7 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.db.models.indexes import Index
+from django.db.models.indexes import Index, Unique, UniqueDeferred
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -159,7 +161,7 @@ class SchemaTests(TransactionTestCase):
         counts = {'fks': 0, 'uniques': 0, 'indexes': 0}
         for c in constraints.values():
             if c['columns'] == [column]:
-                if c['foreign_key'] == fk_to:
+                if fk_to and c['foreign_key'] == fk_to:
                     counts['fks'] += 1
                 if c['unique']:
                     counts['uniques'] += 1
@@ -1625,6 +1627,93 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(Author, index)
         self.assertNotIn('name', self.get_indexes(Author._meta.db_table))
+
+    def test_add_remove_unique_index(self):
+        """
+        Tests index addition and removal
+        """
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure the table is there and has no index.
+        self.assertNotIn('title', self.get_indexes(Author._meta.db_table))
+        # Add the unique index.
+        index = Unique(fields=['name'])
+        index.set_name_with_model(Author)
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+        self.assertEqual(
+            self.get_constraints_for_column(Author, 'name'),
+            ['schema_auth_name_328d97_unq'],
+        )
+        self.assertEqual(
+            self.get_constraints_count(Author._meta.db_table, 'name', None),
+            {'fks': 0, 'uniques': 1, 'indexes': 0},
+        )
+        # Test column is unique.
+        Author.objects.create(name='Carl Sagan')
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name='Carl Sagan')
+        # Drop the unique index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
+        self.assertEqual(
+            self.get_constraints_count(Author._meta.db_table, 'name', None),
+            {'fks': 0, 'uniques': 0, 'indexes': 0},
+        )
+
+    @skipUnlessDBFeature('can_defer_constraint_checks')
+    def test_add_remove_unique_deferred_index(self):
+        """
+        Tests index addition and removal
+        """
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure the table is there and has no index.
+        self.assertNotIn('title', self.get_indexes(Author._meta.db_table))
+        # Add the unique index.
+        index = UniqueDeferred(fields=['name'])
+        index.set_name_with_model(Author)
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+        self.assertEqual(
+            self.get_constraints_for_column(Author, 'name'),
+            ['schema_auth_name_328d97_unq'],
+        )
+        self.assertEqual(
+            self.get_constraints_count(Author._meta.db_table, 'name', None),
+            {'fks': 0, 'uniques': 1, 'indexes': 0},
+        )
+        # Test unique constriant is deferred until the end of the transaction.
+        # Use ExitStack to enter and exit the atomic contextmanger manually as
+        # the exception should not be raised until exiting.
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(atomic())
+            Author.objects.create(name='Carl Sagan')
+            Author.objects.create(name='Carl Sagan')
+            with self.assertRaises(IntegrityError):
+                stack.close()
+        # Drop the unique index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertEqual(self.get_constraints_for_column(Author, 'name'), [])
+        self.assertEqual(
+            self.get_constraints_count(Author._meta.db_table, 'name', None),
+            {'fks': 0, 'uniques': 0, 'indexes': 0},
+        )
+
+    @skipIfDBFeature('can_defer_constraint_checks')
+    def test_add_unique_deferred_index_without_defer_constraints_support(self):
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = UniqueDeferred(fields=['name'])
+        index.set_name_with_model(Author)
+        with self.assertRaises(NotSupportedError):
+            with connection.schema_editor() as editor:
+                editor.add_index(Author, index)
 
     def test_remove_db_index_doesnt_remove_custom_indexes(self):
         """

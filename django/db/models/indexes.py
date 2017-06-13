@@ -1,8 +1,9 @@
 import hashlib
 
+from django.db import NotSupportedError
 from django.utils.encoding import force_bytes
 
-__all__ = ['Index']
+__all__ = ['Index', 'Unique', 'UniqueDeferred']
 
 
 class Index:
@@ -58,17 +59,25 @@ class Index:
             'extra': tablespace_sql,
         }
 
+    def create_sql_template(self, schema_editor):
+        return schema_editor.sql_create_index
+
     def create_sql(self, model, schema_editor, using=''):
-        sql_create_index = schema_editor.sql_create_index
+        tpl = self.create_sql_template(schema_editor)
         sql_parameters = self.get_sql_create_template_values(model, schema_editor, using)
-        return sql_create_index % sql_parameters
+        return tpl % sql_parameters
+
+    def remove_sql_template(self, schema_editor):
+        return schema_editor.sql_delete_index
 
     def remove_sql(self, model, schema_editor):
+        tpl = self.remove_sql_template(schema_editor)
         quote_name = schema_editor.quote_name
-        return schema_editor.sql_delete_index % {
+        sql_parameters = {
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
         }
+        return tpl % sql_parameters
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
@@ -124,3 +133,32 @@ class Index:
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+
+    def get_unique_checks(self):
+        return ()
+
+
+class Unique(Index):
+    suffix = 'unq'
+
+    def create_sql_template(self, schema_editor):
+        return schema_editor.sql_create_unique
+
+    def remove_sql_template(self, schema_editor):
+        return schema_editor.sql_delete_unique
+
+    def get_unique_checks(self):
+        return tuple([field_name for field_name, order in self.fields_orders])
+
+
+class UniqueDeferred(Unique):
+    def create_sql_template(self, schema_editor):
+        tpl = super().create_sql_template(schema_editor)
+        return '%s DEFERRABLE INITIALLY DEFERRED' % tpl
+
+    def create_sql(self, model, schema_editor, using=''):
+        if not schema_editor.connection.features.can_defer_constraint_checks:
+            raise NotSupportedError(
+                "Deferrable constraints are not supported on this database backend."
+            )
+        return super().create_sql(model, schema_editor, using)
