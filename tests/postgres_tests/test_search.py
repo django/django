@@ -14,7 +14,7 @@ from .models import Character, Line, LineSavedSearch, Scene
 
 try:
     from django.contrib.postgres.search import (
-        SearchConfig, SearchHeadline, SearchQuery, SearchRank, SearchVector,
+        Lexeme, RawSearchQuery, SearchConfig, SearchHeadline, SearchQuery, SearchRank, SearchVector,
     )
 except ImportError:
     pass
@@ -669,3 +669,35 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
             '<b>Brave</b>, <b>brave</b>, <b>brave</b>...<br>'
             '<b>brave</b> <b>Sir</b> <b>Robin</b>',
         )
+
+
+class TestPrefixMatching(GrailTestData, PostgreSQLTestCase):
+
+    def test_prefix_searching(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(Lexeme('hear', prefix=True))
+        )
+
+        self.assertSequenceEqual(searched, [self.verse2])
+
+    def test_inverse_prefix_searching(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(Lexeme('Robi', prefix=True, invert=True))
+        )
+        self.assertEqual(set(searched), {self.verse2, self.bedemir0, self.bedemir1, self.french,
+                                         self.crowd, self.witch, self.duck})
+
+    def test_lexemes_multiple_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(
+                Lexeme('Robi', prefix=True) & Lexeme('Camel', prefix=True)
+            )
+        )
+
+        self.assertSequenceEqual(searched, [self.verse0])
