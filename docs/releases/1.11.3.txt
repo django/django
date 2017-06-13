@@ -29,3 +29,6 @@ Bugfixes
 
 * Fixed crash in admin's inlines when a model has an inherited non-editable
   primary key (:ticket:`27967`).
+
+* Fixed ``QuerySet.union()``, ``intersection()``, and ``difference()`` when
+  combining with an ``EmptyQuerySet`` (:ticket:`28293`).

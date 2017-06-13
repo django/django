@@ -42,6 +42,31 @@ class QuerySetSetOperationTests(TestCase):
         self.assertEqual(len(list(qs1.union(qs2, all=True))), 20)
         self.assertEqual(len(list(qs1.union(qs2))), 10)
 
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_intersection_with_empty_qs(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.none()
+        self.assertEqual(len(qs1.intersection(qs2)), 0)
+        self.assertEqual(len(qs2.intersection(qs1)), 0)
+        self.assertEqual(len(qs2.intersection(qs2)), 0)
+
+    @skipUnlessDBFeature('supports_select_difference')
+    def test_difference_with_empty_qs(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.none()
+        self.assertEqual(len(qs1.difference(qs2)), 10)
+        self.assertEqual(len(qs2.difference(qs1)), 0)
+        self.assertEqual(len(qs2.difference(qs2)), 0)
+
+    def test_union_with_empty_qs(self):
+        qs1 = Number.objects.all()
+        qs2 = Number.objects.none()
+        self.assertEqual(len(qs1.union(qs2)), 10)
+        self.assertEqual(len(qs2.union(qs1)), 10)
+        self.assertEqual(len(qs2.union(qs1, qs1, qs1)), 10)
+        self.assertEqual(len(qs2.union(qs1, qs1, all=True)), 20)
+        self.assertEqual(len(qs2.union(qs2)), 0)
+
     def test_limits(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.all()

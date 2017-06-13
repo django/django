@@ -818,12 +818,25 @@ class QuerySet:
         return clone
 
     def union(self, *other_qs, all=False):
+        # If the query is an EmptyQuerySet, combine all nonempty querysets.
+        if isinstance(self, EmptyQuerySet):
+            qs = [q for q in other_qs if not isinstance(q, EmptyQuerySet)]
+            return qs[0]._combinator_query('union', *qs[1:], all=all) if qs else self
         return self._combinator_query('union', *other_qs, all=all)
 
     def intersection(self, *other_qs):
+        # If any query is an EmptyQuerySet, return it.
+        if isinstance(self, EmptyQuerySet):
+            return self
+        for other in other_qs:
+            if isinstance(other, EmptyQuerySet):
+                return other
         return self._combinator_query('intersection', *other_qs)
 
     def difference(self, *other_qs):
+        # If the query is an EmptyQuerySet, return it.
+        if isinstance(self, EmptyQuerySet):
+            return self
         return self._combinator_query('difference', *other_qs)
 
     def select_for_update(self, nowait=False, skip_locked=False):
