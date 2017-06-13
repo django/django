@@ -28,6 +28,11 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     sign = ''
     if isinstance(number, Decimal):
         str_number = '{:f}'.format(number)
+    elif isinstance(number, float):
+        # if decimal_pos is not given, render it with sufficient precision
+        precision = decimal_pos or 8
+        fmt = '{{:.{}f}}'.format(precision + 1)  # gives '{:.1f}' if precision=1
+        str_number = fmt.format(number)
     else:
         str_number = str(number)
     if str_number[0] == '-':
@@ -42,6 +47,13 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         int_part, dec_part = str_number, ''
     if decimal_pos is not None:
         dec_part = dec_part + ('0' * (decimal_pos - len(dec_part)))
+    else:
+        if isinstance(number, (float, int)):
+            # By default, {:f} formatted floats get 9 decimal pos.
+            # Strip trailing zeros that add no extra information.
+            # The second part of the "or" expression emulates how str() renders
+            # a float, i.e. retain a single 0 in the decimal part
+            dec_part = dec_part.rstrip('0') or ('0' if isinstance(number, float) else '')
     if dec_part:
         dec_part = decimal_sep + dec_part
     # grouping
