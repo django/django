@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 
 UserModel = get_user_model()
 
@@ -37,7 +38,6 @@ class ModelBackend(object):
     def _get_group_permissions(self, user_obj):
         user_groups_field = get_user_model()._meta.get_field('groups')
         user_groups_query = 'group__%s' % user_groups_field.related_query_name()
-        from django.contrib.auth.models import Permission
         return Permission.objects.filter(**{user_groups_query: user_obj})
 
     def _get_permissions(self, user_obj, obj, from_name):
@@ -49,7 +49,6 @@ class ModelBackend(object):
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
-        from django.contrib.auth.models import Permission
         perm_cache_name = '_%s_perm_cache' % from_name
         if not hasattr(user_obj, perm_cache_name):
             if user_obj.is_superuser:
