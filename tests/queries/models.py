@@ -657,6 +657,7 @@ class School(models.Model):
 
 
 class Student(models.Model):
+    name = models.CharField(max_length=20, blank=True)
     school = models.ForeignKey(School, models.CASCADE)
 
 

@@ -3197,6 +3197,28 @@ class JoinReuseTest(TestCase):
         )
         self.assertSequenceEqual(qs, [hp])
 
+    def test_join_use_correct_table_28297(self):
+        """
+        Queries use the last table reference created by the join. The first
+        annotation ('total') should give a different result compared to the
+        latter annotation ('available').
+        """
+        s1 = School.objects.create()
+        s2 = School.objects.create()
+        c1 = Classroom.objects.create(name='Software Engineering', school=s1)
+        c2 = Classroom.objects.create(name='Security', school=s2)
+        t1 = Student.objects.create(school=s1, name='Neo')
+        t2 = Student.objects.create(school=s1, name='Morpheus')
+        t3 = Student.objects.create(school=s2, name='Agent Smith')
+        c1.students.set([t1, t2])
+        c2.students.set([t1, t3])
+        queryset = School.objects.annotate(
+            total=Count('classroom__students', distinct=True)
+        ).filter(classroom__students__name__in=[t1.name, t2.name]).annotate(
+            available=Count('classroom__students', distinct=True)
+        ).filter(total=F('available'))
+        self.assertSequenceEqual(queryset, [s1])
+
 
 class DisjunctionPromotionTests(TestCase):
     def test_disjunction_promotion_select_related(self):
