@@ -16,23 +16,25 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.utils import six, translation
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
 )
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeBytes, SafeText
+from django.utils.safestring import SafeBytes, SafeString, SafeText, mark_safe
 from django.utils.six import PY3
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
-    get_language, get_language_from_request, get_language_info, gettext,
-    gettext_lazy, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
-    pgettext_lazy, trans_real, ugettext, ugettext_lazy, ungettext,
-    ungettext_lazy,
+    get_language, get_language_bidi, get_language_from_request,
+    get_language_info, gettext, gettext_lazy, ngettext_lazy, npgettext,
+    npgettext_lazy, pgettext, pgettext_lazy, string_concat, to_locale,
+    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -261,6 +263,57 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(pgettext("month name", "May"), "Mai")
             self.assertEqual(pgettext("verb", "May"), "Kann")
             self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, "4 Resultate")
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_string_concat(self):
+        self.assertEqual(str(string_concat('dja', 'ngo')), 'django')
+
+    def test_empty_value(self):
+        """Empty value must stay empty after being translated (#23196)."""
+        with translation.override('de'):
+            self.assertEqual('', gettext(''))
+            s = mark_safe('')
+            self.assertEqual(s, gettext(s))
+
+    def test_safe_status(self):
+        """
+        Translating a string requiring no auto-escaping shouldn't change the
+        "safe" status.
+        """
+        s = mark_safe(str('Password'))
+        self.assertIs(type(s), SafeString)
+        with translation.override('de', deactivate=True):
+            self.assertIs(type(ugettext(s)), SafeText)
+        self.assertEqual('aPassword', SafeText('a') + s)
+        self.assertEqual('Passworda', s + SafeText('a'))
+        self.assertEqual('Passworda', s + mark_safe('a'))
+        self.assertEqual('aPassword', mark_safe('a') + s)
+        self.assertEqual('as', mark_safe('a') + mark_safe('s'))
+
+    def test_maclines(self):
+        """
+        Translations on files with Mac or DOS end of lines will be converted
+        to unix EOF in .po catalogs.
+        """
+        ca_translation = trans_real.translation('ca')
+        ca_translation._catalog['Mac\nEOF\n'] = 'Catalan Mac\nEOF\n'
+        ca_translation._catalog['Win\nEOF\n'] = 'Catalan Win\nEOF\n'
+        with translation.override('ca', deactivate=True):
+            self.assertEqual('Catalan Mac\nEOF\n', gettext('Mac\rEOF\r'))
+            self.assertEqual('Catalan Win\nEOF\n', gettext('Win\r\nEOF\r\n'))
+
+    def test_to_locale(self):
+        self.assertEqual(to_locale('en-us'), 'en_US')
+        self.assertEqual(to_locale('sr-lat'), 'sr_Lat')
+
+    def test_to_language(self):
+        self.assertEqual(trans_real.to_language('en_US'), 'en-us')
+        self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
+
+    def test_language_bidi(self):
+        self.assertIs(get_language_bidi(), False)
+        with translation.override(None):
+            self.assertIs(get_language_bidi(), False)
 
 
 class TranslationThreadSafetyTests(SimpleTestCase):
