@@ -191,7 +191,7 @@ class Field(RegisterLookupMixin):
 
     def __repr__(self):
         """Display the module, class, and name of the field."""
-        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        path = '%s.%s' % (self.__class__.__module__, self.__class__.__qualname__)
         name = getattr(self, 'name', None)
         if name is not None:
             return '<%s: %s>' % (path, name)
@@ -448,7 +448,7 @@ class Field(RegisterLookupMixin):
                 if value is not default:
                     keywords[name] = value
         # Work out path - we shorten it for known Django core fields
-        path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
         if path.startswith("django.db.models.fields.related"):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         if path.startswith("django.db.models.fields.files"):

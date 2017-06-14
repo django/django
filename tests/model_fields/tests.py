@@ -9,6 +9,11 @@ from .models import (
 )
 
 
+class Nested():
+    class Field(models.Field):
+        pass
+
+
 class BasicFieldTests(TestCase):
 
     def test_show_hidden_initial(self):
@@ -32,6 +37,10 @@ class BasicFieldTests(TestCase):
         self.assertEqual(repr(f), '<django.db.models.fields.CharField: a>')
         f = models.fields.CharField()
         self.assertEqual(repr(f), '<django.db.models.fields.CharField>')
+
+    def test_field_repr_nested(self):
+        """__repr__() uses __qualname__ for nested class support."""
+        self.assertEqual(repr(Nested.Field()), '<model_fields.tests.Nested.Field>')
 
     def test_field_name(self):
         """
@@ -84,6 +93,11 @@ class BasicFieldTests(TestCase):
         # Must be picklable with this cached property populated (#28188).
         field._get_default
         pickle.dumps(field)
+
+    def test_deconstruct_nested_field(self):
+        """deconstruct() uses __qualname__ for nested class support."""
+        name, path, args, kwargs = Nested.Field().deconstruct()
+        self.assertEqual(path, 'model_fields.tests.Nested.Field')
 
 
 class ChoicesTests(SimpleTestCase):
