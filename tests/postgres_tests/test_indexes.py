@@ -12,12 +12,6 @@ class BrinIndexTests(PostgreSQLTestCase):
     def test_suffix(self):
         self.assertEqual(BrinIndex.suffix, 'brin')
 
-    def test_repr(self):
-        index = BrinIndex(fields=['title'], pages_per_range=4)
-        another_index = BrinIndex(fields=['title'])
-        self.assertEqual(repr(index), "<BrinIndex: fields='title', pages_per_range=4>")
-        self.assertEqual(repr(another_index), "<BrinIndex: fields='title'>")
-
     def test_not_eq(self):
         index = BrinIndex(fields=['title'])
         index_with_page_range = BrinIndex(fields=['title'], pages_per_range=16)
@@ -57,10 +51,6 @@ class GinIndexTests(PostgreSQLTestCase):
 
     def test_suffix(self):
         self.assertEqual(GinIndex.suffix, 'gin')
-
-    def test_repr(self):
-        index = GinIndex(fields=['title'])
-        self.assertEqual(repr(index), "<GinIndex: fields='title'>")
 
     def test_eq(self):
         index = GinIndex(fields=['title'])
