@@ -609,6 +609,8 @@ Some undocumented classes in ``django.forms.widgets`` are removed:
   ``CheckboxFieldRenderer``
 * ``ChoiceInput``, ``RadioChoiceInput``, ``CheckboxChoiceInput``
 
+The undocumented ``Select.render_option()`` method is removed.
+
 The ``Widget.format_output()`` method is removed. Use a custom widget template
 instead.
 
