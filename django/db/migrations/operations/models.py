@@ -71,7 +71,7 @@ class CreateModel(ModelOperation):
         if self.managers and self.managers != [('objects', models.Manager())]:
             kwargs['managers'] = self.managers
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -232,7 +232,7 @@ class DeleteModel(ModelOperation):
             'name': self.name,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -276,7 +276,7 @@ class RenameModel(ModelOperation):
             'new_name': self.new_name,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -429,7 +429,7 @@ class AlterModelTable(ModelOperation):
             'table': self.table,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -505,7 +505,7 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
             'unique_together': self.unique_together,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -559,7 +559,7 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
             'index_together': self.index_together,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -608,7 +608,7 @@ class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
             'order_with_respect_to': self.order_with_respect_to,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -683,7 +683,7 @@ class AlterModelOptions(ModelOptionOperation):
             'options': self.options,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -718,7 +718,7 @@ class AlterModelManagers(ModelOptionOperation):
 
     def deconstruct(self):
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [self.name, self.managers],
             {}
         )
@@ -781,7 +781,7 @@ class AddIndex(IndexOperation):
             'index': self.index,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs,
         )
@@ -827,7 +827,7 @@ class RemoveIndex(IndexOperation):
             'name': self.name,
         }
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs,
         )

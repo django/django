@@ -24,7 +24,7 @@ class SeparateDatabaseAndState(Operation):
         if self.state_operations:
             kwargs['state_operations'] = self.state_operations
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -87,7 +87,7 @@ class RunSQL(Operation):
         if self.hints:
             kwargs['hints'] = self.hints
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
@@ -164,7 +164,7 @@ class RunPython(Operation):
         if self.hints:
             kwargs['hints'] = self.hints
         return (
-            self.__class__.__name__,
+            self.__class__.__qualname__,
             [],
             kwargs
         )
