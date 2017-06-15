@@ -30,7 +30,7 @@ def get_field_from_path(model, path):
     for piece in pieces:
         parent = model
         if (fields and fields[-1].is_relation and
-                    fields[-1].remote_field.model != model):
+                fields[-1].remote_field.model != model):
             parent = fields[-1].remote_field.model
         fields.append(parent._meta.get_field(piece))
 
