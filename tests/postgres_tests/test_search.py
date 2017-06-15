@@ -701,3 +701,14 @@ class TestPrefixMatching(GrailTestData, PostgreSQLTestCase):
         )
 
         self.assertSequenceEqual(searched, [self.verse0])
+
+    def test_lexemes_multiple_or(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(
+            search=RawSearchQuery(
+                Lexeme('kneecap', prefix=True) | Lexeme('afrai', prefix=True)
+            )
+        )
+
+        self.assertSequenceEqual(searched, [self.verse0, self.verse1])
