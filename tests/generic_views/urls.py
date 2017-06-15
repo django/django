@@ -223,7 +223,7 @@ urlpatterns = [
     url(r'^dates/books/(?P<year>[0-9]{4})/no_month/$',
         views.BookMonthArchive.as_view()),
     url(r'^dates/books/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/related_field/$',
-        views.BookMonthArchive.as_view(date_field='series__pubdate')),
+        views.BookMonthArchive.as_view(date_field='artist__birthdate')),
     url(r'^dates/booksignings/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/$',
         views.BookSigningMonthArchive.as_view()),
 

@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import requires_tz_support
 from django.utils import timezone
 
-from .models import Artist, Author, Book, BookSigning, Page, Series
+from .models import Artist, Author, Book, BookSigning, Page
 
 
 def _make_books(n, base_date):
@@ -21,23 +21,18 @@ class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
-        cls.series1 = Series.objects.create(
-            name='Django books 1', pubdate=datetime.date(2003, 10, 1),
-        )
-        cls.series2 = Series.objects.create(
-            name='Django books 2', pubdate=datetime.date(2003, 9, 1),
-        )
-        cls.artist1 = Artist.objects.create(name='Rene Magritte')
+        cls.artist1 = Artist.objects.create(name='Rene Magritte', birthdate=datetime.date(2003, 10, 1))
+        cls.artist2 = Artist.objects.create(name='Salvador Dali', birthdate=datetime.date(2003, 9, 1))
         cls.author1 = Author.objects.create(name='Roberto Bolaño', slug='roberto-bolano')
         cls.author2 = Author.objects.create(name='Scott Rosenberg', slug='scott-rosenberg')
         cls.book1 = Book.objects.create(
-            name='2066', slug='2066', pages=800, series=cls.series1,
+            name='2066', slug='2066', pages=800, artist=cls.artist1,
             pubdate=datetime.date(2008, 10, 1),
         )
         cls.book1.authors.add(cls.author1)
         cls.book2 = Book.objects.create(
             name='Dreaming in Code', slug='dreaming-in-code', pages=300,
-            series=cls.series2, pubdate=datetime.date(2006, 5, 1),
+            artist=cls.artist2, pubdate=datetime.date(2006, 5, 1),
         )
         cls.page1 = Page.objects.create(
             content='I was once bitten by a moose.', template='generic_views/page_template.html'
@@ -371,6 +366,10 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
     def test_month_view_based_on_related_fields(self):
         res = self.client.get('/dates/books/2003/oct/related_field/')
         self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            list(res.context['object_list']),
+            list(Book.objects.filter(artist__birthdate__year=2003, artist__birthdate__month=10))
+        )
 
     def test_previous_month_without_content(self):
         "Content can exist on any day of the previous month. Refs #14711"

@@ -707,8 +707,7 @@ def _get_next_prev(generic_view, date, is_previous, period):
         # Snag the first object from the queryset; if it doesn't exist that
         # means there's no next/previous link available.
         try:
-            result = functools.reduce(
-                getattr, date_field.split(LOOKUP_SEP), qs[0])
+            result = functools.reduce(getattr, date_field.split(LOOKUP_SEP), qs[0])
         except IndexError:
             return None
 
