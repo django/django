@@ -6,7 +6,7 @@ from django.urls import reverse
 
 class Artist(models.Model):
     name = models.CharField(max_length=100)
-    birthdate = models.DateField()
+    birthdate = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering = ['name']
