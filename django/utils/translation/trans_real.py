@@ -327,6 +327,8 @@ def pgettext(context, message):
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         result = message
+    elif isinstance(message, SafeData):
+        result = mark_safe(result)
     return result
 
 

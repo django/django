@@ -227,19 +227,23 @@ class TranslationTests(SimpleTestCase):
             s = mark_safe('')
             self.assertEqual(s, gettext(s))
 
+    @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_safe_status(self):
         """
-        Translating a string requiring no auto-escaping shouldn't change the
-        "safe" status.
+        Translating a string requiring no auto-escaping with gettext or pgettext
+        shouldn't change the "safe" status.
         """
-        s = mark_safe('Password')
-        self.assertIs(type(s), SafeText)
+        trans_real._active = local()
+        trans_real._translations = {}
+        s1 = mark_safe('Password')
+        s2 = mark_safe('May')
         with translation.override('de', deactivate=True):
-            self.assertIs(type(gettext(s)), SafeText)
-        self.assertEqual('aPassword', SafeText('a') + s)
-        self.assertEqual('Passworda', s + SafeText('a'))
-        self.assertEqual('Passworda', s + mark_safe('a'))
-        self.assertEqual('aPassword', mark_safe('a') + s)
+            self.assertIs(type(gettext(s1)), SafeText)
+            self.assertIs(type(pgettext('month name', s2)), SafeText)
+        self.assertEqual('aPassword', SafeText('a') + s1)
+        self.assertEqual('Passworda', s1 + SafeText('a'))
+        self.assertEqual('Passworda', s1 + mark_safe('a'))
+        self.assertEqual('aPassword', mark_safe('a') + s1)
         self.assertEqual('as', mark_safe('a') + mark_safe('s'))
 
     def test_maclines(self):
