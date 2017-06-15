@@ -44,3 +44,10 @@ Bugfixes
 * Prevented attribute values in the ``django/forms/widgets/attrs.html``
   template from being localized so that numeric attributes (e.g. ``max`` and
   ``min``) of ``NumberInput`` work correctly (:ticket:`28303`).
+
+* Removed casting of the option value to a string in the template context of
+  the ``CheckboxSelectMultiple``, ``NullBooleanSelect``, ``RadioSelect``,
+  ``SelectMultiple``, and ``Select`` widgets (:ticket:`28176`). In Django
+  1.11.1, casting was added in Python to avoid localization of numeric values
+  in Django templates, but this made some use cases more difficult. Casting is
+  now done in the template using the ``|stringformat:'s'`` filter.
