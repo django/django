@@ -668,6 +668,7 @@ The following checks are performed when a model contains a
 * **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
+* **contenttypes.E005**: Model names must be at most 100 characters.
 
 ``sites``
 ---------
