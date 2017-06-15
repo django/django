@@ -1,3 +1,6 @@
+from django.db.models.constants import LOOKUP_SEP
+
+
 def make_model_tuple(model):
     """
     Take a model or a string of the form "app_label.ModelName" and return a
@@ -19,3 +22,16 @@ def make_model_tuple(model):
             "Invalid model reference '%s'. String model references "
             "must be of the form 'app_label.ModelName'." % model
         )
+
+
+def get_field_from_path(model, path):
+    pieces = path.split(LOOKUP_SEP)
+    fields = []
+    for piece in pieces:
+        parent = model
+        if (fields and fields[-1].is_relation and
+                    fields[-1].remote_field.model != model):
+            parent = fields[-1].remote_field.model
+        fields.append(parent._meta.get_field(piece))
+
+    return fields[-1]
