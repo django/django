@@ -1,0 +1,37 @@
+1.1.4 Release Notes
+===================
+
+Channels 1.1.4 is a bugfix release for the 1.1 series, released on
+June 15th, 2017.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Minor Changes & Bugfixes
+------------------------
+
+* Pending messages correctly handle retries in backlog situations
+
+* Workers in threading mode now respond to ctrl-C and gracefully exit.
+
+* ``request.meta['QUERY_STRING']`` is now correctly encoded at all times.
+
+* Test client improvements
+
+* ``ChannelServerLiveTestCase`` added, allows an equivalent of the Django
+  ``LiveTestCase``.
+
+* Decorator added to check ``Origin`` headers (``allowed_hosts_only``)
+
+* New ``TEST_CONFIG`` setting in ``CHANNEL_LAYERS`` that allows varying of
+  the channel layer for tests (e.g. using a different Redis install)
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
