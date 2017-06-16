@@ -592,8 +592,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
-        management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')
-        management.call_command('loaddata', 'db_fixture_2', verbosity=0, using='default')
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0, database='default')
+        management.call_command('loaddata', 'db_fixture_2', verbosity=0, database='default')
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Who needs more than one database?>',
             '<Article: Who needs to use compressed data?>',
@@ -604,7 +604,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_3' found."):
             management.call_command('loaddata', 'db_fixture_3', verbosity=0)
         with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_3' found."):
-            management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
+            management.call_command('loaddata', 'db_fixture_3', verbosity=0, database='default')
         self.assertQuerysetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):
