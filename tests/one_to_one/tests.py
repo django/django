@@ -129,8 +129,8 @@ class OneToOneTests(TestCase):
 
     def test_unsaved_object(self):
         """
-        #10811 -- Assigning an unsaved object to a OneToOneField
-        should raise an exception.
+        Assigning an unsaved object to a OneToOneField
+        should raise an exception (#10811).
         """
         place = Place(name='User', address='London')
         with self.assertRaises(Restaurant.DoesNotExist):
@@ -144,8 +144,8 @@ class OneToOneTests(TestCase):
 
     def test_reverse_relationship_cache_cascade(self):
         """
-        Regression test for #9023: accessing the reverse relationship shouldn't
-        result in a cascading delete().
+        Accessing the reverse relationship shouldn't
+        result in a cascading delete() (#9023).
         """
         bar = UndergroundBar.objects.create(place=self.p1, serves_cocktails=False)
 
@@ -197,7 +197,7 @@ class OneToOneTests(TestCase):
         p.undergroundbar = None
 
     def test_related_object_cache(self):
-        """ Regression test for #6886 (the related-object cache) """
+        """The related-object cache (#6886)."""
 
         # Look up the objects again so that we get "fresh" objects
         p = Place.objects.get(name="Demon Dogs")
@@ -248,11 +248,9 @@ class OneToOneTests(TestCase):
 
     def test_filter_one_to_one_relations(self):
         """
-        Regression test for #9968
-
-        filtering reverse one-to-one relations with primary_key=True was
+        Filtering reverse one-to-one relations with primary_key=True was
         misbehaving. We test both (primary_key=True & False) cases here to
-        prevent any reappearance of the problem.
+        prevent any reappearance of the problem (#9968).
         """
         target = Target.objects.create()
         self.assertSequenceEqual(Target.objects.filter(pointer=None), [target])
@@ -269,9 +267,7 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_does_not_exist_cache(self):
         """
-        Regression for #13839 and #17439.
-
-        DoesNotExist on a reverse one-to-one relation is cached.
+        DoesNotExist on a reverse one-to-one relation is cached (#13839, #17439).
         """
         p = Place(name='Zombie Cats', address='Not sure')
         p.save()
@@ -284,10 +280,8 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_cached_when_related_is_accessed(self):
         """
-        Regression for #13839 and #17439.
-
         The target of a one-to-one relation is cached
-        when the origin is accessed through the reverse relation.
+        when the origin is accessed through the reverse relation (#13839, #17439).
         """
         # Use a fresh object without caches
         r = Restaurant.objects.get(pk=self.r1.pk)
@@ -297,10 +291,8 @@ class OneToOneTests(TestCase):
 
     def test_related_object_cached_when_reverse_is_accessed(self):
         """
-        Regression for #13839 and #17439.
-
         The origin of a one-to-one relation is cached
-        when the target is accessed through the reverse relation.
+        when the target is accessed through the reverse relation (#13839, #17439).
         """
         # Use a fresh object without caches
         p = Place.objects.get(pk=self.p1.pk)
@@ -310,9 +302,8 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_cached_when_related_is_set(self):
         """
-        Regression for #13839 and #17439.
-
-        The target of a one-to-one relation is always cached.
+        The target of a one-to-one relation is always cached
+        (#13839, #17439).
         """
         p = Place(name='Zombie Cats', address='Not sure')
         p.save()
@@ -323,9 +314,8 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_cached_when_related_is_unset(self):
         """
-        Regression for #13839 and #17439.
-
-        The target of a one-to-one relation is always cached.
+        The target of a one-to-one relation is always cached
+        (#13839, #17439).
         """
         b = UndergroundBar(place=self.p1, serves_cocktails=True)
         b.save()
@@ -339,10 +329,8 @@ class OneToOneTests(TestCase):
 
     def test_get_reverse_on_unsaved_object(self):
         """
-        Regression for #18153 and #19089.
-
         Accessing the reverse relation on an unsaved object
-        always raises an exception.
+        always raises an exception (#18153, #19089).
         """
         p = Place()
 

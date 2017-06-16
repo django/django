@@ -200,8 +200,7 @@ class HandlerRequestTests(SimpleTestCase):
 
 class ScriptNameTests(SimpleTestCase):
     def test_get_script_name(self):
-        # Regression test for #23173
-        # Test first without PATH_INFO
+        # Test first without PATH_INFO (#23173).
         script_name = get_script_name({'SCRIPT_URL': '/foobar/'})
         self.assertEqual(script_name, '/foobar/')
 

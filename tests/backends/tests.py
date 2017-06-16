@@ -271,9 +271,7 @@ class PostgreSQLTests(TestCase):
             new_connection.close()
 
     def test_connect_isolation_level(self):
-        """
-        Regression test for #18130 and #24318.
-        """
+        """(#18130, #24318)."""
         import psycopg2
         from psycopg2.extensions import (
             ISOLATION_LEVEL_READ_COMMITTED as read_committed,

@@ -1752,7 +1752,7 @@ class RouterAttributeErrorTestCase(TestCase):
 
 
 class ModelMetaRouter:
-    "A router to ensure model arguments are real model classes"
+    "model arguments are real model classes"
     def db_for_write(self, model, **hints):
         if not hasattr(model, '_meta'):
             raise ValueError
@@ -1801,7 +1801,7 @@ class MigrateTestCase(TestCase):
     multi_db = True
 
     def test_migrate_to_other_database(self):
-        """Regression test for #16039: migrate with --database option."""
+        """Migrate with --database option (#16039)."""
         cts = ContentType.objects.using('other').filter(app_label='multiple_database')
 
         count = cts.count()
@@ -1812,7 +1812,7 @@ class MigrateTestCase(TestCase):
         self.assertEqual(cts.count(), count)
 
     def test_migrate_to_other_database_with_router(self):
-        """Regression test for #16039: migrate with --database option."""
+        """Migrate with --database option (#16039)."""
         cts = ContentType.objects.using('other').filter(app_label='multiple_database')
 
         cts.delete()

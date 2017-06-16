@@ -147,8 +147,8 @@ class DeferTests(AssertionMixin, TestCase):
         )
 
     def test_defer_baseclass_when_subclass_has_no_added_fields(self):
-        # Regression for #10572 - A subclass with no extra fields can defer
-        # fields from the base class
+        # A subclass with no extra fields can defer 
+        # fields from the base class (#10572).
         Child.objects.create(name="c1", value="foo", related=self.s1)
         # You can defer a field on a baseclass when the subclass has no fields
         obj = Child.objects.defer("value").get(name="c1")
@@ -209,8 +209,8 @@ class BigChildDeferTests(AssertionMixin, TestCase):
 class TestDefer2(AssertionMixin, TestCase):
     def test_defer_proxy(self):
         """
-        Ensure select_related together with only on a proxy model behaves
-        as expected. See #17876.
+        select_related together with only on a proxy model behaves
+        as expected (#17876).
         """
         related = Secondary.objects.create(first='x1', second='x2')
         ChildProxy.objects.create(name='p1', value='xx', related=related)

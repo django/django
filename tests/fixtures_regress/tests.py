@@ -40,7 +40,7 @@ class TestFixtures(TestCase):
 
     def test_duplicate_pk(self):
         """
-        This is a regression test for ticket #3790.
+        (#3790).
         """
         # Load a fixture that uses PK=1
         management.call_command(
@@ -63,9 +63,9 @@ class TestFixtures(TestCase):
 
     def test_loaddata_not_found_fields_not_ignore(self):
         """
-        Test for ticket #9279 -- Error is raised for entries in
+        Error is raised for entries in
         the serialized data for fields that have been removed
-        from the database when not ignored.
+        from the database when not ignored (#9279).
         """
         with self.assertRaises(DeserializationError):
             management.call_command(
@@ -76,9 +76,8 @@ class TestFixtures(TestCase):
 
     def test_loaddata_not_found_fields_ignore(self):
         """
-        Test for ticket #9279 -- Ignores entries in
-        the serialized data for fields that have been removed
-        from the database.
+        Ignores entries in the serialized data for fields that have been removed
+        from the database (#9279).
         """
         management.call_command(
             'loaddata',
@@ -90,8 +89,8 @@ class TestFixtures(TestCase):
 
     def test_loaddata_not_found_fields_ignore_xml(self):
         """
-        Test for ticket #19998 -- Ignore entries in the XML serialized data
-        for fields that have been removed from the model definition.
+        Ignore entries in the XML serialized data for fields
+        that have been removed from the model definition (#19998).
         """
         management.call_command(
             'loaddata',
@@ -104,8 +103,8 @@ class TestFixtures(TestCase):
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml(self):
         """
-        Regression test for ticket #4558 -- pretty printing of XML fixtures
-        doesn't affect parsing of None values.
+        Pretty printing of XML fixtures
+        doesn't affect parsing of None values (#4558).
         """
         # Load a pretty-printed XML fixture with Nulls.
         management.call_command(
@@ -119,8 +118,8 @@ class TestFixtures(TestCase):
     @skipUnlessDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml_empty_strings(self):
         """
-        Regression test for ticket #4558 -- pretty printing of XML fixtures
-        doesn't affect parsing of None values.
+        Pretty printing of XML fixtures
+        doesn't affect parsing of None values (#4558).
         """
         # Load a pretty-printed XML fixture with Nulls.
         management.call_command(
@@ -133,12 +132,11 @@ class TestFixtures(TestCase):
 
     def test_absolute_path(self):
         """
-        Regression test for ticket #6436 --
         os.path.join will throw away the initial parts of a path if it
         encounters an absolute path.
         This means that if a fixture is specified as an absolute path,
         we need to make sure we don't discover the absolute path in every
-        fixture directory.
+        fixture directory (#6436).
         """
         load_absolute_path = os.path.join(
             os.path.dirname(__file__),
@@ -180,8 +178,8 @@ class TestFixtures(TestCase):
 
     def test_unknown_format(self):
         """
-        Test for ticket #4371 -- Loading data of an unknown format should fail
-        Validate that error conditions are caught correctly
+        Loading data of an unknown format should fail
+        Validate that error conditions are caught correctly (#4371).
         """
         msg = "Problem installing fixture 'bad_fixture1': unkn is not a known serialization format."
         with self.assertRaisesMessage(management.CommandError, msg):
@@ -205,9 +203,9 @@ class TestFixtures(TestCase):
 
     def test_invalid_data(self):
         """
-        Test for ticket #4371 -- Loading a fixture file with invalid data
-        using explicit filename.
-        Test for ticket #18213 -- warning conditions are caught correctly
+        Loading a fixture file with invalid data
+        using explicit filename (#4371).
+        Warning conditions are caught correctly (#18213).
         """
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
@@ -225,9 +223,9 @@ class TestFixtures(TestCase):
 
     def test_invalid_data_no_ext(self):
         """
-        Test for ticket #4371 -- Loading a fixture file with invalid data
-        without file extension.
-        Test for ticket #18213 -- warning conditions are caught correctly
+        Loading a fixture file with invalid data
+        without file extension (#4371).
+        Warning conditions are caught correctly (#18213).
         """
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
@@ -245,8 +243,8 @@ class TestFixtures(TestCase):
 
     def test_empty(self):
         """
-        Test for ticket #18213 -- Loading a fixture file with no data output a warning.
-        Previously empty fixture raises an error exception, see ticket #4371.
+        Loading a fixture file with no data output a warning (#18213).
+        Previously empty fixture raises an error exception (#4371).
         """
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
@@ -261,8 +259,8 @@ class TestFixtures(TestCase):
 
     def test_error_message(self):
         """
-        Regression for #9011 - error message is correct.
-        Change from error to warning for ticket #18213.
+        Error message is correct (#9011).
+        Change from error to warning (#18213).
         """
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
@@ -281,9 +279,9 @@ class TestFixtures(TestCase):
 
     def test_pg_sequence_resetting_checks(self):
         """
-        Test for ticket #7565 -- PostgreSQL sequence resetting checks shouldn't
+        PostgreSQL sequence resetting checks shouldn't
         ascend to parent models when inheritance is used
-        (since they are treated individually).
+        (since they are treated individually) (#7565).
         """
         management.call_command(
             'loaddata',
@@ -295,11 +293,11 @@ class TestFixtures(TestCase):
 
     def test_close_connection_after_loaddata(self):
         """
-        Test for ticket #7572 -- MySQL has a problem if the same connection is
+        MySQL has a problem if the same connection is
         used to create tables, load data, and then query over that data.
         To compensate, we close the connection after running loaddata.
         This ensures that a new connection is opened when test queries are
-        issued.
+        issued (#7572).
         """
         management.call_command(
             'loaddata',
@@ -321,8 +319,8 @@ class TestFixtures(TestCase):
 
     def test_field_value_coerce(self):
         """
-        Test for tickets #8298, #9942 - Field values should be coerced into the
-        correct type by the deserializer, not as part of the database write.
+        Field values should be coerced into the correct type
+        by the deserializer, not as part of the database write (#8298, #9942).
         """
         self.pre_save_checks = []
         signals.pre_save.connect(self.animal_pre_save_check)
@@ -344,9 +342,8 @@ class TestFixtures(TestCase):
 
     def test_dumpdata_uses_default_manager(self):
         """
-        Regression for #11286
         Dumpdata honors the default manager. Dump the current contents of
-        the database as a JSON fixture
+        the database as a JSON fixture (#11286).
         """
         management.call_command(
             'loaddata',
@@ -403,7 +400,7 @@ class TestFixtures(TestCase):
 
     def test_proxy_model_included(self):
         """
-        Regression for #11428 - Proxy models aren't included when you dumpdata
+        Proxy models aren't included when you dumpdata (#11428).
         """
         out = StringIO()
         # Create an instance of the concrete class
@@ -424,7 +421,7 @@ class TestFixtures(TestCase):
     @skipUnlessDBFeature('supports_forward_references')
     def test_loaddata_works_when_fixture_has_forward_refs(self):
         """
-        Regression for #3615 - Forward references cause fixtures not to load in MySQL (InnoDB)
+        Forward references cause fixtures not to load in MySQL (InnoDB) (#3615).
         """
         management.call_command(
             'loaddata',
@@ -436,7 +433,7 @@ class TestFixtures(TestCase):
 
     def test_loaddata_raises_error_when_fixture_has_invalid_foreign_key(self):
         """
-        Regression for #3615 - Ensure data with nonexistent child key references raises error
+        Data with nonexistent child key references raises error (#3615).
         """
         with self.assertRaisesMessage(IntegrityError, "Problem installing fixture"):
             management.call_command(
@@ -450,8 +447,8 @@ class TestFixtures(TestCase):
                                      os.path.join(_cur_dir, 'fixtures_2')])
     def test_loaddata_forward_refs_split_fixtures(self):
         """
-        Regression for #17530 - should be able to cope with forward references
-        when the fixtures are not in the same files or directories.
+        Should be able to cope with forward references
+        when the fixtures are not in the same files or directories (#17530).
         """
         management.call_command(
             'loaddata',
@@ -464,7 +461,8 @@ class TestFixtures(TestCase):
 
     def test_loaddata_no_fixture_specified(self):
         """
-        Regression for #7043 - Error is quickly reported when no fixtures is provided in the command line.
+        Error is quickly reported when no fixtures
+        is provided in the command line (#7043).
         """
         msg = "No database fixture specified. Please provide the path of at least one fixture in the command line."
         with self.assertRaisesMessage(management.CommandError, msg):
@@ -475,8 +473,8 @@ class TestFixtures(TestCase):
 
     def test_ticket_20820(self):
         """
-        Regression for ticket #20820 -- loaddata on a model that inherits
-        from a model with a M2M shouldn't blow up.
+        Loaddata on a model that inherits
+        from a model with a M2M shouldn't blow up (#20820).
         """
         management.call_command(
             'loaddata',
@@ -486,9 +484,9 @@ class TestFixtures(TestCase):
 
     def test_ticket_22421(self):
         """
-        Regression for ticket #22421 -- loaddata on a model that inherits from
+        Loaddata on a model that inherits from
         a grand-parent model with a M2M but via an abstract parent shouldn't
-        blow up.
+        blow up (#22421).
         """
         management.call_command(
             'loaddata',
@@ -498,7 +496,7 @@ class TestFixtures(TestCase):
 
     def test_loaddata_with_m2m_to_self(self):
         """
-        Regression test for ticket #17946.
+        (#17946).
         """
         management.call_command(
             'loaddata',
@@ -544,8 +542,8 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_nk_deserialize(self):
         """
-        Test for ticket #13030 - Python based parser version
-        natural keys deserialize with fk to inheriting model
+        Python based parser version
+        natural keys deserialize with fk to inheriting model (#13030).
         """
         management.call_command(
             'loaddata',
@@ -569,8 +567,8 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_nk_deserialize_xml(self):
         """
-        Test for ticket #13030 - XML version
-        natural keys deserialize with fk to inheriting model
+        XML version natural keys deserialize
+        with fk to inheriting model (#13030).
         """
         management.call_command(
             'loaddata',
@@ -768,15 +766,14 @@ class NaturalKeyFixtureTests(TestCase):
 
 
 class M2MNaturalKeyFixtureTests(TestCase):
-    """Tests for ticket #14426."""
+    """(#14426)."""
 
     def test_dependency_sorting_m2m_simple(self):
         """
         M2M relations without explicit through models SHOULD count as dependencies
 
-        Regression test for bugs that could be caused by flawed fixes to
-        #14226, namely if M2M checks are removed from sort_dependencies
-        altogether.
+        Namely if M2M checks are removed from sort_dependencies
+        altogether (#14226).
         """
         sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [M2MSimpleA, M2MSimpleB])]
@@ -826,7 +823,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
     def test_dependency_sorting_m2m_complex_circular_2(self):
         """
         Circular M2M relations with explicit through models should be serializable
-        This test tests the circularity with explicit natural_key.dependencies
+        Circularity with explicit natural_key.dependencies
         """
         sorted_deps = serializers.sort_dependencies([
             ('fixtures_regress', [M2MComplexCircular2A, M2MComplexCircular2B, M2MCircular2ThroughAB])
@@ -887,8 +884,8 @@ class TestTicket11101(TransactionTestCase):
 
 class TestLoadFixtureFromOtherAppDirectory(TestCase):
     """
-    #23612 -- fixtures path should be normalized to allow referencing relative
-    paths on Windows.
+    Fixtures path should be normalized to allow referencing relative
+    paths on Windows (#23612).
     """
     current_dir = os.path.abspath(os.path.dirname(__file__))
     # relative_prefix is something like tests/fixtures_regress or

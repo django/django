@@ -19,7 +19,7 @@ class Plant(models.Model):
     name = models.CharField(max_length=150)
 
     class Meta:
-        # For testing when upper case letter in app name; regression for #4057
+        # For testing when upper case letter in app name (#4057).
         db_table = "Fixtures_regress_plant"
 
 
@@ -46,7 +46,7 @@ class Child(Parent):
     data = models.CharField(max_length=10)
 
 
-# Models to regression test #7572, #20820
+# Models to regression test (#7572, #20820)
 class Channel(models.Model):
     name = models.CharField(max_length=255)
 
@@ -59,12 +59,12 @@ class Article(models.Model):
         ordering = ('id',)
 
 
-# Subclass of a model with a ManyToManyField for test_ticket_20820
+# Subclass of a model with a ManyToManyField for (#20820)
 class SpecialArticle(Article):
     pass
 
 
-# Models to regression test #22421
+# Models to regression test (#22421)
 class CommonFeature(Article):
 
     class Meta:
@@ -75,7 +75,7 @@ class Feature(CommonFeature):
     pass
 
 
-# Models to regression test #11428
+# Models to regression test (#11428)
 class Widget(models.Model):
     name = models.CharField(max_length=255)
 
@@ -231,7 +231,7 @@ class ExternalDependency(models.Model):
     natural_key.dependencies = ['fixtures_regress.book']
 
 
-# Model for regression test of #11101
+# Model for regression test of (#11101)
 class Thingy(models.Model):
     name = models.CharField(max_length=255)
 

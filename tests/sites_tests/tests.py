@@ -141,8 +141,7 @@ class SitesFrameworkTests(TestCase):
             self.assertEqual(site.name, 'example.com:80')
 
     def test_domain_name_with_whitespaces(self):
-        # Regression for #17320
-        # Domain names are not allowed contain whitespace characters
+        # Domain names are not allowed contain whitespace characters (#17320).
         site = Site(name="test name", domain="test test")
         with self.assertRaises(ValidationError):
             site.full_clean()

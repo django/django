@@ -134,9 +134,9 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
         )
 
-        # Regression check for #12879: specifying the same CSS or JS file
+        # Specifying the same CSS or JS file
         # multiple times in a single Media instance should result in that file
-        # only being included once.
+        # only being included once (#12879).
         class MyWidget4(TextInput):
             class Media:
                 css = {'all': ('/path/to/css1', '/path/to/css1')}

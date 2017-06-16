@@ -20,7 +20,7 @@ class Tag(models.Model):
         return self.name
 
 
-# Regression for #11956 -- a many to many to the base class
+# A many to many to the base class (#11956).
 class TagCollection(Tag):
     tags = models.ManyToManyField(Tag, related_name='tag_collections')
 
@@ -61,10 +61,10 @@ class Worksheet(models.Model):
     lines = models.ManyToManyField(Line, blank=True)
 
 
-# Regression for #11226 -- A model with the same name that another one to
+# A model with the same name that another one to
 # which it has a m2m relation. This shouldn't cause a name clash between
 # the automatically created m2m intermediary table FK field names when
-# running migrate
+# running migrate (#11226).
 class User(models.Model):
     name = models.CharField(max_length=30)
     friends = models.ManyToManyField(auth.User)
@@ -87,8 +87,8 @@ class RegressionModelSplit(BadModelWithSplit):
     others = models.ManyToManyField('self')
 
 
-# Regression for #24505 -- Two ManyToManyFields with the same "to" model
-# and related_name set to '+'.
+# Two ManyToManyFields with the same "to" model
+# and related_name set to '+' (#24505).
 class Post(models.Model):
     primary_lines = models.ManyToManyField(Line, related_name='+')
     secondary_lines = models.ManyToManyField(Line, related_name='+')

@@ -414,8 +414,8 @@ class ManyToOneTests(TestCase):
         )
 
     def test_deepcopy_and_circular_references(self):
-        # Regression for #12876 -- Model methods that include queries that
-        # recursive don't cause recursion depth problems under deepcopy.
+        # Model methods that include queries that
+        # recursive don't cause recursion depth problems under deepcopy (#12876).
         self.r.cached_query = Article.objects.filter(reporter=self.r)
         self.assertEqual(repr(deepcopy(self.r)), "<Reporter: John Smith>")
 
@@ -554,8 +554,8 @@ class ManyToOneTests(TestCase):
             Child.objects.create(name="Grandchild", parent=c)
 
     def test_fk_instantiation_outside_model(self):
-        # Regression for #12190 -- Should be able to instantiate a FK outside
-        # of a model, and interrogate its related field.
+        # Should be able to instantiate a FK outside
+        # of a model, and interrogate its related field (#12190).
         cat = models.ForeignKey(Category, models.CASCADE)
         self.assertEqual('id', cat.remote_field.get_related_field().name)
 

@@ -421,9 +421,7 @@ class JavascriptExtractorTests(ExtractorTests):
         self.assertMsgId("foobar", po_contents)
 
     def test_media_static_dirs_ignored(self):
-        """
-        Regression test for #23583.
-        """
+        """(#23583)."""
         with override_settings(STATIC_ROOT=os.path.join(self.test_dir, 'static/'),
                                MEDIA_ROOT=os.path.join(self.test_dir, 'media_root/')):
             _, po_contents = self._run_makemessages(domain='djangojs')
@@ -432,9 +430,7 @@ class JavascriptExtractorTests(ExtractorTests):
 
     @override_settings(STATIC_ROOT=None, MEDIA_ROOT='')
     def test_default_root_settings(self):
-        """
-        Regression test for #23717.
-        """
+        """(#23717)."""
         _, po_contents = self._run_makemessages(domain='djangojs')
         self.assertMsgId("Static content inside app should be included.", po_contents)
 
@@ -507,7 +503,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             self.assertIn('Plural-Forms: nplurals=2; plural=(n != 1)', po_contents)
 
     def test_override_plural_forms(self):
-        """Ticket #20311."""
+        """ (#20311)."""
         management.call_command('makemessages', locale=['es'], extensions=['djtpl'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_ES))
         with open(self.PO_FILE_ES, 'r', encoding='utf-8') as fp:
@@ -517,7 +513,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
 
     def test_trans_and_plural_blocktrans_collision(self):
         """
-        Ensures a correct workaround for the gettext bug when handling a literal
+        Correct workaround for the gettext bug when handling a literal
         found inside a {% trans %} tag and also in another file inside a
         {% blocktrans %} with a plural (#17375).
         """
@@ -559,7 +555,7 @@ class NoWrapExtractorTests(ExtractorTests):
 class LocationCommentsTests(ExtractorTests):
 
     def test_no_location_enabled(self):
-        """Behavior is correct if --no-location switch is specified. See #16903."""
+        """Behavior is correct if --no-location switch is specified (#16903)."""
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         self.assertLocationCommentNotPresent(self.PO_FILE, None, 'test.html')
@@ -568,13 +564,13 @@ class LocationCommentsTests(ExtractorTests):
         """Behavior is correct if --no-location switch isn't specified."""
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        # #16903 -- Standard comment with source file relative path should be present
+        # Standard comment with source file relative path should be present (#16903)
         self.assertLocationCommentPresent(self.PO_FILE, 'Translatable literal #6b', 'templates', 'test.html')
 
     def test_location_comments_for_templatized_files(self):
         """
-        Ensure no leaky paths in comments, e.g. #: path\to\file.html.py:123
-        Refs #21209/#26341.
+        No leaky paths in comments, e.g. #: path\to\file.html.py:123
+        (#21209/#26341).
         """
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))

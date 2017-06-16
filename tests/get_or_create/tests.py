@@ -233,9 +233,9 @@ class GetOrCreateTransactionTests(TransactionTestCase):
 
     def test_get_or_create_integrityerror(self):
         """
-        Regression test for #15117. Requires a TransactionTestCase on
+        Requires a TransactionTestCase on
         databases that delay integrity checks until the end of transactions,
-        otherwise the exception is never raised.
+        otherwise the exception is never raised (#15117).
         """
         try:
             Profile.objects.get_or_create(person=Person(id=1))

@@ -224,9 +224,7 @@ class SettingsTests(SimpleTestCase):
     def test_signal_callback_decorator(self):
         self.assertEqual(self.testvalue, 'override')
 
-    #
-    # Regression tests for #10130: deleting settings.
-    #
+    # Deleting settings (#10130).
 
     def test_settings_delete(self):
         settings.TEST = 'test'
@@ -297,7 +295,7 @@ class TestComplexSettingOverride(SimpleTestCase):
         self.assertNotIn('TEST_WARN', signals.COMPLEX_OVERRIDE_SETTINGS)
 
     def test_complex_override_warning(self):
-        """Regression test for #19031"""
+        """(#19031)."""
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
 

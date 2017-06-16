@@ -17,9 +17,7 @@ class ExtraRegressTests(TestCase):
         )
 
     def test_regression_7314_7372(self):
-        """
-        Regression tests for #7314 and #7372
-        """
+        """(#7314, #7372)."""
         rm = RevisionableModel.objects.create(
             title='First Revision',
             when=datetime.datetime(2008, 9, 28, 10, 30, 0)
@@ -85,9 +83,9 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_7957(self):
         """
-        Regression test for #7957: Combining extra() calls should leave the
+        Combining extra() calls should leave the
         corresponding parameters associated with the right extra() bit. I.e.
-        internal dictionary must remain sorted.
+        internal dictionary must remain sorted (#7957).
         """
         self.assertEqual(
             (User.objects
@@ -105,9 +103,9 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_7961(self):
         """
-        Regression test for #7961: When not using a portion of an
+        When not using a portion of an
         extra(...) in a query, remove any corresponding parameters from the
-        query as well.
+        query as well (#7961).
         """
         self.assertEqual(
             list(User.objects.extra(select={"alpha": "%s"}, select_params=(-6,))
@@ -117,8 +115,8 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_8063(self):
         """
-        Regression test for #8063: limiting a query shouldn't discard any
-        extra() bits.
+        Limiting a query shouldn't discard any
+        extra() bits (#8063).
         """
         qs = User.objects.all().extra(where=['id=%s'], params=[self.u.id])
         self.assertQuerysetEqual(qs, ['<User: fred>'])
@@ -126,10 +124,10 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_8039(self):
         """
-        Regression test for #8039: Ordering sometimes removed relevant tables
+        Ordering sometimes removed relevant tables
         from extra(). This test is the critical case: ordering uses a table,
         but then removes the reference because of an optimization. The table
-        should still be present because of the extra() call.
+        should still be present because of the extra() call (#8039).
         """
         self.assertQuerysetEqual(
             (Order.objects
@@ -140,8 +138,8 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_8819(self):
         """
-        Regression test for #8819: Fields in the extra(select=...) list
-        should be available to extra(order_by=...).
+        Fields in the extra(select=...) list
+        should be available to extra(order_by=...) (#8819).
         """
         self.assertQuerysetEqual(
             User.objects.filter(pk=self.u.id).extra(select={'extra_field': 1}).distinct(),
@@ -174,8 +172,8 @@ class ExtraRegressTests(TestCase):
 
     def test_values_with_extra(self):
         """
-        Regression test for #10256... If there is a values() clause, Extra
-        columns are only returned if they are explicitly mentioned.
+        If there is a values() clause, Extra
+        columns are only returned if they are explicitly mentioned (#10256).
         """
         obj = TestObject(first='first', second='second', third='third')
         obj.save()
@@ -354,10 +352,10 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_10847(self):
         """
-        Regression for #10847: the list of extra columns can always be
+        List of extra columns can always be
         accurately evaluated. Using an inner query ensures that as_sql() is
         producing correct output without requiring full evaluation and
-        execution of the inner query.
+        execution of the inner query (#10847).
         """
         obj = TestObject(first='first', second='second', third='third')
         obj.save()

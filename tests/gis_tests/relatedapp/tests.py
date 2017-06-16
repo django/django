@@ -103,8 +103,10 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
 
     def test05_select_related_fk_to_subclass(self):
-        "Testing that calling select_related on a query over a model with an FK to a model subclass works"
-        # Regression test for #9752.
+        """
+        Calling select_related on a query over a model
+        with an FK to a model subclass works (#9752).
+        """
         list(DirectoryEntry.objects.all().select_related())
 
     def test06_f_expressions(self):
@@ -289,7 +291,7 @@ class RelatedGeoModelTest(TestCase):
         str(qs.query)
 
     def test16_annotated_date_queryset(self):
-        "Ensure annotated date querysets work if spatial backend is used.  See #14648."
+        """Annotated date querysets work if spatial backend is used (#14648)."""
         birth_years = [dt.year for dt in
                        list(Author.objects.annotate(num_books=Count('books')).dates('dob', 'year'))]
         birth_years.sort()

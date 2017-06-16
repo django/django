@@ -882,10 +882,9 @@ class FileStoragePathParsing(SimpleTestCase):
         shutil.rmtree(self.storage_dir)
 
     def test_directory_with_dot(self):
-        """Regression test for #9610.
-
+        """
         If the directory name contains a dot and the file name doesn't, make
-        sure we still mangle the file name instead of the directory name.
+        sure we still mangle the file name instead of the directory name ((#9610).
         """
 
         self.storage.save('dotted.path/test', ContentFile("1"))

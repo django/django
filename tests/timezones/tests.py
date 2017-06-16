@@ -214,7 +214,7 @@ class LegacyDatabaseTests(TestCase):
         )
 
     def test_raw_sql(self):
-        # Regression test for #17755
+        # (#17755).
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
         event = Event.objects.create(dt=dt)
         self.assertEqual(list(Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt])), [event])
@@ -234,7 +234,7 @@ class LegacyDatabaseTests(TestCase):
             self.assertEqual(cursor.fetchall()[0][0], dt)
 
     def test_filter_date_field_with_aware_datetime(self):
-        # Regression test for #17742
+        # (#17742).
         day = datetime.date(2011, 9, 1)
         AllDayEvent.objects.create(day=day)
         # This is 2011-09-02T01:30:00+03:00 in EAT
@@ -515,7 +515,7 @@ class NewDatabaseTests(TestCase):
             )
 
     def test_raw_sql(self):
-        # Regression test for #17755
+        # (#17755).
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         event = Event.objects.create(dt=dt)
         self.assertSequenceEqual(list(Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt])), [event])
@@ -556,7 +556,7 @@ class NewDatabaseTests(TestCase):
 
     @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
-        # Regression test for #17742
+        # (#17742).
         day = datetime.date(2011, 9, 1)
         AllDayEvent.objects.create(day=day)
         # This is 2011-09-02T01:30:00+03:00 in EAT
@@ -564,7 +564,7 @@ class NewDatabaseTests(TestCase):
         self.assertFalse(AllDayEvent.objects.filter(day__gte=dt).exists())
 
     def test_null_datetime(self):
-        # Regression test for #17294
+        # (#17294).
         e = MaybeEvent.objects.create()
         self.assertIsNone(e.dt)
 
@@ -1067,7 +1067,7 @@ class TemplateTests(SimpleTestCase):
 
     @requires_tz_support
     def test_now_template_tag_uses_current_time_zone(self):
-        # Regression for #17343
+        # (#17343).
         tpl = Template("{% now \"O\" %}")
         self.assertEqual(tpl.render(Context({})), "+0300")
         with timezone.override(ICT):

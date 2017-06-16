@@ -2696,8 +2696,8 @@ class ExcludeTests(TestCase):
 
 class ExcludeTest17600(TestCase):
     """
-    Some regressiontests for ticket #17600. Some of these likely duplicate
-    other existing tests.
+    Some of these likely duplicate
+    other existing tests (#17600).
     """
     @classmethod
     def setUpTestData(cls):
@@ -2787,7 +2787,7 @@ class ExcludeTest17600(TestCase):
 
 
 class Exclude15786(TestCase):
-    """Regression test for #15786"""
+    """(#15786)."""
     def test_ticket15786(self):
         c1 = SimpleCategory.objects.create(name='c1')
         c2 = SimpleCategory.objects.create(name='c2')
@@ -3568,7 +3568,8 @@ class RelatedLookupTypeTests(TestCase):
 
     def test_values_queryset_lookup(self):
         """
-        #23396 - Ensure ValueQuerySets are not checked for compatibility with the lookup field
+        ValueQuerySets are not checked for
+        compatibility with the lookup field (#23396).
         """
         # Make sure the num and objecta field values match.
         ob = ObjectB.objects.get(name='ob')

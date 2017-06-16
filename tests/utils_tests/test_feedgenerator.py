@@ -102,7 +102,7 @@ class FeedgeneratorTest(unittest.TestCase):
             rss_feed.content_type, "application/rss+xml; charset=utf-8"
         )
 
-    # Two regression tests for #14202
+    # Two regression tests for (#14202).
 
     def test_feed_without_feed_url_gets_rendered_without_atom_link(self):
         feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr')

@@ -591,10 +591,11 @@ class TestCars(TestCase):
 
 class CustomManagersRegressTestCase(TestCase):
     def test_filtered_default_manager(self):
-        """Even though the default manager filters out some records,
+        """
+        Even though the default manager filters out some records,
         we must still be able to save (particularly, save by updating
-        existing records) those filtered instances. This is a
-        regression test for #8990, #9527"""
+        existing records) those filtered instances (#8990, #9527).
+        """
         related = RelatedModel.objects.create(name="xyzzy")
         obj = RestrictedModel.objects.create(name="hidden", related=related)
         obj.name = "still hidden"
@@ -605,9 +606,10 @@ class CustomManagersRegressTestCase(TestCase):
         self.assertEqual(RestrictedModel.plain_manager.count(), 1)
 
     def test_delete_related_on_filtered_manager(self):
-        """Deleting related objects should also not be distracted by a
-        restricted manager on the related object. This is a regression
-        test for #2698."""
+        """
+        Deleting related objects should also not be distracted by a
+        restricted manager on the related object(#2698).
+        """
         related = RelatedModel.objects.create(name="xyzzy")
 
         for name, public in (('one', True), ('two', False), ('three', False)):

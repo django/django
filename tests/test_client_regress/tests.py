@@ -128,14 +128,14 @@ class AssertContainsTests(SimpleTestCase):
 
     def test_unicode_contains(self):
         "Unicode characters can be found in template context"
-        # Regression test for #10183
+        # (#10183).
         r = self.client.get('/check_unicode/')
         self.assertContains(r, 'さかき')
         self.assertContains(r, b'\xe5\xb3\xa0'.decode())
 
     def test_unicode_not_contains(self):
         "Unicode characters can be searched for, and not found in template context"
-        # Regression test for #10183
+        # (#10183).
         r = self.client.get('/check_unicode/')
         self.assertNotContains(r, 'はたけ')
         self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode())
@@ -1164,7 +1164,7 @@ class RequestMethodStringDataTests(SimpleTestCase):
 
     def test_post(self):
         "Request a view with string data via request method POST"
-        # Regression test for #11371
+        # (#11371).
         data = '{"test": "json"}'
         response = self.client.post('/request_methods/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -1172,7 +1172,7 @@ class RequestMethodStringDataTests(SimpleTestCase):
 
     def test_put(self):
         "Request a view with string data via request method PUT"
-        # Regression test for #11371
+        # (#11371).
         data = '{"test": "json"}'
         response = self.client.put('/request_methods/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -1180,7 +1180,7 @@ class RequestMethodStringDataTests(SimpleTestCase):
 
     def test_patch(self):
         "Request a view with string data via request method PATCH"
-        # Regression test for #17797
+        # (#17797).
         data = '{"test": "json"}'
         response = self.client.patch('/request_methods/', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -1188,7 +1188,7 @@ class RequestMethodStringDataTests(SimpleTestCase):
 
     def test_empty_string_data(self):
         "Request a view with empty string data via request method GET/POST/HEAD"
-        # Regression test for #21740
+        # (#21740).
         response = self.client.get('/body/', data='', content_type='application/json')
         self.assertEqual(response.content, b'')
         response = self.client.post('/body/', data='', content_type='application/json')
@@ -1269,7 +1269,7 @@ class QueryStringTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class PayloadEncodingTests(SimpleTestCase):
-    """Regression tests for #10571."""
+    """(#10571)."""
 
     def test_simple_payload(self):
         """A simple ASCII-only text can be POSTed."""
@@ -1379,7 +1379,7 @@ class ReadLimitedStreamTest(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestFactoryStateTest(SimpleTestCase):
-    """Regression tests for #15929."""
+    """(#15929)."""
     # These tests are checking that certain middleware don't change certain
     # global state. Alternatively, from the point of view of a test, they are
     # ensuring test isolation behavior. So, unusually, it doesn't make sense to
@@ -1407,8 +1407,8 @@ class RequestFactoryStateTest(SimpleTestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestFactoryEnvironmentTests(SimpleTestCase):
     """
-    Regression tests for #8551 and #17067: ensure that environment variables
-    are set correctly in RequestFactory.
+    Environment variables are set correctly in RequestFactory
+    (#8551, #17067).
     """
 
     def test_should_set_correct_env_variables(self):

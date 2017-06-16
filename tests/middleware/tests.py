@@ -347,7 +347,7 @@ class CommonMiddlewareTest(SimpleTestCase):
             CommonMiddleware().process_request(request)
 
     def test_non_ascii_query_string_does_not_crash(self):
-        """Regression test for #15152"""
+        """(#15152)."""
         request = self.rf.get('/slash')
         request.META['QUERY_STRING'] = 'drink=café'
         r = CommonMiddleware().process_request(request)

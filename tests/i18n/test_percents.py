@@ -60,10 +60,8 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
 class RenderingTemplatesWithPercentSigns(FrenchTestCase):
     """
     Test rendering of templates that use percent signs.
-
-    Ensures both trans and blocktrans tags behave consistently.
-
-    Refs #11240, #11966, #24257
+    Both trans and blocktrans tags behave consistently.
+    (#11240, #11966, #24257).
     """
 
     def test_translates_with_a_percent_symbol_at_the_end(self):

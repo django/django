@@ -57,7 +57,7 @@ resolve_test_data = (
         views.empty_view, (), {'arg2': '37'}
     ),
 
-    # Unnamed views should have None as the url_name. Regression data for #21157.
+    # Unnamed views should have None as the url_name. Data for (#21157).
     (
         '/unnamed/normal/42/37/', None, '', '', 'urlpatterns_reverse.views.empty_view', views.empty_view, (),
         {'arg1': '42', 'arg2': '37'}
@@ -318,12 +318,12 @@ class URLPatternReverse(SimpleTestCase):
 
     @override_script_prefix('/%7Eme/')
     def test_non_urlsafe_prefix_with_args(self):
-        # Regression for #20022, adjusted for #24013 because ~ is an unreserved
-        # character. Tests whether % is escaped.
+        # Adjusted for #24013 because ~ is an unreserved
+        # character. Tests whether % is escaped (#20022).
         self.assertEqual('/%257Eme/places/1/', reverse('places', args=[1]))
 
     def test_patterns_reported(self):
-        # Regression for #17076
+        # (#17076).
         with self.assertRaisesMessage(NoReverseMatch, r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"):
             # this url exists, but requires an argument
             reverse("people", args=[])

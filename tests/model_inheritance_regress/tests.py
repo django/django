@@ -19,12 +19,11 @@ from .models import (
 
 class ModelInheritanceTest(TestCase):
     def test_model_inheritance(self):
-        # Regression for #7350, #7202
         # When you create a Parent object with a specific reference to an
         # existent child instance, saving the Parent doesn't duplicate the
         # child. This behavior is only activated during a raw save - it is
         # mostly relevant to deserialization, but any sort of CORBA style
-        # 'narrow()' API would require a similar approach.
+        # 'narrow()' API would require a similar approach (#7350, #7202).
 
         # Create a child-parent-grandparent chain
         place1 = Place(
@@ -130,8 +129,8 @@ class ModelInheritanceTest(TestCase):
         }])
 
     def test_issue_7105(self):
-        # Regressions tests for #7105: dates() queries should be able to use
-        # fields from the parent model as easily as the child.
+        # dates() queries should be able to use
+        # fields from the parent model as easily as the child (#7105).
         Child.objects.create(
             name='child',
             created=datetime.datetime(2008, 6, 26, 17, 0, 0))
@@ -139,9 +138,9 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(datetimes, [datetime.datetime(2008, 6, 1, 0, 0)])
 
     def test_issue_7276(self):
-        # Regression test for #7276: calling delete() on a model with
+        # Calling delete() on a model with
         # multi-table inheritance should delete the associated rows from any
-        # ancestor tables, as well as any descendent objects.
+        # ancestor tables, as well as any descendent objects (#7276).
         place1 = Place(
             name="Guido's House of Pasta",
             address='944 W. Fullerton')
@@ -174,9 +173,7 @@ class ModelInheritanceTest(TestCase):
             ItalianRestaurant.objects.get(pk=ident)
 
     def test_issue_6755(self):
-        """
-        Regression test for #6755
-        """
+        """(#6755)."""
         r = Restaurant(serves_pizza=False, serves_hot_dogs=False)
         r.save()
         self.assertEqual(r.id, r.place_ptr_id)
@@ -187,35 +184,29 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(r.id, r.place_ptr_id)
 
     def test_issue_7488(self):
-        # Regression test for #7488. This looks a little crazy, but it's the
+        # This looks a little crazy, but it's the
         # equivalent of what the admin interface has to do for the edit-inline
-        # case.
+        # case (#7488).
         suppliers = Supplier.objects.filter(
             restaurant=Restaurant(name='xx', address='yy'))
         suppliers = list(suppliers)
         self.assertEqual(suppliers, [])
 
     def test_issue_11764(self):
-        """
-        Regression test for #11764
-        """
+        """(#11764)."""
         wholesalers = list(Wholesaler.objects.all().select_related())
         self.assertEqual(wholesalers, [])
 
     def test_issue_7853(self):
         """
-        Regression test for #7853
         If the parent class has a self-referential link, make sure that any
-        updates to that link via the child update the right table.
+        updates to that link via the child update the right table (#7853).
         """
         obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
         obj.delete()
 
     def test_get_next_previous_by_date(self):
-        """
-        Regression tests for #8076
-        get_(next/previous)_by_date should work
-        """
+        """get_(next/previous)_by_date should work (#8076)."""
         c1 = ArticleWithAuthor(
             headline='ArticleWithAuthor 1',
             author="Person 1",
@@ -243,18 +234,17 @@ class ModelInheritanceTest(TestCase):
 
     def test_inherited_fields(self):
         """
-        Regression test for #8825 and #9390
         Make sure all inherited fields (esp. m2m fields, in this case) appear
-        on the child class.
+        on the child class (#8825, #9390).
         """
         m2mchildren = list(M2MChild.objects.filter(articles__isnull=False))
         self.assertEqual(m2mchildren, [])
 
         # Ordering should not include any database column more than once (this
         # is most likely to occur naturally with model inheritance, so we
-        # check it here). Regression test for #9390. This necessarily pokes at
+        # check it here). This necessarily pokes at
         # the SQL string for the query, since the duplicate problems are only
-        # apparent at that late stage.
+        # apparent at that late stage (#9390).
         qs = ArticleWithAuthor.objects.order_by('pub_date', 'pk')
         sql = qs.query.get_compiler(qs.db).as_sql()[0]
         fragment = sql[sql.find('ORDER BY'):]
@@ -263,9 +253,8 @@ class ModelInheritanceTest(TestCase):
 
     def test_queryset_update_on_parent_model(self):
         """
-        Regression test for #10362
         It is possible to call update() and only change a field in
-        an ancestor model.
+        an ancestor model (#10362).
         """
         article = ArticleWithAuthor.objects.create(
             author="fred",
@@ -310,9 +299,7 @@ class ModelInheritanceTest(TestCase):
         )
 
     def test_all_fields_from_abstract_base_class(self):
-        """
-        Regression tests for #7588
-        """
+        """(#7588)."""
         # All fields from an ABC, including those inherited non-abstractly
         # should be available on child classes (#7588). Creating this instance
         # should work without error.
@@ -364,10 +351,10 @@ class ModelInheritanceTest(TestCase):
         verbose_name_plural correctly inherited from ABC if inheritance chain
         includes an abstract model.
         """
-        # Regression test for #11369: verbose_name_plural should be inherited
+        # verbose_name_plural should be inherited
         # from an ABC even when there are one or more intermediate
         # abstract models in the inheritance chain, for consistency with
-        # verbose_name.
+        # verbose_name (#11369).
         self.assertEqual(
             InternalCertificationAudit._meta.verbose_name_plural,
             'Audits'
@@ -392,9 +379,9 @@ class ModelInheritanceTest(TestCase):
         """
         Primary key set correctly with concrete->abstract->concrete inheritance.
         """
-        # Regression test for #13987: Primary key is incorrectly determined
+        # Primary key is incorrectly determined
         # when more than one model has a concrete->abstract->concrete
-        # inheritance hierarchy.
+        # inheritance hierarchy (#13987).
         self.assertEqual(
             len([field for field in BusStation._meta.local_fields if field.primary_key]),
             1
@@ -451,7 +438,7 @@ class ModelInheritanceTest(TestCase):
         self.assertIsInstance(p.restaurant.serves_pizza, bool)
 
     def test_inheritance_select_related(self):
-        # Regression test for #7246
+        # (#7246).
         r1 = Restaurant.objects.create(
             name="Nobu", serves_hot_dogs=True, serves_pizza=False
         )

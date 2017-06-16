@@ -367,7 +367,7 @@ class ProxyModelAdminTests(TestCase):
 
     def test_cascade_delete_proxy_model_admin_warning(self):
         """
-        Test if admin gives warning about cascade deleting models referenced
+        Admin gives warning about cascade deleting models referenced
         to concrete model by deleting proxy object.
         """
         tracker_user = TrackerUser.objects.all()[0]
@@ -382,7 +382,7 @@ class ProxyModelAdminTests(TestCase):
 
     def test_delete_str_in_model_admin(self):
         """
-        Test if the admin delete page shows the correct string representation
+        Admin delete page shows the correct string representation
         for a proxy model.
         """
         user = TrackerUser.objects.get(name='Django Pony')

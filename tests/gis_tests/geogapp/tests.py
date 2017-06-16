@@ -19,7 +19,7 @@ class GeographyTest(TestCase):
     fixtures = ['initial']
 
     def test01_fixture_load(self):
-        "Ensure geography features loaded properly."
+        """Geography features loaded properly."""
         self.assertEqual(8, City.objects.count())
 
     @skipIf(spatialite, "SpatiaLite doesn't support distance lookups with Distance objects.")
@@ -52,7 +52,7 @@ class GeographyTest(TestCase):
         with self.assertRaises(ValueError):
             City.objects.filter(point__contained=z.poly).count()
 
-        # Regression test for #14060, `~=` was never really implemented for PostGIS.
+        # `~=` was never really implemented for PostGIS (#14060).
         htown = City.objects.get(name='Houston')
         with self.assertRaises(ValueError):
             City.objects.get(point__exact=htown.point)

@@ -20,7 +20,7 @@ class RenameMethodsTests(SimpleTestCase):
 
     def test_class_definition_warnings(self):
         """
-        Ensure a warning is raised upon class definition to suggest renaming
+        Warning is raised upon class definition to suggest renaming
         the faulty method.
         """
         with warnings.catch_warnings(record=True) as recorded:
@@ -35,7 +35,7 @@ class RenameMethodsTests(SimpleTestCase):
 
     def test_get_new_defined(self):
         """
-        Ensure `old` complains and not `new` when only `new` is defined.
+        `old` complains and not `new` when only `new` is defined.
         """
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
@@ -54,7 +54,7 @@ class RenameMethodsTests(SimpleTestCase):
 
     def test_get_old_defined(self):
         """
-        Ensure `old` complains when only `old` is defined.
+        `old` complains when only `old` is defined.
         """
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
@@ -73,7 +73,7 @@ class RenameMethodsTests(SimpleTestCase):
 
     def test_deprecated_subclass_renamed(self):
         """
-        Ensure the correct warnings are raised when a class that didn't rename
+        Correct warnings are raised when a class that didn't rename
         `old` subclass one that did.
         """
         with warnings.catch_warnings(record=True) as recorded:
@@ -103,7 +103,7 @@ class RenameMethodsTests(SimpleTestCase):
 
     def test_renamed_subclass_deprecated(self):
         """
-        Ensure the correct warnings are raised when a class that renamed
+        Correct warnings are raised when a class that renamed
         `old` subclass one that didn't.
         """
         with warnings.catch_warnings(record=True) as recorded:
@@ -127,7 +127,7 @@ class RenameMethodsTests(SimpleTestCase):
 
     def test_deprecated_subclass_renamed_and_mixins(self):
         """
-        Ensure the correct warnings are raised when a subclass inherit from a
+        Correct warnings are raised when a subclass inherit from a
         class that renamed `old` and mixins that may or may not have renamed
         `new`.
         """

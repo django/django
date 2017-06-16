@@ -7,7 +7,7 @@ from ..utils import setup
 
 class IriencodeTests(SimpleTestCase):
     """
-    Ensure iriencode keeps safe strings.
+    Iriencode keeps safe strings.
     """
 
     @setup({'iriencode01': '{{ url|iriencode }}'})

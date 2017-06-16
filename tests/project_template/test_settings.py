@@ -22,7 +22,7 @@ class TestStartProjectSettings(TestCase):
 
     def test_middleware_headers(self):
         """
-        Ensure headers sent by the default MIDDLEWARE don't inadvertently
+        Headers sent by the default MIDDLEWARE don't inadvertently
         change. For example, we never want "Vary: Cookie" to appear in the list
         since it prevents the caching of responses.
         """

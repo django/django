@@ -64,8 +64,8 @@ class ChangeListTests(TestCase):
 
     def test_select_related_preserved(self):
         """
-        Regression test for #10348: ChangeList.get_queryset() shouldn't
-        overwrite a custom select_related provided by ModelAdmin.get_queryset().
+        ChangeList.get_queryset() shouldn't
+        overwrite a custom select_related provided by ModelAdmin.get_queryset() (#10348).
         """
         m = ChildAdmin(Child, custom_site)
         request = self.factory.get('/child/')
@@ -111,8 +111,8 @@ class ChangeListTests(TestCase):
 
     def test_result_list_empty_changelist_value(self):
         """
-        Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored
-        for relationship fields
+        EMPTY_CHANGELIST_VALUE should be honored
+        for relationship fields (#14982).
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
@@ -192,12 +192,12 @@ class ChangeListTests(TestCase):
 
     def test_result_list_editable_html(self):
         """
-        Regression tests for #11791: Inclusion tag result_list generates a
+        Inclusion tag result_list generates a
         table and this checks that the items are nested within the table
-        element tags.
-        Also a regression test for #13599, verifies that hidden fields
+        element tags (#11791.
+        Verifies that hidden fields
         when list_editable is enabled are rendered in a div outside the
-        table.
+        table (#13599).
         """
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
@@ -234,9 +234,7 @@ class ChangeListTests(TestCase):
         )
 
     def test_result_list_editable(self):
-        """
-        Regression test for #14312: list_editable with pagination
-        """
+        """list_editable with pagination (#14312)."""
         new_parent = Parent.objects.create(name='parent')
         for i in range(200):
             Child.objects.create(name='name %s' % i, parent=new_parent)
@@ -264,8 +262,8 @@ class ChangeListTests(TestCase):
 
     def test_distinct_for_m2m_in_list_filter(self):
         """
-        Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't appear more than once. Basic ManyToMany.
+        When using a ManyToMany in list_filter,
+        results shouldn't appear more than once. Basic ManyToMany (#13902).
         """
         blues = Genre.objects.create(name='Blues')
         band = Band.objects.create(name='B.B. King Review', nr_of_members=11)
@@ -284,8 +282,8 @@ class ChangeListTests(TestCase):
 
     def test_distinct_for_through_m2m_in_list_filter(self):
         """
-        Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't appear more than once. With an intermediate model.
+        When using a ManyToMany in list_filter,
+        results shouldn't appear more than once. With an intermediate model (#13902).
         """
         lead = Musician.objects.create(name='Vox')
         band = Group.objects.create(name='The Hype')
@@ -324,9 +322,9 @@ class ChangeListTests(TestCase):
 
     def test_distinct_for_inherited_m2m_in_list_filter(self):
         """
-        Regression test for #13902: When using a ManyToMany in list_filter,
+        When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Model managed in the
-        admin inherits from the one that defins the relationship.
+        admin inherits from the one that defins the relationship (#13902).
         """
         lead = Musician.objects.create(name='John')
         four = Quartet.objects.create(name='The Beatles')
@@ -344,9 +342,9 @@ class ChangeListTests(TestCase):
 
     def test_distinct_for_m2m_to_inherited_in_list_filter(self):
         """
-        Regression test for #13902: When using a ManyToMany in list_filter,
+        When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Target of the relationship
-        inherits from another.
+        inherits from another (#13902).
         """
         lead = ChordsMusician.objects.create(name='Player A')
         three = ChordsBand.objects.create(name='The Chords Trio')
@@ -364,8 +362,8 @@ class ChangeListTests(TestCase):
 
     def test_distinct_for_non_unique_related_object_in_list_filter(self):
         """
-        Regressions tests for #15819: If a field listed in list_filters
-        is a non-unique related object, distinct() must be called.
+        If a field listed in list_filters
+        is a non-unique related object, distinct() must be called (#15819).
         """
         parent = Parent.objects.create(name='Mary')
         # Two children with the same name
@@ -381,8 +379,8 @@ class ChangeListTests(TestCase):
 
     def test_distinct_for_non_unique_related_object_in_search_fields(self):
         """
-        Regressions tests for #15819: If a field listed in search_fields
-        is a non-unique related object, distinct() must be called.
+        If a field listed in search_fields
+        is a non-unique related object, distinct() must be called (#15819).
         """
         parent = Parent.objects.create(name='Mary')
         Child.objects.create(parent=parent, name='Danielle')
@@ -447,8 +445,8 @@ class ChangeListTests(TestCase):
 
     def test_pagination(self):
         """
-        Regression tests for #12893: Pagination in admins changelist doesn't
-        use queryset set by modeladmin.
+        Pagination in admins changelist doesn't
+        use queryset set by modeladmin (#12893).
         """
         parent = Parent.objects.create(name='anything')
         for i in range(30):
@@ -473,8 +471,8 @@ class ChangeListTests(TestCase):
 
     def test_computed_list_display_localization(self):
         """
-        Regression test for #13196: output of functions should be  localized
-        in the changelist.
+        Output of functions should be  localized
+        in the changelist (#13196).
         """
         superuser = User.objects.create_superuser(username='super', email='super@localhost', password='secret')
         self.client.force_login(superuser)
@@ -484,9 +482,7 @@ class ChangeListTests(TestCase):
         self.assertNotContains(response, str(event.date))
 
     def test_dynamic_list_display(self):
-        """
-        Regression tests for #14206: dynamic list_display support.
-        """
+        """Dynamic list_display support (#14206)."""
         parent = Parent.objects.create(name='parent')
         for i in range(10):
             Child.objects.create(name='child %s' % i, parent=parent)
@@ -552,9 +548,7 @@ class ChangeListTests(TestCase):
         self.assertEqual(len(cl.result_list), 10)
 
     def test_dynamic_list_display_links(self):
-        """
-        Regression tests for #16257: dynamic list_display_links support.
-        """
+        """Dynamic list_display_links support (#16257)."""
         parent = Parent.objects.create(name='parent')
         for i in range(1, 10):
             Child.objects.create(id=i, name='child %s' % i, parent=parent, age=i)
@@ -755,9 +749,7 @@ class ChangeListTests(TestCase):
         check_results_order(ascending=True)
 
     def test_dynamic_list_filter(self):
-        """
-        Regression tests for ticket #17646: dynamic list_filter support.
-        """
+        """Dynamic list_filter support (#17646)."""
         parent = Parent.objects.create(name='parent')
         for i in range(10):
             Child.objects.create(name='child %s' % i, parent=parent)
@@ -786,8 +778,7 @@ class ChangeListTests(TestCase):
 
     def test_pagination_page_range(self):
         """
-        Regression tests for ticket #15653: ensure the number of pages
-        generated for changelist views are correct.
+        Number of pages generated for changelist views are correct (#15653).
         """
         # instantiating and setting up ChangeList object
         m = GroupAdmin(Group, custom_site)
@@ -833,8 +824,8 @@ class AdminLogNodeTestCase(TestCase):
 
     def test_get_admin_log_templatetag_custom_user(self):
         """
-        Regression test for ticket #20088: admin log depends on User model
-        having id field as primary key.
+        Admin log depends on User model
+        having id field as primary key (#20088).
 
         The old implementation raised an AttributeError when trying to use
         the id field.

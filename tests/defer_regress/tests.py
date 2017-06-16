@@ -35,8 +35,8 @@ class DeferRegressionTest(TestCase):
         with self.assertNumQueries(0):
             self.assertEqual(obj.text, "xyzzy")
 
-        # Regression test for #10695. Make sure different instances don't
-        # inadvertently share data in the deferred descriptor objects.
+        # Make sure different instances don't
+        # inadvertently share data in the deferred descriptor objects (#10695).
         i = Item.objects.create(name="no I'm first", value=37)
         items = Item.objects.only("value").order_by("-value")
         self.assertEqual(items[0].name, "first")
@@ -48,7 +48,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(r.item, i)
 
         # Some further checks for select_related() and inherited model
-        # behavior (regression for #10710).
+        # behavior (#10710).
         c1 = Child.objects.create(name="c1", value=42)
         c2 = Child.objects.create(name="c2", value=37)
         Leaf.objects.create(name="l1", child=c1, second_child=c2)
@@ -71,8 +71,8 @@ class DeferRegressionTest(TestCase):
         c3 = ctype(Item.objects.only("name")[0])
         self.assertTrue(c1 is c2 is c3)
 
-        # Regression for #10733 - only() can be used on a model with two
-        # foreign keys.
+        # only() can be used on a model with two
+        # foreign keys (#10733).
         results = Leaf.objects.only("name", "child", "second_child").select_related()
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
@@ -83,7 +83,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(results[0].child.name, "c1")
         self.assertEqual(results[0].second_child.name, "c2")
 
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+        # Make sure defer() and only() work with annotate() (#16409).
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count('feature')).defer('name')),
             list)
@@ -112,7 +112,7 @@ class DeferRegressionTest(TestCase):
         self.assertFalse(i2._deferred)
 
     def test_ticket_16409(self):
-        # Regression for #16409 - make sure defer() and only() work with annotate()
+        # Make sure defer() and only() work with annotate() (#16409).
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count('feature')).defer('name')),
             list)
@@ -130,7 +130,7 @@ class DeferRegressionTest(TestCase):
             self.assertEqual(1, obj.derived.base_ptr_id)
 
     def test_only_and_defer_usage_on_proxy_models(self):
-        # Regression for #15790 - only() broken for proxy models
+        # only() broken for proxy models (#15790).
         proxy = Proxy.objects.create(name="proxy", value=42)
 
         msg = 'QuerySet.only() return bogus results with proxy models'
@@ -195,7 +195,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(obj.item_id, item2.id)
 
     def test_proxy_model_defer_with_select_related(self):
-        # Regression for #22050
+        # (#22050).
         item = Item.objects.create(name="first", value=47)
         RelatedItem.objects.create(item=item)
         # Defer fields with only()

@@ -305,7 +305,7 @@ class RawQueryTests(TestCase):
 
     def test_db_column_name_is_used_in_raw_query(self):
         """
-        Regression test that ensures the `column` attribute on the field is
+        `column` attribute on the field is
         used to generate the list of fields included in the query, as opposed
         to the `attname`. This is important when the primary key is a
         ForeignKey field because `attname` and `column` are not necessarily the

@@ -109,7 +109,7 @@ class BaseModelBackendTest:
         self.assertIs(user.has_perms(['auth.test2', 'auth.test3']), False)
 
     def test_has_no_object_perm(self):
-        """Regressiontest for #12462"""
+        """(#12462)."""
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')

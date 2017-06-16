@@ -937,12 +937,12 @@ class UniqueTest(TestCase):
                          ['Derived book with this Suffix1 and Suffix2 already exists.'])
 
     def test_explicitpk_unspecified(self):
-        """Test for primary_key being in the form and failing validation."""
+        """primary_key being in the form and failing validation."""
         form = ExplicitPKForm({'key': '', 'desc': ''})
         self.assertFalse(form.is_valid())
 
     def test_explicitpk_unique(self):
-        """Ensure keys and blank character strings are tested for uniqueness."""
+        """Keys and blank character strings are tested for uniqueness."""
         form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertTrue(form.is_valid())
         form.save()
@@ -1236,7 +1236,7 @@ class ModelFormBasicTests(TestCase):
 
     def test_m2m_initial_callable(self):
         """
-        Regression for #10349: A callable can be provided as the initial value for an m2m field
+        A callable can be provided as the initial value for an m2m field (#10349).
         """
         self.maxDiff = 1200
         self.create_basic_data()
@@ -1629,7 +1629,7 @@ class ModelChoiceFieldTests(TestCase):
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, "It's a test")])
 
-        # check that we can override the label_from_instance method to print custom labels (#4620)
+        # check that we can override the label_from_instance method to print custom labels (#4620).
         f.queryset = Category.objects.all()
         f.label_from_instance = lambda obj: "category " + str(obj)
         self.assertEqual(list(f.choices), [
@@ -1639,9 +1639,7 @@ class ModelChoiceFieldTests(TestCase):
             (self.c3.pk, 'category Third')])
 
     def test_modelchoicefield_11183(self):
-        """
-        Regression test for ticket #11183.
-        """
+        """(#11183)."""
         class ModelChoiceForm(forms.Form):
             category = forms.ModelChoiceField(Category.objects.all())
 
@@ -1674,9 +1672,9 @@ class ModelChoiceFieldTests(TestCase):
 
     def test_modelchoicefield_22745(self):
         """
-        #22745 -- Make sure that ModelChoiceField with RadioSelect widget
+        Make sure that ModelChoiceField with RadioSelect widget
         doesn't produce unnecessary db queries when accessing its BoundField's
-        attrs.
+        attrs (#22745).
         """
         class ModelChoiceForm(forms.Form):
             category = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
@@ -1921,7 +1919,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_show_hidden_initial(self):
         """
-        Test support of show_hidden_initial by ModelMultipleChoiceField.
+        Support of show_hidden_initial by ModelMultipleChoiceField.
         """
         class WriterForm(forms.Form):
             persons = forms.ModelMultipleChoiceField(show_hidden_initial=True,
@@ -1944,9 +1942,9 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_field_22745(self):
         """
-        #22745 -- Make sure that ModelMultipleChoiceField with
+        Make sure that ModelMultipleChoiceField with
         CheckboxSelectMultiple widget doesn't produce unnecessary db queries
-        when accessing its BoundField's attrs.
+        when accessing its BoundField's attrs (#22745).
         """
         class ModelMultipleChoiceForm(forms.Form):
             categories = forms.ModelMultipleChoiceField(Category.objects.all(), widget=forms.CheckboxSelectMultiple)
@@ -2273,7 +2271,7 @@ class FileAndImageFieldTests(TestCase):
 
     def test_custom_file_field_save(self):
         """
-        Regression for #11149: save_form_data should be called only once
+        save_form_data should be called only once (#11149).
         """
         class CFFForm(forms.ModelForm):
             class Meta:
@@ -2288,7 +2286,7 @@ class FileAndImageFieldTests(TestCase):
     def test_file_field_multiple_save(self):
         """
         Simulate a file upload and check how many times Model.save() gets
-        called. Test for bug #639.
+        called (#639).
         """
         class PhotoForm(forms.ModelForm):
             class Meta:
@@ -2317,7 +2315,7 @@ class FileAndImageFieldTests(TestCase):
 
     def test_file_path_field_blank(self):
         """
-        Regression test for #8842: FilePathField(blank=True)
+        FilePathField(blank=True) (#8842).
         """
         class FPForm(forms.ModelForm):
             class Meta:
@@ -2332,8 +2330,8 @@ class FileAndImageFieldTests(TestCase):
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
         # ImageField and FileField are nearly identical, but they differ slightly when
-        # it comes to validation. This specifically tests that #6302 is fixed for
-        # both file fields and image fields.
+        # it comes to validation (#6302).
+        # Is fixed for both file fields and image fields.
 
         with open(os.path.join(os.path.dirname(__file__), 'test.png'), 'rb') as fp:
             image_data = fp.read()
@@ -2752,8 +2750,8 @@ class ModelFormCustomErrorTests(SimpleTestCase):
 class CustomCleanTests(TestCase):
     def test_override_clean(self):
         """
-        Regression for #12596: Calling super from ModelForm.clean() should be
-        optional.
+        Calling super from ModelForm.clean() should be
+        optional (#12596).
         """
         class TripleFormWithCleanOverride(forms.ModelForm):
             class Meta:
@@ -2773,8 +2771,8 @@ class CustomCleanTests(TestCase):
 
     def test_model_form_clean_applies_to_model(self):
         """
-        Regression test for #12960. Make sure the cleaned_data returned from
-        ModelForm.clean() is applied to the model instance.
+        Make sure the cleaned_data returned from
+        ModelForm.clean() is applied to the model instance (#12960).
         """
         class CategoryForm(forms.ModelForm):
             class Meta:
@@ -2867,7 +2865,7 @@ class StumpJokeWithCustomFieldForm(forms.ModelForm):
 
 class LimitChoicesToTests(TestCase):
     """
-    Tests the functionality of ``limit_choices_to``.
+    Functionality of ``limit_choices_to``.
     """
     @classmethod
     def setUpTestData(cls):
@@ -2910,7 +2908,7 @@ class LimitChoicesToTests(TestCase):
 class FormFieldCallbackTests(SimpleTestCase):
 
     def test_baseform_with_widgets_in_meta(self):
-        """Regression for #13095: Using base forms with widgets defined in Meta should not raise errors."""
+        """Using base forms with widgets defined in Meta should not raise errors (#13095)."""
         widget = forms.Textarea()
 
         class BaseForm(forms.ModelForm):
@@ -2923,9 +2921,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         self.assertIsInstance(Form.base_fields['name'].widget, forms.Textarea)
 
     def test_factory_with_widget_argument(self):
-        """ Regression for #15315: modelform_factory should accept widgets
-            argument
-        """
+        """modelform_factory should accept widgets argument (#15315)."""
         widget = forms.Textarea()
 
         # Without a widget should not set the widget to textarea
@@ -2937,7 +2933,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         self.assertEqual(Form.base_fields['name'].widget.__class__, forms.Textarea)
 
     def test_modelform_factory_without_fields(self):
-        """ Regression for #19733 """
+        """(#19733)."""
         message = (
             "Calling modelform_factory without defining 'fields' or 'exclude' "
             "explicitly is prohibited."
@@ -2946,7 +2942,7 @@ class FormFieldCallbackTests(SimpleTestCase):
             modelform_factory(Person)
 
     def test_modelform_factory_with_all_fields(self):
-        """ Regression for #19733 """
+        """(#19733)."""
         form = modelform_factory(Person, fields="__all__")
         self.assertEqual(list(form.base_fields), ["name"])
 

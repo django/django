@@ -595,8 +595,8 @@ class TaggedItemForm(forms.ModelForm):
 class GenericInlineFormsetTest(TestCase):
     def test_generic_inlineformset_factory(self):
         """
-        Regression for #14572: Using base forms with widgets
-        defined in Meta should not raise errors.
+        Using base forms with widgets
+        defined in Meta should not raise errors (#14572).
         """
         Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
         form = Formset().forms[0]
@@ -613,7 +613,7 @@ class GenericInlineFormsetTest(TestCase):
 
     def test_save_new_uses_form_save(self):
         """
-        Regression for #16260: save_new should call form.save()
+        save_new should call form.save() (#16260).
         """
         class SaveTestForm(forms.ModelForm):
             def save(self, *args, **kwargs):

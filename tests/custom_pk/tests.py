@@ -208,7 +208,7 @@ class CustomPKTests(TestCase):
         self.assertEqual(employee.employee_code, 0)
 
     def test_custom_field_pk(self):
-        # Regression for #10785 -- Custom fields can be used for primary keys.
+        # Custom fields can be used for primary keys (#10785).
         new_bar = Bar.objects.create()
         new_foo = Foo.objects.create(bar=new_bar)
 

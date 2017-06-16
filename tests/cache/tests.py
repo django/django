@@ -1107,7 +1107,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertIsNone(caches['other'].get('value'))
 
     def test_locking_on_pickle(self):
-        """#20613/#18541 -- Ensures pickling is done outside of the lock."""
+        """Pickling is done outside of the lock (#20613/#18541)."""
         bad_obj = PicklingSideEffect(cache)
         cache.set('set', bad_obj)
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
@@ -1180,7 +1180,7 @@ class BaseMemcachedTests(BaseCacheTests):
             cache.set('a' * 251, 'value')
 
     def test_default_never_expiring_timeout(self):
-        # Regression test for #22845
+        # (#22845).
         with self.settings(CACHES=caches_setting_for_tests(
                 base=self.base_params,
                 exclude=memcached_excluded_caches,
@@ -1189,7 +1189,7 @@ class BaseMemcachedTests(BaseCacheTests):
             self.assertEqual(cache.get('infinite_foo'), 'bar')
 
     def test_default_far_future_timeout(self):
-        # Regression test for #22845
+        # (#22845).
         with self.settings(CACHES=caches_setting_for_tests(
                 base=self.base_params,
                 exclude=memcached_excluded_caches,
@@ -1253,7 +1253,7 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     base_params = MemcachedCache_params
 
     def test_memcached_uses_highest_pickle_version(self):
-        # Regression test for #19810
+        # (#19810).
         for cache_key in settings.CACHES:
             with self.subTest(cache_key=cache_key):
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
@@ -1977,7 +1977,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def test_constructor(self):
         """
-        Ensure the constructor is correctly distinguishing between usage of CacheMiddleware as
+        Constructor is correctly distinguishing between usage of CacheMiddleware as
         Middleware vs. usage of CacheMiddleware as view decorator and setting attributes
         appropriately.
         """

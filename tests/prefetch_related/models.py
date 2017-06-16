@@ -262,7 +262,7 @@ class WordEntry(models.Model):
         return "%s (%s)" % (self.name, self.id)
 
 
-# Ticket #21410: Regression when related_name="+"
+# Regression when related_name="+" (#21410).
 
 class Author2(models.Model):
     name = models.CharField(max_length=50, unique=True)

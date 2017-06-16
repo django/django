@@ -234,9 +234,9 @@ class SerializersTestBase:
         )
 
     def test_serialize_superfluous_queries(self):
-        """Ensure no superfluous queries are made when serializing ForeignKeys
-
-        #17602
+        """
+        No superfluous queries are made 
+        when serializing ForeignKeys (#17602).
         """
         ac = Actor(name='Actor name')
         ac.save()
@@ -292,8 +292,8 @@ class SerializersTestBase:
 
     def test_pre_1000ad_date(self):
         """Year values before 1000AD are properly formatted"""
-        # Regression for #12524 -- dates before 1000AD get prefixed
-        # 0's on the year
+        # Dates before 1000AD get prefixed
+        # 0's on the year (#12524).
         a = Article.objects.create(
             author=self.jane,
             headline="Nobody remembers the early years",
@@ -395,7 +395,7 @@ class SerializersTransactionTestBase:
 
 def register_tests(test_class, method_name, test_func, exclude=None):
     """
-    Dynamically create serializer tests to ensure that all registered
+    Dynamically create serializer tests to all registered
     serializers are automatically tested.
     """
     formats = [

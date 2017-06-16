@@ -169,7 +169,7 @@ class RequestsTests(SimpleTestCase):
             path_info = path_info.encode(encoding)  # Actual URL sent by the browser (bytestring)
             path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
             return path_info
-        # Regression for #19468
+        # (#19468).
         request = WSGIRequest({'PATH_INFO': wsgi_str("/سلام/"), 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
         self.assertEqual(request.path, "/سلام/")
 
@@ -308,10 +308,9 @@ class RequestsTests(SimpleTestCase):
         # Read everything else.
         self.assertEqual(stream.readline(), b'ijkl')
 
-        # Regression for #15018
         # If a stream contains a newline, but the provided length
         # is less than the number of provided characters, the newline
-        # doesn't reset the available character count
+        # doesn't reset the available character count (#15018).
         stream = LimitedStream(BytesIO(b'1234\nabcdef'), 9)
         self.assertEqual(stream.readline(10), b'1234\n')
         self.assertEqual(stream.readline(3), b'abc')
@@ -440,7 +439,7 @@ class RequestsTests(SimpleTestCase):
         # According to:
         # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
         # Every request.POST with Content-Length >= 0 is a valid request,
-        # this test ensures that we handle Content-Length == 0.
+        # handle Content-Length == 0.
         payload = FakePayload("\r\n".join([
             '--boundary',
             'Content-Disposition: form-data; name="name"',
@@ -863,9 +862,7 @@ class HostValidationTests(SimpleTestCase):
 
 
 class BuildAbsoluteURITestCase(SimpleTestCase):
-    """
-    Regression tests for ticket #18314.
-    """
+    """(#18314)."""
 
     def setUp(self):
         self.factory = RequestFactory()

@@ -54,8 +54,6 @@ class DatetimeTests(unittest.TestCase):
 
     def test_zero_padding(self):
         """
-        Regression for #12524
-
-        Pre-1000AD dates are padded with zeros if necessary
+        Pre-1000AD dates are padded with zeros if necessary (#12524).
         """
         self.assertEqual(date(1, 1, 1).strftime("%Y/%m/%d was a %A"), '0001/01/01 was a Monday')

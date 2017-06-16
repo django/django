@@ -1026,8 +1026,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         )
 
     def test_regression_6926(self):
-        # Regression test for #6926 ##################################################
-        # Make sure the management form has the correct prefix.
+        # Make sure the management form has the correct prefix (#6926).
 
         formset = FavoriteDrinksFormSet()
         self.assertEqual(formset.management_form.prefix, 'form')
@@ -1045,7 +1044,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.management_form.prefix, 'form')
 
     def test_regression_12878(self):
-        # Regression test for #12878 #################################################
+        # (#12878).
 
         data = {
             'drinks-TOTAL_FORMS': '2',  # the number of forms rendered
@@ -1061,7 +1060,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.non_form_errors(), ['You may only specify a drink once.'])
 
     def test_formset_iteration(self):
-        # Regression tests for #16455 -- formset instances are iterable
+        # Formset instances are iterable (#16455).
         ChoiceFormset = formset_factory(Choice, extra=3)
         formset = ChoiceFormset()
 
@@ -1094,8 +1093,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_formset_nonzero(self):
         """
-        Formsets with no forms should still evaluate as true.
-        Regression test for #15722
+        Formsets with no forms should still evaluate as true (#15722).
         """
         ChoiceFormset = formset_factory(Choice, extra=0)
         formset = ChoiceFormset()
@@ -1104,8 +1102,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_formset_splitdatetimefield(self):
         """
-        Formset should also work with SplitDateTimeField(initial=datetime.datetime.now).
-        Regression test for #18709.
+        Formset should also work with SplitDateTimeField(initial=datetime.datetime.now) (#18709).
         """
         data = {
             'form-TOTAL_FORMS': '1',
@@ -1117,7 +1114,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertTrue(formset.is_valid())
 
     def test_formset_error_class(self):
-        # Regression tests for #16479 -- formsets form use ErrorList instead of supplied error_class
+        # Formsets form use ErrorList instead of supplied error_class (#16479).
         class CustomErrorList(ErrorList):
             pass
 
@@ -1125,8 +1122,8 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.forms[0].error_class, CustomErrorList)
 
     def test_formset_calls_forms_is_valid(self):
-        # Regression tests for #18574 -- make sure formsets call
-        # is_valid() on each form.
+        # Make sure formsets call
+        # is_valid() on each form (#18574).
 
         class AnotherChoice(Choice):
             def is_valid(self):
@@ -1209,9 +1206,8 @@ class FormsFormsetTestCase(SimpleTestCase):
             formsets.DEFAULT_MAX_NUM = _old_DEFAULT_MAX_NUM
 
     def test_non_form_errors_run_full_clean(self):
-        # Regression test for #11160
         # If non_form_errors() is called without calling is_valid() first,
-        # it should ensure that full_clean() is called.
+        # it should ensure that full_clean() is called (#11160).
         class BaseCustomFormSet(BaseFormSet):
             def clean(self):
                 raise ValidationError("This is a non-form error")
@@ -1326,7 +1322,7 @@ class FormsetAsFooTests(SimpleTestCase):
         )
 
 
-# Regression test for #11418 #################################################
+# Regression test for (#11418).
 class ArticleForm(Form):
     title = CharField()
     pub_date = DateField()

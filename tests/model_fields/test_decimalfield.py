@@ -48,7 +48,7 @@ class DecimalFieldTests(TestCase):
 
     def test_save_without_float_conversion(self):
         """
-        Ensure decimals don't go through a corrupting float conversion during
+        Decimals don't go through a corrupting float conversion during
         save (#5079).
         """
         bd = BigD(d='12.9')
