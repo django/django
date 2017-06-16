@@ -1104,16 +1104,27 @@ blue.
 
 .. class:: GDALRaster(ds_input, write=False)
 
-    The constructor for ``GDALRaster`` accepts two parameters. The first parameter
-    defines the raster source, it is either a path to a file or spatial data with
-    values defining the properties of a new raster (such as size and name). If the
-    input is a file path, the second parameter specifies if the raster should
-    be opened with write access. If the input is raw data, the parameters ``width``,
-    ``height``, and ``srid`` are required. The following example shows how rasters
-    can be created from different input sources (using the sample data from the
-    GeoDjango tests, see also the :ref:`gdal_sample_data` section). For a
-    detailed description of how to create rasters using dictionary input, see
-    the :ref:`gdal-raster-ds-input` section.
+    The constructor for ``GDALRaster`` accepts two parameters. The first
+    parameter defines the raster source, and the second parameter defines if a
+    raster should be opened in write mode. For newly-created rasters, the second
+    parameter is ignored and the new raster is always created in write mode.
+
+    The first parameter can take three forms: a string representing a file
+    path, a dictionary with values defining a new raster, or a bytes object
+    representing a raster file.
+
+    If the input is a file path, the raster is opened from there. If the input
+    is raw data in a dictionary, the parameters ``width``, ``height``, and
+    ``srid`` are required. If the input is a bytes object, it will be opened
+    using a GDAL virtual filesystem.
+
+    For a detailed description of how to create rasters using dictionary input,
+    see :ref:`gdal-raster-ds-input`. For a detailed description of how to
+    create rasters in the virtual filesystem, see :ref:`gdal-raster-vsimem`.
+
+    The following example shows how rasters can be created from different input
+    sources (using the sample data from the GeoDjango tests; see also the
+    :ref:`gdal_sample_data` section).
 
         >>> from django.contrib.gis.gdal import GDALRaster
         >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
@@ -1143,6 +1154,13 @@ blue.
                [5, 2, 3, 5],
                [5, 2, 3, 5],
                [5, 5, 5, 5]], dtype=uint8)
+        >>> rst_file = open('/path/to/your/raster.tif', 'rb')
+        >>> rst_bytes = rst_file.read()
+        >>> rst = GDALRaster(rst_bytes)
+        >>> rst.is_vsi_based
+        True
+        >>> rst.name  # Stored in a random path in the vsimem filesystem.
+        '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
 
     .. versionchanged:: 1.11
 
@@ -1152,6 +1170,12 @@ blue.
         finely control initial pixel values. The functionality is similar to
         the :meth:`GDALBand.data()<django.contrib.gis.gdal.GDALBand.data>`
         method.
+
+    .. versionchanged:: 2.0
+
+       Added the ability to read and write rasters in GDAL's memory-based
+       virtual filesystem. ``GDALRaster`` objects can now be converted to and
+       from binary data in-memory.
 
     .. attribute:: name
 
@@ -1425,6 +1449,20 @@ blue.
             >>> rst.metadata
             {'DEFAULT': {'VERSION': '2.0'}}
 
+    .. attribute:: vsi_buffer
+
+       .. versionadded:: 2.0
+
+        A ``bytes`` representation of this raster. Returns ``None`` for rasters
+        that are not stored in GDAL's virtual filesystem.
+
+    .. attribute:: is_vsi_based
+
+       .. versionadded:: 2.0
+
+        A boolean indicating if this raster is stored in GDAL's virtual
+        filesystem.
+
 ``GDALBand``
 ------------
 
@@ -1639,7 +1677,9 @@ Key               Default  Usage
 .. object:: name
 
     String representing the name of the raster. When creating a file-based
-    raster, this parameter must be the file path for the new raster.
+    raster, this parameter must be the file path for the new raster. If the
+    name starts with ``/vsimem/``, the raster is created in GDAL's virtual
+    filesystem.
 
 .. object:: datatype
 
@@ -1730,6 +1770,56 @@ Key              Default                           Usage
 ``shape``        Same as size                      Passed to the :meth:`~GDALBand.data` method
 ``offset``       ``(0, 0)``                        Passed to the :meth:`~GDALBand.data` method
 ================ ================================= ======================================================
+
+.. _gdal-raster-vsimem:
+
+Using GDAL's Virtual Filesystem
+-------------------------------
+
+GDAL has an internal memory-based filesystem, which allows treating blocks of
+memory as files. It can be used to read and write :class:`GDALRaster` objects
+to and from binary file buffers.
+
+This is useful in web contexts where rasters might be obtained as a buffer
+from a remote storage or returned from a view without being written to disk.
+
+:class:`GDALRaster` objects are created in the virtual filesystem when a
+``bytes`` object is provided as input, or when the file path starts with
+``/vsimem/``.
+
+Input provided as ``bytes`` has to be a full binary representation of a file.
+For instance::
+
+    # Read a raster as a file object from a remote source.
+    >>> from urllib.request import urlopen
+    >>> dat = urlopen('http://example.com/raster.tif').read()
+    # Instantiate a raster from the bytes object.
+    >>> rst = GDALRaster(dat)
+    # The name starts with /vsimem/, indicating that the raster lives in the
+    # virtual filesystem.
+    >>> rst.name
+    '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
+
+To create a new virtual file-based raster from scratch, use the ``ds_input``
+dictionary representation and provide a ``name`` argument that starts with
+``/vsimem/`` (for detail of the dictionary representation, see
+:ref:`gdal-raster-ds-input`). For virtual file-based rasters, the
+:attr:`~GDALRaster.vsi_buffer` attribute returns the ``bytes`` representation
+of the raster.
+
+Here's how to create a raster and return it as a file in an
+:class:`~django.http.HttpResponse`::
+
+    >>> from django.http import HttpResponse
+    >>> rst = GDALRaster({
+    ...     'name': '/vsimem/temporarymemfile',
+    ...     'driver': 'tif',
+    ...     'width': 6, 'height': 6, 'srid': 3086,
+    ...     'origin': [500000, 400000],
+    ...     'scale': [100, -100],
+    ...     'bands': [{'data': range(36), 'nodata_value': 99}]
+    ... })
+    >>> HttpResponse(rast.vsi_buffer, 'image/tiff')
 
 Settings
 ========

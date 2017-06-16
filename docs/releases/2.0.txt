@@ -86,6 +86,10 @@ Minor features
 * Allowed passing driver-specific creation options to
   :class:`~django.contrib.gis.gdal.GDALRaster` objects using ``papsz_options``.
 
+* Allowed creating :class:`~django.contrib.gis.gdal.GDALRaster` objects in
+  GDAL's internal virtual filesystem. Rasters can now be :ref:`created from and
+  converted to binary data <gdal-raster-vsimem>` in-memory.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
