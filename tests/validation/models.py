@@ -121,8 +121,7 @@ class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(null=True, blank=True, unique=True, unpack_ipv4=True)
 
 
-# A model can't have multiple AutoFields
-# Refs #12467.
+# A model can't have multiple AutoFields (#12467).
 assertion_error = None
 try:
     class MultipleAutoFields(models.Model):

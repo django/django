@@ -59,9 +59,7 @@ class LoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.template_name, 'index.html')
 
     def test_loader_priority(self):
-        """
-        #21460 -- The order of template loader works.
-        """
+        """The order of template loader works (#21460)."""
         loaders = [
             'django.template.loaders.filesystem.Loader',
             'django.template.loaders.app_directories.Loader',
@@ -72,7 +70,7 @@ class LoaderTests(SimpleTestCase):
 
     def test_cached_loader_priority(self):
         """
-        The order of template loader works. Refs #21460.
+        The order of template loader works (#21460).
         """
         loaders = [
             ('django.template.loaders.cached.Loader', [

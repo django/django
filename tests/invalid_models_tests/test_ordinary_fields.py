@@ -20,7 +20,7 @@ class AutoFieldTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_primary_key(self):
-        # primary_key must be True. Refs #12467.
+        # primary_key must be True (#12467).
         class Model(models.Model):
             field = models.AutoField(primary_key=False)
 

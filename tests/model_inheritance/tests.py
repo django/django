@@ -326,8 +326,8 @@ class ModelInheritanceDataTests(TestCase):
 
     def test_select_related_defer(self):
         """
-        #23370 - Should be able to defer child fields when using
-        select_related() from parent to child.
+        Should be able to defer child fields when using
+        select_related() from parent to child (#23370).
         """
         qs = (Restaurant.objects.select_related("italianrestaurant")
               .defer("italianrestaurant__serves_gnocchi").order_by("rating"))
@@ -351,7 +351,7 @@ class ModelInheritanceDataTests(TestCase):
             self.italian_restaurant.save()
 
     def test_filter_inherited_on_null(self):
-        # Refs #12567
+        # (#12567).
         Supplier.objects.create(
             name="Central market",
             address="610 some street",
@@ -371,7 +371,7 @@ class ModelInheritanceDataTests(TestCase):
         )
 
     def test_exclude_inherited_on_null(self):
-        # Refs #12567
+        # (#12567).
         Supplier.objects.create(
             name="Central market",
             address="610 some street",

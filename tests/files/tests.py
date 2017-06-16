@@ -82,8 +82,7 @@ class FileTests(unittest.TestCase):
 
     def test_file_iteration(self):
         """
-        File objects should yield lines when iterated over.
-        Refs #22107.
+        File objects should yield lines when iterated over (#22107).
         """
         file = File(BytesIO(b'one\ntwo\nthree'))
         self.assertEqual(list(file), [b'one\n', b'two\n', b'three'])
@@ -294,8 +293,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
     @unittest.skipUnless(Image, "Pillow not installed")
     def test_bug_19457(self):
         """
-        Regression test for #19457
-        get_image_dimensions fails on some pngs, while Image.size is working good on them
+        get_image_dimensions fails on some pngs, while Image.size is working good on them (#19457).
         """
         img_path = os.path.join(os.path.dirname(__file__), "magic.png")
         size = images.get_image_dimensions(img_path)

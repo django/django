@@ -1193,9 +1193,8 @@ class MiscTests(SimpleTestCase):
         language codes will be removed in Django 1.9, these will be incorrectly
         matched. For example zh-tw (traditional) will be interpreted as zh-hans
         (simplified), which is wrong. So we should also accept these deprecated
-        language codes.
-
-        refs #18419 -- this is explicitly for browser compatibility
+        language codes (#18419).
+        This is explicitly for browser compatibility
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1529,7 +1528,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language('de-DE.utf-8'))
 
     def test_get_language_from_request(self):
-        # issue 19919
+        # (#19919).
         r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.8,bg;q=0.6,ru;q=0.4'}
@@ -1542,7 +1541,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertEqual('bg', lang)
 
     def test_specific_language_codes(self):
-        # issue 11915
+        # (#11915).
         r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}

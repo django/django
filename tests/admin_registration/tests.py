@@ -52,8 +52,7 @@ class TestRegistration(SimpleTestCase):
 
     def test_abstract_model(self):
         """
-        Exception is raised when trying to register an abstract model.
-        Refs #12004.
+        Exception is raised when trying to register an abstract model (#12004).
         """
         with self.assertRaises(ImproperlyConfigured):
             self.site.register(Location)

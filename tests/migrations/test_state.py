@@ -525,8 +525,8 @@ class StateTests(SimpleTestCase):
 
     def test_add_relations(self):
         """
-        #24573 - Adding relations to existing models should reload the
-        referenced models too.
+        Adding relations to existing models should reload the
+        referenced models too (#24573).
         """
         new_apps = Apps()
 
@@ -585,8 +585,8 @@ class StateTests(SimpleTestCase):
 
     def test_remove_relations(self):
         """
-        #24225 - Relations between models are updated while
-        remaining the relations and references for models of an old state.
+        Relations between models are updated while
+        remaining the relations and references for models of an old state (#24225).
         """
         new_apps = Apps()
 
@@ -636,8 +636,8 @@ class StateTests(SimpleTestCase):
 
     def test_self_relation(self):
         """
-        #24513 - Modifying an object pointing to itself would cause it to be
-        rendered twice and thus breaking its related M2M through objects.
+        Modifying an object pointing to itself would cause it to be
+        rendered twice and thus breaking its related M2M through objects (#24513).
         """
         class A(models.Model):
             to_a = models.ManyToManyField('something.A', symmetrical=False)
@@ -865,8 +865,8 @@ class StateTests(SimpleTestCase):
 
     def test_manager_refer_correct_model_version(self):
         """
-        #24147 - Managers refer to the correct version of a
-        historical model
+        Managers refer to the correct version of a
+        historical model (#24147).
         """
         project_state = ProjectState()
         project_state.add_model(ModelState(
@@ -902,8 +902,8 @@ class StateTests(SimpleTestCase):
 
     def test_choices_iterator(self):
         """
-        #24483 - ProjectState.from_apps should not destructively consume
-        Field.choices iterators.
+        ProjectState.from_apps should not destructively consume
+        Field.choices iterators (#24483).
         """
         new_apps = Apps(["migrations"])
         choices = [('a', 'A'), ('b', 'B')]
@@ -1055,7 +1055,7 @@ class ModelStateTests(SimpleTestCase):
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
     def test_custom_manager_swappable(self):
         """
-        Tests making a ProjectState from unused models with custom managers
+        Making a ProjectState from unused models with custom managers
         """
         new_apps = Apps(['migrations'])
 

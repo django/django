@@ -647,7 +647,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
     def setUpClass(cls):
         super().setUpClass()
         # This cleanup is necessary because contrib.sites cache
-        # makes tests interfere with each other, see #11505
+        # makes tests interfere with each other (#11505).
         Site.objects.clear_cache()
 
     def create_dummy_user(self):
@@ -690,7 +690,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         # Since we're not providing a request object, we must provide a
         # domain_override to prevent the save operation from failing in the
-        # potential case where contrib.sites is not installed. Refs #16412.
+        # potential case where contrib.sites is not installed (#16412).
         form.save(domain_override='example.com')
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Custom password reset on example.com')
@@ -717,7 +717,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         # Since we're not providing a request object, we must provide a
         # domain_override to prevent the save operation from failing in the
-        # potential case where contrib.sites is not installed. Refs #16412.
+        # potential case where contrib.sites is not installed (#16412).
         form.save(domain_override='example.com')
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Forgot your password?')

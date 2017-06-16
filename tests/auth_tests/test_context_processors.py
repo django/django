@@ -50,7 +50,7 @@ class PermWrapperTests(SimpleTestCase):
 
     def test_permlookupdict_in(self):
         """
-        No endless loops if accessed with 'in' - refs #18979.
+        No endless loops if accessed with 'in' (#18979).
         """
         pldict = PermLookupDict(MockUser(), 'mockapp')
         with self.assertRaises(TypeError):
@@ -134,7 +134,6 @@ class AuthContextProcessorTests(TestCase):
         Q(user=response.context['user']) & Q(someflag=True)
 
         # Tests for user equality.  This is hard because User defines
-        # equality in a non-duck-typing way
-        # See bug #12060
+        # equality in a non-duck-typing way (#12060).
         self.assertEqual(response.context['user'], user)
         self.assertEqual(user, response.context['user'])

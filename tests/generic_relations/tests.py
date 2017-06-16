@@ -39,7 +39,7 @@ class GenericRelationsTests(TestCase):
     def test_generic_update_or_create_when_created(self):
         """
         Should be able to use update_or_create from the generic related manager
-        to create a tag. Refs #23611.
+        to create a tag (#23611).
         """
         count = self.bacon.tags.count()
         tag, created = self.bacon.tags.update_or_create(tag='stinky')
@@ -49,7 +49,7 @@ class GenericRelationsTests(TestCase):
     def test_generic_update_or_create_when_updated(self):
         """
         Should be able to use update_or_create from the generic related manager
-        to update a tag. Refs #23611.
+        to update a tag (#23611).
         """
         count = self.bacon.tags.count()
         tag = self.bacon.tags.create(tag='stinky')
@@ -62,7 +62,7 @@ class GenericRelationsTests(TestCase):
     def test_generic_get_or_create_when_created(self):
         """
         Should be able to use get_or_create from the generic related manager
-        to create a tag. Refs #23611.
+        to create a tag (#23611).
         """
         count = self.bacon.tags.count()
         tag, created = self.bacon.tags.get_or_create(tag='stinky')
@@ -72,7 +72,7 @@ class GenericRelationsTests(TestCase):
     def test_generic_get_or_create_when_exists(self):
         """
         Should be able to use get_or_create from the generic related manager
-        to get a tag. Refs #23611.
+        to get a tag (#236110.
         """
         count = self.bacon.tags.count()
         tag = self.bacon.tags.create(tag="stinky")
@@ -485,7 +485,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         )
 
     def test_gfk_manager(self):
-        # GenericForeignKey should not use the default manager (which may filter objects) #16048
+        # GenericForeignKey should not use the default manager (which may filter objects) (#16048).
         tailless = Gecko.objects.create(has_tail=False)
         tag = TaggedItem.objects.create(content_object=tailless, tag="lizard")
         self.assertEqual(tag.content_object, tailless)
@@ -493,7 +493,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
     def test_subclasses_with_gen_rel(self):
         """
         Concrete model subclasses with generic relations work
-        correctly (ticket 11263).
+        correctly (#11263).
         """
         granite = Rock.objects.create(name='granite', hardness=5)
         TaggedItem.objects.create(content_object=granite, tag="countertop")
@@ -510,7 +510,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
 
     def test_generic_inline_formsets_initial(self):
         """
-        Test for #17927 Initial values support for BaseGenericInlineFormSet.
+        Initial values support for BaseGenericInlineFormSet (#17927).
         """
         quartz = Mineral.objects.create(name="Quartz", hardness=7)
 

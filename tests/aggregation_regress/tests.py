@@ -595,7 +595,7 @@ class AggregationTests(TestCase):
 
     def test_boolean_conversion(self):
         # Aggregates mixed up ordering of columns for backend's convert_values
-        # method. Refs #21126.
+        # method (#21126).
         e = Entries.objects.create(Entry='foo')
         c = Clues.objects.create(EntryID=e, Clue='bar')
         qs = Clues.objects.select_related('EntryID').annotate(Count('ID'))
@@ -1180,7 +1180,7 @@ class AggregationTests(TestCase):
         """
         The base table's join isn't promoted to LOUTER. This could
         cause the query generation to fail if there is an exclude() for fk-field
-        in the query, too. Refs #19087.
+        in the query (#19087).
         """
         qs = Book.objects.annotate(n=Count('pk'))
         self.assertIs(qs.query.alias_map['aggregation_regress_book'].join_type, None)
@@ -1306,7 +1306,7 @@ class AggregationTests(TestCase):
         """
         Aggregates with joins ignore extra
         filters provided by setup_joins
-        
+
         tests aggregations with generic reverse relations (#10870).
         """
         django_book = Book.objects.get(name='Practical Django Projects')

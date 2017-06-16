@@ -448,7 +448,7 @@ class ExceptionReporterTests(SimpleTestCase):
     def test_unfrozen_importlib(self):
         """
         importlib is not a frozen app, but its loader thinks it's frozen which
-        results in an ImportError. Refs #21443.
+        results in an ImportError (#21443).
         """
         try:
             request = self.rf.get('/test_view/')
@@ -887,8 +887,8 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_multivalue_dict_key_error(self):
         """
-        #21098 -- Sensitive POST parameters cannot be seen in the
-        error reports for if request.POST['nonexistent_key'] throws an error.
+        Sensitive POST parameters cannot be seen in the
+        error reports for if request.POST['nonexistent_key'] throws an error (#21098).
         """
         with self.settings(DEBUG=True):
             self.verify_unsafe_response(multivalue_dict_key_error)

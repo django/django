@@ -170,8 +170,7 @@ class AssertContainsTests(SimpleTestCase):
 
     def test_assert_contains_using_non_template_response(self):
         """ auto-rendering does not affect responses that aren't
-            instances (or subclasses) of SimpleTemplateResponse.
-            Refs #15826.
+            instances (or subclasses) of SimpleTemplateResponse (#15826).
         """
         response = HttpResponse('Hello')
         self.assertContains(response, 'Hello')
@@ -1344,9 +1343,7 @@ class RequestHeadersTest(SimpleTestCase):
 class ReadLimitedStreamTest(SimpleTestCase):
     """
     HttpRequest.body, HttpRequest.read(), and HttpRequest.read(BUFFER) have
-    proper LimitedStream behavior.
-
-    Refs #14753, #15785
+    proper LimitedStream behavior (#14753, #15785)
     """
 
     def test_body_from_empty_request(self):

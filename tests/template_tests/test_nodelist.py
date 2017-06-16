@@ -48,7 +48,7 @@ class TextNodeTest(TestCase):
 class ErrorIndexTest(TestCase):
     """
     Checks whether index of error is calculated correctly in
-    template debugger in for loops. Refs ticket #5831
+    template debugger in for loops (#5831).
     """
     def test_correct_exception_index(self):
         tests = [

@@ -369,9 +369,9 @@ class BasicExpressionsTests(TestCase):
     def test_ticket_18375_kwarg_ordering_2(self):
         # Another similar case for F() than above. Now we have the same join
         # in two filter kwargs, one in the lhs lookup, one in F. Here pre
-        # #18375 the amount of joins generated was random if dict
+        # the amount of joins generated was random if dict
         # randomization was enabled, that is the generated query dependent
-        # on which clause was seen first.
+        # on which clause was seen first (#18375).
         qs = Employee.objects.filter(
             company_ceo_set__num_employees=F('pk'),
             pk=F('company_ceo_set__num_employees')
@@ -424,7 +424,7 @@ class BasicExpressionsTests(TestCase):
 
         results = list(qs)
         # Could use Coalesce(subq, Value('')) instead except for the bug in
-        # cx_Oracle mentioned in #23843.
+        # cx_Oracle (#23843).
         bob = results[0]
         if bob['largest_company'] == '' and connection.features.interprets_empty_strings_as_nulls:
             bob['largest_company'] = None
@@ -724,8 +724,7 @@ class ExpressionsTests(TestCase):
     def test_patterns_escape(self):
         r"""
         Special characters (e.g. %, _ and \) stored in database are
-        properly escaped when using a pattern lookup with an expression
-        refs #16731
+        properly escaped when using a pattern lookup with an expression (#16731).
         """
         Employee.objects.bulk_create([
             Employee(firstname="%Joh\\nny", lastname="%Joh\\n"),
@@ -757,7 +756,7 @@ class ExpressionsTests(TestCase):
         r"""
         Special characters (e.g. %, _ and \) stored in database are
         properly escaped when using a case insensitive pattern lookup with an
-        expression -- refs #16731
+        expression (#16731).
         """
         Employee.objects.bulk_create([
             Employee(firstname="%Joh\\nny", lastname="%joh\\n"),
@@ -1074,14 +1073,14 @@ class FTimeDeltaTests(TestCase):
         cls.expnames = [e.name for e in Experiment.objects.all()]
 
     def test_multiple_query_compilation(self):
-        # Ticket #21643
+        # (#21643).
         queryset = Experiment.objects.filter(end__lt=F('start') + datetime.timedelta(hours=1))
         q1 = str(queryset.query)
         q2 = str(queryset.query)
         self.assertEqual(q1, q2)
 
     def test_query_clone(self):
-        # Ticket #21643 - Crash when compiling query more than once
+        # Crash when compiling query more than once (#21643).
         qs = Experiment.objects.filter(end__lt=F('start') + datetime.timedelta(hours=1))
         qs2 = qs.all()
         list(qs)

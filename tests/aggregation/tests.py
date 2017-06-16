@@ -817,10 +817,10 @@ class AggregateTestCase(TestCase):
         .dates() returns a distinct set of dates when applied to a
         QuerySet with aggregation.
 
-        Refs #18056. Previously, .dates() would return distinct (date_kind,
+        Previously, .dates() would return distinct (date_kind,
         aggregation) sets, in this case (year, num_authors), so 2008 would be
         returned twice because there are books from 2008 with a different
-        number of authors.
+        number of authors (#18056).
         """
         dates = Book.objects.annotate(num_authors=Count("authors")).dates('pubdate', 'year')
         self.assertQuerysetEqual(
@@ -833,7 +833,7 @@ class AggregateTestCase(TestCase):
         )
 
     def test_values_aggregation(self):
-        # Refs #20782
+        # (#20782).
         max_rating = Book.objects.values('rating').aggregate(max_rating=Max('rating'))
         self.assertEqual(max_rating['max_rating'], 5)
         max_books_per_rating = Book.objects.values('rating').annotate(

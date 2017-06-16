@@ -142,7 +142,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
     def test_localized_priority(self):
-        "The priority value should not be localized (Refs #14164)"
+        """The priority value should not be localized (#14164)."""
         activate('fr')
         self.assertEqual('0,3', localize(0.3))
 

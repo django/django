@@ -64,7 +64,7 @@ class DeferRegressionTest(TestCase):
         )
 
         # Models instances with deferred fields should still return the same
-        # content types as their non-deferred versions (bug #10738).
+        # content types as their non-deferred versions (#10738).
         ctype = ContentType.objects.get_for_model
         c1 = ctype(Item.objects.all()[0])
         c2 = ctype(Item.objects.defer("name")[0])
@@ -151,8 +151,8 @@ class DeferRegressionTest(TestCase):
         self.assertEqual('Foobar', qs[0].name)
 
     def test_reverse_one_to_one_relations(self):
-        # Refs #14694. Test reverse relations which are known unique (reverse
-        # side has o2ofield or unique FK) - the o2o case
+        # Test reverse relations which are known unique (reverse
+        # side has o2ofield or unique FK) - the o2o case (#14694).
         item = Item.objects.create(name="first", value=42)
         o2o = OneToOneItem.objects.create(item=item, name="second")
         self.assertEqual(len(Item.objects.defer('one_to_one_item__name')), 1)
@@ -206,7 +206,7 @@ class DeferRegressionTest(TestCase):
             self.assertEqual(obj.item.value, 47)
 
     def test_only_with_select_related(self):
-        # Test for #17485.
+        # (#17485).
         item = SimpleItem.objects.create(name='first', value=47)
         feature = Feature.objects.create(item=item)
         SpecialFeature.objects.create(feature=feature)

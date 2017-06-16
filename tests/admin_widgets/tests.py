@@ -830,8 +830,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_date_time_picker_shortcuts(self):
         """
-        date/time/datetime picker shortcuts work in the current time zone.
-        Refs #20663.
+        date/time/datetime picker shortcuts work in the current time zone (#20663).
 
         This test case is fairly tricky, it relies on selenium still running the browser
         in the default time zone "America/Chicago" despite `override_settings` changing

@@ -519,7 +519,7 @@ class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
 class TestInlinePermissions(TestCase):
     """
     Make sure the admin respects permissions for objects that are edited
-    inline. Refs #8060.
+    inline (#8060).
     """
 
     def setUp(self):

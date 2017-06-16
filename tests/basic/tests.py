@@ -313,7 +313,7 @@ class ModelTest(TestCase):
     def test_create_relation_with_gettext_lazy(self):
         """
         gettext_lazy objects work when saving model instances
-        through various methods. Refs #10498.
+        through various methods (#10498).
         """
         notlazy = 'test'
         lazy = gettext_lazy(notlazy)
@@ -350,7 +350,7 @@ class ModelTest(TestCase):
             self.assertEqual(len(qs), 0)
 
     def test_emptyqs_customqs(self):
-        # A hacky test for custom QuerySet subclass - refs #17271
+        # A hacky test for custom QuerySet subclass (#17271).
         Article.objects.create(headline='foo', pub_date=datetime.now())
 
         class CustomQuerySet(QuerySet):
@@ -366,7 +366,7 @@ class ModelTest(TestCase):
             self.assertEqual(qs.do_something(), 'did something')
 
     def test_emptyqs_values_order(self):
-        # Tests for ticket #17712
+        # (#17712).
         Article.objects.create(headline='foo', pub_date=datetime.now())
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().values_list('id').order_by('id')), 0)
@@ -376,7 +376,7 @@ class ModelTest(TestCase):
 
     @skipUnlessDBFeature('can_distinct_on_fields')
     def test_emptyqs_distinct(self):
-        # Tests for #19426
+        # (#19426).
         Article.objects.create(headline='foo', pub_date=datetime.now())
         with self.assertNumQueries(0):
             self.assertEqual(len(Article.objects.none().distinct('headline', 'pub_date')), 0)

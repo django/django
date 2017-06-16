@@ -49,8 +49,7 @@ class BaseModelBackendTest:
     def tearDown(self):
         self.patched_settings.disable()
         # The custom_perms test messes with ContentTypes, which will
-        # be cached; flush the cache to ensure there are no side effects
-        # Refs #14975, #14925
+        # be cached; flush the cache to ensure there are no side effects (#14975, #14925).
         ContentType.objects.clear_cache()
 
     def test_has_perm(self):
@@ -122,8 +121,8 @@ class BaseModelBackendTest:
 
     def test_anonymous_has_no_permissions(self):
         """
-        #17903 -- Anonymous users shouldn't have permissions in
-        ModelBackend.get_(all|user|group)_permissions().
+        Anonymous users shouldn't have permissions in
+        ModelBackend.get_(all|user|group)_permissions() (#17903).
         """
         backend = ModelBackend()
 
@@ -148,8 +147,8 @@ class BaseModelBackendTest:
 
     def test_inactive_has_no_permissions(self):
         """
-        #17903 -- Inactive users shouldn't have permissions in
-        ModelBackend.get_(all|user|group)_permissions().
+        Inactive users shouldn't have permissions in
+        ModelBackend.get_(all|user|group)_permissions() (#17903).
         """
         backend = ModelBackend()
 
@@ -175,13 +174,13 @@ class BaseModelBackendTest:
         self.assertEqual(backend.get_group_permissions(user), set())
 
     def test_get_all_superuser_permissions(self):
-        """A superuser has all permissions. Refs #14795."""
+        """A superuser has all permissions (#14795)."""
         user = self.UserModel._default_manager.get(pk=self.superuser.pk)
         self.assertEqual(len(user.get_all_permissions()), len(Permission.objects.all()))
 
     @override_settings(PASSWORD_HASHERS=['auth_tests.test_auth_backends.CountingMD5PasswordHasher'])
     def test_authentication_timing(self):
-        """Hasher is run once regardless of whether the user exists. Refs #20760."""
+        """Hasher is run once regardless of whether the user exists (#20760)."""
         # Re-set the password, because this tests overrides PASSWORD_HASHERS
         self.user.set_password('test')
         self.user.save()
@@ -385,8 +384,7 @@ class RowlevelBackendTest(TestCase):
 
     def tearDown(self):
         # The get_group_permissions test messes with ContentTypes, which will
-        # be cached; flush the cache to ensure there are no side effects
-        # Refs #14975, #14925
+        # be cached; flush the cache to ensure there are no side effects (#14975, #14925).
         ContentType.objects.clear_cache()
 
     def test_has_perm(self):
@@ -644,8 +642,8 @@ class OtherModelBackend(ModelBackend):
 
 class ImportedBackendTests(TestCase):
     """
-    #23925 - The backend path added to the session should be the same
-    as the one defined in AUTHENTICATION_BACKENDS setting.
+    The backend path added to the session should be the same
+    as the one defined in AUTHENTICATION_BACKENDS setting (#23925).
     """
 
     backend = 'auth_tests.backend_alias.ImportedModelBackend'

@@ -757,8 +757,7 @@ class RelatedPrepopulated(models.Model):
 
 class UnorderedObject(models.Model):
     """
-    Model without any defined `Meta.ordering`.
-    Refs #16819.
+    Model without any defined `Meta.ordering` (#16819).
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
@@ -766,16 +765,14 @@ class UnorderedObject(models.Model):
 
 class UndeletableObject(models.Model):
     """
-    Model whose show_delete in admin change_view has been disabled
-    Refs #10057.
+    Model whose show_delete in admin change_view has been disabled (#10057).
     """
     name = models.CharField(max_length=255)
 
 
 class UnchangeableObject(models.Model):
     """
-    Model whose change_view is disabled in admin
-    Refs #20640.
+    Model whose change_view is disabled in admin (#20640).
     """
 
 

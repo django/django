@@ -104,9 +104,7 @@ class DeleteCascadeTransactionTests(TransactionTestCase):
         """
         Auto-created many-to-many through tables referencing a parent model are
         correctly found by the delete cascade when a child of that parent is
-        deleted.
-
-        Refs #14896.
+        deleted (#14896).
         """
         r = Researcher.objects.create()
         email = Email.objects.create(
@@ -144,11 +142,7 @@ class LargeDeleteTests(TestCase):
 
 
 class ProxyDeleteTest(TestCase):
-    """
-    Tests on_delete behavior for proxy models.
-
-    See #16128.
-    """
+    """on_delete behavior for proxy models (#16128)."""
     def create_image(self):
         """Return an Image referenced by both a FooImage and a FooFile."""
         # Create an Image
@@ -229,9 +223,7 @@ class ProxyDeleteTest(TestCase):
         If a pair of proxy models are linked by an FK from one concrete parent
         to the other, deleting one proxy model cascade-deletes the other, and
         the deletion happens in the right order (not triggering an
-        IntegrityError on databases unable to defer integrity checks).
-
-        Refs #17918.
+        IntegrityError on databases unable to defer integrity checks) (#17918).
         """
         # Create an Image (proxy of File) and FooFileProxy (proxy of FooFile,
         # which has an FK to File)
@@ -337,7 +329,7 @@ class OrderedDeleteTests(TestCase):
     def test_meta_ordered_delete(self):
         # When a subquery is performed by deletion code, the subquery must be
         # cleared of all ordering. There was a but that caused _meta ordering
-        # to be used. Refs #19720.
+        # to be used (#19720).
         h = House.objects.create(address='Foo')
         OrderedPerson.objects.create(name='Jack', lives_in=h)
         OrderedPerson.objects.create(name='Bob', lives_in=h)
