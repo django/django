@@ -68,7 +68,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
 
 # ModelForms #################################################################
 
-def model_to_dict(instance, fields=None, exclude=None):
+def model_to_dict(instance, fields=None, exclude=None, form=None):
     """
     Return a dict containing the data in ``instance`` suitable for passing as
     a Form's ``initial`` keyword argument.
@@ -89,6 +89,12 @@ def model_to_dict(instance, fields=None, exclude=None):
             continue
         if exclude and f.name in exclude:
             continue
+        if form is not None and type(form.base_fields.get(f.name)) is ModelChoiceField:
+            to_field_name = getattr(form.base_fields.get(f.name), 'to_field_name', None)
+            related_instance = getattr(instance, f.name)
+            if to_field_name is not None and related_instance is not None:
+                data[f.name] = getattr(related_instance, to_field_name)
+                continue
         data[f.name] = f.value_from_object(instance)
     return data
 
@@ -289,7 +295,7 @@ class BaseModelForm(BaseForm):
             object_data = {}
         else:
             self.instance = instance
-            object_data = model_to_dict(instance, opts.fields, opts.exclude)
+            object_data = model_to_dict(instance, opts.fields, opts.exclude, form=self)
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
@@ -880,6 +886,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
 
 class BaseInlineFormSet(BaseModelFormSet):
     """A formset for child objects related to a parent."""
+
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=None, **kwargs):
         if instance is None:
@@ -1234,6 +1241,13 @@ class ModelChoiceField(ChoiceField):
                 return value.serializable_value(self.to_field_name)
             else:
                 return value.pk
+        # If to_field_name is different from the model field's to_field, then
+        # the value needs to be transformed from the to_field value to the
+        # to_field_name value.
+        if self.to_field_name:
+            selected_value = [x for x in self.queryset if getattr(x, self.to_field_name) == value]
+            if selected_value:
+                return getattr(selected_value[0], self.to_field_name)
         return super().prepare_value(value)
 
     def to_python(self, value):
