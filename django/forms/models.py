@@ -1112,7 +1112,7 @@ class ModelChoiceIterator:
             yield self.choice(obj)
 
     def __len__(self):
-        return (len(self.queryset) + (1 if self.field.empty_label is not None else 0))
+        return (len(self.queryset.all()) + (1 if self.field.empty_label is not None else 0))
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))

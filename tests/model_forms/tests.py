@@ -1997,6 +1997,12 @@ class ModelMultipleChoiceFieldTests(TestCase):
         form = ArticleCategoriesForm(instance=article)
         self.assertCountEqual(form['categories'].value(), [self.c2.slug, self.c3.slug])
 
+    def test_added_fields_gets_counted(self):
+        f = forms.ModelMultipleChoiceField(Category.objects.all())
+        self.assertEqual(len(f.choices), 3)
+        Category.objects.create()
+        self.assertEqual(len(f.choices), 4)
+
 
 class ModelOneToOneFieldTests(TestCase):
     def test_modelform_onetoonefield(self):
