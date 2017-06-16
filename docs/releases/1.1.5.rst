@@ -1,0 +1,22 @@
+1.1.5 Release Notes
+===================
+
+Channels 1.1.5 is a packaging release for the 1.1 series, released on
+June 16th, 2017.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Minor Changes & Bugfixes
+------------------------
+
+* The Daphne dependency requirement was bumped to 1.3.0.
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
