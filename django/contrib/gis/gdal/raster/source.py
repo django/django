@@ -1,13 +1,20 @@
 import json
 import os
-from ctypes import addressof, byref, c_char_p, c_double, c_void_p
+import sys
+import uuid
+from ctypes import (
+    addressof, byref, c_buffer, c_char_p, c_double, c_int, c_void_p, string_at,
+)
 
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
-from django.contrib.gis.gdal.raster.const import GDAL_RESAMPLE_ALGORITHMS
+from django.contrib.gis.gdal.raster.const import (
+    GDAL_RESAMPLE_ALGORITHMS, VSI_DELETE_BUFFER_ON_READ,
+    VSI_FILESYSTEM_BASE_PATH, VSI_TAKE_BUFFER_OWNERSHIP,
+)
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry.regex import json_regex
 from django.utils.encoding import force_bytes, force_text
@@ -66,13 +73,36 @@ class GDALRaster(GDALRasterBase):
 
         # If input is a valid file path, try setting file as source.
         if isinstance(ds_input, str):
-            if not os.path.exists(ds_input):
-                raise GDALException('Unable to read raster source input "{}"'.format(ds_input))
             try:
                 # GDALOpen will auto-detect the data source type.
                 self._ptr = capi.open_ds(force_bytes(ds_input), self._write)
             except GDALException as err:
                 raise GDALException('Could not open the datasource at "{}" ({}).'.format(ds_input, err))
+        elif isinstance(ds_input, bytes):
+            # Create a new raster in write mode.
+            self._write = 1
+            # Get size of buffer.
+            size = sys.getsizeof(ds_input)
+            # Pass data to ctypes, keeping a reference to the ctypes object so
+            # that the vsimem file remains available until the GDALRaster is
+            # deleted.
+            self._ds_input = c_buffer(ds_input)
+            # Create random name to reference in vsimem filesystem.
+            vsi_path = os.path.join(VSI_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
+            # Create vsimem file from buffer.
+            capi.create_vsi_file_from_mem_buffer(
+                force_bytes(vsi_path),
+                byref(self._ds_input),
+                size,
+                VSI_TAKE_BUFFER_OWNERSHIP,
+            )
+            # Open the new vsimem file as a GDALRaster.
+            try:
+                self._ptr = capi.open_ds(force_bytes(vsi_path), self._write)
+            except GDALException:
+                # Remove the broken file from the VSI filesystem.
+                capi.unlink_vsi_file(force_bytes(vsi_path))
+                raise GDALException('Failed creating VSI raster from the input buffer.')
         elif isinstance(ds_input, dict):
             # A new raster needs to be created in write mode
             self._write = 1
@@ -151,6 +181,12 @@ class GDALRaster(GDALRasterBase):
         else:
             raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
 
+    def __del__(self):
+        if self.is_vsi_based:
+            # Remove the temporary file from the VSI in-memory filesystem.
+            capi.unlink_vsi_file(force_bytes(self.name))
+        super().__del__()
+
     def __str__(self):
         return self.name
 
@@ -171,6 +207,25 @@ class GDALRaster(GDALRasterBase):
         if not self._write:
             raise GDALException('Raster needs to be opened in write mode to change values.')
         capi.flush_ds(self._ptr)
+
+    @property
+    def vsi_buffer(self):
+        if not self.is_vsi_based:
+            return None
+        # Prepare an integer that will contain the buffer length.
+        out_length = c_int()
+        # Get the data using the vsi file name.
+        dat = capi.get_mem_buffer_from_vsi_file(
+            force_bytes(self.name),
+            byref(out_length),
+            VSI_DELETE_BUFFER_ON_READ,
+        )
+        # Read the full buffer pointer.
+        return string_at(dat, out_length.value)
+
+    @cached_property
+    def is_vsi_based(self):
+        return self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
 
     @property
     def name(self):

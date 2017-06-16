@@ -43,3 +43,13 @@ GDAL_RESAMPLE_ALGORITHMS = {
     'Average': 5,
     'Mode': 6,
 }
+
+# Fixed base path for buffer-based GDAL in-memory files.
+VSI_FILESYSTEM_BASE_PATH = '/vsimem/'
+
+# Should the memory file system take ownership of the buffer, freeing it when
+# the file is deleted? (No, GDALRaster.__del__() will delete the buffer.)
+VSI_TAKE_BUFFER_OWNERSHIP = False
+
+# Should a VSI file be removed when retrieving its buffer?
+VSI_DELETE_BUFFER_ON_READ = False

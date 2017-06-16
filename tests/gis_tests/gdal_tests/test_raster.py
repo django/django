@@ -155,6 +155,69 @@ class GDALRasterTests(SimpleTestCase):
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
 
+    def test_vsi_raster_creation(self):
+        # Open a raster as a file object.
+        with open(self.rs_path, 'rb') as dat:
+            # Instantiate a raster from the file binary buffer.
+            vsimem = GDALRaster(dat.read())
+        # The data of the in-memory file is equal to the source file.
+        result = vsimem.bands[0].data()
+        target = self.rs.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+            target = target.flatten().tolist()
+        self.assertEqual(result, target)
+
+    def test_vsi_raster_deletion(self):
+        path = '/vsimem/raster.tif'
+        # Create a vsi-based raster from scratch.
+        vsimem = GDALRaster({
+            'name': path,
+            'driver': 'tif',
+            'width': 4,
+            'height': 4,
+            'srid': 4326,
+            'bands': [{
+                'data': range(16),
+            }],
+        })
+        # The virtual file exists.
+        rst = GDALRaster(path)
+        self.assertEqual(rst.width, 4)
+        # Delete GDALRaster.
+        del vsimem
+        del rst
+        # The virtual file has been removed.
+        msg = 'Could not open the datasource at "/vsimem/raster.tif"'
+        with self.assertRaisesMessage(GDALException, msg):
+            GDALRaster(path)
+
+    def test_vsi_invalid_buffer_error(self):
+        msg = 'Failed creating VSI raster from the input buffer.'
+        with self.assertRaisesMessage(GDALException, msg):
+            GDALRaster(b'not-a-raster-buffer')
+
+    def test_vsi_buffer_property(self):
+        # Create a vsi-based raster from scratch.
+        rast = GDALRaster({
+            'name': '/vsimem/raster.tif',
+            'driver': 'tif',
+            'width': 4,
+            'height': 4,
+            'srid': 4326,
+            'bands': [{
+                'data': range(16),
+            }],
+        })
+        # Do a round trip from raster to buffer to raster.
+        result = GDALRaster(rast.vsi_buffer).bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to nodata value except on input block of ones.
+        self.assertEqual(result, list(range(16)))
+        # The vsi buffer is None for rasters that are not vsi based.
+        self.assertIsNone(self.rs.vsi_buffer)
+
     def test_offset_size_and_shape_on_raster_creation(self):
         rast = GDALRaster({
             'datatype': 1,
