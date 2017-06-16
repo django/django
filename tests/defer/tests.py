@@ -147,7 +147,7 @@ class DeferTests(AssertionMixin, TestCase):
         )
 
     def test_defer_baseclass_when_subclass_has_no_added_fields(self):
-        # A subclass with no extra fields can defer 
+        # A subclass with no extra fields can defer
         # fields from the base class (#10572).
         Child.objects.create(name="c1", value="foo", related=self.s1)
         # You can defer a field on a baseclass when the subclass has no fields
