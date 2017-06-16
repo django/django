@@ -1205,6 +1205,13 @@ class ModelChoiceField(ChoiceField):
                 return value.serializable_value(self.to_field_name)
             else:
                 return value.pk
+        # If to_field_name is different from the model field's to_field, then
+        # the value needs to be transformed from the to_field value to the
+        # to_field_name value.
+        if self.to_field_name:
+            selected_value = [x for x in self.queryset if x.pk == value]
+            if selected_value:
+                return getattr(selected_value[0], self.to_field_name)
         return super().prepare_value(value)
 
     def to_python(self, value):
