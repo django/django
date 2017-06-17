@@ -40,3 +40,7 @@ Bugfixes
   context. It's now an empty string (as it is for the original function-based
   ``login()`` view) if the corresponding parameter isn't sent in a request (in
   particular, when the login page is accessed directly) (:ticket:`28229`).
+
+* Prevented attribute values in the ``django/forms/widgets/attrs.html``
+  template from being localized so that numeric attributes (e.g. ``max`` and
+  ``min``) of ``NumberInput`` work correctly (:ticket:`28303`).
