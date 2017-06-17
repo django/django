@@ -17,16 +17,6 @@ class BrinIndex(Index):
         self.pages_per_range = pages_per_range
         super().__init__(fields, name)
 
-    def __repr__(self):
-        if self.pages_per_range is not None:
-            return '<%(name)s: fields=%(fields)s, pages_per_range=%(pages_per_range)s>' % {
-                'name': self.__class__.__name__,
-                'fields': "'{}'".format(', '.join(self.fields)),
-                'pages_per_range': self.pages_per_range,
-            }
-        else:
-            return super().__repr__()
-
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         kwargs['pages_per_range'] = self.pages_per_range
