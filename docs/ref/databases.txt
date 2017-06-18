@@ -224,6 +224,33 @@ live for the duration of the transaction.
 
 .. _pgBouncer: https://pgbouncer.github.io/
 
+.. _manually-specified-autoincrement-pk:
+
+Manually-specifying values of auto-incrementing primary keys
+------------------------------------------------------------
+
+Django uses PostgreSQL's `SERIAL data type`_ to store auto-incrementing primary
+keys. A ``SERIAL`` column is populated with values from a `sequence`_ that
+keeps track of the next available value. Manually assigning a value to an
+auto-incrementing field doesn't update the field's sequence, which might later
+cause a conflict. For example::
+
+    >>> from django.contrib.auth.models import User
+    >>> User.objects.create(username='alice', pk=1)
+    <User: alice>
+    >>> # The sequence hasn't been updated; its next value is 1.
+    >>> User.objects.create(username='bob')
+    ...
+    IntegrityError: duplicate key value violates unique constraint
+    "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
+
+If you need to specify such values, reset the sequence afterwards to avoid
+reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
+management command generates the SQL statements to do that.
+
+.. _SERIAL data type: https://www.postgresql.org/docs/current/static/datatype-numeric.html#DATATYPE-SERIAL
+.. _sequence: https://www.postgresql.org/docs/current/static/sql-createsequence.html
+
 Test database templates
 -----------------------
 
