@@ -187,6 +187,9 @@ Models
 
 * Query expressions can now be negated using a minus sign.
 
+* :meth:`.QuerySet.order_by` and :meth:`distinct(*fields) <.QuerySet.distinct>`
+  now support using field transforms.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -241,6 +244,9 @@ Database backend API
 
 * Renamed the ``allow_sliced_subqueries`` database feature flag to
   ``allow_sliced_subqueries_with_in``.
+
+* ``DatabaseOperations.distinct_sql()`` now requires an additional ``params``
+  argument and returns a tuple of SQL and parameters instead of a SQL string.
 
 :mod:`django.contrib.gis`
 -------------------------

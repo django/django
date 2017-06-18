@@ -63,6 +63,14 @@ class Mult3BilateralTransform(models.Transform):
         return '3 * (%s)' % lhs, lhs_params
 
 
+class LastDigitTransform(models.Transform):
+    lookup_name = 'lastdigit'
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
+        return 'SUBSTR(CAST(%s AS CHAR(2)), 2, 1)' % lhs, lhs_params
+
+
 class UpperBilateralTransform(models.Transform):
     bilateral = True
     lookup_name = 'upper'
@@ -378,6 +386,15 @@ class BilateralTransformTests(TestCase):
             # mult3__div3 always leads to 0
             self.assertSequenceEqual(baseqs.filter(age__mult3__div3=42), [a1, a2, a3, a4])
             self.assertSequenceEqual(baseqs.filter(age__div3__mult3=42), [a3])
+
+    def test_transform_order_by(self):
+        with register_lookup(models.IntegerField, LastDigitTransform):
+            a1 = Author.objects.create(name='a1', age=11)
+            a2 = Author.objects.create(name='a2', age=23)
+            a3 = Author.objects.create(name='a3', age=32)
+            a4 = Author.objects.create(name='a4', age=40)
+            qs = Author.objects.order_by('age__lastdigit')
+            self.assertSequenceEqual(qs, [a4, a1, a3, a2])
 
     def test_bilateral_fexpr(self):
         with register_lookup(models.IntegerField, Mult3BilateralTransform):

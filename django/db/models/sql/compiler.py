@@ -451,7 +451,7 @@ class SQLCompiler:
                     raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
-                distinct_fields = self.get_distinct()
+                distinct_fields, distinct_params = self.get_distinct()
                 # This must come after 'select', 'ordering', and 'distinct'
                 # (see docstring of get_from_clause() for details).
                 from_, f_params = self.get_from_clause()
@@ -461,7 +461,12 @@ class SQLCompiler:
                 params = []
 
                 if self.query.distinct:
-                    result.append(self.connection.ops.distinct_sql(distinct_fields))
+                    distinct_result, distinct_params = self.connection.ops.distinct_sql(
+                        distinct_fields,
+                        distinct_params,
+                    )
+                    result += distinct_result
+                    params += distinct_params
 
                 out_cols = []
                 col_idx = 1
@@ -621,21 +626,22 @@ class SQLCompiler:
         This method can alter the tables in the query, and thus it must be
         called before get_from_clause().
         """
-        qn = self.quote_name_unless_alias
-        qn2 = self.connection.ops.quote_name
         result = []
+        params = []
         opts = self.query.get_meta()
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
-            _, targets, alias, joins, path, _ = self._setup_joins(parts, opts, None)
+            _, targets, alias, joins, path, _, transform_function = self._setup_joins(parts, opts, None)
             targets, alias, _ = self.query.trim_joins(targets, joins, path)
             for target in targets:
                 if name in self.query.annotation_select:
                     result.append(name)
                 else:
-                    result.append("%s.%s" % (qn(alias), qn2(target.column)))
-        return result
+                    r, p = self.compile(transform_function(target, alias))
+                    result.append(r)
+                    params.append(p)
+        return result, params
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
                            already_seen=None):
@@ -647,7 +653,7 @@ class SQLCompiler:
         name, order = get_order_dir(name, default_order)
         descending = order == 'DESC'
         pieces = name.split(LOOKUP_SEP)
-        field, targets, alias, joins, path, opts = self._setup_joins(pieces, opts, alias)
+        field, targets, alias, joins, path, opts, transform_function = self._setup_joins(pieces, opts, alias)
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name
@@ -666,7 +672,7 @@ class SQLCompiler:
                                                        order, already_seen))
             return results
         targets, alias, _ = self.query.trim_joins(targets, joins, path)
-        return [(OrderBy(t.get_col(alias), descending=descending), False) for t in targets]
+        return [(OrderBy(transform_function(t, alias), descending=descending), False) for t in targets]
 
     def _setup_joins(self, pieces, opts, alias):
         """
@@ -677,10 +683,9 @@ class SQLCompiler:
         match. Executing SQL where this is not true is an error.
         """
         alias = alias or self.query.get_initial_alias()
-        field, targets, opts, joins, path = self.query.setup_joins(
-            pieces, opts, alias)
+        field, targets, opts, joins, path, transform_function = self.query.setup_joins(pieces, opts, alias)
         alias = joins[-1]
-        return field, targets, alias, joins, path, opts
+        return field, targets, alias, joins, path, opts, transform_function
 
     def get_from_clause(self):
         """
@@ -786,7 +791,7 @@ class SQLCompiler:
             }
             related_klass_infos.append(klass_info)
             select_fields = []
-            _, _, _, joins, _ = self.query.setup_joins(
+            _, _, _, joins, _, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
             columns = self.get_default_columns(start_alias=alias, opts=f.remote_field.model._meta)
@@ -843,7 +848,7 @@ class SQLCompiler:
                     break
                 if name in self.query._filtered_relations:
                     fields_found.add(name)
-                    f, _, join_opts, joins, _ = self.query.setup_joins([name], opts, root_alias)
+                    f, _, join_opts, joins, _, _ = self.query.setup_joins([name], opts, root_alias)
                     model = join_opts.model
                     alias = joins[-1]
                     from_parent = issubclass(model, opts.model) and model is not opts.model

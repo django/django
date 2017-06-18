@@ -535,6 +535,19 @@ The ``values()`` method also takes optional keyword arguments,
     >>> Blog.objects.values(lower_name=Lower('name'))
     <QuerySet [{'lower_name': 'beatles blog'}]>
 
+You can use built-in and :doc:`custom lookups </howto/custom-lookups>` in
+ordering. For example::
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Lower
+    >>> CharField.register_lookup(Lower, 'lower')
+    >>> Blog.objects.values('name__lower')
+    <QuerySet [{'name__lower': 'beatles blog'}]>
+
+.. versionchanged:: 2.1
+
+    Support for lookups was added.
+
 An aggregate within a ``values()`` clause is applied before other arguments
 within the same ``values()`` clause. If you need to group by another value,
 add it to an earlier ``values()`` clause instead. For example::
@@ -579,6 +592,25 @@ A few subtleties that are worth mentioning:
 
 * Calling :meth:`only()` and :meth:`defer()` after ``values()`` doesn't make
   sense, so doing so will raise a ``NotImplementedError``.
+
+* Combining transforms and aggregates requires the use of two :meth:`annotate`
+  calls, either explicitly or as keyword arguments to :meth:`values`. As above,
+  if the transform has been registered on the relevant field type the first
+  :meth:`annotate` can be omitted, thus the following examples are equivalent::
+
+    >>> from django.db.models import CharField, Count
+    >>> from django.db.models.functions import Lower
+    >>> CharField.register_lookup(Lower, 'lower')
+    >>> Blog.objects.values('entry__authors__name__lower').annotate(entries=Count('entry'))
+    <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
+    >>> Blog.objects.values(
+    ...     entry__authors__name__lower=Lower('entry__authors__name')
+    ... ).annotate(entries=Count('entry'))
+    <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
+    >>> Blog.objects.annotate(
+    ...     entry__authors__name__lower=Lower('entry__authors__name')
+    ... ).values('entry__authors__name__lower').annotate(entries=Count('entry'))
+    <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
 
 It is useful when you know you're only going to need values from a small number
 of the available fields and you won't need the functionality of a model
