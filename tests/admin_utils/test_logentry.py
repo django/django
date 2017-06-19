@@ -67,6 +67,11 @@ class LogEntryTests(TestCase):
         with translation.override('fr'):
             self.assertEqual(logentry.get_change_message(), 'Ajout.')
 
+    def test_logentry_change_message_not_json(self):
+        """LogEntry.change_message was a string before Django 1.10."""
+        logentry = LogEntry(change_message='non-JSON string')
+        self.assertEqual(logentry.get_change_message(), logentry.change_message)
+
     @override_settings(USE_L10N=True)
     def test_logentry_change_message_localized_datetime_input(self):
         """
@@ -176,6 +181,10 @@ class LogEntryTests(TestCase):
         # Make sure custom action_flags works
         log_entry.action_flag = 4
         self.assertEqual(str(log_entry), 'LogEntry Object')
+
+    def test_logentry_repr(self):
+        logentry = LogEntry.objects.first()
+        self.assertEqual(repr(logentry), str(logentry.action_time))
 
     def test_log_action(self):
         content_type_pk = ContentType.objects.get_for_model(Article).pk
