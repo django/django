@@ -443,7 +443,7 @@ class RedirectViewTest(SimpleTestCase):
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_when_meta_contains_no_query_string(self):
-        "regression for #16705"
+        """(#16705)."""
         # we can't use self.rf.get because it always sets QUERY_STRING
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 302)
@@ -481,7 +481,7 @@ class GetContextDataTest(unittest.TestCase):
         self.assertEqual(context['pony'], test_view.object)
 
     def test_object_in_get_context_data(self):
-        # Checks 'object' key presence in dict returned by get_context_date #20234
+        # Checks 'object' key presence in dict returned by get_context_date (#20234).
         test_view = views.CustomSingleObjectView()
         context = test_view.get_context_data()
         self.assertEqual(context['object'], test_view.object)

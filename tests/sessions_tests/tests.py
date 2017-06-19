@@ -325,7 +325,7 @@ class SessionTestsMixin:
         with override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer'):
             self.session = self.backend()  # reinitialize after overriding settings
 
-            # Regression test for #19200
+            # (#19200).
             old_session_key = None
             new_session_key = None
             try:

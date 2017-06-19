@@ -86,8 +86,7 @@ class SwallowOneToOne(models.Model):
 
 class UnorderedObject(models.Model):
     """
-    Model without any defined `Meta.ordering`.
-    Refs #17198.
+    Model without any defined `Meta.ordering` (#17198).
     """
     bool = models.BooleanField(default=True)
 
@@ -99,8 +98,7 @@ class OrderedObjectManager(models.Manager):
 
 class OrderedObject(models.Model):
     """
-    Model with Manager that defines a default order.
-    Refs #17198.
+    Model with Manager that defines a default order (#17198).
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)

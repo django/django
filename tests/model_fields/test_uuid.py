@@ -153,7 +153,7 @@ class TestAsPrimaryKey(TestCase):
         self.assertEqual(related.uuid_fk.pk, related.uuid_fk_id)
 
     def test_update_with_related_model_instance(self):
-        # regression for #24611
+        # (#24611).
         u1 = PrimaryKeyUUIDModel.objects.create()
         u2 = PrimaryKeyUUIDModel.objects.create()
         r = RelatedToUUIDModel.objects.create(uuid_fk=u1)

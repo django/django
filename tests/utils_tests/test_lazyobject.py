@@ -407,7 +407,7 @@ class BazProxy(Baz):
 
 class SimpleLazyObjectPickleTestCase(TestCase):
     """
-    Regression test for pickling a SimpleLazyObject wrapping a model (#25389).
+    Pickling a SimpleLazyObject wrapping a model (#25389).
     Also covers other classes with a custom __reduce__ method.
     """
     def test_pickle_with_reduce(self):

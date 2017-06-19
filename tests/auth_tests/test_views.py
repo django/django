@@ -527,8 +527,8 @@ class ChangePasswordTest(AuthViewsTestCase):
 class SessionAuthenticationTests(AuthViewsTestCase):
     def test_user_password_change_updates_session(self):
         """
-        #21649 - Ensure contrib.auth.views.password_change updates the user's
-        session auth hash after a password change so the session isn't logged out.
+        contrib.auth.views.password_change updates the user's session auth
+        hash after a password change so the session isn't logged out (#21649).
         """
         self.login()
         original_session_key = self.client.session.session_key
@@ -672,9 +672,8 @@ class LoginTest(AuthViewsTestCase):
 
     def test_session_key_flushed_on_login(self):
         """
-        To avoid reusing another user's session, ensure a new, empty session is
-        created if the existing session corresponds to a different authenticated
-        user.
+        A new, empty session is created if the existing session corresponds to a different authenticated
+        user to avoid reusing another user's session.
         """
         self.login()
         original_session_key = self.client.session.session_key

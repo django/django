@@ -58,7 +58,7 @@ class URLTestCaseBase(SimpleTestCase):
 
 class URLPrefixTests(URLTestCaseBase):
     """
-    Tests if the `i18n_patterns` is adding the prefix correctly.
+    The `i18n_patterns` are adding the prefix correctly.
     """
     def test_not_prefixed(self):
         with translation.override('en'):
@@ -121,7 +121,7 @@ class PathUnusedTests(URLTestCaseBase):
 
 class URLTranslationTests(URLTestCaseBase):
     """
-    Tests if the pattern-strings are translated correctly (within the
+    The pattern-strings are translated correctly (within the
     `i18n_patterns` and the normal `patterns` function).
     """
     def test_no_prefix_translated(self):
@@ -163,7 +163,7 @@ class URLTranslationTests(URLTestCaseBase):
 
 class URLNamespaceTests(URLTestCaseBase):
     """
-    Tests if the translations are still working within namespaces.
+    The translations are still working within namespaces.
     """
     def test_account_register(self):
         with translation.override('en'):
@@ -175,7 +175,7 @@ class URLNamespaceTests(URLTestCaseBase):
 
 class URLRedirectTests(URLTestCaseBase):
     """
-    Tests if the user gets redirected to the right URL when there is no
+    The user gets redirected to the right URL when there is no
     language-prefix in the request URL.
     """
     def test_no_prefix_response(self):
@@ -289,7 +289,7 @@ class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
 
 class URLResponseTests(URLTestCaseBase):
     """
-    Tests if the response has the right language-code.
+    The response has the right language-code.
     """
     def test_not_prefixed_with_prefix(self):
         response = self.client.get('/en/not-prefixed/')
@@ -324,7 +324,7 @@ class URLResponseTests(URLTestCaseBase):
 
 class URLRedirectWithScriptAliasTests(URLTestCaseBase):
     """
-    #21579 - LocaleMiddleware should respect the script prefix.
+    LocaleMiddleware should respect the script prefix (#21579).
     """
     def test_language_prefix_with_script_prefix(self):
         prefix = '/script_prefix'
@@ -335,7 +335,7 @@ class URLRedirectWithScriptAliasTests(URLTestCaseBase):
 
 class URLTagTests(URLTestCaseBase):
     """
-    Test if the language tag works.
+    The language tag works.
     """
     def test_strings_only(self):
         t = Template("""{% load i18n %}

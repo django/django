@@ -101,7 +101,7 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context['latest']), list(Book.objects.all()[10:20]))
 
     def test_paginated_archive_view_does_not_load_entire_table(self):
-        # Regression test for #18087
+        # (#18087).
         _make_books(20, base_date=datetime.date.today())
         # 1 query for years list + 1 query for books
         with self.assertNumQueries(2):
@@ -111,7 +111,7 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
             self.client.get('/dates/books/paginated/')
 
     def test_no_duplicate_query(self):
-        # Regression test for #18354
+        # (#18354).
         with self.assertNumQueries(2):
             self.client.get('/dates/books/reverse/')
 
@@ -248,7 +248,7 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_no_duplicate_query(self):
-        # Regression test for #18354
+        # (#18354).
         with self.assertNumQueries(4):
             self.client.get('/dates/books/2008/reverse/')
 
@@ -484,7 +484,7 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_week_start_Monday(self):
-        # Regression for #14752
+        # (#14752).
         res = self.client.get('/dates/books/2008/week/39/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 28))

@@ -871,7 +871,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_input(self):
         """
-        Tests if form input is correctly localized
+        Form input is correctly localized
         """
         self.maxDiff = 1200
         with translation.override('de-at', deactivate=True):
@@ -1018,7 +1018,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_as_text_as_hidden_input(self):
         """
-        Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
+        Form input with 'as_hidden' or 'as_text' is correctly localized (#18777).
         """
         self.maxDiff = 1200
 
@@ -1193,9 +1193,8 @@ class MiscTests(SimpleTestCase):
         language codes will be removed in Django 1.9, these will be incorrectly
         matched. For example zh-tw (traditional) will be interpreted as zh-hans
         (simplified), which is wrong. So we should also accept these deprecated
-        language codes.
-
-        refs #18419 -- this is explicitly for browser compatibility
+        language codes (#18419).
+        This is explicitly for browser compatibility
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1419,7 +1418,7 @@ class TestLanguageInfo(SimpleTestCase):
 class LocaleMiddlewareTests(TestCase):
 
     def test_streaming_response(self):
-        # Regression test for #5241
+        # (#5241).
         response = self.client.get('/fr/streaming/')
         self.assertContains(response, "Oui/Non")
         response = self.client.get('/en/streaming/')
@@ -1529,7 +1528,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language('de-DE.utf-8'))
 
     def test_get_language_from_request(self):
-        # issue 19919
+        # (#19919).
         r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.8,bg;q=0.6,ru;q=0.4'}
@@ -1542,7 +1541,7 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertEqual('bg', lang)
 
     def test_specific_language_codes(self):
-        # issue 11915
+        # (#11915).
         r = self.rf.get('/')
         r.COOKIES = {}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt,en-US;q=0.8,en;q=0.6,ru;q=0.4'}
@@ -1569,10 +1568,10 @@ class TranslationFilesMissing(SimpleTestCase):
         gettext_module.find = lambda *args, **kw: None
 
     def test_failure_finding_default_mo_files(self):
-        '''
-        Ensure IOError is raised if the default language is unparseable.
-        Refs: #18192
-        '''
+        """
+        IOError is raised if the default
+        language is unparseable (#18192)
+        """
         self.patchGettextFind()
         trans_real._translations = {}
         with self.assertRaises(IOError):

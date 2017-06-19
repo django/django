@@ -306,8 +306,8 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_custom_user(self):
         """
-        Regression test for #22325 - references to a custom user model defined in the
-        same app are not resolved correctly.
+        References to a custom user model defined in the
+        same app are not resolved correctly (#22325).
         """
         executor = MigrationExecutor(connection)
         self.assertTableNotExists("migrations_author")

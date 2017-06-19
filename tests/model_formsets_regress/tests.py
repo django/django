@@ -15,7 +15,9 @@ from .models import (
 
 class InlineFormsetTests(TestCase):
     def test_formset_over_to_field(self):
-        "A formset over a ForeignKey with a to_field can be saved. Regression for #10243"
+        """
+        A formset over a ForeignKey with a to_field can be saved (#10243).
+        """
         Form = modelform_factory(User, fields="__all__")
         FormSet = inlineformset_factory(User, UserSite, fields="__all__")
 
@@ -91,7 +93,9 @@ class InlineFormsetTests(TestCase):
             self.fail('Errors found on formset:%s' % form_set.errors)
 
     def test_formset_over_inherited_model(self):
-        "A formset over a ForeignKey with a to_field can be saved. Regression for #11120"
+        """
+        A formset over a ForeignKey with a to_field can be saved (#11120).
+        """
         Form = modelform_factory(Restaurant, fields="__all__")
         FormSet = inlineformset_factory(Restaurant, Manager, fields="__all__")
 
@@ -189,7 +193,9 @@ class InlineFormsetTests(TestCase):
         self.assertEqual(formset[0].instance.profile_id, 1)
 
     def test_formset_with_none_instance(self):
-        "A formset with instance=None can be created. Regression for #11872"
+        """
+        A formset with instance=None can be created (#11872).
+        """
         Form = modelform_factory(User, fields="__all__")
         FormSet = inlineformset_factory(User, UserSite, fields="__all__")
 
@@ -211,9 +217,7 @@ class InlineFormsetTests(TestCase):
 
     def test_save_as_new_with_new_inlines(self):
         """
-        Existing and new inlines are saved with save_as_new.
-
-        Regression for #14938.
+        Existing and new inlines are saved with save_as_new (#14938).
         """
         efnet = Network.objects.create(name="EFNet")
         host1 = Host.objects.create(hostname="irc.he.net", network=efnet)
@@ -324,9 +328,9 @@ class Callback:
 
 class FormfieldCallbackTests(TestCase):
     """
-    Regression for #13095 and #17683: Using base forms with widgets
+    Using base forms with widgets
     defined in Meta should not raise errors and BaseModelForm should respect
-    the specified pk widget.
+    the specified pk widget (#13095, #17683).
     """
 
     def test_inlineformset_factory_default(self):
@@ -386,7 +390,7 @@ class BaseCustomDeleteFormSet(BaseFormSet):
 
 class FormfieldShouldDeleteFormTests(TestCase):
     """
-    Regression for #14099: BaseModelFormSet should use ModelFormSet method _should_delete_form
+    BaseModelFormSet should use ModelFormSet method _should_delete_form (#14099).
     """
 
     class BaseCustomDeleteModelFormSet(BaseModelFormSet, BaseCustomDeleteFormSet):

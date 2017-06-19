@@ -221,7 +221,7 @@ class QueryDictTests(SimpleTestCase):
         self.assertEqual(q, q1)
 
     def test_update_from_querydict(self):
-        """Regression test for #8278: QueryDict.update(QueryDict)"""
+        """QueryDict.update(QueryDict) (#8278)."""
         x = QueryDict("a=1&a=2", mutable=True)
         y = QueryDict("a=3&a=4")
         x.update(y)
@@ -400,7 +400,7 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.content, b'helloworld!')
 
     def test_iterator_isnt_rewound(self):
-        # Regression test for #13222
+        # (#13222).
         r = HttpResponse('abc')
         i = iter(r)
         self.assertEqual(list(i), [b'abc'])

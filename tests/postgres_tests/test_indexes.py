@@ -82,7 +82,7 @@ class SchemaTests(PostgreSQLTestCase):
             return connection.introspection.get_constraints(cursor, table)
 
     def test_gin_index(self):
-        # Ensure the table is there and doesn't have an index.
+        # The table is there and doesn't have an index.
         self.assertNotIn('field', self.get_constraints(IntegerArrayModel._meta.db_table))
         # Add the index
         index_name = 'integer_array_model_field_gin'

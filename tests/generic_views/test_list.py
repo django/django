@@ -204,7 +204,7 @@ class ListViewTests(TestCase):
             self.client.get('/list/authors/invalid/')
 
     def test_paginated_list_view_does_not_load_entire_table(self):
-        # Regression test for #17535
+        # (#17535).
         self._make_authors(3)
         # 1 query for authors
         with self.assertNumQueries(1):

@@ -11,15 +11,13 @@ class SelectRelatedRegressTests(TestCase):
 
     def test_regression_7110(self):
         """
-        Regression test for bug #7110.
-
         When using select_related(), we must query the
         Device and Building tables using two different aliases (each) in order to
         differentiate the start and end Connection fields. The net result is that
         both the "connections = ..." queries here should give the same results
         without pulling in more than the absolute minimum number of tables
         (history has shown that it's easy to make a mistake in the implementation
-        and include some unnecessary bonus joins).
+        and include some unnecessary bonus joins) (#7110).
         """
 
         b = Building.objects.create(name='101')
@@ -55,11 +53,9 @@ class SelectRelatedRegressTests(TestCase):
 
     def test_regression_8106(self):
         """
-        Regression test for bug #8106.
-
         Same sort of problem as the previous test, but this time there are
         more extra tables to pull in as part of the select_related() and some
-        of them could potentially clash (so need to be kept separate).
+        of them could potentially clash (so need to be kept separate) (#8106).
         """
 
         us = TUser.objects.create(name="std")
@@ -77,12 +73,10 @@ class SelectRelatedRegressTests(TestCase):
 
     def test_regression_8036(self):
         """
-        Regression test for bug #8036
-
-        the first related model in the tests below
+        The first related model in the tests below
         ("state") is empty and we try to select the more remotely related
         state__country. The regression here was not skipping the empty column results
-        for country before getting status.
+        for country before getting status (#8036).
         """
 
         Country.objects.create(name='Australia')
@@ -110,10 +104,8 @@ class SelectRelatedRegressTests(TestCase):
 
     def test_regression_12851(self):
         """
-        Regression for #12851
-
         Deferred fields are used correctly if you select_related a subset
-        of fields.
+        of fields (#12851).
         """
         australia = Country.objects.create(name='Australia')
         active = ClientStatus.objects.create(name='active')

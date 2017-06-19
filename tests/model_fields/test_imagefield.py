@@ -108,9 +108,9 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_equal_notequal_hash(self):
         """
-        Bug #9786: Ensure '==' and '!=' work correctly.
-        Bug #9508: make sure hash() works as expected (equal items must
-        hash to the same value).
+        '==' and '!=' work correctly (#9786).
+        hash() works as expected (equal items must
+        hash to the same value) (#9508).
         """
         # Create two Persons with different mugshots.
         p1 = self.PersonModel(name="Joe")

@@ -469,11 +469,12 @@ class TestInlineMedia(TestDataMixin, TestCase):
 class TestInlineAdminForm(TestCase):
 
     def test_immutable_content_type(self):
-        """Regression for #9362
+        """
         The problem depends only on InlineAdminForm and its "original"
         argument, so we can safely set the other arguments to None/{}. We just
         need to check that the content_type argument of Child isn't altered by
-        the internals of the inline form."""
+        the internals of the inline form (#9362).
+        """
 
         sally = Teacher.objects.create(name='Sally')
         john = Parent.objects.create(name='John')
@@ -518,7 +519,7 @@ class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
 class TestInlinePermissions(TestCase):
     """
     Make sure the admin respects permissions for objects that are edited
-    inline. Refs #8060.
+    inline (#8060).
     """
 
     def setUp(self):

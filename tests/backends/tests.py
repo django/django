@@ -271,9 +271,7 @@ class PostgreSQLTests(TestCase):
             new_connection.close()
 
     def test_connect_isolation_level(self):
-        """
-        Regression test for #18130 and #24318.
-        """
+        """(#18130, #24318)."""
         import psycopg2
         from psycopg2.extensions import (
             ISOLATION_LEVEL_READ_COMMITTED as read_committed,
@@ -415,7 +413,9 @@ class LastExecutedQueryTest(TestCase):
 class ParameterHandlingTest(TestCase):
 
     def test_bad_parameter_count(self):
-        "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
+        """
+        An executemany call with too many/not enough parameters will raise an exception (#12612).
+        """
         cursor = connection.cursor()
         query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
             connection.introspection.table_name_converter('backends_square'),
@@ -429,16 +429,17 @@ class ParameterHandlingTest(TestCase):
 
 
 class LongNameTest(TransactionTestCase):
-    """Long primary keys and model names can result in a sequence name
+    """
+    Long primary keys and model names can result in a sequence name
     that exceeds the database limits, which will result in truncation
     on certain databases (e.g., Postgres). The backend needs to use
     the correct sequence name in last_insert_id and other places, so
-    check it is. Refs #8901.
+    check it is (#8901).
     """
     available_apps = ['backends']
 
     def test_sequence_name_length_limits_create(self):
-        """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
+        """Creation of model with long name and long pk name doesn't error (#8901)."""
         VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
     def test_sequence_name_length_limits_m2m(self):
@@ -580,7 +581,7 @@ class BackendTestCase(TransactionTestCase):
             cursor.execute(query, args)
 
     def test_cursor_executemany(self):
-        # Test cursor.executemany #4896
+        # Test cursor.executemany (#4896).
         args = [(i, i ** 2) for i in range(-5, 6)]
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 11)
@@ -589,13 +590,13 @@ class BackendTestCase(TransactionTestCase):
             self.assertEqual(square.square, i ** 2)
 
     def test_cursor_executemany_with_empty_params_list(self):
-        # Test executemany with params=[] does nothing #4765
+        # Test executemany with params=[] does nothing (#4765).
         args = []
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 0)
 
     def test_cursor_executemany_with_iterator(self):
-        # Test executemany accepts iterators #10320
+        # Test executemany accepts iterators (#10320).
         args = iter((i, i ** 2) for i in range(-3, 2))
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 5)
@@ -608,14 +609,14 @@ class BackendTestCase(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_execute_with_pyformat(self):
-        # Support pyformat style passing of parameters #10070
+        # Support pyformat style passing of parameters (#10070).
         args = {'root': 3, 'square': 9}
         self.create_squares(args, 'pyformat', multiple=False)
         self.assertEqual(Square.objects.count(), 1)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat(self):
-        # Support pyformat style passing of parameters #10070
+        # Support pyformat style passing of parameters (#10070).
         args = [{'root': i, 'square': i ** 2} for i in range(-5, 6)]
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(Square.objects.count(), 11)
@@ -636,7 +637,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertEqual(Square.objects.count(), 9)
 
     def test_unicode_fetches(self):
-        # fetchone, fetchmany, fetchall return strings as unicode objects #6254
+        # fetchone, fetchmany, fetchall return strings as unicode objects (#6254).
         qn = connection.ops.quote_name
         Person(first_name="John", last_name="Doe").save()
         Person(first_name="Jane", last_name="Doe").save()
@@ -679,8 +680,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_database_operations_init(self):
         """
-        DatabaseOperations initialization doesn't query the database.
-        See #17656.
+        DatabaseOperations initialization doesn't query the database (#17656).
         """
         with self.assertNumQueries(0):
             connection.ops.__class__(connection)
@@ -833,7 +833,7 @@ class FkConstraintsTests(TransactionTestCase):
         else:
             self.skipTest("This backend does not support integrity checks.")
         # Now that we know this backend supports integrity checks we make sure
-        # constraints are also enforced for proxy  Refs #17519
+        # constraints are also enforced for proxy (#17519).
         a2 = Article(
             headline='This is another test', reporter=self.r,
             pub_date=datetime.datetime(2012, 8, 3),
@@ -859,7 +859,7 @@ class FkConstraintsTests(TransactionTestCase):
         else:
             self.skipTest("This backend does not support integrity checks.")
         # Now that we know this backend supports integrity checks we make sure
-        # constraints are also enforced for proxy  Refs #17519
+        # constraints are also enforced for proxy (#17519).
         # Create another article
         r_proxy = ReporterProxy.objects.get(pk=self.r.pk)
         Article.objects.create(

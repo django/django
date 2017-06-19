@@ -156,7 +156,7 @@ class DataSourceTest(unittest.TestCase):
 
     def test03c_layer_references(self):
         """
-        Ensure OGR objects keep references to the objects they belong to.
+        OGR objects keep references to the objects they belong to.
         """
         source = ds_list[0]
 
@@ -173,7 +173,7 @@ class DataSourceTest(unittest.TestCase):
         self.assertEqual(source.nfeat, len(lyr))
         self.assertEqual(source.gtype, lyr.geom_type.num)
 
-        # Same issue for Feature/Field objects, see #18640
+        # Same issue for Feature/Field objects (#18640).
         self.assertEqual(str(lyr[0]['str']), "1")
 
     def test04_features(self):

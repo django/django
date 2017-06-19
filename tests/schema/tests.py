@@ -39,7 +39,7 @@ from .models import (
 
 class SchemaTests(TransactionTestCase):
     """
-    Tests for the schema-alteration code.
+    Schema-alteration code.
 
     Be aware that these tests are more liable than most to false results,
     as sometimes the code to check if a test has worked is almost as complex
@@ -357,7 +357,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field(self):
         """
-        Tests adding fields to models
+        Adding fields to models
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -381,7 +381,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field_temp_default(self):
         """
-        Tests adding fields to models with a temporary default
+        Adding fields to models with a temporary default
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -405,7 +405,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field_temp_default_boolean(self):
         """
-        Tests adding fields to models with a temporary default where
+        Adding fields to models with a temporary default where
         the default is False. (#21783)
         """
         # Create the table
@@ -433,8 +433,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field_default_transform(self):
         """
-        Tests adding fields to models with a default that is not directly
-        valid in the database (#22581)
+        Adding fields to models with a default that is not directly
+        valid in the database (#22581).
         """
 
         class TestTransformField(IntegerField):
@@ -468,7 +468,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field_binary(self):
         """
-        Tests binary fields get a sane default (#22851)
+        Binary fields get a sane default (#22851).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -487,7 +487,7 @@ class SchemaTests(TransactionTestCase):
     @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific")
     def test_add_binaryfield_mediumblob(self):
         """
-        Test adding a custom-sized binary field on MySQL (#24846).
+        Adding a custom-sized binary field on MySQL (#24846).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -503,7 +503,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter(self):
         """
-        Tests simple altering of fields
+        Simple altering of fields
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -557,7 +557,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, old_field, new_field, strict=True)
 
     def test_alter_text_field(self):
-        # Regression for "BLOB/TEXT column 'info' can't have a default value")
+        # "BLOB/TEXT column 'info' can't have a default value")
         # on MySQL.
         # Create the table
         with connection.schema_editor() as editor:
@@ -571,8 +571,8 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('can_defer_constraint_checks', 'can_rollback_ddl')
     def test_alter_fk_checks_deferred_constraints(self):
         """
-        #25492 - Altering a foreign key's structure and data in the same
-        transaction.
+        Altering a foreign key's structure and data in the same
+        transaction (#25492).
         """
         with connection.schema_editor() as editor:
             editor.create_model(Node)
@@ -587,7 +587,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_text_field_to_date_field(self):
         """
-        #25002 - Test conversion of text field to date field.
+        Conversion of text field to date field (#25002).
         """
         with connection.schema_editor() as editor:
             editor.create_model(Note)
@@ -603,7 +603,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_text_field_to_datetime_field(self):
         """
-        #25002 - Test conversion of text field to datetime field.
+        Conversion of text field to datetime field (#25002).
         """
         with connection.schema_editor() as editor:
             editor.create_model(Note)
@@ -619,7 +619,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_text_field_to_time_field(self):
         """
-        #25002 - Test conversion of text field to time field.
+        Conversion of text field to time field (#25002).
         """
         with connection.schema_editor() as editor:
             editor.create_model(Note)
@@ -668,7 +668,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_null_to_not_null(self):
         """
-        #23609 - Tests handling of default values when altering from NULL to NOT NULL.
+        Handling of default values when altering from NULL to NOT NULL (#23609).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -697,8 +697,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_charfield_to_null(self):
         """
-        #24307 - Should skip an alter statement on databases with
-        interprets_empty_strings_as_null when changing a CharField to null.
+        Should skip an alter statement on databases with
+        interprets_empty_strings_as_null when changing a CharField to null (#24307).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -712,8 +712,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_alter_textfield_to_null(self):
         """
-        #24307 - Should skip an alter statement on databases with
-        interprets_empty_strings_as_null when changing a TextField to null.
+        Should skip an alter statement on databases with
+        interprets_empty_strings_as_null when changing a TextField to null (#24307).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -728,8 +728,8 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_combined_alters')
     def test_alter_null_to_not_null_keeping_default(self):
         """
-        #23738 - Can change a nullable field with default to non-nullable
-        with the same default.
+        Can change a nullable field with default to non-nullable
+        with the same default (#23738).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -750,7 +750,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_fk(self):
         """
-        Tests altering of FKs
+        Altering of FKs
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -774,7 +774,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_to_fk(self):
         """
-        #24447 - Tests adding a FK constraint for an existing column
+        Adding a FK constraint for an existing column (#24447).
         """
         class LocalBook(Model):
             author = IntegerField()
@@ -806,7 +806,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_o2o_to_fk(self):
         """
-        #24163 - Tests altering of OneToOneField to ForeignKey
+        Altering of OneToOneField to ForeignKey (#24163).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -839,7 +839,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_fk_to_o2o(self):
         """
-        #24163 - Tests altering of ForeignKey to OneToOneField
+        Altering of ForeignKey to OneToOneField (#24163).
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1084,7 +1084,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_rename(self):
         """
-        Tests simple altering of fields
+        Simple altering of fields
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1126,7 +1126,7 @@ class SchemaTests(TransactionTestCase):
 
     def _test_m2m_create(self, M2MFieldClass):
         """
-        Tests M2M fields on models during creation
+        M2M fields on models during creation
         """
         class LocalBookWithM2M(Model):
             author = ForeignKey(Author, CASCADE)
@@ -1158,7 +1158,7 @@ class SchemaTests(TransactionTestCase):
 
     def _test_m2m_create_through(self, M2MFieldClass):
         """
-        Tests M2M fields on models during creation with through models
+        M2M fields on models during creation with through models
         """
         class LocalTagThrough(Model):
             book = ForeignKey("schema.LocalBookWithM2MThrough", CASCADE)
@@ -1255,7 +1255,7 @@ class SchemaTests(TransactionTestCase):
 
     def _test_m2m_through_alter(self, M2MFieldClass):
         """
-        Tests altering M2Ms with explicit through models (should no-op)
+        Altering M2Ms with explicit through models (should no-op)
         """
         class LocalAuthorTag(Model):
             author = ForeignKey("schema.LocalAuthorWithM2MThrough", CASCADE)
@@ -1302,7 +1302,7 @@ class SchemaTests(TransactionTestCase):
 
     def _test_m2m_repoint(self, M2MFieldClass):
         """
-        Tests repointing M2M fields
+        Repointing M2M fields
         """
         class LocalBookWithM2M(Model):
             author = ForeignKey(Author, CASCADE)
@@ -1356,7 +1356,7 @@ class SchemaTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_column_check_constraints')
     def test_check_constraints(self):
         """
-        Tests creating/deleting CHECK constraints
+        Creating/deleting CHECK constraints
         """
         # Create the tables
         with connection.schema_editor() as editor:
@@ -1391,7 +1391,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_unique(self):
         """
-        Tests removing and adding unique constraints to a single column.
+        Removing and adding unique constraints to a single column.
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1434,7 +1434,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_unique_together(self):
         """
-        Tests removing and adding unique_together constraints on a model.
+        Removing and adding unique_together constraints on a model.
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1466,7 +1466,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_unique_together_with_fk(self):
         """
-        Tests removing and adding unique_together constraints that include
+        Removing and adding unique_together constraints that include
         a foreign key.
         """
         # Create the table
@@ -1484,7 +1484,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_unique_together_with_fk_with_existing_index(self):
         """
-        Tests removing and adding unique_together constraints that include
+        Removing and adding unique_together constraints that include
         a foreign key, where the foreign key is added after the model is
         created.
         """
@@ -1506,7 +1506,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_index_together(self):
         """
-        Tests removing and adding index_together constraints on a model.
+        Removing and adding index_together constraints on a model.
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1549,7 +1549,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_index_together_with_fk(self):
         """
-        Tests removing and adding index_together constraints that include
+        Removing and adding index_together constraints that include
         a foreign key.
         """
         # Create the table
@@ -1567,7 +1567,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_create_index_together(self):
         """
-        Tests creating models with index_together already defined
+        Creating models with index_together already defined
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1584,7 +1584,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_db_table(self):
         """
-        Tests renaming of the table
+        Renaming of the table
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1609,7 +1609,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_remove_index(self):
         """
-        Tests index addition and removal
+        Index addition and removal
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1692,7 +1692,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_indexes(self):
         """
-        Tests creation/altering of indexes
+        Creation/altering of indexes
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1750,7 +1750,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_primary_key(self):
         """
-        Tests altering of the primary key
+        Altering of the primary key
         """
         # Create the table
         with connection.schema_editor() as editor:
@@ -1775,7 +1775,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_context_manager_exit(self):
         """
-        Ensures transaction is correctly closed when an error occurs
+        Transaction is correctly closed when an error occurs
         inside a SchemaEditor context.
         """
         class SomeError(Exception):
@@ -1798,10 +1798,7 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_foreign_key_index_long_names_regression(self):
-        """
-        Regression test for #21497.
-        Only affects databases that supports foreign keys.
-        """
+        """Only affects databases that supports foreign keys (#21497)."""
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(AuthorWithEvenLongerName)
@@ -1817,9 +1814,7 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_add_foreign_key_long_names(self):
-        """
-        Regression test for #23009.
-        Only affects databases that supports foreign keys.
+        """Only affects databases that supports foreign keys (#23009).
         """
         # Create the initial tables
         with connection.schema_editor() as editor:
@@ -1863,7 +1858,7 @@ class SchemaTests(TransactionTestCase):
 
     def test_remove_constraints_capital_letters(self):
         """
-        #23065 - Constraint names must be quoted if they contain capital letters.
+        Constraint names must be quoted if they contain capital letters (#23065).
         """
         def get_field(*args, field_class=IntegerField, **kwargs):
             kwargs['db_column'] = "CamelCase"
@@ -1930,8 +1925,8 @@ class SchemaTests(TransactionTestCase):
 
     def test_add_field_use_effective_default(self):
         """
-        #23987 - effective_default() should be used as the field default when
-        adding a new field.
+        Effective_default() should be used as the field default when
+        adding a new field (#23987).
         """
         # Create the table
         with connection.schema_editor() as editor:

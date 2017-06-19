@@ -1331,7 +1331,7 @@ class ManageRunserver(AdminScriptTestCase):
 
     def test_no_database(self):
         """
-        Ensure runserver.check_migrations doesn't choke on empty DATABASES.
+        runserver.check_migrations doesn't choke on empty DATABASES.
         """
         tested_connections = ConnectionHandler({})
         with mock.patch('django.core.management.base.connections', new=tested_connections):
@@ -1339,7 +1339,7 @@ class ManageRunserver(AdminScriptTestCase):
 
     def test_readonly_database(self):
         """
-        Ensure runserver.check_migrations doesn't choke when a database is read-only
+        runserver.check_migrations doesn't choke when a database is read-only
         (with possibly no django_migrations table).
         """
         with mock.patch.object(
@@ -2213,9 +2213,8 @@ class Dumpdata(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_pks_parsing(self):
-        """Regression for #20509
-
-        Test would raise an exception rather than printing an error message.
+        """
+        Raise an exception rather than printing an error message (#20509).
         """
         args = ['dumpdata', '--pks=1']
         out, err = self.run_manage(args)

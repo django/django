@@ -18,8 +18,7 @@ class NullFkTests(TestCase):
 
         # Starting from comment, make sure that a .select_related(...) with a specified
         # set of fields will properly LEFT JOIN multiple levels of NULLs (and the things
-        # that come after the NULLs, or else data that should exist won't). Regression
-        # test for #7369.
+        # that come after the NULLs, or else data that should exist won't) (#7369).
         c = Comment.objects.select_related().get(id=c1.id)
         self.assertEqual(c.post, p)
         self.assertIsNone(Comment.objects.select_related().get(id=c2.id).post)
@@ -33,7 +32,7 @@ class NullFkTests(TestCase):
             transform=lambda c: (c.id, c.comment_text, repr(c.post))
         )
 
-        # Regression test for #7530, #7716.
+        # (#7530, #7716).
         self.assertIsNone(Comment.objects.select_related('post').filter(post__isnull=True)[0].post)
 
         self.assertQuerysetEqual(
@@ -63,6 +62,6 @@ class NullFkTests(TestCase):
         qs3 = Item.objects.filter(q1) | Item.objects.filter(q2)
         qs4 = Item.objects.filter(q2) | Item.objects.filter(q1)
 
-        # Regression test for #15823.
+        # (#15823).
         self.assertEqual(list(qs1), list(qs2))
         self.assertEqual(list(qs3), list(qs4))

@@ -77,8 +77,10 @@ class DataTypesTestCase(TestCase):
 
     @skipIfDBFeature('supports_timezones')
     def test_error_on_timezone(self):
-        """Regression test for #8354: the MySQL and Oracle backends should raise
-        an error if given a timezone-aware datetime object."""
+        """
+        The MySQL and Oracle backends should raise
+        an error if given a timezone-aware datetime object (#8354).
+        """
         dt = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=utc)
         d = Donut(name='Bear claw', consumed_at=dt)
         # MySQL backend does not support timezone-aware datetimes.
@@ -86,8 +88,10 @@ class DataTypesTestCase(TestCase):
             d.save()
 
     def test_datefield_auto_now_add(self):
-        """Regression test for #10970, auto_now_add for DateField should store
-        a Python datetime.date, not a datetime.datetime"""
+        """
+        Auto_now_add for DateField should store
+        a Python datetime.date, not a datetime.datetime (#10970).
+        """
         b = RumBaba.objects.create()
         # Verify we didn't break DateTimeField behavior
         self.assertIsInstance(b.baked_timestamp, datetime.datetime)

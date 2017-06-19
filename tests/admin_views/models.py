@@ -690,9 +690,9 @@ class PluggableSearchPerson(models.Model):
 
 class PrePopulatedPostLargeSlug(models.Model):
     """
-    Regression test for #15938: a large max_length for the slugfield must not
+    A large max_length for the slugfield must not
     be localized in prepopulated_fields_js.html or it might end up breaking
-    the javascript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000)
+    the javascript (ie, using THOUSAND_SEPARATOR ends up with maxLength=1,000) (#15938).
     """
     title = models.CharField(max_length=100)
     published = models.BooleanField(default=False)
@@ -757,8 +757,7 @@ class RelatedPrepopulated(models.Model):
 
 class UnorderedObject(models.Model):
     """
-    Model without any defined `Meta.ordering`.
-    Refs #16819.
+    Model without any defined `Meta.ordering` (#16819).
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
@@ -766,16 +765,14 @@ class UnorderedObject(models.Model):
 
 class UndeletableObject(models.Model):
     """
-    Model whose show_delete in admin change_view has been disabled
-    Refs #10057.
+    Model whose show_delete in admin change_view has been disabled (#10057).
     """
     name = models.CharField(max_length=255)
 
 
 class UnchangeableObject(models.Model):
     """
-    Model whose change_view is disabled in admin
-    Refs #20640.
+    Model whose change_view is disabled in admin (#20640).
     """
 
 

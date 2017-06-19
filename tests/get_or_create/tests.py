@@ -198,7 +198,7 @@ class GetOrCreateTestsWithManualPKs(TestCase):
         get_or_create should raise IntegrityErrors with the full traceback.
         This is tested by checking that a known method call is in the traceback.
         We cannot use assertRaises here because we need to inspect
-        the actual traceback. Refs #16340.
+        the actual traceback (#16340).
         """
         try:
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
@@ -233,9 +233,9 @@ class GetOrCreateTransactionTests(TransactionTestCase):
 
     def test_get_or_create_integrityerror(self):
         """
-        Regression test for #15117. Requires a TransactionTestCase on
+        Requires a TransactionTestCase on
         databases that delay integrity checks until the end of transactions,
-        otherwise the exception is never raised.
+        otherwise the exception is never raised (#15117).
         """
         try:
             Profile.objects.get_or_create(person=Person(id=1))
@@ -343,7 +343,7 @@ class UpdateOrCreateTests(TestCase):
         update_or_create should raise IntegrityErrors with the full traceback.
         This is tested by checking that a known method call is in the traceback.
         We cannot use assertRaises/assertRaises here because we need to inspect
-        the actual traceback. Refs #16340.
+        the actual traceback (#16340).
         """
         try:
             ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
@@ -354,7 +354,7 @@ class UpdateOrCreateTests(TestCase):
     def test_create_with_related_manager(self):
         """
         Should be able to use update_or_create from the related manager to
-        create a book. Refs #23611.
+        create a book (#23611).
         """
         p = Publisher.objects.create(name="Acme Publishing")
         book, created = p.books.update_or_create(name="The Book of Ed & Fred")
@@ -364,7 +364,7 @@ class UpdateOrCreateTests(TestCase):
     def test_update_with_related_manager(self):
         """
         Should be able to use update_or_create from the related manager to
-        update a book. Refs #23611.
+        update a book (#23611).
         """
         p = Publisher.objects.create(name="Acme Publishing")
         book = Book.objects.create(name="The Book of Ed & Fred", publisher=p)
@@ -378,7 +378,7 @@ class UpdateOrCreateTests(TestCase):
     def test_create_with_many(self):
         """
         Should be able to use update_or_create from the m2m related manager to
-        create a book. Refs #23611.
+        create a book (#23611).
         """
         p = Publisher.objects.create(name="Acme Publishing")
         author = Author.objects.create(name="Ted")
@@ -389,7 +389,7 @@ class UpdateOrCreateTests(TestCase):
     def test_update_with_many(self):
         """
         Should be able to use update_or_create from the m2m related manager to
-        update a book. Refs #23611.
+        update a book (#23611).
         """
         p = Publisher.objects.create(name="Acme Publishing")
         author = Author.objects.create(name="Ted")

@@ -55,16 +55,16 @@ class M2MRegressionTests(TestCase):
         self.assertQuerysetEqual(sr_sibling.related.all(), ["<SelfRefer: Hanna>"])
 
     def test_m2m_pk_field_type(self):
-        # Regression for #11311 - The primary key for models in a m2m relation
-        # doesn't have to be an AutoField
+        # The primary key for models in a m2m relation
+        # doesn't have to be an AutoField (#11311).
 
         w = Worksheet(id='abc')
         w.save()
         w.delete()
 
     def test_add_m2m_with_base_class(self):
-        # Regression for #11956 -- You can add an object to a m2m with the
-        # base class without causing integrity errors
+        # You can add an object to a m2m with the
+        # base class without causing integrity errors (#11956).
 
         t1 = Tag.objects.create(name='t1')
         t2 = Tag.objects.create(name='t2')
@@ -91,8 +91,8 @@ class M2MRegressionTests(TestCase):
         self.assertIs(t1.entry_set.__class__, t2.entry_set.__class__)
 
     def test_m2m_abstract_split(self):
-        # Regression for #19236 - an abstract class with a 'split' method
-        # causes a TypeError in add_lazy_relation
+        # An abstract class with a 'split' method
+        # causes a TypeError in add_lazy_relation (#19236).
         m1 = RegressionModelSplit(name='1')
         m1.save()
 
@@ -109,8 +109,8 @@ class M2MRegressionTests(TestCase):
         self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])
 
     def test_multiple_forwards_only_m2m(self):
-        # Regression for #24505 - Multiple ManyToManyFields to same "to"
-        # model with related_name set to '+'.
+        # Multiple ManyToManyFields to same "to"
+        # model with related_name set to '+' (#24505).
         foo = Line.objects.create(name='foo')
         bar = Line.objects.create(name='bar')
         post = Post.objects.create()

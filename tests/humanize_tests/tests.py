@@ -90,7 +90,7 @@ class HumanizeTests(SimpleTestCase):
                 self.humanize_tester(test_list, result_list, 'intcomma')
 
     def test_intcomma_without_number_grouping(self):
-        # Regression for #17414
+        # (#17414).
         with translation.override('ja'), self.settings(USE_L10N=True):
             self.humanize_tester([100], ['100'], 'intcomma')
 
@@ -166,7 +166,7 @@ class HumanizeTests(SimpleTestCase):
         self.assertNotEqual(naturalday_one, naturalday_two)
 
     def test_naturalday_uses_localtime(self):
-        # Regression for #18504
+        # (#18504).
         # This is 2012-03-08HT19:30:00-06:00 in America/Chicago
         dt = datetime.datetime(2012, 3, 9, 1, 30, tzinfo=utc)
 

@@ -66,7 +66,9 @@ class GeoRegressionTests(TestCase):
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
     @no_oracle
     def test_defer_or_only_with_annotate(self):
-        "Regression for #16409. Make sure defer() and only() work with annotate()"
+        """
+        Make sure defer() and only() work with annotate() (#16409).
+        """
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
         self.assertIsInstance(list(City.objects.annotate(Count('point')).only('name')), list)
 

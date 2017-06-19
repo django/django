@@ -31,7 +31,9 @@ class SerializerRegistrationTests(SimpleTestCase):
         serializers._serializers = self.old_serializers
 
     def test_register(self):
-        "Registering a new serializer populates the full registry. Refs #14823"
+        """
+        Registering a new serializer populates the full registry (#14823)
+        """
         serializers.register_serializer('json3', 'django.core.serializers.json')
 
         public_formats = serializers.get_public_serializer_formats()
@@ -40,7 +42,9 @@ class SerializerRegistrationTests(SimpleTestCase):
         self.assertIn('xml', public_formats)
 
     def test_unregister(self):
-        "Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"
+        """
+        Unregistering a serializer doesn't cause the registry to be repopulated (#14823).
+        """
         serializers.unregister_serializer('xml')
         serializers.register_serializer('json3', 'django.core.serializers.json')
 
@@ -234,9 +238,9 @@ class SerializersTestBase:
         )
 
     def test_serialize_superfluous_queries(self):
-        """Ensure no superfluous queries are made when serializing ForeignKeys
-
-        #17602
+        """
+        No superfluous queries are made
+        when serializing ForeignKeys (#17602).
         """
         ac = Actor(name='Actor name')
         ac.save()
@@ -292,8 +296,8 @@ class SerializersTestBase:
 
     def test_pre_1000ad_date(self):
         """Year values before 1000AD are properly formatted"""
-        # Regression for #12524 -- dates before 1000AD get prefixed
-        # 0's on the year
+        # Dates before 1000AD get prefixed
+        # 0's on the year (#12524).
         a = Article.objects.create(
             author=self.jane,
             headline="Nobody remembers the early years",
@@ -395,7 +399,7 @@ class SerializersTransactionTestBase:
 
 def register_tests(test_class, method_name, test_func, exclude=None):
     """
-    Dynamically create serializer tests to ensure that all registered
+    Dynamically create serializer tests to all registered
     serializers are automatically tested.
     """
     formats = [

@@ -2039,8 +2039,7 @@ class SubqueryTests(TestCase):
 
     def test_related_sliced_subquery(self):
         """
-        Related objects constraints can safely contain sliced subqueries.
-        refs #22434
+        Related objects constraints can safely contain sliced subqueries (#22434).
         """
         generic = NamedCategory.objects.create(id=5, name="Generic")
         t1 = Tag.objects.create(name='t1', category=generic)
@@ -2107,7 +2106,7 @@ class CloneTests(TestCase):
         """
         Cloning a queryset does not get out of hand. While complete
         testing is impossible, this is a sanity check against invalid use of
-        deepcopy. refs #16759.
+        deepcopy (#16759).
         """
         opts_class = type(Note._meta)
         note_deepcopy = getattr(opts_class, "__deepcopy__", None)
@@ -2124,7 +2123,7 @@ class CloneTests(TestCase):
         """
         Cloning a queryset does not get out of hand. While complete
         testing is impossible, this is a sanity check against invalid use of
-        deepcopy. refs #16759.
+        deepcopy (#16759).
         """
         opts_class = type(Note._meta.get_field("misc"))
         note_deepcopy = getattr(opts_class, "__deepcopy__", None)
@@ -2157,8 +2156,8 @@ class EmptyQuerySetTests(TestCase):
         )
 
     def test_ticket_19151(self):
-        # #19151 -- Calling .values() or .values_list() on an empty QuerySet
-        # should return an empty QuerySet and not cause an error.
+        # Calling .values() or .values_list() on an empty QuerySet
+        # should return an empty QuerySet and not cause an error (#19151).
         q = Author.objects.none()
         self.assertQuerysetEqual(q.values(), [])
         self.assertQuerysetEqual(q.values_list(), [])
@@ -2175,7 +2174,7 @@ class ValuesQuerysetTests(TestCase):
         self.assertSequenceEqual(qs, [72])
 
     def test_extra_values(self):
-        # testing for ticket 14930 issues
+        # testing for ticket (#14930) issues
         qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
                                                      ('value_minus_x', 'num-%s')]),
                                   select_params=(1, 2))
@@ -2184,7 +2183,7 @@ class ValuesQuerysetTests(TestCase):
         self.assertSequenceEqual(qs, [{'num': 72}])
 
     def test_extra_values_order_twice(self):
-        # testing for ticket 14930 issues
+        # testing for ticket (#14930) issues
         qs = Number.objects.extra(select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'})
         qs = qs.order_by('value_minus_one').order_by('value_plus_one')
         qs = qs.values('num')
@@ -2202,14 +2201,14 @@ class ValuesQuerysetTests(TestCase):
         self.assertSequenceEqual(qs, [{'num': 72}])
 
     def test_extra_values_order_in_extra(self):
-        # testing for ticket 14930 issues
+        # testing for ticket (#14930) issues
         qs = Number.objects.extra(
             select={'value_plus_one': 'num+1', 'value_minus_one': 'num-1'},
             order_by=['value_minus_one'])
         qs = qs.values('num')
 
     def test_extra_select_params_values_order_in_extra(self):
-        # testing for 23259 issue
+        # testing for (#23259) issue
         qs = Number.objects.extra(
             select={'value_plus_x': 'num+%s'},
             select_params=[1],
@@ -2219,7 +2218,7 @@ class ValuesQuerysetTests(TestCase):
         self.assertSequenceEqual(qs, [{'num': 72}])
 
     def test_extra_multiple_select_params_values_order_by(self):
-        # testing for 23259 issue
+        # testing for (#23259) issue
         qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
                                                      ('value_minus_x', 'num-%s')]),
                                   select_params=(72, 72))
@@ -2229,21 +2228,21 @@ class ValuesQuerysetTests(TestCase):
         self.assertSequenceEqual(qs, [])
 
     def test_extra_values_list(self):
-        # testing for ticket 14930 issues
+        # testing for ticket (#14930) issues
         qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
         qs = qs.order_by('value_plus_one')
         qs = qs.values_list('num')
         self.assertSequenceEqual(qs, [(72,)])
 
     def test_flat_extra_values_list(self):
-        # testing for ticket 14930 issues
+        # testing for ticket (#14930) issues
         qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
         qs = qs.order_by('value_plus_one')
         qs = qs.values_list('num', flat=True)
         self.assertSequenceEqual(qs, [72])
 
     def test_field_error_values_list(self):
-        # see #23443
+        # see (#23443).
         msg = "Cannot resolve keyword %r into field. Join on 'name' not permitted." % 'foo'
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.values_list('name__foo')
@@ -2369,7 +2368,7 @@ class WeirdQuerysetSlicingTests(TestCase):
             Article.objects.all()[:0].latest('created')
 
     def test_empty_resultset_sql(self):
-        # ticket #12192
+        # (#12192).
         self.assertNumQueries(0, lambda: list(Number.objects.all()[1:1]))
 
     def test_empty_sliced_subquery(self):
@@ -2572,7 +2571,7 @@ class ConditionalTests(TestCase):
 
 class UnionTests(unittest.TestCase):
     """
-    Tests for the union of two querysets. Bug #12252.
+    Tests for the union of two querysets (#12252).
     """
     @classmethod
     def setUpTestData(cls):
@@ -2696,8 +2695,8 @@ class ExcludeTests(TestCase):
 
 class ExcludeTest17600(TestCase):
     """
-    Some regressiontests for ticket #17600. Some of these likely duplicate
-    other existing tests.
+    Some of these likely duplicate
+    other existing tests (#17600).
     """
     @classmethod
     def setUpTestData(cls):
@@ -2787,7 +2786,7 @@ class ExcludeTest17600(TestCase):
 
 
 class Exclude15786(TestCase):
-    """Regression test for #15786"""
+    """(#15786)."""
     def test_ticket15786(self):
         c1 = SimpleCategory.objects.create(name='c1')
         c2 = SimpleCategory.objects.create(name='c2')
@@ -2850,7 +2849,7 @@ class EmptyStringsAsNullTest(TestCase):
     """
     Filtering on non-null character fields works as expected.
     The reason for these tests is that Oracle treats '' as NULL, and this
-    can cause problems in query construction. Refs #17957.
+    can cause problems in query construction (#17957).
     """
     @classmethod
     def setUpTestData(cls):
@@ -2880,7 +2879,7 @@ class ProxyQueryCleanupTest(TestCase):
     def test_evaluated_proxy_count(self):
         """
         Generating the query string doesn't alter the query's state
-        in irreversible ways. Refs #18248.
+        in irreversible ways (#18248).
         """
         ProxyCategory.objects.create()
         qs = ProxyCategory.objects.all()
@@ -3568,7 +3567,8 @@ class RelatedLookupTypeTests(TestCase):
 
     def test_values_queryset_lookup(self):
         """
-        #23396 - Ensure ValueQuerySets are not checked for compatibility with the lookup field
+        ValueQuerySets are not checked for
+        compatibility with the lookup field (#23396).
         """
         # Make sure the num and objecta field values match.
         ob = ObjectB.objects.get(name='ob')
@@ -3695,8 +3695,7 @@ class Ticket23605Tests(TestCase):
         # Test filtering on a complicated q-object from ticket's report.
         # The query structure is such that we have multiple nested subqueries.
         # The original problem was that the inner queries weren't relabeled
-        # correctly.
-        # See also #24090.
+        # correctly (#24090).
         a1 = Ticket23605A.objects.create()
         a2 = Ticket23605A.objects.create()
         c1 = Ticket23605C.objects.create(field_c0=10000.0)

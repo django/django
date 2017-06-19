@@ -190,7 +190,7 @@ class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
 
     def test_filter_choices_by_request_user(self):
         """
-        Ensure the user can only see their own cars in the foreign key dropdown.
+        User can only see their own cars in the foreign key dropdown.
         """
         self.client.force_login(self.superuser)
         response = self.client.get(reverse('admin:admin_widgets_cartire_add'))
@@ -722,8 +722,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_calendar_nonday_class(self):
         """
-        Ensure cells that are not days of the month have the `nonday` CSS class.
-        Refs #4574.
+        Cells that are not days of the month have the `nonday` CSS class (#4574).
         """
         self.admin_login(username='super', password='secret', login_url='/')
         # Open a page that has a date and time picker widgets
@@ -745,8 +744,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_calendar_selected_class(self):
         """
-        Ensure cell for the day in the input has the `selected` CSS class.
-        Refs #4574.
+        Cell for the day in the input has the `selected` CSS class (#4574).
         """
         self.admin_login(username='super', password='secret', login_url='/')
         # Open a page that has a date and time picker widgets
@@ -770,8 +768,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_calendar_no_selected_class(self):
         """
-        Ensure no cells are given the selected class when the field is empty.
-        Refs #4574.
+        No cells are given the selected class when the field is empty (#4574).
         """
         self.admin_login(username='super', password='secret', login_url='/')
         # Open a page that has a date and time picker widgets
@@ -833,8 +830,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_date_time_picker_shortcuts(self):
         """
-        date/time/datetime picker shortcuts work in the current time zone.
-        Refs #20663.
+        date/time/datetime picker shortcuts work in the current time zone (#20663).
 
         This test case is fairly tricky, it relies on selenium still running the browser
         in the default time zone "America/Chicago" despite `override_settings` changing

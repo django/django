@@ -7,7 +7,7 @@ from .models import Author, Book, Reader
 class PrefetchRelatedObjectsTests(TestCase):
     """
     Since prefetch_related_objects() is just the inner part of
-    prefetch_related(), only do basic tests to ensure its API hasn't changed.
+    prefetch_related(), its API hasn't changed.
     """
     @classmethod
     def setUpTestData(cls):

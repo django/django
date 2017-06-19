@@ -61,7 +61,7 @@ full_decorator = compose(
     never_cache,
 
     # django.contrib.auth.decorators
-    # Apply user_passes_test twice to check #9474
+    # Apply user_passes_test twice to check (#9474).
     user_passes_test(lambda u: True),
     login_required,
     permission_required('change_world'),
@@ -133,8 +133,7 @@ class DecoratorsTest(TestCase):
     def test_require_safe_accepts_only_safe_methods(self):
         """
         Test for the require_safe decorator.
-        A view returns either a response or an exception.
-        Refs #15637.
+        A view returns either a response or an exception (#15637).
         """
         def my_view(request):
             return HttpResponse("OK")
@@ -400,7 +399,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
     """
     def test_deny_decorator(self):
         """
-        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
+        @xframe_options_deny properly sets the X-Frame-Options header.
         """
         @xframe_options_deny
         def a_view(request):
@@ -410,7 +409,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
 
     def test_sameorigin_decorator(self):
         """
-        Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
+        @xframe_options_sameorigin properly sets the X-Frame-Options
         header.
         """
         @xframe_options_sameorigin
@@ -421,7 +420,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
 
     def test_exempt_decorator(self):
         """
-        Ensures @xframe_options_exempt properly instructs the
+        @xframe_options_exempt properly instructs the
         XFrameOptionsMiddleware to NOT set the header.
         """
         @xframe_options_exempt

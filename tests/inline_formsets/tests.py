@@ -83,8 +83,7 @@ class DeletionTests(TestCase):
 
     def test_save_new(self):
         """
-        Make sure inlineformsets respect commit=False
-        regression for #10750
+        Make sure inlineformsets respect commit=False (#10750).
         """
         # exclude some required field from the forms
         ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
@@ -142,7 +141,7 @@ class InlineFormsetFactoryTest(TestCase):
             inlineformset_factory(Parent, Child, fk_name='test')
 
     def test_any_iterable_allowed_as_argument_to_exclude(self):
-        # Regression test for #9171.
+        # (#9171).
         inlineformset_factory(
             Parent, Child, exclude=['school'], fk_name='mother'
         )
@@ -153,7 +152,7 @@ class InlineFormsetFactoryTest(TestCase):
 
     @skipUnlessDBFeature('allows_auto_pk_0')
     def test_zero_primary_key(self):
-        # Regression test for #21472
+        # (#21472).
         poet = Poet.objects.create(id=0, name='test')
         poet.poem_set.create(name='test poem')
         PoemFormSet = inlineformset_factory(Poet, Poem, fields="__all__", extra=0)

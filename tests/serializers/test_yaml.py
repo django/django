@@ -25,9 +25,7 @@ class YamlImportModuleMock:
     when run on a system that has yaml installed (like the django CI server),
     mock import_module, so that it raises an ImportError when the yaml
     serializer is being imported.  The importlib.import_module() call is
-    being made in the serializers.register_serializer().
-
-    Refs: #12756
+    being made in the serializers.register_serializer() (#12756).
     """
     def __init__(self):
         self._import_module = importlib.import_module
@@ -40,9 +38,8 @@ class YamlImportModuleMock:
 
 
 class NoYamlSerializerTestCase(SimpleTestCase):
-    """Not having pyyaml installed provides a misleading error
-
-    Refs: #12756
+    """
+    Not having pyyaml installed provides a misleading error (#12756).
     """
     @classmethod
     def setUpClass(cls):

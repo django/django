@@ -22,21 +22,15 @@ class ModelTests(TestCase):
     # The bug is that the following queries would raise:
     # "TypeError: Related Field has invalid lookup: gte"
     def test_related_gte_lookup(self):
-        """
-        Regression test for #10153: foreign key __gte lookups.
-        """
+        """foreign key __gte lookups (#10153)."""
         Worker.objects.filter(department__gte=0)
 
     def test_related_lte_lookup(self):
-        """
-        Regression test for #10153: foreign key __lte lookups.
-        """
+        """foreign key __lte lookups (#10153)."""
         Worker.objects.filter(department__lte=0)
 
     def test_sql_insert_compiler_return_id_attribute(self):
-        """
-        Regression test for #14019: SQLInsertCompiler.as_sql() failure
-        """
+        """SQLInsertCompiler.as_sql() failure (#14019)."""
         db = router.db_for_write(Party)
         query = InsertQuery(Party)
         query.insert_values([Party._meta.fields[0]], [], raw=False)
@@ -79,7 +73,7 @@ class ModelTests(TestCase):
         self.assertEqual(len(a.article_text), 3000)
 
     def test_date_lookup(self):
-        # Regression test for #659
+        # (#659).
         Party.objects.create(when=datetime.datetime(1999, 12, 31))
         Party.objects.create(when=datetime.datetime(1998, 12, 31))
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
@@ -107,7 +101,7 @@ class ModelTests(TestCase):
             ],
             attrgetter("when")
         )
-        # Regression test for #8510
+        # (#8510).
         self.assertQuerysetEqual(
             Party.objects.filter(when__day="31"), [
                 datetime.date(1999, 12, 31),
@@ -131,7 +125,7 @@ class ModelTests(TestCase):
             attrgetter("when")
         )
 
-        # Regression test for #18969
+        # (#18969).
         self.assertQuerysetEqual(
             Party.objects.filter(when__year=1), [
                 datetime.date(1, 3, 3),
@@ -146,8 +140,7 @@ class ModelTests(TestCase):
         )
 
     def test_date_filter_null(self):
-        # Date filtering was failing with NULL date values in SQLite
-        # (regression test for #3501, among other things).
+        # Date filtering was failing with NULL date values in SQLite (#3501).
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]
@@ -188,8 +181,7 @@ class ModelTests(TestCase):
 
     @skipUnlessDBFeature("supports_timezones")
     def test_timezones(self):
-        # Saving an updating with timezone-aware datetime Python objects.
-        # Regression test for #10443.
+        # Saving an updating with timezone-aware datetime Python objects (#10443).
         # The idea is that all these creations and saving should work without
         # crashing. It's not rocket science.
         dt1 = datetime.datetime(2008, 8, 31, 16, 20, tzinfo=get_fixed_timezone(600))
@@ -206,7 +198,7 @@ class ModelTests(TestCase):
 
     def test_chained_fks(self):
         """
-        Regression for #18432: Chained foreign keys with to_field produce incorrect query
+        Chained foreign keys with to_field produce incorrect query (#18432).
         """
 
         m1 = Model1.objects.create(pkey=1000)
@@ -227,9 +219,7 @@ class ModelValidationTest(TestCase):
 
 
 class EvaluateMethodTest(TestCase):
-    """
-    Regression test for #13640: cannot filter by objects with 'evaluate' attr
-    """
+    """Cannot filter by objects with 'evaluate' attr (#13640)."""
 
     def test_model_with_evaluate_method(self):
         """

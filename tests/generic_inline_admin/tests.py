@@ -41,25 +41,19 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         self.png_media_pk = m.pk
 
     def test_basic_add_GET(self):
-        """
-        A smoke test to ensure GET on the add_view works.
-        """
+        """GET on the add_view."""
         response = self.client.get(reverse('admin:generic_inline_admin_episode_add'))
         self.assertEqual(response.status_code, 200)
 
     def test_basic_edit_GET(self):
-        """
-        A smoke test to ensure GET on the change_view works.
-        """
+        """GET on the change_view."""
         response = self.client.get(
             reverse('admin:generic_inline_admin_episode_change', args=(self.episode_pk,))
         )
         self.assertEqual(response.status_code, 200)
 
     def test_basic_add_POST(self):
-        """
-        A smoke test to ensure POST on add_view works.
-        """
+        """POST on add_view works."""
         post_data = {
             "name": "This Week in Django",
             # inline data
@@ -71,9 +65,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def test_basic_edit_POST(self):
-        """
-        A smoke test to ensure POST on edit_view works.
-        """
+        """POST on edit_view."""
         post_data = {
             "name": "This Week in Django",
             # inline data
@@ -187,10 +179,10 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         )
 
     def test_generic_inline_formset_factory(self):
-        # Regression test for #10522.
+        # (#10522).
         inline_formset = generic_inlineformset_factory(Media, exclude=('url',))
 
-        # Regression test for #12340.
+        # (#12340).
         e = Episode.objects.get(name='This Week in Django')
         formset = inline_formset(instance=e)
         self.assertTrue(formset.get_queryset().ordered)
@@ -450,7 +442,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         The custom ModelForm's `Meta.exclude` is respected by
         `GenericInlineModelAdmin.get_formset`, and overridden if
         `ModelAdmin.exclude` or `GenericInlineModelAdmin.exclude` are defined.
-        Refs #15907.
+        (#15907).
         """
         # First with `GenericInlineModelAdmin`  -----------------
 
@@ -492,8 +484,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             ['description', 'keywords', 'id', 'DELETE'])
 
     def test_get_fieldsets(self):
-        # get_fieldsets is called when figuring out form fields.
-        # Refs #18681.
+        # get_fieldsets is called when figuring out form fields (#18681).
         class MediaForm(ModelForm):
             class Meta:
                 model = Media

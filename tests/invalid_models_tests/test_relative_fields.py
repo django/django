@@ -42,8 +42,8 @@ class RelativeFieldTests(SimpleTestCase):
     @isolate_apps('invalid_models_tests')
     def test_foreign_key_to_isolate_apps_model(self):
         """
-        #25723 - Referenced model registration lookup should be run against the
-        field's model registry.
+        Referenced model registration lookup should be run against the
+        field's model registry (#25723).
         """
         class OtherModel(models.Model):
             pass
@@ -73,8 +73,8 @@ class RelativeFieldTests(SimpleTestCase):
     @isolate_apps('invalid_models_tests')
     def test_many_to_many_to_isolate_apps_model(self):
         """
-        #25723 - Referenced model registration lookup should be run against the
-        field's model registry.
+        Referenced model registration lookup should be run against the
+        field's model registry (#25723).
         """
         class OtherModel(models.Model):
             pass
@@ -259,8 +259,8 @@ class RelativeFieldTests(SimpleTestCase):
     @isolate_apps('invalid_models_tests')
     def test_many_to_many_through_isolate_apps_model(self):
         """
-        #25723 - Through model registration lookup should be run against the
-        field's model registry.
+        Through model registration lookup should be run against the
+        field's model registry (#25723).
         """
         class GroupMember(models.Model):
             person = models.ForeignKey('Person', models.CASCADE)
@@ -873,7 +873,7 @@ class AccessorClashTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_m2m_to_m2m_with_inheritance(self):
-        """ Ref #22047. """
+        """(#22047)."""
 
         class Target(models.Model):
             pass

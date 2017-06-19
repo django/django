@@ -105,7 +105,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_cc(self):
-        """Regression test for #7722"""
+        """(#7722)."""
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
         message = email.message()
         self.assertEqual(message['Cc'], 'cc@example.com')
@@ -259,8 +259,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_multiple_message_call(self):
         """
-        Regression for #13259 - Make sure that headers are not changed when
-        calling EmailMessage.message()
+        Make sure that headers are not changed when
+        calling EmailMessage.message() (#13259).
         """
         email = EmailMessage(
             'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
@@ -273,9 +273,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_unicode_address_header(self):
         """
-        Regression for #11144 - When a to/from/cc header contains unicode,
+        When a to/from/cc header contains unicode,
         make sure the email addresses are parsed correctly (especially with
-        regards to commas)
+        regards to commas) (#11144).
         """
         email = EmailMessage(
             'Subject', 'Content', 'from@example.com',
@@ -320,8 +320,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_encoding(self):
         """
-        Regression for #12791 - Encode body correctly with other encodings
-        than utf-8
+        Encode body correctly with other encodings
+        than utf-8 (#12791).
         """
         email = EmailMessage('Subject', 'Firstname Sürname is a great guy.', 'from@example.com', ['other@example.com'])
         email.encoding = 'iso-8859-1'
@@ -357,7 +357,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
 
     def test_attachments(self):
-        """Regression test for #9367"""
+        """(#9367)."""
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
         text_content = 'This is an important message.'
@@ -388,7 +388,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(payload[0], txt)
 
     def test_non_ascii_attachment_filename(self):
-        """Regression test for #14964"""
+        """(#14964)."""
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
         subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
         content = 'This is the message.'
@@ -552,8 +552,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(connection.test_outbox[0].subject, '[Django] Manager message')
 
     def test_dont_mangle_from_in_body(self):
-        # Regression for #13433 - Make sure that EmailMessage doesn't mangle
-        # 'From ' in message body.
+        # Make sure that EmailMessage doesn't mangle
+        # 'From ' in message body (#13433).
         email = EmailMessage(
             'Subject', 'From the future', 'bounce@example.com', ['to@example.com'],
             headers={'From': 'from@example.com'},
@@ -865,8 +865,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         MANAGERS=[('nobody', 'nobody+manager@example.com')])
     def test_manager_and_admin_mail_prefix(self):
         """
-        String prefix + lazy translated subject = bad output
-        Regression for #13494
+        String prefix + lazy translated subject = bad output (#13494).
         """
         mail_managers(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
@@ -889,9 +888,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertEqual(self.get_mailbox_content(), [])
 
     def test_message_cc_header(self):
-        """
-        Regression test for #7722
-        """
+        """(#7722)."""
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], cc=['cc@example.com'])
         mail.get_connection().send_messages([email])
         message = self.get_the_message()
@@ -906,9 +903,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertIn('\nDate: ', message.as_string())
 
     def test_idn_send(self):
-        """
-        Regression test for #14301
-        """
+        """(#14301)."""
         self.assertTrue(send_mail('Subject', 'Content', 'from@öäü.com', ['to@öäü.com']))
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
@@ -925,9 +920,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertEqual(message.get('cc'), 'cc@xn--4ca9at.com')
 
     def test_recipient_without_domain(self):
-        """
-        Regression test for #15042
-        """
+        """(#15042)."""
         self.assertTrue(send_mail("Subject", "Content", "tester", ["django"]))
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')

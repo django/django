@@ -270,9 +270,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         DEBUG=False,
     )
     def test_uses_custom_email_backend(self):
-        """
-        Refs #19325
-        """
+        """(#19325)."""
         message = 'All work and no play makes Jack a dull boy'
         admin_email_handler = self.get_admin_email_handler(self.logger)
         mail_admins_called = {'called': False}
@@ -302,8 +300,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_emit_non_ascii(self):
         """
-        #23593 - AdminEmailHandler should allow Unicode characters in the
-        request.
+        AdminEmailHandler should allow Unicode characters in the
+        request (#23593).
         """
         handler = self.get_admin_email_handler(self.logger)
         record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)

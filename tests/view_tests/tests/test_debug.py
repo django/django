@@ -200,12 +200,11 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     @override_settings(ROOT_URLCONF='view_tests.regression_21530_urls')
     def test_regression_21530(self):
         """
-        Regression test for bug #21530.
-
         If the admin app include is replaced with exactly one url
         pattern, then the technical 404 template should be displayed.
 
         The bug here was that an AttributeError caused a 500 response.
+        (#21530).
         """
         response = self.client.get('/')
         self.assertContains(
@@ -221,7 +220,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 
     def test_handle_db_exception(self):
         """
-        Ensure the debug view works when a database exception is raised by
+        Debug view works when a database exception is raised by
         performing an invalid query and passing the exception to the debug view.
         """
         with connection.cursor() as cursor:
@@ -449,7 +448,7 @@ class ExceptionReporterTests(SimpleTestCase):
     def test_unfrozen_importlib(self):
         """
         importlib is not a frozen app, but its loader thinks it's frozen which
-        results in an ImportError. Refs #21443.
+        results in an ImportError (#21443).
         """
         try:
             request = self.rf.get('/test_view/')
@@ -888,8 +887,8 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_multivalue_dict_key_error(self):
         """
-        #21098 -- Sensitive POST parameters cannot be seen in the
-        error reports for if request.POST['nonexistent_key'] throws an error.
+        Sensitive POST parameters cannot be seen in the
+        error reports for if request.POST['nonexistent_key'] throws an error (#21098).
         """
         with self.settings(DEBUG=True):
             self.verify_unsafe_response(multivalue_dict_key_error)

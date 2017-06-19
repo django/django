@@ -74,7 +74,7 @@ class PrefetchRelatedTests(TestCase):
         self.assertQuerysetEqual(self.book2.authors.all(), ["<Author: Charlotte>"])
 
     def test_onetoone_reverse_no_match(self):
-        # Regression for #17439
+        # (#17439).
         with self.assertNumQueries(2):
             book = Book.objects.prefetch_related('bookwithyear').all()[0]
         with self.assertNumQueries(0):
@@ -110,10 +110,10 @@ class PrefetchRelatedTests(TestCase):
 
     def test_in_and_prefetch_related(self):
         """
-        Regression test for #20242 - QuerySet "in" didn't work the first time
+        QuerySet "in" didn't work the first time
         when using prefetch_related. This was fixed by the removal of chunked
         reads from QuerySet iteration in
-        70679243d1786e03557c28929f9762a119e3ac14.
+        70679243d1786e03557c28929f9762a119e3ac14 (#20242).
         """
         qs = Book.objects.prefetch_related('first_time_authors')
         self.assertIn(qs[0], qs)
@@ -695,7 +695,7 @@ class CustomPrefetchTests(TestCase):
         )
 
     def test_nested_prefetch_related_are_not_overwritten(self):
-        # Regression test for #24873
+        # (#24873).
         houses_2 = House.objects.prefetch_related(Prefetch('rooms'))
         persons = Person.objects.prefetch_related(Prefetch('houses', queryset=houses_2))
         houses = House.objects.prefetch_related(Prefetch('occupants', queryset=persons))
@@ -929,7 +929,7 @@ class MultiTableInheritanceTest(TestCase):
         with self.assertNumQueries(2):
             authors = [a.authorwithage for a in Author.objects.prefetch_related('authorwithage')]
 
-        # Regression for #18090: the prefetching query must include an IN clause.
+        # The prefetching query must include an IN clause (#18090).
         # Note that on Oracle the table name is upper case in the generated SQL,
         # thus the .lower() call.
         self.assertIn('authorwithage', connection.queries[-1]['sql'].lower())
@@ -977,8 +977,8 @@ class ForeignKeyToFieldTest(TestCase):
 
 class LookupOrderingTest(TestCase):
     """
-    Test cases that demonstrate that ordering of lookups is important, and
-    ensure it is preserved.
+    Test cases that demonstrate that ordering of lookups is important,
+    and it is preserved.
     """
 
     def setUp(self):

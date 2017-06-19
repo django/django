@@ -96,7 +96,7 @@ class UtilsTests(SimpleTestCase):
 
     def test_values_from_lookup_field(self):
         """
-        Regression test for #12654: lookup_field
+        lookup_field (#12654).
         """
         SITE_NAME = 'example.com'
         TITLE_TEXT = 'Some title'
@@ -141,7 +141,7 @@ class UtilsTests(SimpleTestCase):
 
     def test_null_display_for_field(self):
         """
-        Regression test for #12550: display_for_field should handle None
+        display_for_field should handle None (#12550).
         value.
         """
         display_value = display_for_field(None, models.CharField(), self.empty_value)
@@ -160,8 +160,8 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(None, models.TimeField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 
-        # Regression test for #13071: NullBooleanField has special
-        # handling.
+        # NullBooleanField has special
+        # handling (#13071).
         display_value = display_for_field(None, models.NullBooleanField(), self.empty_value)
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
@@ -284,9 +284,7 @@ class UtilsTests(SimpleTestCase):
         )
 
     def test_related_name(self):
-        """
-        Regression test for #13963
-        """
+        """(#13963)."""
         self.assertEqual(
             label_for_field('location', Event, return_attr=True),
             ('location', None),
@@ -335,9 +333,7 @@ class UtilsTests(SimpleTestCase):
             self.assertEqual(flatten(orig), expected)
 
     def test_flatten_fieldsets(self):
-        """
-        Regression test for #18051
-        """
+        """(#18051)."""
         fieldsets = (
             (None, {
                 'fields': ('url', 'title', ('content', 'sites'))

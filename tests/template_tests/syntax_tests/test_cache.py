@@ -89,17 +89,13 @@ class CacheTagTests(SimpleTestCase):
 
     @setup({'cache16': '{% load cache %}{% cache 1 foo bar %}{% endcache %}'})
     def test_cache16(self):
-        """
-        Regression test for #7460.
-        """
+        """(#7460)."""
         output = self.engine.render_to_string('cache16', {'foo': 'foo', 'bar': 'with spaces'})
         self.assertEqual(output, '')
 
     @setup({'cache17': '{% load cache %}{% cache 10 long_cache_key poem %}Some Content{% endcache %}'})
     def test_cache17(self):
-        """
-        Regression test for #11270.
-        """
+        """(#11270)."""
         output = self.engine.render_to_string(
             'cache17',
             {

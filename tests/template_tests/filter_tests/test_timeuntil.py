@@ -45,7 +45,7 @@ class TimeuntilTests(TimezoneTestCase):
         )
         self.assertEqual(output, '1\xa0minute')
 
-    # Regression for #7443
+    # (#7443).
     @setup({'timeuntil06': '{{ earlier|timeuntil }}'})
     def test_timeuntil06(self):
         output = self.engine.render_to_string('timeuntil06', {'earlier': self.now - timedelta(days=7)})
@@ -86,7 +86,7 @@ class TimeuntilTests(TimezoneTestCase):
         output = self.engine.render_to_string('timeuntil12', {'a': self.now_tz_i, 'b': self.now_tz})
         self.assertEqual(output, '0\xa0minutes')
 
-    # Regression for #9065 (two date objects).
+    # (two date objects) (#9065).
     @setup({'timeuntil13': '{{ a|timeuntil:b }}'})
     def test_timeuntil13(self):
         output = self.engine.render_to_string('timeuntil13', {'a': self.today, 'b': self.today})

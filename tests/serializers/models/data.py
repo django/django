@@ -282,7 +282,7 @@ class ModifyingSaveData(models.Model):
         super().save(*args, **kwargs)
 
 # Tests for serialization of models using inheritance.
-# Regression for #7202, #7350
+# (#7202, #7350).
 
 
 class AbstractBaseModel(models.Model):

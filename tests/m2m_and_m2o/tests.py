@@ -84,8 +84,8 @@ class RelatedObjectTests(TestCase):
 class RelatedObjectUnicodeTests(TestCase):
     def test_m2m_with_unicode_reference(self):
         """
-        Regression test for #6045: references to other models can be
-        strings, providing they are directly convertible to ASCII.
+        References to other models can be
+        strings, providing they are directly convertible to ASCII (#6045).
         """
         m1 = StringReferenceModel.objects.create()
         m2 = StringReferenceModel.objects.create()

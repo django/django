@@ -201,8 +201,8 @@ class IfChangedTests(SimpleTestCase):
 
     def test_include(self):
         """
-        #23516 -- This works as a regression test only if the cached loader
-        isn't used. Hence we don't use the @setup decorator.
+        This works as a regression test only if the cached loader
+        isn't used. Hence we don't use the @setup decorator (#23516).
         """
         engine = Engine(loaders=[
             ('django.template.loaders.locmem.Loader', {
