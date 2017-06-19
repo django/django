@@ -210,6 +210,8 @@ Management Commands
 * On Oracle, :djadmin:`inspectdb` can now introspect ``AutoField`` if the
   column is created as an identity column.
 
+* On MySQL, :djadmin:`dbshell` now supports client-side TLS certificates.
+
 Migrations
 ~~~~~~~~~~
 
