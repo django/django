@@ -61,7 +61,7 @@ class MigrationRecorder:
         if self.has_table():
             return {tuple(x) for x in self.migration_qs.values_list('app', 'name')}
         else:
-            # If the django_migrations table doesn't eixst, then no migrations
+            # If the django_migrations table doesn't exist, then no migrations
             # are applied.
             return set()
 
