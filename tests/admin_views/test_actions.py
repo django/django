@@ -2,7 +2,7 @@ import json
 
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.core import mail
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
@@ -364,3 +364,48 @@ action)</option>
         self.assertIn(
             r'&quot;obj\\&quot;', output
         )
+
+
+@override_settings(ROOT_URLCONF='admin_views.urls')
+class AdminActionsPermissionTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = ExternalSubscriber.objects.create(name='John Doe', email='john@example.org')
+        cls.s2 = Subscriber.objects.create(name='Max Mustermann', email='max@example.org')
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='user', password='secret', email='user@example.com',
+            is_staff=True,
+        )
+        self.client.force_login(self.user)
+        permission = Permission.objects.get(codename='change_subscriber')
+        self.user.user_permissions.add(permission)
+
+    def test_model_admin_no_delete_permission(self):
+        """
+        Permission is denied if the user doesn't have delete permission for the
+        model (Subscriber).
+        """
+        action_data = {
+            ACTION_CHECKBOX_NAME: [self.s1.pk],
+            'action': 'delete_selected',
+        }
+        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_model_admin_no_delete_permission_externalsubscriber(self):
+        """
+        Permission is denied if the user doesn't have delete permission for a
+        related model (ExternalSubscriber).
+        """
+        permission = Permission.objects.get(codename='delete_subscriber')
+        self.user.user_permissions.add(permission)
+        delete_confirmation_data = {
+            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
+            'action': 'delete_selected',
+            'post': 'yes',
+        }
+        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), delete_confirmation_data)
+        self.assertEqual(response.status_code, 403)
