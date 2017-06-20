@@ -108,6 +108,13 @@ Minor features
   :class:`~django.contrib.postgres.operations.CryptoExtension` migration
   operation.
 
+* The new :class:`~django.contrib.postgres.search.PhraseSearchQuery` adds
+  ability to perform phrase search query.
+
+* The new :class:`~django.contrib.postgres.search.RawSearchQuery` adds
+  ability to perform raw text search queries.
+
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
