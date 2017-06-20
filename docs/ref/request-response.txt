@@ -384,7 +384,7 @@ Methods
 .. class:: QueryDict
 
 In an :class:`HttpRequest` object, the :attr:`~HttpRequest.GET` and
-`attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
+:attr:`~HttpRequest.POST` attributes are instances of ``django.http.QueryDict``,
 a dictionary-like class customized to deal with multiple values for the same
 key. This is necessary because some HTML form elements, notably
 ``<select multiple>``, pass multiple values for the same key.
