@@ -601,15 +601,16 @@ Assuming both models have a ``length`` field, to find posts where the post
 length is greater than the total length of all combined comments::
 
     >>> from django.db.models import OuterRef, Subquery, Sum
-    >>> comments = Comment.objects.filter(post=OuterRef('pk')).values('post')
+    >>> comments = Comment.objects.filter(post=OuterRef('pk')).order_by().values('post')
     >>> total_comments = comments.annotate(total=Sum('length')).values('total')
     >>> Post.objects.filter(length__gt=Subquery(total_comments))
 
 The initial ``filter(...)`` limits the subquery to the relevant parameters.
-``values('post')`` aggregates comments by ``Post``. Finally, ``annotate(...)``
-performs the aggregation. The order in which these queryset methods are applied
-is important. In this case, since the subquery must be limited to a single
-column, ``values('total')`` is required.
+``order_by()`` removes the default :attr:`~django.db.models.Options.ordering`
+(if any) on the ``Comment`` model. ``values('post')`` aggregates comments by
+``Post``. Finally, ``annotate(...)`` performs the aggregation. The order in
+which these queryset methods are applied is important. In this case, since the
+subquery must be limited to a single column, ``values('total')`` is required.
 
 This is the only way to perform an aggregation within a ``Subquery``, as
 using :meth:`~.QuerySet.aggregate` attempts to evaluate the queryset (and if
