@@ -259,83 +259,73 @@ class PrefetchRelatedTests(TestCase):
         self.assertWhereContains(sql, self.author1.id)
 
 
-@mock.patch('django.db.connection.features.max_query_params', 100)
+@mock.patch('django.db.connection.features.max_query_params', 50)
 class LargePrefetchSetTests(TestCase):
     """
-    Tests to check that prefetch queries to the database using large "WHERE id IN (…)"
-    clauses are performed in batches on databases with a limited number of variables
-    per query, such as SQLite. To improve test performance, we do not use the actual
-    database limites here but test with a smaller batch size.
+    Prefetch queries using large "WHERE id IN (…)" clauses are performed in
+    batches on databases with a limited number of variables per query, such as
+    SQLite. To improve test performance, a smaller value of max_query_params
+    is mocked.
     """
-
-    TEST_SIZE = 101
+    test_size = 101
 
     @classmethod
     def setUpTestData(cls):
-        # Create a large set of books and authors
         cls.book1 = Book.objects.create(title='Poems')
         cls.book2 = Book.objects.create(title='Poems II')
-
-        authors = [Author(name='Charlotte {}'.format(i), first_book=cls.book1)
-                   for i in range(cls.TEST_SIZE)]
-        Author.objects.bulk_create(authors)
+        Author.objects.bulk_create((
+            Author(name='Charlotte {}'.format(i), first_book=cls.book1)
+            for i in range(cls.test_size)
+        ))
         cls.author_first = Author.objects.first()
         cls.author_last = Author.objects.last()
-
         cls.reader = Reader.objects.create(name='Amy')
-
-        # Add related objects to the first and the last authors in the list to assure that
-        # the result sets are being properly merged after the bulk processing
+        # Add related objects to the first and the last authors in the list to
+        # ensure that the result sets are properly merged after the bulk
+        # processing.
         cls.author_first.books.add(cls.book1)
         cls.author_last.books.add(cls.book2)
         cls.reader.books_read.add(cls.book1)
         cls.reader.books_read.add(cls.book2)
 
-    def _get_batch_number(self):
-        if connection.features.max_query_params is not None:
-            # The current implementation uses a safety margin to
-            # cope with additional variables in the query.
+    @property
+    def num_batches(self):
+        if connection.features.max_query_params:
+            # 25 is the hardcoded safety margin to cope with additional
+            # variables in the query.
             batch_size = connection.features.max_query_params - 25
-            return int(ceil(self.TEST_SIZE / batch_size))
+            return int(ceil(self.test_size / batch_size))
         else:
             return 1
 
     def test_number_of_queries(self):
-        batches = self._get_batch_number()
-
-        #   1 query for looking up authors
-        # + N queries for looking up books
-        with self.assertNumQueries(1 + batches):
+        # 1 query for looking up authors + N queries for looking up books.
+        with self.assertNumQueries(1 + self.num_batches):
             results = list(Author.objects.prefetch_related('books'))
 
         with self.assertNumQueries(0):
-            self.assertEqual(self.TEST_SIZE, len(results))
-            self.assertEqual(1, len(results[0].books.all()))
-            self.assertEqual(1, len(results[-1].books.all()))
+            self.assertEqual(self.test_size, len(results))
+            self.assertEqual(len(results[0].books.all()), 1)
+            self.assertEqual(len(results[-1].books.all()), 1)
 
     def test_related_lookups(self):
-        batches = self._get_batch_number()
-
-        #   1 query for looking up authors
-        # + N queries for looking up books
-        # + 1 query for looking up readers (because we only have two books)
-        with self.assertNumQueries(2 + batches):
+        # 1 query for looking up authors + N queries for looking up books +
+        # 1 query for looking up readers (because there are two books).
+        with self.assertNumQueries(2 + self.num_batches):
             results = list(Author.objects.prefetch_related('books__read_by'))
 
         with self.assertNumQueries(0):
             first_author_books = results[0].books.all()
             self.assertEqual([self.book1], list(first_author_books))
             self.assertEqual([self.reader], list(first_author_books[0].read_by.all()))
-
             last_author_books = results[-1].books.all()
             self.assertEqual([self.book2], list(last_author_books))
             self.assertEqual([self.reader], list(last_author_books[0].read_by.all()))
 
     @skipUnlessDBFeature('max_query_params')
     def test_additional_variables_safety_margin(self):
-        #   1 query for looking up authors
-        # + 2 queries for looking up books, because we are just
-        #     over the safety margin
+        # 1 query for looking up authors + 2 queries for looking up books
+        # because the query is just over the safety margin.
         with self.assertNumQueries(3):
             list(
                 Author.objects.prefetch_related(
