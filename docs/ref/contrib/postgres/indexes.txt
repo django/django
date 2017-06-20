@@ -12,7 +12,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BrinIndex``
 =============
 
-.. class:: BrinIndex(fields=[], name=None, pages_per_range=None)
+.. class:: BrinIndex(pages_per_range=None, **options)
 
     Creates a `BRIN index
     <https://www.postgresql.org/docs/current/static/brin-intro.html>`_.
@@ -22,7 +22,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``GinIndex``
 ============
 
-.. class:: GinIndex(fields=[], name=None, fastupdate=None, gin_pending_list_limit=None)
+.. class:: GinIndex(fastupdate=None, gin_pending_list_limit=None, **options)
 
     Creates a `gin index
     <https://www.postgresql.org/docs/current/static/gin.html>`_.
