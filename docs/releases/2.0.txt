@@ -554,6 +554,11 @@ Miscellaneous
 * Renamed ``BaseExpression._output_field`` to ``output_field``. You may need
   to update custom expressions.
 
+* In older versions, forms and formsets combine their ``Media`` with widget
+  ``Media`` by concatenating the two. The combining now tries to :ref:`preserve
+  the relative order of elements in each list <form-media-asset-order>`.
+  ``MediaOrderConflictWarning`` is issued if the order can't be preserved.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

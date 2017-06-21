@@ -1,3 +1,5 @@
+import warnings
+
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
@@ -106,7 +108,7 @@ class FormsMediaTestCase(SimpleTestCase):
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
+                    'all': ('path/to/css1', '/path/to/css3')
                 }
                 js = ('/path/to/js1', '/path/to/js4')
 
@@ -237,9 +239,9 @@ class FormsMediaTestCase(SimpleTestCase):
         w8 = MyWidget8()
         self.assertEqual(
             str(w8.media),
-            """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+            """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
@@ -312,9 +314,9 @@ class FormsMediaTestCase(SimpleTestCase):
         w11 = MyWidget11()
         self.assertEqual(
             str(w11.media),
-            """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+            """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
@@ -341,9 +343,9 @@ class FormsMediaTestCase(SimpleTestCase):
         w12 = MyWidget12()
         self.assertEqual(
             str(w12.media),
-            """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+            """<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />
 <link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="/path/to/js4"></script>"""
         )
@@ -396,7 +398,7 @@ class FormsMediaTestCase(SimpleTestCase):
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
+                    'all': ('path/to/css1', '/path/to/css3')
                 }
                 js = ('/path/to/js1', '/path/to/js4')
 
@@ -441,7 +443,7 @@ class FormsMediaTestCase(SimpleTestCase):
         class MyWidget3(TextInput):
             class Media:
                 css = {
-                    'all': ('/path/to/css3', 'path/to/css1')
+                    'all': ('path/to/css1', '/path/to/css3')
                 }
                 js = ('/path/to/js1', '/path/to/js4')
 
@@ -518,3 +520,25 @@ class FormsMediaTestCase(SimpleTestCase):
         media = Media(css={'all': ['/path/to/css']}, js=['/path/to/js'])
         self.assertTrue(hasattr(Media, '__html__'))
         self.assertEqual(str(media), media.__html__())
+
+    def test_merge(self):
+        test_values = (
+            (([1, 2], [3, 4]), [1, 2, 3, 4]),
+            (([1, 2], [2, 3]), [1, 2, 3]),
+            (([2, 3], [1, 2]), [1, 2, 3]),
+            (([1, 3], [2, 3]), [1, 2, 3]),
+            (([1, 2], [1, 3]), [1, 2, 3]),
+            (([1, 2], [3, 2]), [1, 3, 2]),
+        )
+        for (list1, list2), expected in test_values:
+            with self.subTest(list1=list1, list2=list2):
+                self.assertEqual(Media.merge(list1, list2), expected)
+
+    def test_merge_warning(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.assertEqual(Media.merge([1, 2], [2, 1]), [1, 2])
+            self.assertEqual(
+                str(w[-1].message),
+                'Detected duplicate Media files in an opposite order:\n1\n2'
+            )

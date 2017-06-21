@@ -4,6 +4,7 @@ Form Widget classes specific to the Django admin site.
 import copy
 
 from django import forms
+from django.conf import settings
 from django.db.models.deletion import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -22,7 +23,14 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     """
     @property
     def media(self):
-        js = ["core.js", "SelectBox.js", "SelectFilter2.js"]
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'vendor/jquery/jquery%s.js' % extra,
+            'jquery.init.js',
+            'core.js',
+            'SelectBox.js',
+            'SelectFilter2.js',
+        ]
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
@@ -43,7 +51,13 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 class AdminDateWidget(forms.DateInput):
     @property
     def media(self):
-        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'vendor/jquery/jquery%s.js' % extra,
+            'jquery.init.js',
+            'calendar.js',
+            'admin/DateTimeShortcuts.js',
+        ]
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
@@ -56,7 +70,13 @@ class AdminDateWidget(forms.DateInput):
 class AdminTimeWidget(forms.TimeInput):
     @property
     def media(self):
-        js = ["calendar.js", "admin/DateTimeShortcuts.js"]
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'vendor/jquery/jquery%s.js' % extra,
+            'jquery.init.js',
+            'calendar.js',
+            'admin/DateTimeShortcuts.js',
+        ]
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):

@@ -305,6 +305,42 @@ specified by both::
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
+.. _form-media-asset-order:
+
+Order of assets
+---------------
+
+The order in which assets are inserted into the DOM if often important. For
+example, you may have a script that depends on jQuery. Therefore, combining
+``Media`` objects attempts to preserve the relative order in which assets are
+defined in each ``Media`` class.
+
+For example::
+
+    >>> from django import forms
+    >>> class CalendarWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = ('jQuery.js', 'calendar.js', 'noConflict.js')
+    >>> class TimeWidget(forms.TextInput):
+    ...     class Media:
+    ...         js = ('jQuery.js', 'time.js', 'noConflict.js')
+    >>> w1 = CalendarWidget()
+    >>> w2 = TimeWidget()
+    >>> print(w1.media + w2.media)
+    <script type="text/javascript" src="http://static.example.com/jQuery.js"></script>
+    <script type="text/javascript" src="http://static.example.com/calendar.js"></script>
+    <script type="text/javascript" src="http://static.example.com/time.js"></script>
+    <script type="text/javascript" src="http://static.example.com/noConflict.js"></script>
+
+Combining ``Media`` objects with assets in a conflicting order results in a
+``MediaOrderConflictWarning``.
+
+.. versionchanged:: 2.0
+
+    In older versions, the assets of ``Media`` objects are concatenated rather
+    than merged in a way that tries to preserve the relative ordering of the
+    elements in each list.
+
 ``Media`` on Forms
 ==================
 
