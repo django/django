@@ -126,7 +126,8 @@ purpose use ``send_and_consume`` method::
             client = Client()
             client.send_and_consume('my_internal_channel', {'value': 'my_value'})
             self.assertEqual(client.receive(), {'all is': 'done'})
-
+            
+*Note: if testing consumers that are expected to close the connection when consuming, set the ``check_accept`` parameter to False on ``send_and_consume``.*
 
 You can use ``WSClient`` for websocket related consumers. It automatically serializes JSON content,
 manage cookies and headers, give easy access to the session and add ability to authorize your requests.
