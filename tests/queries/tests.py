@@ -2365,7 +2365,7 @@ class WeirdQuerysetSlicingTests(TestCase):
         self.assertQuerysetEqual(Article.objects.all()[0:0], [])
         self.assertQuerysetEqual(Article.objects.all()[0:0][:10], [])
         self.assertEqual(Article.objects.all()[:0].count(), 0)
-        with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken.'):
+        with self.assertRaisesMessage(TypeError, 'Cannot reverse a query once a slice has been taken.'):
             Article.objects.all()[:0].latest('created')
 
     def test_empty_resultset_sql(self):

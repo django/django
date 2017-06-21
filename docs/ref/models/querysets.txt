@@ -2099,20 +2099,29 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
 ``latest()``
 ~~~~~~~~~~~~
 
-.. method:: latest(field_name=None)
+.. method:: latest(*fields)
 
-Returns the latest object in the table, by date, using the ``field_name``
-provided as the date field.
+Returns the latest object in the table based on the given field(s).
 
 This example returns the latest ``Entry`` in the table, according to the
 ``pub_date`` field::
 
     Entry.objects.latest('pub_date')
 
+You can also choose the latest based on several fields. For example, to select
+the ``Entry`` with the earliest ``expire_date`` when two entries have the same
+``pub_date``::
+
+    Entry.objects.latest('pub_date', '-expire_date')
+
+The negative sign in ``'-expire_date'`` means to sort ``expire_date`` in
+*descending* order. Since ``latest()`` gets the last result, the ``Entry`` with
+the earliest ``expire_date`` is selected.
+
 If your model's :ref:`Meta <meta-options>` specifies
-:attr:`~django.db.models.Options.get_latest_by`, you can leave off the
-``field_name`` argument to ``earliest()`` or ``latest()``. Django will use the
-field specified in :attr:`~django.db.models.Options.get_latest_by` by default.
+:attr:`~django.db.models.Options.get_latest_by`, you can omit any arguments to
+``earliest()`` or ``latest()``. The fields specified in
+:attr:`~django.db.models.Options.get_latest_by` will be used by default.
 
 Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
 :exc:`~django.db.models.Model.DoesNotExist` if there is no object with the
@@ -2120,6 +2129,10 @@ given parameters.
 
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and
 readability.
+
+.. versionchanged:: 2.0
+
+    Support for several arguments was added.
 
 .. admonition:: ``earliest()`` and ``latest()`` may return instances with null dates.
 
@@ -2135,7 +2148,7 @@ readability.
 ``earliest()``
 ~~~~~~~~~~~~~~
 
-.. method:: earliest(field_name=None)
+.. method:: earliest(*fields)
 
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.

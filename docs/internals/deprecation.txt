@@ -26,6 +26,9 @@ details on these changes.
 * Support for the ``context`` argument of ``Field.from_db_value()`` and
   ``Expression.convert_value()`` will be removed.
 
+* The ``field_name`` keyword argument of ``QuerySet.earliest()` and
+  ``latest()`` will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1

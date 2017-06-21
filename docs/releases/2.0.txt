@@ -250,6 +250,10 @@ Models
   from the database. For databases that don't support server-side cursors, it
   controls the number of results Django fetches from the database adapter.
 
+* :meth:`.QuerySet.earliest`, :meth:`.QuerySet.latest`, and
+  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>`  now
+  allow ordering by several fields.
+
 * Added the :class:`~django.db.models.functions.datetime.ExtractQuarter`
   function to extract the quarter from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField`, and exposed it through the
@@ -641,6 +645,11 @@ Miscellaneous
 
 * ``HttpRequest.xreadlines()`` is deprecated in favor of iterating over the
   request.
+
+* The ``field_name`` keyword argument to :meth:`.QuerySet.earliest` and
+  :meth:`.QuerySet.latest` is deprecated in favor of passing the field
+  names as arguments. Write ``.earliest('pub_date')`` instead of
+  ``.earliest(field_name='pub_date')``.
 
 .. _removed-features-2.0:
 

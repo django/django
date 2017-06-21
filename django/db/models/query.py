@@ -25,6 +25,7 @@ from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
@@ -525,27 +526,47 @@ class QuerySet:
                 ))
         return lookup, params
 
-    def _earliest_or_latest(self, field_name=None, direction="-"):
+    def _earliest_or_latest(self, *fields, field_name=None):
         """
         Return the latest object, according to the model's
         'get_latest_by' option or optional given field_name.
         """
-        order_by = field_name or getattr(self.model._meta, 'get_latest_by')
-        assert bool(order_by), "earliest() and latest() require either a "\
-            "field_name parameter or 'get_latest_by' in the model"
+        if fields and field_name is not None:
+            raise ValueError('Cannot use both positional arguments and the field_name keyword argument.')
+
+        order_by = None
+        if field_name is not None:
+            warnings.warn(
+                'The field_name keyword argument to earliest() and latest() '
+                'is deprecated in favor of passing positional arguments.',
+                RemovedInDjango30Warning,
+            )
+            order_by = (field_name,)
+        elif fields:
+            order_by = fields
+        else:
+            order_by = getattr(self.model._meta, 'get_latest_by')
+            if order_by and not isinstance(order_by, (tuple, list)):
+                order_by = (order_by,)
+        if order_by is None:
+            raise ValueError(
+                "earliest() and latest() require either fields as positional "
+                "arguments or 'get_latest_by' in the model's Meta."
+            )
+
         assert self.query.can_filter(), \
             "Cannot change a query once a slice has been taken."
         obj = self._chain()
         obj.query.set_limits(high=1)
         obj.query.clear_ordering(force_empty=True)
-        obj.query.add_ordering('%s%s' % (direction, order_by))
+        obj.query.add_ordering(*order_by)
         return obj.get()
 
-    def earliest(self, field_name=None):
-        return self._earliest_or_latest(field_name=field_name, direction="")
+    def earliest(self, *fields, field_name=None):
+        return self._earliest_or_latest(*fields, field_name=field_name)
 
-    def latest(self, field_name=None):
-        return self._earliest_or_latest(field_name=field_name, direction="-")
+    def latest(self, *fields, field_name=None):
+        return self.reverse()._earliest_or_latest(*fields, field_name=field_name)
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
