@@ -8,10 +8,13 @@ from .models import Article, IndexErrorArticle, Person
 class EarliestOrLatestTests(TestCase):
     """Tests for the earliest() and latest() objects methods"""
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._article_get_latest_by = Article._meta.get_latest_by
+
     def tearDown(self):
-        """Makes sure Article has a get_latest_by"""
-        if not Article._meta.get_latest_by:
-            Article._meta.get_latest_by = 'pub_date'
+        Article._meta.get_latest_by = self._article_get_latest_by
 
     def test_earliest(self):
         # Because no Articles exist yet, earliest() raises ArticleDoesNotExist.
