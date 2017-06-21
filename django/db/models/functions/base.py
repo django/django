@@ -12,7 +12,11 @@ class Cast(Func):
     mysql_types = {
         fields.CharField: 'char',
         fields.IntegerField: 'signed integer',
+        fields.BigIntegerField: 'signed integer',
+        fields.SmallIntegerField: 'signed integer',
         fields.FloatField: 'signed',
+        fields.PositiveIntegerField: 'unsigned integer',
+        fields.PositiveSmallIntegerField: 'unsigned integer',
     }
 
     def __init__(self, expression, output_field):
