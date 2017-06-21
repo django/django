@@ -163,6 +163,14 @@ class FilteredRelationTests(TestCase):
         self.assertQuerysetEqual(
             qs, ["<Author: Alice>"])
 
+    def test_filtered_relation_as_subquery(self):
+        inner_qs = (Author.objects
+                    .filtered_relation('book', alias='book_alice',
+                                       condition=Q(book__title__iexact='poem by alice'))
+                    .filter(book_alice__isnull=False))
+        qs = Author.objects.filter(id__in=inner_qs)
+        self.assertQuerysetEqual(qs, ["<Author: Alice>"])
+
     def test_filtered_relation_with_foreign_key_error(self):
         with self.assertRaisesMessage(FieldError, "Filtered relation 'alice_favourite_books'"
                                       " cannot operate on foreign key 'author__favourite_books__author'."):
