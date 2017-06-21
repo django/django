@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from unittest import skipIf
 
+from django.core.exceptions import ValidationError
 from django.db import connection, models
 from django.test import TestCase
 
@@ -34,3 +35,9 @@ class TextFieldTests(TestCase):
         p = Post.objects.create(title='Whatever', body='Smile 😀.')
         p.refresh_from_db()
         self.assertEqual(p.body, 'Smile 😀.')
+
+    def test_textfield_has_null_chars_builtin_validator(self):
+        p = Post(title='some-title', body='\x00something')
+        with self.assertRaises(ValidationError) as cm:
+            p.full_clean()
+        self.assertEqual(cm.exception.messages, ['Null characters are not allowed.'])
