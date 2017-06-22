@@ -87,8 +87,7 @@ one, it runs the relevant consumer. So rather than running in just a
 single process tied to a WSGI server, Django runs in three separate layers:
 
 * Interface servers, which communicate between Django and the outside world.
-  This includes a WSGI adapter as well as a separate WebSocket server - we'll
-  cover this later.
+  This includes a WSGI adapter as well as a separate WebSocket server - this is explained and covered in :ref:`run-interface-servers`.
 
 * The channel backend, which is a combination of pluggable Python code and
   a datastore (e.g. Redis, or a shared memory segment) responsible for
