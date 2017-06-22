@@ -32,6 +32,12 @@ class TestCharField(TestCase):
         p.refresh_from_db()
         self.assertEqual(p.title, 'Smile 😀')
 
+    def test_charfield_has_null_chars_builtin_validator(self):
+        p = Post(title='\x00something', body='some-body')
+        with self.assertRaises(ValidationError) as cm:
+            p.full_clean()
+        self.assertEqual(cm.exception.messages, ['Null characters are not allowed.'])
+
 
 class ValidationTests(SimpleTestCase):
 
