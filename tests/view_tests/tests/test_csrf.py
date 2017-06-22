@@ -22,21 +22,15 @@ class CsrfViewTests(SimpleTestCase):
         ],
     )
     def test_translation(self):
-        """
-        An invalid request is rejected with a localized error message.
-        """
+        """An invalid request is rejected with a localized error message."""
         response = self.client.post('/')
-        self.assertContains(response, "Forbidden", status_code=403)
-        self.assertContains(response,
-                            "CSRF verification failed. Request aborted.",
-                            status_code=403)
+        self.assertContains(response, 'Forbidden', status_code=403)
+        self.assertContains(response, 'CSRF verification failed. Request aborted.', status_code=403)
 
         with self.settings(LANGUAGE_CODE='nl'), override('en-us'):
             response = self.client.post('/')
-            self.assertContains(response, "Verboden", status_code=403)
-            self.assertContains(response,
-                                "CSRF-verificatie mislukt. Verzoek afgebroken.",
-                                status_code=403)
+            self.assertContains(response, 'Verboden', status_code=403)
+            self.assertContains(response, 'CSRF-verificatie mislukt. Verzoek afgebroken.', status_code=403)
 
     @override_settings(
         SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTO', 'https')
@@ -47,11 +41,20 @@ class CsrfViewTests(SimpleTestCase):
         exception by sending an incorrect referer.
         """
         response = self.client.post('/', HTTP_X_FORWARDED_PROTO='https')
-        self.assertContains(response,
-                            "You are seeing this message because this HTTPS "
-                            "site requires a &#39;Referer header&#39; to be "
-                            "sent by your Web browser, but none was sent.",
-                            status_code=403)
+        self.assertContains(
+            response,
+            'You are seeing this message because this HTTPS site requires a '
+            '&#39;Referer header&#39; to be sent by your Web browser, but '
+            'none was sent.',
+            status_code=403,
+        )
+        self.assertContains(
+            response,
+            'If you have configured your browser to disable &#39;Referer&#39; '
+            'headers, please re-enable them, at least for this site, or for '
+            'HTTPS connections, or for &#39;same-origin&#39; requests.',
+            status_code=403,
+        )
 
     def test_no_cookies(self):
         """
@@ -59,13 +62,14 @@ class CsrfViewTests(SimpleTestCase):
         provide a nice error message.
         """
         response = self.client.post('/')
-        self.assertContains(response,
-                            "You are seeing this message because this site "
-                            "requires a CSRF cookie when submitting forms. "
-                            "This cookie is required for security reasons, to "
-                            "ensure that your browser is not being hijacked "
-                            "by third parties.",
-                            status_code=403)
+        self.assertContains(
+            response,
+            'You are seeing this message because this site requires a CSRF '
+            'cookie when submitting forms. This cookie is required for '
+            'security reasons, to ensure that your browser is not being '
+            'hijacked by third parties.',
+            status_code=403,
+        )
 
     @override_settings(TEMPLATES=[])
     def test_no_django_template_engine(self):
@@ -73,7 +77,7 @@ class CsrfViewTests(SimpleTestCase):
         The CSRF view doesn't depend on the TEMPLATES configuration (#24388).
         """
         response = self.client.post('/')
-        self.assertContains(response, "Forbidden", status_code=403)
+        self.assertContains(response, 'Forbidden', status_code=403)
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -86,17 +90,13 @@ class CsrfViewTests(SimpleTestCase):
         },
     }])
     def test_custom_template(self):
-        """
-        A custom CSRF_FAILURE_TEMPLATE_NAME is used.
-        """
+        """A custom CSRF_FAILURE_TEMPLATE_NAME is used."""
         response = self.client.post('/')
-        self.assertContains(response, "Test template for CSRF failure", status_code=403)
+        self.assertContains(response, 'Test template for CSRF failure', status_code=403)
 
     def test_custom_template_does_not_exist(self):
-        """
-        An exception is raised if a nonexistent template is supplied.
-        """
+        """An exception is raised if a nonexistent template is supplied."""
         factory = RequestFactory()
         request = factory.post('/')
         with self.assertRaises(TemplateDoesNotExist):
-            csrf_failure(request, template_name="nonexistent.html")
+            csrf_failure(request, template_name='nonexistent.html')
