@@ -304,3 +304,27 @@ to, or in lieu of custom ``field.clean()`` methods.
     Uses Pillow to ensure that ``value.name`` (``value`` is a
     :class:`~django.core.files.File`) has `a valid image extension
     <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`_.
+
+``ProhibitNullCharactersValidator``
+-----------------------------------
+
+.. class:: ProhibitNullCharactersValidator(message=None, code=None)
+
+    .. versionadded:: 2.0
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
+    contains one or more nulls characters (``'\x00'``).
+
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+
+    .. attribute:: message
+
+        The error message used by
+        :exc:`~django.core.exceptions.ValidationError` if validation fails.
+        Defaults to ``"Null characters are not allowed."``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. Defaults to ``"null_characters_not_allowed"``.

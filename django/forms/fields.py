@@ -217,6 +217,7 @@ class CharField(Field):
             self.validators.append(validators.MinLengthValidator(int(min_length)))
         if max_length is not None:
             self.validators.append(validators.MaxLengthValidator(int(max_length)))
+        self.validators.append(validators.ProhibitNullCharactersValidator())
 
     def to_python(self, value):
         """Return a string."""

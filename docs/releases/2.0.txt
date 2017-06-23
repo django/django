@@ -318,7 +318,12 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new :class:`.ProhibitNullCharactersValidator` disallows the null
+  character in the input of the :class:`~django.forms.CharField` form field
+  and its subclasses. Null character input was observed from vulnerability
+  scanning tools. Most databases silently discard null characters, but
+  psycopg2 2.7+ raises an exception when trying to save a null character to
+  a char/text field with PostgreSQL.
 
 .. _backwards-incompatible-2.0:
 

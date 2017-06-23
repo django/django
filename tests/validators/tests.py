@@ -9,11 +9,11 @@ from django.core.files.base import ContentFile
 from django.core.validators import (
     BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
-    MinValueValidator, RegexValidator, URLValidator, int_list_validator,
-    validate_comma_separated_integer_list, validate_email,
-    validate_image_file_extension, validate_integer, validate_ipv4_address,
-    validate_ipv6_address, validate_ipv46_address, validate_slug,
-    validate_unicode_slug,
+    MinValueValidator, ProhibitNullCharactersValidator, RegexValidator,
+    URLValidator, int_list_validator, validate_comma_separated_integer_list,
+    validate_email, validate_image_file_extension, validate_integer,
+    validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
+    validate_slug, validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 
@@ -264,6 +264,10 @@ TEST_DATA = [
     (validate_image_file_extension, ContentFile('contents', name='file.PNG'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
     (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
+
+    (ProhibitNullCharactersValidator(), '\x00something', ValidationError),
+    (ProhibitNullCharactersValidator(), 'something', None),
+    (ProhibitNullCharactersValidator(), None, None),
 ]
 
 
@@ -487,4 +491,22 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             FileExtensionValidator(['txt']),
             FileExtensionValidator(['txt'], message='custom error message')
+        )
+
+    def test_prohibit_null_characters_validator_equality(self):
+        self.assertEqual(
+            ProhibitNullCharactersValidator(message='message', code='code'),
+            ProhibitNullCharactersValidator(message='message', code='code')
+        )
+        self.assertEqual(
+            ProhibitNullCharactersValidator(),
+            ProhibitNullCharactersValidator()
+        )
+        self.assertNotEqual(
+            ProhibitNullCharactersValidator(message='message1', code='code'),
+            ProhibitNullCharactersValidator(message='message2', code='code')
+        )
+        self.assertNotEqual(
+            ProhibitNullCharactersValidator(message='message', code='code1'),
+            ProhibitNullCharactersValidator(message='message', code='code2')
         )
