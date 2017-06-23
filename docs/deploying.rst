@@ -136,6 +136,8 @@ Or telling a worker to ignore all messages on the "thumbnail" channel::
     python manage.py runworker --exclude-channels=thumbnail
 
 
+.. _run-interface-servers:
+
 Run interface servers
 ---------------------
 
