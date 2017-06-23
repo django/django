@@ -7,6 +7,19 @@ Simple mixins
 
 .. class:: django.views.generic.base.ContextMixin
 
+    **Attributes**
+
+    .. attribute:: extra_context
+
+        .. versionadded:: 2.0
+
+        A dictionary to include in the context. This is a convenient way of
+        specifying some simple context in
+        :meth:`~django.views.generic.base.View.as_view`. Example usage::
+
+            from django.views.generic import TemplateView
+            TemplateView.as_view(extra_context={'title': 'Custom Title'})
+
     **Methods**
 
     .. method:: get_context_data(**kwargs)
