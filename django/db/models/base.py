@@ -1553,8 +1553,8 @@ class Model(metaclass=ModelBase):
         errors = []
         fields = cls._meta.ordering
 
-        # Skip '?' fields.
-        fields = (f for f in fields if f != '?')
+        # Skip expressions and '?' fields.
+        fields = (f for f in fields if isinstance(f, str) and f != '?')
 
         # Convert "-field" to "field".
         fields = ((f[1:] if f.startswith('-') else f) for f in fields)

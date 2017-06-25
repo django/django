@@ -256,9 +256,10 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-order_date']
 
-    This is a tuple or list of strings. Each string is a field name with an optional
-    "-" prefix, which indicates descending order. Fields without a leading "-" will
-    be ordered ascending. Use the string "?" to order randomly.
+    This is a tuple or list of strings and/or query expressions. Each string is
+    a field name with an optional "-" prefix, which indicates descending order.
+    Fields without a leading "-" will be ordered ascending. Use the string "?"
+    to order randomly.
 
     For example, to order by a ``pub_date`` field ascending, use this::
 
@@ -272,8 +273,19 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
+    You can also use :doc:`query expressions </ref/models/expressions>`. To
+    order by ``author`` ascending and make null values sort last, use this::
+
+        from django.db.models import F
+
+        ordering = [F('author').asc(nulls_last=True)]
+
     Default ordering also affects :ref:`aggregation queries
     <aggregation-ordering-interaction>`.
+
+    .. versionchanged:: 2.0
+
+        Support for query expressions was added.
 
 .. warning::
 

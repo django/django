@@ -283,6 +283,9 @@ Models
   different conditionals <conditional-aggregation>` to multiple aggregations
   over the same fields or relations.
 
+* Added support for expressions in :attr:`Meta.ordering
+  <django.db.models.Options.ordering>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
