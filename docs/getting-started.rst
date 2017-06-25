@@ -382,26 +382,35 @@ provides you with an attribute called ``message.channel_session`` that acts
 just like a normal Django session.
 
 Let's use it now to build a chat server that expects you to pass a chatroom
-name in the path of your WebSocket request (we'll ignore auth for now - that's next)::
+name in the path of your WebSocket request and a query string with your username (we'll ignore auth for now - that's next)::
 
     # In consumers.py
     from channels import Group
     from channels.sessions import channel_session
+    from urllib.parse import parse_qs
 
     # Connected to websocket.connect
     @channel_session
     def ws_connect(message, room_name):
         # Accept connection
         message.reply_channel.send({"accept": True})
-        # Save room in session and add us to the group
-        message.channel_session['room_name'] = room_name
-        Group("chat-%s" % room).add(message.reply_channel)
+        # Parse the query string
+        params = parse_qs(message.content["query_string"])
+        if "username" in params:
+            # Set the username in the session
+            message.channel_session["username"] = params["username"]
+            # Add the user to the room_name group
+            Group("chat-%s" % room_name).add(message.reply_channel)
+        else:
+            # Close the connection.
+            message.reply_channel.send({"close": True})
 
     # Connected to websocket.receive
     @channel_session
     def ws_message(message, room_name):
-        Group("chat-%s" % message.channel_session['room_name']).send({
-            "text": message['text'],
+        Group("chat-%s" % room_name).send({
+            "text": message["text"],
+            "username": message.channel_session["username"]
         })
 
     # Connected to websocket.disconnect
@@ -416,9 +425,9 @@ Update ``routing.py`` as well::
     from myapp.consumers import ws_connect, ws_message, ws_disconnect
 
     channel_routing = [
-        route("websocket.connect", ws_connect),
-        route("websocket.receive", ws_message),
-        route("websocket.disconnect", ws_disconnect),
+        route("websocket.connect", ws_connect, path=r"^/(?P<room_name>[a-zA-Z0-9_]+)/$"),
+        route("websocket.receive", ws_message, path=r"^/(?P<room_name>[a-zA-Z0-9_]+)/$"),
+        route("websocket.disconnect", ws_disconnect, path=r"^/(?P<room_name>[a-zA-Z0-9_]+)/$"),
     ]
 
 If you play around with it from the console (or start building a simple
