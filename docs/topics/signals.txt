@@ -243,7 +243,7 @@ arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look::
 
-    class PizzaStore(object):
+    class PizzaStore:
         ...
 
         def send_pizza(self, toppings, size):

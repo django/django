@@ -42,7 +42,7 @@ method of database routers as ``**hints``:
 .. snippet::
     :filename: myapp/dbrouters.py
 
-    class MyRouter(object):
+    class MyRouter:
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
             if 'target_db' in hints:

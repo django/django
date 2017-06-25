@@ -43,7 +43,7 @@ A middleware can be written as a function that looks like this::
 
 Or it can be written as a class whose instances are callable, like this::
 
-    class SimpleMiddleware(object):
+    class SimpleMiddleware:
         def __init__(self, get_response):
             self.get_response = get_response
             # One-time configuration and initialization.

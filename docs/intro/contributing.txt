@@ -427,7 +427,7 @@ Navigate to the ``django/django/forms/`` folder and open the ``forms.py`` file.
 Find the ``BaseForm`` class on line 72 and add the ``prefix`` class attribute
 right after the ``field_order`` attribute::
 
-    class BaseForm(object):
+    class BaseForm:
         # This is the main implementation of all the Form logic. Note that this
         # class is different than Form. See the comments by the Form class for
         # more information. Any improvements to the form API should be made to
@@ -529,7 +529,7 @@ Use the arrow keys to move up and down.
     index 509709f..d1370de 100644
     --- a/django/forms/forms.py
     +++ b/django/forms/forms.py
-    @@ -75,6 +75,7 @@ class BaseForm(object):
+    @@ -75,6 +75,7 @@ class BaseForm:
          # information. Any improvements to the form API should be made to *this*
          # class, not to the Form class.
          field_order = None
@@ -537,7 +537,7 @@ Use the arrow keys to move up and down.
 
          def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                       initial=None, error_class=ErrorList, label_suffix=None,
-    @@ -83,7 +84,8 @@ class BaseForm(object):
+    @@ -83,7 +84,8 @@ class BaseForm:
              self.data = data or {}
              self.files = files or {}
              self.auto_id = auto_id

@@ -122,7 +122,7 @@ class ForeignKeyNameTests(IndexNameTests):
         )
 
 
-class MockReference(object):
+class MockReference:
     def __init__(self, representation, referenced_tables, referenced_columns):
         self.representation = representation
         self.referenced_tables = referenced_tables
