@@ -69,6 +69,13 @@ MRO is an acronym for Method Resolution Order.
         The returned view has ``view_class`` and ``view_initkwargs``
         attributes.
 
+        When the view is called during the request/response cycle, the
+        :class:`~django.http.HttpRequest` is assigned to the view's ``request``
+        attribute. Any positional and/or keyword arguments :ref:`captured from
+        the URL pattern <how-django-processes-a-request>` are assigned to the
+        ``args`` and ``kwargs`` attributes, respectively. Then :meth:`dispatch`
+        is called.
+
     .. method:: dispatch(request, *args, **kwargs)
 
         The ``view`` part of the view -- the method that accepts a ``request``
