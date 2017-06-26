@@ -657,9 +657,10 @@ __ http://spatialreference.org/ref/epsg/32140/
 Lazy Geometries
 ---------------
 GeoDjango loads geometries in a standardized textual representation.  When the
-geometry field is first accessed, GeoDjango creates a `GEOS geometry object
-<ref-geos>`, exposing powerful functionality, such as serialization properties
-for popular geospatial formats::
+geometry field is first accessed, GeoDjango creates a
+:class:`~django.contrib.gis.geos.GEOSGeometry` object, exposing powerful
+functionality, such as serialization properties for popular geospatial
+formats::
 
     >>> sm = WorldBorder.objects.get(name='San Marino')
     >>> sm.mpoly
