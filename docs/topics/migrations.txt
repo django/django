@@ -717,7 +717,7 @@ serializable, you can use the ``@deconstructible`` class decorator from
     from django.utils.deconstruct import deconstructible
 
     @deconstructible
-    class MyCustomClass(object):
+    class MyCustomClass:
 
         def __init__(self, foo=1):
             self.foo = foo

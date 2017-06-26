@@ -603,7 +603,7 @@ For example, a simple JSON mixin might look something like this::
 
     from django.http import JsonResponse
 
-    class JSONResponseMixin(object):
+    class JSONResponseMixin:
         """
         A mixin that can be used to render a JSON response.
         """

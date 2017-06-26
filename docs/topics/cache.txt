@@ -238,7 +238,7 @@ operations to ``cache_replica``, and all write operations to
 ``cache_primary``. The cache table will only be synchronized onto
 ``cache_primary``::
 
-    class CacheRouter(object):
+    class CacheRouter:
         """A router to control all database cache operations"""
 
         def db_for_read(self, model, **hints):

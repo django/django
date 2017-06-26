@@ -100,14 +100,14 @@ and returns a user object.
 The ``authenticate`` method takes a ``request`` argument and credentials as
 keyword arguments. Most of the time, it'll just look like this::
 
-    class MyBackend(object):
+    class MyBackend:
         def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a user.
             ...
 
 But it could also authenticate a token, like so::
 
-    class MyBackend(object):
+    class MyBackend:
         def authenticate(self, request, token=None):
             # Check the token and return a user.
             ...
@@ -135,7 +135,7 @@ object the first time a user authenticates::
     from django.contrib.auth.hashers import check_password
     from django.contrib.auth.models import User
 
-    class SettingsBackend(object):
+    class SettingsBackend:
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
@@ -198,7 +198,7 @@ will immediately fail and Django won't check the backends that follow.
 The simple backend above could implement permissions for the magic admin
 fairly simply::
 
-    class SettingsBackend(object):
+    class SettingsBackend:
         ...
         def has_perm(self, user_obj, perm, obj=None):
             return user_obj.username == settings.ADMIN_LOGIN

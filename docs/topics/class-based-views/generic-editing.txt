@@ -233,7 +233,7 @@ works for AJAX requests as well as 'normal' form POSTs::
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AjaxableResponseMixin(object):
+    class AjaxableResponseMixin:
         """
         Mixin to add AJAX support to a form.
         Must be used with an object-based FormView (e.g. CreateView)

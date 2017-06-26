@@ -40,7 +40,7 @@ class Money(decimal.Decimal):
         )
 
 
-class TestModel1(object):
+class TestModel1:
     def upload_to(self):
         return '/somewhere/dynamic/'
     thing = models.FileField(upload_to=upload_to)

@@ -531,7 +531,7 @@ fictional ``foobar`` template library::
                 raise TemplateSyntaxError(exc.args)
 
 
-    class Template(object):
+    class Template:
 
         def __init__(self, template):
             self.template = template

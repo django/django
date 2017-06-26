@@ -36,7 +36,7 @@ You only need to know that 52 cards are dealt out equally to four players, who
 are traditionally called *north*, *east*, *south* and *west*.  Our class looks
 something like this::
 
-    class Hand(object):
+    class Hand:
         """A hand of cards (bridge style)"""
 
         def __init__(self, north, east, south, west):
