@@ -472,6 +472,10 @@ Miscellaneous
   option. Add this to your existing migrations or accept an auto-generated
   migration for fields that use it.
 
+* Performing queries that require :ref:`automatic spatial transformations
+  <automatic-spatial-transformations>` now raises ``NotImplementedError``
+  on MySQL instead of silently using non-transformed geometries.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

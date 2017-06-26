@@ -72,10 +72,7 @@ class BaseSpatialOperations:
         backend.
         """
         def transform_value(value, field):
-            return (
-                not (value is None or value.srid == field.srid) and
-                self.connection.features.supports_transform
-            )
+            return value is not None and value.srid != field.srid
 
         if hasattr(value, 'as_sql'):
             return (

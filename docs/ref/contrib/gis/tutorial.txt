@@ -610,6 +610,8 @@ of a queryset::
 The ``contains`` and ``intersects`` lookups are just a subset of the
 available queries -- the :doc:`db-api` documentation has more.
 
+.. _automatic-spatial-transformations:
+
 Automatic Spatial Transformations
 ---------------------------------
 When doing spatial queries, GeoDjango automatically transforms

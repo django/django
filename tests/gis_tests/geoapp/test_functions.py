@@ -270,7 +270,7 @@ class GISFunctionsTests(TestCase):
     def test_area_with_regular_aggregate(self):
         # Create projected country objects, for this test to work on all backends.
         for c in Country.objects.all():
-            CountryWebMercator.objects.create(name=c.name, mpoly=c.mpoly)
+            CountryWebMercator.objects.create(name=c.name, mpoly=c.mpoly.transform(3857, clone=True))
         # Test in projected coordinate system
         qs = CountryWebMercator.objects.annotate(area_sum=Sum(functions.Area('mpoly')))
         # Some backends (e.g. Oracle) cannot group by multipolygon values, so

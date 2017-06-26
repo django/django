@@ -132,7 +132,8 @@ class RelatedGeoModelTest(TestCase):
         # actually correspond to the centroid of the border.
         c1 = b1.centroid
         c2 = c1.transform(2276, clone=True)
-        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b1)
+        b2 = b1 if connection.features.supports_transform else b1.transform(2276, clone=True)
+        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b2)
 
         # Should return the second Parcel, which has the center within the
         # border.
@@ -140,12 +141,15 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
 
+        # This time center2 is in a different coordinate system and needs to be
+        # wrapped in transformation SQL.
+        qs = Parcel.objects.filter(center2__within=F('border1'))
         if connection.features.supports_transform:
-            # This time center2 is in a different coordinate system and needs
-            # to be wrapped in transformation SQL.
-            qs = Parcel.objects.filter(center2__within=F('border1'))
-            self.assertEqual(1, len(qs))
-            self.assertEqual('P2', qs[0].name)
+            self.assertEqual('P2', qs.get().name)
+        else:
+            msg = "This backend doesn't support the Transform function."
+            with self.assertRaisesMessage(NotImplementedError, msg):
+                list(qs)
 
         # Should return the first Parcel, which has the center point equal
         # to the point in the City ForeignKey.
@@ -153,11 +157,14 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P1', qs[0].name)
 
+        # This time the city column should be wrapped in transformation SQL.
+        qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
         if connection.features.supports_transform:
-            # This time the city column should be wrapped in transformation SQL.
-            qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
-            self.assertEqual(1, len(qs))
-            self.assertEqual('P1', qs[0].name)
+            self.assertEqual('P1', qs.get().name)
+        else:
+            msg = "This backend doesn't support the Transform function."
+            with self.assertRaisesMessage(NotImplementedError, msg):
+                list(qs)
 
     def test07_values(self):
         "Testing values() and values_list()."
