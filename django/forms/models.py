@@ -590,20 +590,37 @@ class BaseModelFormSet(BaseFormSet):
         return field.to_python
 
     def _construct_form(self, i, **kwargs):
-        if self.is_bound and i < self.initial_form_count():
-            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
-            pk = self.data[pk_key]
-            pk_field = self.model._meta.pk
-            to_python = self._get_to_python(pk_field)
-            pk = to_python(pk)
-            kwargs['instance'] = self._existing_object(pk)
-        if i < self.initial_form_count() and 'instance' not in kwargs:
-            kwargs['instance'] = self.get_queryset()[i]
-        if i >= self.initial_form_count() and self.initial_extra:
+        pk_required = False
+        if i < self.initial_form_count():
+            pk_required = True
+            if self.is_bound:
+                pk_key = '%s-%s' % (self.add_prefix(i), self.model._meta.pk.name)
+                try:
+                    pk = self.data[pk_key]
+                except KeyError:
+                    # The primary key is missing. The user may have tampered
+                    # with POST data.
+                    pass
+                else:
+                    to_python = self._get_to_python(self.model._meta.pk)
+                    try:
+                        pk = to_python(pk)
+                    except ValidationError:
+                        # The primary key exists but is an invalid value. The
+                        # user may have tampered with POST data.
+                        pass
+                    else:
+                        kwargs['instance'] = self._existing_object(pk)
+            else:
+                kwargs['instance'] = self.get_queryset()[i]
+        elif self.initial_extra:
             # Set initial values for extra forms
             with suppress(IndexError):
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
-        return super()._construct_form(i, **kwargs)
+        form = super()._construct_form(i, **kwargs)
+        if pk_required:
+            form.fields[self.model._meta.pk.name].required = True
+        return form
 
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
