@@ -339,7 +339,7 @@ class ModelPaginationTests(TestCase):
         Unordered object list warning with an object that has an orderd
         attribute but not a model attribute.
         """
-        class ObjectList():
+        class ObjectList:
             ordered = False
         object_list = ObjectList()
         with warnings.catch_warnings(record=True) as warns:

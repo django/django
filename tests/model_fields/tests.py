@@ -9,7 +9,7 @@ from .models import (
 )
 
 
-class Nested():
+class Nested:
     class Field(models.Field):
         pass
 
