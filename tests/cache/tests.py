@@ -1312,6 +1312,18 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
         self.assertIsInstance(warns[0].message, RemovedInDjango21Warning)
         self.assertEqual(str(warns[0].message), deprecation_message)
 
+    # We want to test what happens if memcached is down. 192.0.2.0 is reserved
+    # for examples, and therefore should never point to a valid memcached
+    # server. See https://tools.ietf.org/html/rfc5737.
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=PyLibMCCache_params,
+        exclude=memcached_excluded_caches,
+        LOCATION='192.0.2.0',
+    ))
+    def test_pylibmc_fails_silently(self):
+        cache.set("key", "value")
+        self.assertEqual(cache.get("key"), None)
+
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.filebased.FileBasedCache',

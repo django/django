@@ -194,6 +194,54 @@ class PyLibMCCache(BaseMemcachedCache):
     def _cache(self):
         return self._lib.Client(self._servers, **self._options)
 
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            return super().add(key, value, timeout=timeout, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            return value
+
+    def get(self, key, default=None, version=None):
+        try:
+            return super().get(key, default=default, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            return default
+
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            super().set(key, value, timeout=timeout, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            pass
+
+    def delete(self, key, version=None):
+        try:
+            super().delete(key, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            pass
+
+    def incr(self, key, delta=1, version=None):
+        try:
+            return super().incr(key, delta=delta, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            raise ValueError("Key '%s' not found" % key)
+
+    def decr(self, key, delta=1, version=None):
+        try:
+            return super().decr(key, delta=delta, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            raise ValueError("Key '%s' not found" % key)
+
+    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            super().set_many(data, timeout=timeout, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            pass
+
+    def delete_many(self, keys, version=None):
+        try:
+            super().delete_many(keys, version=version)
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+            pass
+
     def close(self, **kwargs):
         # libmemcached manages its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
