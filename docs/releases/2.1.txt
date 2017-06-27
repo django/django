@@ -162,7 +162,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the :meth:`~django.utils.translation.get_supported_language_variant`
+  function.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~

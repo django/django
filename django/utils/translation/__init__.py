@@ -205,6 +205,10 @@ def get_language_from_path(path):
     return _trans.get_language_from_path(path)
 
 
+def get_supported_language_variant(lang_code, *, strict=False):
+    return _trans.get_supported_language_variant(lang_code, strict)
+
+
 def templatize(src, **kwargs):
     from .template import templatize
     return templatize(src, **kwargs)

@@ -1092,6 +1092,23 @@ functions without the ``u``.
     for whether its path begins with a language code listed in the
     :setting:`LANGUAGES` setting.
 
+.. function:: get_supported_language_variant(lang_code, strict=False)
+
+    .. versionadded:: 2.1
+
+    Returns ``lang_code`` if it's in the :setting:`LANGUAGES` setting, possibly
+    selecting a more generic variant. For example, ``'es'`` is returned if
+    ``lang_code`` is ``'es-ar'`` and ``'es'`` is in :setting:`LANGUAGES` but
+    ``'es-ar'`` isn't.
+
+    If ``strict`` is ``False`` (the default), a country-specific variant may
+    be returned when neither the language code nor its generic variant is found.
+    For example, if only ``'es-co'`` is in :setting:`LANGUAGES`, that's
+    returned for ``lang_code``\s like ``'es'`` and ``'es-ar'``. Those matches
+    aren't returned if ``strict=True``.
+
+    Raises :exc:`LookupError` if nothing is found.
+
 .. function:: to_locale(language)
 
     Turns a language name (en-us) into a locale name (en_US).

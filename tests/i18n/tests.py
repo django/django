@@ -1307,6 +1307,50 @@ class MiscTests(SimpleTestCase):
         self.assertEqual(g(r), 'zh-hans')
 
     @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('en', 'English'),
+            ('de', 'German'),
+            ('de-at', 'Austrian German'),
+            ('pt-br', 'Portuguese (Brazil)'),
+        ],
+    )
+    def test_get_supported_language_variant_real(self):
+        g = trans_real.get_supported_language_variant
+        self.assertEqual(g('en'), 'en')
+        self.assertEqual(g('en-gb'), 'en')
+        self.assertEqual(g('de'), 'de')
+        self.assertEqual(g('de-at'), 'de-at')
+        self.assertEqual(g('de-ch'), 'de')
+        self.assertEqual(g('pt-br'), 'pt-br')
+        self.assertEqual(g('pt'), 'pt-br')
+        self.assertEqual(g('pt-pt'), 'pt-br')
+        with self.assertRaises(LookupError):
+            g('pt', strict=True)
+        with self.assertRaises(LookupError):
+            g('pt-pt', strict=True)
+        with self.assertRaises(LookupError):
+            g('xyz')
+        with self.assertRaises(LookupError):
+            g('xy-zz')
+
+    def test_get_supported_language_variant_null(self):
+        g = trans_null.get_supported_language_variant
+        self.assertEqual(g(settings.LANGUAGE_CODE), settings.LANGUAGE_CODE)
+        with self.assertRaises(LookupError):
+            g('pt')
+        with self.assertRaises(LookupError):
+            g('de')
+        with self.assertRaises(LookupError):
+            g('de-at')
+        with self.assertRaises(LookupError):
+            g('de', strict=True)
+        with self.assertRaises(LookupError):
+            g('de-at', strict=True)
+        with self.assertRaises(LookupError):
+            g('xyz')
+
+    @override_settings(
         LANGUAGES=[
             ('en', 'English'),
             ('de', 'German'),
