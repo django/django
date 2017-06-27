@@ -404,6 +404,17 @@ For custom management commands that use options not created using
     class MyCommand(BaseCommand):
         stealth_options = ('option_name', ...)
 
+Indexes no longer accept positional arguments
+---------------------------------------------
+
+For example::
+
+    models.Index(['headline', '-pub_date'], 'index_name')
+
+raises an exception and should be replaced with::
+
+    models.Index(fields=['headline', '-pub_date'], name='index_name')
+
 Miscellaneous
 -------------
 

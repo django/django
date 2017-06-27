@@ -11,7 +11,7 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, fields=[], name=None):
+    def __init__(self, *, fields=[], name=None):
         if not isinstance(fields, list):
             raise ValueError('Index.fields must be a list.')
         if not fields:
