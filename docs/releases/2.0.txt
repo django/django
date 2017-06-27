@@ -245,6 +245,9 @@ Models
   function to truncate :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` to the first day of a quarter.
 
+* Added the :attr:`~django.db.models.Index.db_tablespace` parameter to
+  class-based indexes.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
