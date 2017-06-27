@@ -20,6 +20,14 @@ Once that's done, you should add ``channels`` to your
 That's it! Once enabled, ``channels`` will integrate itself into Django and
 take control of the ``runserver`` command. See :doc:`getting-started` for more.
 
+.. note::
+  Please be wary of any other third-party apps that require an overloaded or
+  replacement ``runserver`` command. Channels provides a separate
+  ``runserver`` command and may conflict with it. An example
+  of such a conflict is with `whitenoise.runserver_nostatic <https://github.com/evansd/whitenoise/issues/77>`_
+  from `whitenoise <https://github.com/evansd/whitenoise>`_. In order to
+  solve such issues, try moving ``channels`` to the top of your ``INSTALLED_APPS``
+  or remove the offending app altogether.
 
 Installing the latest development version
 -----------------------------------------
