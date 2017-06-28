@@ -31,7 +31,7 @@ class SQLCompiler:
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
 
     def setup_query(self):
-        if all(self.query.alias_refcount[a] == 0 for a in self.query.tables):
+        if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
             self.query.get_initial_alias()
         self.select, self.klass_info, self.annotation_col_map = self.get_select()
         self.col_count = len(self.select)
@@ -141,7 +141,7 @@ class SQLCompiler:
                 # Is this a reference to query's base table primary key? If the
                 # expression isn't a Col-like, then skip the expression.
                 if (getattr(expr, 'target', None) == self.query.model._meta.pk and
-                        getattr(expr, 'alias', None) == self.query.tables[0]):
+                        getattr(expr, 'alias', None) == self.query.base_table):
                     pk = expr
                     break
             # If the main model's primary key is in the query, group by that
@@ -681,7 +681,7 @@ class SQLCompiler:
         """
         result = []
         params = []
-        for alias in self.query.tables:
+        for alias in self.query.alias_map:
             if not self.query.alias_refcount[alias]:
                 continue
             try:
@@ -1149,10 +1149,10 @@ class SQLDeleteCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
-        assert len([t for t in self.query.tables if self.query.alias_refcount[t] > 0]) == 1, \
+        assert len([t for t in self.query.alias_map if self.query.alias_refcount[t] > 0]) == 1, \
             "Can only delete from one table at a time."
         qn = self.quote_name_unless_alias
-        result = ['DELETE FROM %s' % qn(self.query.tables[0])]
+        result = ['DELETE FROM %s' % qn(self.query.base_table)]
         where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
@@ -1205,7 +1205,7 @@ class SQLUpdateCompiler(SQLCompiler):
                 update_params.append(val)
             else:
                 values.append('%s = NULL' % qn(name))
-        table = self.query.tables[0]
+        table = self.query.base_table
         result = [
             'UPDATE %s SET' % qn(table),
             ', '.join(values),

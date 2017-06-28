@@ -971,7 +971,7 @@ class Subquery(Expression):
         clone.queryset.query = clone.queryset.query.relabeled_clone(change_map)
         clone.queryset.query.external_aliases.update(
             alias for alias in change_map.values()
-            if alias not in clone.queryset.query.tables
+            if alias not in clone.queryset.query.alias_map
         )
         return clone
 

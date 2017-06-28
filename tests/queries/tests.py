@@ -272,7 +272,7 @@ class Queries1Tests(TestCase):
         list(q2)
         combined_query = (q1 & q2).order_by('name').query
         self.assertEqual(len([
-            t for t in combined_query.tables if combined_query.alias_refcount[t]
+            t for t in combined_query.alias_map if combined_query.alias_refcount[t]
         ]), 1)
 
     def test_order_by_join_unref(self):
@@ -499,7 +499,7 @@ class Queries1Tests(TestCase):
             qs,
             ['<Item: four>', '<Item: one>', '<Item: three>', '<Item: two>']
         )
-        self.assertEqual(len(qs.query.tables), 1)
+        self.assertEqual(len(qs.query.alias_map), 1)
 
     def test_tickets_2874_3002(self):
         qs = Item.objects.select_related().order_by('note__note', 'name')
