@@ -1,0 +1,23 @@
+1.1.6 Release Notes
+===================
+
+Channels 1.1.5 is a packaging release for the 1.1 series, released on
+June 28th, 2017.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Minor Changes & Bugfixes
+------------------------
+
+* The ``runserver`` ``server_cls`` override no longer fails with more modern
+  Django versions that pass an ``ipv6`` parameter.
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

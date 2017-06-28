@@ -1,6 +1,13 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+1.1.6 (2017-06-28)
+------------------
+
+* The ``runserver`` ``server_cls`` override no longer fails with more modern
+  Django versions that pass an ``ipv6`` parameter.
+
+
 1.1.5 (2017-06-16)
 ------------------
 
