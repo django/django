@@ -1916,7 +1916,7 @@ Example: ``"http://media.example.com/"``
 
 .. versionadded:: 1.10
 
-Default:: ``None``
+Default: ``None``
 
 A list of middleware to use. See :doc:`/topics/http/middleware`.
 
