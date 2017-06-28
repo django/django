@@ -1958,7 +1958,7 @@ Example: ``"http://media.example.com/"``
 ``MIDDLEWARE``
 --------------
 
-Default:: ``None``
+Default: ``None``
 
 A list of middleware to use. See :doc:`/topics/http/middleware`.
 
