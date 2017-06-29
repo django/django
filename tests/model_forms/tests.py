@@ -19,7 +19,7 @@ from django.forms.models import (
 )
 from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, mock, skipUnlessDBFeature
 from django.utils import six
 from django.utils._os import upath
 
@@ -2942,6 +2942,16 @@ class LimitChoicesToTests(TestCase):
     def test_fields_for_model_applies_limit_choices_to(self):
         fields = fields_for_model(StumpJoke, ['has_fooled_today'])
         self.assertSequenceEqual(fields['has_fooled_today'].queryset, [self.threepwood])
+
+    def test_callable_called_each_time_form_is_instantiated(self):
+        field = StumpJokeForm.base_fields['most_recently_fooled']
+        with mock.patch.object(field, 'limit_choices_to') as today_callable_dict:
+            StumpJokeForm()
+            self.assertEqual(today_callable_dict.call_count, 1)
+            StumpJokeForm()
+            self.assertEqual(today_callable_dict.call_count, 2)
+            StumpJokeForm()
+            self.assertEqual(today_callable_dict.call_count, 3)
 
 
 class FormFieldCallbackTests(SimpleTestCase):

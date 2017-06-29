@@ -97,10 +97,18 @@ def model_to_dict(instance, fields=None, exclude=None):
     return data
 
 
+def apply_limit_choices_to_to_formfield(formfield):
+    """Apply limit_choices_to to the formfield's queryset if needed."""
+    if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
+        limit_choices_to = formfield.get_limit_choices_to()
+        if limit_choices_to is not None:
+            formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
+
+
 def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      formfield_callback=None, localized_fields=None,
                      labels=None, help_texts=None, error_messages=None,
-                     field_classes=None):
+                     field_classes=None, apply_limit_choices_to=True):
     """
     Returns a ``OrderedDict`` containing form fields for the given model.
 
@@ -127,6 +135,9 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
 
     ``field_classes`` is a dictionary of model field names mapped to a form
     field class.
+
+    ``apply_limit_choices_to`` is a boolean indicating if limit_choices_to
+    should be applied to a field's queryset.
     """
     field_list = []
     ignored = []
@@ -170,11 +181,8 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
             formfield = formfield_callback(f, **kwargs)
 
         if formfield:
-            # Apply ``limit_choices_to``.
-            if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
-                limit_choices_to = formfield.get_limit_choices_to()
-                if limit_choices_to is not None:
-                    formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
+            if apply_limit_choices_to:
+                apply_limit_choices_to_to_formfield(formfield)
             field_list.append((f.name, formfield))
         else:
             ignored.append(f.name)
@@ -245,11 +253,13 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 # fields from the model"
                 opts.fields = None
 
-            fields = fields_for_model(opts.model, opts.fields, opts.exclude,
-                                      opts.widgets, formfield_callback,
-                                      opts.localized_fields, opts.labels,
-                                      opts.help_texts, opts.error_messages,
-                                      opts.field_classes)
+            fields = fields_for_model(
+                opts.model, opts.fields, opts.exclude, opts.widgets,
+                formfield_callback, opts.localized_fields, opts.labels,
+                opts.help_texts, opts.error_messages, opts.field_classes,
+                # limit_choices_to will be applied during ModelForm.__init__().
+                apply_limit_choices_to=False,
+            )
 
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in six.iteritems(fields) if not v]
@@ -296,6 +306,8 @@ class BaseModelForm(BaseForm):
             data, files, auto_id, prefix, object_data, error_class,
             label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
         )
+        for formfield in self.fields.values():
+            apply_limit_choices_to_to_formfield(formfield)
 
     def _get_validation_exclusions(self):
         """
