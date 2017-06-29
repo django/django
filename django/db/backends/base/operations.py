@@ -177,16 +177,15 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def for_update_sql(self, nowait=False, skip_locked=False):
+    def for_update_sql(self, nowait=False, skip_locked=False, of=()):
         """
         Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """
-        if nowait:
-            return 'FOR UPDATE NOWAIT'
-        elif skip_locked:
-            return 'FOR UPDATE SKIP LOCKED'
-        else:
-            return 'FOR UPDATE'
+        return 'FOR UPDATE%s%s%s' % (
+            ' OF %s' % ', '.join(of) if of else '',
+            ' NOWAIT' if nowait else '',
+            ' SKIP LOCKED' if skip_locked else '',
+        )
 
     def last_executed_query(self, cursor, sql, params):
         """
