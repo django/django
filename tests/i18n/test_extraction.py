@@ -25,7 +25,7 @@ from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')
 gettext_version = MakeMessagesCommand().gettext_version if has_xgettext else None
-requires_gettext_019 = skipIf(gettext_version < (0, 19), 'gettext 0.19 required')
+requires_gettext_019 = skipIf(has_xgettext and gettext_version < (0, 19), 'gettext 0.19 required')
 
 
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
