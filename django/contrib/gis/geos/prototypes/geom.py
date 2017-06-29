@@ -68,16 +68,6 @@ class StringFromGeom(GEOSFuncFactory):
 
 # ### ctypes prototypes ###
 
-# Deprecated creation routines from WKB, HEX, WKT
-from_hex = BinConstructor('GEOSGeomFromHEX_buf')
-from_wkb = BinConstructor('GEOSGeomFromWKB_buf')
-from_wkt = GeomOutput('GEOSGeomFromWKT', [c_char_p])
-
-# Deprecated output routines
-to_hex = BinOutput('GEOSGeomToHEX_buf')
-to_wkb = BinOutput('GEOSGeomToWKB_buf')
-to_wkt = StringFromGeom('GEOSGeomToWKT')
-
 # The GEOS geometry type, typeid, num_coordinates and number of geometries
 geos_normalize = IntFromGeom('GEOSNormalize')
 geos_type = StringFromGeom('GEOSGeomType')
