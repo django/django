@@ -323,6 +323,7 @@ class QuerySet:
         """
         if self.query.distinct_fields:
             raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
+        self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='aggregate')
         for arg in args:
             # The default_alias property raises TypeError if default_alias
             # can't be set automatically or AttributeError if it isn't an
@@ -895,6 +896,7 @@ class QuerySet:
         Return a query set in which the returned objects have been annotated
         with extra data or aggregations.
         """
+        self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
         annotations = OrderedDict()  # To preserve ordering of args
         for arg in args:
             # The default_alias property may raise a TypeError.
@@ -1144,6 +1146,17 @@ class QuerySet:
         example, qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
+
+    @staticmethod
+    def _validate_values_are_expressions(values, method_name):
+        invalid_args = sorted(str(arg) for arg in values if not hasattr(arg, 'resolve_expression'))
+        if invalid_args:
+            raise TypeError(
+                'QuerySet.%s() received non-expression(s): %s.' % (
+                    method_name,
+                    ', '.join(invalid_args),
+                )
+            )
 
 
 class InstanceCheckMeta(type):
