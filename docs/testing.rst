@@ -358,7 +358,25 @@ In the test above Daphne and Channels worker processes were fired up.
 These processes run your project against the test database and the
 default channel layer you spacify in the settings.  If channel layer
 support ``flush`` extension, initial cleanup will be done.  So do not
-run this code against your production environment.  When channels
+run this code against your production environment. 
+ChannelLiveServerTestCase can not be used with in memory databases.
+When using the SQLite database engine the Django tests will by default 
+use an in-memory database. To disable this add the ``TEST`` setting
+to the database configuration.
+
+.. code:: python
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'TEST': {
+                'NAME': 'testdb.sqlite3'
+            }
+        }
+    }
+
+When channels
 infrastructure is ready default web browser will be also started.  You
 can open your website in the real browser which can execute JavaScript
 and operate on WebSockets.  ``live_server_ws_url`` property is also
