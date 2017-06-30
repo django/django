@@ -30,3 +30,7 @@ Bugfixes
 
 * Fixed a regression in caching of a ``GenericForeignKey`` when the referenced
   model instance uses multi-table inheritance (:ticket:`28856`).
+
+* Fixed "Cannot change column 'x': used in a foreign key constraint" crash on
+  MySQL with a sequence of ``AlterField`` and/or ``RenameField`` operations in
+  a migration (:ticket:`28305`).

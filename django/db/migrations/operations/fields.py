@@ -5,6 +5,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from .base import Operation
+from .utils import is_referenced_by_foreign_key
 
 
 class FieldOperation(Operation):
@@ -201,8 +202,12 @@ class AlterField(FieldOperation):
         ]
         # TODO: investigate if old relational fields must be reloaded or if it's
         # sufficient if the new field is (#27737).
-        # Delay rendering of relationships if it's not a relational field
-        delay = not field.is_relation
+        # Delay rendering of relationships if it's not a relational field and
+        # not referenced by a foreign key.
+        delay = (
+            not field.is_relation and
+            not is_referenced_by_foreign_key(state, self.model_name_lower, self.field, self.name)
+        )
         state.reload_model(app_label, self.model_name_lower, delay=delay)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -275,8 +280,12 @@ class RenameField(FieldOperation):
         for index, (name, field) in enumerate(fields):
             if name == self.old_name:
                 fields[index] = (self.new_name, field)
-                # Delay rendering of relationships if it's not a relational field.
-                delay = not field.is_relation
+                # Delay rendering of relationships if it's not a relational
+                # field and not referenced by a foreign key.
+                delay = (
+                    not field.is_relation and
+                    not is_referenced_by_foreign_key(state, self.model_name_lower, field, self.name)
+                )
                 break
         else:
             raise FieldDoesNotExist(
