@@ -536,9 +536,15 @@ class BaseDatabaseSchemaEditor:
                 ))
             for constraint_name in constraint_names:
                 self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
-        # Drop incoming FK constraints if we're a primary key and things are going
-        # to change.
-        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+        # Drop incoming FK constraints if the field is a primary key or unique,
+        # which might be a to_field target, and things are going to change.
+        drop_foreign_keys = (
+            (
+                (old_field.primary_key and new_field.primary_key) or
+                (old_field.unique and new_field.unique)
+            ) and old_type != new_type
+        )
+        if drop_foreign_keys:
             # '_meta.related_field' also contains M2M reverse fields, these
             # will be filtered out
             for _old_rel, new_rel in _related_non_m2m_objects(old_field, new_field):
@@ -727,7 +733,7 @@ class BaseDatabaseSchemaEditor:
                 new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
-        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+        if drop_foreign_keys:
             for rel in new_field.model._meta.related_objects:
                 if not rel.many_to_many and rel.field.db_constraint:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
