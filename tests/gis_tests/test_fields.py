@@ -7,9 +7,9 @@ from django.test import SimpleTestCase
 class FieldsTests(SimpleTestCase):
 
     def test_area_field_deepcopy(self):
-        field = AreaField()
+        field = AreaField(None)
         self.assertEqual(copy.deepcopy(field), field)
 
     def test_distance_field_deepcopy(self):
-        field = DistanceField()
+        field = DistanceField(None)
         self.assertEqual(copy.deepcopy(field), field)

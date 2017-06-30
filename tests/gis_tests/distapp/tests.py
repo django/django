@@ -9,7 +9,9 @@ from django.db import connection
 from django.db.models import F, Q
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import mysql, no_oracle, oracle, postgis, spatialite
+from ..utils import (
+    FuncTestMixin, mysql, no_oracle, oracle, postgis, spatialite,
+)
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
@@ -262,7 +264,7 @@ Perimeter(geom1)                                |    OK              |      :-( 
 '''  # NOQA
 
 
-class DistanceFunctionsTests(TestCase):
+class DistanceFunctionsTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     @skipUnlessDBFeature("has_Area_function")

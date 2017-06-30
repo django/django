@@ -389,3 +389,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         def converter(value, expression, connection):
             return None if value is None else GEOSGeometryBase(read(value), geom_class)
         return converter
+
+    def get_area_att_for_field(self, field):
+        return 'sq_m'
