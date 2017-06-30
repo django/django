@@ -54,3 +54,6 @@ Bugfixes
 
 * Prevented a primary key alteration from adding a foreign key constraint if
   ``db_constraint=False`` (:ticket:`28298`).
+
+* Fixed ``UnboundLocalError`` crash in ``RenameField`` with nonexistent field
+  (:ticket:`28350`).

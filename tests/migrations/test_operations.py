@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import unittest
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations import CreateModel
@@ -1369,6 +1370,12 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RenameField")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'old_name': "pink", 'new_name': "blue"})
+
+    def test_rename_missing_field(self):
+        state = ProjectState()
+        state.add_model(ModelState('app', 'model', []))
+        with self.assertRaisesMessage(FieldDoesNotExist, "app.model has no field named 'field'"):
+            migrations.RenameField('model', 'field', 'new_field').state_forwards('app', state)
 
     def test_alter_unique_together(self):
         """
