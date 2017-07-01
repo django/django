@@ -41,8 +41,29 @@ class ProcessSetup(multiprocessing.Process):
         else:
             django.setup()
 
+    def cleanup_connections(self):
+
+        # Channels run `django.db.close_old_connections` as a signal
+        # receiver after each consumer finished event.  This function
+        # iterate on each created connection wrapper, checks if
+        # connection is still usable and closes it otherwise.  Under
+        # normal circumstances this is a very reasonable approach.
+        # When process starts the usual way `django.db.connections`
+        # contains empty connection list.  But channels worker in the
+        # test case is created with the fork system call.  This means
+        # file descriptors from the parent process are available in
+        # the connection list, but connections themselves are not
+        # usable.  So test worker will close connections of the parent
+        # process and test suite will fail when it tries to flush
+        # database after test run.
+        #
+        # See https://github.com/django/channels/issues/614
+        for alias in self.databases:
+            del connections[alias]
+
     def setup_databases(self):
 
+        self.cleanup_connections()
         for alias, db in self.databases.items():
             backend = load_backend(db['ENGINE'])
             conn = backend.DatabaseWrapper(db, alias)
