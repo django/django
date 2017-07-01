@@ -1,4 +1,4 @@
-from django.contrib.postgres.indexes import BrinIndex, GinIndex
+from django.contrib.postgres.indexes import BrinIndex, GinIndex, GistIndex
 from django.db import connection
 from django.test import skipUnlessDBFeature
 
@@ -92,6 +92,46 @@ class GinIndexTests(PostgreSQLTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_gin'})
 
 
+class GistIndexTests(PostgreSQLTestCase):
+
+    def test_suffix(self):
+        self.assertEqual(GistIndex.suffix, 'gist')
+
+    def test_eq(self):
+        index = GistIndex(fields=['title'], fillfactor=64)
+        same_index = GistIndex(fields=['title'], fillfactor=64)
+        another_index = GistIndex(fields=['author'], buffering=True)
+        self.assertEqual(index, same_index)
+        self.assertNotEqual(index, another_index)
+
+    def test_name_auto_generation(self):
+        index = GistIndex(fields=['field'])
+        index.set_name_with_model(CharFieldModel)
+        self.assertEqual(index.name, 'postgres_te_field_1e0206_gist')
+
+    def test_deconstruction(self):
+        index = GistIndex(fields=['title'], name='test_title_gist', buffering=False, fillfactor=80)
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.indexes.GistIndex')
+        self.assertEqual(args, ())
+        self.assertEqual(
+            kwargs,
+            {
+                'fields': ['title'],
+                'name': 'test_title_gist',
+                'buffering': False,
+                'fillfactor': 80,
+            }
+        )
+
+    def test_deconstruction_no_customization(self):
+        index = GistIndex(fields=['title'], name='test_title_gist')
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.indexes.GistIndex')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_gist'})
+
+
 class SchemaTests(PostgreSQLTestCase):
 
     def get_constraints(self, table):
@@ -151,6 +191,34 @@ class SchemaTests(PostgreSQLTestCase):
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]['type'], BrinIndex.suffix)
         self.assertEqual(constraints[index_name]['options'], ['pages_per_range=4'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(CharFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    def test_gist_index(self):
+        # Ensure the table is there and doesn't have an index.
+        self.assertNotIn('field', self.get_constraints(CharFieldModel._meta.db_table))
+        # Add the index.
+        index_name = 'char_field_model_field_gist'
+        index = GistIndex(fields=['field'], name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(CharFieldModel, index)
+        constraints = self.get_constraints(CharFieldModel._meta.db_table)
+        # The index was added.
+        self.assertEqual(constraints[index_name]['type'], GistIndex.suffix)
+        # Drop the index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(CharFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    def test_gist_parameters(self):
+        index_name = 'integer_array_gist_buffering'
+        index = GistIndex(fields=['field'], name=index_name, buffering=True, fillfactor=80)
+        with connection.schema_editor() as editor:
+            editor.add_index(CharFieldModel, index)
+        constraints = self.get_constraints(CharFieldModel._meta.db_table)
+        self.assertEqual(constraints[index_name]['type'], GistIndex.suffix)
+        self.assertEqual(constraints[index_name]['options'], ['buffering=on', 'fillfactor=80'])
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))

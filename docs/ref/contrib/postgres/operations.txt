@@ -58,6 +58,15 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
     Install the ``btree_gin`` extension.
 
+``BtreeGistExtension``
+======================
+
+.. class:: BtreeGistExtension()
+
+    .. versionadded:: 2.0
+
+    Install the ``btree_gist`` extension.
+
 ``CITextExtension``
 ===================
 

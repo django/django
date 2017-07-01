@@ -33,6 +33,12 @@ class BtreeGinExtension(CreateExtension):
         self.name = 'btree_gin'
 
 
+class BtreeGistExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'btree_gist'
+
+
 class CITextExtension(CreateExtension):
 
     def __init__(self):

@@ -48,3 +48,35 @@ available from the ``django.contrib.postgres.indexes`` module.
     .. versionchanged:: 2.0
 
         The ``fastupdate`` and ``gin_pending_list_limit`` parameters were added.
+
+``GistIndex``
+=============
+
+.. class:: GistIndex(buffering=None, fillfactor=None, **options)
+
+    .. versionadded:: 2.0
+
+    Creates a `GiST index
+    <https://www.postgresql.org/docs/current/static/gist.html>`_. These indexes
+    are automatically created on spatial fields with :attr:`spatial_index=True
+    <django.contrib.gis.db.models.BaseSpatialField.spatial_index>`. They're
+    also useful on other types, such as
+    :class:`~django.contrib.postgres.fields.HStoreField` or the :ref:`range
+    fields <range-fields>`.
+
+    To use this index on data types not in the built-in `gist operator classes
+    <https://www.postgresql.org/docs/current/static/gist-builtin-opclasses.html>`_,
+    you need to activate the `btree_gist extension
+    <https://www.postgresql.org/docs/current/static/btree-gist.html>`_ on
+    PostgreSQL. You can install it using the
+    :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+    operation.
+
+    Set the ``buffering`` parameter to ``True`` or ``False`` to manually enable
+    or disable `buffering build`_ of the index.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. _buffering build: https://www.postgresql.org/docs/current/static/gist-implementation.html#GIST-BUFFERING-BUILD
+    .. _fillfactor: https://www.postgresql.org/docs/current/static/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS

@@ -117,6 +117,12 @@ Minor features
 * :class:`django.contrib.postgres.indexes.GinIndex` now supports the
   ``fastupdate`` and ``gin_pending_list_limit`` parameters.
 
+* The new :class:`~django.contrib.postgres.indexes.GistIndex` class allows
+  creating ``GiST`` indexes in the database. The new
+  :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+  operation installs the ``btree_gist`` extension to add support for operator
+  classes that aren't built-in.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
