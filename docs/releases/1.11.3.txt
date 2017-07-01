@@ -2,7 +2,7 @@
 Django 1.11.3 release notes
 ===========================
 
-*Under development*
+*July 1, 2017*
 
 Django 1.11.3 fixes several bugs in 1.11.2.
 
