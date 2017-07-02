@@ -1268,8 +1268,8 @@ class DateField(DateTimeCheckMixin, Field):
             val = parse_date(val)
             if val is None:
                 raise exceptions.ValidationError(
-                    self.error_messages['invalid'],
-                    code='invalid',
+                    self.error_messages['invalid_date'],
+                    code='invalid_date',
                     params={'value': original_value}
                 )
 

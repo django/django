@@ -3,7 +3,7 @@ import decimal
 import json
 import re
 
-from django.core import serializers
+from django.core import exceptions, serializers
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -336,3 +336,19 @@ class DateAndDateTimeFieldSerializerTests(SimpleTestCase):
 
         fields = json.loads(serialized_object)[0].get('fields')
         self.assertEqual(fields['date_field2'], fields['date_field2'])
+
+    def test_raise_exception_on_wrong_date_field_serializer(self):
+        random_datetime = datetime.date.today()
+        string_datetime = random_datetime.isoformat()+"a"
+
+        instance = DateFieldSerialization(date_field2=string_datetime)
+        with self.assertRaises(exceptions.ValidationError):
+            serializers.serialize('json', [instance])
+
+    def test_raise_exception_on_wrong_datetime_field_serializer(self):
+        random_datetime = datetime.date.today()
+        string_datetime = random_datetime.isoformat()+"a"
+
+        instance = DateFieldSerialization(date_field2=string_datetime)
+        with self.assertRaises(exceptions.ValidationError):
+            serializers.serialize('json', [instance])
