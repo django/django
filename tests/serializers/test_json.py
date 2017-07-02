@@ -339,7 +339,7 @@ class DateAndDateTimeFieldSerializerTests(SimpleTestCase):
 
     def test_raise_exception_on_wrong_date_field_serializer(self):
         random_datetime = datetime.date.today()
-        string_datetime = random_datetime.isoformat()+"a"
+        string_datetime = random_datetime.isoformat() + "a"
 
         instance = DateFieldSerialization(date_field2=string_datetime)
         with self.assertRaises(exceptions.ValidationError):
@@ -347,7 +347,7 @@ class DateAndDateTimeFieldSerializerTests(SimpleTestCase):
 
     def test_raise_exception_on_wrong_datetime_field_serializer(self):
         random_datetime = datetime.date.today()
-        string_datetime = random_datetime.isoformat()+"a"
+        string_datetime = random_datetime.isoformat() + "a"
 
         instance = DateFieldSerialization(date_field2=string_datetime)
         with self.assertRaises(exceptions.ValidationError):
