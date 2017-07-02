@@ -396,9 +396,9 @@ name in the path of your WebSocket request and a query string with your username
         message.reply_channel.send({"accept": True})
         # Parse the query string
         params = parse_qs(message.content["query_string"])
-        if "username" in params:
+        if b"username" in params:
             # Set the username in the session
-            message.channel_session["username"] = params["username"]
+            message.channel_session["username"] = params[b"username"][0].decode("utf8")
             # Add the user to the room_name group
             Group("chat-%s" % room_name).add(message.reply_channel)
         else:
@@ -408,10 +408,12 @@ name in the path of your WebSocket request and a query string with your username
     # Connected to websocket.receive
     @channel_session
     def ws_message(message, room_name):
-        Group("chat-%s" % room_name).send({
-            "text": message["text"],
-            "username": message.channel_session["username"]
-        })
+        Group("chat-%s" % room_name).send(
+            "text": json.dumps({
+                "text": message["text"],
+                "username": message.channel_session["username"],
+            }),
+        )
 
     # Connected to websocket.disconnect
     @channel_session
