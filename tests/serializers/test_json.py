@@ -11,7 +11,7 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score
+from .models import Score, DateFieldSerialization, DateTimeFieldSerialization
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -312,3 +312,27 @@ class DjangoJSONEncoderTests(SimpleTestCase):
             json.dumps({'duration': duration}, cls=DjangoJSONEncoder),
             '{"duration": "P0DT00H00M00S"}'
         )
+
+
+class DateAndDateTimeFieldSerializerTests(SimpleTestCase):
+    def test_datetime_field_serializer(self):
+        random_datetime = datetime.datetime.now()
+        string_datetime = random_datetime.isoformat()
+
+        instance = DateTimeFieldSerialization(datetime_field1=string_datetime)
+
+        serialized_object = serializers.serialize('json', [instance])
+
+        fields = json.loads(serialized_object)[0].get('fields')
+        self.assertEqual(fields['datetime_field1'], fields['datetime_field1'])
+
+    def test_date_field_serializer(self):
+        random_datetime = datetime.datetime.now()
+        string_datetime = random_datetime.isoformat()
+
+        instance = DateFieldSerialization(date_field2=string_datetime)
+
+        serialized_object = serializers.serialize('json', [instance])
+
+        fields = json.loads(serialized_object)[0].get('fields')
+        self.assertEqual(fields['date_field2'], fields['date_field2'])

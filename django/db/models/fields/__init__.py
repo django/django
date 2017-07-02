@@ -1261,7 +1261,19 @@ class DateField(DateTimeCheckMixin, Field):
 
     def value_to_string(self, obj):
         val = self.value_from_object(obj)
-        return '' if val is None else val.isoformat()
+        if not val:
+            return ""
+        elif isinstance(val, str):
+            original_value = val
+            val = parse_date(val)
+            if val is None:
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': original_value}
+                )
+
+        return val.isoformat()
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateField}
@@ -1416,7 +1428,19 @@ class DateTimeField(DateField):
 
     def value_to_string(self, obj):
         val = self.value_from_object(obj)
-        return '' if val is None else val.isoformat()
+        if not val:
+            return ""
+        elif isinstance(val, str):
+            original_value = val
+            val = parse_datetime(val)
+            if val is None:
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': original_value}
+                )
+
+        return val.isoformat()
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateTimeField}

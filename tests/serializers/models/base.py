@@ -163,3 +163,18 @@ class ComplexModel(models.Model):
     field1 = models.CharField(max_length=10)
     field2 = models.CharField(max_length=10)
     field3 = models.CharField(max_length=10)
+
+
+class DateTimeFieldSerialization(models.Model):
+    datetime_field1 = models.DateTimeField()
+
+
+class DateFieldSerialization(models.Model):
+    date_field2 = models.DateField()
+
+
+# Fixed #28356 -- Fix serializer DateField/DateTimeField
+
+    # When we serializer one DateTimeField/DateField we need to check if
+    # it was a datetime/date object, if not, try to parse it before and
+    # raise an Exception in case of invalid format.
