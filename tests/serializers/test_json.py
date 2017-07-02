@@ -11,7 +11,7 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score, DateFieldSerialization, DateTimeFieldSerialization
+from .models import DateFieldSerialization, DateTimeFieldSerialization, Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -327,7 +327,7 @@ class DateAndDateTimeFieldSerializerTests(SimpleTestCase):
         self.assertEqual(fields['datetime_field1'], fields['datetime_field1'])
 
     def test_date_field_serializer(self):
-        random_datetime = datetime.datetime.now()
+        random_datetime = datetime.date.today()
         string_datetime = random_datetime.isoformat()
 
         instance = DateFieldSerialization(date_field2=string_datetime)
