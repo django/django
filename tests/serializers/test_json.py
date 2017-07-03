@@ -3,7 +3,7 @@ import decimal
 import json
 import re
 
-from django.core import serializers
+from django.core import exceptions, serializers
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -11,7 +11,7 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score
+from .models import DateFieldSerialization, DateTimeFieldSerialization, Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -312,3 +312,43 @@ class DjangoJSONEncoderTests(SimpleTestCase):
             json.dumps({'duration': duration}, cls=DjangoJSONEncoder),
             '{"duration": "P0DT00H00M00S"}'
         )
+
+
+class DateAndDateTimeFieldSerializerTests(SimpleTestCase):
+    def test_datetime_field_serializer(self):
+        random_datetime = datetime.datetime.now()
+        string_datetime = random_datetime.isoformat()
+
+        instance = DateTimeFieldSerialization(datetime_field1=string_datetime)
+
+        serialized_object = serializers.serialize('json', [instance])
+
+        fields = json.loads(serialized_object)[0].get('fields')
+        self.assertEqual(fields['datetime_field1'], fields['datetime_field1'])
+
+    def test_date_field_serializer(self):
+        random_datetime = datetime.date.today()
+        string_datetime = random_datetime.isoformat()
+
+        instance = DateFieldSerialization(date_field2=string_datetime)
+
+        serialized_object = serializers.serialize('json', [instance])
+
+        fields = json.loads(serialized_object)[0].get('fields')
+        self.assertEqual(fields['date_field2'], fields['date_field2'])
+
+    def test_raise_exception_on_wrong_date_field_serializer(self):
+        random_datetime = datetime.date.today()
+        string_datetime = random_datetime.isoformat() + "a"
+
+        instance = DateFieldSerialization(date_field2=string_datetime)
+        with self.assertRaises(exceptions.ValidationError):
+            serializers.serialize('json', [instance])
+
+    def test_raise_exception_on_wrong_datetime_field_serializer(self):
+        random_datetime = datetime.date.today()
+        string_datetime = random_datetime.isoformat() + "a"
+
+        instance = DateFieldSerialization(date_field2=string_datetime)
+        with self.assertRaises(exceptions.ValidationError):
+            serializers.serialize('json', [instance])

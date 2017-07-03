@@ -163,3 +163,11 @@ class ComplexModel(models.Model):
     field1 = models.CharField(max_length=10)
     field2 = models.CharField(max_length=10)
     field3 = models.CharField(max_length=10)
+
+
+class DateTimeFieldSerialization(models.Model):
+    datetime_field1 = models.DateTimeField()
+
+
+class DateFieldSerialization(models.Model):
+    date_field2 = models.DateField()
