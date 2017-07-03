@@ -12,8 +12,11 @@
     "docs": "rm -rf docs && esdoc -c esdoc.json",
     "test": "jest",
     "browserify": "browserify src/index.js -p browserify-banner -s channels -o ../channels/static/channels/js/websocketbridge.js",
-    "prepublish": "npm run transpile",
+    "prepare": "npm run transpile",
     "compile": "npm run transpile && npm run browserify"
+  },
+  "engines": {
+    "npm": "^5.0.0"
   },
   "files": [
     "lib/index.js"
@@ -35,7 +38,6 @@
     ]
   },
   "devDependencies": {
-    "babel": "^6.5.2",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.16.0",
     "babel-plugin-transform-inline-environment-variables": "^6.8.0",
