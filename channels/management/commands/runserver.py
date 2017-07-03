@@ -42,7 +42,8 @@ class Command(RunserverCommand):
     def inner_run(self, *args, **options):
         # Maybe they want the wsgi one?
         if not options.get("use_asgi", True) or DEFAULT_CHANNEL_LAYER not in channel_layers:
-            self.server_cls = RunserverCommand.server_cls
+            if hasattr(RunserverCommand, "server_cls"):
+                self.server_cls = RunserverCommand.server_cls
             return RunserverCommand.inner_run(self, *args, **options)
         # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
