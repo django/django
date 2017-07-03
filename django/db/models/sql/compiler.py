@@ -702,7 +702,7 @@ class SQLCompiler:
         """
         result = []
         params = []
-        for alias in self.query.alias_map:
+        for alias in tuple(self.query.alias_map):
             if not self.query.alias_refcount[alias]:
                 continue
             try:
