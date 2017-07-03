@@ -463,7 +463,9 @@ class DateTimeBaseInput(TextInput):
         self.format = format if format else None
 
     def format_value(self, value):
-        return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])
+        if value is not None:
+            # localize_input() returns str on Python 2.
+            return force_text(formats.localize_input(value, self.format or formats.get_format(self.format_key)[0]))
 
 
 class DateInput(DateTimeBaseInput):

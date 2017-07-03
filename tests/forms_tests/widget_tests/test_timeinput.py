@@ -1,4 +1,9 @@
+# -*- encoding: utf-8 -*-
+from __future__ import unicode_literals
+
+import sys
 from datetime import time
+from unittest import skipIf
 
 from django.forms import TimeInput
 from django.test import override_settings
@@ -42,6 +47,12 @@ class TimeInputTest(WidgetTest):
         t = time(12, 51, 34, 482548)
         widget = TimeInput(format='%H:%M', attrs={'type': 'time'})
         self.check_html(widget, 'time', t, html='<input type="time" name="time" value="12:51" />')
+
+    # Test fails on Windows due to http://bugs.python.org/issue8304#msg222667
+    @skipIf(sys.platform.startswith('win'), 'Fails with UnicodeEncodeError error on Windows.')
+    def test_non_ascii_format(self):
+        widget = TimeInput(format='τ-%H:%M')
+        self.check_html(widget, 'time', time(10, 10), '<input type="text" name="time" value="\u03c4-10:10" />')
 
     @override_settings(USE_L10N=True)
     @translation.override('de-at')
