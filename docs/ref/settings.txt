@@ -2280,6 +2280,12 @@ to this host rather than the originally-requested host
 (e.g. ``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
 setting has no effect.
 
+.. versionchanged:: 2.0
+
+   Secure requests are also redirected if the originally-requested host
+   does not match the setting. Previously, secure requests were never
+   redirected.
+
 .. setting:: SECURE_SSL_REDIRECT
 
 ``SECURE_SSL_REDIRECT``
