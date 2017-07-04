@@ -214,6 +214,7 @@ def new_method_proxy(func):
         if self._wrapped is empty:
             self._setup()
         return func(self._wrapped, *args)
+    inner._mask_wrapped = False
     return inner
 
 
@@ -234,7 +235,23 @@ class LazyObject:
         # override __copy__() and __deepcopy__() as well.
         self._wrapped = empty
 
-    __getattr__ = new_method_proxy(getattr)
+    def __getattribute__(self, name):
+        """
+        Return attribute from wrapped if
+        - attribute is not found on wrapper,
+        - attribute is found on wrapper, but has special flag set.
+        """
+        __getattribute__ = super().__getattribute__
+        found = True
+        try:
+            val = __getattribute__(name)
+        except AttributeError:
+            found = False
+        if not found or not getattr(val, '_mask_wrapped', True):
+            if __getattribute__('_wrapped') is empty:
+                __getattribute__('_setup')()
+            return getattr(__getattribute__('_wrapped'), name)
+        return val
 
     def __setattr__(self, name, value):
         if name == "_wrapped":

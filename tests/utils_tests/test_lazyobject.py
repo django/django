@@ -288,6 +288,26 @@ class LazyObjectTestCase(TestCase):
         self.assertIs(obj._wrapped, empty)
         self.assertIs(obj2._wrapped, empty)
 
+    def test_getattribute(self):
+        attrs = [
+            '__getitem__',
+            '__setitem__',
+            '__delitem__',
+            '__iter__',
+            '__len__',
+            '__contains__',
+        ]
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        for attr in attrs:
+            with self.subTest(attr):
+                self.assertFalse(hasattr(obj, attr))
+
+            with self.subTest(attr):
+                setattr(foo, attr, attr)
+                self.assertEqual(getattr(foo, attr), attr)
+
 
 class SimpleLazyObjectTestCase(LazyObjectTestCase):
     # By inheriting from LazyObjectTestCase and redefining the lazy_wrap()
