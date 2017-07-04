@@ -30,7 +30,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     cache_bust_counter = 1
 
     def get_field_type(self, data_type, description):
-        # If it's a NUMBER with scale == 0, consider it an IntegerField
         if data_type == cx_Oracle.NUMBER:
             precision, scale = description[4:6]
             if scale == 0:
