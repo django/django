@@ -408,12 +408,12 @@ name in the path of your WebSocket request and a query string with your username
     # Connected to websocket.receive
     @channel_session
     def ws_message(message, room_name):
-        Group("chat-%s" % room_name).send(
+        Group("chat-%s" % room_name).send({
             "text": json.dumps({
                 "text": message["text"],
                 "username": message.channel_session["username"],
             }),
-        )
+        })
 
     # Connected to websocket.disconnect
     @channel_session
