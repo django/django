@@ -223,7 +223,7 @@ msgstr[1] "hace %(count)s segundos"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] "hace un minutos"
+msgstr[0] "hace un minuto"
 msgstr[1] "hace %(count)s minutos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
