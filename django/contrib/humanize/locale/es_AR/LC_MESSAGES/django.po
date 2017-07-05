@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # Ramiro Morales, 2012,2014-2015
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-11-30 00:25+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2017-07-05 06:33+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -215,7 +216,7 @@ msgstr "ahora"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] "hace un\\u00a0segundo"
+msgstr[0] "hace un segundo"
 msgstr[1] "hace %(count)s segundos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
@@ -223,7 +224,7 @@ msgstr[1] "hace %(count)s segundos"
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] "hace un\\u00a0minutos"
+msgstr[0] "hace un minutos"
 msgstr[1] "hace %(count)s minutos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
@@ -231,7 +232,7 @@ msgstr[1] "hace %(count)s minutos"
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] "hace una\\u00a0hora"
+msgstr[0] "hace una hora"
 msgstr[1] "hace %(count)s horas"
 
 #, python-format
@@ -244,7 +245,7 @@ msgstr "dentro de %(delta)s"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] "dentro de un\\u00a0segundo"
+msgstr[0] "dentro de un segundo"
 msgstr[1] "dentro de %(count)s segundos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
@@ -252,7 +253,7 @@ msgstr[1] "dentro de %(count)s segundos"
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] "dentro de un\\u00a0minuto"
+msgstr[0] "dentro de un minuto"
 msgstr[1] "dentro de %(count)s minutos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
@@ -260,5 +261,5 @@ msgstr[1] "dentro de %(count)s minutos"
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] "dentro de una\\u00a0hora"
+msgstr[0] "dentro de una hora"
 msgstr[1] "dentro de %(count)s horas"
