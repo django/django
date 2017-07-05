@@ -429,6 +429,21 @@ class ChangeListTests(TestCase):
         cl = ChangeList(request, Concert, *get_changelist_args(m))
         self.assertEqual(cl.queryset.count(), 0)
 
+    def test_custom_lookup_in_search_fields(self):
+        band = Group.objects.create(name='The Hype')
+        Concert.objects.create(name='Woodstock', group=band)
+
+        m = ConcertAdmin(Concert, custom_site)
+        m.search_fields = ['!group__name__endswith']
+
+        request = self.factory.get('/concert/', data={SEARCH_VAR: 'Hype'})
+        cl = ChangeList(request, Concert, *get_changelist_args(m))
+        self.assertEqual(cl.queryset.count(), 1)
+
+        request = self.factory.get('/concert/', data={SEARCH_VAR: 'The'})
+        cl = ChangeList(request, Concert, *get_changelist_args(m))
+        self.assertEqual(cl.queryset.count(), 0)
+
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,
