@@ -101,7 +101,7 @@ the field in question. This example updates the ``blog`` attribute of an
 ``Entry`` instance ``entry``, assuming appropriate instances of ``Entry`` and
 ``Blog`` are already saved to the database (so we can retrieve them below)::
 
-    >>> from blog.models import Entry
+    >>> from blog.models import Blog, Entry
     >>> entry = Entry.objects.get(pk=1)
     >>> cheese_blog = Blog.objects.get(name="Cheddar Talk")
     >>> entry.blog = cheese_blog
