@@ -385,6 +385,7 @@ Let's use it now to build a chat server that expects you to pass a chatroom
 name in the path of your WebSocket request and a query string with your username (we'll ignore auth for now - that's next)::
 
     # In consumers.py
+    import json
     from channels import Group
     from channels.sessions import channel_session
     from urllib.parse import parse_qs
