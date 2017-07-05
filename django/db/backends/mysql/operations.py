@@ -96,7 +96,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TIME(%s)" % (field_name)
 
     def date_interval_sql(self, timedelta):
-        return "INTERVAL '%06f' SECOND_MICROSECOND" % (timedelta.total_seconds()), []
+        return "INTERVAL '%06f' SECOND_MICROSECOND" % timedelta.total_seconds()
 
     def format_for_duration_arithmetic(self, sql):
         if self.connection.features.supports_microsecond_precision:

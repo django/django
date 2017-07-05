@@ -77,7 +77,7 @@ END;
         """
         NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
         """
-        return "NUMTODSINTERVAL(%06f, 'SECOND')" % (timedelta.total_seconds()), []
+        return "NUMTODSINTERVAL(%06f, 'SECOND')" % timedelta.total_seconds()
 
     def date_trunc_sql(self, lookup_type, field_name):
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058

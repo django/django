@@ -639,7 +639,7 @@ class DurationValue(Value):
         connection.ops.check_expression_support(self)
         if connection.features.has_native_duration_field:
             return super().as_sql(compiler, connection)
-        return connection.ops.date_interval_sql(self.value)
+        return connection.ops.date_interval_sql(self.value), []
 
 
 class RawSQL(Expression):
