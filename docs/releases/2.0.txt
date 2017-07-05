@@ -326,6 +326,8 @@ backends.
   ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``, and
   ``datetime_extract_sql()`` methods now return only the SQL to perform the
   operation instead of SQL and a list of parameters.
+* DatabaseWrapper now pass through args and kwargs to underlying database
+  adapter for all supported backends.
 
 * Third-party database backends should add a ``DatabaseWrapper.display_name``
   attribute with the name of the database that your backend works with. Django

@@ -164,7 +164,7 @@ class BaseDatabaseWrapper:
         """Initialize the database connection settings."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
 
-    def create_cursor(self, name=None):
+    def create_cursor(self, name=None, *args, **kwargs):
         """Create a cursor. Assume that a connection is established."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
 
@@ -222,10 +222,10 @@ class BaseDatabaseWrapper:
             wrapped_cursor = self.make_cursor(cursor)
         return wrapped_cursor
 
-    def _cursor(self, name=None):
+    def _cursor(self, name=None, *args, **kwargs):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self._prepare_cursor(self.create_cursor(name))
+            return self._prepare_cursor(self.create_cursor(name, *args, **kwargs))
 
     def _commit(self):
         if self.connection is not None:
@@ -244,9 +244,9 @@ class BaseDatabaseWrapper:
 
     # ##### Generic wrappers for PEP-249 connection methods #####
 
-    def cursor(self):
+    def cursor(self, *args, **kwargs):
         """Create a cursor, opening a connection if necessary."""
-        return self._cursor()
+        return self._cursor(*args, **kwargs)
 
     def commit(self):
         """Commit a transaction and reset the dirty flag."""
