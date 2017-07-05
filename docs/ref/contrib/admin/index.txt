@@ -1238,51 +1238,39 @@ subclass::
 
     When somebody does a search in the admin search box, Django splits the
     search query into words and returns all objects that contain each of the
-    words, case insensitive, where each word must be in at least one of
-    ``search_fields``. For example, if ``search_fields`` is set to
-    ``['first_name', 'last_name']`` and a user searches for ``john lennon``,
-    Django will do the equivalent of this SQL ``WHERE`` clause::
+    words, case-insensitive (using the :lookup:`icontains` lookup), where each
+    word must be in at least one of ``search_fields``. For example, if
+    ``search_fields`` is set to ``['first_name', 'last_name']`` and a user
+    searches for ``john lennon``, Django will do the equivalent of this SQL
+    ``WHERE`` clause::
 
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
         AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
-    For faster and/or more restrictive searches, prefix the field name
-    with an operator:
+    If you don't want to use ``icontains`` as the lookup, you can use any
+    lookup by appending it the field. For example, you could use :lookup:`exact`
+    by setting ``search_fields`` to ``['first_name__exact']``.
 
-    ``^``
-        Use the '^' operator to match starting at the beginning of the
-        field. For example, if ``search_fields`` is set to
-        ``['^first_name', '^last_name']`` and a user searches for
-        ``john lennon``, Django will do the equivalent of this SQL ``WHERE``
-        clause::
+    Beware that because query terms are split and ANDed as described earlier,
+    searching with :lookup:`exact` only works with a single search word since
+    two or more words can't all be an exact match unless all words are the same.
 
-            WHERE (first_name ILIKE 'john%' OR last_name ILIKE 'john%')
-            AND (first_name ILIKE 'lennon%' OR last_name ILIKE 'lennon%')
+    .. versionadded:: 2.1
 
-        This query is more efficient than the normal ``'%john%'`` query,
-        because the database only needs to check the beginning of a column's
-        data, rather than seeking through the entire column's data. Plus, if
-        the column has an index on it, some databases may be able to use the
-        index for this query, even though it's a ``LIKE`` query.
+        The ability to specify a field lookup was added.
 
-    ``=``
-        Use the '=' operator for case-insensitive exact matching. For
-        example, if ``search_fields`` is set to
-        ``['=first_name', '=last_name']`` and a user searches for
-        ``john lennon``, Django will do the equivalent of this SQL
-        ``WHERE`` clause::
+    Some (older) shortcuts for specifying a field lookup are also available.
+    You can prefix a field in ``search_fields`` with the following characters
+    and it's equivalent to adding ``__<lookup>`` to the field:
 
-            WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
-            AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
-
-        Note that the query input is split by spaces, so, following this
-        example, it's currently not possible to search for all records in which
-        ``first_name`` is exactly ``'john winston'`` (containing a space).
-
-    ``@``
-        Using the '@' operator to perform a full text match. This is like the
-        default search method but uses an index. Currently this is only
-        available for MySQL.
+    ======  ====================
+    Prefix  Lookup
+    ======  ====================
+    ^       :lookup:`startswith`
+    =       :lookup:`iexact`
+    @       :lookup:`search`
+    None    :lookup:`icontains`
+    ======  ====================
 
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate

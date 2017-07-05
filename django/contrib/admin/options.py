@@ -943,8 +943,27 @@ class ModelAdmin(BaseModelAdmin):
                 return "%s__iexact" % field_name[1:]
             elif field_name.startswith('@'):
                 return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
+            # Use field_name if it includes a lookup.
+            opts = queryset.model._meta
+            lookup_fields = field_name.split(LOOKUP_SEP)
+            # Go through the fields, following all relations.
+            prev_field = None
+            for path_part in lookup_fields:
+                if path_part == 'pk':
+                    path_part = opts.pk.name
+                try:
+                    field = opts.get_field(path_part)
+                except FieldDoesNotExist:
+                    # Use valid query lookups.
+                    if prev_field and prev_field.get_lookup(path_part):
+                        return field_name
+                else:
+                    prev_field = field
+                    if hasattr(field, 'get_path_info'):
+                        # Update opts to follow the relation.
+                        opts = field.get_path_info()[-1].to_opts
+            # Otherwise, use the field with icontains.
+            return "%s__icontains" % field_name
 
         use_distinct = False
         search_fields = self.get_search_fields(request)
