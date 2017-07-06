@@ -156,6 +156,9 @@ MRO is an acronym for Method Resolution Order.
 
     * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
       the keyword arguments captured from the URL pattern that served the view.
+    * You can also add context using the
+      :attr:`~django.views.generic.base.ContextMixin.extra_context` keyword
+      argument for :meth:`~django.views.generic.base.View.as_view`.
 
 ``RedirectView``
 ================

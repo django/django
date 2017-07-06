@@ -22,6 +22,8 @@ urlpatterns = [
 
     url(r'^template/cached/(?P<foo>\w+)/$',
         cache_page(2.0)(TemplateView.as_view(template_name='generic_views/about.html'))),
+    url(r'^template/extra_context/$',
+        TemplateView.as_view(template_name='generic_views/about.html', extra_context={'title': 'Title'})),
 
     # DetailView
     url(r'^detail/obj/$',

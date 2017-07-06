@@ -189,7 +189,8 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`.ContextMixin.extra_context` attribute allows adding context
+  in ``View.as_view()``.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~

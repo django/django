@@ -343,6 +343,10 @@ class TemplateViewTest(SimpleTestCase):
         match = resolve('/template/login_required/')
         self.assertIs(match.func.view_class, TemplateView)
 
+    def test_extra_context(self):
+        response = self.client.get('/template/extra_context/')
+        self.assertEqual(response.context['title'], 'Title')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class RedirectViewTest(SimpleTestCase):

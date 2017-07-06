@@ -62,7 +62,8 @@ interface to working with templates in class-based views.
     any data they want to ensure is in there as keyword arguments.
     ``get_context_data()`` returns a dictionary; in ``ContextMixin`` it
     simply returns its keyword arguments, but it is common to override this to
-    add more members to the dictionary.
+    add more members to the dictionary. You can also use the
+    :attr:`~django.views.generic.base.ContextMixin.extra_context` attribute.
 
 Building up Django's generic class-based views
 ==============================================
