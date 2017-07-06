@@ -54,7 +54,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
     def date_interval_sql(self, timedelta):
-        return "'%s'" % duration_string(timedelta), []
+        return "'%s'" % duration_string(timedelta)
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
