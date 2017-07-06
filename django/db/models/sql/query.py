@@ -241,7 +241,8 @@ class Query:
         return self.get_compiler(DEFAULT_DB_ALIAS).as_sql()
 
     def __deepcopy__(self, memo):
-        result = self.clone(memo=memo)
+        """Limit the amount of work when a Query is deepcopied."""
+        result = self.clone()
         memo[id(self)] = result
         return result
 
@@ -263,7 +264,7 @@ class Query:
         """
         return self.model._meta
 
-    def clone(self, klass=None, memo=None, **kwargs):
+    def clone(self, klass=None, **kwargs):
         """
         Create a copy of the current instance. The 'kwargs' parameter can be
         used by clients to update attributes after copying has taken place.
