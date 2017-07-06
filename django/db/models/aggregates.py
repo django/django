@@ -73,7 +73,7 @@ class Count(Aggregate):
     def _get_repr_options(self):
         return {'distinct': self.extra['distinct'] != ''}
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return 0
         return int(value)
@@ -99,7 +99,7 @@ class StdDev(Aggregate):
     def _get_repr_options(self):
         return {'sample': self.function == 'STDDEV_SAMP'}
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return value
         return float(value)
@@ -129,7 +129,7 @@ class Variance(Aggregate):
     def _get_repr_options(self):
         return {'sample': self.function == 'VAR_SAMP'}
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return value
         return float(value)

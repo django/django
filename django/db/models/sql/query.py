@@ -46,7 +46,7 @@ def get_field_names_from_opts(opts):
 class RawQuery:
     """A single raw SQL query."""
 
-    def __init__(self, sql, using, params=None, context=None):
+    def __init__(self, sql, using, params=None):
         self.params = params or ()
         self.sql = sql
         self.using = using
@@ -57,10 +57,9 @@ class RawQuery:
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.extra_select = {}
         self.annotation_select = {}
-        self.context = context or {}
 
     def clone(self, using):
-        return RawQuery(self.sql, using, params=self.params, context=self.context.copy())
+        return RawQuery(self.sql, using, params=self.params)
 
     def get_columns(self):
         if self.cursor is None:
@@ -200,8 +199,6 @@ class Query:
         # load.
         self.deferred_loading = (frozenset(), True)
 
-        self.context = {}
-
     @property
     def extra(self):
         if self._extra is None:
@@ -334,14 +331,7 @@ class Query:
         obj.__dict__.update(kwargs)
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
-        obj.context = self.context.copy()
         return obj
-
-    def add_context(self, key, value):
-        self.context[key] = value
-
-    def get_context(self, key, default=None):
-        return self.context.get(key, default)
 
     def relabeled_clone(self, change_map):
         clone = self.clone()

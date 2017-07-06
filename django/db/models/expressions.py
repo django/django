@@ -261,7 +261,7 @@ class BaseExpression:
                 raise FieldError('Expression contains mixed types. You must set output_field.')
             return output_field
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         """
         Expressions provide their own converters because users have the option
         of manually specifying the output_field which may be a different type

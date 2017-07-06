@@ -95,7 +95,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     # https://dev.mysql.com/doc/refman/en/spatial-function-argument-handling.html
     # MySQL 5.7.5 adds support for the empty geometry collections, but they are represented with invalid WKT.
-    def convert_invalid_empty_geometry_collection(self, value, expression, connection, context):
+    def convert_invalid_empty_geometry_collection(self, value, expression, connection):
         if value == b'GEOMETRYCOLLECTION()':
             return b'GEOMETRYCOLLECTION EMPTY'
         return value

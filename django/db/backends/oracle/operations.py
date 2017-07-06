@@ -165,17 +165,17 @@ END;
         converters.append(self.convert_empty_values)
         return converters
 
-    def convert_textfield_value(self, value, expression, connection, context):
+    def convert_textfield_value(self, value, expression, connection):
         if isinstance(value, Database.LOB):
             value = value.read()
         return value
 
-    def convert_binaryfield_value(self, value, expression, connection, context):
+    def convert_binaryfield_value(self, value, expression, connection):
         if isinstance(value, Database.LOB):
             value = force_bytes(value.read())
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
             value = bool(value)
         return value
@@ -184,28 +184,28 @@ END;
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if settings.USE_TZ:
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_datefield_value(self, value, expression, connection, context):
+    def convert_datefield_value(self, value, expression, connection):
         if isinstance(value, Database.Timestamp):
             value = value.date()
         return value
 
-    def convert_timefield_value(self, value, expression, connection, context):
+    def convert_timefield_value(self, value, expression, connection):
         if isinstance(value, Database.Timestamp):
             value = value.time()
         return value
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
 
-    def convert_empty_values(self, value, expression, connection, context):
+    def convert_empty_values(self, value, expression, connection):
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
         # string instead of null, but only if the field accepts the

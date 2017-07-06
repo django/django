@@ -564,6 +564,22 @@ Miscellaneous
 Features deprecated in 2.0
 ==========================
 
+``context`` argument of ``Field.from_db_value()`` and ``Expression.convert_value()``
+------------------------------------------------------------------------------------
+
+The ``context`` argument of ``Field.from_db_value()`` and
+``Expression.convert_value()`` is unused as it's always an empty dictionary.
+The signature of both methods is now::
+
+    (self, value, expression, connection)
+
+instead of::
+
+    (self, value, expression, connection, context)
+
+Support for the old signature in custom fields and expressions remains until
+Django 3.0.
+
 Miscellaneous
 -------------
 

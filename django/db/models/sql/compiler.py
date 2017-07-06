@@ -1,5 +1,6 @@
 import collections
 import re
+import warnings
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -12,6 +13,8 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, NotSupportedError
+from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.inspect import func_supports_parameter
 
 FORCE = object()
 
@@ -926,7 +929,18 @@ class SQLCompiler:
         for pos, (convs, expression) in converters.items():
             value = row[pos]
             for converter in convs:
-                value = converter(value, expression, self.connection, self.query.context)
+                if func_supports_parameter(converter, 'context'):
+                    warnings.warn(
+                        'Remove the context parameter from %s.%s(). Support for it '
+                        'will be removed in Django 3.0.' % (
+                            converter.__self__.__class__.__name__,
+                            converter.__name__,
+                        ),
+                        RemovedInDjango30Warning,
+                    )
+                    value = converter(value, expression, self.connection, {})
+                else:
+                    value = converter(value, expression, self.connection)
             row[pos] = value
         return tuple(row)
 

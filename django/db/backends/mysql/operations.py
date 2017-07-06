@@ -221,23 +221,23 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_uuidfield_value)
         return converters
 
-    def convert_textfield_value(self, value, expression, connection, context):
+    def convert_textfield_value(self, value, expression, connection):
         if value is not None:
             value = force_text(value)
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
             value = bool(value)
         return value
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if settings.USE_TZ:
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value

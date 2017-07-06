@@ -8,6 +8,7 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+from django.utils.inspect import func_supports_parameter
 
 
 class Options:
@@ -64,7 +65,10 @@ class DatabaseCache(BaseDatabaseCache):
         expression = models.Expression(output_field=models.DateTimeField())
         for converter in (connection.ops.get_db_converters(expression) +
                           expression.get_db_converters(connection)):
-            expires = converter(expires, expression, connection, {})
+            if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
+                expires = converter(expires, expression, connection, {})
+            else:
+                expires = converter(expires, expression, connection)
 
         if expires < timezone.now():
             db = router.db_for_write(self.cache_model_class)
@@ -126,7 +130,10 @@ class DatabaseCache(BaseDatabaseCache):
                         expression = models.Expression(output_field=models.DateTimeField())
                         for converter in (connection.ops.get_db_converters(expression) +
                                           expression.get_db_converters(connection)):
-                            current_expires = converter(current_expires, expression, connection, {})
+                            if func_supports_parameter(converter, 'context'):  # RemovedInDjango30Warning
+                                current_expires = converter(current_expires, expression, connection, {})
+                            else:
+                                current_expires = converter(current_expires, expression, connection)
 
                     exp = connection.ops.adapt_datetimefield_value(exp)
                     if result and (mode == 'set' or (mode == 'add' and current_expires < now)):

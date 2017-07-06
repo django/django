@@ -212,7 +212,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_booleanfield_value)
         return converters
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
@@ -220,30 +220,30 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_datefield_value(self, value, expression, connection, context):
+    def convert_datefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.date):
                 value = parse_date(value)
         return value
 
-    def convert_timefield_value(self, value, expression, connection, context):
+    def convert_timefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.time):
                 value = parse_time(value)
         return value
 
-    def convert_decimalfield_value(self, value, expression, connection, context):
+    def convert_decimalfield_value(self, value, expression, connection):
         if value is not None:
             value = expression.output_field.format_number(value)
             value = backend_utils.typecast_decimal(value)
         return value
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):

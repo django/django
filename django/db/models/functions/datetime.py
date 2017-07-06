@@ -198,7 +198,7 @@ class TruncBase(TimezoneMixin, Transform):
             ))
         return copy
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if isinstance(self.output_field, DateTimeField):
             if settings.USE_TZ:
                 if value is None:

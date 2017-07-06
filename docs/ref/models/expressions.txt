@@ -714,7 +714,7 @@ calling the appropriate methods on the wrapped expression.
               clone.expression = self.expression.relabeled_clone(change_map)
               return clone
 
-    .. method:: convert_value(value, expression, connection, context)
+    .. method:: convert_value(value, expression, connection)
 
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.

@@ -1797,7 +1797,7 @@ Field API reference
 
     When loading data, :meth:`from_db_value` is used:
 
-    .. method:: from_db_value(value, expression, connection, context)
+    .. method:: from_db_value(value, expression, connection)
 
         Converts a value as returned by the database to a Python object. It is
         the reverse of :meth:`get_prep_value`.

@@ -255,7 +255,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             kwargs['geography'] = self.geography
         return name, path, args, kwargs
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         if value:
             value = Geometry(value)
             srid = value.srid
@@ -351,7 +351,7 @@ class RasterField(BaseSpatialField):
         self._check_connection(connection)
         return super().db_type(connection)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return connection.ops.parse_raster(value)
 
     def contribute_to_class(self, cls, name, **kwargs):

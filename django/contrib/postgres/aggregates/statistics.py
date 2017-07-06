@@ -41,7 +41,7 @@ class RegrCount(StatAggregate):
     def __init__(self, y, x):
         super().__init__(y=y, x=x, output_field=IntegerField())
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return 0
         return int(value)
