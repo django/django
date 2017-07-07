@@ -7,6 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 from collections import Counter, Iterator, Mapping, OrderedDict
+from contextlib import suppress
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -57,6 +58,9 @@ class RawQuery:
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.extra_select = {}
         self.annotation_select = {}
+
+    def chain(self, using):
+        return self.clone(using)
 
     def clone(self, using):
         return RawQuery(self.sql, using, params=self.params)
@@ -262,35 +266,21 @@ class Query:
         """
         return self.model._meta
 
-    def clone(self, klass=None, **kwargs):
+    def clone(self):
         """
-        Create a copy of the current instance. The 'kwargs' parameter can be
-        used by clients to update attributes after copying has taken place.
+        Return a copy of the current Query. A lightweight alternative to
+        to deepcopy().
         """
         obj = Empty()
-        obj.__class__ = klass or self.__class__
-        obj.model = self.model
+        obj.__class__ = self.__class__
+        # Copy references to everything.
+        obj.__dict__ = self.__dict__.copy()
+        # Clone attributes that can't use shallow copy.
         obj.alias_refcount = self.alias_refcount.copy()
         obj.alias_map = self.alias_map.copy()
         obj.external_aliases = self.external_aliases.copy()
         obj.table_map = self.table_map.copy()
-        obj.default_cols = self.default_cols
-        obj.default_ordering = self.default_ordering
-        obj.standard_ordering = self.standard_ordering
-        obj.select = self.select
         obj.where = self.where.clone()
-        obj.where_class = self.where_class
-        obj.group_by = self.group_by
-        obj.order_by = self.order_by
-        obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
-        obj.distinct = self.distinct
-        obj.distinct_fields = self.distinct_fields
-        obj.select_for_update = self.select_for_update
-        obj.select_for_update_nowait = self.select_for_update_nowait
-        obj.select_for_update_skip_locked = self.select_for_update_skip_locked
-        obj.select_for_update_of = self.select_for_update_of
-        obj.select_related = self.select_related
-        obj.values_select = self.values_select
         obj._annotations = self._annotations.copy() if self._annotations is not None else None
         if self.annotation_select_mask is None:
             obj.annotation_select_mask = None
@@ -302,10 +292,6 @@ class Query:
         # It will get re-populated in the cloned queryset the next time it's
         # used.
         obj._annotation_select_cache = None
-        obj.max_depth = self.max_depth
-        obj.combinator = self.combinator
-        obj.combinator_all = self.combinator_all
-        obj.combined_queries = self.combined_queries
         obj._extra = self._extra.copy() if self._extra is not None else None
         if self.extra_select_mask is None:
             obj.extra_select_mask = None
@@ -315,21 +301,25 @@ class Query:
             obj._extra_select_cache = None
         else:
             obj._extra_select_cache = self._extra_select_cache.copy()
-        obj.extra_tables = self.extra_tables
-        obj.extra_order_by = self.extra_order_by
-        obj.deferred_loading = self.deferred_loading
-        if self.filter_is_sticky and self.used_aliases:
-            obj.used_aliases = self.used_aliases.copy()
-        else:
-            obj.used_aliases = set()
-        obj.filter_is_sticky = False
-        obj.subquery = self.subquery
-        if 'alias_prefix' in self.__dict__:
-            obj.alias_prefix = self.alias_prefix
         if 'subq_aliases' in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
+        obj.used_aliases = self.used_aliases.copy()
+        # Clear the cached_property
+        with suppress(AttributeError):
+            del obj.base_table
+        return obj
 
-        obj.__dict__.update(kwargs)
+    def chain(self, klass=None):
+        """
+        Return a copy of the current Query that's ready for another operation.
+        The klass argument changes the type of the Query, e.g. UpdateQuery.
+        """
+        obj = self.clone()
+        if klass and obj.__class__ != klass:
+            obj.__class__ = klass
+        if not obj.filter_is_sticky:
+            obj.used_aliases = set()
+        obj.filter_is_sticky = False
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         return obj

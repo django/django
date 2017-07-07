@@ -87,16 +87,17 @@ class UpdateQuery(Query):
 
     def _setup_query(self):
         """
-        Run on initialization and after cloning. Any attributes that would
-        normally be set in __init__ should go in here, instead, so that they
-        are also set up after a clone() call.
+        Run on initialization and at the end of chaining. Any attributes that
+        would normally be set in __init__() should go here instead.
         """
         self.values = []
         self.related_ids = None
         self.related_updates = {}
 
-    def clone(self, klass=None, **kwargs):
-        return super().clone(klass, related_updates=self.related_updates.copy(), **kwargs)
+    def clone(self):
+        obj = super().clone()
+        obj.related_updates = self.related_updates.copy()
+        return obj
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)

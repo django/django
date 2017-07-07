@@ -1334,7 +1334,7 @@ class SQLUpdateCompiler(SQLCompiler):
         count = self.query.count_active_tables()
         if not self.query.related_updates and count == 1:
             return
-        query = self.query.clone(klass=Query)
+        query = self.query.chain(klass=Query)
         query.select_related = False
         query.clear_ordering(True)
         query._extra = {}

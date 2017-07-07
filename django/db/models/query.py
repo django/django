@@ -335,7 +335,7 @@ class QuerySet:
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
-        query = self.query.clone()
+        query = self.query.chain()
         for (alias, aggregate_expr) in kwargs.items():
             query.add_annotation(aggregate_expr, alias, is_summary=True)
             if not query.annotations[alias].contains_aggregate:
@@ -632,7 +632,7 @@ class QuerySet:
         assert self.query.can_filter(), \
             "Cannot update a query once a slice has been taken."
         self._for_write = True
-        query = self.query.clone(sql.UpdateQuery)
+        query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
         # Clear any annotations so that they won't be present in subqueries.
         query._annotations = None
@@ -651,7 +651,7 @@ class QuerySet:
         """
         assert self.query.can_filter(), \
             "Cannot update a query once a slice has been taken."
-        query = self.query.clone(sql.UpdateQuery)
+        query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
@@ -1087,7 +1087,7 @@ class QuerySet:
         Return a copy of the current QuerySet. A lightweight alternative
         to deepcopy().
         """
-        c = self.__class__(model=self.model, query=self.query.clone(), using=self._db, hints=self._hints)
+        c = self.__class__(model=self.model, query=self.query.chain(), using=self._db, hints=self._hints)
         c._sticky_filter = self._sticky_filter
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
@@ -1267,7 +1267,7 @@ class RawQuerySet:
         """Select the database this RawQuerySet should execute against."""
         return RawQuerySet(
             self.raw_query, model=self.model,
-            query=self.query.clone(using=alias),
+            query=self.query.chain(using=alias),
             params=self.params, translations=self.translations,
             using=alias,
         )
