@@ -277,12 +277,13 @@ class URLPatternReverse(SimpleTestCase):
 
     def test_urlpattern_reverse(self):
         for name, expected, args, kwargs in test_data:
-            try:
-                got = reverse(name, args=args, kwargs=kwargs)
-            except NoReverseMatch:
-                self.assertEqual(expected, NoReverseMatch)
-            else:
-                self.assertEqual(got, expected)
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                try:
+                    got = reverse(name, args=args, kwargs=kwargs)
+                except NoReverseMatch:
+                    self.assertEqual(NoReverseMatch, expected)
+                else:
+                    self.assertEqual(got, expected)
 
     def test_reverse_none(self):
         # Reversing None should raise an error, not return the last un-named view.
@@ -382,9 +383,15 @@ class ResolverTests(SimpleTestCase):
 
     def test_resolver_reverse(self):
         resolver = get_resolver('urlpatterns_reverse.named_urls')
-        self.assertEqual(resolver.reverse('named-url1'), '')
-        self.assertEqual(resolver.reverse('named-url2', 'arg'), 'extra/arg/')
-        self.assertEqual(resolver.reverse('named-url2', extra='arg'), 'extra/arg/')
+        test_urls = [
+            # (name, args, kwargs, expected)
+            ('named-url1', (), {}, ''),
+            ('named-url2', ('arg',), {}, 'extra/arg/'),
+            ('named-url2', (), {'extra': 'arg'}, 'extra/arg/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(resolver.reverse(name, *args, **kwargs), expected)
 
     def test_resolver_reverse_conflict(self):
         """
@@ -392,16 +399,22 @@ class ResolverTests(SimpleTestCase):
         pattern takes precedence for conflicting names.
         """
         resolver = get_resolver('urlpatterns_reverse.named_urls_conflict')
-        # Without arguments, the last URL in urlpatterns has precedence.
-        self.assertEqual(resolver.reverse('name-conflict'), 'conflict/')
-        # With an arg, the last URL in urlpatterns has precedence.
-        self.assertEqual(resolver.reverse('name-conflict', 'arg'), 'conflict-last/arg/')
-        # With a kwarg, other url()s can be reversed.
-        self.assertEqual(resolver.reverse('name-conflict', first='arg'), 'conflict-first/arg/')
-        self.assertEqual(resolver.reverse('name-conflict', middle='arg'), 'conflict-middle/arg/')
-        self.assertEqual(resolver.reverse('name-conflict', last='arg'), 'conflict-last/arg/')
-        # The number and order of the arguments don't interfere with reversing.
-        self.assertEqual(resolver.reverse('name-conflict', 'arg', 'arg'), 'conflict/arg/arg/')
+        test_urls = [
+            # (name, args, kwargs, expected)
+            # Without arguments, the last URL in urlpatterns has precedence.
+            ('name-conflict', (), {}, 'conflict/'),
+            # With an arg, the last URL in urlpatterns has precedence.
+            ('name-conflict', ('arg',), {}, 'conflict-last/arg/'),
+            # With a kwarg, other url()s can be reversed.
+            ('name-conflict', (), {'first': 'arg'}, 'conflict-first/arg/'),
+            ('name-conflict', (), {'middle': 'arg'}, 'conflict-middle/arg/'),
+            ('name-conflict', (), {'last': 'arg'}, 'conflict-last/arg/'),
+            # The number and order of the arguments don't interfere with reversing.
+            ('name-conflict', ('arg', 'arg'), {}, 'conflict/arg/arg/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(resolver.reverse(name, *args, **kwargs), expected)
 
     def test_non_regex(self):
         """
@@ -410,14 +423,11 @@ class ResolverTests(SimpleTestCase):
         the root pattern '^/'. Never return None from resolve() to prevent a
         TypeError from occurring later (#10834).
         """
-        with self.assertRaises(Resolver404):
-            resolve('')
-        with self.assertRaises(Resolver404):
-            resolve('a')
-        with self.assertRaises(Resolver404):
-            resolve('\\')
-        with self.assertRaises(Resolver404):
-            resolve('.')
+        test_urls = ['', 'a', '\\', '.']
+        for path in test_urls:
+            with self.subTest(path=path):
+                with self.assertRaises(Resolver404):
+                    resolve(path)
 
     def test_404_tried_urls_have_names(self):
         """
@@ -452,16 +462,17 @@ class ResolverTests(SimpleTestCase):
         )
         for tried, expected in zip(e.args[0]['tried'], url_types_names):
             for t, e in zip(tried, expected):
-                self.assertIsInstance(t, e['type']), '%s is not an instance of %s' % (t, e['type'])
-                if 'name' in e:
-                    if not e['name']:
-                        self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
-                    else:
-                        self.assertEqual(
-                            t.name,
-                            e['name'],
-                            'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
-                        )
+                with self.subTest(t):
+                    self.assertIsInstance(t, e['type']), '%s is not an instance of %s' % (t, e['type'])
+                    if 'name' in e:
+                        if not e['name']:
+                            self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
+                        else:
+                            self.assertEqual(
+                                t.name,
+                                e['name'],
+                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
+                            )
 
     def test_namespaced_view_detail(self):
         resolver = get_resolver('urlpatterns_reverse.nested_urls')
@@ -593,249 +604,323 @@ class ReverseShortcutTests(SimpleTestCase):
 class NamespaceTests(SimpleTestCase):
 
     def test_ambiguous_object(self):
-        "Names deployed via dynamic URL objects that require namespaces can't be resolved"
-        with self.assertRaises(NoReverseMatch):
-            reverse('urlobject-view')
-        with self.assertRaises(NoReverseMatch):
-            reverse('urlobject-view', args=[37, 42])
-        with self.assertRaises(NoReverseMatch):
-            reverse('urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
+        """
+        Names deployed via dynamic URL objects that require namespaces can't
+        be resolved.
+        """
+        test_urls = [
+            ('urlobject-view', [], {}),
+            ('urlobject-view', [37, 42], {}),
+            ('urlobject-view', [], {'arg1': 42, 'arg2': 37}),
+        ]
+        for name, args, kwargs in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                with self.assertRaises(NoReverseMatch):
+                    reverse(name, args=args, kwargs=kwargs)
 
     def test_ambiguous_urlpattern(self):
-        "Names deployed via dynamic URL objects that require namespaces can't be resolved"
-        with self.assertRaises(NoReverseMatch):
-            reverse('inner-nothing')
-        with self.assertRaises(NoReverseMatch):
-            reverse('inner-nothing', args=[37, 42])
-        with self.assertRaises(NoReverseMatch):
-            reverse('inner-nothing', kwargs={'arg1': 42, 'arg2': 37})
+        """
+        Names deployed via dynamic URL objects that require namespaces can't
+        be resolved.
+        """
+        test_urls = [
+            ('inner-nothing', [], {}),
+            ('inner-nothing', [37, 42], {}),
+            ('inner-nothing', [], {'arg1': 42, 'arg2': 37}),
+        ]
+        for name, args, kwargs in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                with self.assertRaises(NoReverseMatch):
+                    reverse(name, args=args, kwargs=kwargs)
 
     def test_non_existent_namespace(self):
-        "Nonexistent namespaces raise errors"
-        with self.assertRaises(NoReverseMatch):
-            reverse('blahblah:urlobject-view')
-        with self.assertRaises(NoReverseMatch):
-            reverse('test-ns1:blahblah:urlobject-view')
+        """Nonexistent namespaces raise errors."""
+        test_urls = [
+            'blahblah:urlobject-view',
+            'test-ns1:blahblah:urlobject-view',
+        ]
+        for name in test_urls:
+            with self.subTest(name=name):
+                with self.assertRaises(NoReverseMatch):
+                    reverse(name)
 
     def test_normal_name(self):
-        "Normal lookups work as expected"
-        self.assertEqual('/normal/', reverse('normal-view'))
-        self.assertEqual('/normal/37/42/', reverse('normal-view', args=[37, 42]))
-        self.assertEqual('/normal/42/37/', reverse('normal-view', kwargs={'arg1': 42, 'arg2': 37}))
-        self.assertEqual('/+%5C$*/', reverse('special-view'))
+        """Normal lookups work as expected."""
+        test_urls = [
+            ('normal-view', [], {}, '/normal/'),
+            ('normal-view', [37, 42], {}, '/normal/37/42/'),
+            ('normal-view', [], {'arg1': 42, 'arg2': 37}, '/normal/42/37/'),
+            ('special-view', [], {}, '/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_simple_included_name(self):
-        "Normal lookups work on names included from other patterns"
-        self.assertEqual('/included/normal/', reverse('included_namespace_urls:inc-normal-view'))
-        self.assertEqual('/included/normal/37/42/', reverse('included_namespace_urls:inc-normal-view', args=[37, 42]))
-        self.assertEqual(
-            '/included/normal/42/37/',
-            reverse('included_namespace_urls:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/included/+%5C$*/', reverse('included_namespace_urls:inc-special-view'))
+        """Normal lookups work on names included from other patterns."""
+        test_urls = [
+            ('included_namespace_urls:inc-normal-view', [], {}, '/included/normal/'),
+            ('included_namespace_urls:inc-normal-view', [37, 42], {}, '/included/normal/37/42/'),
+            ('included_namespace_urls:inc-normal-view', [], {'arg1': 42, 'arg2': 37}, '/included/normal/42/37/'),
+            ('included_namespace_urls:inc-special-view', [], {}, '/included/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_namespace_object(self):
-        "Dynamic URL objects can be found using a namespace"
-        self.assertEqual('/test1/inner/', reverse('test-ns1:urlobject-view'))
-        self.assertEqual('/test1/inner/37/42/', reverse('test-ns1:urlobject-view', args=[37, 42]))
-        self.assertEqual('/test1/inner/42/37/', reverse('test-ns1:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
-        self.assertEqual('/test1/inner/+%5C$*/', reverse('test-ns1:urlobject-special-view'))
+        """Dynamic URL objects can be found using a namespace."""
+        test_urls = [
+            ('test-ns1:urlobject-view', [], {}, '/test1/inner/'),
+            ('test-ns1:urlobject-view', [37, 42], {}, '/test1/inner/37/42/'),
+            ('test-ns1:urlobject-view', [], {'arg1': 42, 'arg2': 37}, '/test1/inner/42/37/'),
+            ('test-ns1:urlobject-special-view', [], {}, '/test1/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_app_object(self):
-        "Dynamic URL objects can return a (pattern, app_name) 2-tuple, and include() can set the namespace"
-        self.assertEqual('/newapp1/inner/', reverse('new-ns1:urlobject-view'))
-        self.assertEqual('/newapp1/inner/37/42/', reverse('new-ns1:urlobject-view', args=[37, 42]))
-        self.assertEqual('/newapp1/inner/42/37/', reverse('new-ns1:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
-        self.assertEqual('/newapp1/inner/+%5C$*/', reverse('new-ns1:urlobject-special-view'))
+        """
+        Dynamic URL objects can return a (pattern, app_name) 2-tuple, and
+        include() can set the namespace.
+        """
+        test_urls = [
+            ('new-ns1:urlobject-view', [], {}, '/newapp1/inner/'),
+            ('new-ns1:urlobject-view', [37, 42], {}, '/newapp1/inner/37/42/'),
+            ('new-ns1:urlobject-view', [], {'arg1': 42, 'arg2': 37}, '/newapp1/inner/42/37/'),
+            ('new-ns1:urlobject-special-view', [], {}, '/newapp1/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_app_object_default_namespace(self):
-        "Namespace defaults to app_name when including a (pattern, app_name) 2-tuple"
-        self.assertEqual('/new-default/inner/', reverse('newapp:urlobject-view'))
-        self.assertEqual('/new-default/inner/37/42/', reverse('newapp:urlobject-view', args=[37, 42]))
-        self.assertEqual(
-            '/new-default/inner/42/37/', reverse('newapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/new-default/inner/+%5C$*/', reverse('newapp:urlobject-special-view'))
+        """
+        Namespace defaults to app_name when including a (pattern, app_name)
+        2-tuple.
+        """
+        test_urls = [
+            ('newapp:urlobject-view', [], {}, '/new-default/inner/'),
+            ('newapp:urlobject-view', [37, 42], {}, '/new-default/inner/37/42/'),
+            ('newapp:urlobject-view', [], {'arg1': 42, 'arg2': 37}, '/new-default/inner/42/37/'),
+            ('newapp:urlobject-special-view', [], {}, '/new-default/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_embedded_namespace_object(self):
-        "Namespaces can be installed anywhere in the URL pattern tree"
-        self.assertEqual('/included/test3/inner/', reverse('included_namespace_urls:test-ns3:urlobject-view'))
-        self.assertEqual(
-            '/included/test3/inner/37/42/', reverse('included_namespace_urls:test-ns3:urlobject-view', args=[37, 42])
-        )
-        self.assertEqual(
-            '/included/test3/inner/42/37/',
-            reverse('included_namespace_urls:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual(
-            '/included/test3/inner/+%5C$*/', reverse('included_namespace_urls:test-ns3:urlobject-special-view')
-        )
+        """Namespaces can be installed anywhere in the URL pattern tree."""
+        test_urls = [
+            ('included_namespace_urls:test-ns3:urlobject-view', [], {}, '/included/test3/inner/'),
+            ('included_namespace_urls:test-ns3:urlobject-view', [37, 42], {}, '/included/test3/inner/37/42/'),
+            (
+                'included_namespace_urls:test-ns3:urlobject-view', [], {'arg1': 42, 'arg2': 37},
+                '/included/test3/inner/42/37/',
+            ),
+            ('included_namespace_urls:test-ns3:urlobject-special-view', [], {}, '/included/test3/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_namespace_pattern(self):
-        "Namespaces can be applied to include()'d urlpatterns"
-        self.assertEqual('/ns-included1/normal/', reverse('inc-ns1:inc-normal-view'))
-        self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37, 42]))
-        self.assertEqual(
-            '/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/ns-included1/+%5C$*/', reverse('inc-ns1:inc-special-view'))
+        """Namespaces can be applied to include()'d urlpatterns."""
+        test_urls = [
+            ('inc-ns1:inc-normal-view', [], {}, '/ns-included1/normal/'),
+            ('inc-ns1:inc-normal-view', [37, 42], {}, '/ns-included1/normal/37/42/'),
+            ('inc-ns1:inc-normal-view', [], {'arg1': 42, 'arg2': 37}, '/ns-included1/normal/42/37/'),
+            ('inc-ns1:inc-special-view', [], {}, '/ns-included1/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_app_name_pattern(self):
-        "Namespaces can be applied to include()'d urlpatterns that set an app_name attribute"
-        self.assertEqual('/app-included1/normal/', reverse('app-ns1:inc-normal-view'))
-        self.assertEqual('/app-included1/normal/37/42/', reverse('app-ns1:inc-normal-view', args=[37, 42]))
-        self.assertEqual(
-            '/app-included1/normal/42/37/', reverse('app-ns1:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/app-included1/+%5C$*/', reverse('app-ns1:inc-special-view'))
+        """
+        Namespaces can be applied to include()'d urlpatterns that set an
+        app_name attribute.
+        """
+        test_urls = [
+            ('app-ns1:inc-normal-view', [], {}, '/app-included1/normal/'),
+            ('app-ns1:inc-normal-view', [37, 42], {}, '/app-included1/normal/37/42/'),
+            ('app-ns1:inc-normal-view', [], {'arg1': 42, 'arg2': 37}, '/app-included1/normal/42/37/'),
+            ('app-ns1:inc-special-view', [], {}, '/app-included1/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_namespace_pattern_with_variable_prefix(self):
-        "When using an include with namespaces when there is a regex variable in front of it"
-        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42}))
-        self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', args=[42]))
-        self.assertEqual(
-            '/ns-outer/42/normal/37/4/',
-            reverse('inc-outer:inc-normal-view', kwargs={'outer': 42, 'arg1': 37, 'arg2': 4})
-        )
-        self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', args=[42, 37, 4]))
-        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view', kwargs={'outer': 42}))
-        self.assertEqual('/ns-outer/42/+%5C$*/', reverse('inc-outer:inc-special-view', args=[42]))
+        """
+        Using include() with namespaces when there is a regex variable in front
+        of it.
+        """
+        test_urls = [
+            ('inc-outer:inc-normal-view', [], {'outer': 42}, '/ns-outer/42/normal/'),
+            ('inc-outer:inc-normal-view', [42], {}, '/ns-outer/42/normal/'),
+            ('inc-outer:inc-normal-view', [], {'arg1': 37, 'arg2': 4, 'outer': 42}, '/ns-outer/42/normal/37/4/'),
+            ('inc-outer:inc-normal-view', [42, 37, 4], {}, '/ns-outer/42/normal/37/4/'),
+            ('inc-outer:inc-special-view', [], {'outer': 42}, '/ns-outer/42/+%5C$*/'),
+            ('inc-outer:inc-special-view', [42], {}, '/ns-outer/42/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_multiple_namespace_pattern(self):
-        "Namespaces can be embedded"
-        self.assertEqual('/ns-included1/test3/inner/', reverse('inc-ns1:test-ns3:urlobject-view'))
-        self.assertEqual('/ns-included1/test3/inner/37/42/', reverse('inc-ns1:test-ns3:urlobject-view', args=[37, 42]))
-        self.assertEqual(
-            '/ns-included1/test3/inner/42/37/',
-            reverse('inc-ns1:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/ns-included1/test3/inner/+%5C$*/', reverse('inc-ns1:test-ns3:urlobject-special-view'))
+        """Namespaces can be embedded."""
+        test_urls = [
+            ('inc-ns1:test-ns3:urlobject-view', [], {}, '/ns-included1/test3/inner/'),
+            ('inc-ns1:test-ns3:urlobject-view', [37, 42], {}, '/ns-included1/test3/inner/37/42/'),
+            (
+                'inc-ns1:test-ns3:urlobject-view', [], {'arg1': 42, 'arg2': 37},
+                '/ns-included1/test3/inner/42/37/',
+            ),
+            ('inc-ns1:test-ns3:urlobject-special-view', [], {}, '/ns-included1/test3/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_nested_namespace_pattern(self):
-        "Namespaces can be nested"
-        self.assertEqual(
-            '/ns-included1/ns-included4/ns-included1/test3/inner/',
-            reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view')
-        )
-        self.assertEqual(
-            '/ns-included1/ns-included4/ns-included1/test3/inner/37/42/',
-            reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', args=[37, 42])
-        )
-        self.assertEqual(
-            '/ns-included1/ns-included4/ns-included1/test3/inner/42/37/',
-            reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual(
-            '/ns-included1/ns-included4/ns-included1/test3/inner/+%5C$*/',
-            reverse('inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-special-view')
-        )
+        """Namespaces can be nested."""
+        test_urls = [
+            (
+                'inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', [], {},
+                '/ns-included1/ns-included4/ns-included1/test3/inner/',
+            ),
+            (
+                'inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', [37, 42], {},
+                '/ns-included1/ns-included4/ns-included1/test3/inner/37/42/',
+            ),
+            (
+                'inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-view', [], {'arg1': 42, 'arg2': 37},
+                '/ns-included1/ns-included4/ns-included1/test3/inner/42/37/',
+            ),
+            (
+                'inc-ns1:inc-ns4:inc-ns1:test-ns3:urlobject-special-view', [], {},
+                '/ns-included1/ns-included4/ns-included1/test3/inner/+%5C$*/',
+            ),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_app_lookup_object(self):
-        "A default application namespace can be used for lookup"
-        self.assertEqual('/default/inner/', reverse('testapp:urlobject-view'))
-        self.assertEqual('/default/inner/37/42/', reverse('testapp:urlobject-view', args=[37, 42]))
-        self.assertEqual('/default/inner/42/37/', reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
-        self.assertEqual('/default/inner/+%5C$*/', reverse('testapp:urlobject-special-view'))
+        """A default application namespace can be used for lookup."""
+        test_urls = [
+            ('testapp:urlobject-view', [], {}, '/default/inner/'),
+            ('testapp:urlobject-view', [37, 42], {}, '/default/inner/37/42/'),
+            ('testapp:urlobject-view', [], {'arg1': 42, 'arg2': 37}, '/default/inner/42/37/'),
+            ('testapp:urlobject-special-view', [], {}, '/default/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_app_lookup_object_with_default(self):
-        "A default application namespace is sensitive to the 'current' app can be used for lookup"
-        self.assertEqual('/default/inner/', reverse('testapp:urlobject-view', current_app='test-ns3'))
-        self.assertEqual(
-            '/default/inner/37/42/',
-            reverse('testapp:urlobject-view', args=[37, 42], current_app='test-ns3')
-        )
-        self.assertEqual(
-            '/default/inner/42/37/',
-            reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='test-ns3')
-        )
-        self.assertEqual(
-            '/default/inner/+%5C$*/', reverse('testapp:urlobject-special-view', current_app='test-ns3')
-        )
+        """A default application namespace is sensitive to the current app."""
+        test_urls = [
+            ('testapp:urlobject-view', [], {}, 'test-ns3', '/default/inner/'),
+            ('testapp:urlobject-view', [37, 42], {}, 'test-ns3', '/default/inner/37/42/'),
+            ('testapp:urlobject-view', [], {'arg1': 42, 'arg2': 37}, 'test-ns3', '/default/inner/42/37/'),
+            ('testapp:urlobject-special-view', [], {}, 'test-ns3', '/default/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, current_app, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs, current_app=current_app):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs, current_app=current_app), expected)
 
     def test_app_lookup_object_without_default(self):
-        "An application namespace without a default is sensitive to the 'current' app can be used for lookup"
-        self.assertEqual('/other2/inner/', reverse('nodefault:urlobject-view'))
-        self.assertEqual('/other2/inner/37/42/', reverse('nodefault:urlobject-view', args=[37, 42]))
-        self.assertEqual('/other2/inner/42/37/', reverse('nodefault:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
-        self.assertEqual('/other2/inner/+%5C$*/', reverse('nodefault:urlobject-special-view'))
-
-        self.assertEqual('/other1/inner/', reverse('nodefault:urlobject-view', current_app='other-ns1'))
-        self.assertEqual(
-            '/other1/inner/37/42/', reverse('nodefault:urlobject-view', args=[37, 42], current_app='other-ns1')
-        )
-        self.assertEqual(
-            '/other1/inner/42/37/',
-            reverse('nodefault:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='other-ns1')
-        )
-        self.assertEqual('/other1/inner/+%5C$*/', reverse('nodefault:urlobject-special-view', current_app='other-ns1'))
+        """
+        An application namespace without a default is sensitive to the current
+        app.
+        """
+        test_urls = [
+            ('nodefault:urlobject-view', [], {}, None, '/other2/inner/'),
+            ('nodefault:urlobject-view', [37, 42], {}, None, '/other2/inner/37/42/'),
+            ('nodefault:urlobject-view', [], {'arg1': 42, 'arg2': 37}, None, '/other2/inner/42/37/'),
+            ('nodefault:urlobject-special-view', [], {}, None, '/other2/inner/+%5C$*/'),
+            ('nodefault:urlobject-view', [], {}, 'other-ns1', '/other1/inner/'),
+            ('nodefault:urlobject-view', [37, 42], {}, 'other-ns1', '/other1/inner/37/42/'),
+            ('nodefault:urlobject-view', [], {'arg1': 42, 'arg2': 37}, 'other-ns1', '/other1/inner/42/37/'),
+            ('nodefault:urlobject-special-view', [], {}, 'other-ns1', '/other1/inner/+%5C$*/'),
+        ]
+        for name, args, kwargs, current_app, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs, current_app=current_app):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs, current_app=current_app), expected)
 
     def test_special_chars_namespace(self):
-        self.assertEqual('/+%5C$*/included/normal/', reverse('special:included_namespace_urls:inc-normal-view'))
-        self.assertEqual(
-            '/+%5C$*/included/normal/37/42/',
-            reverse('special:included_namespace_urls:inc-normal-view', args=[37, 42])
-        )
-        self.assertEqual(
-            '/+%5C$*/included/normal/42/37/',
-            reverse('special:included_namespace_urls:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/+%5C$*/included/+%5C$*/', reverse('special:included_namespace_urls:inc-special-view'))
+        test_urls = [
+            ('special:included_namespace_urls:inc-normal-view', [], {}, '/+%5C$*/included/normal/'),
+            ('special:included_namespace_urls:inc-normal-view', [37, 42], {}, '/+%5C$*/included/normal/37/42/'),
+            (
+                'special:included_namespace_urls:inc-normal-view', [], {'arg1': 42, 'arg2': 37},
+                '/+%5C$*/included/normal/42/37/',
+            ),
+            ('special:included_namespace_urls:inc-special-view', [], {}, '/+%5C$*/included/+%5C$*/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_namespaces_with_variables(self):
-        "Namespace prefixes can capture variables: see #15900"
-        self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', kwargs={'outer': '70'}))
-        self.assertEqual(
-            '/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', kwargs={'outer': '78', 'extra': 'foobar'})
-        )
-        self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', args=['70']))
-        self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78', 'foobar']))
+        """Namespace prefixes can capture variables."""
+        test_urls = [
+            ('inc-ns5:inner-nothing', [], {'outer': '70'}, '/inc70/'),
+            ('inc-ns5:inner-extra', [], {'extra': 'foobar', 'outer': '78'}, '/inc78/extra/foobar/'),
+            ('inc-ns5:inner-nothing', ['70'], {}, '/inc70/'),
+            ('inc-ns5:inner-extra', ['78', 'foobar'], {}, '/inc78/extra/foobar/'),
+        ]
+        for name, args, kwargs, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs), expected)
 
     def test_nested_app_lookup(self):
-        "A nested current_app should be split in individual namespaces (#24904)"
-        self.assertEqual('/ns-included1/test4/inner/', reverse('inc-ns1:testapp:urlobject-view'))
-        self.assertEqual('/ns-included1/test4/inner/37/42/', reverse('inc-ns1:testapp:urlobject-view', args=[37, 42]))
-        self.assertEqual(
-            '/ns-included1/test4/inner/42/37/',
-            reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
-        )
-        self.assertEqual('/ns-included1/test4/inner/+%5C$*/', reverse('inc-ns1:testapp:urlobject-special-view'))
-
-        self.assertEqual(
-            '/ns-included1/test3/inner/',
-            reverse('inc-ns1:testapp:urlobject-view', current_app='inc-ns1:test-ns3')
-        )
-        self.assertEqual(
-            '/ns-included1/test3/inner/37/42/',
-            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='inc-ns1:test-ns3')
-        )
-        self.assertEqual(
-            '/ns-included1/test3/inner/42/37/',
-            reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='inc-ns1:test-ns3')
-        )
-        self.assertEqual(
-            '/ns-included1/test3/inner/+%5C$*/',
-            reverse('inc-ns1:testapp:urlobject-special-view', current_app='inc-ns1:test-ns3')
-        )
+        """
+        A nested current_app should be split in individual namespaces (#24904).
+        """
+        test_urls = [
+            ('inc-ns1:testapp:urlobject-view', [], {}, None, '/ns-included1/test4/inner/'),
+            ('inc-ns1:testapp:urlobject-view', [37, 42], {}, None, '/ns-included1/test4/inner/37/42/'),
+            ('inc-ns1:testapp:urlobject-view', [], {'arg1': 42, 'arg2': 37}, None, '/ns-included1/test4/inner/42/37/'),
+            ('inc-ns1:testapp:urlobject-special-view', [], {}, None, '/ns-included1/test4/inner/+%5C$*/'),
+            ('inc-ns1:testapp:urlobject-view', [], {}, 'inc-ns1:test-ns3', '/ns-included1/test3/inner/'),
+            ('inc-ns1:testapp:urlobject-view', [37, 42], {}, 'inc-ns1:test-ns3', '/ns-included1/test3/inner/37/42/'),
+            (
+                'inc-ns1:testapp:urlobject-view', [], {'arg1': 42, 'arg2': 37}, 'inc-ns1:test-ns3',
+                '/ns-included1/test3/inner/42/37/',
+            ),
+            (
+                'inc-ns1:testapp:urlobject-special-view', [], {}, 'inc-ns1:test-ns3',
+                '/ns-included1/test3/inner/+%5C$*/',
+            ),
+        ]
+        for name, args, kwargs, current_app, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs, current_app=current_app):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs, current_app=current_app), expected)
 
     def test_current_app_no_partial_match(self):
-        "current_app should either match the whole path or shouldn't be used"
-        self.assertEqual(
-            '/ns-included1/test4/inner/',
-            reverse('inc-ns1:testapp:urlobject-view', current_app='nonexistent:test-ns3')
-        )
-        self.assertEqual(
-            '/ns-included1/test4/inner/37/42/',
-            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='nonexistent:test-ns3')
-        )
-        self.assertEqual(
-            '/ns-included1/test4/inner/42/37/',
-            reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37},
-                    current_app='nonexistent:test-ns3')
-        )
-        self.assertEqual(
-            '/ns-included1/test4/inner/+%5C$*/',
-            reverse('inc-ns1:testapp:urlobject-special-view', current_app='nonexistent:test-ns3')
-        )
+        """current_app shouldn't be used unless it matches the whole path."""
+        test_urls = [
+            ('inc-ns1:testapp:urlobject-view', [], {}, 'nonexistent:test-ns3', '/ns-included1/test4/inner/'),
+            (
+                'inc-ns1:testapp:urlobject-view', [37, 42], {}, 'nonexistent:test-ns3',
+                '/ns-included1/test4/inner/37/42/',
+            ),
+            (
+                'inc-ns1:testapp:urlobject-view', [], {'arg1': 42, 'arg2': 37}, 'nonexistent:test-ns3',
+                '/ns-included1/test4/inner/42/37/',
+            ),
+            (
+                'inc-ns1:testapp:urlobject-special-view', [], {}, 'nonexistent:test-ns3',
+                '/ns-included1/test4/inner/+%5C$*/',
+            ),
+        ]
+        for name, args, kwargs, current_app, expected in test_urls:
+            with self.subTest(name=name, args=args, kwargs=kwargs, current_app=current_app):
+                self.assertEqual(reverse(name, args=args, kwargs=kwargs, current_app=current_app), expected)
 
 
 @override_settings(ROOT_URLCONF=urlconf_outer.__name__)
@@ -954,15 +1039,15 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
 
     def test_named_handlers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.resolver.resolve_error_handler(400), handler)
-        self.assertEqual(self.resolver.resolve_error_handler(404), handler)
-        self.assertEqual(self.resolver.resolve_error_handler(500), handler)
+        for code in [400, 404, 500]:
+            with self.subTest(code=code):
+                self.assertEqual(self.resolver.resolve_error_handler(code), handler)
 
     def test_callable_handlers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.callable_resolver.resolve_error_handler(400), handler)
-        self.assertEqual(self.callable_resolver.resolve_error_handler(404), handler)
-        self.assertEqual(self.callable_resolver.resolve_error_handler(500), handler)
+        for code in [400, 404, 500]:
+            with self.subTest(code=code):
+                self.assertEqual(self.callable_resolver.resolve_error_handler(code), handler)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')
@@ -991,27 +1076,26 @@ class ResolverMatchTests(SimpleTestCase):
 
     def test_urlpattern_resolve(self):
         for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
-            # Test legacy support for extracting "function, args, kwargs"
-            match_func, match_args, match_kwargs = resolve(path)
-            self.assertEqual(match_func, func)
-            self.assertEqual(match_args, args)
-            self.assertEqual(match_kwargs, kwargs)
-
-            # Test ResolverMatch capabilities.
-            match = resolve(path)
-            self.assertEqual(match.__class__, ResolverMatch)
-            self.assertEqual(match.url_name, url_name)
-            self.assertEqual(match.app_name, app_name)
-            self.assertEqual(match.namespace, namespace)
-            self.assertEqual(match.view_name, view_name)
-            self.assertEqual(match.func, func)
-            self.assertEqual(match.args, args)
-            self.assertEqual(match.kwargs, kwargs)
-
-            # ... and for legacy purposes:
-            self.assertEqual(match[0], func)
-            self.assertEqual(match[1], args)
-            self.assertEqual(match[2], kwargs)
+            with self.subTest(path=path):
+                # Legacy support for extracting "function, args, kwargs".
+                match_func, match_args, match_kwargs = resolve(path)
+                self.assertEqual(match_func, func)
+                self.assertEqual(match_args, args)
+                self.assertEqual(match_kwargs, kwargs)
+                # ResolverMatch capabilities.
+                match = resolve(path)
+                self.assertEqual(match.__class__, ResolverMatch)
+                self.assertEqual(match.url_name, url_name)
+                self.assertEqual(match.app_name, app_name)
+                self.assertEqual(match.namespace, namespace)
+                self.assertEqual(match.view_name, view_name)
+                self.assertEqual(match.func, func)
+                self.assertEqual(match.args, args)
+                self.assertEqual(match.kwargs, kwargs)
+                # and for legacy purposes:
+                self.assertEqual(match[0], func)
+                self.assertEqual(match[1], args)
+                self.assertEqual(match[2], kwargs)
 
     def test_resolver_match_on_request(self):
         response = self.client.get('/resolver_match/')
@@ -1125,8 +1209,8 @@ class LookaheadTests(SimpleTestCase):
             '/lookbehind+/a-city/',
         ]
         for test_url in test_urls:
-            match = resolve(test_url)
-            self.assertEqual(match.kwargs, {'city': 'a-city'})
+            with self.subTest(url=test_url):
+                self.assertEqual(resolve(test_url).kwargs, {'city': 'a-city'})
 
     def test_invalid_resolve(self):
         test_urls = [
@@ -1136,27 +1220,29 @@ class LookaheadTests(SimpleTestCase):
             '/lookbehind+/other-city/',
         ]
         for test_url in test_urls:
-            with self.assertRaises(Resolver404):
-                resolve(test_url)
+            with self.subTest(url=test_url):
+                with self.assertRaises(Resolver404):
+                    resolve(test_url)
 
     def test_valid_reverse(self):
-        url = reverse('lookahead-positive', kwargs={'city': 'a-city'})
-        self.assertEqual(url, '/lookahead+/a-city/')
-        url = reverse('lookahead-negative', kwargs={'city': 'a-city'})
-        self.assertEqual(url, '/lookahead-/a-city/')
-
-        url = reverse('lookbehind-positive', kwargs={'city': 'a-city'})
-        self.assertEqual(url, '/lookbehind+/a-city/')
-        url = reverse('lookbehind-negative', kwargs={'city': 'a-city'})
-        self.assertEqual(url, '/lookbehind-/a-city/')
+        test_urls = [
+            ('lookahead-positive', {'city': 'a-city'}, '/lookahead+/a-city/'),
+            ('lookahead-negative', {'city': 'a-city'}, '/lookahead-/a-city/'),
+            ('lookbehind-positive', {'city': 'a-city'}, '/lookbehind+/a-city/'),
+            ('lookbehind-negative', {'city': 'a-city'}, '/lookbehind-/a-city/'),
+        ]
+        for name, kwargs, expected in test_urls:
+            with self.subTest(name=name, kwargs=kwargs):
+                self.assertEqual(reverse(name, kwargs=kwargs), expected)
 
     def test_invalid_reverse(self):
-        with self.assertRaises(NoReverseMatch):
-            reverse('lookahead-positive', kwargs={'city': 'other-city'})
-        with self.assertRaises(NoReverseMatch):
-            reverse('lookahead-negative', kwargs={'city': 'not-a-city'})
-
-        with self.assertRaises(NoReverseMatch):
-            reverse('lookbehind-positive', kwargs={'city': 'other-city'})
-        with self.assertRaises(NoReverseMatch):
-            reverse('lookbehind-negative', kwargs={'city': 'not-a-city'})
+        test_urls = [
+            ('lookahead-positive', {'city': 'other-city'}),
+            ('lookahead-negative', {'city': 'not-a-city'}),
+            ('lookbehind-positive', {'city': 'other-city'}),
+            ('lookbehind-negative', {'city': 'not-a-city'}),
+        ]
+        for name, kwargs in test_urls:
+            with self.subTest(name=name, kwargs=kwargs):
+                with self.assertRaises(NoReverseMatch):
+                    reverse(name, kwargs=kwargs)
