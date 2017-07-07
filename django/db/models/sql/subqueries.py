@@ -93,8 +93,7 @@ class UpdateQuery(Query):
         """
         self.values = []
         self.related_ids = None
-        if not hasattr(self, 'related_updates'):
-            self.related_updates = {}
+        self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
         return super().clone(klass, related_updates=self.related_updates.copy(), **kwargs)
