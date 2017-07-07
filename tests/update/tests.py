@@ -139,6 +139,15 @@ class AdvancedTests(TestCase):
         bar_qs.update(foo=b_foo)
         self.assertEqual(bar_qs[0].foo_id, b_foo.target)
 
+    def test_update_m2m_field(self):
+        msg = (
+            'Cannot update model field '
+            '<django.db.models.fields.related.ManyToManyField: m2m_foo> '
+            '(only non-relations and foreign keys permitted).'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Bar.objects.update(m2m_foo='whatever')
+
     def test_update_annotated_queryset(self):
         """
         Update of a queryset that's been annotated.
