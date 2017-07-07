@@ -44,8 +44,8 @@ class Avg(Aggregate):
     def _resolve_output_field(self):
         source_field = self.get_source_fields()[0]
         if isinstance(source_field, (IntegerField, DecimalField)):
-            self._output_field = FloatField()
-        super()._resolve_output_field()
+            return FloatField()
+        return super()._resolve_output_field()
 
     def as_oracle(self, compiler, connection):
         if self.output_field.get_internal_type() == 'DurationField':

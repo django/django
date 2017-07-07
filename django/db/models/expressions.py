@@ -236,7 +236,7 @@ class BaseExpression:
         None values.
         """
         if self._output_field is None:
-            self._resolve_output_field()
+            self._output_field = self._resolve_output_field()
         return self._output_field
 
     def _resolve_output_field(self):
@@ -253,18 +253,11 @@ class BaseExpression:
         this check. If all sources are `None`, then an error will be thrown
         higher up the stack in the `output_field` property.
         """
-        if self._output_field is None:
-            sources = self.get_source_fields()
-            num_sources = len(sources)
-            if num_sources == 0:
-                self._output_field = None
-            else:
-                for source in sources:
-                    if self._output_field is None:
-                        self._output_field = source
-                    if source is not None and not isinstance(self._output_field, source.__class__):
-                        raise FieldError(
-                            "Expression contains mixed types. You must set output_field")
+        sources_iter = (source for source in self.get_source_fields() if source is not None)
+        for output_field in sources_iter:
+            if any(not isinstance(output_field, source.__class__) for source in sources_iter):
+                raise FieldError('Expression contains mixed types. You must set output_field.')
+            return output_field
 
     def convert_value(self, value, expression, connection, context):
         """

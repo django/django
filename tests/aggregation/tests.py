@@ -965,8 +965,12 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
 
     def test_combine_different_types(self):
-        with self.assertRaisesMessage(FieldError, 'Expression contains mixed types. You must set output_field'):
-            Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=self.b4.pk)
+        msg = 'Expression contains mixed types. You must set output_field.'
+        qs = Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price'))
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.first()
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.first()
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
                                    output_field=IntegerField())).get(pk=self.b4.pk)
