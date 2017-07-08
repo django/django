@@ -248,6 +248,13 @@ class HttpRequest:
         parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
         return parser.parse()
 
+    def get_client_ip(self):
+        x_forwarded_for = self.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            return x_forwarded_for.split(',')[0]
+
+        return self.META.get('REMOTE_ADDR')
+
     @property
     def body(self):
         if not hasattr(self, '_body'):

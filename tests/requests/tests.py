@@ -921,3 +921,41 @@ class BuildAbsoluteURITestCase(SimpleTestCase):
             request.build_absolute_uri(location='/foo/bar/'),
             'http://testserver/foo/bar/'
         )
+
+    def test_no_client_ip_address(self):
+        """``request.get_client_ip()`` returns None for empty request without ip headers"""
+
+        request = HttpRequest()
+
+        self.assertIsNone(request.get_client_ip())
+
+    def test_client_ip_address_from_remote_addr(self):
+        """``request.get_client_ip()`` returns value from ``REMOTE_ADDR`` header."""
+        request = HttpRequest()
+        request.META = {
+            'REMOTE_ADDR': '127.0.0.1'
+        }
+
+        self.assertEqual(request.get_client_ip(), '127.0.0.1')
+
+    def test_client_ip_address_from_x_forwarder_for(self):
+        """
+        ``request.get_client_ip()`` returns client ip from ``X-Forwarded-For`` header.
+        """
+        request = HttpRequest()
+        request.META = {
+            'HTTP_X_FORWARDED_FOR': '192.168.0.10,192.168.0.1',
+        }
+
+        self.assertEqual(request.get_client_ip(), '192.168.0.10')
+
+    def test_client_ip_address_x_forwarded_for_priority(self):
+        """``X-Forwarded-For`` header value is more preferred then ``REMOTE_ADDR``."""
+
+        request = HttpRequest()
+        request.META = {
+            'HTTP_X_FORWARDED_FOR': '192.168.0.10,192.168.0.1',
+            'REMOTE_ADDR': '127.0.0.1'
+        }
+
+        self.assertEqual(request.get_client_ip(), '192.168.0.10')
