@@ -63,8 +63,7 @@ Django Core Shepherd: Andrew Godwin <andrew@aeracode.org>
 Maintenance team:
 
 * Andrew Godwin <andrew@aeracode.org>
-* Steven Davidson
-* Jeremy Spencer
+* Artem Malyshev
 
 If you are interested in joining the maintenance team, please
 `read more about contributing <https://channels.readthedocs.io/en/latest/contributing.html>`_
