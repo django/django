@@ -9,6 +9,21 @@ register = template.Library()
 
 
 @register.filter
+def admin_delete_url(modeladmin, instance):
+    return modeladmin.admin_delete_url(pk=instance.pk)
+
+
+@register.filter
+def admin_change_url(modeladmin, instance):
+    return modeladmin.admin_change_url(pk=instance.pk)
+
+
+@register.filter
+def admin_history_url(modeladmin, instance):
+    return modeladmin.admin_history_url(pk=instance.pk)
+
+
+@register.filter
 def admin_urlname(value, arg):
     return 'admin:%s_%s_%s' % (value.app_label, value.model_name, arg)
 
