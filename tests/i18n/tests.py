@@ -1473,7 +1473,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         self.assertEqual(response.content, b'Yes')
 
     def test_page_with_dash(self):
-        # A page starting with /de* shouldn't match the 'de' langauge code.
+        # A page starting with /de* shouldn't match the 'de' language code.
         response = self.client.get('/de-simple-page/')
         self.assertEqual(response.content, b'Yes')
 
