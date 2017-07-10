@@ -2,7 +2,7 @@ import string
 from contextlib import suppress
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import models
+from django.db import models, connection
 from django.db.models.signals import pre_delete, pre_save
 from django.http.request import split_domain_port
 from django.utils.translation import gettext_lazy as _
@@ -29,10 +29,10 @@ class SiteManager(models.Manager):
     use_in_migrations = True
 
     def _get_site_by_id(self, site_id):
-        if site_id not in SITE_CACHE:
+        if (site_id, connection.get_schema()) not in SITE_CACHE:
             site = self.get(pk=site_id)
-            SITE_CACHE[site_id] = site
-        return SITE_CACHE[site_id]
+            SITE_CACHE[(site_id, connection.get_schema())] = site
+        return SITE_CACHE[(site_id, connection.get_schema())]
 
     def _get_site_by_request(self, request):
         host = request.get_host()
@@ -109,7 +109,7 @@ def clear_site_cache(sender, **kwargs):
     instance = kwargs['instance']
     using = kwargs['using']
     with suppress(KeyError):
-        del SITE_CACHE[instance.pk]
+        del SITE_CACHE[(instance.pk, connection.get_schema())]
 
     with suppress(KeyError, Site.DoesNotExist):
         del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
