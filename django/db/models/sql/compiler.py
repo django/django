@@ -399,7 +399,18 @@ class SQLCompiler:
                     raise DatabaseError('LIMIT/OFFSET not allowed in subqueries of compound statements.')
                 if compiler.get_order_by():
                     raise DatabaseError('ORDER BY not allowed in subqueries of compound statements.')
-        parts = (compiler.as_sql() for compiler in compilers)
+        parts = ()
+        for compiler in compilers:
+            try:
+                parts += (compiler.as_sql(),)
+            except EmptyResultSet:
+                # Omit the empty queryset with UNION and with DIFFERENCE if the
+                # first queryset is nonempty.
+                if combinator == 'union' or (combinator == 'difference' and parts):
+                    continue
+                raise
+        if not parts:
+            return [], []
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == 'union':
             combinator_sql += ' ALL'
@@ -422,16 +433,7 @@ class SQLCompiler:
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
-            distinct_fields = self.get_distinct()
-
-            # This must come after 'select', 'ordering', and 'distinct' -- see
-            # docstring of get_from_clause() for details.
-            from_, f_params = self.get_from_clause()
-
             for_update_part = None
-            where, w_params = self.compile(self.where) if self.where is not None else ("", [])
-            having, h_params = self.compile(self.having) if self.having is not None else ("", [])
-
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
@@ -439,6 +441,12 @@ class SQLCompiler:
                     raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
+                distinct_fields = self.get_distinct()
+                # This must come after 'select', 'ordering', and 'distinct'
+                # (see docstring of get_from_clause() for details).
+                from_, f_params = self.get_from_clause()
+                where, w_params = self.compile(self.where) if self.where is not None else ("", [])
+                having, h_params = self.compile(self.having) if self.having is not None else ("", [])
                 result = ['SELECT']
                 params = []
 

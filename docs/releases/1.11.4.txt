@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in 1.11.3 on Python 2 where non-ASCII ``format`` values
   for date/time widgets results in an empty ``value`` in the widget's HTML
   (:ticket:`28355`).
+
+* Fixed ``QuerySet.union()`` and ``difference()`` when combining with
+  a queryset raising ``EmptyResultSet`` (:ticket:`28378`).
