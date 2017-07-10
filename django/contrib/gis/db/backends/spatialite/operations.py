@@ -36,7 +36,10 @@ class SpatiaLiteDistanceOperator(SpatialOperator):
 
 class SpatialiteNullCheckOperator(SpatialOperator):
     def as_sql(self, connection, lookup, template_params, sql_params):
-        sql_template = '%(func)s(%(lhs)s, %(rhs)s) > 0'
+        if 'rhs' in template_params:
+            sql_template = '%(func)s(%(lhs)s, %(rhs)s) > 0'
+        else:
+            sql_template = '%(func)s(%(lhs)s) > 0'
         template_params.update({'op': self.op, 'func': self.func})
         return sql_template % template_params, sql_params
 
