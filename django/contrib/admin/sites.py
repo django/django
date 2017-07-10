@@ -442,11 +442,7 @@ class AdminSite:
                 app_dict[app_label] = {
                     'name': apps.get_app_config(app_label).verbose_name,
                     'app_label': app_label,
-                    'app_url': reverse(
-                        'admin:app_list',
-                        kwargs={'app_label': app_label},
-                        current_app=self.name,
-                    ),
+                    'app_url': model_admin.admin_applist_url(),
                     'has_module_perms': has_module_perms,
                     'models': [model_dict],
                 }

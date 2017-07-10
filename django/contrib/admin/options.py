@@ -1192,8 +1192,8 @@ class ModelAdmin(BaseModelAdmin):
         return self.admin_site.admin_index_url()
 
     def admin_applist_url(self):
-        return reverse('admin:%s_%s_applist' %
-                       (self.model._meta.app_label, self.model._meta.model_name),
+        return reverse('admin:applist',
+                       args=[self.model._meta.app_label],
                        current_app=self.admin_site.name)
 
     def admin_changelist_url(self):
