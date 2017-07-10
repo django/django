@@ -927,8 +927,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_resolve_admin_urls(self):
         list_match = resolve('/test_admin/admin4/auth/user/')
         self.assertEqual(list_match.func.model_admin.admin_changelist_url(), '/test_admin/admin4/auth/user/')
+        self.assertEqual(list_match.func.model_admin.admin_applist_url(), '/test_admin/admin4/auth/user/')
         self.assertEqual(list_match.func.model_admin.admin_add_url(), '/test_admin/admin4/auth/user/add/')
         self.assertEqual(list_match.func.model_admin.admin_change_url(5), '/test_admin/admin4/auth/user/5/change/')
+        self.assertEqual(list_match.func.model_admin.admin_delete_url(5), '/test_admin/admin4/auth/user/5/delete/')
         self.assertEqual(list_match.func.model_admin.admin_history_url(5), '/test_admin/admin4/auth/user/5/history/')
 
     def test_adminsite_display_site_url(self):
