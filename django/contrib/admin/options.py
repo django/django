@@ -1760,6 +1760,7 @@ class ModelAdmin(BaseModelAdmin):
             model_count=dict(model_count).items(),
             perms_lacking=perms_needed,
             protected=protected,
+            model_admin=self,
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
@@ -1798,6 +1799,7 @@ class ModelAdmin(BaseModelAdmin):
             module_name=str(capfirst(opts.verbose_name_plural)),
             object=obj,
             opts=opts,
+            model_admin=self,
             preserved_filters=self.get_preserved_filters(request),
         )
         context.update(extra_context or {})

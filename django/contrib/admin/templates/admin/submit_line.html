@@ -2,8 +2,7 @@
 <div class="submit-row">
 {% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save" />{% endif %}
 {% if show_delete_link %}
-    {% admin_delete_url cl.model_admin original.pk as delete_url %}
-    <p class="deletelink-box"><a href="{% add_preserved_filters delete_url|admin_urlquote %}" class="deletelink">{% trans "Delete" %}</a></p>
+    <p class="deletelink-box"><a href="{% admin_delete_url cl.model_admin original.pk %}" class="deletelink">{% trans "Delete" %}</a></p>
 {% endif %}
 {% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" />{% endif %}
 {% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" />{% endif %}

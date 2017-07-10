@@ -8,19 +8,44 @@ from django.utils.http import urlencode
 register = template.Library()
 
 
-@register.simple_tag
-def admin_delete_url(modeladmin, instance):
-    return modeladmin.admin_delete_url(pk=instance.pk)
+@register.simple_tag(takes_context=True)
+def admin_viewonsite_url(context, modeladmin, obj):
+    return quote(
+        add_preserved_filters(
+            context,
+            modeladmin.admin_viewonsite_url(obj)
+        )
+    )
 
 
-@register.simple_tag
-def admin_change_url(modeladmin, instance):
-    return modeladmin.admin_change_url(pk=instance.pk)
+@register.simple_tag(takes_context=True)
+def admin_delete_url(context, modeladmin, pk):
+    return quote(
+        add_preserved_filters(
+            context,
+            modeladmin.admin_delete_url(pk)
+        )
+    )
 
 
-@register.simple_tag
-def admin_history_url(modeladmin, instance):
-    return modeladmin.admin_history_url(pk=instance.pk)
+@register.simple_tag(takes_context=True)
+def admin_change_url(context, modeladmin, pk):
+    return quote(
+        add_preserved_filters(
+            context,
+            modeladmin.admin_change_url(pk)
+        )
+    )
+
+
+@register.simple_tag(takes_context=True)
+def admin_history_url(context, modeladmin, pk):
+    return quote(
+        add_preserved_filters(
+            context,
+            modeladmin.admin_history_url(pk)
+        )
+    )
 
 
 @register.filter
@@ -52,7 +77,7 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
             pass
         else:
             current_url = '%s:%s' % (match.app_name, match.url_name)
-            changelist_url = 'admin:%s_%s_changelist' % (opts.app_label, opts.model_name)
+            changelist_url = opts.model_admin.admin_changelist_url()
             if changelist_url == current_url and '_changelist_filters' in preserved_filters:
                 preserved_filters = dict(parse_qsl(preserved_filters['_changelist_filters']))
 

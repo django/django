@@ -6,7 +6,7 @@
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 &rsaquo; <a href="{{ cl.model_admin.admin_applist_url }}">{{ opts.app_config.verbose_name }}</a>
 &rsaquo; <a href="{{ cl.model_admin.admin_changelist_url }}">{{ module_name }}</a>
-&rsaquo; <a href="{% admin_change_url cl.model_admin object.pk as change_url %}{{ change_url|admin_urlquote }}">{{ object|truncatewords:"18" }}</a>
+&rsaquo; <a href="{% admin_change_url cl.model_admin object.pk %}">{{ object|truncatewords:"18" }}</a>
 &rsaquo; {% trans 'History' %}
 </div>
 {% endblock %}

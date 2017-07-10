@@ -12,7 +12,6 @@ from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils.translation import gettext, gettext_lazy as _
@@ -146,16 +145,7 @@ class UserAdmin(admin.ModelAdmin):
                 msg = gettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
-                return HttpResponseRedirect(
-                    reverse(
-                        '%s:%s_%s_change' % (
-                            self.admin_site.name,
-                            user._meta.app_label,
-                            user._meta.model_name,
-                        ),
-                        args=(user.pk,),
-                    )
-                )
+                return HttpResponseRedirect(self.admin_change_url(user.pk))
         else:
             form = self.change_password_form(user)
 
@@ -170,6 +160,7 @@ class UserAdmin(admin.ModelAdmin):
             'is_popup': (IS_POPUP_VAR in request.POST or
                          IS_POPUP_VAR in request.GET),
             'add': True,
+            'model_admin': self,
             'change': False,
             'has_delete_permission': False,
             'has_change_permission': True,

@@ -29,8 +29,7 @@
   <ul class="object-tools">
     {% block object-tools-items %}
     <li>
-        {% admin_history_url cl.model_admin, original.pk as history_url %}
-        <a href="{% add_preserved_filters history_url|admin_urlquote %}" class="historylink">{% trans "History" %}</a>
+        <a href="{% admin_history_url cl.model_admin original.pk %}" class="historylink">{% trans "History" %}</a>
     </li>
     {% if has_absolute_url %}<li><a href="{{ absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
     {% endblock %}
