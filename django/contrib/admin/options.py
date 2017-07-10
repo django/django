@@ -1234,11 +1234,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         opts = self.model._meta
         if self.has_change_permission(request, None):
-            post_url = self.admin_changelist_url(request, obj, opts)
+            post_url = self.admin_changelist_url()
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url)
         else:
-            post_url = self.admin_index_url(request)
+            post_url = self.admin_index_url()
         return HttpResponseRedirect(post_url)
 
     def response_post_save_change(self, request, obj):
@@ -1253,7 +1253,7 @@ class ModelAdmin(BaseModelAdmin):
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url)
         else:
-            post_url = self.admin_index_url(request)
+            post_url = self.admin_index_url()
         return HttpResponseRedirect(post_url)
 
     def response_action(self, request, queryset):
