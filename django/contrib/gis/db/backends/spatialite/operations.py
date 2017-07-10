@@ -17,6 +17,12 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 
+class SpatialiteNullCheckOperator(SpatialOperator):
+    def as_sql(self, connection, lookup, template_params, sql_params):
+        sql, params = super().as_sql(connection, lookup, template_params, sql_params)
+        return '%s > 0' % sql, params
+
+
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'spatialite'
     spatialite = True
@@ -33,15 +39,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     gis_operators = {
         # Binary predicates
-        'equals': SpatialOperator(func='Equals'),
-        'disjoint': SpatialOperator(func='Disjoint'),
-        'touches': SpatialOperator(func='Touches'),
-        'crosses': SpatialOperator(func='Crosses'),
-        'within': SpatialOperator(func='Within'),
-        'overlaps': SpatialOperator(func='Overlaps'),
-        'contains': SpatialOperator(func='Contains'),
-        'intersects': SpatialOperator(func='Intersects'),
-        'relate': SpatialOperator(func='Relate'),
+        'equals': SpatialiteNullCheckOperator(func='Equals'),
+        'disjoint': SpatialiteNullCheckOperator(func='Disjoint'),
+        'touches': SpatialiteNullCheckOperator(func='Touches'),
+        'crosses': SpatialiteNullCheckOperator(func='Crosses'),
+        'within': SpatialiteNullCheckOperator(func='Within'),
+        'overlaps': SpatialiteNullCheckOperator(func='Overlaps'),
+        'contains': SpatialiteNullCheckOperator(func='Contains'),
+        'intersects': SpatialiteNullCheckOperator(func='Intersects'),
+        'relate': SpatialiteNullCheckOperator(func='Relate'),
         # Returns true if B's bounding box completely contains A's bounding box.
         'contained': SpatialOperator(func='MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.
@@ -49,8 +55,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         # Returns true if A's bounding box overlaps B's bounding box.
         'bboverlaps': SpatialOperator(func='MbrOverlaps'),
         # These are implemented here as synonyms for Equals
-        'same_as': SpatialOperator(func='Equals'),
-        'exact': SpatialOperator(func='Equals'),
+        'same_as': SpatialiteNullCheckOperator(func='Equals'),
+        'exact': SpatialiteNullCheckOperator(func='Equals'),
         # Distance predicates
         'dwithin': SpatialOperator(func='PtDistWithin'),
     }
