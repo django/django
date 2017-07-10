@@ -8,17 +8,17 @@ from django.utils.http import urlencode
 register = template.Library()
 
 
-@register.filter
+@register.simple_tag
 def admin_delete_url(modeladmin, instance):
     return modeladmin.admin_delete_url(pk=instance.pk)
 
 
-@register.filter
+@register.simple_tag
 def admin_change_url(modeladmin, instance):
     return modeladmin.admin_change_url(pk=instance.pk)
 
 
-@register.filter
+@register.simple_tag
 def admin_history_url(modeladmin, instance):
     return modeladmin.admin_history_url(pk=instance.pk)
 

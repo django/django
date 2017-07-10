@@ -1189,7 +1189,7 @@ class ModelAdmin(BaseModelAdmin):
         return self.get_view_on_site_url(obj)
 
     def admin_index_url(self):
-        return reverse('admin:index', current_app=self.admin_site.name)
+        return self.admin_site.admin_index_url()
 
     def admin_applist_url(self):
         return reverse('admin:%s_%s_applist' %
