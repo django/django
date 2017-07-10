@@ -8,14 +8,13 @@ from django.contrib.admin.options import (
     IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
 )
 from django.contrib.admin.utils import (
-    get_fields_from_path, lookup_needs_distinct, prepare_lookup_value, quote,
+    get_fields_from_path, lookup_needs_distinct, prepare_lookup_value
 )
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
 from django.db import models
-from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext
 
