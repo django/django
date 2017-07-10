@@ -33,7 +33,7 @@ Why you need to create tests
 So why create tests, and why now?
 
 You may feel that you have quite enough on your plate just learning
-Python/Django, and having yet another thing to learn and do may seem
+Python/Django, and having yet another thing to learn and so may seem
 overwhelming and perhaps unnecessary. After all, our polls application is
 working quite happily now; going through the trouble of creating automated
 tests is not going to make it work any better. If creating the polls
