@@ -108,7 +108,7 @@ class Group(models.Model):
     members-only portion of your site, or sending them members-only email
     messages.
     """
-    name = models.CharField(_('name'), max_length=80, unique=True)
+    name = models.CharField(_('name'), max_length=100, unique=True)
     permissions = models.ManyToManyField(
         Permission,
         verbose_name=_('permissions'),
