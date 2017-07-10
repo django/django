@@ -46,9 +46,13 @@ class QuerySetSetOperationTests(TestCase):
     def test_intersection_with_empty_qs(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.none()
+        qs3 = Number.objects.filter(pk__in=[])
         self.assertEqual(len(qs1.intersection(qs2)), 0)
+        self.assertEqual(len(qs1.intersection(qs3)), 0)
         self.assertEqual(len(qs2.intersection(qs1)), 0)
+        self.assertEqual(len(qs3.intersection(qs1)), 0)
         self.assertEqual(len(qs2.intersection(qs2)), 0)
+        self.assertEqual(len(qs3.intersection(qs3)), 0)
 
     @skipUnlessDBFeature('supports_select_difference')
     def test_difference_with_empty_qs(self):
