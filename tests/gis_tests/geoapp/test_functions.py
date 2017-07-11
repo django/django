@@ -336,9 +336,8 @@ class GISFunctionsTests(TestCase):
         self.assertEqual(qs.first().num_points, 2)
         mpoly_qs = Country.objects.annotate(num_points=functions.NumPoints('mpoly'))
         if not connection.features.supports_num_points_poly:
-            msg = 'NumPoints can only operate on LineString content on this database.'
-            with self.assertRaisesMessage(TypeError, msg):
-                list(mpoly_qs)
+            for c in mpoly_qs:
+                self.assertIsNone(c.num_points)
             return
 
         for c in mpoly_qs:

@@ -419,12 +419,6 @@ class NumPoints(GeoFunc):
     output_field_class = IntegerField
     arity = 1
 
-    def as_sql(self, compiler, connection):
-        if self.source_expressions[self.geom_param_pos[0]].output_field.geom_type != 'LINESTRING':
-            if not connection.features.supports_num_points_poly:
-                raise TypeError('NumPoints can only operate on LineString content on this database.')
-        return super().as_sql(compiler, connection)
-
 
 class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     arity = 1
