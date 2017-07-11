@@ -110,7 +110,7 @@ A simple example::
     ...         output_field=CharField(),
     ...     ),
     ... ).values_list('name', 'discount')
-    [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')]
+    <QuerySet [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')]>
 
 ``Case()`` accepts any number of ``When()`` objects as individual arguments.
 Other options are provided using keyword arguments. If none of the conditions
@@ -132,7 +132,7 @@ the ``Client`` has been with us, we could do so using lookups::
     ...         output_field=CharField(),
     ...     )
     ... ).values_list('name', 'discount')
-    [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]
+    <QuerySet [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')]>
 
 .. note::
 
@@ -153,7 +153,7 @@ registered more than a year ago::
     ...         When(account_type=Client.PLATINUM, then=a_year_ago),
     ...     ),
     ... ).values_list('name', 'account_type')
-    [('Jack Black', 'P')]
+    <QuerySet [('Jack Black', 'P')]>
 
 Advanced queries
 ================
@@ -182,7 +182,7 @@ their registration dates. We can do this using a conditional expression and the
     ...     ),
     ... )
     >>> Client.objects.values_list('name', 'account_type')
-    [('Jane Doe', 'G'), ('James Smith', 'R'), ('Jack Black', 'P')]
+    <QuerySet [('Jane Doe', 'G'), ('James Smith', 'R'), ('Jack Black', 'P')]>
 
 Conditional aggregation
 -----------------------

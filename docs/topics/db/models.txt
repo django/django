@@ -229,7 +229,7 @@ ones:
         >>> fruit.name = 'Pear'
         >>> fruit.save()
         >>> Fruit.objects.values_list('name', flat=True)
-        ['Apple', 'Pear']
+        <QuerySet ['Apple', 'Pear']>
 
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.

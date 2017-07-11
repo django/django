@@ -635,20 +635,20 @@ respective field or expression passed into the ``values_list()`` call — so the
 first item is the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
-    [(1, 'First entry'), ...]
+    <QuerySet [(1, 'First entry'), ...]>
     >>> from django.db.models.functions import Lower
     >>> Entry.objects.values_list('id', Lower('headline'))
-    [(1, 'first entry'), ...]
+    <QuerySet [(1, 'first entry'), ...]>
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
 rather than one-tuples. An example should make the difference clearer::
 
     >>> Entry.objects.values_list('id').order_by('id')
-    [(1,), (2,), (3,), ...]
+    <QuerySet[(1,), (2,), (3,), ...]>
 
     >>> Entry.objects.values_list('id', flat=True).order_by('id')
-    [1, 2, 3, ...]
+    <QuerySet [1, 2, 3, ...]>
 
 It is an error to pass in ``flat`` when there is more than one field.
 
@@ -671,10 +671,10 @@ For example, notice the behavior when querying across a
 :class:`~django.db.models.ManyToManyField`::
 
     >>> Author.objects.values_list('name', 'entry__headline')
-    [('Noam Chomsky', 'Impressions of Gaza'),
+    <QuerySet [('Noam Chomsky', 'Impressions of Gaza'),
      ('George Orwell', 'Why Socialists Do Not Believe in Fun'),
      ('George Orwell', 'In Defence of English Cooking'),
-     ('Don Quixote', None)]
+     ('Don Quixote', None)]>
 
 Authors with multiple entries appear multiple times and authors without any
 entries have ``None`` for the entry headline.
@@ -683,7 +683,7 @@ Similarly, when querying a reverse foreign key, ``None`` appears for entries
 not having any author::
 
     >>> Entry.objects.values_list('authors')
-    [('Noam Chomsky',), ('George Orwell',), (None,)]
+    <QuerySet [('Noam Chomsky',), ('George Orwell',), (None,)]>
 
 .. versionchanged:: 1.11
 
