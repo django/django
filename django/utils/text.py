@@ -413,11 +413,8 @@ def slugify(value, allow_unicode=False):
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-
     text = re.sub(r'[-\s\_]+', '-', value)
-    # remove redundant
-    text = re_duplicate_dash.sub("-", text).strip("-")
-
+    text = re_duplicate_dash.sub('-', text).strip('-')
     return mark_safe(text)
 
 
