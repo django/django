@@ -436,6 +436,60 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 stdout=new_io,
             )
 
+    @mock_inputs({
+        'password': 'nopasswd',
+    })
+    def test_invalid_username_by_command_line(self):
+        """
+        Creation should fail when an invalid username is inputted using --username
+        """
+        with self.assertRaises(CommandError):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                username="%invalid%username",
+                stdin=MockTTY(),
+            )
+        self.assertEqual(CustomUser._default_manager.count(), 0)
+
+    @mock_inputs({
+        'password': 'nopasswd',
+    })
+    def test_non_interactive_invalid_required_field(self):
+        """
+        Creation should fail when an invalid email is inputted using --email
+        """
+        with self.assertRaises(CommandError):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                email="%invalid%email",
+                stdin=MockTTY(),
+            )
+        self.assertEqual(CustomUser._default_manager.count(), 0)
+
+    @mock_inputs({
+        'password': 'nopasswd',
+    })
+    def test_non_interactive_unique_username(self):
+        """
+        Creation should fail if username inputted using --username is already taken
+        """
+        new_io = StringIO()
+        call_command("createsuperuser",
+                     interactive=False,
+                     username="username",
+                     email="mymail@gmail.com",
+                     stdout=new_io)
+        with self.assertRaises(CommandError):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                username="username",
+                stdin=MockTTY(),
+            )
+        self.assertEqual(User._default_manager.count(), 1)
+
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
     def test_fields_with_fk_interactive(self):
         new_io = StringIO()
