@@ -338,6 +338,10 @@ Methods
 
     See :doc:`cryptographic signing </topics/signing>` for more information.
 
+.. method:: HttpRequest.get_client_ip()
+
+    Returns client ip address. Detects ip address by ``HTTP_X_FORWARDED_FOR`` and ``REMOTE_ADDR`` headers.
+
 .. method:: HttpRequest.is_secure()
 
     Returns ``True`` if the request is secure; that is, if it was made with
