@@ -18,14 +18,22 @@ class SecurityMiddleware(MiddlewareMixin):
         self.get_response = get_response
 
     def process_request(self, request):
+        if not self.redirect:
+            return
+        if (request.is_secure() and (
+                # redirect_host is not set OR
+                not self.redirect_host or
+                # host is already the same
+                self.redirect_host == request.get_host())):
+            return
         path = request.path.lstrip("/")
-        if (self.redirect and not request.is_secure() and
-                not any(pattern.search(path)
-                        for pattern in self.redirect_exempt)):
-            host = self.redirect_host or request.get_host()
-            return HttpResponsePermanentRedirect(
-                "https://%s%s" % (host, request.get_full_path())
-            )
+        if any(pattern.search(path) for pattern in self.redirect_exempt):
+            return
+
+        host = self.redirect_host or request.get_host()
+        return HttpResponsePermanentRedirect(
+            "https://%s%s" % (host, request.get_full_path())
+        )
 
     def process_response(self, request, response):
         if (self.sts_seconds and request.is_secure() and

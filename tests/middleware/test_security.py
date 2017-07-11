@@ -221,6 +221,10 @@ class SecurityMiddlewareTest(SimpleTestCase):
         self.assertEqual(ret.status_code, 301)
         self.assertEqual(ret["Location"], "https://secure.example.com/some/url")
 
+        ret = self.process_request("get", "/some/url", secure=True, headers={"host": "www.secure.example.com"})
+        self.assertEqual(ret.status_code, 301)
+        self.assertEqual(ret["Location"], "https://secure.example.com/some/url")
+
     @override_settings(SECURE_SSL_REDIRECT=False)
     def test_ssl_redirect_off(self):
         """
