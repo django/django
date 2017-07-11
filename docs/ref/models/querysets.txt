@@ -670,10 +670,10 @@ For example, notice the behavior when querying across a
 :class:`~django.db.models.ManyToManyField`::
 
     >>> Author.objects.values_list('name', 'entry__headline')
-    [('Noam Chomsky', 'Impressions of Gaza'),
+    <QuerySet [('Noam Chomsky', 'Impressions of Gaza'),
      ('George Orwell', 'Why Socialists Do Not Believe in Fun'),
      ('George Orwell', 'In Defence of English Cooking'),
-     ('Don Quixote', None)]
+     ('Don Quixote', None)]>
 
 Authors with multiple entries appear multiple times and authors without any
 entries have ``None`` for the entry headline.
