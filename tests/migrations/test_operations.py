@@ -2055,9 +2055,11 @@ class OperationTests(OperationTestBase):
             with self.assertRaises(ValueError):
                 with connection.schema_editor() as editor:
                     atomic_migration.unapply(project_state, editor)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
             with self.assertRaises(ValueError):
                 with connection.schema_editor() as editor:
                     non_atomic_migration.unapply(project_state, editor)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
         # Verify deconstruction.
         definition = non_atomic_migration.operations[0].deconstruct()
         self.assertEqual(definition[0], "RunPython")
