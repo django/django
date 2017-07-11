@@ -87,7 +87,7 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Model class <ref/models/class>`
 
 * **QuerySets:**
-  :doc:`Executing queries <topics/db/queries>` |
+  :doc:`Making queries <topics/db/queries>` |
   :doc:`QuerySet method reference <ref/models/querysets>` |
   :doc:`Lookup expressions <ref/models/lookups>`
 
