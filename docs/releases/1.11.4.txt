@@ -15,3 +15,6 @@ Bugfixes
 
 * Fixed ``QuerySet.union()`` and ``difference()`` when combining with
   a queryset raising ``EmptyResultSet`` (:ticket:`28378`).
+
+* Fixed a regression in pickling of ``LazyObject`` on Python 2 when the wrapped
+  object doesn't have ``__reduce__()`` (:ticket:`28389`).
