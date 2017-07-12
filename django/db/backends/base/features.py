@@ -234,6 +234,9 @@ class BaseDatabaseFeatures:
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
+    # Does the backend support CAST with precision?
+    supports_cast_with_precision = True
+
     def __init__(self, connection):
         self.connection = connection
 
