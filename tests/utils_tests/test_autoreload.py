@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 import gettext
 import os
 import shutil
+import sys
 import tempfile
 from importlib import import_module
 
@@ -251,3 +254,17 @@ class ResetTranslationsTests(SimpleTestCase):
         self.assertEqual(trans_real._translations, {})
         self.assertIsNone(trans_real._default)
         self.assertIsInstance(trans_real._active, _thread._local)
+
+
+class TestRestartWithReloader(SimpleTestCase):
+
+    def test_environment(self):
+        """"
+        With Python 2 on Windows, restart_with_reloader() coerces environment
+        variables to str to avoid "TypeError: environment can only contain
+        strings" in Python's subprocess.py.
+        """
+        # With unicode_literals, these values are unicode.
+        os.environ['SPAM'] = 'spam'
+        with mock.patch.object(sys, 'argv', ['-c', 'pass']):
+            autoreload.restart_with_reloader()

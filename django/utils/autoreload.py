@@ -40,6 +40,7 @@ from django.conf import settings
 from django.core.signals import request_finished
 from django.utils import six
 from django.utils._os import npath
+from django.utils.encoding import force_bytes, get_system_encoding
 from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
@@ -285,6 +286,14 @@ def restart_with_reloader():
     while True:
         args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
         new_environ = os.environ.copy()
+        if _win and six.PY2:
+            # Environment variables on Python 2 + Windows must be str.
+            encoding = get_system_encoding()
+            for key in new_environ.keys():
+                str_key = force_bytes(key, encoding=encoding)
+                str_value = force_bytes(new_environ[key], encoding=encoding)
+                del new_environ[key]
+                new_environ[str_key] = str_value
         new_environ["RUN_MAIN"] = 'true'
         exit_code = subprocess.call(args, env=new_environ)
         if exit_code != 3:
