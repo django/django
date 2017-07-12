@@ -328,6 +328,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             with self.assertRaisesMessage(TypeError, 'Invalid initialization input for LineStrings.'):
                 LineString('wrong input')
 
+        # Test __iter__().
+        self.assertEqual(list(LineString((0, 0), (1, 1), (2, 2))), [(0, 0), (1, 1), (2, 2)])
+
     def test_multilinestring(self):
         "Testing MultiLineString objects."
         prev = fromstr('POINT(0 0)')
