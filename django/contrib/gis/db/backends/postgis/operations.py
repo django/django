@@ -15,7 +15,7 @@ from django.utils.version import get_version_tuple
 
 from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
-from .pgraster import from_pgraster, get_pgraster_srid, to_pgraster
+from .pgraster import from_pgraster
 
 # Identifier to mark raster lookups as bilateral.
 BILATERAL = 'bilateral'
@@ -297,8 +297,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # Get the srid for this object
         if value is None:
             value_srid = None
-        elif f.geom_type == 'RASTER' and isinstance(value, str):
-            value_srid = get_pgraster_srid(value)
         else:
             value_srid = value.srid
 
@@ -306,8 +304,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # is not equal to the field srid.
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
-        elif f.geom_type == 'RASTER' and isinstance(value, str):
-            placeholder = '%s((%%s)::raster, %s)' % (tranform_func, f.srid)
         else:
             placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
 
@@ -376,10 +372,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     def spatial_ref_sys(self):
         return PostGISSpatialRefSys
 
-    # Methods to convert between PostGIS rasters and dicts that are
-    # readable by GDALRaster.
     def parse_raster(self, value):
+        """Convert a PostGIS HEX String into a dict readable by GDALRaster."""
         return from_pgraster(value)
-
-    def deconstruct_raster(self, value):
-        return to_pgraster(value)

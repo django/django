@@ -361,13 +361,6 @@ class RasterField(BaseSpatialField):
     def from_db_value(self, value, expression, connection, context):
         return connection.ops.parse_raster(value)
 
-    def get_db_prep_value(self, value, connection, prepared=False):
-        self._check_connection(connection)
-        # Prepare raster for writing to database.
-        if not prepared:
-            value = connection.ops.deconstruct_raster(value)
-        return super().get_db_prep_value(value, connection, prepared)
-
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
         # Setup for lazy-instantiated Raster object. For large querysets, the
