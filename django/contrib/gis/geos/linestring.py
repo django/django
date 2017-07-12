@@ -92,8 +92,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     def __iter__(self):
         "Allow iteration over this LineString."
-        for i in range(len(self)):
-            yield self[i]
+        return iter(self._cs)
 
     def __len__(self):
         "Return the number of points in this LineString."
