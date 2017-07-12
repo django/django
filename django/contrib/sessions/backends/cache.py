@@ -19,7 +19,8 @@ class SessionStore(SessionBase):
 
     @property
     def cache_key(self):
-        return self.cache_key_prefix + self._get_or_create_session_key()
+        session_key = self.get_session_key_hash(self._get_or_create_session_key())
+        return self.cache_key_prefix + session_key
 
     def load(self):
         try:
@@ -67,13 +68,15 @@ class SessionStore(SessionBase):
             raise CreateError
 
     def exists(self, session_key):
+        session_key = self.get_session_key_hash(session_key)
         return bool(session_key) and (self.cache_key_prefix + session_key) in self._cache
 
     def delete(self, session_key=None):
+        session_key = self.get_session_key_hash(session_key)
         if session_key is None:
             if self.session_key is None:
                 return
-            session_key = self.session_key
+            session_key = self.get_session_key_hash(self.session_key)
         self._cache.delete(self.cache_key_prefix + session_key)
 
     @classmethod

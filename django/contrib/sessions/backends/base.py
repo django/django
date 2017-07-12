@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import logging
 import string
 from contextlib import suppress
@@ -17,6 +18,12 @@ from django.utils.module_loading import import_string
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
 VALID_KEY_CHARS = string.ascii_lowercase + string.digits
+
+# the delimiter cannot be a member of VALID_KEY_CHARS or a file directory
+# component. It can only be a single character.
+SESSION_KEY_DELIMITER = '$'
+# this should be available in hashlib
+SESSION_HASHING_ALGORITHM = 'md5'
 
 
 class CreateError(Exception):
@@ -48,6 +55,7 @@ class SessionBase:
         self.accessed = False
         self.modified = False
         self.serializer = import_string(settings.SESSION_SERIALIZER)
+        self._session_hashing_algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
 
     def __contains__(self, key):
         return key in self._session
@@ -147,18 +155,44 @@ class SessionBase:
         except AttributeError:
             return True
 
+    def _get_session_key_part(self, session_key):
+        "Return a string of the session_key key."
+        return session_key.split(SESSION_KEY_DELIMITER)[1]
+
+    def _is_hashed(self, session_key):
+        "Return True when the session_key is hashed in the backend."
+        try:
+            return bool(self._get_session_key_part(session_key))
+        except IndexError:
+            return False
+
+    def get_session_key_hash(self, session_key):
+        """
+        Return a hash of the session key to be stored in the db. We want a fast
+        hashing function to minimize the impact on performance. We don't have to
+        worry about speed and salting since the session_key is already high entropy.
+        """
+        if session_key is not None:
+            if self._is_hashed(session_key):
+                return self._session_hashing_algorithm(
+                    self._get_session_key_part(session_key).encode('ascii')).hexdigest()
+            return session_key
+        return None
+
     def _get_new_session_key(self):
         "Return session key that isn't being used."
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
                 break
+        if settings.SESSION_STORE_KEY_HASH:
+            session_key = SESSION_HASHING_ALGORITHM + SESSION_KEY_DELIMITER + session_key
         return session_key
 
     def _get_or_create_session_key(self):
         if self._session_key is None:
             self._session_key = self._get_new_session_key()
-        return self._session_key
+        return self.get_session_key_hash(self._session_key)
 
     def _validate_session_key(self, key):
         """

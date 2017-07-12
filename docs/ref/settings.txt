@@ -3146,6 +3146,17 @@ See :ref:`session_serialization` for details, including a warning regarding
 possible remote code execution when using
 :class:`~django.contrib.sessions.serializers.PickleSerializer`.
 
+.. setting:: SESSION_STORE_KEY_HASH
+
+``SESSION_STORE_KEY_HASH``
+------------------------------
+
+Default: ``True``
+
+Whether to save the session key as a one-way hash. You should only set this to
+``False`` if you have a good reason since it can decrease the security of your
+site.
+
 Sites
 =====
 

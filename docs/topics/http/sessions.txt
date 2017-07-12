@@ -38,6 +38,14 @@ By default, Django stores sessions in your database (using the model
 some setups it's faster to store session data elsewhere, so Django can be
 configured to store session data on your filesystem or in your cache.
 
+.. versionchanged:: 2.0
+
+  The way session keys are stored in the backend was changed.
+
+One-way hashes of the session_keys will be stored in the backends by
+default. You can override this by changing :setting:`SESSION_STORE_KEY_HASH`
+to False.
+
 Using database-backed sessions
 ------------------------------
 
@@ -243,6 +251,15 @@ You can edit it multiple times.
     .. method:: delete_test_cookie()
 
       Deletes the test cookie. Use this to clean up after yourself.
+
+    .. method:: get_session_key_hash(session_key)
+
+      .. versionadded:: 2.0
+
+      Returns the hashed version of the session_key or if
+      :setting:`SESSION_STORE_KEY_HASH` is False it will just return the
+      session_key. Pass the value of the sessionid cookie through this
+      method in order to query the backend directly.
 
     .. method:: set_expiry(value)
 
@@ -481,7 +498,10 @@ Using sessions out of views
       >>> from django.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
-An API is available to manipulate session data outside of a view::
+An API is available to manipulate session data outside of a view. Note that you
+must pass the session_key through the
+:meth:`~backends.base.SessionBase.get_session_key_hash` before directly
+querying the session_key field::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
@@ -489,8 +509,9 @@ An API is available to manipulate session data outside of a view::
     >>> s['last_login'] = 1376587691
     >>> s.create()
     >>> s.session_key
-    '2b1189a188b44ad18c35e113ac6ceead'
-    >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
+    'md5$2b1189a188b44ad18c35e113ac6ceead'
+    >>> session_key = get_session_key_hash(s.session_key)
+    >>> s = SessionStore(session_key=session_key)
     >>> s['last_login']
     1376587691
 
@@ -507,7 +528,9 @@ session is just a normal Django model. The ``Session`` model is defined in
 access sessions using the normal Django database API::
 
     >>> from django.contrib.sessions.models import Session
-    >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> from django.contrib.sessions import get_session_key_hash
+    >>> pk = get_session_key_hash('md5$2b1189a188b44ad18c35e113ac6ceead')
+    >>> s = Session.objects.get(pk=pk)
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
@@ -635,6 +658,7 @@ behavior:
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
 * :setting:`SESSION_SERIALIZER`
+* :setting:`SESSION_STORE_KEY_HASH`
 
 .. _topics-session-security:
 
@@ -655,6 +679,10 @@ sensitive personal data (e.g. credit card info) into the attackers account.
 Another possible attack would be if ``good.example.com`` sets its
 :setting:`SESSION_COOKIE_DOMAIN` to ``".example.com"`` which would cause
 session cookies from that site to be sent to ``bad.example.com``.
+
+Changing :setting:`SESSION_STORE_KEY_HASH` to False could allow an attacker
+to takeover a session even if they only had access to a backend backup or
+read-only access to the backend.
 
 Technical details
 =================
@@ -719,7 +747,11 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
 
         Primary key. The field itself may contain up to 40 characters. The
         current implementation generates a 32-character string (a random
-        sequence of digits and lowercase ASCII letters).
+        sequence of digits and lowercase ASCII letters) which is passed
+        through a one-way hashing function before being stored. You will
+        need to pass the value of the sessionid cookie through the
+        :meth:`~backends.base.SessionBase.get_session_key_hash`
+        before directly querying this field.
 
     .. attribute:: session_data
 

@@ -25,7 +25,8 @@ class SessionStore(DBStore):
 
     @property
     def cache_key(self):
-        return self.cache_key_prefix + self._get_or_create_session_key()
+        session_key = self.get_session_key_hash(self._get_or_create_session_key())
+        return self.cache_key_prefix + session_key
 
     def load(self):
         try:
@@ -40,7 +41,7 @@ class SessionStore(DBStore):
             # of the expiry date to set it properly in the cache.
             try:
                 s = self.model.objects.get(
-                    session_key=self.session_key,
+                    session_key=self.get_session_key_hash(self.session_key),
                     expire_date__gt=timezone.now()
                 )
                 data = self.decode(s.session_data)
@@ -54,6 +55,7 @@ class SessionStore(DBStore):
         return data
 
     def exists(self, session_key):
+        session_key = self.get_session_key_hash(session_key)
         if session_key and (self.cache_key_prefix + session_key) in self._cache:
             return True
         return super().exists(session_key)
@@ -63,11 +65,12 @@ class SessionStore(DBStore):
         self._cache.set(self.cache_key, self._session, self.get_expiry_age())
 
     def delete(self, session_key=None):
+        session_key = self.get_session_key_hash(session_key)
         super().delete(session_key)
         if session_key is None:
             if self.session_key is None:
                 return
-            session_key = self.session_key
+            session_key = self.get_session_key_hash(self.session_key)
         self._cache.delete(self.cache_key_prefix + session_key)
 
     def flush(self):
