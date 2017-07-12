@@ -301,11 +301,10 @@ class BaseFormSet:
         self.errors
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
-            if self.can_delete:
-                if self._should_delete_form(form):
-                    # This form is going to be deleted so any of its errors
-                    # should not cause the entire formset to be invalid.
-                    continue
+            if self.can_delete and self._should_delete_form(form):
+                # This form is going to be deleted so any of its errors
+                # shouldn't cause the entire formset to be invalid.
+                continue
             forms_valid &= form.is_valid()
         return forms_valid and not self.non_form_errors()
 
