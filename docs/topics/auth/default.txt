@@ -757,8 +757,17 @@ Redirecting unauthorized requests in class-based views
 ------------------------------------------------------
 
 To ease the handling of access restrictions in :doc:`class-based views
-</ref/class-based-views/index>`, the ``AccessMixin`` can be used to redirect a
-user to the login page or issue an HTTP 403 Forbidden response.
+</ref/class-based-views/index>`, the ``AccessMixin`` can be used to configure
+the behavior of a view when access is denied. Authenticated users are denied
+access with an HTTP 403 Forbidden response. Anonymous users are redirected to
+the login page or shown an HTTP 403 Forbidden response, depending on the
+:attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute.
+
+.. versionchanged:: 2.1
+
+    In older versions, authenticated users who lacked permissions were
+    redirected to the login page (which resulted in a loop) instead of
+    receiving an HTTP 403 Forbidden response.
 
 .. class:: AccessMixin
 
@@ -781,8 +790,9 @@ user to the login page or issue an HTTP 403 Forbidden response.
     .. attribute:: raise_exception
 
         If this attribute is set to ``True``, a
-        :class:`~django.core.exceptions.PermissionDenied` exception will be
-        raised instead of the redirect. Defaults to ``False``.
+        :class:`~django.core.exceptions.PermissionDenied` exception is raised
+        when the conditions are not met.  When ``False`` (the default),
+        anonymous users are redirected to the login page.
 
     .. method:: get_login_url()
 
