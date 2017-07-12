@@ -41,7 +41,7 @@ class AccessMixin(object):
         return self.redirect_field_name
 
     def handle_no_permission(self):
-        if self.raise_exception:
+        if self.request.user.is_authenticated or self.raise_exception:
             raise PermissionDenied(self.get_permission_denied_message())
         return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
 

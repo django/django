@@ -78,6 +78,22 @@ class AccessMixinTests(TestCase):
         with self.assertRaises(PermissionDenied):
             view(request)
 
+    def test_access_mixin_permission_denied_response(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+
+        request = self.factory.get('/rand')
+        view = AlwaysFalseView.as_view()
+
+        request.user = user
+
+        with self.assertRaises(PermissionDenied):
+            view(request)
+
+        request.user = AnonymousUser()
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/accounts/login/?next=/rand')
+
     @mock.patch.object(models.User, 'is_authenticated', False)
     def test_stacked_mixins_not_logged_in(self):
         user = models.User.objects.create(username='joe', password='qwerty')
@@ -240,7 +256,7 @@ class PermissionsRequiredMixinTests(TestCase):
             ]
 
         request = self.factory.get('/rand')
-        request.user = self.user
+        request.user = AnonymousUser()
         resp = AView.as_view()(request)
         self.assertEqual(resp.status_code, 302)
 
