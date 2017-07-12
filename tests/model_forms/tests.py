@@ -1799,6 +1799,40 @@ class ModelChoiceFieldTests(TestCase):
         with self.assertNumQueries(2):
             template.render(Context({'form': CategoriesForm()}))
 
+    def test_to_field_name_with_initial_data_different_to_field_from_model(self):
+        """
+        Inventory.parent to_field='barcode' but the form field uses a different
+        to_field_name.
+        """
+        class InventoryForm(forms.ModelForm):
+            parent = forms.ModelChoiceField(Inventory.objects.all(), to_field_name='name')
+
+            class Meta:
+                model = Inventory
+                fields = ['parent']
+
+        apple = Inventory.objects.create(barcode=86, name='Apple')
+        pear = Inventory.objects.create(barcode=22, name='Pear', parent=apple)
+        form = InventoryForm(instance=pear)
+        self.assertEqual(form['parent'].value(), apple.name)
+
+    def test_to_field_name_with_initial_data(self):
+        """
+        Student.character doesn't have to_field but the form field uses
+        to_field_name.
+        """
+        class StudentForm(forms.ModelForm):
+            character = forms.ModelChoiceField(Character.objects.all(), to_field_name='username')
+
+            class Meta:
+                model = Student
+                fields = ['character']
+
+        character = Character.objects.create(username='character', last_action=datetime.datetime.today())
+        student = Student.objects.create(character=character, study='Django')
+        form = StudentForm(instance=student)
+        self.assertEqual(form['character'].value(), character.username)
+
 
 class ModelMultipleChoiceFieldTests(TestCase):
     def setUp(self):
