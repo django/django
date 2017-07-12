@@ -149,7 +149,7 @@ class Command(BaseCommand):
                     )
                     if field_type.startswith('ForeignKey('):
                         field_desc += ', models.DO_NOTHING'
-                        
+
                     comment = getattr(row, 'comment', None)
                     if comment:
                         extra_params['help_text'] = comment

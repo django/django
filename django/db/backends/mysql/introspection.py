@@ -11,7 +11,8 @@ from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'is_unsigned', 'comment'))
-InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned comment')
+InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale '
+                                  'extra column_default is_unsigned comment')
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
