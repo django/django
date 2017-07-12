@@ -300,13 +300,14 @@ class LazyObject(object):
             self._setup()
         return (unpickle_lazyobject, (self._wrapped,))
 
+    # Overriding __class__ stops __reduce__ from being called on Python 2.
+    # So, define __getstate__ in a way that cooperates with the way that
+    # pickle interprets this class. This fails when the wrapped class is a
+    # builtin, but it's better than nothing.
     def __getstate__(self):
-        """
-        Prevent older versions of pickle from trying to pickle the __dict__
-        (which in the case of a SimpleLazyObject may contain a lambda). The
-        value will be ignored by __reduce__() and the custom unpickler.
-        """
-        return {}
+        if self._wrapped is empty:
+            self._setup()
+        return self._wrapped.__dict__
 
     def __copy__(self):
         if self._wrapped is empty:
