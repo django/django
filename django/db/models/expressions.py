@@ -292,9 +292,7 @@ class BaseExpression:
         return clone
 
     def copy(self):
-        c = copy.copy(self)
-        c.copied = True
-        return c
+        return copy.copy(self)
 
     def get_group_by_cols(self):
         if not self.contains_aggregate:
