@@ -122,7 +122,6 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             raise GEOSException('Geometry resulting from slice deletion was invalid.')
 
     def _set_single(self, index, value):
-        self._checkindex(index)
         self._cs[index] = value
 
     def _checkdim(self, dim):
