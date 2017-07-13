@@ -280,15 +280,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             kwargs['geography'] = self.geography
         return name, path, args, kwargs
 
-    # ### Routines specific to GeometryField ###
-    def get_distance(self, value, lookup_type, connection):
-        """
-        Return a distance number in units of the field.  For example, if
-        `D(km=1)` was passed in and the units of the field were in meters,
-        then 1000 would be returned.
-        """
-        return connection.ops.get_distance(self, value, lookup_type)
-
     def get_db_prep_value(self, value, connection, *args, **kwargs):
         return connection.ops.Adapter(
             super().get_db_prep_value(value, connection, *args, **kwargs),
@@ -304,7 +295,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
                 value.srid = self.srid
         return value
 
-    # ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
 
