@@ -21,3 +21,7 @@ Bugfixes
 
 * Fixed crash in ``runserver``'s ``autoreload`` with Python 2 on Windows with
   non-``str`` environment variables (:ticket:`28174`).
+
+* Corrected ``Field.has_changed()`` to return ``False`` for disabled form
+  fields: ``BooleanField``, ``MultipleChoiceField``, ``MultiValueField``,
+  ``FileField``, ``ModelChoiceField``, and ``ModelMultipleChoiceField``.
