@@ -236,11 +236,11 @@ class ListMixin:
     def _set_single_rebuild(self, index, value):
         self._set_slice(slice(index, index + 1, 1), [value])
 
-    def _checkindex(self, index, correct=True):
+    def _checkindex(self, index):
         length = len(self)
         if 0 <= index < length:
             return index
-        if correct and -length <= index < 0:
+        if -length <= index < 0:
             return index + length
         raise IndexError('invalid index: %s' % index)
 
