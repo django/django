@@ -1099,9 +1099,12 @@ class AggregateTestCase(TestCase):
 
     def test_multi_arg_aggregate(self):
         class MyMax(Max):
+            output_field = DecimalField()
+
             def as_sql(self, compiler, connection):
-                self.set_source_expressions(self.get_source_expressions()[0:1])
-                return super().as_sql(compiler, connection)
+                copy = self.copy()
+                copy.set_source_expressions(copy.get_source_expressions()[0:1])
+                return super(MyMax, copy).as_sql(compiler, connection)
 
         with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Book.objects.aggregate(MyMax('pages', 'price'))
