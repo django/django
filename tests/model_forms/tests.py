@@ -1702,6 +1702,10 @@ class ModelChoiceFieldTests(TestCase):
             ['Select a valid choice. That choice is not one of the available choices.']
         )
 
+    def test_disabled_modelchoicefield_has_changed(self):
+        field = forms.ModelChoiceField(Author.objects.all(), disabled=True)
+        self.assertIs(field.has_changed('x', 'y'), False)
+
     def test_disabled_multiplemodelchoicefield(self):
         class ArticleForm(forms.ModelForm):
             categories = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
@@ -1726,6 +1730,10 @@ class ModelChoiceFieldTests(TestCase):
         form.fields['categories'].disabled = True
         self.assertEqual(form.errors, {})
         self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category1.pk])
+
+    def test_disabled_modelmultiplechoicefield_has_changed(self):
+        field = forms.ModelMultipleChoiceField(Author.objects.all(), disabled=True)
+        self.assertIs(field.has_changed('x', 'y'), False)
 
     def test_modelchoicefield_iterator(self):
         """
