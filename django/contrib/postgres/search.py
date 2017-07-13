@@ -47,7 +47,7 @@ class SearchVectorCombinable:
 class SearchVector(SearchVectorCombinable, Func):
     function = 'to_tsvector'
     arg_joiner = " || ' ' || "
-    _output_field = SearchVectorField()
+    output_field = SearchVectorField()
     config = None
 
     def __init__(self, *expressions, **extra):
@@ -125,7 +125,7 @@ class SearchQueryCombinable:
 
 
 class SearchQuery(SearchQueryCombinable, Value):
-    _output_field = SearchQueryField()
+    output_field = SearchQueryField()
 
     def __init__(self, value, output_field=None, *, config=None, invert=False):
         self.config = config
@@ -170,7 +170,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
 
 class SearchRank(Func):
     function = 'ts_rank'
-    _output_field = FloatField()
+    output_field = FloatField()
 
     def __init__(self, vector, query, **extra):
         if not hasattr(vector, 'resolve_expression'):
