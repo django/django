@@ -391,7 +391,7 @@ increasingly complex as you try to do so, and a good rule of thumb is:
     Each of your views should use only mixins or views from one of the
     groups of generic class-based views: :doc:`detail,
     list<generic-display>`, :doc:`editing<generic-editing>` and
-    date. For example it's fine to combine
+    update. For example it's fine to combine
     :class:`TemplateView` (built in view) with
     :class:`~django.views.generic.list.MultipleObjectMixin` (generic list), but
     you're likely to have problems combining ``SingleObjectMixin`` (generic
