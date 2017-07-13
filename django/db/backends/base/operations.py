@@ -36,6 +36,8 @@ class BaseDatabaseOperations:
     # name) to the data type to use for the Cast() function, if different from
     # DatabaseWrapper.data_types.
     cast_data_types = {}
+    # CharField data type if the max_length argument isn't provided.
+    cast_char_field_without_max_length = None
 
     def __init__(self, connection):
         self.connection = connection

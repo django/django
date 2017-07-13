@@ -24,6 +24,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveIntegerField': 'unsigned integer',
         'PositiveSmallIntegerField': 'unsigned integer',
     }
+    cast_char_field_without_max_length = 'char'
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html

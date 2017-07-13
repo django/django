@@ -14,6 +14,8 @@ from django.utils.duration import duration_string
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'text'
+
     def bulk_batch_size(self, fields, objs):
         """
         SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
