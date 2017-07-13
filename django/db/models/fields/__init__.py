@@ -964,7 +964,12 @@ class AutoField(Field):
         value = super().get_prep_value(value)
         if value is None or isinstance(value, OuterRef):
             return value
-        return int(value)
+        try:
+            return int(value)
+        except (TypeError, ValueError) as e:
+            raise e.__class__(
+                "Field '%s' expected a number but got %r." % (self.name, value),
+            ) from e
 
     def contribute_to_class(self, cls, name, **kwargs):
         assert not cls._meta.auto_field, "Model %s can't have more than one AutoField." % cls._meta.label
@@ -1745,7 +1750,12 @@ class FloatField(Field):
         value = super().get_prep_value(value)
         if value is None:
             return None
-        return float(value)
+        try:
+            return float(value)
+        except (TypeError, ValueError) as e:
+            raise e.__class__(
+                "Field '%s' expected a number but got %r." % (self.name, value),
+            ) from e
 
     def get_internal_type(self):
         return "FloatField"
@@ -1827,7 +1837,12 @@ class IntegerField(Field):
         value = super().get_prep_value(value)
         if value is None:
             return None
-        return int(value)
+        try:
+            return int(value)
+        except (TypeError, ValueError) as e:
+            raise e.__class__(
+                "Field '%s' expected a number but got %r." % (self.name, value),
+            ) from e
 
     def get_internal_type(self):
         return "IntegerField"

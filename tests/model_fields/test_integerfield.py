@@ -137,6 +137,23 @@ class IntegerFieldTests(TestCase):
         instance = self.model.objects.get(value='10')
         self.assertEqual(instance.value, 10)
 
+    def test_invalid_value(self):
+        tests = [
+            (TypeError, ()),
+            (TypeError, []),
+            (TypeError, {}),
+            (TypeError, set()),
+            (TypeError, object()),
+            (TypeError, complex()),
+            (ValueError, 'non-numeric string'),
+            (ValueError, b'non-numeric byte-string'),
+        ]
+        for exception, value in tests:
+            with self.subTest(value):
+                msg = "Field 'value' expected a number but got %r." % (value,)
+                with self.assertRaisesMessage(exception, msg):
+                    self.model.objects.create(value=value)
+
 
 class SmallIntegerFieldTests(IntegerFieldTests):
     model = SmallIntegerModel

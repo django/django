@@ -3853,7 +3853,7 @@ class TestTicket24279(TestCase):
 
 class TestInvalidValuesRelation(SimpleTestCase):
     def test_invalid_values(self):
-        msg = "invalid literal for int() with base 10: 'abc'"
+        msg = "Field 'id' expected a number but got 'abc'."
         with self.assertRaisesMessage(ValueError, msg):
             Annotation.objects.filter(tag='abc')
         with self.assertRaisesMessage(ValueError, msg):

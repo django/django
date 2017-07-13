@@ -92,6 +92,18 @@ class UnicodeSlugField(models.Model):
     s = models.SlugField(max_length=255, allow_unicode=True)
 
 
+class AutoModel(models.Model):
+    value = models.AutoField(primary_key=True)
+
+
+class BigAutoModel(models.Model):
+    value = models.BigAutoField(primary_key=True)
+
+
+class SmallAutoModel(models.Model):
+    value = models.SmallAutoField(primary_key=True)
+
+
 class SmallIntegerModel(models.Model):
     value = models.SmallIntegerField()
 
