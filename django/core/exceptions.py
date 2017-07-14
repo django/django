@@ -8,10 +8,6 @@ class FieldDoesNotExist(Exception):
     pass
 
 
-class DjangoRuntimeWarning(RuntimeWarning):
-    pass
-
-
 class AppRegistryNotReady(Exception):
     """The django.apps registry is not populated yet"""
     pass

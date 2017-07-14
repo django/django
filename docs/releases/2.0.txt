@@ -547,6 +547,10 @@ Miscellaneous
   <automatic-spatial-transformations>` now raises ``NotImplementedError``
   on MySQL instead of silently using non-transformed geometries.
 
+* ``django.core.exceptions.DjangoRuntimeWarning`` is removed. It was only used
+  in the cache backend as an intermediate class in ``CacheKeyWarning``'s
+  inheritance of ``RuntimeWarning``.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

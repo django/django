@@ -2,7 +2,7 @@
 import time
 import warnings
 
-from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 
@@ -10,7 +10,7 @@ class InvalidCacheBackendError(ImproperlyConfigured):
     pass
 
 
-class CacheKeyWarning(DjangoRuntimeWarning):
+class CacheKeyWarning(RuntimeWarning):
     pass
 
 
