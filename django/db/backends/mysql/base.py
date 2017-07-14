@@ -92,14 +92,6 @@ class CursorWrapper:
     def __iter__(self):
         return iter(self.cursor)
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        # Close instead of passing through to avoid backend-specific behavior
-        # (#17671).
-        self.close()
-
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
