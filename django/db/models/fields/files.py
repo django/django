@@ -1,5 +1,6 @@
 import datetime
 import posixpath
+import io
 
 from django import forms
 from django.core import checks
@@ -206,6 +207,11 @@ class FileDescriptor:
         return instance.__dict__[self.field.name]
 
     def __set__(self, instance, value):
+        # Check if image bytes were given (Allows self.file = b'\x00\x00ImageBytes\x00\x00...')
+        if isinstance(value, bytes):
+            value = File(io.BytesIO(value))  # if filename `value = File(open(file, "rb"))`
+            # Some default filename. Method/string upload_to still modifies
+            value.name = "".join((str(instance), "_", self.field.name, ".png"))
         instance.__dict__[self.field.name] = value
 
 
