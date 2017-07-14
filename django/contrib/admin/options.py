@@ -1192,7 +1192,7 @@ class ModelAdmin(BaseModelAdmin):
         return self.admin_site.admin_index_url()
 
     def admin_applist_url(self):
-        return reverse('admin:applist',
+        return reverse('admin:app_list',
                        args=[self.model._meta.app_label],
                        current_app=self.admin_site.name)
 
