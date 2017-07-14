@@ -410,7 +410,7 @@ class SQLCompiler:
                     continue
                 raise
         if not parts:
-            return [], []
+            raise EmptyResultSet
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == 'union':
             combinator_sql += ' ALL'

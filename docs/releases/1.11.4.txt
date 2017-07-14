@@ -25,3 +25,6 @@ Bugfixes
 * Corrected ``Field.has_changed()`` to return ``False`` for disabled form
   fields: ``BooleanField``, ``MultipleChoiceField``, ``MultiValueField``,
   ``FileField``, ``ModelChoiceField``, and ``ModelMultipleChoiceField``.
+
+* Fixed ``QuerySet.count()`` for ``union()``, ``difference()``, and
+  ``intersection()`` queries. (:ticket:`28399`).

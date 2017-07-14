@@ -411,12 +411,12 @@ class Query:
         # aren't smart enough to remove the existing annotations from the
         # query, so those would force us to use GROUP BY.
         #
-        # If the query has limit or distinct, then those operations must be
-        # done in a subquery so that we are aggregating on the limit and/or
-        # distinct results instead of applying the distinct and limit after the
-        # aggregation.
+        # If the query has limit or distinct, or uses set operations, then
+        # those operations must be done in a subquery so that the query
+        # aggregates on the limit and/or distinct results instead of applying
+        # the distinct and limit after the aggregation.
         if (isinstance(self.group_by, tuple) or has_limit or has_existing_annotations or
-                self.distinct):
+                self.distinct or self.combinator):
             from django.db.models.sql.subqueries import AggregateQuery
             outer_query = AggregateQuery(self.model)
             inner_query = self.clone()

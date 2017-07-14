@@ -821,11 +821,15 @@ of other models. Passing different models works as long as the ``SELECT`` list
 is the same in all ``QuerySet``\s (at least the types, the names don't matter
 as long as the types in the same order).
 
-In addition, only ``LIMIT``, ``OFFSET``, and ``ORDER BY`` (i.e. slicing and
-:meth:`order_by`) are allowed on the resulting ``QuerySet``. Further, databases
-place restrictions on what operations are allowed in the combined queries. For
-example, most databases don't allow ``LIMIT`` or ``OFFSET`` in the combined
-queries.
+In addition, only ``LIMIT``, ``OFFSET``, ``COUNT(*)``, and ``ORDER BY`` (i.e.
+slicing, :meth:`count`, and :meth:`order_by`) are allowed on the resulting
+``QuerySet``. Further, databases place restrictions on what operations are
+allowed in the combined queries. For example, most databases don't allow
+``LIMIT`` or ``OFFSET`` in the combined queries.
+
+.. versionchanged:: 1.11.4
+
+    ``COUNT(*)`` support was added.
 
 ``intersection()``
 ~~~~~~~~~~~~~~~~~~
