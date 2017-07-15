@@ -1,6 +1,6 @@
+import collections
 import keyword
 import re
-import collections
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
@@ -156,7 +156,7 @@ class Command(BaseCommand):
                     if field_type.startswith('ForeignKey('):
                         field_desc += ', models.DO_NOTHING'
 
-                    help_text_real = help_text_format % collections.defaultdict(lambda :'', row._asdict())
+                    help_text_real = help_text_format % collections.defaultdict(lambda: '', row._asdict())
                     if help_text_real.strip():
                         extra_params['help_text'] = help_text_real
 
