@@ -1,5 +1,6 @@
 import keyword
 import re
+import collections
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
@@ -22,6 +23,10 @@ class Command(BaseCommand):
             '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
         )
+        parser.add_argument(
+            '--help_text_format', action='store', dest='help_text_format', default='',
+            help='help_text format e.g. "%%(name)s %%(comment)s" ',
+        )
 
     def handle(self, **options):
         try:
@@ -32,6 +37,7 @@ class Command(BaseCommand):
 
     def handle_inspection(self, options):
         connection = connections[options['database']]
+        help_text_format = options['help_text_format']
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
@@ -150,9 +156,9 @@ class Command(BaseCommand):
                     if field_type.startswith('ForeignKey('):
                         field_desc += ', models.DO_NOTHING'
 
-                    comment = getattr(row, 'comment', None)
-                    if comment:
-                        extra_params['help_text'] = comment
+                    help_text_real = help_text_format % collections.defaultdict(lambda :'', row._asdict())
+                    if help_text_real.strip():
+                        extra_params['help_text'] = help_text_real
 
                     if extra_params:
                         if not field_desc.endswith('('):
