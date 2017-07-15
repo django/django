@@ -37,7 +37,7 @@ class BoolOr(Aggregate):
 
 class JSONBAgg(Aggregate):
     function = 'JSONB_AGG'
-    _output_field = JSONField()
+    output_field = JSONField()
 
     def convert_value(self, value, expression, connection, context):
         if not value:

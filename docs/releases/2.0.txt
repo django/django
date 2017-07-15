@@ -551,6 +551,9 @@ Miscellaneous
   in the cache backend as an intermediate class in ``CacheKeyWarning``'s
   inheritance of ``RuntimeWarning``.
 
+* Renamed ``BaseExpression._output_field`` to ``output_field``. You may need
+  to update custom expressions.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
