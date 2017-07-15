@@ -12,11 +12,11 @@ from django.contrib import admin
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import autoreload
-from django.utils._os import npath
+from django.utils._os import npath, upath
 from django.utils.six.moves import _thread
 from django.utils.translation import trans_real
 
-LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
+LOCALE_PATH = os.path.join(os.path.dirname(upath(__file__)), 'locale')
 
 
 class TestFilenameGenerator(SimpleTestCase):
@@ -50,7 +50,7 @@ class TestFilenameGenerator(SimpleTestCase):
         """
         gen_filenames() yields the built-in Django locale files.
         """
-        django_dir = os.path.join(os.path.dirname(conf.__file__), 'locale')
+        django_dir = os.path.join(os.path.dirname(upath(conf.__file__)), 'locale')
         django_mo = os.path.join(django_dir, 'nl', 'LC_MESSAGES', 'django.mo')
         self.assertFileFound(django_mo)
 
@@ -69,7 +69,7 @@ class TestFilenameGenerator(SimpleTestCase):
         """
         old_cwd = os.getcwd()
         os.chdir(os.path.dirname(__file__))
-        current_dir = os.path.join(os.path.dirname(__file__), 'locale')
+        current_dir = os.path.join(os.path.dirname(upath(__file__)), 'locale')
         current_dir_mo = os.path.join(current_dir, 'nl', 'LC_MESSAGES', 'django.mo')
         try:
             self.assertFileFound(current_dir_mo)
@@ -81,7 +81,7 @@ class TestFilenameGenerator(SimpleTestCase):
         """
         gen_filenames() also yields from locale dirs in installed apps.
         """
-        admin_dir = os.path.join(os.path.dirname(admin.__file__), 'locale')
+        admin_dir = os.path.join(os.path.dirname(upath(admin.__file__)), 'locale')
         admin_mo = os.path.join(admin_dir, 'nl', 'LC_MESSAGES', 'django.mo')
         self.assertFileFound(admin_mo)
 
@@ -91,7 +91,7 @@ class TestFilenameGenerator(SimpleTestCase):
         If i18n machinery is disabled, there is no need for watching the
         locale files.
         """
-        django_dir = os.path.join(os.path.dirname(conf.__file__), 'locale')
+        django_dir = os.path.join(os.path.dirname(upath(conf.__file__)), 'locale')
         django_mo = os.path.join(django_dir, 'nl', 'LC_MESSAGES', 'django.mo')
         self.assertFileNotFound(django_mo)
 
