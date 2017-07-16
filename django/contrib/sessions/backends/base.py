@@ -87,14 +87,14 @@ class SessionBase:
     def delete_test_cookie(self):
         del self[self.TEST_COOKIE_NAME]
 
-    def _hash(self, value):
+    def _hash(self, value, algo):
         key_salt = "django.contrib.sessions" + self.__class__.__name__
-        return salted_hmac(key_salt, value).hexdigest()
+        return salted_hmac(key_salt, value, algo).hexdigest()
 
     def encode(self, session_dict):
         "Return the given session dictionary serialized and encoded as a string."
         serialized = self.serializer().dumps(session_dict)
-        hash = self._hash(serialized)
+        hash = self._hash(serialized, 'sha256')
         return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
 
     def decode(self, session_data):
@@ -102,8 +102,8 @@ class SessionBase:
         try:
             # could produce ValueError if there is no ':'
             hash, serialized = encoded_data.split(b':', 1)
-            expected_hash = self._hash(serialized)
-            if not constant_time_compare(hash.decode(), expected_hash):
+            if not constant_time_compare(hash.decode(), self._hash(serialized, 'sha256')) and \
+               not constant_time_compare(hash.decode(), self._hash(serialized, 'sha1')):
                 raise SuspiciousSession("Session data corrupted")
             else:
                 return self.serializer().loads(serialized)

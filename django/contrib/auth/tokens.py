@@ -18,7 +18,7 @@ class PasswordResetTokenGenerator:
         Return a token that can be used once to do a password reset
         for the given user.
         """
-        return self._make_token_with_timestamp(user, self._num_days(self._today()))
+        return self._make_token_with_timestamp(user, self._num_days(self._today()), 'sha256')
 
     def check_token(self, user, token):
         """
@@ -38,7 +38,8 @@ class PasswordResetTokenGenerator:
             return False
 
         # Check that the timestamp/uid has not been tampered with
-        if not constant_time_compare(self._make_token_with_timestamp(user, ts), token):
+        if not constant_time_compare(self._make_token_with_timestamp(user, ts, 'sha256'), token) and\
+           not constant_time_compare(self._make_token_with_timestamp(user, ts, 'sha1'), token):
             return False
 
         # Check the timestamp is within limit. Timestamps are rounded to
@@ -51,7 +52,7 @@ class PasswordResetTokenGenerator:
 
         return True
 
-    def _make_token_with_timestamp(self, user, timestamp):
+    def _make_token_with_timestamp(self, user, timestamp, algo):
         # timestamp is number of days since 2001-1-1.  Converted to
         # base 36, this gives us a 3 digit string until about 2121
         ts_b36 = int_to_base36(timestamp)
@@ -67,7 +68,8 @@ class PasswordResetTokenGenerator:
             self.key_salt,
             self._make_hash_value(user, timestamp),
             secret=self.secret,
-        ).hexdigest()[::2]
+            algo=algo
+        ).hexdigest()[:40:2]
         return "%s-%s" % (ts_b36, hash)
 
     def _make_hash_value(self, user, timestamp):

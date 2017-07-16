@@ -119,10 +119,17 @@ class AbstractBaseUser(models.Model):
 
     def get_session_auth_hash(self):
         """
-        Return an HMAC of the password field.
+        Return an HMAC-SHA1 of the password field.
         """
         key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
-        return salted_hmac(key_salt, self.password).hexdigest()
+        return salted_hmac(key_salt, self.password, algo='sha1').hexdigest()
+
+    def get_session_auth_hash_sha256(self):
+        """
+        Return an HMAC-SHA256 of the password field.
+        """
+        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
+        return salted_hmac(key_salt, self.password, algo='sha256').hexdigest()
 
     @classmethod
     def get_email_field_name(cls):

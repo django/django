@@ -100,13 +100,13 @@ class TestSigner(SimpleTestCase):
         binary_key = b'\xe7'  # Set some binary (non-ASCII key)
 
         s = signing.Signer(binary_key)
-        self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
+        self.assertEqual('foo:EE4qGC5MEKyQG5msxYA0sBohAxLC0BJf8uRhemh0BGU', s.sign('foo'))
 
     def test_valid_sep(self):
         separators = ['/', '*sep*', ',']
         for sep in separators:
             signer = signing.Signer('predictable-secret', sep=sep)
-            self.assertEqual('foo%ssH9B01cZcJ9FoT_jEVkRkNULrl8' % sep, signer.sign('foo'))
+            self.assertEqual('foo%sjZQoX_FtSO70jX9HLRGg2A_2s4kdDBxz1QoO_OpEQb0' % sep, signer.sign('foo'))
 
     def test_invalid_sep(self):
         """should warn on invalid separator"""

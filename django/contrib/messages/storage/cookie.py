@@ -119,13 +119,13 @@ class CookieStorage(BaseStorage):
         self._update_cookie(encoded_data, response)
         return unstored_messages
 
-    def _hash(self, value):
+    def _hash(self, value, algo):
         """
-        Create an HMAC/SHA1 hash based on the value and the project setting's
+        Create an HMAC-SHA1/HMAC-SHA256 based on the value and the project setting's
         SECRET_KEY, modified to make it unique for the present purpose.
         """
         key_salt = 'django.contrib.messages'
-        return salted_hmac(key_salt, value).hexdigest()
+        return salted_hmac(key_salt, value, algo).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
         """
@@ -138,7 +138,7 @@ class CookieStorage(BaseStorage):
         if messages or encode_empty:
             encoder = MessageEncoder(separators=(',', ':'))
             value = encoder.encode(messages)
-            return '%s$%s' % (self._hash(value), value)
+            return '%s$%s' % (self._hash(value, 'sha256'), value)
 
     def _decode(self, data):
         """
@@ -152,7 +152,8 @@ class CookieStorage(BaseStorage):
         bits = data.split('$', 1)
         if len(bits) == 2:
             hash, value = bits
-            if constant_time_compare(hash, self._hash(value)):
+            if constant_time_compare(hash, self._hash(value, 'sha256')) or\
+               constant_time_compare(hash, self._hash(value, 'sha1')):
                 try:
                     # If we get here (and the JSON decode works), everything is
                     # good. In any other case, drop back and return None.

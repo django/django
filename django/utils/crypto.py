@@ -20,13 +20,16 @@ except NotImplementedError:
     using_sysrandom = False
 
 
-def salted_hmac(key_salt, value, secret=None):
+def salted_hmac(key_salt, value, secret=None, algo='sha256'):
     """
-    Return the HMAC-SHA1 of 'value', using a key generated from key_salt and a
+    Return the HMAC-SHA1/HMAC-SHA256 of 'value', using a key generated from key_salt and a
     secret (which defaults to settings.SECRET_KEY).
 
     A different key_salt should be passed in for every application of HMAC.
     """
+    if algo not in ('sha1', 'sha256'):
+        raise ValueError('only SHA1 and SHA256 are supported.')
+
     if secret is None:
         secret = settings.SECRET_KEY
 
@@ -35,14 +38,15 @@ def salted_hmac(key_salt, value, secret=None):
 
     # We need to generate a derived key from our base key.  We can do this by
     # passing the key_salt and our base key through a pseudo-random function and
-    # SHA1 works nicely.
-    key = hashlib.sha1(key_salt + secret).digest()
+    # SHA1/SHA256 works nicely.
+    sha_func = getattr(hashlib, algo)
+    key = sha_func(key_salt + secret).digest()
 
     # If len(key_salt + secret) > sha_constructor().block_size, the above
     # line is redundant and could be replaced by key = key_salt + secret, since
     # the hmac module does the same thing for keys longer than the block size.
     # However, we need to ensure that we *always* do this.
-    return hmac.new(key, msg=force_bytes(value), digestmod=hashlib.sha1)
+    return hmac.new(key, msg=force_bytes(value), digestmod=sha_func)
 
 
 def get_random_string(length=12,

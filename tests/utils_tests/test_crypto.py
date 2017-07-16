@@ -48,17 +48,6 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
             },
             "result": "4b007901b765489abead49d926f721d065a429c1",
         },
-        # # this takes way too long :(
-        # {
-        #     "args": {
-        #         "password": "password",
-        #         "salt": "salt",
-        #         "iterations": 16777216,
-        #         "dklen": 20,
-        #         "digest": hashlib.sha1,
-        #     },
-        #     "result": "eefe3d61cd4da4e4e9945b3d6ba2158c2634e984",
-        # },
         {
             "args": {
                 "password": "passwordPASSWORDpassword",
@@ -79,9 +68,101 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
             },
             "result": "56fa6aa75548099dcc37d7f03425e0c3",
         },
+        {
+            "args": {
+                "password": "password",
+                "salt": "salt",
+                "iterations": 1,
+                "dklen": 20,
+                "digest": hashlib.sha256,
+            },
+            "result": "120fb6cffcf8b32c43e7225256c4f837a86548c9",
+        },
+        {
+            "args": {
+                "password": "password",
+                "salt": "salt",
+                "iterations": 2,
+                "dklen": 20,
+                "digest": hashlib.sha256,
+            },
+            "result": "ae4d0c95af6b46d32d0adff928f06dd02a303f8e",
+        },
+        {
+            "args": {
+                "password": "password",
+                "salt": "salt",
+                "iterations": 4096,
+                "dklen": 20,
+                "digest": hashlib.sha256,
+            },
+            "result": "c5e478d59288c841aa530db6845c4c8d962893a0",
+        },
+        {
+            "args": {
+                "password": "passwordPASSWORDpassword",
+                "salt": "saltSALTsaltSALTsaltSALTsaltSALTsalt",
+                "iterations": 4096,
+                "dklen": 25,
+                "digest": hashlib.sha256,
+            },
+            "result": "348c89dbcbd32b2f32d814b8116e84cf2b17347ebc1800181c",
+        },
+        {
+            "args": {
+                "password": "pass\0word",
+                "salt": "sa\0lt",
+                "iterations": 4096,
+                "dklen": 16,
+                "digest": hashlib.sha256,
+            },
+            "result": "89b69d0516f829893c696226650a8687",
+        },
+
     ]
 
     regression_vectors = [
+        {
+            "args": {
+                "password": "password",
+                "salt": "salt",
+                "iterations": 1,
+                "dklen": 20,
+                "digest": hashlib.sha1,
+            },
+            "result": "0c60c80f961f0e71f3a9b524af6012062fe037a6"
+        },
+        {
+            "args": {
+                "password": "password",
+                "salt": "salt",
+                "iterations": 1,
+                "dklen": 20,
+                "digest": hashlib.sha1,
+            },
+            "result": "0c60c80f961f0e71f3a9b524af6012062fe037a6",
+        },
+        {
+            "args": {
+                "password": "password",
+                "salt": "salt",
+                "iterations": 1000,
+                "dklen": 0,
+                "digest": hashlib.sha1,
+            },
+            "result": "6e88be8bad7eae9d9e10aa061224034fed48d03f",
+        },
+        # Check leading zeros are not stripped (#17481)
+        {
+            "args": {
+                "password": b'\xba',
+                "salt": "salt",
+                "iterations": 1,
+                "dklen": 20,
+                "digest": hashlib.sha1,
+            },
+            "result": '0053d3b91a7f1e54effebd6d68771e8a6e0b2c5b',
+        },
         {
             "args": {
                 "password": "password",

@@ -90,20 +90,26 @@ def login(request, user, backend=None):
     have to reauthenticate on every request. Note that data set during
     the anonymous session is retained when the user logs in.
     """
-    session_auth_hash = ''
+    session_auth_hash_sha256 = ''
+    session_auth_hash_sha1 = ''
     if user is None:
         user = request.user
     if hasattr(user, 'get_session_auth_hash'):
-        session_auth_hash = user.get_session_auth_hash()
-
+        session_auth_hash_sha256 = user.get_session_auth_hash_sha256()
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
-                session_auth_hash and
-                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''), session_auth_hash)):
-            # To avoid reusing another user's session, create a new, empty
-            # session if the existing session corresponds to a different
-            # authenticated user.
-            request.session.flush()
+                session_auth_hash_sha256 and
+                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''), session_auth_hash_sha256)):
+            # To avoid computing SHA1, SHA256 simulatenously, the following if branch has been
+            # created. Clubbing them in a single if condition works also.
+            session_auth_hash_sha1 = user.get_session_auth_hash()
+            if (session_auth_hash_sha1 and
+                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''),
+                                          session_auth_hash_sha1)):
+                # To avoid reusing another user's session, create a new, empty
+                # session if the existing session corresponds to a different
+                # authenticated user.
+                request.session.flush()
     else:
         request.session.cycle_key()
 
@@ -122,7 +128,7 @@ def login(request, user, backend=None):
 
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = backend
-    request.session[HASH_SESSION_KEY] = session_auth_hash
+    request.session[HASH_SESSION_KEY] = session_auth_hash_sha256
     if hasattr(request, 'user'):
         request.user = user
     rotate_token(request)
@@ -187,10 +193,13 @@ def get_user(request):
             # Verify the session
             if hasattr(user, 'get_session_auth_hash'):
                 session_hash = request.session.get(HASH_SESSION_KEY)
-                session_hash_verified = session_hash and constant_time_compare(
+                session_hash_verified = session_hash and (constant_time_compare(
+                    session_hash,
+                    user.get_session_auth_hash_sha256()
+                ) or constant_time_compare(
                     session_hash,
                     user.get_session_auth_hash()
-                )
+                ))
                 if not session_hash_verified:
                     request.session.flush()
                     user = None
@@ -216,7 +225,7 @@ def update_session_auth_hash(request, user):
     """
     request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
-        request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
+        request.session[HASH_SESSION_KEY] = user.get_session_auth_hash_sha256()
 
 
 default_app_config = 'django.contrib.auth.apps.AuthConfig'
