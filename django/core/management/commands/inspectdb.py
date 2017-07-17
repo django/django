@@ -156,7 +156,7 @@ class Command(BaseCommand):
                     if field_type.startswith('ForeignKey('):
                         field_desc += ', models.DO_NOTHING'
 
-                    help_text_real = help_text_format % collections.defaultdict(lambda: '', row._asdict())
+                    help_text_real = help_text_format % collections.defaultdict(lambda: '', {k:v if v is not None else '' for k, v in row._asdict().items()})
                     if help_text_real.strip():
                         extra_params['help_text'] = help_text_real
 
