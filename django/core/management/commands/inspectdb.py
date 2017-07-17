@@ -98,6 +98,10 @@ class Command(BaseCommand):
                     column_name = row[0]
                     is_relation = column_name in relations
 
+                    comment = getattr(row, 'comment', None)
+                    if(comment):
+                        comment_notes.append(comment)
+
                     att_name, params, notes = self.normalize_col_name(
                         column_name, used_column_names, is_relation)
                     extra_params.update(params)
