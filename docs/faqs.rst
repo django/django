@@ -136,7 +136,12 @@ a few choices:
   (see :doc:`deploying`), you can import the channel layer directly as
   ``yourproject.asgi.channel_layer`` and call ``send()`` and ``receive_many()``
   on it directly. See the :doc:`ASGI spec <asgi>` for the API the channel layer
-  presents.
+  presents. Here's what that looks like:
+
+  >>> from mysite.asgi import channel_layer
+  >>> from channels import Channel, Group
+  >>> Channel("channel_name").send({"text":"channel_text"})
+  >>> Group("group_name").send({"text":"group_text"})
 
 * If you just need to send messages in when events happen, you can make a
   management command that calls ``Channel("namehere").send({...})``
