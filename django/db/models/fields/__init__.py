@@ -607,13 +607,16 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def db_type_parameters(self, connection):
+        return DictWrapper(self.__dict__, connection.ops.quote_name, 'qn_')
+
     def db_check(self, connection):
         """
         Return the database column check constraint for this field, for the
         provided connection. Works the same way as db_type() for the case that
         get_internal_type() does not map to a preexisting model field.
         """
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        data = self.db_type_parameters(connection)
         try:
             return connection.data_type_check_constraints[self.get_internal_type()] % data
         except KeyError:
@@ -639,7 +642,7 @@ class Field(RegisterLookupMixin):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        data = self.db_type_parameters(connection)
         try:
             return connection.data_types[self.get_internal_type()] % data
         except KeyError:

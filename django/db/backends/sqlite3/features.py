@@ -30,6 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_clone_databases = True
     supports_temporal_subtraction = True
     ignores_table_name_case = True
+    supports_cast_with_precision = False
 
     @cached_property
     def uses_savepoints(self):
