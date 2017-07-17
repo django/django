@@ -138,7 +138,7 @@ a few choices:
   on it directly. See the :doc:`ASGI spec <asgi>` for the API the channel layer
   presents. Here's what that looks like:
 
-  >>> from mysite.asgi import channel_layer
+  >>> from yourproject.asgi import channel_layer
   >>> from channels import Channel, Group
   >>> Channel("channel_name").send({"text":"channel_text"})
   >>> Group("group_name").send({"text":"group_text"})
