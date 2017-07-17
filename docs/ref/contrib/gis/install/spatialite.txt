@@ -86,7 +86,7 @@ Get the latest SpatiaLite library source bundle from the
 
         $ ./configure --target=macosx
 
-__ https://www.gaia-gis.it/gaia-sins/libspatialite-sources/
+__ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 
 .. _spatialite_macos:
 
