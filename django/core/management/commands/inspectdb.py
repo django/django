@@ -1,4 +1,3 @@
-import collections
 import keyword
 import re
 from collections import OrderedDict

@@ -8,7 +8,7 @@ from django.db.backends.base.introspection import (
 )
 from django.utils.deprecation import RemovedInDjango21Warning
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield','comment'))
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield', 'comment'))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -72,7 +72,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 END as is_autofield,
                 cc.comments as comment
             FROM user_tab_cols AS tc
-            LEFT JOIN user_col_comments AS cc ON cc.column_name = tc.column_name AND cc.table_name  = tc.table_name
+            LEFT JOIN user_col_comments AS cc ON cc.column_name = tc.column_name AND cc.table_name = tc.table_name
             WHERE table_name = UPPER(%s)""", [table_name])
         field_map = {
             column: (internal_size, default if default != 'NULL' else None, is_autofield, comment)
