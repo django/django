@@ -23,10 +23,6 @@ class Command(BaseCommand):
             '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
         )
-        parser.add_argument(
-            '--help_text_format', action='store', dest='help_text_format', default='',
-            help='help_text format e.g. "%%(name)s %%(comment)s" ',
-        )
 
     def handle(self, **options):
         try:
@@ -37,7 +33,6 @@ class Command(BaseCommand):
 
     def handle_inspection(self, options):
         connection = connections[options['database']]
-        help_text_format = options['help_text_format']
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
@@ -159,10 +154,6 @@ class Command(BaseCommand):
                     )
                     if field_type.startswith('ForeignKey('):
                         field_desc += ', models.DO_NOTHING'
-
-                    help_text_real = help_text_format % collections.defaultdict(lambda: '', {k:v if v is not None else '' for k, v in row._asdict().items()})
-                    if help_text_real.strip():
-                        extra_params['help_text'] = help_text_real
 
                     if extra_params:
                         if not field_desc.endswith('('):
