@@ -417,7 +417,7 @@ def display_for_value(value, empty_value_display, boolean=False):
 
     if boolean:
         return _boolean_icon(value)
-    elif value is None:
+    elif value is None or value == '':
         return empty_value_display
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
