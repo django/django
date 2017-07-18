@@ -125,10 +125,14 @@ class RasterFieldTest(TransactionTestCase):
         stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
         stx_pnt.transform(3086)
 
+        lookups = list(
+            (name, lookup)
+            for name, lookup in BaseSpatialField.get_lookups().items()
+            if issubclass(lookup, GISLookup)
+        )
+        self.assertNotEqual(lookups, [], 'No lookups found')
         # Loop through all the GIS lookups.
-        for name, lookup in BaseSpatialField.get_lookups().items():
-            if not isinstance(lookup, GISLookup):
-                continue
+        for name, lookup in lookups:
             # Construct lookup filter strings.
             combo_keys = [
                 field + name for field in [
