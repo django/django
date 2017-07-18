@@ -235,7 +235,7 @@ Databases
 Database optimization
 ---------------------
 
-Django’s database layer provides various ways to help developers get the best
+Django's database layer provides various ways to help developers get the best
 performance from their databases. The :doc:`database optimization documentation
 </topics/db/optimization>` gathers together links to the relevant
 documentation and adds various tips that outline the steps to take when

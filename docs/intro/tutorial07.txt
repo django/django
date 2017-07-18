@@ -328,8 +328,8 @@ when loading Django templates; it's a search path.
     Just like the static files, we *could* have all our templates together, in
     one big templates directory, and it would work perfectly well. However,
     templates that belong to a particular application should be placed in that
-    application’s template directory (e.g. ``polls/templates``) rather than the
-    project’s (``templates``). We'll discuss in more detail in the
+    application's template directory (e.g. ``polls/templates``) rather than the
+    project's (``templates``). We'll discuss in more detail in the
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
 Now create a directory called ``admin`` inside ``templates``, and copy the

@@ -390,7 +390,7 @@ run.
 The solution is simple: instead of doing something during the atomic block
 (transaction) and then undoing it if the transaction fails, use
 :func:`on_commit` to delay doing it in the first place until after the
-transaction succeeds. It’s a lot easier to undo something you never did in the
+transaction succeeds. It's a lot easier to undo something you never did in the
 first place!
 
 Low-level APIs
