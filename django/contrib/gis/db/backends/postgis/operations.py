@@ -42,17 +42,11 @@ class PostGISOperator(SpatialOperator):
         return super().as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
-        # Get rhs value.
-        if isinstance(lookup.rhs, (tuple, list)):
-            rhs_val = lookup.rhs[0]
-            spheroid = lookup.rhs[-1] == 'spheroid'
-        else:
-            rhs_val = lookup.rhs
-            spheroid = False
+        spheroid = lookup.rhs_params and lookup.rhs_params[-1] == 'spheroid'
 
         # Check which input is a raster.
         lhs_is_raster = lookup.lhs.field.geom_type == 'RASTER'
-        rhs_is_raster = isinstance(rhs_val, GDALRaster)
+        rhs_is_raster = isinstance(lookup.rhs, GDALRaster)
 
         # Look for band indices and inject them if provided.
         if lookup.band_lhs is not None and lhs_is_raster:
@@ -90,7 +84,7 @@ class PostGISDistanceOperator(PostGISOperator):
         if not lookup.lhs.output_field.geography and lookup.lhs.output_field.geodetic(connection):
             template_params = self.check_raster(lookup, template_params)
             sql_template = self.sql_template
-            if len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid':
+            if len(lookup.rhs_params) == 2 and lookup.rhs_params[-1] == 'spheroid':
                 template_params.update({
                     'op': self.op,
                     'func': connection.ops.spatial_function_name('DistanceSpheroid'),

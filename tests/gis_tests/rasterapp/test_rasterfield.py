@@ -271,10 +271,9 @@ class RasterFieldTest(TransactionTestCase):
 
     def test_lookup_input_tuple_too_long(self):
         rast = GDALRaster(json.loads(JSON_RASTER))
-        qs = RasterModel.objects.filter(rast__bbcontains=(rast, 1, 2))
         msg = 'Tuple too long for lookup bbcontains.'
         with self.assertRaisesMessage(ValueError, msg):
-            qs.count()
+            RasterModel.objects.filter(rast__bbcontains=(rast, 1, 2))
 
     def test_lookup_input_band_not_allowed(self):
         rast = GDALRaster(json.loads(JSON_RASTER))
