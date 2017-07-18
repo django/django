@@ -396,17 +396,40 @@ class FormatStylePlaceholderCursor:
         self.cursor.arraysize = 100
 
     @staticmethod
+    def _output_number_converter(value):
+        return decimal.Decimal(value) if '.' in value else int(value)
+
+    @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
-        Called for each db column fetched from cursors. Return numbers as
-        strings so that decimal values don't have rounding error.
+        Called for each db column fetched from cursors. Return numbers as the
+        appropriate Python type.
         """
         if defaultType == Database.NUMBER:
+            if scale == -127:
+                if precision == 0:
+                    # NUMBER column: decimal-precision floating point.
+                    # This will normally be an integer from a sequence,
+                    # but it could be a decimal value.
+                    outconverter = FormatStylePlaceholderCursor._output_number_converter
+                else:
+                    # FLOAT column: binary-precision floating point.
+                    # This comes from FloatField columns.
+                    outconverter = float
+            elif precision > 0:
+                # NUMBER(p,s) column: decimal-precision fixed point.
+                # This comes from IntegerField and DecimalField columns.
+                outconverter = int if scale == 0 else decimal.Decimal
+            else:
+                # No type information. This normally comes from a
+                # mathematical expression in the SELECT list. Guess int
+                # or Decimal based on whether it has a decimal point.
+                outconverter = FormatStylePlaceholderCursor._output_number_converter
             return cursor.var(
                 Database.STRING,
                 size=255,
                 arraysize=cursor.arraysize,
-                outconverter=str,
+                outconverter=outconverter,
             )
 
     def _format_params(self, params):
@@ -490,19 +513,13 @@ class FormatStylePlaceholderCursor:
         self._guess_input_sizes(formatted)
         return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
-    def fetchone(self):
-        row = self.cursor.fetchone()
-        if row is None:
-            return row
-        return _rowfactory(row, self.cursor)
-
     def fetchmany(self, size=None):
         if size is None:
             size = self.arraysize
-        return tuple(_rowfactory(r, self.cursor) for r in self.cursor.fetchmany(size))
+        return tuple(self.cursor.fetchmany(size))
 
     def fetchall(self):
-        return tuple(_rowfactory(r, self.cursor) for r in self.cursor.fetchall())
+        return tuple(self.cursor.fetchall())
 
     def close(self):
         try:
@@ -521,43 +538,4 @@ class FormatStylePlaceholderCursor:
         return getattr(self.cursor, attr)
 
     def __iter__(self):
-        return (_rowfactory(r, self.cursor) for r in self.cursor)
-
-
-def _rowfactory(row, cursor):
-    # Cast numeric values as the appropriate Python type based upon the
-    # cursor description.
-    casted = []
-    for value, desc in zip(row, cursor.description):
-        if value is not None and desc[1] is Database.NUMBER:
-            precision = desc[4] or 0
-            scale = desc[5] or 0
-            if scale == -127:
-                if precision == 0:
-                    # NUMBER column: decimal-precision floating point
-                    # This will normally be an integer from a sequence,
-                    # but it could be a decimal value.
-                    if '.' in value:
-                        value = decimal.Decimal(value)
-                    else:
-                        value = int(value)
-                else:
-                    # FLOAT column: binary-precision floating point.
-                    # This comes from FloatField columns.
-                    value = float(value)
-            elif precision > 0:
-                # NUMBER(p,s) column: decimal-precision fixed point.
-                # This comes from IntField and DecimalField columns.
-                if scale == 0:
-                    value = int(value)
-                else:
-                    value = decimal.Decimal(value)
-            elif '.' in value:
-                # No type information. This normally comes from a
-                # mathematical expression in the SELECT list. Guess int
-                # or Decimal based on whether it has a decimal point.
-                value = decimal.Decimal(value)
-            else:
-                value = int(value)
-        casted.append(value)
-    return tuple(casted)
+        return iter(self.cursor)
