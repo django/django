@@ -40,10 +40,7 @@ class GISLookup(Lookup):
             self.band_lhs = 1
 
         self.band_rhs = self.rhs[1]
-        if len(self.rhs) == 1:
-            self.rhs = self.rhs[0]
-        else:
-            self.rhs = (self.rhs[0], ) + self.rhs[2:]
+        self.rhs = (self.rhs[0], ) + self.rhs[2:]
 
     def get_db_prep_lookup(self, value, connection):
         # get_db_prep_lookup is called by process_rhs from super class
