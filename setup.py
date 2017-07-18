@@ -19,10 +19,10 @@ setup(
     extras_require={
         'tests': [
             'coverage',
-            'mock ; python_version < "3.0"',
             'flake8>=2.0,<3.0',
             'isort',
         ],
+        'tests:python_version < "3.0"': ['mock'],
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
