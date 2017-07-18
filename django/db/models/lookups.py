@@ -96,9 +96,7 @@ class Lookup:
             return self.get_db_prep_lookup(value, connection)
 
     def rhs_is_direct_value(self):
-        return not(
-            hasattr(self.rhs, 'as_sql') or
-            hasattr(self.rhs, 'get_compiler'))
+        return not hasattr(self.rhs, 'as_sql')
 
     def relabeled_clone(self, relabels):
         new = copy(self)
@@ -410,7 +408,7 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
+        if hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:
