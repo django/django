@@ -392,7 +392,7 @@ class ClearableFileInput(FileInput):
         context = super().get_context(name, value, attrs)
         checkbox_name = self.clear_checkbox_name(name)
         checkbox_id = self.clear_checkbox_id(checkbox_name)
-        context.update({
+        context['widget'].update({
             'checkbox_name': checkbox_name,
             'checkbox_id': checkbox_id,
             'is_initial': self.is_initial(value),
