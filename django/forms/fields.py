@@ -1083,6 +1083,8 @@ class FilePathField(ChoiceField):
         if recursive:
             for root, dirs, files in sorted(os.walk(self.path)):
                 if self.allow_files:
+                    if root.endswith('__pycache__'):
+                        continue
                     for f in files:
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
