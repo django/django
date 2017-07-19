@@ -22,28 +22,18 @@ class GISLookup(Lookup):
         super().__init__(*args, **kwargs)
         self.template_params = {}
 
-    def process_band_indices(self, only_lhs=False):
+    def process_band_indices(self):
         """
         Extract the lhs band index from the band transform class and the rhs
         band index from the input tuple.
         """
-        # PostGIS band indices are 1-based, so the band index needs to be
-        # increased to be consistent with the GDALRaster band indices.
-        if only_lhs:
-            self.band_rhs = 1
-            self.band_lhs = self.lhs.band_index + 1
-            return
-
         if isinstance(self.lhs, RasterBandTransform):
             self.band_lhs = self.lhs.band_index + 1
         else:
             self.band_lhs = 1
 
         self.band_rhs = self.rhs[1]
-        if len(self.rhs) == 1:
-            self.rhs = self.rhs[0]
-        else:
-            self.rhs = (self.rhs[0], ) + self.rhs[2:]
+        self.rhs = (self.rhs[0], ) + self.rhs[2:]
 
     def get_db_prep_lookup(self, value, connection):
         # get_db_prep_lookup is called by process_rhs from super class
@@ -80,8 +70,6 @@ class GISLookup(Lookup):
                 self.process_band_indices()
             elif len(self.rhs) > 2:
                 raise ValueError('Tuple too long for lookup %s.' % self.lookup_name)
-        elif isinstance(self.lhs, RasterBandTransform):
-            self.process_band_indices(only_lhs=True)
 
         rhs, rhs_params = super().process_rhs(compiler, connection)
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
