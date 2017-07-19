@@ -306,7 +306,7 @@ class DistanceLookupBase(GISLookup):
         if not isinstance(self.rhs, (tuple, list)) or not 2 <= len(self.rhs) <= 4:
             raise ValueError("2, 3, or 4-element tuple required for '%s' lookup." % self.lookup_name)
         elif len(self.rhs) == 4 and not self.rhs[3] == 'spheroid':
-            raise ValueError("For 4-element tuples the last argument must be the 'speroid' directive.")
+            raise ValueError("For 4-element tuples the last argument must be the 'spheroid' directive.")
 
         # Check if the second parameter is a band index.
         if len(self.rhs) > 2 and not self.rhs[2] == 'spheroid':

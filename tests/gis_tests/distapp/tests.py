@@ -140,14 +140,16 @@ class DistanceTest(TestCase):
             expected_cities.pop(0)
         self.assertEqual(expected_cities, self.get_names(dist_qs))
 
-        # Too many params (4 in this case) should raise a ValueError.
-        queryset = AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
-        with self.assertRaises(ValueError):
-            len(queryset)
+        msg = "2, 3, or 4-element tuple required for 'distance_lte' lookup."
+        with self.assertRaisesMessage(ValueError, msg):  # Too many params.
+            len(AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4', None)))
 
-        # Not enough params should raise a ValueError.
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):  # Too few params.
             len(AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)',)))
+
+        msg = "For 4-element tuples the last argument must be the 'spheroid' directive."
+        with self.assertRaisesMessage(ValueError, msg):
+            len(AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4')))
 
         # Getting all cities w/in 550 miles of Hobart.
         hobart = AustraliaCity.objects.get(name='Hobart')
