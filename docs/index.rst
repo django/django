@@ -23,7 +23,7 @@ If you are interested in contributing, please read our :doc:`contributing` docs!
 Projects
 --------
 
-Channels is comprised of five packages:
+Channels is comprised of six packages:
 
 * `Channels <https://github.com/django/channels/>`_, the Django integration layer
 * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
