@@ -1,5 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ClearableFileInput
+from django.forms import ClearableFileInput, MultiWidget
 from django.utils.encoding import python_2_unicode_compatible
 
 from .base import WidgetTest
@@ -76,6 +76,18 @@ class ClearableFileInputTest(WidgetTest):
         a clear checkbox.
         """
         self.check_html(self.widget, 'myfile', None, html='<input type="file" name="myfile" />')
+
+    def test_render_as_subwidget(self):
+        """A ClearableFileInput as a subwidget of MultiWidget."""
+        widget = MultiWidget(widgets=(self.widget,))
+        self.check_html(widget, 'myfile', [FakeFieldFile()], html=(
+            """
+            Currently: <a href="something">something</a>
+            <input type="checkbox" name="myfile_0-clear" id="myfile_0-clear_id" />
+            <label for="myfile_0-clear_id">Clear</label><br />
+            Change: <input type="file" name="myfile_0" />
+            """
+        ))
 
     def test_clear_input_checked_returns_false(self):
         """
