@@ -579,9 +579,9 @@ class ModelAdmin(BaseModelAdmin):
     def media(self):
         extra = '' if settings.DEBUG else '.min'
         js = [
-            'core.js',
             'vendor/jquery/jquery%s.js' % extra,
             'jquery.init.js',
+            'core.js',
             'admin/RelatedObjectLookups.js',
             'actions%s.js' % extra,
             'urlify.js',
