@@ -6,7 +6,6 @@ from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.expressions import Expression
 from django.db.models.fields import Field
 from django.utils.translation import gettext_lazy as _
 
@@ -181,24 +180,7 @@ class BaseSpatialField(Field):
                 raise ValueError("Couldn't create spatial object from lookup value '%s'." % value)
 
     def get_prep_value(self, value):
-        """
-        Spatial lookup values are either a parameter that is (or may be
-        converted to) a geometry or raster, or a sequence of lookup values
-        that begins with a geometry or raster. Set up the geometry or raster
-        value properly and preserves any other lookup parameters.
-        """
-        value = super().get_prep_value(value)
-
-        # For IsValid lookups, boolean values are allowed.
-        if isinstance(value, (Expression, bool)):
-            return value
-        elif isinstance(value, (tuple, list)):
-            obj = value[0]
-            seq_value = True
-        else:
-            obj = value
-            seq_value = False
-
+        obj = super().get_prep_value(value)
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
         if isinstance(obj, Geometry):
@@ -221,13 +203,7 @@ class BaseSpatialField(Field):
 
         # Assigning the SRID value.
         obj.srid = self.get_srid(obj)
-
-        if seq_value:
-            lookup_val = [obj]
-            lookup_val.extend(value[1:])
-            return tuple(lookup_val)
-        else:
-            return obj
+        return obj
 
 
 class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
