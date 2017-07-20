@@ -185,6 +185,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
 
+    @staticmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = super().config_from_url(engine, scheme, url)
+        result['PORT'] = str(result['PORT'])
+        return result
+
     def _connect_string(self):
         settings_dict = self.settings_dict
         if not settings_dict['HOST'].strip():

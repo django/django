@@ -6,6 +6,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 
 import threading
 import warnings
+from urllib import parse
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -141,6 +142,36 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        parsed = parse.urlparse(url)
+        host, _ = parsed._hostinfo
+
+        # Handle postgres percent-encoded paths.
+        if '%2f' in host.lower():
+            host = parse.unquote(host)
+
+            username, password = parsed.username, parsed.password
+
+            # Recreate the host with the appropriate username and password
+            if username and password:
+                host = '{user}:{password}@{host}'.format(user=username,
+                                                         password=password,
+                                                         host=host)
+            elif username:
+                host = '{user}@{host}'.format(user=username,
+                                              host=host)
+
+            parsed = parsed._replace(netloc=host)
+
+        result = super().config_from_url(engine, scheme, parsed)
+
+        if 'currentSchema' in result['OPTIONS']:
+            value = result['OPTIONS'].pop('currentSchema')
+            result['OPTIONS']['options'] = '-c search_path={0}'.format(value)
+
+        return result
 
     def get_connection_params(self):
         settings_dict = self.settings_dict

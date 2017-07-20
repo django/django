@@ -3,6 +3,7 @@ import time
 import warnings
 from collections import deque
 from contextlib import contextmanager
+from urllib import parse
 
 import _thread
 import pytz
@@ -104,6 +105,45 @@ class BaseDatabaseWrapper:
         self.introspection = self.introspection_class(self)
         self.ops = self.ops_class(self)
         self.validation = self.validation_class(self)
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        if isinstance(url, parse.ParseResult):
+            parsed = url
+        else:
+            parsed = parse.urlparse(url)
+
+        # parsed.hostname always returns a lower-cased hostname
+        # this isn't correct if hostname is a file path, so use '_hostinfo'
+        # to get the actual host
+        hostname, port = parsed._hostinfo
+        query = parse.parse_qs(parsed.query)
+
+        options = {}
+        for key, values in query.items():
+            value = values[-1]
+            if value.isdigit():
+                value = int(value)
+            elif value.lower() == 'true':
+                value = True
+            elif value.lower() == 'false':
+                value = False
+
+            options[key] = value
+
+        path = parsed.path[1:]
+
+        result = {
+            'ENGINE': engine,
+            'NAME': parse.unquote(path or ''),
+            'USER': parse.unquote(parsed.username or ''),
+            'PASSWORD': parse.unquote(parsed.password or ''),
+            'HOST': hostname,
+            'PORT': parsed.port or '',
+            'OPTIONS': options
+        }
+
+        return result
 
     def ensure_timezone(self):
         """

@@ -126,6 +126,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
 
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        if url in ('sqlite://:memory:', 'sqlite://'):
+            return {
+                'ENGINE': engine,
+                'NAME': ':memory:'
+            }
+
+        return super().config_from_url(engine, scheme, url)
+
     def get_connection_params(self):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
