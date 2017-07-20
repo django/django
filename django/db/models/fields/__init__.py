@@ -1544,12 +1544,6 @@ class DecimalField(Field):
                 params={'value': value},
             )
 
-    def _format(self, value):
-        if isinstance(value, str):
-            return value
-        else:
-            return self.format_number(value)
-
     def format_number(self, value):
         """
         Format a number into a string with the requisite number of digits and
