@@ -155,14 +155,13 @@ class BaseSpatialField(Field):
         else:
             return srid
 
-    def get_db_prep_save(self, value, connection):
-        """
-        Prepare the value for saving in the database.
-        """
-        if isinstance(value, Geometry) or value:
-            return connection.ops.Adapter(self.get_prep_value(value))
-        else:
+    def get_db_prep_value(self, value, connection, *args, **kwargs):
+        if value is None:
             return None
+        return connection.ops.Adapter(
+            super().get_db_prep_value(value, connection, *args, **kwargs),
+            **({'geography': True} if self.geography and connection.ops.geography else {})
+        )
 
     def get_raster_prep_value(self, value, is_candidate):
         """
@@ -255,12 +254,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         if self.geography is not False:
             kwargs['geography'] = self.geography
         return name, path, args, kwargs
-
-    def get_db_prep_value(self, value, connection, *args, **kwargs):
-        return connection.ops.Adapter(
-            super().get_db_prep_value(value, connection, *args, **kwargs),
-            **({'geography': True} if self.geography else {})
-        )
 
     def from_db_value(self, value, expression, connection, context):
         if value:
