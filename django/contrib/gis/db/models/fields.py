@@ -288,8 +288,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
 
     def from_db_value(self, value, expression, connection, context):
         if value:
-            if not isinstance(value, Geometry):
-                value = Geometry(value)
+            value = Geometry(value)
             srid = value.srid
             if not srid and self.srid != -1:
                 value.srid = self.srid
