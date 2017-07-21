@@ -21,10 +21,16 @@ class Link(models.Model):
         return "Link to %s id=%s" % (self.content_type, self.object_id)
 
 
+class LinkProxy(Link):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=100)
     links = GenericRelation(Link)
+    link_proxy = GenericRelation(LinkProxy)
 
     def __str__(self):
         return "Place: %s" % self.name
