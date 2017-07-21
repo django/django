@@ -1,6 +1,6 @@
 import ipaddress
-import os
 import re
+from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
@@ -480,7 +480,7 @@ class FileExtensionValidator:
             self.code = code
 
     def __call__(self, value):
-        extension = os.path.splitext(value.name)[1][1:].lower()
+        extension = Path(value.name).suffix[1:].lower()
         if self.allowed_extensions is not None and extension not in self.allowed_extensions:
             raise ValidationError(
                 self.message,

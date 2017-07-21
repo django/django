@@ -1,8 +1,8 @@
 import functools
 import gzip
-import os
 import re
 from difflib import SequenceMatcher
+from pathlib import Path
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -165,16 +165,14 @@ class CommonPasswordValidator:
     The list Django ships with contains 20000 common passwords, created by
     Royce Williams: https://gist.github.com/roycewilliams/281ce539915a947a23db17137d91aeb7
     """
-    DEFAULT_PASSWORD_LIST_PATH = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), 'common-passwords.txt.gz'
-    )
+    DEFAULT_PASSWORD_LIST_PATH = Path(__file__).resolve().parent / 'common-passwords.txt.gz'
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
         try:
-            with gzip.open(password_list_path) as f:
+            with gzip.open(str(password_list_path)) as f:
                 common_passwords_lines = f.read().decode().splitlines()
         except IOError:
-            with open(password_list_path) as f:
+            with open(str(password_list_path)) as f:
                 common_passwords_lines = f.readlines()
 
         self.passwords = {p.strip() for p in common_passwords_lines}
