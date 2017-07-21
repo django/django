@@ -32,21 +32,40 @@ options`_.
 
 .. attribute:: Index.fields
 
-A list of the name of the fields on which the index is desired.
+A list of the name of the fields or database expressions on which the index is
+desired.
 
 By default, indexes are created with an ascending order for each column. To
 define an index with a descending order for a column, add a hyphen before the
-field's name.
+field's name. When using an expression, use ``.desc()`` for descending order.
 
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
+
+``Index(fields=[Lower('title').desc()])`` would create an index on the
+lowercase value of the ``title`` field in descending order.
 
 .. admonition:: Support for column ordering on SQLite
 
     Column ordering is supported on SQLite 3.3.0+ and only for some database
     file formats. Refer to the `SQLite docs
     <https://www.sqlite.org/lang_createindex.html>`_ for specifics.
+
+.. admonition:: Suitable expressions on PostgreSQL
+
+    The way indexes work on PostgreSQL requires the database functions to be
+    marked as ``IMMUTABLE``. As a result, you can't use functions like
+    :class:`~.functions.Concat` in a database index. If you do use such a
+    function you'll get an error when applying a migration saying this:
+
+    .. code-block:: text
+
+        ERROR:  functions in index expression must be marked IMMUTABLE
+
+.. versionadded:: 2.0
+
+    Support for functional indexes was added.
 
 ``name``
 --------

@@ -250,6 +250,9 @@ Models
 * Added the :attr:`~django.db.models.Index.db_tablespace` parameter to
   class-based indexes.
 
+* Added expression support through Django's expression API for
+  :attr:`class-based indexes <django.db.models.Index.fields>`.
+
 * If the database supports a native duration field (Oracle and PostgreSQL),
   :class:`~django.db.models.functions.datetime.Extract` now works with
   :class:`~django.db.models.DurationField`.
