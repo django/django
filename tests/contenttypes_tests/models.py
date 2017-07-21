@@ -36,6 +36,30 @@ class Article(models.Model):
         return self.title
 
 
+class ArticleManySites(models.Model):
+    title = models.CharField(max_length=100)
+    sites = models.ManyToManyField(Site)
+
+    def get_absolute_url(self):
+        return '/article/%d/' % self.pk
+
+
+class ArticleSite(models.Model):
+    title = models.CharField(max_length=100)
+    site = models.ForeignKey(Site, models.CASCADE)
+
+    def get_absolute_url(self):
+        return '/article/%d/' % self.pk
+
+
+class ArticleManyAuthors(models.Model):
+    title = models.CharField(max_length=100)
+    authors = models.ManyToManyField(Author)
+
+    def get_absolute_url(self):
+        return '/article/%d/' % self.pk
+
+
 class SchemeIncludedURL(models.Model):
     url = models.URLField(max_length=100)
 
