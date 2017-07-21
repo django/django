@@ -533,7 +533,7 @@ class Func(Expression):
         args = self.arg_joiner.join(str(arg) for arg in self.source_expressions)
         extra = dict(self.extra, **self._get_repr_options())
         if extra:
-            extra = ', '.join(str(key) + '=' + str(val) for key, val in extra.items())
+            extra = ', '.join(str(key) + '=' + str(val) for key, val in sorted(extra.items()))
             return "{}({}, {})".format(self.__class__.__name__, args, extra)
         return "{}({})".format(self.__class__.__name__, args)
 
