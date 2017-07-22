@@ -32,6 +32,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_select_difference = False
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
+    has_case_insensitive_like = False
 
     @cached_property
     def _mysql_storage_engine(self):
