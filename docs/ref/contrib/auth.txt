@@ -145,6 +145,15 @@ Attributes
             In older versions, this was a method. Backwards-compatibility
             support for using it as a method will be removed in Django 2.0.
 
+        .. admonition:: Don't use the ``is`` operator for comparisons!
+
+            To allow the ``is_authenticated`` and ``is_anonymous`` attributes
+            to also work as methods, the attributes are  ``CallableBool``
+            objects. Thus, until the deprecation period ends in Django 2.0, you
+            can't compare these properties using the ``is`` operator. That is,
+            ``request.user.is_authenticated is True`` always evaluate to
+            ``False``.
+
     .. attribute:: is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
