@@ -1320,9 +1320,30 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
         exclude=memcached_excluded_caches,
         LOCATION='192.0.2.0',
     ))
-    def test_pylibmc_fails_silently(self):
-        cache.set("key", "value")
-        self.assertEqual(cache.get("key"), None)
+    def test_pylibmc_warnings(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('default', RuntimeWarning)
+
+            cache.set('answer', 42)
+            self.assertEqual(len(warns), 1)
+
+            cache.add('answer', 42)
+            self.assertEqual(len(warns), 2)
+
+            value = cache.get('answer')
+            self.assertEqual(len(warns), 3)
+            self.assertEqual(value, None)
+
+            cache.delete('answer')
+            self.assertEqual(len(warns), 4)
+
+            cache.set_many({'a': 1, 'b': 2})
+            self.assertEqual(len(warns), 5)
+
+            cache.delete_many({'a': 1, 'b': 2})
+            self.assertEqual(len(warns), 6)
+
+            warnings.simplefilter('error', RuntimeWarning)
 
 
 @override_settings(CACHES=caches_setting_for_tests(

@@ -197,26 +197,28 @@ class PyLibMCCache(BaseMemcachedCache):
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         try:
             return super().add(key, value, timeout=timeout, version=version)
-        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error) as e:
+            warnings.warn(str(e), RuntimeWarning)
             return value
 
     def get(self, key, default=None, version=None):
         try:
             return super().get(key, default=default, version=version)
-        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error) as e:
+            warnings.warn(str(e), RuntimeWarning)
             return default
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         try:
             super().set(key, value, timeout=timeout, version=version)
-        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
-            pass
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error) as e:
+            warnings.warn(str(e), RuntimeWarning)
 
     def delete(self, key, version=None):
         try:
             super().delete(key, version=version)
-        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
-            pass
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error) as e:
+            warnings.warn(str(e), RuntimeWarning)
 
     def incr(self, key, delta=1, version=None):
         try:
@@ -233,14 +235,14 @@ class PyLibMCCache(BaseMemcachedCache):
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
         try:
             super().set_many(data, timeout=timeout, version=version)
-        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
-            pass
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error) as e:
+            warnings.warn(str(e), RuntimeWarning)
 
     def delete_many(self, keys, version=None):
         try:
             super().delete_many(keys, version=version)
-        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error):
-            pass
+        except (self._lib.ConnectionError, self._lib.ServerDown, self._lib.Error) as e:
+            warnings.warn(str(e), RuntimeWarning)
 
     def close(self, **kwargs):
         # libmemcached manages its own connections. Don't call disconnect_all()
