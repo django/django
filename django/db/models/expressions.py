@@ -698,7 +698,7 @@ class Col(Expression):
 
     def as_sql(self, compiler, connection):
         if self.index_col:
-            return "%s" % connection.ops.quote_name(self.alias), []
+            return connection.ops.quote_name(self.alias), []
 
         qn = compiler.quote_name_unless_alias
         return "%s.%s" % (qn(self.alias), qn(self.target.column)), []

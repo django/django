@@ -44,7 +44,9 @@ For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 case, a descending index is created as a normal index.
 
 ``Index(fields=[Lower('title').desc()])`` would create an index on the
-lowercase value of the ``title`` field in descending order.
+lowercase value of the ``title`` field in descending order. Using ``F``
+expressions in a construct like ``Index(fields=[F('height') * F('weight')])``
+allows constructing indexes on mathematical operations.
 
 .. admonition:: Support for column ordering on SQLite
 
@@ -52,16 +54,31 @@ lowercase value of the ``title`` field in descending order.
     file formats. Refer to the `SQLite docs
     <https://www.sqlite.org/lang_createindex.html>`_ for specifics.
 
-.. admonition:: Suitable expressions on PostgreSQL
+.. admonition:: Database specific exceptions of suitable expressions
 
-    The way indexes work on PostgreSQL requires the database functions to be
-    marked as ``IMMUTABLE``. As a result, you can't use functions like
-    :class:`~.functions.Concat` in a database index. If you do use such a
-    function you'll get an error when applying a migration saying this:
+    :PostgreSQL:
+        PostgreSQL requires that "*all functions and operators used in an index
+        definition must be 'immutable'*" --- `PostgreSQL documentation
+        <https://www.postgresql.org/docs/9.6/static/sql-createindex.html#AEN80057>`_.
+        As a result, you can't use functions like :class:`~.functions.Concat`
+        in a database index. If you do use such a function you'll get an error
+        when applying a migration saying this:
+    
+        .. code-block:: text
+    
+            ERROR:  functions in index expression must be marked IMMUTABLE
 
-    .. code-block:: text
+    :MySQL:
+        MySQL doesn't support expression indexes as of version 5.7.
 
-        ERROR:  functions in index expression must be marked IMMUTABLE
+    :Oracle:
+        Oracle Database requires "*that any schema-level or package-level
+        PL/SQL function that the index expression invokes is deterministic
+        (that is, that the function always return the same result for the same
+        input).*" --- `Oracle Database documentation
+        <https://docs.oracle.com/database/121/ADFNS/adfns_indexes.htm#ADFNS257>`_.
+        However, unlike PostgreSQL, "*Oracle Database does not check this
+        assertion*".
 
 .. versionadded:: 2.0
 
