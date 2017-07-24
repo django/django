@@ -41,8 +41,6 @@ class BaseDatabaseFeatures:
     # than a table?
     select_for_update_of_column = False
 
-    supports_select_related = True
-
     # Does the default test database allow multiple connections?
     # Usually an indication that the test database is in-memory
     test_db_allows_multiple_connections = True
