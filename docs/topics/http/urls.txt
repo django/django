@@ -669,6 +669,9 @@ Namespaces can also be nested. The named URL ``'sports:polls:index'`` would
 look for a pattern named ``'index'`` in the namespace ``'polls'`` that is itself
 defined within the top-level namespace ``'sports'``.
 
+Namespaces are only supported in included URLconfs; they can't be used in a
+:setting:`ROOT_URLCONF`.
+
 .. _topics-http-reversing-url-namespaces:
 
 Reversing namespaced URLs
