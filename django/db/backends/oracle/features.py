@@ -39,3 +39,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
     supports_index_on_text_field = False
+    has_case_insensitive_like = False
