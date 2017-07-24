@@ -108,9 +108,13 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
             if hasattr(default_manager, 'get_by_natural_key') and hasattr(Model, 'natural_key'):
                 natural_key = Model(**d['fields']).natural_key()[0]
 
-                data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                    Model._meta.default_manager.db_manager(using).get_by_natural_key(natural_key).pk
-                )
+                try:
+                    data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                        Model._meta.default_manager.db_manager(using).get_by_natural_key(natural_key).pk
+                    )
+                except Model.DoesNotExist:
+                    pass
+
         m2m_data = {}
 
         if Model not in field_names_cache:
