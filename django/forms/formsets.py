@@ -324,8 +324,12 @@ class BaseFormSet:
             # Empty forms are unchanged forms beyond those with initial data.
             if not form.has_changed() and i >= self.initial_form_count():
                 empty_forms_count += 1
-
-            self._errors.append(form.errors)
+            # Accessing errors calls full_clean() if necessary.
+            # _should_delete_form() requires cleaned_data.
+            form_errors = form.errors
+            if self.can_delete and self._should_delete_form(form):
+                continue
+            self._errors.append(form_errors)
         try:
             if (self.validate_max and
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \

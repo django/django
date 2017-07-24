@@ -597,6 +597,7 @@ class FormsFormsetTestCase(SimpleTestCase):
              'form-MIN_NUM_FORMS': 0, 'form-MAX_NUM_FORMS': 1})
 
         self.assertTrue(p.is_valid())
+        self.assertEqual(p._errors, [])
         self.assertEqual(len(p.deleted_forms), 1)
 
     def test_formsets_with_ordering(self):
