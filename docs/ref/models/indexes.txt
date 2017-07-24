@@ -63,9 +63,9 @@ allows constructing indexes on mathematical operations.
         As a result, you can't use functions like :class:`~.functions.Concat`
         in a database index. If you do use such a function you'll get an error
         when applying a migration saying this:
-    
+
         .. code-block:: text
-    
+
             ERROR:  functions in index expression must be marked IMMUTABLE
 
     :MySQL:

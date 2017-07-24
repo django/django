@@ -1795,6 +1795,9 @@ class SchemaTests(TransactionTestCase):
     def test_func_index(self):
         func_index = Index(fields=[Lower('title').desc()], name='lorem_ipsum_idx')
         with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+            editor.add_index(Book, func_index)
             sql = func_index.create_sql(Book, editor)
 
         sql = sql.upper()
@@ -1804,22 +1807,9 @@ class SchemaTests(TransactionTestCase):
 
         with connection.schema_editor() as editor:
             sql = func_index.remove_sql(Book, editor)
-
-        sql = sql.upper()
-        self.assertIn('LOREM_IPSUM_IDX', sql)
-
-    def test_func_index_source_field(self):
-        func_index = Index(fields=[ExtractMonth('pub_date')], name='lorem_ipsum_idx')
-        with connection.schema_editor() as editor:
-            sql = func_index.create_sql(Book, editor)
-
-        sql = sql.upper()
-        self.assertIn('MONTH', sql)
-        self.assertIn('PUB_DATE', sql)
-        self.assertIn('LOREM_IPSUM_IDX', sql)
-
-        with connection.schema_editor() as editor:
-            sql = func_index.remove_sql(Book, editor)
+            editor.remove_index(Book, func_index)
+            editor.delete_model(Book)
+            editor.delete_model(Author)
 
         sql = sql.upper()
         self.assertIn('LOREM_IPSUM_IDX', sql)
