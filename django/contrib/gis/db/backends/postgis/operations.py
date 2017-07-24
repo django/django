@@ -5,10 +5,12 @@ from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.contrib.gis.db.models import GeometryField, RasterField
 from django.contrib.gis.gdal import GDALRaster
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
+from django.db.models import Func, Value
 from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
@@ -77,26 +79,18 @@ class PostGISOperator(SpatialOperator):
         return template_params
 
 
-class PostGISDistanceOperator(PostGISOperator):
-    sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %(value)s'
+class ST_Polygon(Func):
+    function = 'ST_Polygon'
 
-    def as_sql(self, connection, lookup, template_params, sql_params):
-        if not lookup.lhs.output_field.geography and lookup.lhs.output_field.geodetic(connection):
-            template_params = self.check_raster(lookup, template_params)
-            sql_template = self.sql_template
-            if len(lookup.rhs_params) == 2 and lookup.rhs_params[-1] == 'spheroid':
-                template_params.update({
-                    'op': self.op,
-                    'func': connection.ops.spatial_function_name('DistanceSpheroid'),
-                })
-                sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s) %(op)s %(value)s'
-                # Using DistanceSpheroid requires the spheroid of the field as
-                # a parameter.
-                sql_params.insert(1, lookup.lhs.output_field.spheroid(connection))
-            else:
-                template_params.update({'op': self.op, 'func': connection.ops.spatial_function_name('DistanceSphere')})
-            return sql_template % template_params, sql_params
-        return super().as_sql(connection, lookup, template_params, sql_params)
+    def __init__(self, expr):
+        super().__init__(expr)
+        expr = self.source_expressions[0]
+        if isinstance(expr, Value) and not expr._output_field_or_none:
+            self.source_expressions[0] = Value(expr.value, output_field=RasterField(srid=expr.value.srid))
+
+    @cached_property
+    def output_field(self):
+        return GeometryField(srid=self.source_expressions[0].field.srid)
 
 
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
@@ -134,10 +128,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'touches': PostGISOperator(func='ST_Touches', raster=BILATERAL),
         'within': PostGISOperator(func='ST_Within', raster=BILATERAL),
         'dwithin': PostGISOperator(func='ST_DWithin', geography=True, raster=BILATERAL),
-        'distance_gt': PostGISDistanceOperator(func='ST_Distance', op='>', geography=True),
-        'distance_gte': PostGISDistanceOperator(func='ST_Distance', op='>=', geography=True),
-        'distance_lt': PostGISDistanceOperator(func='ST_Distance', op='<', geography=True),
-        'distance_lte': PostGISDistanceOperator(func='ST_Distance', op='<=', geography=True),
     }
 
     unsupported_functions = set()
@@ -375,3 +365,19 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     def parse_raster(self, value):
         """Convert a PostGIS HEX String into a dict readable by GDALRaster."""
         return from_pgraster(value)
+
+    def distance_expr_for_lookup(self, lhs, rhs, **kwargs):
+        return super().distance_expr_for_lookup(
+            self._normalize_distance_lookup_arg(lhs),
+            self._normalize_distance_lookup_arg(rhs),
+            **kwargs
+        )
+
+    @staticmethod
+    def _normalize_distance_lookup_arg(arg):
+        is_raster = (
+            arg.field.geom_type == 'RASTER'
+            if hasattr(arg, 'field') else
+            isinstance(arg, GDALRaster)
+        )
+        return ST_Polygon(arg) if is_raster else arg

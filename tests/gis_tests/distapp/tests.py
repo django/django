@@ -1,5 +1,5 @@
 from django.contrib.gis.db.models.functions import (
-    Area, Distance, Length, Perimeter, Transform,
+    Area, Distance, Intersection, Length, Perimeter, Transform,
 )
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
@@ -205,6 +205,13 @@ class DistanceTest(TestCase):
                 point__distance_lte=(hobart.point, F('radius') * 70, 'spheroid'),
             ).order_by('name')
             self.assertEqual(self.get_names(qs), ['Canberra', 'Hobart', 'Melbourne'])
+
+        # With a complex geometry expression
+        self.assertFalse(SouthTexasCity.objects.filter(point__distance_gt=(Intersection('point', 'point'), 0)))
+        self.assertEqual(
+            SouthTexasCity.objects.filter(point__distance_lte=(Intersection('point', 'point'), 0)).count(),
+            SouthTexasCity.objects.count(),
+        )
 
 
 '''
