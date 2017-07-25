@@ -110,7 +110,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
 
                 try:
                     data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                        Model._meta.default_manager.db_manager(using).get_by_natural_key(natural_key).pk
+                        default_manager.db_manager(using).get_by_natural_key(natural_key).pk
                     )
                 except Model.DoesNotExist:
                     pass
