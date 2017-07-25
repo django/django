@@ -40,6 +40,7 @@ def get_changelist_args(modeladmin, **kwargs):
         kwargs.pop('list_display_links', m.list_display_links),
         kwargs.pop('list_filter', m.list_filter),
         kwargs.pop('date_hierarchy', m.date_hierarchy),
+        kwargs.pop('approximate_date_hierarchy', m.approximate_date_hierarchy),
         kwargs.pop('search_fields', m.search_fields),
         kwargs.pop('list_select_related', m.list_select_related),
         kwargs.pop('list_per_page', m.list_per_page),

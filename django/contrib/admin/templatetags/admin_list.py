@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import datetime
 import warnings
 
+from django.contrib.admin import ApproximateWith
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, get_fields_from_path,
@@ -356,22 +357,40 @@ def date_hierarchy(cl):
         year_lookup = cl.params.get(year_field)
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
+        approximate = cl.approximate_date_hierarchy
 
         def link(filters):
             return cl.get_query_string(filters, [field_generic])
+
+        def minmax(qs):
+            date_range = qs.aggregate(first=models.Min(field_name),
+                                      last=models.Max(field_name))
+            return date_range['first'], date_range['last']
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level
             date_range = cl.queryset.aggregate(first=models.Min(field_name),
                                                last=models.Max(field_name))
-            if date_range['first'] and date_range['last']:
-                if date_range['first'].year == date_range['last'].year:
-                    year_lookup = date_range['first'].year
-                    if date_range['first'].month == date_range['last'].month:
-                        month_lookup = date_range['first'].month
+
+            min_date, max_date = minmax(cl.queryset)
+            if min_date and max_date:
+                if min_date.year == max_date.year:
+                    year_lookup = min_date.year
+                    if min_date.month == max_date.month:
+                        month_lookup = min_date.month
 
         if year_lookup and month_lookup and day_lookup:
-            day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
+            qs = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
+            if approximate >= ApproximateWith.DAYS:
+                min_date, max_date = minmax(qs)
+                if min_date is None:
+                   days = []
+                else:
+                    days = [datetime.date(int(year_lookup), int(month_lookup), d)
+                            for d in range(min_date.day, max_date.day + 1)]
+            else:
+                days = getattr(qs, dates_or_datetimes)(field_name, 'day')
+
             return {
                 'show': True,
                 'back': {
@@ -395,8 +414,17 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.queryset.filter(**{year_field: year_lookup})
-            months = getattr(months, dates_or_datetimes)(field_name, 'month')
+            qs = cl.queryset.filter(**{year_field: year_lookup})
+            if approximate >= ApproximateWith.MONTHS:
+                min_date, max_date = minmax(qs)
+                if min_date is None:
+                    months = []
+                else:
+                    months = [datetime.date(int(year_lookup), m, 1)
+                              for m in range(min_date.month, max_date.month + 1)]
+
+            else:
+                months = getattr(qs, dates_or_datetimes)(field_name, 'month')
             return {
                 'show': True,
                 'back': {
@@ -409,7 +437,15 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year')
+            if approximate >= ApproximateWith.YEARS:
+                min_date, max_date = minmax(cl.queryset)
+                if min_date is None:
+                    years = []
+                else:
+                    years = [datetime.date(y, 1, 1)
+                             for y in range(min_date.year, max_date.year + 1)]
+            else:
+                years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{

@@ -298,8 +298,8 @@ class ListFiltersTests(TestCase):
         return ChangeList(
             request, model, modeladmin.list_display,
             modeladmin.list_display_links, modeladmin.list_filter,
-            modeladmin.date_hierarchy, modeladmin.search_fields,
-            modeladmin.list_select_related, modeladmin.list_per_page,
+            modeladmin.date_hierarchy, modeladmin.approximate_date_hierarchy,
+            modeladmin.search_fields, modeladmin.list_select_related, modeladmin.list_per_page,
             modeladmin.list_max_show_all, modeladmin.list_editable, modeladmin,
         )
 

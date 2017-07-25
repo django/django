@@ -530,6 +530,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         errors.extend(self._check_list_editable(admin_obj))
         errors.extend(self._check_search_fields(admin_obj))
         errors.extend(self._check_date_hierarchy(admin_obj))
+        errors.extend(self._check_approximate_date_hierarchy(admin_obj))
         return errors
 
     def _check_save_as(self, obj):
@@ -540,6 +541,25 @@ class ModelAdminChecks(BaseModelAdminChecks):
                            obj=obj, id='admin.E101')
         else:
             return []
+
+    def _check_approximate_date_hierarchy(self, obj):
+        from django.contrib.admin import ApproximateWith
+        appropriate_values = {
+            ApproximateWith.NONE, ApproximateWith.DAYS, ApproximateWith.MONTHS,
+            ApproximateWith.YEARS,
+        }
+        if obj.approximate_date_hierarchy not in appropriate_values:
+            return [checks.Error(
+                "The value of 'approximate_date_hierarchy' must be ApproximateWith.NONE, "
+                "ApproximateWith.YEARS, ApproximateWith.MONTHS, or ApproximateWith.DAYS, not %r." % (
+                    obj.approximate_date_hierarchy,
+                ),
+                obj=obj,
+                id='admin.E129',
+            )]
+        else:
+           return []
+
 
     def _check_save_on_top(self, obj):
         """ Check save_on_top is a boolean. """

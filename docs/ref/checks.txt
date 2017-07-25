@@ -576,6 +576,9 @@ with the admin site:
   which does not refer to a Field.
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
+  * **admin.E129**: The value of 'approximate_date_hierarchy' must be
+  ApproximateWith.NONE, ApproximateWith.YEARS, ApproximateWith.MONTHS, or
+  ApproximateWith.DAYS.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~

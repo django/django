@@ -744,8 +744,17 @@ class DateHierarchyCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin, ValidationTestModel,
             "The value of 'date_hierarchy' must be a DateField or DateTimeField.",
-            'admin.E128'
-        )
+            'admin.E128')
+
+    def test_approximate_date_hierarchy(self):
+        class IncorrectApproximateModelAdmin(ModelAdmin):
+            approximate_date_hierarchy = 7
+
+        self.assertIsInvalid(
+            IncorrectApproximateModelAdmin, ValidationTestModel,
+            "The value of 'approximate_date_hierarchy' must be ApproximateWith.NONE, "
+            "ApproximateWith.YEARS, ApproximateWith.MONTHS, or ApproximateWith.DAYS, not 7.",
+            'admin.E129')
 
 
 class OrderingCheckTests(CheckTestCase):

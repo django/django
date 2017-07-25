@@ -185,6 +185,9 @@ Minor features
 
 * JavaScript slug generation now supports Romanian characters.
 
+* The :attr:`ModelAdmin.approximate_date_hierarchy <django.contrib.admin.ModelAdmin.approximate_date_hierarchy>`
+  option was added to speed up the changelist for large tables.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

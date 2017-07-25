@@ -233,6 +233,27 @@ subclass::
         to its documentation for some caveats when time zone support is
         enabled (:setting:`USE_TZ = True <USE_TZ>`).
 
+.. attribute:: ModelAdmin.approximate_date_hierarchy
+
+    .. versionadded:: 1.9
+
+    When using ``date_hierarchy``, in order to calculate the dates to show,
+    Django does a query that can be very slow for large tables. The
+    ``approximate_date_hierarchy`` option can be used to bypass this query by
+    assuming that every date between the minimum and maximum dates has results.
+
+    Valid values:
+      - ``admin.ApproximateWith.NONE``. The default, only shows dates that
+        actually have results.
+      - ``admin.ApproximateWith.DAYS``. Use the approximate query for days,
+        months, and years.
+      - ``admin.ApproximateWith.MONTHS``. Use the approximate query for years
+        and months, but switch to the exact method once a year and a month
+        have been selected.
+      - ``admin.ApproximateWith.YEARS``. Use the approximate query for years,
+        but switch to the exact method once a year has been selected.
+
+
 .. attribute:: ModelAdmin.empty_value_display
 
     This attribute overrides the default display value for record's fields that

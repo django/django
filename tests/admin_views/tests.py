@@ -44,7 +44,7 @@ from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 
 from . import customadmin
-from .admin import CityAdmin, site, site2
+from .admin import CityAdmin, site, site2, PodcastAdmin
 from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
@@ -5332,7 +5332,7 @@ class ValidXHTMLTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls', USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
-class DateHierarchyTests(TestCase):
+class DateHierarchyTestBase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -5340,6 +5340,7 @@ class DateHierarchyTests(TestCase):
 
     def setUp(self):
         self.client.force_login(self.superuser)
+        self.url = reverse('admin:admin_views_podcast_changelist')
 
     def assert_non_localized_year(self, response, year):
         """
@@ -5347,26 +5348,25 @@ class DateHierarchyTests(TestCase):
         """
         self.assertNotContains(response, formats.number_format(year))
 
-    def assert_contains_year_link(self, response, date):
-        self.assertContains(response, '?release_date__year=%d"' % (date.year,))
 
-    def assert_contains_month_link(self, response, date):
-        self.assertContains(
-            response, '?release_date__month=%d&amp;release_date__year=%d"' % (
-                date.month, date.year))
+    def _year_link(self, date):
+        return '?release_date__year=%d"' % (date.year,)
 
-    def assert_contains_day_link(self, response, date):
-        self.assertContains(
-            response, '?release_date__day=%d&amp;'
-            'release_date__month=%d&amp;release_date__year=%d"' % (
-                date.day, date.month, date.year))
+    def _month_link(self, date):
+        return '?release_date__month=%d&amp;release_date__year=%d"' % (
+            date.month, date.year)
 
+    def _day_link(self, date):
+        return '?release_date__day=%d&amp;'\
+               'release_date__month=%d&amp;release_date__year=%d"' % (
+                   date.day, date.month, date.year)
+
+class DateHierarchyTests(DateHierarchyTestBase):
     def test_empty(self):
         """
         No date hierarchy links display with empty changelist.
         """
-        response = self.client.get(
-            reverse('admin:admin_views_podcast_changelist'))
+        response = self.client.get(self.url)
         self.assertNotContains(response, 'release_date__year=')
         self.assertNotContains(response, 'release_date__month=')
         self.assertNotContains(response, 'release_date__day=')
@@ -5377,9 +5377,8 @@ class DateHierarchyTests(TestCase):
         """
         DATE = datetime.date(2000, 6, 30)
         Podcast.objects.create(release_date=DATE)
-        url = reverse('admin:admin_views_podcast_changelist')
-        response = self.client.get(url)
-        self.assert_contains_day_link(response, DATE)
+        response = self.client.get(self.url)
+        self.assertContains(response, self._day_link(DATE))
         self.assert_non_localized_year(response, 2000)
 
     def test_within_month(self):
@@ -5391,10 +5390,10 @@ class DateHierarchyTests(TestCase):
                  datetime.date(2000, 6, 3))
         for date in DATES:
             Podcast.objects.create(release_date=date)
-        url = reverse('admin:admin_views_podcast_changelist')
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         for date in DATES:
-            self.assert_contains_day_link(response, date)
+            self.assertContains(response, self._day_link(date))
+        self.assertNotContains(response, self._day_link(datetime.date(2000, 6, 16)))
         self.assert_non_localized_year(response, 2000)
 
     def test_within_year(self):
@@ -5406,12 +5405,12 @@ class DateHierarchyTests(TestCase):
                  datetime.date(2000, 5, 3))
         for date in DATES:
             Podcast.objects.create(release_date=date)
-        url = reverse('admin:admin_views_podcast_changelist')
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         # no day-level links
         self.assertNotContains(response, 'release_date__day=')
         for date in DATES:
-            self.assert_contains_month_link(response, date)
+            self.assertContains(response, self._month_link(date))
+        self.assertNotContains(response, self._month_link(datetime.date(2000, 2, 1)))
         self.assert_non_localized_year(response, 2000)
 
     def test_multiple_years(self):
@@ -5423,30 +5422,28 @@ class DateHierarchyTests(TestCase):
                  datetime.date(2005, 5, 3))
         for date in DATES:
             Podcast.objects.create(release_date=date)
-        response = self.client.get(
-            reverse('admin:admin_views_podcast_changelist'))
+        response = self.client.get(self.url)
         # no day/month-level links
         self.assertNotContains(response, 'release_date__day=')
         self.assertNotContains(response, 'release_date__month=')
         for date in DATES:
-            self.assert_contains_year_link(response, date)
+            self.assertContains(response, self._year_link(date))
+        self.assertNotContains(response, self._year_link(datetime.date(2002, 1, 1)))
+
 
         # and make sure GET parameters still behave correctly
         for date in DATES:
-            url = '%s?release_date__year=%d' % (
-                  reverse('admin:admin_views_podcast_changelist'),
-                  date.year)
+            url = '%s?release_date__year=%d' % (self.url, date.year)
             response = self.client.get(url)
-            self.assert_contains_month_link(response, date)
+            self.assertContains(response, self._month_link(date))
             self.assert_non_localized_year(response, 2000)
             self.assert_non_localized_year(response, 2003)
             self.assert_non_localized_year(response, 2005)
 
             url = '%s?release_date__year=%d&release_date__month=%d' % (
-                  reverse('admin:admin_views_podcast_changelist'),
-                  date.year, date.month)
+                self.url, date.year, date.month)
             response = self.client.get(url)
-            self.assert_contains_day_link(response, date)
+            self.assertContains(response, self._day_link(date))
             self.assert_non_localized_year(response, 2000)
             self.assert_non_localized_year(response, 2003)
             self.assert_non_localized_year(response, 2005)
@@ -5470,6 +5467,57 @@ class DateHierarchyTests(TestCase):
                 self.assertContains(response, link)
             else:
                 self.assertNotContains(response, link)
+
+
+class ApproximateDateHierarchyTests(DateHierarchyTestBase):
+    def tearDown(self):
+        PodcastAdmin.approximate_date_hierarchy = False
+
+    def test_approximate_day(self):
+        DATES = (datetime.date(2000, 6, 30),
+                 datetime.date(2000, 6, 3))
+        for date in DATES:
+            Podcast.objects.create(release_date=date)
+
+        PodcastAdmin.approximate_date_hierarchy = 3
+        response = self.client.get(self.url)
+        for date in DATES:
+            self.assertContains(response, self._day_link(date))
+        self.assertContains(response, self._day_link(datetime.date(2000, 6, 16)))
+
+        PodcastAdmin.approximate_date_hierarchy = 2
+        response = self.client.get(self.url)
+        self.assertNotContains(response, self._day_link(datetime.date(2000, 6, 16)))
+
+    def test_approximate_month(self):
+        DATES = (datetime.date(2000, 1, 30),
+                 datetime.date(2000, 5, 3))
+        for date in DATES:
+            Podcast.objects.create(release_date=date)
+
+        PodcastAdmin.approximate_date_hierarchy = 2
+        response = self.client.get(self.url)
+        for date in DATES:
+            self.assertContains(response, self._month_link(date))
+        self.assertContains(response, self._month_link(datetime.date(2000, 2, 1)))
+
+        PodcastAdmin.approximate_date_hierarchy = 1
+        response = self.client.get(self.url)
+        for date in DATES:
+            self.assertContains(response, self._month_link(date))
+        self.assertNotContains(response, self._month_link(datetime.date(2000, 2, 1)))
+
+    def test_approximate_year(self):
+        DATES = (datetime.date(2001, 1, 30),
+                 datetime.date(2005, 5, 3))
+        for date in DATES:
+            Podcast.objects.create(release_date=date)
+
+        PodcastAdmin.approximate_date_hierarchy = 1
+        response = self.client.get(self.url)
+        for date in DATES:
+            self.assertContains(response, self._year_link(date))
+        self.assertContains(response, self._year_link(datetime.date(2002, 1, 1)))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
