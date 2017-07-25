@@ -7,9 +7,9 @@ from unittest import mock
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model, F, Value
+from django.db.models import Model
 from django.db.models.deletion import CASCADE, PROTECT
-from django.db.models.expressions import OrderBy
+from django.db.models.expressions import F, OrderBy, Value
 from django.db.models.fields import (
     AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
     CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
