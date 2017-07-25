@@ -7,7 +7,7 @@ from unittest import mock
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model
+from django.db.models import Model, F, Value
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
     AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
@@ -17,7 +17,7 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.db.models.functions import ExtractMonth, Lower
+from django.db.models.functions import Lower
 from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
@@ -1809,6 +1809,31 @@ class SchemaTests(TransactionTestCase):
             sql = func_index.remove_sql(Book, editor)
             editor.remove_index(Book, func_index)
             editor.delete_model(Book)
+            editor.delete_model(Author)
+
+        sql = sql.upper()
+        self.assertIn('LOREM_IPSUM_IDX', sql)
+
+    def test_func_index_math_expression(self):
+        func_index = Index(fields=[F('height') / (F('weight') + Value(5))], name='lorem_ipsum_idx')
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_index(Author, func_index)
+            sql = func_index.create_sql(Author, editor)
+
+        sql = sql.upper()
+        self.assertTrue(
+            sql.index('HEIGHT') <
+            sql.index('/') <
+            sql.index('WEIGHT') <
+            sql.index('+') <
+            sql.index('5')
+        )
+        self.assertIn('LOREM_IPSUM_IDX', sql)
+
+        with connection.schema_editor() as editor:
+            sql = func_index.remove_sql(Author, editor)
+            editor.remove_index(Author, func_index)
             editor.delete_model(Author)
 
         sql = sql.upper()
