@@ -18,9 +18,7 @@ from django.db.models.functions import (
 )
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
-from django.test import (
-    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
-)
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from .models import (
@@ -339,12 +337,14 @@ class BasicExpressionsTests(TestCase):
         queryset = Employee.objects.filter(firstname__iexact=F('lastname'))
         self.assertQuerysetEqual(queryset, ["<Employee: Test test>"])
 
-    @skipIfDBFeature('has_case_insensitive_like')
     def test_ticket_16731_startswith_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
         e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
         e3 = Employee.objects.create(firstname="Jack", lastname="jackson")
-        self.assertSequenceEqual(Employee.objects.filter(lastname__startswith=F('firstname')), [e2])
+        self.assertSequenceEqual(
+            Employee.objects.filter(lastname__startswith=F('firstname')),
+            [e2, e3] if connection.features.has_case_insensitive_like else [e2]
+        )
         qs = Employee.objects.filter(lastname__istartswith=F('firstname')).order_by('pk')
         self.assertSequenceEqual(qs, [e2, e3])
 

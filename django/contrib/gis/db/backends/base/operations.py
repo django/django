@@ -1,3 +1,6 @@
+from django.contrib.gis.db.models.functions import Distance
+
+
 class BaseSpatialOperations:
     # Quick booleans for the type of this spatial backend, and
     # an attribute for the spatial database version tuple (if applicable)
@@ -113,3 +116,5 @@ class BaseSpatialOperations:
 
     def spatial_ref_sys(self):
         raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method')
+
+    distance_expr_for_lookup = staticmethod(Distance)

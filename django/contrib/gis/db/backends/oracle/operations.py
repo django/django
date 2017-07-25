@@ -26,10 +26,6 @@ class SDOOperator(SpatialOperator):
     sql_template = "%(func)s(%(lhs)s, %(rhs)s) = 'TRUE'"
 
 
-class SDODistance(SpatialOperator):
-    sql_template = "SDO_GEOM.SDO_DISTANCE(%%(lhs)s, %%(rhs)s, %s) %%(op)s %%(value)s" % DEFAULT_TOLERANCE
-
-
 class SDODWithin(SpatialOperator):
     sql_template = "SDO_WITHIN_DISTANCE(%(lhs)s, %(rhs)s, %%s) = 'TRUE'"
 
@@ -104,10 +100,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'relate': SDORelate(),  # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches': SDOOperator(func='SDO_TOUCH'),
         'within': SDOOperator(func='SDO_INSIDE'),
-        'distance_gt': SDODistance(op='>'),
-        'distance_gte': SDODistance(op='>='),
-        'distance_lt': SDODistance(op='<'),
-        'distance_lte': SDODistance(op='<='),
         'dwithin': SDODWithin(),
     }
 
