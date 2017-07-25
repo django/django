@@ -179,6 +179,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ls = fromstr('LINESTRING(0 0, 1 1, 5 5)')
         self.assertEqual(ls, ls.wkt)
         self.assertNotEqual(p, 'bar')
+        self.assertEqual(p, 'POINT(5.0 23.0)')
         # Error shouldn't be raise on equivalence testing with
         # an invalid type.
         for g in (p, ls):
@@ -1321,6 +1322,24 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 '</gml:Point>'
             ),
         )
+
+    def test_from_ewkt(self):
+        self.assertEqual(GEOSGeometry.from_ewkt('SRID=1;POINT(1 1)'), Point(1, 1, srid=1))
+        self.assertEqual(GEOSGeometry.from_ewkt('POINT(1 1)'), Point(1, 1))
+
+    def test_from_ewkt_empty_string(self):
+        msg = 'Expected WKT but got an empty string.'
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('')
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('SRID=1;')
+
+    def test_from_ewkt_invalid_srid(self):
+        msg = 'EWKT has invalid SRID part.'
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('SRUD=1;POINT(1 1)')
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('SRID=WGS84;POINT(1 1)')
 
     def test_normalize(self):
         g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
