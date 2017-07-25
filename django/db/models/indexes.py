@@ -1,7 +1,7 @@
 import hashlib
 
 from django.db.models import F
-from django.db.models.expressions import BaseExpression, Expression
+from django.db.models.expressions import Expression
 from django.db.models.sql.query import ExpressionIndexQuery
 from django.utils.encoding import force_bytes
 
@@ -63,19 +63,15 @@ class Index:
         supports_expression_indexes = connection.features.supports_expression_indexes
         for column_expression in self.expressions:
             if not supports_expression_indexes:
-                exps = [column_expression]
-                for exp in exps:
-                    if isinstance(exp, Expression):
-                        raise ExpressionIndexNotSupported(
-                            (
-                                'Not creating expression index:\n'
-                                '   {expression}\n'
-                                'Expression indexes are not supported on {vendor}.'
-                            ).format(expression=column_expression, vendor=connection.vendor),
-                        )
-
-                    if isinstance(exp, BaseExpression):
-                        exps.extend(exp.get_source_expressions())
+                if (hasattr(column_expression, 'flatten') and
+                        any(isinstance(expr, Expression) for expr in column_expression.flatten())):
+                    raise ExpressionIndexNotSupported(
+                        (
+                            'Not creating expression index:\n'
+                            '   {expression}\n'
+                            'Expression indexes are not supported on {vendor}.'
+                        ).format(expression=column_expression, vendor=connection.vendor),
+                    )
 
             expression = column_expression.resolve_expression(query)
             column_sql, params = compiler.compile(expression)

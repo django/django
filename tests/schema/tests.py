@@ -9,6 +9,7 @@ from django.db import (
 )
 from django.db.models import Model, F, Value
 from django.db.models.deletion import CASCADE, PROTECT
+from django.db.models.expressions import OrderBy
 from django.db.models.fields import (
     AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
     CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
@@ -1854,6 +1855,10 @@ class SchemaTests(TransactionTestCase):
         indexes = [
             Index(fields=[Lower('name')], name='dolor_idx'),
             Index(fields=[Lower('name').desc()], name='dolor_idx'),
+            Index(
+                fields=[OrderBy(OrderBy(Lower(Lower(F('name')), descending=True), descending=False))],
+                name='dolor_idx'
+            ),
             Index(fields=['height', Lower('name').asc()], name='dolor_idx'),
         ]
 

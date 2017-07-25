@@ -322,7 +322,7 @@ class BaseExpression:
         """
         yield self
         for expr in self.get_source_expressions():
-            if expr:
+            if expr and hasattr(expr, 'flatten'):
                 yield from expr.flatten()
 
     def __eq__(self, other):
