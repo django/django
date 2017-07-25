@@ -71,6 +71,11 @@ allows constructing indexes on mathematical operations.
     :MySQL:
         MySQL doesn't support expression indexes as of version 5.7.
 
+    :SQLite3:
+        "*The ability to index expressions was added to SQLite with version
+        3.9.0 (2015-10-14)*" --- `SQLite3 documentation
+        <https://sqlite.org/expridx.html#compatibility>`_.
+
     :Oracle:
         Oracle Database requires "*that any schema-level or package-level
         PL/SQL function that the index expression invokes is deterministic

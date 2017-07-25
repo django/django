@@ -70,7 +70,7 @@ class Index:
                         'Not creating expression index:\n'
                         '   {expression}\n'
                         'Expression indexes are not supported on {vendor}.'
-                    ).format(expression=column_expression, vendor=connection.vendor),
+                    ).format(expression=column_expression, vendor=connection.display_name),
                 )
 
             expression = column_expression.resolve_expression(query)

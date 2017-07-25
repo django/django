@@ -41,6 +41,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return Database.sqlite_version_info >= (3, 3, 0)
 
     @cached_property
+    def supports_expression_indexes(self):
+        return Database.sqlite_version_info >= (3, 9, 0)
+
+    @cached_property
     def can_release_savepoints(self):
         return self.uses_savepoints
 
