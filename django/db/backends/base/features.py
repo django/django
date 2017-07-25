@@ -235,6 +235,9 @@ class BaseDatabaseFeatures:
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
 
+    # Does the backend support indexes on expressions?
+    supports_expression_indexes = True
+
     def __init__(self, connection):
         self.connection = connection
 

@@ -1,10 +1,15 @@
 import hashlib
 
 from django.db.models import F
+from django.db.models.expressions import BaseExpression, Expression
 from django.db.models.sql.query import ExpressionIndexQuery
 from django.utils.encoding import force_bytes
 
 __all__ = ['Index']
+
+
+class ExpressionIndexNotSupported(Exception):
+    pass
 
 
 class Index:
@@ -55,7 +60,23 @@ class Index:
         compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
 
         columns = []
+        supports_expression_indexes = connection.features.supports_expression_indexes
         for column_expression in self.expressions:
+            if not supports_expression_indexes:
+                exps = [column_expression]
+                for exp in exps:
+                    if isinstance(exp, Expression):
+                        raise ExpressionIndexNotSupported(
+                            (
+                                'Not creating expression index:\n'
+                                '   {expression}\n'
+                                'Expression indexes are not supported on {vendor}.'
+                            ).format(expression=column_expression, vendor=connection.vendor),
+                        )
+
+                    if isinstance(exp, BaseExpression):
+                        exps.extend(exp.get_source_expressions())
+
             expression = column_expression.resolve_expression(query)
             column_sql, params = compiler.compile(expression)
             params = tuple(map(schema_editor.quote_value, params))
