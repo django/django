@@ -33,7 +33,7 @@ IGNORED_PARAMS = (
 
 class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
-                 list_filter, date_hierarchy, search_fields, list_select_related,
+                 list_filter, date_hierarchy, approximate_date_hierarchy, search_fields, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin):
         self.model = model
         self.opts = model._meta
@@ -43,6 +43,7 @@ class ChangeList:
         self.list_display_links = list_display_links
         self.list_filter = list_filter
         self.date_hierarchy = date_hierarchy
+        self.approximate_date_hierarchy = approximate_date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related
         self.list_per_page = list_per_page

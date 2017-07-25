@@ -52,6 +52,15 @@ TO_FIELD_VAR = '_to_field'
 
 HORIZONTAL, VERTICAL = 1, 2
 
+class ApproximateWith(object):
+    """
+    Constants to be used with approximate_date_hierarchy.
+    """
+    NONE = 0
+    YEARS = 1
+    MONTHS = 2
+    DAYS = 3
+
 
 def get_content_type_for_model(obj):
     # Since this module gets imported in the application's root package,
@@ -499,6 +508,7 @@ class ModelAdmin(BaseModelAdmin):
     list_editable = ()
     search_fields = ()
     date_hierarchy = None
+    approximate_date_hierarchy = ApproximateWith.NONE
     save_as = False
     save_as_continue = True
     save_on_top = False
@@ -1539,7 +1549,8 @@ class ModelAdmin(BaseModelAdmin):
             cl = ChangeList(
                 request, self.model, list_display,
                 list_display_links, list_filter, self.date_hierarchy,
-                search_fields, list_select_related, self.list_per_page,
+                self.approximate_date_hierarchy, search_fields,
+                list_select_related, self.list_per_page,
                 self.list_max_show_all, self.list_editable, self,
             )
         except IncorrectLookupParameters:
