@@ -8,7 +8,7 @@ from django.utils.encoding import force_bytes
 __all__ = ['Index']
 
 
-class ExpressionIndexNotSupported(Exception):
+class ExpressionIndexNotSupported(ValueError):
     pass
 
 
@@ -160,7 +160,7 @@ class Index:
         self.check_name()
 
     def __repr__(self):
-        return "<%s: fields='%s'>" % (self.__class__.__name__, ', '.join(self.fields))
+        return "<%s: fields='%s'>" % (self.__class__.__name__, ', '.join(map(str, self.fields)))
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())

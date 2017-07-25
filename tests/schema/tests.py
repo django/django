@@ -1792,6 +1792,7 @@ class SchemaTests(TransactionTestCase):
         assertion = self.assertIn if connection.features.supports_index_on_text_field else self.assertNotIn
         assertion('text_field', self.get_indexes(AuthorTextFieldWithIndex._meta.db_table))
 
+    @skipUnlessDBFeature('supports_expression_indexes')
     def test_func_index(self):
         func_index = Index(fields=[Lower('title').desc()], name='lorem_ipsum_idx')
         with connection.schema_editor() as editor:
@@ -1814,6 +1815,7 @@ class SchemaTests(TransactionTestCase):
         sql = sql.upper()
         self.assertIn('LOREM_IPSUM_IDX', sql)
 
+    @skipUnlessDBFeature('supports_expression_indexes')
     def test_func_index_math_expression(self):
         func_index = Index(fields=[F('height') / (F('weight') + Value(5))], name='lorem_ipsum_idx')
         with connection.schema_editor() as editor:
@@ -1839,11 +1841,40 @@ class SchemaTests(TransactionTestCase):
         sql = sql.upper()
         self.assertIn('LOREM_IPSUM_IDX', sql)
 
+    @skipUnlessDBFeature('supports_expression_indexes')
     def test_func_index_invalid_field(self):
         func_index = Index(fields=[Lower('blub')], name='dolor_idx')
-        with self.assertRaisesMessage(ValueError, "Invalid reference to field 'blub' on model 'schema.Book'"):
+        with self.assertRaisesMessage(ValueError, "Invalid reference to field 'blub' on model 'schema.Author'"):
             with connection.schema_editor() as editor:
-                func_index.create_sql(Book, editor)
+                editor.add_index(Author, func_index)
+                func_index.create_sql(Author, editor)
+
+    @skipIfDBFeature('supports_expression_indexes')
+    def test_no_expression_index_support_forbidden(self):
+        indexes = [
+            Index(fields=[Lower('name')], name='dolor_idx'),
+            Index(fields=[Lower('name').desc()], name='dolor_idx'),
+            Index(fields=['height', Lower('name').asc()], name='dolor_idx'),
+        ]
+
+        for index in indexes:
+            with self.subTest(index=index):
+                with self.assertRaisesRegex(ValueError, "Not creating expression index:.*"):
+                    with connection.schema_editor() as editor:
+                        index.create_sql(Author, editor)
+
+    @skipIfDBFeature('supports_expression_indexes')
+    def test_no_expression_index_support_accepted(self):
+        indexes = [
+            Index(fields=['name'], name='dolor_idx'),
+            Index(fields=['-name'], name='dolor_idx'),
+            Index(fields=['height', F('name').desc()], name='dolor_idx'),
+        ]
+
+        for index in indexes:
+            with self.subTest(index=index):
+                with connection.schema_editor() as editor:
+                    index.create_sql(Author, editor)
 
     def test_primary_key(self):
         """
