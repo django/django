@@ -3,7 +3,7 @@ from django.core import serializers
 from django.db import connection
 from django.test import TestCase
 
-from .models import FKDataNaturalKey, NaturalKeyAnchor, Foo
+from .models import FKDataNaturalKey, Foo, NaturalKeyAnchor
 from .tests import register_tests
 
 
@@ -77,10 +77,10 @@ class NaturalKeyTestCase(TestCase):
 
         Test to prove that deserializer get `pk` via `natural key` and update object instead of create new one.
         """
-        management.call_command("loaddata", "fixtures1.json", verbosity=0)
+        management.call_command("loaddata", "fixture.json", verbosity=0)
         self.assertEqual(Foo.objects.all().count(), 1)
 
-        management.call_command("loaddata", "fixtures1.json", verbosity=0)
+        management.call_command("loaddata", "fixture.json", verbosity=0)
         self.assertEqual(Foo.objects.all().count(), 1)
 
 
