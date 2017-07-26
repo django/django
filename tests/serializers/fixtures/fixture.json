@@ -1,0 +1,8 @@
+[
+  {
+    "model": "serializers.Foo",
+    "fields": {
+      "name": "barfoo"
+    }
+  }
+]

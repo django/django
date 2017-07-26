@@ -1,8 +1,9 @@
+from django.core import management
 from django.core import serializers
 from django.db import connection
 from django.test import TestCase
 
-from .models import FKDataNaturalKey, NaturalKeyAnchor
+from .models import FKDataNaturalKey, NaturalKeyAnchor, Foo
 from .tests import register_tests
 
 
@@ -65,6 +66,22 @@ def natural_key_test(format, self):
     self.assertEqual(books[0].object.pk, adrian.pk)
     self.assertEqual(books[1].object.title, book2['title'])
     self.assertIsNone(books[1].object.pk)
+
+
+class NaturalKeyTestCase(TestCase):
+    fixtures = ['fixture.json']
+
+    def test_natural_key_if_pk_does_not_exist(self):
+        """
+        Verify that deserializers do not ignore natural keys when primary key has a default value (ticket `28385`).
+
+        Test to prove that deserializer get `pk` via `natural key` and update object instead of create new one.
+        """
+        management.call_command("loaddata", "fixtures1.json", verbosity=0)
+        self.assertEqual(Foo.objects.all().count(), 1)
+
+        management.call_command("loaddata", "fixtures1.json", verbosity=0)
+        self.assertEqual(Foo.objects.all().count(), 1)
 
 
 # Dynamically register tests for each serializer
