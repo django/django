@@ -1,5 +1,4 @@
-from django.core import management
-from django.core import serializers
+from django.core import management, serializers
 from django.db import connection
 from django.test import TestCase
 
