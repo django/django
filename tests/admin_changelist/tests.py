@@ -8,6 +8,8 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.fields import Field
+from django.db.models.lookups import Contains
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
@@ -434,15 +436,19 @@ class ChangeListTests(TestCase):
         Concert.objects.create(name='Woodstock', group=band)
 
         m = ConcertAdmin(Concert, custom_site)
-        m.search_fields = ['!group__name__endswith']
+        m.search_fields = ['!group__name__cc']
 
-        request = self.factory.get('/concert/', data={SEARCH_VAR: 'Hype'})
-        cl = ChangeList(request, Concert, *get_changelist_args(m))
-        self.assertEqual(cl.queryset.count(), 1)
+        try:
+            Field.register_lookup(Contains, 'cc')
+            request = self.factory.get('/concert/', data={SEARCH_VAR: 'Hype'})
+            cl = ChangeList(request, Concert, *get_changelist_args(m))
+            self.assertEqual(cl.queryset.count(), 1)
 
-        request = self.factory.get('/concert/', data={SEARCH_VAR: 'The'})
-        cl = ChangeList(request, Concert, *get_changelist_args(m))
-        self.assertEqual(cl.queryset.count(), 0)
+            request = self.factory.get('/concert/', data={SEARCH_VAR: 'Woodstock'})
+            cl = ChangeList(request, Concert, *get_changelist_args(m))
+            self.assertEqual(cl.queryset.count(), 0)
+        finally:
+            Field._unregister_lookup(Contains, 'cc')
 
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
