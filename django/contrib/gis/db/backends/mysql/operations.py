@@ -4,6 +4,7 @@ from django.contrib.gis.db.backends.base.operations import (
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import GeometryField, aggregates
+from django.contrib.gis.measure import Distance
 from django.db.backends.mysql.operations import DatabaseOperations
 from django.utils.functional import cached_property
 
@@ -86,6 +87,19 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         return f.geom_type
+
+    def get_distance(self, f, value, lookup_type):
+        value = value[0]
+        if isinstance(value, Distance):
+            if f.geodetic(self.connection):
+                raise ValueError(
+                    'Only numeric values of degree units are allowed on '
+                    'geodetic distance queries.'
+                )
+            dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
+        else:
+            dist_param = value
+        return [dist_param]
 
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)

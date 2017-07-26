@@ -606,7 +606,7 @@ PostGIS equivalent::
 Distance Lookups
 ================
 
-*Availability*: PostGIS, Oracle, SpatiaLite, PGRaster (Native)
+*Availability*: PostGIS, Oracle, MySQL, SpatiaLite, PGRaster (Native)
 
 For an overview on performing distance queries, please refer to
 the :ref:`distance queries introduction <distance-queries>`.
@@ -638,6 +638,10 @@ spheroid based lookups.
 .. versionadded:: 1.11
 
     Support for the ``'spheroid'`` option on SQLite was added.
+
+.. versionadded:: 2.0
+
+    MySQL support was added.
 
 .. fieldlookup:: distance_gt
 

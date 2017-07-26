@@ -65,8 +65,8 @@ Minor features
 * Added MySQL support for the
   :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` function,
   :class:`~django.contrib.gis.db.models.functions.GeoHash` function,
-  :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
-  :lookup:`isvalid` lookup.
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function,
+  :lookup:`isvalid` lookup, and :ref:`distance lookups <distance-lookups>`.
 
 * Added the :class:`~django.contrib.gis.db.models.functions.Azimuth` and
   :class:`~django.contrib.gis.db.models.functions.LineLocatePoint` functions,
