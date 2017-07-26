@@ -32,6 +32,10 @@ class BaseDatabaseOperations:
         'intersection': 'INTERSECT',
         'difference': 'EXCEPT',
     }
+    # Mapping of Field.get_internal_type() (typically the model field's class
+    # name) to the data type to use for the Cast() function, if different from
+    # DatabaseWrapper.data_types.
+    cast_data_types = {}
 
     def __init__(self, connection):
         self.connection = connection
