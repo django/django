@@ -73,6 +73,9 @@ class DistanceTest(TestCase):
                 with self.subTest(dist=dist, qs=qs):
                     self.assertEqual(tx_cities, self.get_names(qs))
 
+        # With a complex geometry expression
+        self.assertFalse(SouthTexasCity.objects.exclude(point__dwithin=(Union('point', 'point'), 0)))
+
         # Now performing the `dwithin` queries on a geodetic coordinate system.
         for dist in au_dists:
             with self.subTest(dist=dist):
