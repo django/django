@@ -29,7 +29,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     unionagg = 'GUnion'
 
     from_text = 'GeomFromText'
-    from_wkb = 'GeomFromWKB'
     select = 'AsText(%s)'
 
     gis_operators = {

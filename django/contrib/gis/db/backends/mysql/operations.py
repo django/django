@@ -37,10 +37,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         return self.geom_func_prefix + 'AsText(%s)'
 
     @cached_property
-    def from_wkb(self):
-        return self.geom_func_prefix + 'GeomFromWKB'
-
-    @cached_property
     def from_text(self):
         return self.geom_func_prefix + 'GeomFromText'
 

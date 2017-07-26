@@ -38,7 +38,6 @@ class BaseSpatialOperations:
 
     # Constructors
     from_text = False
-    from_wkb = False
 
     # Default conversion functions for aggregates; will be overridden if implemented
     # for the spatial backend.
