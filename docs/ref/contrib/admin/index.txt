@@ -1231,12 +1231,20 @@ subclass::
         available for MySQL.
 
     ``!``
+
+        .. versionadded:: 2.0
+
         Use the '!' operator to specify your own field lookup. For example
         if ``search_fields`` is set to ``['!first_name__exact']`` and
         user searches for ``John Lennon``, Django will do the equivalent
         of this SQL ``WHERE`` clause::
 
             WHERE (first_name = 'John Lennon')
+
+        .. note::
+
+           Allows for tuning search queries for specific database engines
+           like avoiding unnecessary type conversions in PostgreSQL.
 
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate

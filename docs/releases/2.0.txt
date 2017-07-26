@@ -41,7 +41,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`ModelAdmin.search_fields<django.contrib.admin.ModelAdmin.search_fields>`
+  added `!` operator for skipping automatic field lookups.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
