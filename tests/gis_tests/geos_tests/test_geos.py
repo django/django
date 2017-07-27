@@ -678,7 +678,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
             self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
 
-        with mock.patch('django.contrib.gis.geos.libgeos.geos_version_info', lambda: {'version': '3.4.9'}):
+        with mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: b'3.4.9'):
             with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
                 MultiLineString().closed
 
@@ -1296,22 +1296,18 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             '{"coordinates": [[[0, 0], [0, 1], [1, 1], [0, 0]]], "type": "Polygon"}',
         )
 
-    def test_geos_version(self):
-        """Testing the GEOS version regular expression."""
-        from django.contrib.gis.geos.libgeos import version_regex
-        versions = [('3.0.0rc4-CAPI-1.3.3', '3.0.0', '1.3.3'),
-                    ('3.0.0-CAPI-1.4.1', '3.0.0', '1.4.1'),
-                    ('3.4.0dev-CAPI-1.8.0', '3.4.0', '1.8.0'),
-                    ('3.4.0dev-CAPI-1.8.0 r0', '3.4.0', '1.8.0')]
-        for v_init, v_geos, v_capi in versions:
-            m = version_regex.match(v_init)
-            self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
-            self.assertEqual(m.group('version'), v_geos)
-            self.assertEqual(m.group('capi_version'), v_capi)
-
     def test_geos_version_tuple(self):
-        with mock.patch('django.contrib.gis.geos.libgeos.geos_version_info', lambda: {'version': '3.4.9'}):
-            self.assertEqual(geos_version_tuple(), (3, 4, 9))
+        versions = (
+            (b'3.0.0rc4-CAPI-1.3.3', (3, 0, 0)),
+            (b'3.0.0-CAPI-1.4.1', (3, 0, 0)),
+            (b'3.4.0dev-CAPI-1.8.0', (3, 4, 0)),
+            (b'3.4.0dev-CAPI-1.8.0 r0', (3, 4, 0)),
+            (b'3.6.2-CAPI-1.10.2 4d2925d6', (3, 6, 2)),
+        )
+        for version_string, version_tuple in versions:
+            with self.subTest(version_string=version_string):
+                with mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: version_string):
+                    self.assertEqual(geos_version_tuple(), version_tuple)
 
     def test_from_gml(self):
         self.assertEqual(
