@@ -501,23 +501,6 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         initial = [{'choice': 'Calexico', 'votes': 100}, {'choice': 'Fergie', 'votes': 900}]
         formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
-        form_output = []
-
-        for form in formset.forms:
-            form_output.append(form.as_ul())
-
-        self.assertHTMLEqual(
-            '\n'.join(form_output),
-            """<li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
-<li>Votes: <input type="number" name="choices-0-votes" value="100" /></li>
-<li>Delete: <input type="checkbox" name="choices-0-DELETE" /></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="Fergie" /></li>
-<li>Votes: <input type="number" name="choices-1-votes" value="900" /></li>
-<li>Delete: <input type="checkbox" name="choices-1-DELETE" /></li>
-<li>Choice: <input type="text" name="choices-2-choice" /></li>
-<li>Votes: <input type="number" name="choices-2-votes" /></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE" /></li>"""
-        )
 
         # To delete something, we just need to set that form's special delete field to
         # 'on'. Let's go ahead and delete Fergie.
