@@ -19,7 +19,7 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.models.functions import Lower
-from django.db.models.indexes import Index
+from django.db.models.indexes import Index, ExpressionIndexNotSupported
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -1864,7 +1864,7 @@ class SchemaTests(TransactionTestCase):
 
         for index in indexes:
             with self.subTest(index=index):
-                with self.assertRaisesRegex(ValueError, "Not creating expression index:.*"):
+                with self.assertRaisesMessage(ExpressionIndexNotSupported, "Not creating expression index:"):
                     with connection.schema_editor() as editor:
                         index.create_sql(Author, editor)
 

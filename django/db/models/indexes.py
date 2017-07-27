@@ -1,5 +1,6 @@
 import hashlib
 
+from django.db import NotSupportedError
 from django.db.models import F
 from django.db.models.expressions import Expression
 from django.db.models.sql.query import ExpressionIndexQuery
@@ -8,7 +9,7 @@ from django.utils.encoding import force_bytes
 __all__ = ['Index']
 
 
-class ExpressionIndexNotSupported(ValueError):
+class ExpressionIndexNotSupported(NotSupportedError):
     pass
 
 

@@ -59,7 +59,7 @@ allows constructing indexes on mathematical operations.
     :PostgreSQL:
         PostgreSQL requires that "*all functions and operators used in an index
         definition must be 'immutable'*" --- `PostgreSQL documentation
-        <https://www.postgresql.org/docs/9.6/static/sql-createindex.html#AEN80057>`_.
+        <https://www.postgresql.org/docs/current/static/sql-createindex.html#AEN80057>`_.
         As a result, you can't use functions like :class:`~.functions.Concat`
         in a database index. If you do use such a function you'll get an error
         when applying a migration saying this:
