@@ -19,6 +19,10 @@ class CastTests(TestCase):
         numbers = Author.objects.annotate(cast_string=Cast('age', models.CharField(max_length=255)),)
         self.assertEqual(numbers.get().cast_string, '1')
 
+    def test_cast_to_char_field_without_max_length(self):
+        numbers = Author.objects.annotate(cast_string=Cast('age', models.CharField()))
+        self.assertEqual(numbers.get().cast_string, '1')
+
     # Silence "Truncated incorrect CHAR(1) value: 'Bob'".
     @ignore_warnings(module='django.db.backends.mysql.base')
     @skipUnlessDBFeature('supports_cast_with_precision')

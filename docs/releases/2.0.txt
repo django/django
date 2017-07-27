@@ -348,6 +348,12 @@ backends.
   requires that the arguments to ``OF`` be columns rather than tables, set
   ``DatabaseFeatures.select_for_update_of_column = True``.
 
+* Third-party database backends should add a
+  ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the
+  database data type that will be used in the
+  :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
+  ``max_length`` argument isn't provided.
+
 Dropped support for Oracle 11.2
 -------------------------------
 

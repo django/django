@@ -5,6 +5,8 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'varchar'
+
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):

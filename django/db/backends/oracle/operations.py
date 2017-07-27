@@ -49,6 +49,9 @@ BEGIN
 END;
 /"""
 
+    # Oracle doesn't support string without precision; use the max string size.
+    cast_char_field_without_max_length = 'NVARCHAR2(2000)'
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_operators['difference'] = 'MINUS'
