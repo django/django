@@ -67,19 +67,33 @@ def natural_key_test(format, self):
     self.assertIsNone(books[1].object.pk)
 
 
-class NaturalKeyTestCase(TestCase):
-    fixtures = ['fixture.json']
+class NaturalKeyWhenPkHasDefaultValueTestCase(TestCase):
+    """
+    Verify that deserializer does not ignore natural keys when primary key has a default value (ticket `28385`).
 
-    def test_natural_key_if_pk_does_not_exist(self):
+    Test to prove that deserializer gets `pk` via `natural key` and updates object instead of create new one.
+    """
+
+    fixtures = ['fixture.json', 'fixture.xml']
+
+    def test_natural_key_json(self):
         """
-        Verify that deserializer does not ignore natural keys when primary key has a default value (ticket `28385`).
-
-        Test to prove that deserializer gets `pk` via `natural key` and updates object instead of create new one.
+        Test fixture based on `json` format.
         """
         management.call_command("loaddata", "fixture.json", verbosity=0)
         self.assertEqual(Foo.objects.all().count(), 1)
 
         management.call_command("loaddata", "fixture.json", verbosity=0)
+        self.assertEqual(Foo.objects.all().count(), 1)
+
+    def test_natural_key_xml(self):
+        """
+        Test fixture based on `xml` format.
+        """
+        management.call_command("loaddata", "fixture.xml", verbosity=0)
+        self.assertEqual(Foo.objects.all().count(), 1)
+
+        management.call_command("loaddata", "fixture.xml", verbosity=0)
         self.assertEqual(Foo.objects.all().count(), 1)
 
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object model="serializers.Foo">
+        <field type="CharField" name="name">barfoo</field>
+    </object>
+</django-objects>

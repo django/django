@@ -100,20 +100,6 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                 data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get('pk'))
             except Exception as e:
                 raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
-        else:
-            # If the model instance doesn't have a primary key and the model supports
-            # natural keys, try to retrieve it from the database.
-            default_manager = Model._meta.default_manager
-
-            if hasattr(default_manager, 'get_by_natural_key') and hasattr(Model, 'natural_key'):
-                natural_key = Model(**d['fields']).natural_key()
-
-                try:
-                    data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                        default_manager.db_manager(using).get_by_natural_key(*natural_key).pk
-                    )
-                except Model.DoesNotExist:
-                    pass
 
         m2m_data = {}
 
@@ -182,7 +168,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                 except Exception as e:
                     raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
 
-        obj = Model(**data)
+        obj = base.build_instance(Model, data, using)
         yield base.DeserializedObject(obj, m2m_data)
 
 
