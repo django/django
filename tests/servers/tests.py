@@ -4,15 +4,20 @@ Tests for django.core.servers.
 import errno
 import os
 import socket
+import sys
 from http.client import HTTPConnection
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from django.test import LiveServerTestCase, override_settings
-from django.test.utils import captured_stdout
 
 from .models import Person
+
+try:
+    from http.client import RemoteDisconnected
+except ImportError:  # Python 3.4
+    from http.client import BadStatusLine as RemoteDisconnected
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
@@ -54,17 +59,31 @@ class LiveServerAddress(LiveServerBase):
 class LiveServerViews(LiveServerBase):
     def test_protocol(self):
         """Launched server serves with HTTP 1.1."""
-        with captured_stdout() as debug_output:
-            conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port)
-            try:
-                conn.set_debuglevel(1)
-                conn.request('GET', '/example_view/', headers={"Connection": "keep-alive"})
-                conn.getresponse().read()
-                conn.request('GET', '/example_view/', headers={"Connection": "close"})
-                conn.getresponse()
-            finally:
-                conn.close()
-        self.assertEqual(debug_output.getvalue().count("reply: 'HTTP/1.1 200 OK"), 2)
+        with self.urlopen('/example_view/') as f:
+            self.assertEqual(f.version, 11)
+
+    @override_settings(MIDDLEWARE=[])
+    def test_closes_connection_without_content_length(self):
+        """
+        The server doesn't support keep-alive because Python's http.server
+        module that it uses hangs if a Content-Length header isn't set (for
+        example, if CommonMiddleware isn't enabled or if the response is a
+        StreamingHttpResponse) (#28440 / https://bugs.python.org/issue31076).
+        """
+        conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port, timeout=1)
+        try:
+            conn.request('GET', '/example_view/', headers={'Connection': 'keep-alive'})
+            response = conn.getresponse().read()
+            conn.request('GET', '/example_view/', headers={'Connection': 'close'})
+            with self.assertRaises(RemoteDisconnected, msg='Server did not close the connection'):
+                try:
+                    conn.getresponse()
+                except ConnectionAbortedError:
+                    if sys.platform == 'win32':
+                        self.skipTest('Ignore nondeterministic failure on Windows.')
+        finally:
+            conn.close()
+        self.assertEqual(response, b'example view')
 
     def test_404(self):
         with self.assertRaises(HTTPError) as err:
