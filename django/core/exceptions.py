@@ -103,9 +103,6 @@ class ValidationError(Exception):
         of ValidationError with its `error_list` or `error_dict` attribute set.
         """
 
-        # PY2 can't pickle naive exception: http://bugs.python.org/issue1692335.
-        super().__init__(message, code, params)
-
         if isinstance(message, ValidationError):
             if hasattr(message, 'error_dict'):
                 message = message.error_dict
