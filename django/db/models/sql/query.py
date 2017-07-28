@@ -789,7 +789,7 @@ class Query:
         relabelling any references to them in select columns and the where
         clause.
         """
-        assert set(change_map).intersection(set(change_map.values())) == set()
+        assert set(change_map).isdisjoint(change_map.values())
 
         # 1. Update references in "select" (normal columns plus aliases),
         # "group by" and "where".
@@ -975,7 +975,7 @@ class Query:
 
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
-        used_joins = []
+        used_joins = set()
         if len(lookups) == 0:
             lookups = ['exact']
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
@@ -987,12 +987,11 @@ class Query:
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
-            used_joins = [k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)]
+            used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}
         elif isinstance(value, (list, tuple)):
             # The items of the iterable may be expressions and therefore need
             # to be resolved independently.
             processed_values = []
-            used_joins = set()
             for sub_value in value:
                 if hasattr(sub_value, 'resolve_expression'):
                     pre_joins = self.alias_refcount.copy()
@@ -1172,7 +1171,7 @@ class Query:
 
         # Update used_joins before trimming since they are reused to determine
         # which joins could be later promoted to INNER.
-        used_joins = set(used_joins).union(set(join_list))
+        used_joins.update(join_list)
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
         if can_reuse is not None:
             can_reuse.update(join_list)

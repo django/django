@@ -67,7 +67,7 @@ class CheckRegistry:
 
         if tags is not None:
             checks = [check for check in checks
-                      if hasattr(check, 'tags') and set(check.tags) & set(tags)]
+                      if hasattr(check, 'tags') and not set(check.tags).isdisjoint(tags)]
         else:
             # By default, 'database'-tagged checks are not run as they do more
             # than mere static code analysis.
