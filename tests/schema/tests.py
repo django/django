@@ -19,7 +19,7 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.models.functions import Lower
-from django.db.models.indexes import Index, ExpressionIndexNotSupported
+from django.db.models.indexes import ExpressionIndexNotSupported, Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,

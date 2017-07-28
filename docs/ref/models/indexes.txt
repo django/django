@@ -37,7 +37,9 @@ desired.
 
 By default, indexes are created with an ascending order for each column. To
 define an index with a descending order for a column, add a hyphen before the
-field's name. When using an expression, use ``.desc()`` for descending order.
+field's name. When using an expression, use
+:meth:`~django.db.models.Expression.asc()` for ascending (default) and
+:meth:`~django.db.models.Expression.desc()` for descending order.
 
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
