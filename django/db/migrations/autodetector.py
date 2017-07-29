@@ -451,12 +451,12 @@ class MigrationAutodetector:
         """
         self.renamed_models = {}
         self.renamed_models_rel = {}
-        added_models = set(self.new_model_keys) - set(self.old_model_keys)
+        added_models = set(self.new_model_keys).difference(self.old_model_keys)
         for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
             model_fields_def = self.only_relation_agnostic_fields(model_state.fields)
 
-            removed_models = set(self.old_model_keys) - set(self.new_model_keys)
+            removed_models = set(self.old_model_keys).difference(self.new_model_keys)
             for rem_app_label, rem_model_name in removed_models:
                 if rem_app_label == app_label:
                     rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
@@ -642,7 +642,7 @@ class MigrationAutodetector:
         models it's safe to skip all the pointless field stuff and just chuck
         out an operation.
         """
-        added = set(self.new_proxy_keys) - set(self.old_proxy_keys)
+        added = set(self.new_proxy_keys).difference(self.old_proxy_keys)
         for app_label, model_name in sorted(added):
             model_state = self.to_state.models[app_label, model_name]
             assert model_state.options.get("proxy")
@@ -764,7 +764,7 @@ class MigrationAutodetector:
 
     def generate_deleted_proxies(self):
         """Make DeleteModel options for proxy models."""
-        deleted = set(self.old_proxy_keys) - set(self.new_proxy_keys)
+        deleted = set(self.old_proxy_keys).difference(self.new_proxy_keys)
         for app_label, model_name in sorted(deleted):
             model_state = self.from_state.models[app_label, model_name]
             assert model_state.options.get("proxy")

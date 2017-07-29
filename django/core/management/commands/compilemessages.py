@@ -85,7 +85,7 @@ class Command(BaseCommand):
 
         # Account for excluded locales
         locales = locale or all_locales
-        locales = set(locales) - set(exclude)
+        locales = set(locales).difference(exclude)
 
         for basedir in basedirs:
             if locales:

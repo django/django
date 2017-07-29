@@ -122,7 +122,7 @@ def call_command(command_name, *args, **options):
     # Raise an error if any unknown options were passed.
     stealth_options = set(command.base_stealth_options + command.stealth_options)
     dest_parameters = {action.dest for action in parser._actions}
-    valid_options = dest_parameters | stealth_options | set(opt_mapping)
+    valid_options = (dest_parameters | stealth_options).union(opt_mapping)
     unknown_options = set(options) - valid_options
     if unknown_options:
         raise TypeError(

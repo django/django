@@ -258,8 +258,8 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             )
 
             # make sure opts.fields doesn't specify an invalid field
-            none_model_fields = [k for k, v in fields.items() if not v]
-            missing_fields = set(none_model_fields) - set(new_class.declared_fields)
+            none_model_fields = {k for k, v in fields.items() if not v}
+            missing_fields = none_model_fields.difference(new_class.declared_fields)
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
                 message = message % (', '.join(missing_fields),
@@ -682,8 +682,8 @@ class BaseModelFormSet(BaseFormSet):
         for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
-            all_unique_checks = all_unique_checks.union(set(unique_checks))
-            all_date_checks = all_date_checks.union(set(date_checks))
+            all_unique_checks.update(unique_checks)
+            all_date_checks.update(date_checks)
 
         errors = []
         # Do each of the unique checks (unique and unique_together)
