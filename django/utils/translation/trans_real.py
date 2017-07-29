@@ -400,7 +400,7 @@ def check_for_language(lang_code):
     return False
 
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=None)
 def get_languages():
     """
     Cache of settings.LANGUAGES in an OrderedDict for easy lookups by key.
