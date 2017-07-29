@@ -14,14 +14,16 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext as _
 from django.utils.version import get_docs_version
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting. Templates are
 # read directly from the filesystem so that the error handler
 # works even if the template loader is broken.
-DEBUG_ENGINE = Engine(debug=True)
+DEBUG_ENGINE = Engine(
+    debug=True,
+    libraries={'i18n': 'django.templatetags.i18n'},
+)
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
@@ -37,6 +39,7 @@ class CallableSettingWrapper:
     * Not to break the debug page if the callable forbidding to set attributes
       (#23070).
     """
+
     def __init__(self, callable_setting):
         self._wrapped = callable_setting
 

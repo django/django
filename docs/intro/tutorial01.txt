@@ -157,7 +157,7 @@ production environment. It's intended only for use while developing. (We're in
 the business of making Web frameworks, not Web servers.)
 
 Now that the server's running, visit http://127.0.0.1:8000/ with your Web
-browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+browser. You'll see a "Congratulations!" page, with a rocket taking off.
 It worked!
 
 .. admonition:: Changing the port
