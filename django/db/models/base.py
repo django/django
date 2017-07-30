@@ -481,8 +481,8 @@ class Model(metaclass=ModelBase):
                         del kwargs[prop]
                 except (AttributeError, FieldDoesNotExist):
                     pass
-            if kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
+            for kwarg in kwargs:
+                raise TypeError("'%s' is an invalid keyword argument for this function" % kwarg)
         super().__init__()
         post_init.send(sender=cls, instance=self)
 

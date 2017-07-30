@@ -275,7 +275,8 @@ class QuerySet:
 
         qs = self._clone()
         qs.query.set_limits(k, k + 1)
-        return list(qs)[0]
+        qs._fetch_all()
+        return qs._result_cache[0]
 
     def __and__(self, other):
         self._merge_sanity_check(other)
@@ -548,17 +549,13 @@ class QuerySet:
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
-        objects = list((self if self.ordered else self.order_by('pk'))[:1])
-        if objects:
-            return objects[0]
-        return None
+        for obj in (self if self.ordered else self.order_by('pk'))[:1]:
+            return obj
 
     def last(self):
         """Return the last object of a query or None if no match is found."""
-        objects = list((self.reverse() if self.ordered else self.order_by('-pk'))[:1])
-        if objects:
-            return objects[0]
-        return None
+        for obj in (self.reverse() if self.ordered else self.order_by('-pk'))[:1]:
+            return obj
 
     def in_bulk(self, id_list=None, *, field_name='pk'):
         """
