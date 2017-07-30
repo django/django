@@ -43,9 +43,20 @@ class Tag(models.Model):
         ordering = ('name', )
 
 
+class NulledTextField(models.TextField):
+    pass
+
+
+@NulledTextField.register_lookup
+class NulledTransform(models.Transform):
+    lookup_name = 'nulled'
+    template = 'NULL'
+
+
 class Season(models.Model):
     year = models.PositiveSmallIntegerField()
     gt = models.IntegerField(null=True, blank=True)
+    nulled_text_field = NulledTextField(null=True)
 
     def __str__(self):
         return str(self.year)

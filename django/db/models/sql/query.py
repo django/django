@@ -984,7 +984,8 @@ class Query:
         if value is None:
             if lookups[-1] not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
-            return True, ['isnull'], used_joins
+            lookups[-1] = 'isnull'
+            return True, lookups, used_joins
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
