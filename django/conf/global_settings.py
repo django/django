@@ -478,6 +478,11 @@ SESSION_FILE_PATH = None
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 # Whether to hash the session_key when stored in the backend
 SESSION_STORE_KEY_HASH = True
+# Whether to allow non-hashed session keys to be loaded. Setting this to
+# 'False' bypasses the security benefit of hashing session keys. This
+# should be set to 'True' after moving session keys from unhashed to
+# hashed
+SESSION_REQUIRE_KEY_HASH = False
 
 #########
 # CACHE #

@@ -44,7 +44,11 @@ configured to store session data on your filesystem or in your cache.
 
 One-way hashes of the session_keys will be stored in the backends by
 default. You can override this by changing :setting:`SESSION_STORE_KEY_HASH`
-to False.
+to False. You must also set :setting:`SESSION_REQUIRE_KEY_HASH` to True in
+order to realize the security benefit of this change. However, you will
+probably want to keep :setting:`SESSION_REQUIRE_KEY_HASH` set to False
+until all of your non-hashed session keys have expired so that they
+will continue to be accessible.
 
 Using database-backed sessions
 ------------------------------
@@ -257,7 +261,8 @@ You can edit it multiple times.
       .. versionadded:: 2.0
 
       Returns the hashed version of the session_key or if
-      :setting:`SESSION_STORE_KEY_HASH` is False it will just return the
+      :setting:`SESSION_STORE_KEY_HASH` is False and
+      :setting:`SESSION_REQUIRE_KEY_HASH` is False it will just return the
       session_key. Pass the value of the sessionid cookie through this
       method in order to query the backend directly.
 
@@ -659,6 +664,7 @@ behavior:
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
 * :setting:`SESSION_SERIALIZER`
 * :setting:`SESSION_STORE_KEY_HASH`
+* :setting:`SESSION_REQUIRE_KEY_HASH`
 
 .. _topics-session-security:
 
@@ -682,7 +688,9 @@ session cookies from that site to be sent to ``bad.example.com``.
 
 Changing :setting:`SESSION_STORE_KEY_HASH` to False could allow an attacker
 to takeover a session even if they only had access to a backend backup or
-read-only access to the backend.
+read-only access to the backend. If :setting:`SESSION_REQUIRE_KEY_HASH` is
+set to False, an attacker could trivially bypass the security benefits of
+having :setting:`SESSION_STORE_KEY_HASH` set to True.
 
 Technical details
 =================

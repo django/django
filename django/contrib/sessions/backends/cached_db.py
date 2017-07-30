@@ -55,8 +55,8 @@ class SessionStore(DBStore):
         return data
 
     def exists(self, session_key):
-        session_key = self.get_session_key_hash(session_key)
-        if session_key and (self.cache_key_prefix + session_key) in self._cache:
+        hashed_session_key = self.get_session_key_hash(session_key)
+        if hashed_session_key and (self.cache_key_prefix + hashed_session_key) in self._cache:
             return True
         return super().exists(session_key)
 

@@ -22,8 +22,9 @@ VALID_KEY_CHARS = string.ascii_lowercase + string.digits
 # the delimiter cannot be a member of VALID_KEY_CHARS or a file directory
 # component. It can only be a single character.
 SESSION_KEY_DELIMITER = '$'
+
 # this should be available in hashlib
-SESSION_HASHING_ALGORITHM = 'md5'
+SESSION_HASHING_ALGORITHM = 'sha256'
 
 
 class CreateError(Exception):
@@ -157,7 +158,13 @@ class SessionBase:
 
     def _get_session_key_part(self, session_key):
         "Return a string of the session_key key."
-        return session_key.split(SESSION_KEY_DELIMITER)[1]
+        try:
+            algorithm, key = session_key.split(SESSION_KEY_DELIMITER)
+            if algorithm == SESSION_HASHING_ALGORITHM:
+                return key
+            return None
+        except ValueError:
+            return None
 
     def _is_hashed(self, session_key):
         "Return True when the session_key is hashed in the backend."
@@ -173,9 +180,10 @@ class SessionBase:
         worry about speed and salting since the session_key is already high entropy.
         """
         if session_key is not None:
-            if self._is_hashed(session_key):
-                return self._session_hashing_algorithm(
-                    self._get_session_key_part(session_key).encode('ascii')).hexdigest()
+            if self._is_hashed(session_key) or settings.SESSION_REQUIRE_KEY_HASH:
+                key = self._get_session_key_part(session_key)
+                if key:
+                    return self._session_hashing_algorithm(key.encode('ascii')).hexdigest()
             return session_key
         return None
 
@@ -183,10 +191,11 @@ class SessionBase:
         "Return session key that isn't being used."
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
-            if not self.exists(session_key):
+            hashed_session_key = SESSION_HASHING_ALGORITHM + SESSION_KEY_DELIMITER + session_key
+            if not self.exists(session_key) and not self.exists(hashed_session_key):
                 break
         if settings.SESSION_STORE_KEY_HASH:
-            session_key = SESSION_HASHING_ALGORITHM + SESSION_KEY_DELIMITER + session_key
+            return hashed_session_key
         return session_key
 
     def _get_or_create_session_key(self):
@@ -196,9 +205,11 @@ class SessionBase:
 
     def _validate_session_key(self, key):
         """
-        Key must be truthy and at least 8 characters long. 8 characters is an
-        arbitrary lower bound for some minimal key security.
+        Key must be truthy and at least 8 characters long and in the
+        correct format if hashing is required.
         """
+        if settings.SESSION_REQUIRE_KEY_HASH:
+            return key and self._get_session_key_part(key) and len(key) >= 8
         return key and len(key) >= 8
 
     def _get_session_key(self):

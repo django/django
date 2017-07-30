@@ -3157,6 +3157,19 @@ Whether to save the session key as a one-way hash. You should only set this to
 ``False`` if you have a good reason since it can decrease the security of your
 site.
 
+.. setting:: SESSION_REQUIRE_KEY_HASH
+
+``SESSION_REQUIRE_KEY_HASH``
+------------------------------
+
+Default: ``False``
+
+Whether to require the session key to be stored and retrieved as a one-way
+hash. All security benefits of having :setting:`SESSION_STORE_KEY_HASH` set to
+``True`` will be invalidated if this is set to the default of ``False``.
+However, this default of ``False`` is useful while transitioning to the new
+one-way hashed session storage behavior in order to support legacy sessions.
+
 Sites
 =====
 

@@ -138,6 +138,13 @@ Minor features
   session key should be stored as a one-way hash. Only set this to
   False if you have an explicit reason.
 
+* Added :setting:`SESSION_REQUIRE_KEY_HASH` to determine whether the
+  session key must be hashed. This needs to be set to True in order
+  to actually see any security benefit in hashing the session keys
+  in the backend. However, you is useful to set this to False (the
+  current default) so that legacy (non-hashed) sessions still work
+  while transitioning to hashed sessions.
+
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -513,6 +520,13 @@ Miscellaneous
   before querying the backend if you currently access it directly. You can
   disable this behavior by setting :setting:`SESSION_STORE_KEY_HASH` to
   False.
+
+* :setting:`SESSION_REQUIRE_KEY_HASH` now dictates whether a session key
+  must be hashed. This is by default set to False so that legacy
+  (non-hashed) sessions will continue to work when upgrading to 2.0.
+  However, unless :setting:`SESSION_REQUIRE_KEY_HASH` is set to True, an
+  attacker could easily bypass the security benefit of hashing the
+  session keys in the backend.
 
 * The ``SessionAuthenticationMiddleware`` class is removed. It provided no
   functionality since session authentication is unconditionally enabled in

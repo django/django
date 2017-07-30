@@ -223,8 +223,10 @@ class SessionTestsMixin:
 
     def test_session_key_valid_string_saved(self):
         """Strings of length 8 and up are accepted and stored."""
-        self.session._session_key = '12345678'
-        self.assertEqual(self.session.session_key, '12345678')
+        with override_settings(SESSION_STORE_KEY_HASH=False,
+                               SESSION_REQUIRE_KEY_HASH=False):
+            self.session._session_key = '12345678'
+            self.assertEqual(self.session.session_key, '12345678')
 
     def test_session_key_is_read_only(self):
         def set_session_key(session):
@@ -518,9 +520,91 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         with self.assertRaises(self.model.DoesNotExist):
             self.model.objects.get(session_key=self.session.session_key)
 
+    def test_hashed_session_key_correct(self):
+        """
+        A session key should be stored as a sha256 hash by default.
+        """
+        # Create a session
+        self.session['y'] = 1
+        self.session.save()
+
+        hashed_session_key = self.session.get_session_key_hash(self.session.session_key)
+        self.assertEqual(len(hashed_session_key), 64)
+
+    def test_hashed_session_key_gets_session(self):
+        """
+        A session backend should be directly accessible via hashed lookup.
+        """
+        # Create a session
+        self.session['y'] = 1
+        self.session.save()
+
+        hashed_session_key = self.session.get_session_key_hash(self.session.session_key)
+        results = self.model.objects.get(session_key=hashed_session_key)
+        self.assertIsNotNone(results)
+
+
+class DatabaseSessionWithHashingNotRequiredTests(DatabaseSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_not_required(self):
+        """
+        A session backend should be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value2')
+
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=True)
+class DatabaseSessionWithHashingRequiredTests(DatabaseSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_required(self):
+        """
+        A session backend should not be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value1')
+
+    def test_session_key_invalid(self):
+        """Inproperly formated strings are not accepted."""
+        self.session._session_key = '123456789'
+        self.assertIsNone(self.session.session_key)
+
+    def test_session_key_valid_string_saved(self):
+        """Properly formatted strings are accepted and stored."""
+        self.session._session_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+
 
 @override_settings(USE_TZ=True, SESSION_STORE_KEY_HASH=True)
 class DatabaseSessionWithHashingWithTimeZoneTests(DatabaseSessionTests):
+    pass
+
+
+@override_settings(USE_TZ=True, SESSION_STORE_KEY_HASH=True,
+                   SESSION_REQUIRE_KEY_HASH=True)
+class DatabaseSessionWithHashingRequiredWithTimeZoneTests(DatabaseSessionTests):
     pass
 
 
@@ -551,6 +635,11 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
 
 @override_settings(SESSION_STORE_KEY_HASH=True)
 class CustomDatabaseSessionTestsWithHashingTests(CustomDatabaseSessionTests):
+    pass
+
+
+@override_settings(SESSION_STORE_KEY_HASH=True, SESSION_REQUIRE_KEY_HASH=True)
+class CustomDatabaseSessionTestsWithHashingRequiredTests(CustomDatabaseSessionTests):
     pass
 
 
@@ -643,8 +732,66 @@ class CacheDBSessionWithHashingTests(CacheDBSessionTests):
                             self.session.cache_key[len(CACHEDB_KEY_PREFIX):])
 
 
+class CacheDBSessionWithHashingNotRequiredTests(CacheDBSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_not_required(self):
+        """
+        A session backend should be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value2')
+
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=True)
+class CacheDBSessionWithHashingRequiredTests(CacheDBSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_required(self):
+        """
+        A session backend should not be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value1')
+
+    def test_session_key_invalid(self):
+        """Inproperly formated strings are not accepted."""
+        self.session._session_key = '123456789'
+        self.assertIsNone(self.session.session_key)
+
+    def test_session_key_valid_string_saved(self):
+        """Properly formatted strings are accepted and stored."""
+        self.session._session_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+
+
 @override_settings(SESSION_STORE_KEY_HASH=True)
 class CacheDBSessionWithTimeZoneWithHashingTests(CacheDBSessionWithTimeZoneTests):
+    pass
+
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=True)
+class CacheDBSessionWithTimeZoneWithHashingRequiredTests(CacheDBSessionWithTimeZoneWithHashingTests):
     pass
 
 
@@ -665,7 +812,8 @@ class FileSessionTests(SessionTestsMixin, TestCase):
     def tearDown(self):
         super().tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
-        shutil.rmtree(self.temp_session_store)
+        if len(os.listdir(self.temp_session_store)) > 0:
+            shutil.rmtree(self.temp_session_store)
 
     @override_settings(
         SESSION_FILE_PATH="/if/this/directory/exists/you/have/a/weird/computer")
@@ -766,6 +914,59 @@ class FileSessionWithHashingTests(FileSessionTests):
         self.assertNotEqual(file_key, self.session.session_key)
 
 
+class FileSessionWithHashingNotRequiredTests(FileSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_not_required(self):
+        """
+        A session backend should be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value2')
+
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=True)
+class FileSessionWithHashingRequiredTests(FileSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_required(self):
+        """
+        A session backend should not be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value1')
+
+    def test_session_key_invalid(self):
+        """Inproperly formated strings are not accepted."""
+        self.session._session_key = '123456789'
+        self.assertIsNone(self.session.session_key)
+
+    def test_session_key_valid_string_saved(self):
+        """Properly formatted strings are accepted and stored."""
+        self.session._session_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+
+
 @override_settings(SESSION_STORE_KEY_HASH=False)
 class CacheSessionTests(SessionTestsMixin, TestCase):
 
@@ -850,6 +1051,59 @@ class CacheSessionWithHashingTests(CacheDBSessionTests):
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
         self.assertNotEqual(self.session.session_key,
                             self.session.cache_key[len(CACHE_KEY_PREFIX):])
+
+
+class CacheSessionWithHashingNotRequiredTests(CacheSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_not_required(self):
+        """
+        A session backend should be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value2')
+
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=True)
+class CacheSessionWithHashingRequiredTests(CacheSessionWithHashingTests):
+
+    def test_insecure_bypass_when_hashing_required(self):
+        """
+        A session backend should not be directly accessible via hashed lookup.
+        """
+        # Create new session.
+        s1 = self.backend()
+        s1['test_data'] = 'value1'
+        s1.save(must_create=True)
+
+        # Login with hashed value in another context.
+        _, key = s1.session_key.split(SESSION_KEY_DELIMITER)
+        hashed_session_key = s1._session_hashing_algorithm(key.encode('ascii')).hexdigest()
+        s2 = self.backend(hashed_session_key)
+        s2['test_data'] = 'value2'
+        s2.save()
+        del s1._session_cache
+        self.assertEqual(s1.get('test_data'), 'value1')
+
+    def test_session_key_invalid(self):
+        """Inproperly formated strings are not accepted."""
+        self.session._session_key = '123456789'
+        self.assertIsNone(self.session.session_key)
+
+    def test_session_key_valid_string_saved(self):
+        """Properly formatted strings are accepted and stored."""
+        self.session._session_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
 
 
 class SessionMiddlewareTests(TestCase):
