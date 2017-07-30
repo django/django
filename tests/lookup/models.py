@@ -44,7 +44,8 @@ class Tag(models.Model):
 
 
 class NulledTextField(models.TextField):
-    pass
+    def get_prep_value(self, value):
+        return None if value == '' else value
 
 
 @NulledTextField.register_lookup

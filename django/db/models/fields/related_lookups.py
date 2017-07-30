@@ -19,6 +19,9 @@ class MultiColSource:
         return self.__class__(relabels.get(self.alias, self.alias),
                               self.targets, self.sources, self.field)
 
+    def get_lookup(self, lookup):
+        return self.output_field.get_lookup(lookup)
+
 
 def get_normalized_value(value, lhs):
     from django.db.models import Model
