@@ -672,8 +672,8 @@ class QueryTestCase(TestCase):
         # Set a one-to-one relation with an object from a different database
         alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
         msg = (
-            'Cannot assign "<UserProfile: UserProfile object (1)>": the '
-            'current database router prevents this relation.'
+            'Cannot assign "%r": the current database router prevents this '
+            'relation.' % alice_profile
         )
         with self.assertRaisesMessage(ValueError, msg):
             bob.userprofile = alice_profile
