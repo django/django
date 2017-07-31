@@ -217,7 +217,8 @@ class Query:
 
     @cached_property
     def base_table(self):
-        return list(self.alias_map)[0] if self.alias_map else None
+        for alias in self.alias_map:
+            return alias
 
     def __str__(self):
         """

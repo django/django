@@ -48,7 +48,7 @@ class MigrationQuestioner:
             elif hasattr(migrations_module, "__path__"):
                 if len(migrations_module.__path__) > 1:
                     return False
-                filenames = os.listdir(list(migrations_module.__path__)[0])
+                filenames = os.listdir(migrations_module.__path__[0])
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
     def ask_not_null_addition(self, field_name, model_name):

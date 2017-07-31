@@ -155,7 +155,7 @@ class TestFirstLast(TestCase):
             # We know that we've broken the __iter__ method, so the queryset
             # should always raise an exception.
             with self.assertRaises(IndexError):
-                IndexErrorArticle.objects.all()[0]
+                IndexErrorArticle.objects.all()[:10:2]
             with self.assertRaises(IndexError):
                 IndexErrorArticle.objects.all().first()
             with self.assertRaises(IndexError):

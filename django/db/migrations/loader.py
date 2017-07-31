@@ -156,9 +156,9 @@ class MigrationLoader:
         if key[0] in self.migrated_apps:
             try:
                 if key[1] == "__first__":
-                    return list(self.graph.root_nodes(key[0]))[0]
+                    return self.graph.root_nodes(key[0])[0]
                 else:  # "__latest__"
-                    return list(self.graph.leaf_nodes(key[0]))[0]
+                    return self.graph.leaf_nodes(key[0])[0]
             except IndexError:
                 if self.ignore_no_migrations:
                     return None
