@@ -148,7 +148,6 @@ ExtractYear.register_lookup(YearLte)
 
 
 class TruncBase(TimezoneMixin, Transform):
-    arity = 1
     kind = None
     tzinfo = None
 
