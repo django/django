@@ -4,7 +4,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
-         {% if request %} at {{ request.path_info|escape }}{% endif %}</title>
+         {% if request %} at {{ request.path_info }}{% endif %}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -106,7 +106,7 @@
 <body>
 <div id="summary">
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
-      {% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
+      {% if request %} at {{ request.path_info }}{% endif %}</h1>
   <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}</pre>
   <table class="meta">
 {% if request %}
@@ -116,7 +116,7 @@
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request.get_raw_uri|escape }}</td>
+      <td>{{ request.get_raw_uri }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -138,12 +138,12 @@
 {% if lastframe %}
     <tr>
       <th>Exception Location:</th>
-      <td>{{ lastframe.filename|escape }} in {{ lastframe.function|escape }}, line {{ lastframe.lineno }}</td>
+      <td>{{ lastframe.filename }} in {{ lastframe.function }}, line {{ lastframe.lineno }}</td>
     </tr>
 {% endif %}
     <tr>
       <th>Python Executable:</th>
-      <td>{{ sys_executable|escape }}</td>
+      <td>{{ sys_executable }}</td>
     </tr>
     <tr>
       <th>Python Version:</th>
@@ -285,7 +285,7 @@
   <div id="pastebinTraceback" class="pastebin">
     <input type="hidden" name="language" value="PythonConsole">
     <input type="hidden" name="title"
-      value="{{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}">
+      value="{{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}">
     <input type="hidden" name="source" value="Django Dpaste Agent">
     <input type="hidden" name="poster" value="Django">
     <textarea name="content" id="traceback_area" cols="140" rows="25">
@@ -293,7 +293,7 @@ Environment:
 
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.get_raw_uri|escape }}
+Request URL: {{ request.get_raw_uri }}
 {% endif %}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
@@ -322,10 +322,10 @@ The above exception ({{ frame.exc_cause }}) was the direct cause of the followin
 {% else %}
 During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:
 {% endif %}{% endif %}{% endifchanged %}
-File "{{ frame.filename|escape }}" in {{ frame.function|escape }}
-{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}{% endfor %}
+File "{{ frame.filename }}" in {{ frame.function }}
+{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line }}{% endif %}{% endfor %}
 
-Exception Type: {{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}
+Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 Exception Value: {{ exception_value|force_escape }}
 </textarea>
   <br><br>
