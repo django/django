@@ -12,7 +12,7 @@ about each item can often be found in the release notes of two versions prior.
 2.1
 ---
 
-See the :ref:`Django 1.11 release notes<deprecated-features-1.11>` for more
+See the :ref:`Django 2.0 release notes<deprecated-features-2.0>` for more
 details on these changes.
 
 * ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
@@ -59,7 +59,7 @@ details on these changes.
 2.0
 ---
 
-See the :ref:`Django 1.9 release notes<deprecated-features-1.9>` for more
+See the :ref:`Django 1.11 release notes<deprecated-features-1.11>` for more
 details on these changes.
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
@@ -153,6 +153,8 @@ details on these changes.
 * The ``django.template.loader.LoaderOrigin`` and
   ``django.template.base.StringOrigin`` aliases for
   ``django.template.base.Origin`` will be removed.
+
+.. _deprecation-removed-in-1.11:
 
 1.11
 ----
