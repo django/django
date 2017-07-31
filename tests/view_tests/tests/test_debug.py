@@ -446,6 +446,18 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
+    def test_encoding_error(self):
+        """A UnicodeError displays a portion of the problematic string."""
+        try:
+            'abcdefghijklmnὀpqrstuwxyz'.encode('ascii')
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h2>Unicode error hint</h2>', html)
+        self.assertIn('The string that could not be encoded/decoded was: ', html)
+        self.assertIn('<strong>jklmnὀpqrst</strong>', html)
+
     def test_unfrozen_importlib(self):
         """
         importlib is not a frozen app, but its loader thinks it's frozen which
