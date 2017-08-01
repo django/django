@@ -818,8 +818,8 @@ class SQLCompiler:
                 related_field_name = f.related_query_name()
                 fields_found.add(related_field_name)
 
-                _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
-                alias = joins[-1]
+                join_info = self.query.setup_joins([related_field_name], opts, root_alias)
+                alias = join_info.joins[-1]
                 from_parent = issubclass(model, opts.model) and model is not opts.model
                 klass_info = {
                     'model': model,
