@@ -436,7 +436,8 @@ if __name__ == "__main__":
     parser.add_argument(
         '--parallel', dest='parallel', nargs='?', default=0, type=int,
         const=default_test_processes(), metavar='N',
-        help='Run tests using up to N parallel processes.',
+        help='Run tests using up to N parallel processes. '
+             'Use 1 to keep stdin connected, which is required with e.g. pdb.',
     )
     parser.add_argument(
         '--tag', dest='tags', action='append',
