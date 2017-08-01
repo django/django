@@ -3,6 +3,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 import copy
+import operator
 import sys
 import warnings
 from collections import OrderedDict, deque
@@ -116,10 +117,8 @@ class ValuesListIterable(BaseIterable):
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
 
-        if not query.extra_select and not query.annotation_select:
-            for row in compiler.results_iter():
-                yield tuple(row)
-        else:
+        results = compiler.results_iter()
+        if queryset._fields:
             field_names = list(query.values_select)
             extra_names = list(query.extra_select)
             annotation_names = list(query.annotation_select)
@@ -127,15 +126,13 @@ class ValuesListIterable(BaseIterable):
             # extra(select=...) cols are always at the start of the row.
             names = extra_names + field_names + annotation_names
 
-            if queryset._fields:
+            fields = list(queryset._fields) + [f for f in annotation_names if f not in queryset._fields]
+            if fields != names:
                 # Reorder according to fields.
-                fields = list(queryset._fields) + [f for f in annotation_names if f not in queryset._fields]
-            else:
-                fields = names
-
-            for row in compiler.results_iter():
-                data = dict(zip(names, row))
-                yield tuple(data[f] for f in fields)
+                index_map = {name: idx for idx, name in enumerate(names)}
+                rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
+                results = map(rowfactory, results)
+        return results
 
 
 class FlatValuesListIterable(BaseIterable):
