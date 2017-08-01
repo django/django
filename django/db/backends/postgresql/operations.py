@@ -85,13 +85,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return lookup
 
-    def last_insert_id(self, cursor, table_name, pk_name):
-        # Use pg_get_serial_sequence to get the underlying sequence name
-        # from the table name and column name (available since PostgreSQL 8)
-        cursor.execute("SELECT CURRVAL(pg_get_serial_sequence('%s','%s'))" % (
-            self.quote_name(table_name), pk_name))
-        return cursor.fetchone()[0]
-
     def no_limit_value(self):
         return None
 
