@@ -193,15 +193,29 @@ class SessionStore(SessionBase):
     @classmethod
     def clear_expired(cls):
         storage_path = cls._get_storage_path()
-        file_prefix = settings.SESSION_COOKIE_NAME
-
         for session_file in os.listdir(storage_path):
-            if not session_file.startswith(file_prefix):
-                continue
-            session_key = session_file[len(file_prefix):]
-            session = cls(session_key)
-            # When an expired session is loaded, its file is removed, and a
-            # new file is immediately created. Prevent this by disabling
-            # the create() method.
-            session.create = lambda: None
-            session.load()
+            session_filepath = os.path.join(storage_path, session_file)
+            session_data = {}
+            try:
+                with open(session_filepath, "rb") as f:
+                    file_data = f.read()
+                # Don't fail if there is no data in the session file.
+                # We may have opened the empty placeholder file.
+                if file_data:
+                    try:
+                        session_data = cls().decode(file_data)
+                    except (EOFError, SuspiciousOperation) as e:
+                        if isinstance(e, SuspiciousOperation):
+                            logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
+                            logger.warning(str(e))
+                        cls().create()
+
+                    # Remove expired sessions.
+                    expiry_age = cls().get_expiry_age(expiry=cls()._expiry_date(session_data))
+                    if expiry_age <= 0:
+                        session_data = {}
+                        with suppress(OSError):
+                            os.unlink(session_filepath)
+            except (IOError, SuspiciousOperation) as e:
+                with suppress(OSError):
+                    os.unlink(session_filepath)
