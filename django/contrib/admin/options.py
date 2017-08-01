@@ -1602,7 +1602,7 @@ class ModelAdmin(BaseModelAdmin):
         # Handle POSTed bulk-edit data.
         if request.method == 'POST' and cl.list_editable and '_save' in request.POST:
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
+            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=cl.get_queryset(request))
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
