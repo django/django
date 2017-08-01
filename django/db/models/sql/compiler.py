@@ -1,4 +1,5 @@
 import collections
+import functools
 import re
 import warnings
 from itertools import chain
@@ -921,7 +922,20 @@ class SQLCompiler:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    converters[i] = (backend_converters + field_converters, expression)
+                    convs = []
+                    for conv in (backend_converters + field_converters):
+                        if func_supports_parameter(conv, 'context'):
+                            warnings.warn(
+                                'Remove the context parameter from %s.%s(). Support for it '
+                                'will be removed in Django 3.0.' % (
+                                    conv.__self__.__class__.__name__,
+                                    conv.__name__,
+                                ),
+                                RemovedInDjango30Warning,
+                            )
+                            conv = functools.partial(conv, context={})
+                        convs.append(conv)
+                    converters[i] = (convs, expression)
         return converters
 
     def apply_converters(self, row, converters):
@@ -929,18 +943,7 @@ class SQLCompiler:
         for pos, (convs, expression) in converters.items():
             value = row[pos]
             for converter in convs:
-                if func_supports_parameter(converter, 'context'):
-                    warnings.warn(
-                        'Remove the context parameter from %s.%s(). Support for it '
-                        'will be removed in Django 3.0.' % (
-                            converter.__self__.__class__.__name__,
-                            converter.__name__,
-                        ),
-                        RemovedInDjango30Warning,
-                    )
-                    value = converter(value, expression, self.connection, {})
-                else:
-                    value = converter(value, expression, self.connection)
+                value = converter(value, expression, self.connection)
             row[pos] = value
         return tuple(row)
 
