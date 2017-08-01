@@ -1220,15 +1220,8 @@ class RawQuerySet:
 
         try:
             model_init_names, model_init_pos, annotation_fields = self.resolve_model_init_order()
-
-            # Find out which model's fields are not present in the query.
-            skip = set()
-            for field in self.model._meta.fields:
-                if field.attname not in model_init_names:
-                    skip.add(field.attname)
-            if skip:
-                if self.model._meta.pk.attname in skip:
-                    raise InvalidQuery('Raw query must include the primary key')
+            if self.model._meta.pk.attname not in model_init_names:
+                raise InvalidQuery('Raw query must include the primary key')
             model_cls = self.model
             fields = [self.model_fields.get(c) for c in self.columns]
             converters = compiler.get_converters([
