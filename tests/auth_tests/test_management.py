@@ -22,7 +22,8 @@ from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
-    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+    Company, CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK,
+    DefaultUserWithFK, Email,
 )
 
 
@@ -462,6 +463,33 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             u = CustomUserWithFK._default_manager.get(email=email)
             self.assertEqual(u.username, email)
             self.assertEqual(u.group, group)
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.DefaultUserWithFK')
+    def test_default_user_with_fk_interactive(self):
+        new_io = StringIO()
+        company = Company.objects.create(title='SomeCompany')
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'username': 'test',
+            'email': 'test@example.com',
+            'company (company.id)': company.pk,
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            u = DefaultUserWithFK._default_manager.get(username='test')
+            self.assertEqual(u.username, 'test')
+            self.assertEqual(u.company, company)
 
         test(self)
 
