@@ -24,7 +24,7 @@ class BaseSessionManager(models.Manager):
 
 
 class AbstractBaseSession(models.Model):
-    session_key = models.CharField(_('session key'), max_length=40, primary_key=True)
+    session_key = models.CharField(_('session key'), max_length=70, primary_key=True)
     session_data = models.TextField(_('session data'))
     expire_date = models.DateTimeField(_('expire date'), db_index=True)
 
