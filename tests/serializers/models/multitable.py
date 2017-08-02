@@ -8,11 +8,9 @@ class PersonManager(models.Manager):
 
 
 class Person(models.Model):
-
-    objects = PersonManager()
-
-    lastname = models.CharField(max_length=20)
     firstname = models.CharField(max_length=20)
+    lastname = models.CharField(max_length=20)
+    objects = PersonManager()
 
     def natural_key(self):
         return (self.lastname, self.firstname)
@@ -22,7 +20,6 @@ class Person(models.Model):
 
 
 class Customer(Person):
-
     cnum = models.IntegerField()
 
     def data(self):
@@ -30,7 +27,6 @@ class Customer(Person):
 
 
 class PremiumCustomer(Customer):
-
     level = models.IntegerField()
 
     def data(self):
@@ -38,7 +34,6 @@ class PremiumCustomer(Customer):
 
 
 class Employee(Person):
-
     enum = models.IntegerField()
 
     def data(self):

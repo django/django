@@ -71,18 +71,18 @@ def natural_key_test(format, self):
 
 
 def natural_pk_mti_test(format, self):
-    x1 = Person.objects.create(firstname="alphonse", lastname="allais")
-    x2 = Customer.objects.create(firstname="alban", lastname="berg", cnum=1885)
-    x3 = PremiumCustomer.objects.create(firstname="vladimir", lastname="jankelevitch", cnum=1903, level=81)
-    x4 = Employee.objects.create(firstname="daksiputra", lastname="panini", enum=-400)
+    x1 = Person.objects.create(firstname='alphonse', lastname='allais')
+    x2 = Customer.objects.create(firstname='alban', lastname='berg', cnum=1885)
+    x3 = PremiumCustomer.objects.create(firstname='vladimir', lastname='jankelevitch', cnum=1903, level=81)
+    x4 = Employee.objects.create(firstname='daksiputra', lastname='panini', enum=-400)
 
     self.assertEqual(len(Person.objects.all()), 4)
     self.assertEqual(len(Customer.objects.all()), 2)
     self.assertEqual(len(PremiumCustomer.objects.all()), 1)
     self.assertEqual(len(Employee.objects.all()), 1)
 
-    # test with 2 different serialization order to ensure that we are not
-    # unknowningly relying on order
+    # test with 2 different serialization orders to ensure that correctness
+    # does not accidentally rely on the order in which instances are serialized
 
     objs1 = []
     objs1.extend(Person.objects.all())
@@ -96,7 +96,7 @@ def natural_pk_mti_test(format, self):
     objs2.extend(Customer.objects.all())
     objs2.extend(PremiumCustomer.objects.all())
 
-    # we will also check that we indeed get back the same data
+    # check that roundtripping through serialization indeed returns the same data
     def get_data():
         objs = []
         objs.extend(reversed(Person.objects.all()))
