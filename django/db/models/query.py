@@ -1665,21 +1665,10 @@ class RelatedPopulator:
             ]
             self.reorder_for_init = None
         else:
-            model_init_attnames = [
-                f.attname for f in klass_info['model']._meta.concrete_fields
-            ]
-            reorder_map = []
-            for idx in select_fields:
-                field = select[idx][0].target
-                init_pos = model_init_attnames.index(field.attname)
-                reorder_map.append((init_pos, field.attname, idx))
-            reorder_map.sort()
-            self.init_list = [v[1] for v in reorder_map]
-            pos_list = [row_pos for _, _, row_pos in reorder_map]
-
-            def reorder_for_init(row):
-                return [row[row_pos] for row_pos in pos_list]
-            self.reorder_for_init = reorder_for_init
+            attname_indexes = {select[idx][0].target.attname: idx for idx in select_fields}
+            model_init_attnames = (f.attname for f in klass_info['model']._meta.concrete_fields)
+            self.init_list = [attname for attname in model_init_attnames if attname in attname_indexes]
+            self.reorder_for_init = operator.itemgetter(*[attname_indexes[attname] for attname in self.init_list])
 
         self.model_cls = klass_info['model']
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
