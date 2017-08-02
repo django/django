@@ -774,38 +774,37 @@ r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
   <h2>Traceback <span class="commands">{% if not is_email %}<a href="#" onclick="return switchPastebinFriendly(this);">
     Switch to copy-and-paste view</a></span>{% endif %}
   </h2>
-  {% autoescape off %}
   <div id="browserTraceback">
     <ul class="traceback">
       {% for frame in frames %}
         {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}
           <li><h3>
           {% if frame.exc_cause_explicit %}
-            The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
+            The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of the following exception:
           {% else %}
-            During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:
+            During handling of the above exception ({{ frame.exc_cause|force_escape }}), another exception occurred:
           {% endif %}
         </h3></li>
         {% endif %}{% endifchanged %}
         <li class="frame {{ frame.type }}">
-          <code>{{ frame.filename|escape }}</code> in <code>{{ frame.function|escape }}</code>
+          <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
 
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
               {% if frame.pre_context and not is_email %}
                 <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">
                 {% for line in frame.pre_context %}
-                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>
+                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line }}</pre></li>
                 {% endfor %}
                 </ol>
               {% endif %}
               <ol start="{{ frame.lineno }}" class="context-line">
                 <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>
-"""            """{{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
+"""            """{{ frame.context_line }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
               {% if frame.post_context and not is_email  %}
                 <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">
                   {% for line in frame.post_context %}
-                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>
+                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line }}</pre></li>
                   {% endfor %}
               </ol>
               {% endif %}
@@ -830,7 +829,7 @@ r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
               <tbody>
                 {% for var in frame.vars|dictsort:0 %}
                   <tr>
-                    <td>{{ var.0|force_escape }}</td>
+                    <td>{{ var.0 }}</td>
                     <td class="code"><pre>{{ var.1 }}</pre></td>
                   </tr>
                 {% endfor %}
@@ -841,7 +840,6 @@ r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
       {% endfor %}
     </ul>
   </div>
-  {% endautoescape %}
   <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
 {% if not is_email %}
   <div id="pastebinTraceback" class="pastebin">
@@ -887,9 +885,9 @@ In template {{ template_info.name }}, error at line {{ template_info.line }}
 
 Traceback:{% for frame in frames %}
 {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}{% if frame.exc_cause_explicit %}
-The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
+The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of the following exception:
 {% else %}
-During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:
+During handling of the above exception ({{ frame.exc_cause|force_escape }}), another exception occurred:
 {% endif %}{% endif %}{% endifchanged %}
 File "{{ frame.filename|escape }}" in {{ frame.function|escape }}
 {% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}{% endfor %}
