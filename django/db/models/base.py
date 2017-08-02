@@ -489,9 +489,11 @@ class Model(metaclass=ModelBase):
     @classmethod
     def from_db(cls, db, field_names, values):
         if len(values) != len(cls._meta.concrete_fields):
-            values = list(values)
-            values.reverse()
-            values = [values.pop() if f.attname in field_names else DEFERRED for f in cls._meta.concrete_fields]
+            values_iter = iter(values)
+            values = [
+                next(values_iter) if f.attname in field_names else DEFERRED
+                for f in cls._meta.concrete_fields
+            ]
         new = cls(*values)
         new._state.adding = False
         new._state.db = db
