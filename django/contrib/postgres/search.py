@@ -36,7 +36,7 @@ class SearchQueryField(Field):
 class SearchVectorCombinable:
     ADD = '||'
 
-    def _combine(self, other, connector, reversed, node=None):
+    def _combine(self, other, connector, reversed):
         if not isinstance(other, SearchVectorCombinable) or not self.config == other.config:
             raise TypeError('SearchVector can only be combined with other SearchVectors')
         if reversed:
@@ -96,7 +96,7 @@ class SearchQueryCombinable:
     BITAND = '&&'
     BITOR = '||'
 
-    def _combine(self, other, connector, reversed, node=None):
+    def _combine(self, other, connector, reversed):
         if not isinstance(other, SearchQueryCombinable):
             raise TypeError(
                 'SearchQuery can only be combined with other SearchQuerys, '
@@ -153,8 +153,8 @@ class SearchQuery(SearchQueryCombinable, Value):
             template = '!!({})'.format(template)
         return template, params
 
-    def _combine(self, other, connector, reversed, node=None):
-        combined = super()._combine(other, connector, reversed, node)
+    def _combine(self, other, connector, reversed):
+        combined = super()._combine(other, connector, reversed)
         combined.output_field = SearchQueryField()
         return combined
 
