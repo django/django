@@ -186,7 +186,7 @@ class AdminSite:
         """
         return request.user.is_active and request.user.is_staff
 
-    def admin_index_url(self):
+    def get_index_url(self):
         return reverse('admin:index', current_app=self.name)
 
     def admin_view(self, view, cacheable=False):
@@ -368,7 +368,7 @@ class AdminSite:
         """
         if request.method == 'GET' and self.has_permission(request):
             # Already logged-in, redirect to admin index
-            index_path = self.admin_index_url()
+            index_path = self.get_index_url()
             return HttpResponseRedirect(index_path)
 
         from django.contrib.auth.views import LoginView
@@ -384,7 +384,7 @@ class AdminSite:
         )
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
-            context[REDIRECT_FIELD_NAME] = self.admin_index_url()
+            context[REDIRECT_FIELD_NAME] = self.get_index_url()
         context.update(extra_context or {})
 
         defaults = {
@@ -431,10 +431,10 @@ class AdminSite:
             }
             if perms.get('change'):
                 with suppress(NoReverseMatch):
-                    model_dict['admin_url'] = model_admin.admin_changelist_url()
+                    model_dict['admin_url'] = model_admin.get_changelist_url()
             if perms.get('add'):
                 with suppress(NoReverseMatch):
-                    model_dict['add_url'] = model_admin.admin_add_url()
+                    model_dict['add_url'] = model_admin.get_add_url()
 
             if app_label in app_dict:
                 app_dict[app_label]['models'].append(model_dict)
@@ -442,7 +442,7 @@ class AdminSite:
                 app_dict[app_label] = {
                     'name': apps.get_app_config(app_label).verbose_name,
                     'app_label': app_label,
-                    'app_url': model_admin.admin_applist_url(),
+                    'app_url': model_admin.get_applist_url(),
                     'has_module_perms': has_module_perms,
                     'models': [model_dict],
                 }

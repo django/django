@@ -2479,7 +2479,7 @@ Therefore here is our new ``change_form.html`` :
     {% load i18n admin_urls %}
     {% block object-tools-items %}
         <li>
-            <a href="{% admin_history_url cl.model_admin original.pk %}" class="historylink">{% trans "History" %}</a>
+            <a href="{% get_history_url cl.model_admin original.pk %}" class="historylink">{% trans "History" %}</a>
         </li>
         <li>
             <a href="mylink/" class="historylink">My Link</a>

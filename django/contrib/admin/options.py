@@ -1008,7 +1008,7 @@ class ModelAdmin(BaseModelAdmin):
         app_label = opts.app_label
         preserved_filters = self.get_preserved_filters(request)
         form_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, form_url)
-        view_on_site_url = self.admin_viewonsite_url(obj)
+        view_on_site_url = self.get_view_on_site_url(obj)
         context.update({
             'add': add,
             'change': change,
@@ -1046,7 +1046,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         opts = obj._meta
         preserved_filters = self.get_preserved_filters(request)
-        obj_url = self.admin_change_url(obj.pk)
+        obj_url = self.get_change_url(obj.pk)
         # Add a link to the object's change form if the user can edit the obj.
         if self.has_change_permission(request, obj):
             obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
@@ -1163,7 +1163,7 @@ class ModelAdmin(BaseModelAdmin):
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
-            redirect_url = self.admin_change_url(obj.pk)
+            redirect_url = self.get_change_url(obj.pk)
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
@@ -1173,7 +1173,7 @@ class ModelAdmin(BaseModelAdmin):
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
-            redirect_url = self.admin_add_url()
+            redirect_url = self.get_add_url()
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
@@ -1185,35 +1185,33 @@ class ModelAdmin(BaseModelAdmin):
             self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_change(request, obj)
 
-    def admin_viewonsite_url(self, obj):
-        return self.get_view_on_site_url(obj)
+    def get_index_url(self):
+        return self.admin_site.get_index_url()
 
-    def admin_index_url(self):
-        return self.admin_site.admin_index_url()
+    def get_applist_url(self):
+        return reverse(
+            'admin:app_list',
+            args=[self.model._meta.app_label],
+            current_app=self.admin_site.name)
 
-    def admin_applist_url(self):
-        return reverse('admin:app_list',
-                       args=[self.model._meta.app_label],
-                       current_app=self.admin_site.name)
+    def get_changelist_url(self):
+        return reverse(
+            'admin:%s_%s_changelist' % (self.model._meta.app_label, self.model._meta.model_name),
+            current_app=self.admin_site.name)
 
-    def admin_changelist_url(self):
-        return reverse('admin:%s_%s_changelist' %
-                       (self.model._meta.app_label, self.model._meta.model_name),
-                       current_app=self.admin_site.name)
+    def get_add_url(self):
+        return reverse(
+            'admin:%s_%s_add' % (self.model._meta.app_label, self.model._meta.model_name),
+            current_app=self.admin_site.name)
 
-    def admin_add_url(self):
-        return reverse('admin:%s_%s_add' %
-                       (self.model._meta.app_label, self.model._meta.model_name),
-                       current_app=self.admin_site.name)
-
-    def admin_history_url(self, pk):
+    def get_history_url(self, pk):
         return reverse(
             'admin:%s_%s_history' % (self.model._meta.app_label, self.model._meta.model_name),
             args=(quote(pk),),
             current_app=self.admin_site.name,
         )
 
-    def admin_change_url(self, pk):
+    def get_change_url(self, pk):
         return reverse(
             'admin:%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
             args=(quote(pk),),
@@ -1234,11 +1232,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         opts = self.model._meta
         if self.has_change_permission(request, None):
-            post_url = self.admin_changelist_url()
+            post_url = self.get_changelist_url()
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url)
         else:
-            post_url = self.admin_index_url()
+            post_url = self.get_index_url()
         return HttpResponseRedirect(post_url)
 
     def response_post_save_change(self, request, obj):
@@ -1249,11 +1247,11 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
 
         if self.has_change_permission(request, None):
-            post_url = self.admin_changelist_url(request, obj, opts)
+            post_url = self.get_changelist_url(request, obj, opts)
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url)
         else:
-            post_url = self.admin_index_url()
+            post_url = self.get_index_url()
         return HttpResponseRedirect(post_url)
 
     def response_action(self, request, queryset):
@@ -1352,13 +1350,13 @@ class ModelAdmin(BaseModelAdmin):
         )
 
         if self.has_change_permission(request, None):
-            post_url = self.admin_changelist_url()
+            post_url = self.get_changelist_url()
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
                 {'preserved_filters': preserved_filters, 'opts': opts}, post_url
             )
         else:
-            post_url = self.admin_index_url()
+            post_url = self.get_index_url()
         return HttpResponseRedirect(post_url)
 
     def render_delete_form(self, request, context):
@@ -1420,7 +1418,7 @@ class ModelAdmin(BaseModelAdmin):
             'key': unquote(object_id),
         }
         self.message_user(request, msg, messages.WARNING)
-        url = self.admin_index_url()
+        url = self.get_index_url()
         return HttpResponseRedirect(url)
 
     @csrf_protect_m

@@ -11,10 +11,10 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="{{ model_admin.admin_index_url }}">{% trans 'Home' %}</a>
-    &rsaquo; <a href="{{ model_admin.admin_applist_url }}">{{ opts.app_config.verbose_name }}</a>
-    &rsaquo; <a href="{{ model_admin.admin_changelist_url }}">{{ opts.verbose_name_plural|capfirst|escape }}</a>
-    &rsaquo; <a href="{% admin_change_url modeladmin object.pk %}">{{ object|truncatewords:"18" }}</a>
+    <a href="{{ model_admin.get_index_url }}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{{ model_admin.get_applist_url }}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{{ model_admin.get_changelist_url }}">{{ opts.verbose_name_plural|capfirst|escape }}</a>
+    &rsaquo; <a href="{% get_change_url modeladmin object.pk %}">{{ object|truncatewords:"18" }}</a>
     &rsaquo; {% trans 'Delete' %}
 </div>
 {% endblock %}

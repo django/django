@@ -379,4 +379,4 @@ class ChangeList:
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
-        return self.model_admin.admin_change_url(pk=pk)
+        return self.model_admin.get_change_url(pk=pk)

@@ -145,7 +145,7 @@ class UserAdmin(admin.ModelAdmin):
                 msg = gettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
-                return HttpResponseRedirect(self.admin_change_url(user.pk))
+                return HttpResponseRedirect(self.get_change_url(user.pk))
         else:
             form = self.change_password_form(user)
 

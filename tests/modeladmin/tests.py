@@ -96,6 +96,18 @@ class ModelAdminTests(TestCase):
         ma = BandAdmin(Band, self.site)
         self.assertTrue(ma.lookup_allowed('name__nonexistent', 'test_value'))
 
+    def test_resolve_admin_urls(self):
+        class BandAdmin(ModelAdmin):
+            fields = ['name']
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(ma.get_changelist_url(), '/test_admin/admin4/auth/user/')
+        self.assertEqual(ma.get_applist_url(), '/test_admin/admin4/auth/')
+        self.assertEqual(ma.get_add_url(), '/test_admin/admin4/auth/user/add/')
+        self.assertEqual(ma.get_change_url(5), '/test_admin/admin4/auth/user/5/change/')
+        self.assertEqual(ma.admin_delete_url(5), '/test_admin/admin4/auth/user/5/delete/')
+        self.assertEqual(ma.get_history_url(5), '/test_admin/admin4/auth/user/5/history/')
+
     @isolate_apps('modeladmin')
     def test_lookup_allowed_onetoone(self):
         class Department(models.Model):

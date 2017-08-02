@@ -29,21 +29,21 @@ def admin_delete_url(context, modeladmin, pk):
 
 
 @register.simple_tag(takes_context=True)
-def admin_change_url(context, modeladmin, pk):
+def get_change_url(context, modeladmin, pk):
     return quote(
         add_preserved_filters(
             context,
-            modeladmin.admin_change_url(pk)
+            modeladmin.get_change_url(pk)
         )
     )
 
 
 @register.simple_tag(takes_context=True)
-def admin_history_url(context, modeladmin, pk):
+def get_history_url(context, modeladmin, pk):
     return quote(
         add_preserved_filters(
             context,
-            modeladmin.admin_history_url(pk)
+            modeladmin.get_history_url(pk)
         )
     )
 
@@ -77,7 +77,7 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
             pass
         else:
             current_url = '%s:%s' % (match.app_name, match.url_name)
-            changelist_url = opts.model_admin.admin_changelist_url()
+            changelist_url = opts.model_admin.get_changelist_url()
             if changelist_url == current_url and '_changelist_filters' in preserved_filters:
                 preserved_filters = dict(parse_qsl(preserved_filters['_changelist_filters']))
 
