@@ -9,6 +9,7 @@ error (raise ... from ...) can't be silenced using NOQA.
 import sys
 
 from django.test import RequestFactory, TestCase
+from django.utils.safestring import mark_safe
 from django.views.debug import ExceptionReporter
 
 
@@ -20,10 +21,10 @@ class Py3ExceptionReporterTests(TestCase):
         request = self.rf.get('/test_view/')
         try:
             try:
-                raise AttributeError('Top level')
+                raise AttributeError(mark_safe('<p>Top level</p>'))
             except AttributeError as explicit:
                 try:
-                    raise ValueError('Second exception') from explicit
+                    raise ValueError('<p>Second exception</p>') from explicit
                 except ValueError:
                     raise IndexError('Final exception')
         except Exception:
@@ -37,9 +38,9 @@ class Py3ExceptionReporterTests(TestCase):
         html = reporter.get_traceback_html()
         # Both messages are twice on page -- one rendered as html,
         # one as plain text (for pastebin)
-        self.assertEqual(2, html.count(explicit_exc.format("Top level")))
-        self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
+        self.assertEqual(2, html.count(explicit_exc.format('&lt;p&gt;Top level&lt;/p&gt;')))
+        self.assertEqual(2, html.count(implicit_exc.format('&lt;p&gt;Second exception&lt;/p&gt;')))
 
         text = reporter.get_traceback_text()
-        self.assertIn(explicit_exc.format("Top level"), text)
-        self.assertIn(implicit_exc.format("Second exception"), text)
+        self.assertIn(explicit_exc.format('<p>Top level</p>'), text)
+        self.assertIn(implicit_exc.format('<p>Second exception</p>'), text)
