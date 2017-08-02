@@ -51,7 +51,7 @@ used by themselves or inherited from. They may not provide all the
 capabilities required for projects, in which case there are Mixins which
 extend what base views can do.
 
-Django’s generic views are built off of those base views, and were developed
+Django's generic views are built off of those base views, and were developed
 as a shortcut for common usage patterns such as displaying the details of an
 object. They take certain common idioms and patterns found in view
 development and abstract them so that you can quickly write common views of

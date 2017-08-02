@@ -5,6 +5,8 @@ from .models import Account, Employee, Person, Profile, ProxyEmployee
 
 
 class UpdateOnlyFieldsTests(TestCase):
+    msg = 'The following fields do not exist in this model or are m2m fields: %s'
+
     def test_update_fields_basic(self):
         s = Person.objects.create(name='Sara', gender='F')
         self.assertEqual(s.gender, 'F')
@@ -120,7 +122,7 @@ class UpdateOnlyFieldsTests(TestCase):
         a2 = Account.objects.create(num=2)
         e1.accounts.set([a1, a2])
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, self.msg % 'accounts'):
             e1.save(update_fields=['accounts'])
 
     def test_update_fields_inheritance(self):
@@ -201,10 +203,12 @@ class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_incorrect_params(self):
         s = Person.objects.create(name='Sara', gender='F')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, self.msg % 'first_name'):
             s.save(update_fields=['first_name'])
 
-        with self.assertRaises(ValueError):
+        # "name" is treated as an iterable so the output is something like
+        # "n, a, m, e" but the order isn't deterministic.
+        with self.assertRaisesMessage(ValueError, self.msg % ''):
             s.save(update_fields="name")
 
     def test_empty_update_fields(self):

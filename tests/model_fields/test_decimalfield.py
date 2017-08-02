@@ -21,18 +21,13 @@ class DecimalFieldTests(TestCase):
         # Uses default rounding of ROUND_HALF_EVEN.
         self.assertEqual(f.to_python(2.0625), Decimal('2.062'))
         self.assertEqual(f.to_python(2.1875), Decimal('2.188'))
-        with self.assertRaises(ValidationError):
+        msg = "'abc' value must be a decimal number."
+        with self.assertRaisesMessage(ValidationError, msg):
             f.to_python('abc')
 
     def test_default(self):
         f = models.DecimalField(default=Decimal('0.00'))
         self.assertEqual(f.get_default(), Decimal('0.00'))
-
-    def test_format(self):
-        f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f._format(f.to_python(2)), '2.0')
-        self.assertEqual(f._format(f.to_python('2.6')), '2.6')
-        self.assertIsNone(f._format(None))
 
     def test_get_prep_value(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)

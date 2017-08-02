@@ -607,13 +607,16 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def db_type_parameters(self, connection):
+        return DictWrapper(self.__dict__, connection.ops.quote_name, 'qn_')
+
     def db_check(self, connection):
         """
         Return the database column check constraint for this field, for the
         provided connection. Works the same way as db_type() for the case that
         get_internal_type() does not map to a preexisting model field.
         """
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        data = self.db_type_parameters(connection)
         try:
             return connection.data_type_check_constraints[self.get_internal_type()] % data
         except KeyError:
@@ -639,7 +642,7 @@ class Field(RegisterLookupMixin):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        data = self.db_type_parameters(connection)
         try:
             return connection.data_types[self.get_internal_type()] % data
         except KeyError:
@@ -651,6 +654,13 @@ class Field(RegisterLookupMixin):
         use. For example, this method is called by ForeignKey and OneToOneField
         to determine its data type.
         """
+        return self.db_type(connection)
+
+    def cast_db_type(self, connection):
+        """Return the data type to use in the Cast() function."""
+        db_type = connection.ops.cast_data_types.get(self.get_internal_type())
+        if db_type:
+            return db_type % self.db_type_parameters(connection)
         return self.db_type(connection)
 
     def db_parameters(self, connection):
@@ -1055,6 +1065,11 @@ class CharField(Field):
             ]
         else:
             return []
+
+    def cast_db_type(self, connection):
+        if self.max_length is None:
+            return connection.ops.cast_char_field_without_max_length
+        return super().cast_db_type(connection)
 
     def get_internal_type(self):
         return "CharField"
@@ -1540,12 +1555,6 @@ class DecimalField(Field):
                 code='invalid',
                 params={'value': value},
             )
-
-    def _format(self, value):
-        if isinstance(value, str):
-            return value
-        else:
-            return self.format_number(value)
 
     def format_number(self, value):
         """

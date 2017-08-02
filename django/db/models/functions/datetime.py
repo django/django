@@ -148,7 +148,6 @@ ExtractYear.register_lookup(YearLte)
 
 
 class TruncBase(TimezoneMixin, Transform):
-    arity = 1
     kind = None
     tzinfo = None
 
@@ -198,7 +197,7 @@ class TruncBase(TimezoneMixin, Transform):
             ))
         return copy
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if isinstance(self.output_field, DateTimeField):
             if settings.USE_TZ:
                 if value is None:
@@ -243,9 +242,8 @@ class TruncDate(TruncBase):
     kind = 'date'
     lookup_name = 'date'
 
-    @cached_property
-    def output_field(self):
-        return DateField()
+    def __init__(self, *args, output_field=None, **kwargs):
+        super().__init__(*args, output_field=DateField(), **kwargs)
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.
@@ -259,9 +257,8 @@ class TruncTime(TruncBase):
     kind = 'time'
     lookup_name = 'time'
 
-    @cached_property
-    def output_field(self):
-        return TimeField()
+    def __init__(self, *args, output_field=None, **kwargs):
+        super().__init__(*args, output_field=TimeField(), **kwargs)
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.

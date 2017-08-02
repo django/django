@@ -5,6 +5,8 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'varchar'
+
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
@@ -82,13 +84,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             lookup = 'UPPER(%s)' % lookup
 
         return lookup
-
-    def last_insert_id(self, cursor, table_name, pk_name):
-        # Use pg_get_serial_sequence to get the underlying sequence name
-        # from the table name and column name (available since PostgreSQL 8)
-        cursor.execute("SELECT CURRVAL(pg_get_serial_sequence('%s','%s'))" % (
-            self.quote_name(table_name), pk_name))
-        return cursor.fetchone()[0]
 
     def no_limit_value(self):
         return None

@@ -60,7 +60,11 @@ class OnDeleteTests(TestCase):
 
     def test_protect(self):
         a = create_a('protect')
-        with self.assertRaises(IntegrityError):
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through a protected foreign key: 'A.protect'"
+        )
+        with self.assertRaisesMessage(IntegrityError, msg):
             a.protect.delete()
 
     def test_do_nothing(self):

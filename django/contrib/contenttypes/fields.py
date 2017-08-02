@@ -362,7 +362,7 @@ class GenericRelation(ForeignObject):
         # generating a join to the parent model, then generating joins to the
         # child models.
         path = []
-        opts = self.remote_field.model._meta
+        opts = self.remote_field.model._meta.concrete_model._meta
         parent_opts = opts.get_field(self.object_id_field_name).model._meta
         target = parent_opts.pk
         path.append(PathInfo(self.model._meta, parent_opts, (target,), self.remote_field, True, False))

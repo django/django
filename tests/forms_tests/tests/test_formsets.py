@@ -597,6 +597,7 @@ class FormsFormsetTestCase(SimpleTestCase):
              'form-MIN_NUM_FORMS': 0, 'form-MAX_NUM_FORMS': 1})
 
         self.assertTrue(p.is_valid())
+        self.assertEqual(p._errors, [])
         self.assertEqual(len(p.deleted_forms), 1)
 
     def test_formsets_with_ordering(self):
@@ -1337,7 +1338,8 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 class TestIsBoundBehavior(SimpleTestCase):
     def test_no_data_raises_validation_error(self):
-        with self.assertRaises(ValidationError):
+        msg = 'ManagementForm data is missing or has been tampered with'
+        with self.assertRaisesMessage(ValidationError, msg):
             ArticleFormSet({}).is_valid()
 
     def test_with_management_data_attrs_work_fine(self):

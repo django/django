@@ -84,21 +84,10 @@ class CursorWrapper:
             raise
 
     def __getattr__(self, attr):
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+        return getattr(self.cursor, attr)
 
     def __iter__(self):
         return iter(self.cursor)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        # Close instead of passing through to avoid backend-specific behavior
-        # (#17671).
-        self.close()
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

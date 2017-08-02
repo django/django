@@ -965,8 +965,12 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(53.39, places=2)})
 
     def test_combine_different_types(self):
-        with self.assertRaisesMessage(FieldError, 'Expression contains mixed types. You must set output_field'):
-            Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price')).get(pk=self.b4.pk)
+        msg = 'Expression contains mixed types. You must set output_field.'
+        qs = Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price'))
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.first()
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.first()
 
         b1 = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
                                    output_field=IntegerField())).get(pk=self.b4.pk)
@@ -1095,9 +1099,12 @@ class AggregateTestCase(TestCase):
 
     def test_multi_arg_aggregate(self):
         class MyMax(Max):
+            output_field = DecimalField()
+
             def as_sql(self, compiler, connection):
-                self.set_source_expressions(self.get_source_expressions()[0:1])
-                return super().as_sql(compiler, connection)
+                copy = self.copy()
+                copy.set_source_expressions(copy.get_source_expressions()[0:1])
+                return super(MyMax, copy).as_sql(compiler, connection)
 
         with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Book.objects.aggregate(MyMax('pages', 'price'))

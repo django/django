@@ -44,8 +44,8 @@ class Avg(Aggregate):
     def _resolve_output_field(self):
         source_field = self.get_source_fields()[0]
         if isinstance(source_field, (IntegerField, DecimalField)):
-            self._output_field = FloatField()
-        super()._resolve_output_field()
+            return FloatField()
+        return super()._resolve_output_field()
 
     def as_oracle(self, compiler, connection):
         if self.output_field.get_internal_type() == 'DurationField':
@@ -70,14 +70,10 @@ class Count(Aggregate):
             output_field=IntegerField(), **extra
         )
 
-    def __repr__(self):
-        return "{}({}, distinct={})".format(
-            self.__class__.__name__,
-            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
-            'False' if self.extra['distinct'] == '' else 'True',
-        )
+    def _get_repr_options(self):
+        return {'distinct': self.extra['distinct'] != ''}
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return 0
         return int(value)
@@ -100,14 +96,10 @@ class StdDev(Aggregate):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
         super().__init__(expression, output_field=FloatField(), **extra)
 
-    def __repr__(self):
-        return "{}({}, sample={})".format(
-            self.__class__.__name__,
-            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
-            'False' if self.function == 'STDDEV_POP' else 'True',
-        )
+    def _get_repr_options(self):
+        return {'sample': self.function == 'STDDEV_SAMP'}
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return value
         return float(value)
@@ -134,14 +126,10 @@ class Variance(Aggregate):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'
         super().__init__(expression, output_field=FloatField(), **extra)
 
-    def __repr__(self):
-        return "{}({}, sample={})".format(
-            self.__class__.__name__,
-            self.arg_joiner.join(str(arg) for arg in self.source_expressions),
-            'False' if self.function == 'VAR_POP' else 'True',
-        )
+    def _get_repr_options(self):
+        return {'sample': self.function == 'VAR_SAMP'}
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if value is None:
             return value
         return float(value)

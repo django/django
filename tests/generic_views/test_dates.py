@@ -79,7 +79,11 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
     def test_archive_view_invalid(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'BookArchive is missing a QuerySet. Define BookArchive.model, '
+            'BookArchive.queryset, or override BookArchive.get_queryset().'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/dates/books/invalid/')
 
     def test_archive_view_by_month(self):

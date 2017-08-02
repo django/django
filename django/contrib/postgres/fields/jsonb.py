@@ -115,7 +115,7 @@ class KeyTransform(Transform):
 class KeyTextTransform(KeyTransform):
     operator = '->>'
     nested_operator = '#>>'
-    _output_field = TextField()
+    output_field = TextField()
 
 
 class KeyTransformTextLookupMixin:

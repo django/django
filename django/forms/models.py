@@ -258,8 +258,8 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             )
 
             # make sure opts.fields doesn't specify an invalid field
-            none_model_fields = [k for k, v in fields.items() if not v]
-            missing_fields = set(none_model_fields) - set(new_class.declared_fields)
+            none_model_fields = {k for k, v in fields.items() if not v}
+            missing_fields = none_model_fields.difference(new_class.declared_fields)
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
                 message = message % (', '.join(missing_fields),
@@ -590,20 +590,37 @@ class BaseModelFormSet(BaseFormSet):
         return field.to_python
 
     def _construct_form(self, i, **kwargs):
-        if self.is_bound and i < self.initial_form_count():
-            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
-            pk = self.data[pk_key]
-            pk_field = self.model._meta.pk
-            to_python = self._get_to_python(pk_field)
-            pk = to_python(pk)
-            kwargs['instance'] = self._existing_object(pk)
-        if i < self.initial_form_count() and 'instance' not in kwargs:
-            kwargs['instance'] = self.get_queryset()[i]
-        if i >= self.initial_form_count() and self.initial_extra:
+        pk_required = False
+        if i < self.initial_form_count():
+            pk_required = True
+            if self.is_bound:
+                pk_key = '%s-%s' % (self.add_prefix(i), self.model._meta.pk.name)
+                try:
+                    pk = self.data[pk_key]
+                except KeyError:
+                    # The primary key is missing. The user may have tampered
+                    # with POST data.
+                    pass
+                else:
+                    to_python = self._get_to_python(self.model._meta.pk)
+                    try:
+                        pk = to_python(pk)
+                    except ValidationError:
+                        # The primary key exists but is an invalid value. The
+                        # user may have tampered with POST data.
+                        pass
+                    else:
+                        kwargs['instance'] = self._existing_object(pk)
+            else:
+                kwargs['instance'] = self.get_queryset()[i]
+        elif self.initial_extra:
             # Set initial values for extra forms
             with suppress(IndexError):
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
-        return super()._construct_form(i, **kwargs)
+        form = super()._construct_form(i, **kwargs)
+        if pk_required:
+            form.fields[self.model._meta.pk.name].required = True
+        return form
 
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
@@ -665,8 +682,8 @@ class BaseModelFormSet(BaseFormSet):
         for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
-            all_unique_checks = all_unique_checks.union(set(unique_checks))
-            all_date_checks = all_date_checks.union(set(date_checks))
+            all_unique_checks.update(unique_checks)
+            all_date_checks.update(date_checks)
 
         errors = []
         # Do each of the unique checks (unique and unique_together)
@@ -1233,6 +1250,8 @@ class ModelChoiceField(ChoiceField):
         return Field.validate(self, value)
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
         return str(self.prepare_value(initial_value)) != str(data_value)
@@ -1317,6 +1336,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
         return super().prepare_value(value)
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if initial is None:
             initial = []
         if data is None:

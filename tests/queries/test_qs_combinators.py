@@ -46,26 +46,38 @@ class QuerySetSetOperationTests(TestCase):
     def test_intersection_with_empty_qs(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.none()
+        qs3 = Number.objects.filter(pk__in=[])
         self.assertEqual(len(qs1.intersection(qs2)), 0)
+        self.assertEqual(len(qs1.intersection(qs3)), 0)
         self.assertEqual(len(qs2.intersection(qs1)), 0)
+        self.assertEqual(len(qs3.intersection(qs1)), 0)
         self.assertEqual(len(qs2.intersection(qs2)), 0)
+        self.assertEqual(len(qs3.intersection(qs3)), 0)
 
     @skipUnlessDBFeature('supports_select_difference')
     def test_difference_with_empty_qs(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.none()
+        qs3 = Number.objects.filter(pk__in=[])
         self.assertEqual(len(qs1.difference(qs2)), 10)
+        self.assertEqual(len(qs1.difference(qs3)), 10)
         self.assertEqual(len(qs2.difference(qs1)), 0)
+        self.assertEqual(len(qs3.difference(qs1)), 0)
         self.assertEqual(len(qs2.difference(qs2)), 0)
+        self.assertEqual(len(qs3.difference(qs3)), 0)
 
     def test_union_with_empty_qs(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.none()
+        qs3 = Number.objects.filter(pk__in=[])
         self.assertEqual(len(qs1.union(qs2)), 10)
         self.assertEqual(len(qs2.union(qs1)), 10)
+        self.assertEqual(len(qs1.union(qs3)), 10)
+        self.assertEqual(len(qs3.union(qs1)), 10)
         self.assertEqual(len(qs2.union(qs1, qs1, qs1)), 10)
         self.assertEqual(len(qs2.union(qs1, qs1, all=True)), 20)
         self.assertEqual(len(qs2.union(qs2)), 0)
+        self.assertEqual(len(qs3.union(qs3)), 0)
 
     def test_limits(self):
         qs1 = Number.objects.all()
@@ -76,6 +88,27 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.filter(num__lte=1)
         qs2 = Number.objects.filter(num__gte=2, num__lte=3)
         self.assertNumbersEqual(qs1.union(qs2).order_by('-num'), [3, 2, 1, 0])
+
+    def test_count_union(self):
+        qs1 = Number.objects.filter(num__lte=1).values('num')
+        qs2 = Number.objects.filter(num__gte=2, num__lte=3).values('num')
+        self.assertEqual(qs1.union(qs2).count(), 4)
+
+    def test_count_union_empty_result(self):
+        qs = Number.objects.filter(pk__in=[])
+        self.assertEqual(qs.union(qs).count(), 0)
+
+    @skipUnlessDBFeature('supports_select_difference')
+    def test_count_difference(self):
+        qs1 = Number.objects.filter(num__lt=10)
+        qs2 = Number.objects.filter(num__lt=9)
+        self.assertEqual(qs1.difference(qs2).count(), 1)
+
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_count_intersection(self):
+        qs1 = Number.objects.filter(num__gte=5)
+        qs2 = Number.objects.filter(num__lte=5)
+        self.assertEqual(qs1.intersection(qs2).count(), 1)
 
     @skipUnlessDBFeature('supports_slicing_ordering_in_compound')
     def test_ordering_subqueries(self):

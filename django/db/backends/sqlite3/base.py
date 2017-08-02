@@ -173,6 +173,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
+        conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
     def init_connection_state(self):
@@ -212,6 +213,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # SQLite always runs at the SERIALIZABLE isolation level.
         with self.wrap_database_errors:
             self.connection.isolation_level = level
+
+    def disable_constraint_checking(self):
+        if self.in_atomic_block:
+            # sqlite3 cannot disable constraint checking inside a transaction.
+            return False
+        self.cursor().execute('PRAGMA foreign_keys = OFF')
+        return True
+
+    def enable_constraint_checking(self):
+        self.cursor().execute('PRAGMA foreign_keys = ON')
 
     def check_constraints(self, table_names=None):
         """

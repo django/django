@@ -1,0 +1,13 @@
+===========================
+Django 1.11.5 release notes
+===========================
+
+*Under development*
+
+Django 1.11.5 fixes several bugs in 1.11.4.
+
+Bugfixes
+========
+
+* Fixed GEOS version parsing if the version has a commit hash at the end (new
+  in GEOS 3.6.2) (:ticket:`28441`).

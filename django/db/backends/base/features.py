@@ -41,8 +41,6 @@ class BaseDatabaseFeatures:
     # than a table?
     select_for_update_of_column = False
 
-    supports_select_related = True
-
     # Does the default test database allow multiple connections?
     # Usually an indication that the test database is in-memory
     test_db_allows_multiple_connections = True
@@ -233,6 +231,9 @@ class BaseDatabaseFeatures:
 
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
+
+    # Does the backend support CAST with precision?
+    supports_cast_with_precision = True
 
     def __init__(self, connection):
         self.connection = connection

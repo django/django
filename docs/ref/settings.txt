@@ -2175,11 +2175,6 @@ the ``preload`` directive to the :ref:`http-strict-transport-security`
 header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
 non-zero value.
 
-.. warning::
-    Setting this incorrectly can irreversibly (for at least several months,
-    depending on browser releases) break your site. Read the
-    :ref:`http-strict-transport-security` documentation first.
-
 .. setting:: SECURE_HSTS_SECONDS
 
 ``SECURE_HSTS_SECONDS``

@@ -289,4 +289,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "check": False,
                 "index": False,
             }
+        # Get foreign keys
+        cursor.execute('PRAGMA foreign_key_list(%s)' % self.connection.ops.quote_name(table_name))
+        for row in cursor.fetchall():
+            # Remaining on_update/on_delete/match values are of no interest here
+            id_, seq, table, from_, to = row[:5]
+            constraints['fk_%d' % id_] = {
+                'columns': [from_],
+                'primary_key': False,
+                'unique': False,
+                'foreign_key': (table, to),
+                'check': False,
+                'index': False,
+            }
         return constraints

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>Page not found at {{ request.path_info|escape }}</title>
+  <title>Page not found at {{ request.path_info }}</title>
   <meta name="robots" content="NONE,NOARCHIVE">
   <style type="text/css">
     html * { padding:0; margin:0; }
@@ -32,7 +32,7 @@
       </tr>
       <tr>
         <th>Request URL:</th>
-        <td>{{ request.build_absolute_uri|escape }}</td>
+        <td>{{ request.build_absolute_uri }}</td>
       </tr>
       {% if raising_view_name %}
       <tr>
@@ -60,7 +60,7 @@
       </ol>
       <p>
         {% if request_path %}
-        The current path, <code>{{ request_path|escape }}</code>,{% else %}
+        The current path, <code>{{ request_path }}</code>,{% else %}
         The empty path{% endif %} didn't match any of these.
       </p>
     {% else %}

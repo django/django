@@ -123,7 +123,8 @@ class LegacyDatabaseTests(TestCase):
     @skipIfDBFeature('supports_timezones')
     def test_aware_datetime_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        with self.assertRaises(ValueError):
+        msg = 'backend does not support timezone-aware datetimes when USE_TZ is False.'
+        with self.assertRaisesMessage(ValueError, msg):
             Event.objects.create(dt=dt)
 
     def test_auto_now_and_auto_now_add(self):
@@ -647,7 +648,11 @@ class UnsupportedTimeZoneDatabaseTests(TestCase):
         connections.databases['tz']['TIME_ZONE'] = 'Asia/Bangkok'
         tz_conn = connections['tz']
         try:
-            with self.assertRaises(ImproperlyConfigured):
+            msg = (
+                "Connection 'tz' cannot set TIME_ZONE because its engine "
+                "handles time zones conversions natively."
+            )
+            with self.assertRaisesMessage(ImproperlyConfigured, msg):
                 tz_conn.cursor()
         finally:
             connections['tz'].close()       # in case the test fails
@@ -1033,7 +1038,8 @@ class TemplateTests(SimpleTestCase):
         self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
     def test_get_current_timezone_templatetag_invalid_argument(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'get_current_timezone' requires 'as variable' (got ['get_current_timezone'])"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Template("{% load tz %}{% get_current_timezone %}").render()
 
     @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")

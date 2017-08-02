@@ -1132,6 +1132,13 @@ behavior, as optimization is meant to be safe.
 
 Suppresses all user prompts.
 
+.. django-admin-option:: --squashed-name SQUASHED_NAME
+
+.. versionadded:: 2.0
+
+Sets the name of the squashed migration. When omitted, the name is based on the
+first and last migration, with ``_squashed_`` in between.
+
 ``startapp``
 ------------
 

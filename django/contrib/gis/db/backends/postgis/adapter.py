@@ -36,10 +36,10 @@ class PostGISAdapter:
     def __eq__(self, other):
         if not isinstance(other, PostGISAdapter):
             return False
-        return (self.ewkb == other.ewkb) and (self.srid == other.srid)
+        return self.ewkb == other.ewkb
 
     def __hash__(self):
-        return hash((self.ewkb, self.srid))
+        return hash(self.ewkb)
 
     def __str__(self):
         return self.getquoted()

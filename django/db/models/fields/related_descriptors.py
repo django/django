@@ -1044,7 +1044,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                             source_field_name: self.related_val[0],
                             '%s__in' % target_field_name: new_ids,
                         }))
-                new_ids = new_ids - set(vals)
+                new_ids.difference_update(vals)
 
                 with transaction.atomic(using=db, savepoint=False):
                     if self.reverse or source_field_name == self.source_field_name:

@@ -123,7 +123,8 @@ class AdvancedTests(TestCase):
         We do not support update on already sliced query sets.
         """
         method = DataPoint.objects.all()[:2].update
-        with self.assertRaises(AssertionError):
+        msg = 'Cannot update a query once a slice has been taken.'
+        with self.assertRaisesMessage(AssertionError, msg):
             method(another_value='another thing')
 
     def test_update_respects_to_field(self):
@@ -138,6 +139,15 @@ class AdvancedTests(TestCase):
         self.assertEqual(bar_qs[0].foo_id, a_foo.target)
         bar_qs.update(foo=b_foo)
         self.assertEqual(bar_qs[0].foo_id, b_foo.target)
+
+    def test_update_m2m_field(self):
+        msg = (
+            'Cannot update model field '
+            '<django.db.models.fields.related.ManyToManyField: m2m_foo> '
+            '(only non-relations and foreign keys permitted).'
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Bar.objects.update(m2m_foo='whatever')
 
     def test_update_annotated_queryset(self):
         """

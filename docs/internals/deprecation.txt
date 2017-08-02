@@ -23,6 +23,9 @@ details on these changes.
 
 * ``HttpRequest.xreadlines()`` will be removed.
 
+* Support for the ``context`` argument of ``Field.from_db_value()`` and
+  ``Expression.convert_value()`` will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1

@@ -16,14 +16,49 @@ class LookupTests(TestCase):
         # Create a few Authors.
         self.au1 = Author.objects.create(name='Author 1')
         self.au2 = Author.objects.create(name='Author 2')
-        # Create a couple of Articles.
-        self.a1 = Article.objects.create(headline='Article 1', pub_date=datetime(2005, 7, 26), author=self.au1)
-        self.a2 = Article.objects.create(headline='Article 2', pub_date=datetime(2005, 7, 27), author=self.au1)
-        self.a3 = Article.objects.create(headline='Article 3', pub_date=datetime(2005, 7, 27), author=self.au1)
-        self.a4 = Article.objects.create(headline='Article 4', pub_date=datetime(2005, 7, 28), author=self.au1)
-        self.a5 = Article.objects.create(headline='Article 5', pub_date=datetime(2005, 8, 1, 9, 0), author=self.au2)
-        self.a6 = Article.objects.create(headline='Article 6', pub_date=datetime(2005, 8, 1, 8, 0), author=self.au2)
-        self.a7 = Article.objects.create(headline='Article 7', pub_date=datetime(2005, 7, 27), author=self.au2)
+        # Create a few Articles.
+        self.a1 = Article.objects.create(
+            headline='Article 1',
+            pub_date=datetime(2005, 7, 26),
+            author=self.au1,
+            slug='a1',
+        )
+        self.a2 = Article.objects.create(
+            headline='Article 2',
+            pub_date=datetime(2005, 7, 27),
+            author=self.au1,
+            slug='a2',
+        )
+        self.a3 = Article.objects.create(
+            headline='Article 3',
+            pub_date=datetime(2005, 7, 27),
+            author=self.au1,
+            slug='a3',
+        )
+        self.a4 = Article.objects.create(
+            headline='Article 4',
+            pub_date=datetime(2005, 7, 28),
+            author=self.au1,
+            slug='a4',
+        )
+        self.a5 = Article.objects.create(
+            headline='Article 5',
+            pub_date=datetime(2005, 8, 1, 9, 0),
+            author=self.au2,
+            slug='a5',
+        )
+        self.a6 = Article.objects.create(
+            headline='Article 6',
+            pub_date=datetime(2005, 8, 1, 8, 0),
+            author=self.au2,
+            slug='a6',
+        )
+        self.a7 = Article.objects.create(
+            headline='Article 7',
+            pub_date=datetime(2005, 7, 27),
+            author=self.au2,
+            slug='a7',
+        )
         # Create a few Tags.
         self.t1 = Tag.objects.create(name='Tag 1')
         self.t1.articles.add(self.a1, self.a2, self.a3)
@@ -137,6 +172,21 @@ class LookupTests(TestCase):
         authors = {author.pk: author for author in Author.objects.all()}
         with self.assertNumQueries(expected_num_queries):
             self.assertEqual(Author.objects.in_bulk(authors), authors)
+
+    def test_in_bulk_with_field(self):
+        self.assertEqual(
+            Article.objects.in_bulk([self.a1.slug, self.a2.slug, self.a3.slug], field_name='slug'),
+            {
+                self.a1.slug: self.a1,
+                self.a2.slug: self.a2,
+                self.a3.slug: self.a3,
+            }
+        )
+
+    def test_in_bulk_non_unique_field(self):
+        msg = "in_bulk()'s field_name must be a unique field but 'author' isn't."
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.in_bulk([self.au1], field_name='author')
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
@@ -265,7 +315,11 @@ class LookupTests(TestCase):
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a nonexistent field name in values() (a field that is neither in the
         # model nor in extra(select)).
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'id_plus_two' into field. Choices are: "
+            "author, author_id, headline, id, id_plus_one, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
         self.assertSequenceEqual(
@@ -274,7 +328,8 @@ class LookupTests(TestCase):
                 'id': self.a5.id,
                 'author_id': self.au2.id,
                 'headline': 'Article 5',
-                'pub_date': datetime(2005, 8, 1, 9, 0)
+                'pub_date': datetime(2005, 8, 1, 9, 0),
+                'slug': 'a5',
             }],
         )
 
@@ -503,7 +558,7 @@ class LookupTests(TestCase):
         with self.assertRaisesMessage(
             FieldError,
             "Cannot resolve keyword 'pub_date_year' into field. Choices are: "
-            "author, author_id, headline, id, pub_date, tag"
+            "author, author_id, headline, id, pub_date, slug, tag"
         ):
             Article.objects.filter(pub_date_year='2005').count()
 
@@ -682,11 +737,16 @@ class LookupTests(TestCase):
         """
         A lookup query containing non-fields raises the proper exception.
         """
-        with self.assertRaises(FieldError):
+        msg = "Unsupported lookup 'blahblah' for CharField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah=99)
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah__exact=99)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'blahblah' into field. Choices are: "
+            "author, author_id, headline, id, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(blahblah=99)
 
     def test_lookup_collision(self):
@@ -779,3 +839,20 @@ class LookupTests(TestCase):
              '<Article: Article 7>'],
             ordered=False
         )
+
+    def test_exact_none_transform(self):
+        """Transforms are used for __exact=None."""
+        Season.objects.create(year=1, nulled_text_field='not null')
+        self.assertFalse(Season.objects.filter(nulled_text_field__isnull=True))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled__isnull=True))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled__exact=None))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled=None))
+
+    def test_custom_field_none_rhs(self):
+        """
+        __exact=value is transformed to __isnull=True if Field.get_prep_value()
+        converts value to None.
+        """
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull=True))
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field=''))

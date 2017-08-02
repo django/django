@@ -17,20 +17,6 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 
-class SpatiaLiteDistanceOperator(SpatialOperator):
-    def as_sql(self, connection, lookup, template_params, sql_params):
-        if lookup.lhs.output_field.geodetic(connection):
-            # SpatiaLite returns NULL instead of zero on geodetic coordinates
-            sql_template = 'COALESCE(%(func)s(%(lhs)s, %(rhs)s, %%s), 0) %(op)s %(value)s'
-            template_params.update({
-                'op': self.op,
-                'func': connection.ops.spatial_function_name('Distance'),
-            })
-            sql_params.insert(1, len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid')
-            return sql_template % template_params, sql_params
-        return super().as_sql(connection, lookup, template_params, sql_params)
-
-
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'spatialite'
     spatialite = True
@@ -43,7 +29,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     unionagg = 'GUnion'
 
     from_text = 'GeomFromText'
-    from_wkb = 'GeomFromWKB'
     select = 'AsText(%s)'
 
     gis_operators = {
@@ -68,10 +53,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'exact': SpatialOperator(func='Equals'),
         # Distance predicates
         'dwithin': SpatialOperator(func='PtDistWithin'),
-        'distance_gt': SpatiaLiteDistanceOperator(func='Distance', op='>'),
-        'distance_gte': SpatiaLiteDistanceOperator(func='Distance', op='>='),
-        'distance_lt': SpatiaLiteDistanceOperator(func='Distance', op='<'),
-        'distance_lte': SpatiaLiteDistanceOperator(func='Distance', op='<='),
     }
 
     disallowed_aggregates = (aggregates.Extent3D,)

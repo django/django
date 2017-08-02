@@ -57,7 +57,11 @@ class RedirectTests(TestCase):
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sites_not_installed(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'You cannot use RedirectFallbackMiddleware when '
+            'django.contrib.sites is not installed.'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             RedirectFallbackMiddleware()
 
 

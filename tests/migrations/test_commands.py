@@ -757,8 +757,18 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations exits if it detects a conflict.
         """
         with self.temporary_migration_module(module="migrations.test_migrations_conflict"):
-            with self.assertRaises(CommandError):
+            with self.assertRaises(CommandError) as context:
                 call_command("makemigrations")
+        exception_message = str(context.exception)
+        self.assertIn(
+            'Conflicting migrations detected; multiple leaf nodes '
+            'in the migration graph:',
+            exception_message
+        )
+        self.assertIn('0002_second', exception_message)
+        self.assertIn('0002_conflicting_second', exception_message)
+        self.assertIn('in migrations', exception_message)
+        self.assertIn("To fix them run 'python manage.py makemigrations --merge'", exception_message)
 
     def test_makemigrations_merge_no_conflict(self):
         """
@@ -780,7 +790,8 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations exits if no app is specified with 'empty' mode.
         """
-        with self.assertRaises(CommandError):
+        msg = 'You must supply at least one app label when using --empty.'
+        with self.assertRaisesMessage(CommandError, msg):
             call_command("makemigrations", empty=True)
 
     def test_makemigrations_empty_migration(self):
@@ -1356,3 +1367,25 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             with self.assertRaisesMessage(CommandError, msg):
                 call_command("squashmigrations", "migrations", "0003", "0002", interactive=False, verbosity=0)
+
+    def test_squashed_name_with_start_migration_name(self):
+        """--squashed-name specifies the new migration's name."""
+        squashed_name = 'squashed_name'
+        with self.temporary_migration_module(module='migrations.test_migrations') as migration_dir:
+            call_command(
+                'squashmigrations', 'migrations', '0001', '0002',
+                squashed_name=squashed_name, interactive=False, verbosity=0,
+            )
+            squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
+            self.assertTrue(os.path.exists(squashed_migration_file))
+
+    def test_squashed_name_without_start_migration_name(self):
+        """--squashed-name also works if a start migration is omitted."""
+        squashed_name = 'squashed_name'
+        with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:
+            call_command(
+                'squashmigrations', 'migrations', '0001',
+                squashed_name=squashed_name, interactive=False, verbosity=0,
+            )
+            squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
+            self.assertTrue(os.path.exists(squashed_migration_file))

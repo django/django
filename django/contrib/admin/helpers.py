@@ -304,7 +304,7 @@ class InlineAdminFormSet:
 
     @property
     def media(self):
-        media = self.opts.media + self.formset.media
+        media = self.formset.media + self.opts.media
         for fs in self:
             media = media + fs.media
         return media

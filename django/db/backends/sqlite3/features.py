@@ -17,7 +17,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
-    supports_foreign_keys = False
     supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
     can_introspect_decimal_field = False
@@ -31,6 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_clone_databases = True
     supports_temporal_subtraction = True
     ignores_table_name_case = True
+    supports_cast_with_precision = False
 
     @cached_property
     def uses_savepoints(self):

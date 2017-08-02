@@ -586,6 +586,8 @@ class FileField(Field):
         return data
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if data is None:
             return False
         return True
@@ -706,6 +708,8 @@ class BooleanField(Field):
             raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         # Sometimes data or initial may be a string equivalent of a boolean
         # so we should run it through to_python first to get a boolean value
         return self.to_python(initial) != self.to_python(data)
@@ -864,6 +868,8 @@ class MultipleChoiceField(ChoiceField):
                 )
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if initial is None:
             initial = []
         if data is None:
@@ -1042,6 +1048,8 @@ class MultiValueField(Field):
         raise NotImplementedError('Subclasses must implement this method.')
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if initial is None:
             initial = ['' for x in range(0, len(data))]
         else:
@@ -1075,12 +1083,12 @@ class FilePathField(ChoiceField):
         if recursive:
             for root, dirs, files in sorted(os.walk(self.path)):
                 if self.allow_files:
-                    for f in files:
+                    for f in sorted(files):
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
                 if self.allow_folders:
-                    for f in dirs:
+                    for f in sorted(dirs):
                         if f == '__pycache__':
                             continue
                         if self.match is None or self.match_re.search(f):

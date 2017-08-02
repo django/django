@@ -4,6 +4,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import transaction
 from django.db.backends import utils
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
@@ -31,6 +32,12 @@ class BaseDatabaseOperations:
         'intersection': 'INTERSECT',
         'difference': 'EXCEPT',
     }
+    # Mapping of Field.get_internal_type() (typically the model field's class
+    # name) to the data type to use for the Cast() function, if different from
+    # DatabaseWrapper.data_types.
+    cast_data_types = {}
+    # CharField data type if the max_length argument isn't provided.
+    cast_char_field_without_max_length = None
 
     def __init__(self, connection):
         self.connection = connection
@@ -366,6 +373,13 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
 
+    def execute_sql_flush(self, using, sql_list):
+        """Execute a list of SQL statements to flush the database."""
+        with transaction.atomic(using=using, savepoint=self.connection.features.can_rollback_ddl):
+            with self.connection.cursor() as cursor:
+                for sql in sql_list:
+                    cursor.execute(sql)
+
     def sequence_reset_by_name_sql(self, style, sequences):
         """
         Return a list of the SQL statements required to reset sequences
@@ -526,7 +540,7 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def convert_durationfield_value(self, value, expression, connection, context):
+    def convert_durationfield_value(self, value, expression, connection):
         if value is not None:
             value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
             value = parse_duration(value)

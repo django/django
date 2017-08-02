@@ -118,7 +118,11 @@ class EarliestOrLatestTests(TestCase):
         # "get_latest_by" set -- just pass in the field name manually.
         Person.objects.create(name="Ralph", birthday=datetime(1950, 1, 1))
         p2 = Person.objects.create(name="Stephanie", birthday=datetime(1960, 2, 3))
-        with self.assertRaises(AssertionError):
+        msg = (
+            "earliest() and latest() require either a field_name parameter or "
+            "'get_latest_by' in the model"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             Person.objects.latest()
         self.assertEqual(Person.objects.latest("birthday"), p2)
 
@@ -151,7 +155,7 @@ class TestFirstLast(TestCase):
             # We know that we've broken the __iter__ method, so the queryset
             # should always raise an exception.
             with self.assertRaises(IndexError):
-                IndexErrorArticle.objects.all()[0]
+                IndexErrorArticle.objects.all()[:10:2]
             with self.assertRaises(IndexError):
                 IndexErrorArticle.objects.all().first()
             with self.assertRaises(IndexError):

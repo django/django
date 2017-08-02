@@ -14,6 +14,8 @@ from django.utils.duration import duration_string
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'text'
+
     def bulk_batch_size(self, fields, objs):
         """
         SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
@@ -149,9 +151,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         return -1
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # NB: The generated SQL below is specific to SQLite
-        # Note: The DELETE FROM... SQL generated below works for SQLite databases
-        # because constraints don't exist
         sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
@@ -160,6 +159,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Note: No requirement for reset of auto-incremented indices (cf. other
         # sql_flush() implementations). Just return SQL at this point
         return sql
+
+    def execute_sql_flush(self, using, sql_list):
+        # To prevent possible violation of foreign key constraints, deactivate
+        # constraints outside of the transaction created in super().
+        with self.connection.constraint_checks_disabled():
+            super().execute_sql_flush(using, sql_list)
 
     def adapt_datetimefield_value(self, value):
         if value is None:
@@ -209,7 +214,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_booleanfield_value)
         return converters
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
@@ -217,30 +222,30 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_datefield_value(self, value, expression, connection, context):
+    def convert_datefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.date):
                 value = parse_date(value)
         return value
 
-    def convert_timefield_value(self, value, expression, connection, context):
+    def convert_timefield_value(self, value, expression, connection):
         if value is not None:
             if not isinstance(value, datetime.time):
                 value = parse_time(value)
         return value
 
-    def convert_decimalfield_value(self, value, expression, connection, context):
+    def convert_decimalfield_value(self, value, expression, connection):
         if value is not None:
             value = expression.output_field.format_number(value)
             value = backend_utils.typecast_decimal(value)
         return value
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):

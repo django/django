@@ -8,11 +8,9 @@
 """
 import logging
 import os
-import re
 from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
-from django.contrib.gis.geos.error import GEOSException
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import SimpleLazyObject
 from django.utils.version import get_version_tuple
@@ -179,29 +177,7 @@ class GEOSFuncFactory:
 # explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
 geos_version = GEOSFuncFactory('GEOSversion', restype=c_char_p)
 
-# Regular expression should be able to parse version strings such as
-# '3.0.0rc4-CAPI-1.3.3', '3.0.0-CAPI-1.4.1', '3.4.0dev-CAPI-1.8.0' or '3.4.0dev-CAPI-1.8.0 r0'
-version_regex = re.compile(
-    r'^(?P<version>(?P<major>\d+)\.(?P<minor>\d+)\.(?P<subminor>\d+))'
-    r'((rc(?P<release_candidate>\d+))|dev)?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)( r\d+)?$'
-)
-
-
-def geos_version_info():
-    """
-    Return a dictionary containing the various version metadata parsed from
-    the GEOS version string, including the version number, whether the version
-    is a release candidate (and what number release candidate), and the C API
-    version.
-    """
-    ver = geos_version().decode()
-    m = version_regex.match(ver)
-    if not m:
-        raise GEOSException('Could not parse version info string "%s"' % ver)
-    return {key: m.group(key) for key in (
-        'version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor')}
-
 
 def geos_version_tuple():
     """Return the GEOS version as a tuple (major, minor, subminor)."""
-    return get_version_tuple(geos_version_info()['version'])
+    return get_version_tuple(geos_version().decode())

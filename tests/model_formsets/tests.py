@@ -1655,6 +1655,65 @@ class ModelFormsetTest(TestCase):
         # created.
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Charles>', '<Author: Walt>'])
 
+    def test_validation_without_id(self):
+        AuthorFormSet = modelformset_factory(Author, fields='__all__')
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-name': 'Charles',
+        }
+        formset = AuthorFormSet(data)
+        self.assertEqual(
+            formset.errors,
+            [{'id': ['This field is required.']}],
+        )
+
+    def test_validation_with_child_model_without_id(self):
+        BetterAuthorFormSet = modelformset_factory(BetterAuthor, fields='__all__')
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-name': 'Charles',
+            'form-0-write_speed': '10',
+        }
+        formset = BetterAuthorFormSet(data)
+        self.assertEqual(
+            formset.errors,
+            [{'author_ptr': ['This field is required.']}],
+        )
+
+    def test_validation_with_invalid_id(self):
+        AuthorFormSet = modelformset_factory(Author, fields='__all__')
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-id': 'abc',
+            'form-0-name': 'Charles',
+        }
+        formset = AuthorFormSet(data)
+        self.assertEqual(
+            formset.errors,
+            [{'id': ['Select a valid choice. That choice is not one of the available choices.']}],
+        )
+
+    def test_validation_with_nonexistent_id(self):
+        AuthorFormSet = modelformset_factory(Author, fields='__all__')
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '',
+            'form-0-id': '12345',
+            'form-0-name': 'Charles',
+        }
+        formset = AuthorFormSet(data)
+        self.assertEqual(
+            formset.errors,
+            [{'id': ['Select a valid choice. That choice is not one of the available choices.']}],
+        )
+
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):
     def test_modelformset_factory_widgets(self):

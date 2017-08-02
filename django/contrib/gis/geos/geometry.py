@@ -2,6 +2,7 @@
  This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
  inherit from this object.
 """
+import re
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
@@ -54,7 +55,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
                 # Handling WKT input.
                 if wkt_m.group('srid'):
                     input_srid = int(wkt_m.group('srid'))
-                g = wkt_r().read(force_bytes(wkt_m.group('wkt')))
+                g = self._from_wkt(force_bytes(wkt_m.group('wkt')))
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
                 g = wkb_r().read(force_bytes(geo_input))
@@ -163,6 +164,27 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def _from_wkb(cls, wkb):
         return wkb_r().read(wkb)
 
+    @staticmethod
+    def from_ewkt(ewkt):
+        ewkt = force_bytes(ewkt)
+        srid = None
+        parts = ewkt.split(b';', 1)
+        if len(parts) == 2:
+            srid_part, wkt = parts
+            match = re.match(b'SRID=(?P<srid>\-?\d+)', srid_part)
+            if not match:
+                raise ValueError('EWKT has invalid SRID part.')
+            srid = int(match.group('srid'))
+        else:
+            wkt = ewkt
+        if not wkt:
+            raise ValueError('Expected WKT but got an empty string.')
+        return GEOSGeometry(GEOSGeometry._from_wkt(wkt), srid=srid)
+
+    @staticmethod
+    def _from_wkt(wkt):
+        return wkt_r().read(wkt)
+
     @classmethod
     def from_gml(cls, gml_string):
         return gdal.OGRGeometry.from_gml(gml_string).geos
@@ -174,13 +196,11 @@ class GEOSGeometry(GEOSBase, ListMixin):
         or an EWKT representation.
         """
         if isinstance(other, str):
-            if other.startswith('SRID=0;'):
-                return self.ewkt == other[7:]  # Test only WKT part of other
-            return self.ewkt == other
-        elif isinstance(other, GEOSGeometry):
-            return self.srid == other.srid and self.equals_exact(other)
-        else:
-            return False
+            try:
+                other = GEOSGeometry.from_ewkt(other)
+            except (ValueError, GEOSException):
+                return False
+        return isinstance(other, GEOSGeometry) and self.srid == other.srid and self.equals_exact(other)
 
     # ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:

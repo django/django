@@ -55,11 +55,11 @@ Official support for Unicode usernames
 --------------------------------------
 
 The :class:`~django.contrib.auth.models.User` model in ``django.contrib.auth``
-originally only accepted ASCII letters in usernames. Although it wasn't a
-deliberate choice, Unicode characters have always been accepted when using
-Python 3.
+originally only accepted ASCII letters and numbers in usernames. Although it
+wasn't a deliberate choice, Unicode characters have always been accepted when
+using Python 3.
 
-The username validator now explicitly accepts Unicode letters by
+The username validator now explicitly accepts Unicode characters by
 default on Python 3 only. This default behavior can be overridden by changing
 the :attr:`~django.contrib.auth.models.User.username_validator` attribute of
 the ``User`` model, or to any proxy of that model, using either

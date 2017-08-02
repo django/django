@@ -17,8 +17,7 @@ class RelativeFieldTests(SimpleTestCase):
             field = models.ForeignKey(Target, models.CASCADE, related_name='+')
 
         field = Model._meta.get_field('field')
-        errors = field.check()
-        self.assertEqual(errors, [])
+        self.assertEqual(field.check(), [])
 
     def test_foreign_key_to_missing_model(self):
         # Model names are resolved when a model is being created, so we cannot
@@ -28,16 +27,14 @@ class RelativeFieldTests(SimpleTestCase):
             foreign_key = models.ForeignKey('Rel1', models.CASCADE)
 
         field = Model._meta.get_field('foreign_key')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 "Field defines a relation with model 'Rel1', "
                 "which is either not installed, or is abstract.",
                 obj=field,
                 id='fields.E300',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     @isolate_apps('invalid_models_tests')
     def test_foreign_key_to_isolate_apps_model(self):
@@ -59,16 +56,14 @@ class RelativeFieldTests(SimpleTestCase):
             m2m = models.ManyToManyField("Rel2")
 
         field = Model._meta.get_field('m2m')
-        errors = field.check(from_model=Model)
-        expected = [
+        self.assertEqual(field.check(from_model=Model), [
             Error(
                 "Field defines a relation with model 'Rel2', "
                 "which is either not installed, or is abstract.",
                 obj=field,
                 id='fields.E300',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     @isolate_apps('invalid_models_tests')
     def test_many_to_many_to_isolate_apps_model(self):
@@ -112,10 +107,8 @@ class RelativeFieldTests(SimpleTestCase):
             model = models.ForeignKey('Model', models.CASCADE)
             modelm2m = models.ForeignKey('ModelM2M', models.CASCADE)
 
-        errors = ModelM2M.check()
         field = ModelM2M._meta.get_field('m2m')
-
-        expected = [
+        self.assertEqual(ModelM2M.check(), [
             DjangoWarning(
                 'null has no effect on ManyToManyField.',
                 obj=field,
@@ -132,9 +125,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=field,
                 id='fields.W343',
             ),
-        ]
-
-        self.assertEqual(errors, expected)
+        ])
 
     def test_ambiguous_relationship_model(self):
 
@@ -151,8 +142,7 @@ class RelativeFieldTests(SimpleTestCase):
             second_model = models.ForeignKey(Group, models.CASCADE)
 
         field = Group._meta.get_field('field')
-        errors = field.check(from_model=Group)
-        expected = [
+        self.assertEqual(field.check(from_model=Group), [
             Error(
                 "The model is used as an intermediate model by "
                 "'invalid_models_tests.Group.field', but it has more than one "
@@ -166,8 +156,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=field,
                 id='fields.E335',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_relationship_model_with_foreign_key_to_wrong_model(self):
         class WrongModel(models.Model):
@@ -185,8 +174,7 @@ class RelativeFieldTests(SimpleTestCase):
             # The last foreign key should point to Group model.
 
         field = Group._meta.get_field('members')
-        errors = field.check(from_model=Group)
-        expected = [
+        self.assertEqual(field.check(from_model=Group), [
             Error(
                 "The model is used as an intermediate model by "
                 "'invalid_models_tests.Group.members', but it does not "
@@ -194,8 +182,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=InvalidRelationship,
                 id='fields.E336',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_relationship_model_missing_foreign_key(self):
         class Person(models.Model):
@@ -209,8 +196,7 @@ class RelativeFieldTests(SimpleTestCase):
             # No foreign key to Person
 
         field = Group._meta.get_field('members')
-        errors = field.check(from_model=Group)
-        expected = [
+        self.assertEqual(field.check(from_model=Group), [
             Error(
                 "The model is used as an intermediate model by "
                 "'invalid_models_tests.Group.members', but it does not have "
@@ -218,8 +204,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=InvalidRelationship,
                 id='fields.E336',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_missing_relationship_model(self):
         class Person(models.Model):
@@ -229,16 +214,14 @@ class RelativeFieldTests(SimpleTestCase):
             members = models.ManyToManyField('Person', through="MissingM2MModel")
 
         field = Group._meta.get_field('members')
-        errors = field.check(from_model=Group)
-        expected = [
+        self.assertEqual(field.check(from_model=Group), [
             Error(
                 "Field specifies a many-to-many relation through model "
                 "'MissingM2MModel', which has not been installed.",
                 obj=field,
                 id='fields.E331',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_missing_relationship_model_on_model_check(self):
         class Person(models.Model):
@@ -285,15 +268,13 @@ class RelativeFieldTests(SimpleTestCase):
             second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
 
         field = Person._meta.get_field('friends')
-        errors = field.check(from_model=Person)
-        expected = [
+        self.assertEqual(field.check(from_model=Person), [
             Error(
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
                 obj=field,
                 id='fields.E332',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_too_many_foreign_keys_in_self_referential_model(self):
         class Person(models.Model):
@@ -305,8 +286,7 @@ class RelativeFieldTests(SimpleTestCase):
             third = models.ForeignKey(Person, models.CASCADE, related_name="too_many_by_far")
 
         field = Person._meta.get_field('friends')
-        errors = field.check(from_model=Person)
-        expected = [
+        self.assertEqual(field.check(from_model=Person), [
             Error(
                 "The model is used as an intermediate model by "
                 "'invalid_models_tests.Person.friends', but it has more than two "
@@ -317,8 +297,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=InvalidRelationship,
                 id='fields.E333',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_symmetric_self_reference_with_intermediate_table(self):
         class Person(models.Model):
@@ -330,15 +309,13 @@ class RelativeFieldTests(SimpleTestCase):
             second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
 
         field = Person._meta.get_field('friends')
-        errors = field.check(from_model=Person)
-        expected = [
+        self.assertEqual(field.check(from_model=Person), [
             Error(
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
                 obj=field,
                 id='fields.E332',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_symmetric_self_reference_with_intermediate_table_and_through_fields(self):
         """
@@ -360,15 +337,13 @@ class RelativeFieldTests(SimpleTestCase):
             referee = models.ForeignKey(Person, models.CASCADE, related_name="referred")
 
         field = Person._meta.get_field('friends')
-        errors = field.check(from_model=Person)
-        expected = [
+        self.assertEqual(field.check(from_model=Person), [
             Error(
                 'Many-to-many fields with intermediate tables must not be symmetrical.',
                 obj=field,
                 id='fields.E332',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_foreign_key_to_abstract_model(self):
         class AbstractModel(models.Model):
@@ -390,8 +365,7 @@ class RelativeFieldTests(SimpleTestCase):
         )
         for field in fields:
             expected_error.obj = field
-            errors = field.check()
-            self.assertEqual(errors, [expected_error])
+            self.assertEqual(field.check(), [expected_error])
 
     def test_m2m_to_abstract_model(self):
         class AbstractModel(models.Model):
@@ -413,8 +387,7 @@ class RelativeFieldTests(SimpleTestCase):
         )
         for field in fields:
             expected_error.obj = field
-            errors = field.check(from_model=Model)
-            self.assertEqual(errors, [expected_error])
+            self.assertEqual(field.check(from_model=Model), [expected_error])
 
     def test_unique_m2m(self):
         class Person(models.Model):
@@ -424,15 +397,13 @@ class RelativeFieldTests(SimpleTestCase):
             members = models.ManyToManyField('Person', unique=True)
 
         field = Group._meta.get_field('members')
-        errors = field.check(from_model=Group)
-        expected = [
+        self.assertEqual(field.check(from_model=Group), [
             Error(
                 'ManyToManyFields cannot be unique.',
                 obj=field,
                 id='fields.E330',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_foreign_key_to_non_unique_field(self):
         class Target(models.Model):
@@ -442,15 +413,13 @@ class RelativeFieldTests(SimpleTestCase):
             foreign_key = models.ForeignKey('Target', models.CASCADE, to_field='bad')
 
         field = Model._meta.get_field('foreign_key')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 "'Target.bad' must set unique=True because it is referenced by a foreign key.",
                 obj=field,
                 id='fields.E311',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_foreign_key_to_non_unique_field_under_explicit_model(self):
         class Target(models.Model):
@@ -460,15 +429,13 @@ class RelativeFieldTests(SimpleTestCase):
             field = models.ForeignKey(Target, models.CASCADE, to_field='bad')
 
         field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 "'Target.bad' must set unique=True because it is referenced by a foreign key.",
                 obj=field,
                 id='fields.E311',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_foreign_object_to_non_unique_fields(self):
         class Person(models.Model):
@@ -488,8 +455,7 @@ class RelativeFieldTests(SimpleTestCase):
             )
 
         field = MMembership._meta.get_field('person')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 "No subset of the fields 'country_id', 'city_id' on model 'Person' is unique.",
                 hint=(
@@ -499,8 +465,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=field,
                 id='fields.E310',
             )
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_on_delete_set_null_on_non_nullable_field(self):
         class Person(models.Model):
@@ -510,16 +475,14 @@ class RelativeFieldTests(SimpleTestCase):
             foreign_key = models.ForeignKey('Person', models.SET_NULL)
 
         field = Model._meta.get_field('foreign_key')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 'Field specifies on_delete=SET_NULL, but cannot be null.',
                 hint='Set null=True argument on the field, or change the on_delete rule.',
                 obj=field,
                 id='fields.E320',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_on_delete_set_default_without_default_value(self):
         class Person(models.Model):
@@ -529,16 +492,14 @@ class RelativeFieldTests(SimpleTestCase):
             foreign_key = models.ForeignKey('Person', models.SET_DEFAULT)
 
         field = Model._meta.get_field('foreign_key')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 'Field specifies on_delete=SET_DEFAULT, but has no default value.',
                 hint='Set a default value, or change the on_delete rule.',
                 obj=field,
                 id='fields.E321',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_nullable_primary_key(self):
@@ -546,16 +507,14 @@ class RelativeFieldTests(SimpleTestCase):
             field = models.IntegerField(primary_key=True, null=True)
 
         field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 'Primary keys must not have null=True.',
                 hint='Set null=False on the field, or remove primary_key=True argument.',
                 obj=field,
                 id='fields.E007',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_not_swapped_model(self):
         class SwappableModel(models.Model):
@@ -635,8 +594,7 @@ class RelativeFieldTests(SimpleTestCase):
 
         for field in fields:
             expected_error.obj = field
-            errors = field.check(from_model=Model)
-            self.assertEqual(errors, [expected_error])
+            self.assertEqual(field.check(from_model=Model), [expected_error])
 
     def test_related_field_has_invalid_related_name(self):
         digit = 0
@@ -667,8 +625,7 @@ class RelativeFieldTests(SimpleTestCase):
             })
 
             field = Child._meta.get_field('parent')
-            errors = Child.check()
-            expected = [
+            self.assertEqual(Child.check(), [
                 Error(
                     "The name '%s' is invalid related_name for field Child%s.parent"
                     % (invalid_related_name, invalid_related_name),
@@ -676,8 +633,7 @@ class RelativeFieldTests(SimpleTestCase):
                     obj=field,
                     id='fields.E306',
                 ),
-            ]
-            self.assertEqual(errors, expected)
+            ])
 
     def test_related_field_has_valid_related_name(self):
         lowercase = 'a'
@@ -704,9 +660,7 @@ class RelativeFieldTests(SimpleTestCase):
                 'parent': models.ForeignKey('Parent', models.CASCADE, related_name=related_name),
                 '__module__': Parent.__module__,
             })
-
-            errors = Child.check()
-            self.assertFalse(errors)
+            self.assertEqual(Child.check(), [])
 
     def test_to_fields_exist(self):
         class Parent(models.Model):
@@ -723,7 +677,7 @@ class RelativeFieldTests(SimpleTestCase):
             )
 
         field = Child._meta.get_field('parent')
-        expected = [
+        self.assertEqual(field.check(), [
             Error(
                 "The to_field 'a' doesn't exist on the related model 'invalid_models_tests.Parent'.",
                 obj=field,
@@ -734,8 +688,7 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=field,
                 id='fields.E312',
             ),
-        ]
-        self.assertEqual(field.check(), expected)
+        ])
 
     def test_to_fields_not_checked_if_related_model_doesnt_exist(self):
         class Child(models.Model):
@@ -828,8 +781,7 @@ class AccessorClashTests(SimpleTestCase):
         class Model(models.Model):
             rel = relative
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.rel' clashes with field name 'Target.model_set'.",
                 hint=("Rename field 'Target.model_set', or add/change "
@@ -838,8 +790,7 @@ class AccessorClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('rel'),
                 id='fields.E302',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_clash_between_accessors(self):
         class Target(models.Model):
@@ -849,8 +800,7 @@ class AccessorClashTests(SimpleTestCase):
             foreign = models.ForeignKey(Target, models.CASCADE)
             m2m = models.ManyToManyField(Target)
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.foreign' clashes with reverse accessor for 'Model.m2m'.",
                 hint=(
@@ -869,8 +819,7 @@ class AccessorClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('m2m'),
                 id='fields.E304',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_m2m_to_m2m_with_inheritance(self):
         """ Ref #22047. """
@@ -887,8 +836,7 @@ class AccessorClashTests(SimpleTestCase):
         class Child(Parent):
             pass
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.children' clashes with field name 'Child.m2m_clash'.",
                 hint=(
@@ -898,8 +846,7 @@ class AccessorClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('children'),
                 id='fields.E302',
             )
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_no_clash_for_hidden_related_name(self):
         class Stub(models.Model):
@@ -960,8 +907,7 @@ class ReverseQueryNameClashTests(SimpleTestCase):
         class Model(models.Model):
             rel = relative
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse query name for 'Model.rel' clashes with field name 'Target.model'.",
                 hint=(
@@ -971,8 +917,7 @@ class ReverseQueryNameClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('rel'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1018,8 +963,7 @@ class ExplicitRelatedNameClashTests(SimpleTestCase):
         class Model(models.Model):
             rel = relative
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.rel' clashes with field name 'Target.clash'.",
                 hint=(
@@ -1038,8 +982,7 @@ class ExplicitRelatedNameClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('rel'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1126,8 +1069,7 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
         class Model(models.Model):
             rel = relative
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse query name for 'Model.rel' clashes with field name 'Target.clash'.",
                 hint=(
@@ -1137,8 +1079,7 @@ class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('rel'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1149,8 +1090,7 @@ class SelfReferentialM2MClashTests(SimpleTestCase):
             first_m2m = models.ManyToManyField('self', symmetrical=False)
             second_m2m = models.ManyToManyField('self', symmetrical=False)
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.first_m2m' clashes with reverse accessor for 'Model.second_m2m'.",
                 hint=(
@@ -1169,15 +1109,13 @@ class SelfReferentialM2MClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('second_m2m'),
                 id='fields.E304',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_accessor_clash(self):
         class Model(models.Model):
             model_set = models.ManyToManyField("self", symmetrical=False)
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.model_set' clashes with field name 'Model.model_set'.",
                 hint=(
@@ -1187,15 +1125,13 @@ class SelfReferentialM2MClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('model_set'),
                 id='fields.E302',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_reverse_query_name_clash(self):
         class Model(models.Model):
             model = models.ManyToManyField("self", symmetrical=False)
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse query name for 'Model.model' clashes with field name 'Model.model'.",
                 hint=(
@@ -1205,16 +1141,14 @@ class SelfReferentialM2MClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('model'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_clash_under_explicit_related_name(self):
         class Model(models.Model):
             clash = models.IntegerField()
             m2m = models.ManyToManyField("self", symmetrical=False, related_name='clash')
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.m2m' clashes with field name 'Model.clash'.",
                 hint=(
@@ -1233,16 +1167,14 @@ class SelfReferentialM2MClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('m2m'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_valid_model(self):
         class Model(models.Model):
             first = models.ManyToManyField("self", symmetrical=False, related_name='first_accessor')
             second = models.ManyToManyField("self", symmetrical=False, related_name='second_accessor')
 
-        errors = Model.check()
-        self.assertEqual(errors, [])
+        self.assertEqual(Model.check(), [])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1252,8 +1184,7 @@ class SelfReferentialFKClashTests(SimpleTestCase):
         class Model(models.Model):
             model_set = models.ForeignKey("Model", models.CASCADE)
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.model_set' clashes with field name 'Model.model_set'.",
                 hint=(
@@ -1264,15 +1195,13 @@ class SelfReferentialFKClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('model_set'),
                 id='fields.E302',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_reverse_query_name_clash(self):
         class Model(models.Model):
             model = models.ForeignKey("Model", models.CASCADE)
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse query name for 'Model.model' clashes with field name 'Model.model'.",
                 hint=(
@@ -1282,16 +1211,14 @@ class SelfReferentialFKClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('model'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
     def test_clash_under_explicit_related_name(self):
         class Model(models.Model):
             clash = models.CharField(max_length=10)
             foreign = models.ForeignKey("Model", models.CASCADE, related_name='clash')
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.foreign' clashes with field name 'Model.clash'.",
                 hint=(
@@ -1310,8 +1237,7 @@ class SelfReferentialFKClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('foreign'),
                 id='fields.E303',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1336,8 +1262,7 @@ class ComplexClashTests(SimpleTestCase):
             m2m_1 = models.ManyToManyField(Target, related_name='id')
             m2m_2 = models.ManyToManyField(Target, related_name='src_safe')
 
-        errors = Model.check()
-        expected = [
+        self.assertEqual(Model.check(), [
             Error(
                 "Reverse accessor for 'Model.foreign_1' clashes with field name 'Target.id'.",
                 hint=("Rename field 'Target.id', or add/change a related_name "
@@ -1425,8 +1350,7 @@ class ComplexClashTests(SimpleTestCase):
                 obj=Model._meta.get_field('m2m_2'),
                 id='fields.E305',
             ),
-        ]
-        self.assertEqual(errors, expected)
+        ])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1459,8 +1383,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
             inviter = models.ForeignKey(Fan, models.CASCADE, related_name='+')
 
         field = Event._meta.get_field('invitees')
-        errors = field.check(from_model=Event)
-        expected = [
+        self.assertEqual(field.check(from_model=Event), [
             Error(
                 "'Invitation.invitee' is not a foreign key to 'Event'.",
                 hint="Did you mean one of the following foreign keys to 'Event': event?",
@@ -1473,8 +1396,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
                 obj=field,
                 id='fields.E339',
             ),
-        ]
-        self.assertEqual(expected, errors)
+        ])
 
     def test_invalid_field(self):
         """
@@ -1497,8 +1419,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
             inviter = models.ForeignKey(Fan, models.CASCADE, related_name='+')
 
         field = Event._meta.get_field('invitees')
-        errors = field.check(from_model=Event)
-        expected = [
+        self.assertEqual(field.check(from_model=Event), [
             Error(
                 "The intermediary model 'invalid_models_tests.Invitation' has no field 'invalid_field_1'.",
                 hint="Did you mean one of the following foreign keys to 'Event': event?",
@@ -1511,8 +1432,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
                 obj=field,
                 id='fields.E338',
             ),
-        ]
-        self.assertEqual(expected, errors)
+        ])
 
     def test_explicit_field_names(self):
         """
@@ -1531,16 +1451,16 @@ class M2mThroughFieldsTests(SimpleTestCase):
             inviter = models.ForeignKey(Fan, models.CASCADE, related_name='+')
 
         field = Event._meta.get_field('invitees')
-        errors = field.check(from_model=Event)
-        expected = [
+        self.assertEqual(field.check(from_model=Event), [
             Error(
                 "Field specifies 'through_fields' but does not provide the names "
                 "of the two link fields that should be used for the relation "
                 "through model 'invalid_models_tests.Invitation'.",
                 hint="Make sure you specify 'through_fields' as through_fields=('field1', 'field2')",
                 obj=field,
-                id='fields.E337')]
-        self.assertEqual(expected, errors)
+                id='fields.E337',
+            ),
+        ])
 
     def test_superset_foreign_object(self):
         class Parent(models.Model):
@@ -1564,8 +1484,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
             )
 
         field = Child._meta.get_field('parent')
-        errors = field.check(from_model=Child)
-        expected = [
+        self.assertEqual(field.check(from_model=Child), [
             Error(
                 "No subset of the fields 'a', 'b' on model 'Parent' is unique.",
                 hint=(
@@ -1575,8 +1494,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
                 obj=field,
                 id='fields.E310',
             ),
-        ]
-        self.assertEqual(expected, errors)
+        ])
 
     def test_intersection_foreign_object(self):
         class Parent(models.Model):
@@ -1602,8 +1520,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
             )
 
         field = Child._meta.get_field('parent')
-        errors = field.check(from_model=Child)
-        expected = [
+        self.assertEqual(field.check(from_model=Child), [
             Error(
                 "No subset of the fields 'a', 'b', 'd' on model 'Parent' is unique.",
                 hint=(
@@ -1613,5 +1530,4 @@ class M2mThroughFieldsTests(SimpleTestCase):
                 obj=field,
                 id='fields.E310',
             ),
-        ]
-        self.assertEqual(expected, errors)
+        ])

@@ -226,7 +226,11 @@ class OneToOneTests(TestCase):
         setattr(p, 'restaurant', None)
 
         # You also can't assign an object of the wrong type here
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<Place: Demon Dogs the place>": '
+            '"Place.restaurant" must be a "Restaurant" instance.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             setattr(p, 'restaurant', p)
 
         # Creation using keyword argument should cache the related object.

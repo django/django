@@ -34,12 +34,12 @@ Fields
 
         .. admonition:: Usernames and Unicode
 
-            Django originally accepted only ASCII letters in usernames.
-            Although it wasn't a deliberate choice, Unicode characters have
-            always been accepted when using Python 3. Django 1.10 officially
-            added Unicode support in usernames, keeping the ASCII-only behavior
-            on Python 2, with the option to customize the behavior using
-            :attr:`.User.username_validator`.
+            Django originally accepted only ASCII letters and numbers in
+            usernames. Although it wasn't a deliberate choice, Unicode
+            characters have always been accepted when using Python 3. Django
+            1.10 officially added Unicode support in usernames, keeping the
+            ASCII-only behavior on Python 2, with the option to customize the
+            behavior using :attr:`.User.username_validator`.
 
     .. attribute:: first_name
 
@@ -395,12 +395,12 @@ Validators
 
 .. class:: validators.ASCIIUsernameValidator
 
-    A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``.
+    A field validator allowing only ASCII letters and numbers, in addition to
+    ``@``, ``.``, ``+``, ``-``, and ``_``.
 
 .. class:: validators.UnicodeUsernameValidator
 
-    A field validator allowing Unicode letters, in addition to ``@``, ``.``,
+    A field validator allowing Unicode characters, in addition to ``@``, ``.``,
     ``+``, ``-``, and ``_``. The default validator for ``User.username``.
 
 .. _topics-auth-signals:

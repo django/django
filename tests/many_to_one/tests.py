@@ -406,7 +406,8 @@ class ManyToOneTests(TestCase):
         self.assertEqual(a3.reporter.id, self.r2.id)
 
         # Get should respect explicit foreign keys as well.
-        with self.assertRaises(MultipleObjectsReturned):
+        msg = 'get() returned more than one Article -- it returned 2!'
+        with self.assertRaisesMessage(MultipleObjectsReturned, msg):
             Article.objects.get(reporter_id=self.r.id)
         self.assertEqual(
             repr(a3),
@@ -484,7 +485,11 @@ class ManyToOneTests(TestCase):
         setattr(c, "parent", None)
 
         # You also can't assign an object of the wrong type here
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<First: First object (1)>": "Child.parent" must '
+            'be a "Parent" instance.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             setattr(c, "parent", First(id=1, second=1))
 
         # You can assign None to Child.parent during object creation.
@@ -550,7 +555,8 @@ class ManyToOneTests(TestCase):
 
         p = Parent.objects.create(name="Parent")
         c = Child.objects.create(name="Child", parent=p)
-        with self.assertRaises(ValueError):
+        msg = 'Cannot assign "%r": "Child.parent" must be a "Parent" instance.' % c
+        with self.assertRaisesMessage(ValueError, msg):
             Child.objects.create(name="Grandchild", parent=c)
 
     def test_fk_instantiation_outside_model(self):

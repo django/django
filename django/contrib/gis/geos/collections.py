@@ -2,7 +2,6 @@
  This module houses the Geometry Collection objects:
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
-import json
 from ctypes import byref, c_int, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
@@ -77,19 +76,6 @@ class GeometryCollection(GEOSGeometry):
 
     _set_single = GEOSGeometry._set_single_rebuild
     _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
-
-    @property
-    def json(self):
-        if self.__class__.__name__ == 'GeometryCollection':
-            return json.dumps({
-                'type': self.__class__.__name__,
-                'geometries': [
-                    {'type': geom.__class__.__name__, 'coordinates': geom.coords}
-                    for geom in self
-                ],
-            })
-        return super().json
-    geojson = json
 
     @property
     def kml(self):

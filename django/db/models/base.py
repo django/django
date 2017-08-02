@@ -481,17 +481,19 @@ class Model(metaclass=ModelBase):
                         del kwargs[prop]
                 except (AttributeError, FieldDoesNotExist):
                     pass
-            if kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
+            for kwarg in kwargs:
+                raise TypeError("'%s' is an invalid keyword argument for this function" % kwarg)
         super().__init__()
         post_init.send(sender=cls, instance=self)
 
     @classmethod
     def from_db(cls, db, field_names, values):
         if len(values) != len(cls._meta.concrete_fields):
-            values = list(values)
-            values.reverse()
-            values = [values.pop() if f.attname in field_names else DEFERRED for f in cls._meta.concrete_fields]
+            values_iter = iter(values)
+            values = [
+                next(values_iter) if f.attname in field_names else DEFERRED
+                for f in cls._meta.concrete_fields
+            ]
         new = cls(*values)
         new._state.adding = False
         new._state.db = db

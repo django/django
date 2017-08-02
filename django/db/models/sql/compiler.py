@@ -1,5 +1,7 @@
 import collections
+import functools
 import re
+import warnings
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -12,6 +14,8 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, NotSupportedError
+from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.inspect import func_supports_parameter
 
 FORCE = object()
 
@@ -399,7 +403,18 @@ class SQLCompiler:
                     raise DatabaseError('LIMIT/OFFSET not allowed in subqueries of compound statements.')
                 if compiler.get_order_by():
                     raise DatabaseError('ORDER BY not allowed in subqueries of compound statements.')
-        parts = (compiler.as_sql() for compiler in compilers)
+        parts = ()
+        for compiler in compilers:
+            try:
+                parts += (compiler.as_sql(),)
+            except EmptyResultSet:
+                # Omit the empty queryset with UNION and with DIFFERENCE if the
+                # first queryset is nonempty.
+                if combinator == 'union' or (combinator == 'difference' and parts):
+                    continue
+                raise
+        if not parts:
+            raise EmptyResultSet
         combinator_sql = self.connection.ops.set_operators[combinator]
         if all and combinator == 'union':
             combinator_sql += ' ALL'
@@ -422,16 +437,7 @@ class SQLCompiler:
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
-            distinct_fields = self.get_distinct()
-
-            # This must come after 'select', 'ordering', and 'distinct' -- see
-            # docstring of get_from_clause() for details.
-            from_, f_params = self.get_from_clause()
-
             for_update_part = None
-            where, w_params = self.compile(self.where) if self.where is not None else ("", [])
-            having, h_params = self.compile(self.having) if self.having is not None else ("", [])
-
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
@@ -439,6 +445,12 @@ class SQLCompiler:
                     raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
+                distinct_fields = self.get_distinct()
+                # This must come after 'select', 'ordering', and 'distinct'
+                # (see docstring of get_from_clause() for details).
+                from_, f_params = self.get_from_clause()
+                where, w_params = self.compile(self.where) if self.where is not None else ("", [])
+                having, h_params = self.compile(self.having) if self.having is not None else ("", [])
                 result = ['SELECT']
                 params = []
 
@@ -806,8 +818,8 @@ class SQLCompiler:
                 related_field_name = f.related_query_name()
                 fields_found.add(related_field_name)
 
-                _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
-                alias = joins[-1]
+                join_info = self.query.setup_joins([related_field_name], opts, root_alias)
+                alias = join_info.joins[-1]
                 from_parent = issubclass(model, opts.model) and model is not opts.model
                 klass_info = {
                     'model': model,
@@ -910,7 +922,20 @@ class SQLCompiler:
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    converters[i] = (backend_converters + field_converters, expression)
+                    convs = []
+                    for conv in (backend_converters + field_converters):
+                        if func_supports_parameter(conv, 'context'):
+                            warnings.warn(
+                                'Remove the context parameter from %s.%s(). Support for it '
+                                'will be removed in Django 3.0.' % (
+                                    conv.__self__.__class__.__name__,
+                                    conv.__name__,
+                                ),
+                                RemovedInDjango30Warning,
+                            )
+                            conv = functools.partial(conv, context={})
+                        convs.append(conv)
+                    converters[i] = (convs, expression)
         return converters
 
     def apply_converters(self, row, converters):
@@ -918,7 +943,7 @@ class SQLCompiler:
         for pos, (convs, expression) in converters.items():
             value = row[pos]
             for converter in convs:
-                value = converter(value, expression, self.connection, self.query.context)
+                value = converter(value, expression, self.connection)
             row[pos] = value
         return tuple(row)
 
@@ -1312,7 +1337,7 @@ class SQLUpdateCompiler(SQLCompiler):
         count = self.query.count_active_tables()
         if not self.query.related_updates and count == 1:
             return
-        query = self.query.clone(klass=Query)
+        query = self.query.chain(klass=Query)
         query.select_related = False
         query.clear_ordering(True)
         query._extra = {}
