@@ -4,278 +4,235 @@
     <head>
         <meta charset="utf-8">
         <title>{% trans "Django: the Web framework for perfectionists with deadlines." %}</title>
-        <meta name="description" content="{% trans "Congratulations! Your Django installation worked! Django is the web framework for perfectionists with deadlines." %}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/static/admin/css/fonts.css">
         <style type="text/css">
           body, main {
-            margin: 0 auto
+            margin: 0 auto;
           }
-
           .body, .tip {
-            stroke: #fff
+            stroke: #fff;
           }
-
           html {
             line-height: 1.15;
             -ms-text-size-adjust: 100%;
             -webkit-text-size-adjust: 100%;
-            box-sizing: border-box
+            box-sizing: border-box;
           }
-
           footer, header, main {
-            display: block
+            display: block;
           }
-
           a {
             background-color: transparent;
             -webkit-text-decoration-skip: objects;
             color: #20AA76;
-            text-decoration: none
+            text-decoration: none;
           }
-
           img {
-            border-style: none
+            border-style: none;
           }
-
           .next-step, header {
-            border-bottom: 1px solid #efefef
+            border-bottom: 1px solid #efefef;
           }
-
           svg:not(:root) {
-            overflow: hidden
+            overflow: hidden;
           }
-
           body {
             max-width: 960px;
             color: #525252;
-            font-family: Roboto, sans-serif
+            font-family: Roboto, sans-serif;
           }
-
           main {
-            text-align: center
+            text-align: center;
           }
-
           .u-clearfix:after {
             content: "";
             clear: both;
-            display: table
+            display: table;
           }
-
           .exhaust.two, .fuel, .removehole {
-            display: none
+            display: none;
           }
-
           h1, h2, h3, h4, h5, p, ul {
             padding: 0;
             margin: 0;
-            font-weight: 400
+            font-weight: 400;
           }
-
           header {
             padding-top: 20px;
-            padding-bottom: 10px
+            padding-bottom: 10px;
           }
-
           .logo {
-            float: left
+            float: left;
           }
-
           .logo h2 {
             font-weight: 700;
-            margin-top: 0px
+            margin-top: 0px;
           }
-
           .release-notes {
             float: right;
-            margin-top: 7px
+            margin-top: 7px;
           }
-
           .release-notes p {
-            font-size: 14px
+            font-size: 14px;
           }
-
           .figure {
             margin-top: 19vh;
-            height: 173px
+            height: 173px;
           }
-
           .figure__animation {
             max-width: 265px;
             position: relative;
-            z-index: -9
+            z-index: -9;
           }
-
           .tip {
             stroke-width: 3px;
             -webkit-transform: translateY(-7px);
-            transform: translateY(-7px)
+            transform: translateY(-7px);
           }
-
           .body {
             fill: #6DDCBD;
             -webkit-transform: scaleX(1.25);
             transform: scaleX(1.25);
             -webkit-transform-origin: center;
             transform-origin: center;
-            stroke-width: 3px
+            stroke-width: 3px;
           }
-
           .box {
             position: absolute;
             bottom: 0;
-            left: 0
+            left: 0;
           }
-
           .circle {
             fill: #6DDCBD;
             stroke: #fff;
-            stroke-width: 7px
+            stroke-width: 7px;
           }
-
           .exhaust {
-            border-bottom-left-radius: 4px
+            border-bottom-left-radius: 4px;
           }
-
           .exhaust.two, .exhaust__line {
             -webkit-animation: thurst 70ms infinite ease-in-out alternate;
-            animation: thurst 70ms infinite ease-in-out alternate
+            animation: thurst 70ms infinite ease-in-out alternate;
           }
-
           .smoke {
             -webkit-animation: smoke .1s infinite ease-in-out alternate;
             animation: smoke .1s infinite ease-in-out alternate;
             -webkit-transform-origin: center;
             transform-origin: center;
-            opacity: .8
+            opacity: .8;
           }
-
           @-moz-document url-prefix() {
             .smoke {
-              animation: smokeFirefox .2s infinite ease-in-out alternate
+              animation: smokeFirefox .2s infinite ease-in-out alternate;
             }
           }
-
           @-webkit-keyframes smoke {
             0% {
-              -webkit-transform: scaleX(1.58) scaleY(1.2) translateY(-55px) skew(3deg);
-              transform: scaleX(1.58) scaleY(1.2) translateY(-55px) skew(3deg)
+              -webkit-transform: scale(1.58, 1.2) translateY(-55px) skew(3deg);
+              transform: scale(1.58, 1.2) translateY(-55px) skew(3deg);
             }
             100% {
-              -webkit-transform: scaleX(1.6) scaleY(1.22) translateY(-55px) skew(-3deg);
-              transform: scaleX(1.6) scaleY(1.22) translateY(-55px) skew(-3deg)
+              -webkit-transform: scale(1.6, 1.22) translateY(-55px) skew(-3deg);
+              transform: scale(1.6, 1.22) translateY(-55px) skew(-3deg);
             }
           }
-
           @keyframes smoke {
             0% {
-              -webkit-transform: scaleX(1.58) scaleY(1.2) translateY(-55px) skew(3deg);
-              transform: scaleX(1.58) scaleY(1.2) translateY(-55px) skew(3deg)
+              -webkit-transform: scale(1.58, 1.2) translateY(-55px) skew(3deg);
+              transform: scale(1.58, 1.2) translateY(-55px) skew(3deg);
             }
             100% {
-              -webkit-transform: scaleX(1.6) scaleY(1.22) translateY(-55px) skew(-3deg);
-              transform: scaleX(1.6) scaleY(1.22) translateY(-55px) skew(-3deg)
+              -webkit-transform: scale(1.6, 1.22) translateY(-55px) skew(-3deg);
+              transform: scale(1.6, 1.22) translateY(-55px) skew(-3deg);
             }
           }
-
           @-webkit-keyframes smokeFirefox {
             0% {
-              -webkit-transform: scaleX(1.58) scaleY(1.2) translateY(-75px) skew(0);
-              transform: scaleX(1.58) scaleY(1.2) translateY(-75px) skew(0)
+              -webkit-transform: scale(1.58, 1.2) translateY(-75px) skew(0);
+              transform: scale(1.58, 1.2) translateY(-75px) skew(0);
             }
             100% {
-              -webkit-transform: scaleX(1.58) scaleY(1.21) translateY(-75px) skew(1deg);
-              transform: scaleX(1.58) scaleY(1.21) translateY(-75px) skew(1deg)
+              -webkit-transform: scale(1.58, 1.21) translateY(-75px) skew(1deg);
+              transform: scale(1.58, 1.21) translateY(-75px) skew(1deg);
             }
           }
-
           @keyframes smokeFirefox {
             0% {
-              -webkit-transform: scaleX(1.58) scaleY(1.2) translateY(-75px) skew(0);
-              transform: scaleX(1.58) scaleY(1.2) translateY(-75px) skew(0)
+              -webkit-transform: scale(1.58, 1.2) translateY(-75px) skew(0);
+              transform: scale(1.58, 1.2) translateY(-75px) skew(0);
             }
             100% {
-              -webkit-transform: scaleX(1.58) scaleY(1.21) translateY(-75px) skew(1deg);
-              transform: scaleX(1.58) scaleY(1.21) translateY(-75px) skew(1deg)
+              -webkit-transform: scale(1.58, 1.21) translateY(-75px) skew(1deg);
+              transform: scale(1.58, 1.21) translateY(-75px) skew(1deg);
             }
           }
-
           .flame 0%, .flame 100% {
             -webkit-transform: translate(265px, 249px) scale(1.9) rotate(180deg);
-            transform: translate(265px, 249px) scale(1.9) rotate(180deg)
+            transform: translate(265px, 249px) scale(1.9) rotate(180deg);
           }
-
           .flame {
             -webkit-animation: burnInner2 .1s infinite ease-in-out alternate;
-            animation: burnInner2 .1s infinite ease-in-out alternate
+            animation: burnInner2 .1s infinite ease-in-out alternate;
           }
-
           @-webkit-keyframes burnInner2 {
             0% {
               -webkit-transform: translate(265px, 249px) scale(1.9) rotate(180deg) skew(5deg);
-              transform: translate(265px, 249px) scale(1.9) rotate(180deg) skew(5deg)
+              transform: translate(265px, 249px) scale(1.9) rotate(180deg) skew(5deg);
             }
             100% {
               -webkit-transform: translate(265px, 253px) scale(2.2) rotate(180deg) skew(-5deg);
-              transform: translate(265px, 253px) scale(2.2) rotate(180deg) skew(-5deg)
+              transform: translate(265px, 253px) scale(2.2) rotate(180deg) skew(-5deg);
             }
           }
-
           @keyframes burnInner2 {
             0% {
               -webkit-transform: translate(265px, 249px) scale(1.9) rotate(180deg) skew(5deg);
-              transform: translate(265px, 249px) scale(1.9) rotate(180deg) skew(5deg)
+              transform: translate(265px, 249px) scale(1.9) rotate(180deg) skew(5deg);
             }
             100% {
               -webkit-transform: translate(265px, 253px) scale(2.2) rotate(180deg) skew(-5deg);
-              transform: translate(265px, 253px) scale(2.2) rotate(180deg) skew(-5deg)
+              transform: translate(265px, 253px) scale(2.2) rotate(180deg) skew(-5deg);
             }
           }
-
           @-webkit-keyframes thurst {
             0% {
-              opacity: 1
+              opacity: 1;
             }
             100% {
-              opacity: .5
+              opacity: .5;
             }
           }
-
           @keyframes thurst {
             0% {
-              opacity: 1
+              opacity: 1;
             }
             100% {
-              opacity: .5
+              opacity: .5;
             }
           }
-
           h2 {
             font-size: 22px;
             max-width: 500px;
-            margin: 5px auto 0
+            margin: 5px auto 0;
           }
-
           main p {
             font-size: 16px;
             line-height: 20px;
             max-width: 390px;
             margin: 15px auto 0;
-            color: gray
+            color: gray;
           }
-
           .next-step {
             max-width: 120px;
             margin: 150px auto 0;
-            padding-bottom: 8px
+            padding-bottom: 8px;
           }
-
           .next-step h5 {
             font-size: 12px;
             color: #b3b3b3;
-            font-weight: 300
+            font-weight: 300;
           }
-
           footer {
             padding: 30px 0;
             position: fixed;
@@ -287,30 +244,25 @@
             transform: translateX(-50%);
             -webkit-transform-style: preserve-3d;
             transform-style: preserve-3d;
-            border-top: 1px solid #efefef
+            border-top: 1px solid #efefef;
           }
-
           .option {
             position: absolute;
             width: 260px;
-            top: 25px
+            top: 25px;
           }
-
           .one {
-            left: 0px
+            left: 0px;
           }
-
           .two {
             left: 50%;
             margin-left: 5px;
             -webkit-transform: translateX(-50%);
-            transform: translateX(-50%)
+            transform: translateX(-50%);
           }
-
           .three {
-            right: 0px
+            right: 0px;
           }
-
           .option svg {
             width: 25px;
             height: 25px;
@@ -319,96 +271,90 @@
             padding: 5px;
             border-radius: 100%;
             float: left;
-            margin-right: 10px
+            margin-right: 10px;
           }
-
           .option h4 {
             color: #20AA76;
-            font-size: 19px
+            font-size: 19px;
           }
-
           .option p {
             font-weight: 300;
             font-size: 15px;
             padding-top: 3px;
-            color: #8f8f8f
+            color: #8f8f8f;
           }
-
           @media (max-width: 996px) {
             body, footer {
-              max-width: 780px
+              max-width: 780px;
             }
             .logo h2 {
-              margin-left: 0px
+              margin-left: 0px;
             }
             .two {
-              margin-left: 5px
+              margin-left: 5px;
             }
           }
-
           @media (max-width: 800px) {
             footer, main {
-              position: relative
+              position: relative;
             }
             footer {
-              height: 100%
+              height: 100%;
             }
             .option {
               position: relative;
               width: 100%;
               left: auto;
               right: auto;
-              top: auto
+              top: auto;
             }
             .two {
               margin-left: 0px;
               -webkit-transform: none;
-              transform: none
+              transform: none;
             }
             .logo, .option, .release-notes {
-              float: none
+              float: none;
             }
             .figure {
-              margin-top: 10px
+              margin-top: 10px;
             }
             main {
-              padding: 0 25px
+              padding: 0 25px;
             }
             main h2 {
-              font-size: 18px
+              font-size: 18px;
             }
             main p {
-              font-size: 14px
+              font-size: 14px;
             }
             header {
               padding-left: 20px;
-              padding-right: 20px
+              padding-right: 20px;
             }
             footer {
               overflow: hidden;
               width: 100%;
-              margin-top: 50px
+              margin-top: 50px;
             }
             .option {
               padding: 0 25px;
               width: 100%;
-              margin-bottom: 60px
+              margin-bottom: 60px;
             }
           }
-
           @media (min-width: 801px) and (max-height: 730px) {
             .figure {
-              margin-top: 80px
+              margin-top: 80px;
             }
           }
-
           @media (min-width: 801px) and (max-height: 600px) {
             footer {
               position: relative;
-              margin: 135px auto 0
+              margin: 135px auto 0;
             }
             .figure {
-              margin-top: 50px
+              margin-top: 50px;
             }
           }
         </style>

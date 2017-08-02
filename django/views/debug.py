@@ -39,7 +39,6 @@ class CallableSettingWrapper:
     * Not to break the debug page if the callable forbidding to set attributes
       (#23070).
     """
-
     def __init__(self, callable_setting):
         self._wrapped = callable_setting
 
@@ -508,7 +507,7 @@ def default_urlconf(request):
     with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open() as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
-        "version": get_docs_version(),
+        'version': get_docs_version(),
     })
 
     return HttpResponse(t.render(c), content_type='text/html')
