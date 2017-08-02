@@ -354,7 +354,7 @@ class ExceptionReporterTests(SimpleTestCase):
                 try:
                     raise ValueError('Second exception') from explicit
                 except ValueError:
-                    raise IndexError('Final exception')
+                    raise IndexError(mark_safe('<p>Final exception</p>'))
         except Exception:
             # Custom exception handler, just pass it into ExceptionReporter
             exc_type, exc_value, tb = sys.exc_info()
@@ -368,10 +368,12 @@ class ExceptionReporterTests(SimpleTestCase):
         # one as plain text (for pastebin)
         self.assertEqual(2, html.count(explicit_exc.format("Top level")))
         self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
+        self.assertEqual(10, html.count('&lt;p&gt;Final exception&lt;/p&gt;'))
 
         text = reporter.get_traceback_text()
         self.assertIn(explicit_exc.format("Top level"), text)
         self.assertIn(implicit_exc.format("Second exception"), text)
+        self.assertEqual(3, text.count('<p>Final exception</p>'))
 
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
@@ -415,6 +417,16 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertIn('VAL\\xe9VAL', html)
         self.assertIn('EXC\\xe9EXC', html)
+
+    def test_local_variable_escaping(self):
+        """Safe strings in local variables are escaped."""
+        try:
+            local = mark_safe('<p>Local variable</p>')
+            raise ValueError(local)
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        html = ExceptionReporter(None, exc_type, exc_value, tb).get_traceback_html()
+        self.assertIn('<td class="code"><pre>&#39;&lt;p&gt;Local variable&lt;/p&gt;&#39;</pre></td>', html)
 
     def test_unprintable_values_handling(self):
         "Unprintable values should not make the output generation choke."
