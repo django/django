@@ -18,6 +18,7 @@ from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
+from django.utils.safestring import mark_safe
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
@@ -447,16 +448,19 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
     def test_encoding_error(self):
-        """A UnicodeError displays a portion of the problematic string."""
+        """
+        A UnicodeError displays a portion of the problematic string. HTML in
+        safe strings is escaped.
+        """
         try:
-            'abcdefghijklmnὀpqrstuwxyz'.encode('ascii')
+            mark_safe('abcdefghijkl<p>mnὀp</p>qrstuwxyz').encode('ascii')
         except Exception:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertIn('<h2>Unicode error hint</h2>', html)
         self.assertIn('The string that could not be encoded/decoded was: ', html)
-        self.assertIn('<strong>jklmnὀpqrst</strong>', html)
+        self.assertIn('<strong>&lt;p&gt;mnὀp&lt;/p&gt;</strong>', html)
 
     def test_unfrozen_importlib(self):
         """

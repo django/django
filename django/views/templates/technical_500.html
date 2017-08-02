@@ -162,7 +162,7 @@
 {% if unicode_hint %}
 <div id="unicode-hint">
     <h2>Unicode error hint</h2>
-    <p>The string that could not be encoded/decoded was: <strong>{{ unicode_hint|force_escape }}</strong></p>
+    <p>The string that could not be encoded/decoded was: <strong>{{ unicode_hint }}</strong></p>
 </div>
 {% endif %}
 {% if template_does_not_exist %}
