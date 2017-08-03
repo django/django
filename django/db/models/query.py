@@ -1227,9 +1227,9 @@ class RawQuerySet:
             converters = compiler.get_converters([
                 f.get_col(f.model._meta.db_table) if f else None for f in fields
             ])
+            if converters:
+                query = compiler.apply_converters(query, converters)
             for values in query:
-                if converters:
-                    values = compiler.apply_converters(values, converters)
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
                 instance = model_cls.from_db(db, model_init_names, model_init_values)

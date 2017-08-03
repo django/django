@@ -938,14 +938,17 @@ class SQLCompiler:
                     converters[i] = (convs, expression)
         return converters
 
-    def apply_converters(self, row, converters):
-        row = list(row)
-        for pos, (convs, expression) in converters.items():
-            value = row[pos]
-            for converter in convs:
-                value = converter(value, expression, self.connection)
-            row[pos] = value
-        return tuple(row)
+    def apply_converters(self, rows, converters):
+        connection = self.connection
+        converters = list(converters.items())
+        for row in rows:
+            row = list(row)
+            for pos, (convs, expression) in converters:
+                value = row[pos]
+                for converter in convs:
+                    value = converter(value, expression, connection)
+                row[pos] = value
+            yield tuple(row)
 
     def results_iter(self, results=None):
         """Return an iterator over the results from executing this query."""
@@ -953,11 +956,10 @@ class SQLCompiler:
             results = self.execute_sql(MULTI)
         fields = [s[0] for s in self.select[0:self.col_count]]
         converters = self.get_converters(fields)
-        for rows in results:
-            for row in rows:
-                if converters:
-                    row = self.apply_converters(row, converters)
-                yield row
+        rows = chain.from_iterable(results)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+        return rows
 
     def has_results(self):
         """

@@ -464,7 +464,7 @@ class Query:
             result = [None for q in outer_query.annotation_select.items()]
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
-        result = compiler.apply_converters(result, converters)
+        result = next(compiler.apply_converters((result,), converters))
 
         return {
             alias: val
