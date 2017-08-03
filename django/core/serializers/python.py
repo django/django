@@ -100,7 +100,6 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                 data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get('pk'))
             except Exception as e:
                 raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
-
         m2m_data = {}
 
         if Model not in field_names_cache:

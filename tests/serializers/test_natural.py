@@ -69,32 +69,32 @@ def natural_key_test(format, self):
 
 class NaturalKeyWhenPkHasDefaultValueTestCase(TestCase):
     """
-    Verify that deserializer does not ignore natural keys when primary key has a default value (ticket `28385`).
+    Verify that deserializer does not ignore natural keys when primary key
+    has a default value (ticket `28385`).
 
-    Test to prove that deserializer gets `pk` via `natural key` and updates object instead of create new one.
+    Test to prove that deserializer gets `pk` via `natural key` and
+    updates object instead of create new one.
     """
 
-    fixtures = ['fixture.json', 'fixture.xml']
+    fixtures = ['fixture.json']
 
-    def test_natural_key_json(self):
+    def test_load_data_natural_key(self):
         """
-        Test fixture based on `json` format.
+        Test natural key behavior during loading fixture data.
         """
+        self.assertEqual(Foo.objects.all().count(), 0)
+
         management.call_command("loaddata", "fixture.json", verbosity=0)
         self.assertEqual(Foo.objects.all().count(), 1)
 
+        first_import_pk = Foo.objects.first().pk
+
         management.call_command("loaddata", "fixture.json", verbosity=0)
         self.assertEqual(Foo.objects.all().count(), 1)
 
-    def test_natural_key_xml(self):
-        """
-        Test fixture based on `xml` format.
-        """
-        management.call_command("loaddata", "fixture.xml", verbosity=0)
-        self.assertEqual(Foo.objects.all().count(), 1)
+        second_import_pk = Foo.objects.first().pk
 
-        management.call_command("loaddata", "fixture.xml", verbosity=0)
-        self.assertEqual(Foo.objects.all().count(), 1)
+        self.assertEqual(first_import_pk, second_import_pk)
 
 
 # Dynamically register tests for each serializer
