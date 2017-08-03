@@ -221,7 +221,8 @@ def build_instance(Model, data, db):
     """
     default_manager = Model._meta.default_manager
 
-    if hasattr(default_manager, 'get_by_natural_key') and hasattr(Model, 'natural_key'):
+    if (data.get('id') is None and hasattr(default_manager, 'get_by_natural_key')
+            and hasattr(Model, 'natural_key')):
         natural_key = Model(**data).natural_key()
 
         try:

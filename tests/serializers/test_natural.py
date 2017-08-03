@@ -76,8 +76,6 @@ class NaturalKeyWhenPkHasDefaultValueTestCase(TestCase):
     updates object instead of create new one.
     """
 
-    fixtures = ['fixture.json']
-
     def test_load_data_natural_key(self):
         """
         Test natural key behavior during loading fixture data.
