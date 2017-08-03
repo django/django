@@ -17,6 +17,13 @@ class NotRunningInTTYException(Exception):
     pass
 
 
+def _resolve_field_fk_if_needed(field, value, database):
+    if value is not None and field.remote_field:
+        kwargs = {field.to_fields[0]: value}
+        return field.remote_field.model._default_manager.db_manager(database).get(**kwargs)
+    return value
+
+
 class Command(BaseCommand):
     help = 'Used to create a superuser.'
     requires_migrations_checks = True
@@ -65,21 +72,24 @@ class Command(BaseCommand):
         # If not provided, create the user with an unusable password
         password = None
         user_data = {}
-        # Same as user_data but with foreign keys as fake model instances
-        # instead of raw IDs.
-        fake_user_data = {}
 
         # Do quick and dirty validation if --noinput
         if not options['interactive']:
             try:
                 if not username:
                     raise CommandError("You must use --%s with --noinput." % self.UserModel.USERNAME_FIELD)
-                username = self.username_field.clean(username, None)
+                username = _resolve_field_fk_if_needed(
+                    self.username_field,
+                    self.username_field.clean(username, None),
+                    database
+                )
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     if options[field_name]:
                         field = self.UserModel._meta.get_field(field_name)
-                        user_data[field_name] = field.clean(options[field_name], None)
+                        user_data[field_name] = _resolve_field_fk_if_needed(
+                            field, field.clean(options[field_name], None), database
+                        )
                     else:
                         raise CommandError("You must use --%s with --noinput." % field_name)
             except exceptions.ValidationError as e:
@@ -120,6 +130,7 @@ class Command(BaseCommand):
                         else:
                             self.stderr.write("Error: That %s is already taken." % verbose_field_name)
                             username = None
+                    username = _resolve_field_fk_if_needed(self.username_field, username, database)
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
@@ -133,12 +144,7 @@ class Command(BaseCommand):
                             ) if field.remote_field else '',
                         )
                         input_value = self.get_input_data(field, message)
-                        user_data[field_name] = input_value
-                        fake_user_data[field_name] = input_value
-
-                        # Wrap any foreign keys in fake model instances
-                        if field.remote_field:
-                            fake_user_data[field_name] = field.remote_field.model(input_value)
+                        user_data[field_name] = _resolve_field_fk_if_needed(field, input_value, database)
 
                 # Get a password
                 while password is None:
@@ -157,7 +163,7 @@ class Command(BaseCommand):
                         continue
 
                     try:
-                        validate_password(password2, self.UserModel(**fake_user_data))
+                        validate_password(password2, self.UserModel(**user_data))
                     except exceptions.ValidationError as err:
                         self.stderr.write('\n'.join(err.messages))
                         password = None

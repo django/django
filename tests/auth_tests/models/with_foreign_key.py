@@ -1,4 +1,6 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Group
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, Group, User,
+)
 from django.db import models
 
 
@@ -8,7 +10,7 @@ class Email(models.Model):
 
 class CustomUserWithFKManager(BaseUserManager):
     def create_superuser(self, username, email, group, password):
-        user = self.model(username_id=username, email_id=email, group_id=group)
+        user = self.model(username=username, email=email, group=group)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -23,3 +25,13 @@ class CustomUserWithFK(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'group']
+
+
+class Company(models.Model):
+    title = models.CharField(max_length=128)
+
+
+class DefaultUserWithFK(User):
+    company = models.ForeignKey(Company, models.CASCADE)
+
+    REQUIRED_FIELDS = ['email', 'company']
