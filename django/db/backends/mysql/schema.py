@@ -1,5 +1,17 @@
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.ddl_references import Columns
 from django.db.models import NOT_PROVIDED
+
+
+class ColumnWithSize(Columns):
+    """Custom Columns class representing a single column with a size suffix."""
+    def __init__(self, cols, size):
+        # cols is a Columns instance
+        self.size = size
+        super().__init__(cols.table, cols.columns, cols.quote_name)
+
+    def __str__(self):
+        return '%s(%d)' % (self.quote_name(self.columns[0]), self.size)
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -64,6 +76,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field.db_constraint):
             return False
         return not self._is_limited_data_type(field) and create_index
+
+    def _create_index_sql(self, model, fields, suffix="", sql=None):
+        statement = super()._create_index_sql(model, fields, suffix=suffix, sql=sql)
+        if len(fields) == 1 and fields[0].get_internal_type() == 'TextField':
+            # Limit index to 192 first chars (worst case: InnoDB and utf8mb4 charset)
+            statement.parts['columns'] = ColumnWithSize(statement.parts['columns'], 191)
+        return statement
 
     def _delete_composed_index(self, model, fields, *args):
         """

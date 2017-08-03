@@ -128,9 +128,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'UUIDField': 'char(32)',
     }
 
-    # For these columns, MySQL doesn't:
-    # - accept default values and implicitly treats these columns as nullable
-    # - support a database index
+    # For these columns, MySQL doesn't accept default values and implicitly
+    # treats these columns as nullable
     _limited_data_types = (
         'tinyblob', 'blob', 'mediumblob', 'longblob', 'tinytext', 'text',
         'mediumtext', 'longtext', 'json',
