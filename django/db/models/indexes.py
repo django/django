@@ -43,26 +43,13 @@ class Index:
             self.name = 'D%s' % self.name[1:]
         return errors
 
-    def get_sql_create_template_values(self, model, schema_editor, using):
-        fields = [model._meta.get_field(field_name) for field_name, order in self.fields_orders]
-        tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields, self.db_tablespace)
-        quote_name = schema_editor.quote_name
-        columns = [
-            ('%s %s' % (quote_name(field.column), order)).strip()
-            for field, (field_name, order) in zip(fields, self.fields_orders)
-        ]
-        return {
-            'table': quote_name(model._meta.db_table),
-            'name': quote_name(self.name),
-            'columns': ', '.join(columns),
-            'using': using,
-            'extra': tablespace_sql,
-        }
-
     def create_sql(self, model, schema_editor, using=''):
-        sql_create_index = schema_editor.sql_create_index
-        sql_parameters = self.get_sql_create_template_values(model, schema_editor, using)
-        return sql_create_index % sql_parameters
+        fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
+        col_suffixes = [order[1] for order in self.fields_orders]
+        return schema_editor._create_index_sql(
+            model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
+            col_suffixes=col_suffixes,
+        )
 
     def remove_sql(self, model, schema_editor):
         quote_name = schema_editor.quote_name

@@ -22,12 +22,13 @@ class BrinIndex(Index):
         kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
 
-    def get_sql_create_template_values(self, model, schema_editor, using):
-        parameters = super().get_sql_create_template_values(model, schema_editor, using=' USING brin')
+    def create_sql(self, model, schema_editor, using=''):
+        statement = super().create_sql(model, schema_editor, using=' USING brin')
         if self.pages_per_range is not None:
-            parameters['extra'] = ' WITH (pages_per_range={})'.format(
-                schema_editor.quote_value(self.pages_per_range)) + parameters['extra']
-        return parameters
+            statement.parts['extra'] = ' WITH (pages_per_range={})'.format(
+                schema_editor.quote_value(self.pages_per_range)
+            ) + statement.parts['extra']
+        return statement
 
 
 class GinIndex(Index):
@@ -44,16 +45,13 @@ class GinIndex(Index):
         kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
         return path, args, kwargs
 
-    def get_sql_create_template_values(self, model, schema_editor, using):
-        parameters = super().get_sql_create_template_values(model, schema_editor, using=' USING gin')
+    def create_sql(self, model, schema_editor, using=''):
+        statement = super().create_sql(model, schema_editor, using=' USING gin')
         with_params = []
         if self.gin_pending_list_limit is not None:
             with_params.append('gin_pending_list_limit = %d' % self.gin_pending_list_limit)
         if self.fastupdate is not None:
             with_params.append('fastupdate = {}'.format('on' if self.fastupdate else 'off'))
         if with_params:
-            parameters['extra'] = 'WITH ({}) {}'.format(', '.join(with_params), parameters['extra'])
-        return parameters
-
-    def create_sql(self, model, schema_editor):
-        return super().create_sql(model, schema_editor, using=' USING gin')
+            statement.parts['extra'] = 'WITH ({}) {}'.format(', '.join(with_params), statement.parts['extra'])
+        return statement

@@ -76,12 +76,19 @@ class TableColumns(Table):
 class Columns(TableColumns):
     """Hold a reference to one or many columns."""
 
-    def __init__(self, table, columns, quote_name):
+    def __init__(self, table, columns, quote_name, col_suffixes=()):
         self.quote_name = quote_name
+        self.col_suffixes = col_suffixes
         super().__init__(table, columns)
 
     def __str__(self):
-        return ', '.join(self.quote_name(column) for column in self.columns)
+        def col_str(column, idx):
+            try:
+                return self.quote_name(column) + self.col_suffixes[idx]
+            except IndexError:
+                return self.quote_name(column)
+
+        return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 
 
 class IndexName(TableColumns):
