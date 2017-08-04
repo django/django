@@ -291,6 +291,9 @@ Models
 * Added support for expressions in :attr:`Meta.ordering
   <django.db.models.Options.ordering>`.
 
+* The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
+  results as named tuples.
+
 Pagination
 ~~~~~~~~~~
 

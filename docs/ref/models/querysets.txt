@@ -626,7 +626,7 @@ You can also refer to fields on related models with reverse relations through
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
-.. method:: values_list(*fields, flat=False)
+.. method:: values_list(*fields, flat=False, named=False)
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
@@ -650,6 +650,15 @@ rather than one-tuples. An example should make the difference clearer::
     <QuerySet [1, 2, 3, ...]>
 
 It is an error to pass in ``flat`` when there is more than one field.
+
+You can pass ``named=True`` to get results as a
+:func:`~python:collections.namedtuple`::
+
+    >>> Entry.objects.values_list('id', 'headline', named=True)
+    <QuerySet [Row(id=1, headline='First entry'), ...]>
+
+Using a named tuple may make use of the results more readable, at the expense
+of a small performance penalty for transforming the results into a named tuple.
 
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
@@ -687,6 +696,10 @@ not having any author::
 .. versionchanged:: 1.11
 
     Support for expressions in ``*fields`` was added.
+
+.. versionchanged:: 2.0
+
+    The ``named`` parameter was added.
 
 ``dates()``
 ~~~~~~~~~~~
