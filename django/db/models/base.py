@@ -370,15 +370,23 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
+class ModelStateFieldsCacheDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            return self
+        res = instance.fields_cache = {}
+        return res
+
+
 class ModelState:
     """Store model instance state."""
-    def __init__(self, db=None):
-        self.db = db
-        # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
-        # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
-        # This impacts validation only; it has no effect on the actual save.
-        self.adding = True
-        self.fields_cache = {}
+    db = None
+    # If true, uniqueness validation checks will consider this a new, unsaved
+    # object. Necessary for correct validation of new instances of objects with
+    # explicit (non-auto) PKs. This impacts validation only; it has no effect
+    # on the actual save.
+    adding = True
+    fields_cache = ModelStateFieldsCacheDescriptor()
 
 
 class Model(metaclass=ModelBase):
