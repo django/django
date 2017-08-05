@@ -32,6 +32,14 @@ but you can override this with the ``hosts`` key in its config::
         },
     }
 
+Consider `hiredis`_ library installation to improve layer performance::
+
+    pip install hiredis
+
+It will be used automatically if it's installed.
+
+.. _hiredis: https://github.com/redis/hiredis-py
+
 Sharding
 ~~~~~~~~
 
