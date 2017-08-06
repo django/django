@@ -835,12 +835,11 @@ Methods
 
 .. _ref-httpresponse-subclasses:
 
-``HttpResponse`` subclasses
----------------------------
+``HttpResponseRedirect`` and subclasses
+---------------------------------------
 
-Django includes a number of ``HttpResponse`` subclasses that handle different
-types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-:mod:`django.http`.
+Django provides some subclasses of ``HttpResponse`` that are useful for
+redirects. They also live in :mod:`django.http`.
 
 .. class:: HttpResponseRedirect
 
@@ -861,6 +860,48 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     Like :class:`HttpResponseRedirect`, but it returns a permanent redirect
     (HTTP status code 301) instead of a "found" redirect (status code 302).
+
+Other ``HttpResponse`` subclasses
+---------------------------------
+
+Django also provides other subclasses of ``HttpResponse`` to complete the
+HTTP specification, again all available from :mod:`django.http`.
+
+.. class:: HttpResponseCreated
+
+    Acts just like :class:`HttpResponse` but uses a 201 status code.
+
+.. class:: HttpResponseAccepted
+
+    Acts just like :class:`HttpResponse` but uses a 202 status code.
+
+.. class:: HttpResponseNonAuthoritative
+
+    Acts just like :class:`HttpResponse` but uses a 203 status code.
+
+.. class:: HttpResponseNoContent
+
+    Acts just like :class:`HttpResponse` but uses a 204 status code.
+
+.. class:: HttpResponseResetContent
+
+    Acts just like :class:`HttpResponse` but uses a 205 status code.
+
+.. class:: HttpResponsePartialContent
+
+    Acts just like :class:`HttpResponse` but uses a 206 status code.
+
+.. class:: HttpResponseMultiStatus
+
+    Acts just like :class:`HttpResponse` but uses a 207 status code.
+
+.. class:: HttpResponseAlreadyReported
+
+    Acts just like :class:`HttpResponse` but uses a 208 status code.
+
+.. class:: HttpResponseIMUsed
+
+    Acts just like :class:`HttpResponse` but uses a 226 status code.
 
 .. class:: HttpResponseNotModified
 

@@ -10,10 +10,14 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
 from django.http import (
-    BadHeaderError, HttpResponse, HttpResponseNotAllowed,
-    HttpResponseNotModified, HttpResponsePermanentRedirect,
-    HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
-    StreamingHttpResponse, parse_cookie,
+    BadHeaderError, HttpResponse, HttpResponseAccepted,
+    HttpResponseAlreadyReported, HttpResponseCreated, HttpResponseIMUsed,
+    HttpResponseMultiStatus, HttpResponseNoContent,
+    HttpResponseNonAuthoritative, HttpResponseNotAllowed,
+    HttpResponseNotModified, HttpResponsePartialContent,
+    HttpResponsePermanentRedirect, HttpResponseRedirect,
+    HttpResponseResetContent, JsonResponse, parse_cookie, QueryDict,
+    SimpleCookie, StreamingHttpResponse,
 )
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
@@ -452,6 +456,34 @@ class HttpResponseTests(unittest.TestCase):
 
 
 class HttpResponseSubclassesTests(SimpleTestCase):
+
+    def test_created(self):
+        assert HttpResponseCreated().status_code == 201
+
+    def test_accepted(self):
+        assert HttpResponseAccepted().status_code == 202
+
+    def test_non_authoritative(self):
+        assert HttpResponseNonAuthoritative().status_code == 203
+
+    def test_no_content(self):
+        assert HttpResponseNoContent().status_code == 204
+
+    def test_reset_content(self):
+        assert HttpResponseResetContent().status_code == 205
+
+    def test_partial_content(self):
+        assert HttpResponsePartialContent().status_code == 206
+
+    def test_multi_status(self):
+        assert HttpResponseMultiStatus().status_code == 207
+
+    def test_already_reported(self):
+        assert HttpResponseAlreadyReported().status_code == 208
+
+    def test_im_used(self):
+        assert HttpResponseIMUsed().status_code == 226
+
     def test_redirect(self):
         response = HttpResponseRedirect('/redirected/')
         self.assertEqual(response.status_code, 302)

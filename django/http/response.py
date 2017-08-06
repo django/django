@@ -394,6 +394,48 @@ class FileResponse(StreamingHttpResponse):
         super()._set_streaming_content(value)
 
 
+class HttpResponseCreated(HttpResponse):
+    status_code = 201
+
+
+class HttpResponseAccepted(HttpResponse):
+    status_code = 202
+
+
+class HttpResponseNonAuthoritative(HttpResponse):
+    status_code = 203
+
+
+class HttpResponseNoContent(HttpResponse):
+    status_code = 204
+
+    @HttpResponse.content.setter
+    def content(self, value):
+        if value:
+            raise AttributeError("You cannot set content to a 304 (Not Modified) response")
+        self._container = []
+
+
+class HttpResponseResetContent(HttpResponse):
+    status_code = 205
+
+
+class HttpResponsePartialContent(HttpResponse):
+    status_code = 206
+
+
+class HttpResponseMultiStatus(HttpResponse):
+    status_code = 207
+
+
+class HttpResponseAlreadyReported(HttpResponse):
+    status_code = 208
+
+
+class HttpResponseIMUsed(HttpResponse):
+    status_code = 226
+
+
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
