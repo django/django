@@ -6,7 +6,7 @@ from django.contrib.staticfiles.views import serve
 from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.six.moves.urllib.request import url2pathname
 
-from .handler import AsgiHandler, ViewConsumer
+from .handler import AsgiHandler
 
 
 class StaticFilesHandler(AsgiHandler):
@@ -15,7 +15,7 @@ class StaticFilesHandler(AsgiHandler):
     """
 
     def __init__(self, *args, **kwargs):
-        super(StaticFilesHandler, self).__init__()
+        super(StaticFilesHandler, self).__init__(*args, **kwargs)
         self.base_url = urlparse(self.get_base_url())
 
     def get_base_url(self):
@@ -55,11 +55,3 @@ class StaticFilesHandler(AsgiHandler):
                     from django.views import debug
                     return debug.technical_404_response(request, e)
         return super(StaticFilesHandler, self).get_response(request)
-
-
-class StaticFilesConsumer(ViewConsumer):
-    """
-    Overrides standard view consumer with our new handler
-    """
-
-    handler_class = StaticFilesHandler

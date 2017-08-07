@@ -41,7 +41,6 @@ class AsgiRequest(http.HttpRequest):
 
     def __init__(self, message):
         self.message = message
-        self.reply_channel = self.message.reply_channel
         self._content_length = 0
         self._post_parse_error = False
         self._read_started = False
@@ -118,29 +117,8 @@ class AsgiRequest(http.HttpRequest):
             except (ValueError, TypeError):
                 pass
         # Body handling
+        # TODO: chunked bodies
         self._body = message.get("body", b"")
-        if message.get("body_channel", None):
-            body_handle_start = time.time()
-            while True:
-                # Get the next chunk from the request body channel
-                chunk = None
-                while chunk is None:
-                    # If they take too long, raise request timeout and the handler
-                    # will turn it into a response
-                    if time.time() - body_handle_start > self.body_receive_timeout:
-                        raise RequestTimeout()
-                    _, chunk = message.channel_layer.receive_many(
-                        [message['body_channel']],
-                        block=True,
-                    )
-                # If chunk contains close, abort.
-                if chunk.get("closed", False):
-                    raise RequestAborted()
-                # Add content to body
-                self._body += chunk.get("content", "")
-                # Exit loop if this was the last
-                if not chunk.get("more_content", False):
-                    break
         assert isinstance(self._body, six.binary_type), "Body is not bytes"
         # Add a stream-a-like for the body
         self._stream = BytesIO(self._body)
@@ -189,11 +167,18 @@ class AsgiHandler(base.BaseHandler):
     # Size to chunk response bodies into for multiple response messages
     chunk_size = 512 * 1024
 
-    def __init__(self, *args, **kwargs):
-        super(AsgiHandler, self).__init__(*args, **kwargs)
+    def __init__(self, type, reply, channel_layer, consumer_channel):
+        if type != "http":
+            raise ValueError("The AsgiHandler can only handle HTTP requests")
+        self.reply = reply
+        self.channel_layer = channel_layer
+        self.consumer_channel = consumer_channel
+        super(AsgiHandler, self).__init__()
         self.load_middleware()
 
     def __call__(self, message):
+        if message["type"] != "http.request":
+            return
         # Set script prefix from message root_path, turning None into empty string
         set_script_prefix(message.get('root_path', '') or '')
         signals.request_started.send(sender=self.__class__, message=message)
@@ -227,8 +212,7 @@ class AsgiHandler(base.BaseHandler):
                 return
         # Transform response into messages, which we yield back to caller
         for message in self.encode_response(response):
-            # TODO: file_to_stream
-            yield message
+            self.reply(message)
         # Close the response now we're done with it
         response.close()
 
@@ -289,6 +273,7 @@ class AsgiHandler(base.BaseHandler):
             )
         # Make initial response message
         message = {
+            "type": "http.response",
             "status": response.status_code,
             "headers": response_headers,
         }
@@ -302,8 +287,8 @@ class AsgiHandler(base.BaseHandler):
                     # We ignore "more" as there may be more parts; instead,
                     # we use an empty final closing message with False.
                     message['more_content'] = True
-                    yield message
-                    message = {}
+                    yield dict(message)
+                    message = {"type": "http.response.hunk"}
             # Final closing message
             message["more_content"] = False
             yield message
@@ -314,7 +299,7 @@ class AsgiHandler(base.BaseHandler):
                 message['content'] = chunk
                 message['more_content'] = not last
                 yield message
-                message = {}
+                message = {"type": "http.response.hunk"}
 
     @classmethod
     def chunk_bytes(cls, data):
@@ -334,31 +319,3 @@ class AsgiHandler(base.BaseHandler):
                 (position + cls.chunk_size) >= len(data),
             )
             position += cls.chunk_size
-
-
-class ViewConsumer(object):
-    """
-    Dispatches channel HTTP requests into django's URL/View system.
-    """
-
-    handler_class = AsgiHandler
-
-    def __init__(self):
-        self.handler = self.handler_class()
-
-    def __call__(self, message):
-        for reply_message in self.handler(message):
-            while True:
-                # If we get ChannelFull we just wait and keep trying until
-                # it goes through.
-                # TODO: Add optional death timeout? Don't want to lock up
-                # a whole worker if the client just vanishes and leaves the response
-                # channel full.
-                try:
-                    # Note: Use immediately to prevent streaming responses trying
-                    # cache all data.
-                    message.reply_channel.send(reply_message, immediately=True)
-                except message.channel_layer.ChannelFull:
-                    time.sleep(0.05)
-                else:
-                    break

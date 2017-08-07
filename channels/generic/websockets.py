@@ -20,39 +20,7 @@ class WebsocketConsumer(BaseConsumer):
         "websocket.disconnect": "raw_disconnect",
     }
 
-    # Turning this on passes the user over from the HTTP session on connect,
-    # implies channel_session_user
-    http_user = False
-    http_user_and_session = False
-
-    # Set to True if you want the class to enforce ordering for you
-    strict_ordering = False
-
     groups = None
-
-    def get_handler(self, message, **kwargs):
-        """
-        Pulls out the path onto an instance variable, and optionally
-        adds the ordering decorator.
-        """
-        # HTTP user implies channel session user
-        if self.http_user or self.http_user_and_session:
-            self.channel_session_user = True
-        # Get super-handler
-        self.path = message['path']
-        handler = super(WebsocketConsumer, self).get_handler(message, **kwargs)
-        # Optionally apply HTTP transfer
-        if self.http_user_and_session:
-            handler = channel_and_http_session_user_from_http(handler)
-        elif self.http_user:
-            handler = channel_session_user_from_http(handler)
-        # Ordering decorators
-        if self.strict_ordering:
-            return enforce_ordering(handler, slight=False)
-        elif getattr(self, "slight_ordering", False):
-            raise ValueError("Slight ordering is now always on. Please remove `slight_ordering=True`.")
-        else:
-            return handler
 
     def connection_groups(self, **kwargs):
         """
@@ -67,14 +35,20 @@ class WebsocketConsumer(BaseConsumer):
         need to call super() all the time.
         """
         for group in self.connection_groups(**kwargs):
-            Group(group, channel_layer=message.channel_layer).add(message.reply_channel)
+            Group(group, channel_layer=self.channel_layer).add(self.consumer_channel)
         self.connect(message, **kwargs)
 
     def connect(self, message, **kwargs):
         """
         Called when a WebSocket connection is opened.
         """
-        self.message.reply_channel.send({"accept": True})
+        self.accept()
+
+    def accept(self):
+        """
+        Accepts an incoming socket
+        """
+        self.reply({"type": "websocket.accept"})
 
     def raw_receive(self, message, **kwargs):
         """
@@ -96,35 +70,35 @@ class WebsocketConsumer(BaseConsumer):
         """
         Sends a reply back down the WebSocket
         """
-        message = {}
-        if close:
-            message["close"] = close
         if text is not None:
-            message["text"] = text
+            self.reply({"type": "websocket.send", "text": text})
         elif bytes is not None:
-            message["bytes"] = bytes
-        else:
-            raise ValueError("You must pass text or bytes")
-        self.message.reply_channel.send(message)
+            self.reply({"type": "websocket.send", "bytes": bytes})
+        if close:
+            self.close(close)
 
     @classmethod
     def group_send(cls, name, text=None, bytes=None, close=False):
-        message = {}
-        if close:
-            message["close"] = close
         if text is not None:
-            message["text"] = text
+            Group(name).send({"type": "websocket.send", "text": text})
         elif bytes is not None:
-            message["bytes"] = bytes
+            Group(name).send({"type": "websocket.send", "bytes": bytes})
         else:
             raise ValueError("You must pass text or bytes")
-        Group(name).send(message)
+        if close:
+            if close is True:
+                Group(name).send({"type": "websocket.close"})
+            else:
+                Group(name).send({"type": "websocket.close", "code": close})
 
-    def close(self, status=True):
+    def close(self, code=None):
         """
         Closes the WebSocket from the server end
         """
-        self.message.reply_channel.send({"close": status})
+        if code is not None and code is not True:
+            self.reply({"type": "websocket.close", "code": code})
+        else:
+            self.reply({"type": "websocket.close"})
 
     def raw_disconnect(self, message, **kwargs):
         """
@@ -132,7 +106,7 @@ class WebsocketConsumer(BaseConsumer):
         need to call super() all the time.
         """
         for group in self.connection_groups(**kwargs):
-            Group(group, channel_layer=message.channel_layer).discard(message.reply_channel)
+            Group(group, channel_layer=self.channel_layer).discard(self.consumer_channel)
         self.disconnect(message, **kwargs)
 
     def disconnect(self, message, **kwargs):

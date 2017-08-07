@@ -21,10 +21,10 @@ class Router(object):
     """
 
     def __init__(self, routing):
-        # Use a blank include as the root item
         self.root = Include(routing)
-        # Cache channel names
-        self.channels = self.root.channel_names()
+
+    def __call__(self, type, reply, channel_layer, consumer_channel):
+        pass
 
     def add_route(self, route):
         """
@@ -98,31 +98,32 @@ class Route(object):
     and optional message parameter matching.
     """
 
-    def __init__(self, channels, consumer, **kwargs):
+    def __init__(self, type, consumer, **kwargs):
+        self.type = type
         # Get channels, make sure it's a list of unicode strings
-        if isinstance(channels, six.string_types):
-            channels = [channels]
-        self.channels = [
-            channel.decode("ascii") if isinstance(channel, six.binary_type) else channel
-            for channel in channels
-        ]
-        # Get consumer, optionally importing it
-        self.consumer = self._resolve_consumer(consumer)
-        # Compile filter regexes up front
-        self.filters = {
-            name: re.compile(Router.normalise_re_arg(value))
-            for name, value in kwargs.items()
-        }
-        # Check filters don't use positional groups
-        for name, regex in self.filters.items():
-            if regex.groups != len(regex.groupindex):
-                raise ValueError(
-                    "Filter for %s on %s contains positional groups; "
-                    "only named groups are allowed." % (
-                        name,
-                        self,
-                    )
-                )
+        # if isinstance(channels, six.string_types):
+        #     channels = [channels]
+        # self.channels = [
+        #     channel.decode("ascii") if isinstance(channel, six.binary_type) else channel
+        #     for channel in channels
+        # ]
+        # # Get consumer, optionally importing it
+        # self.consumer = self._resolve_consumer(consumer)
+        # # Compile filter regexes up front
+        # self.filters = {
+        #     name: re.compile(Router.normalise_re_arg(value))
+        #     for name, value in kwargs.items()
+        # }
+        # # Check filters don't use positional groups
+        # for name, regex in self.filters.items():
+        #     if regex.groups != len(regex.groupindex):
+        #         raise ValueError(
+        #             "Filter for %s on %s contains positional groups; "
+        #             "only named groups are allowed." % (
+        #                 name,
+        #                 self,
+        #             )
+        #         )
 
     def _resolve_consumer(self, consumer):
         """

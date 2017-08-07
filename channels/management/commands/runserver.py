@@ -2,7 +2,8 @@ import datetime
 import sys
 import threading
 
-from daphne.server import Server, build_endpoint_description_strings
+from daphne.server import Server
+from daphne.endpoints import build_endpoint_description_strings
 from django.apps import apps
 from django.conf import settings
 from django.core.management.commands.runserver import Command as RunserverCommand
@@ -10,9 +11,9 @@ from django.utils import six
 from django.utils.encoding import get_system_encoding
 
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
-from channels.handler import ViewConsumer
+from channels.handler import AsgiHandler
 from channels.log import setup_logger
-from channels.staticfiles import StaticFilesConsumer
+from channels.staticfiles import StaticFilesHandler
 from channels.worker import Worker
 
 
@@ -154,9 +155,9 @@ class Command(RunserverCommand):
         use_static_handler = options.get('use_static_handler', staticfiles_installed)
         insecure_serving = options.get('insecure_serving', False)
         if use_static_handler and (settings.DEBUG or insecure_serving):
-            return StaticFilesConsumer()
+            return StaticFilesHandler()
         else:
-            return ViewConsumer()
+            return AsgiHandler()
 
 
 class WorkerThread(threading.Thread):

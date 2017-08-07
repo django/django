@@ -22,22 +22,19 @@ class BaseConsumer(object):
     channel_session = False
     channel_session_user = False
 
-    def __init__(self, message, **kwargs):
+    def __init__(self, type, reply, channel_layer, consumer_channel, **kwargs):
         """
-        Constructor, called when a new message comes in (the consumer is
-        the uninstantiated class, so calling it creates it)
+        Constructor, called when the socket is established.
         """
-        self.message = message
+        self.type = type
+        self.reply = reply
+        self.channel_layer = channel_layer
+        self.consumer_channel = consumer_channel
         self.kwargs = kwargs
-        self.dispatch(message, **kwargs)
 
-    @classmethod
-    def channel_names(cls):
-        """
-        Returns a list of channels this consumer will respond to, in our case
-        derived from the method_mapping class attribute.
-        """
-        return set(cls.method_mapping.keys())
+    def __call__(self, message):
+        handler = getattr(self, self.method_mapping[message['type']])
+        handler(message)
 
     @classmethod
     def as_route(cls, attrs=None, **kwargs):
@@ -50,21 +47,3 @@ class BaseConsumer(object):
             assert isinstance(attrs, dict), 'attrs must be a dict'
             _cls = type(cls.__name__, (cls,), attrs)
         return route_class(_cls, **kwargs)
-
-    def get_handler(self, message, **kwargs):
-        """
-        Return handler uses method_mapping to return the right method to call.
-        """
-        handler = getattr(self, self.method_mapping[message.channel.name])
-        if self.channel_session_user:
-            return channel_session_user(handler)
-        elif self.channel_session:
-            return channel_session(handler)
-        else:
-            return handler
-
-    def dispatch(self, message, **kwargs):
-        """
-        Call handler with the message and all keyword arguments.
-        """
-        return self.get_handler(message, **kwargs)(message, **kwargs)
