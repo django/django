@@ -34,6 +34,11 @@ Next, clone your fork, install some requirements, and run the tests::
    $ pip install -r requirements/py3.txt
    $ ./runtests.py
 
+Before installing requirements you may need to install some system development
+packages related to `pylibmc`. On Ubuntu you would run::
+
+    $ sudo apt-get install python3-dev libmemcached-dev zlib1g-dev
+
 Installing the requirements will likely require some operating system packages
 that your computer doesn't have installed. You can usually figure out which
 package to install by doing a Web search for the last line or so of the error
