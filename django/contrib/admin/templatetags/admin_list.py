@@ -410,7 +410,7 @@ def search_form(cl):
     """
     return {
         'cl': cl,
-        'show_result_count': cl.result_count != cl.full_result_count,
+        'show_result_count': not cl.no_count and (cl.result_count != cl.full_result_count),
         'search_var': SEARCH_VAR
     }
 
