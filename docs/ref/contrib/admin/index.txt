@@ -1245,6 +1245,16 @@ subclass::
     a full count on the table which can be expensive if the table contains a
     large number of rows.
 
+.. attribute:: ModelAdmin.no_count
+
+    Set ``no_count`` to prevent the admin pagination from preforming a count
+    query. If set to ``True`` and alternative paginator with next / prev options
+    is displayed.
+
+    The default of ``no_count=False`` generates a query to perform a full count
+    on the table which can be expensive if the table contains a large number of
+    rows.
+
 .. attribute:: ModelAdmin.view_on_site
 
     Set ``view_on_site`` to control whether or not to display the "View on site" link.

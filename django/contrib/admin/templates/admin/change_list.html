@@ -82,7 +82,19 @@
           {% result_list cl %}
           {% if action_form and actions_on_bottom and cl.show_admin_actions %}{% admin_actions %}{% endif %}
       {% endblock %}
-      {% block pagination %}{% pagination cl %}{% endblock %}
+
+      {% if cl.no_count %}
+        <p class="paginator">
+          {% if cl.page_num > 0 %}
+              <a href="?p={{cl.page_num|add:-1}}">Prev</a>
+          {% endif %}
+          <span class="this-page">{{cl.page_num|add:1}}</span>
+          <a href="?p={{cl.page_num|add:1}}">Next</a>
+        </p>
+      {% else %}
+        {% block pagination %}{% pagination cl %}{% endblock %}
+      {% endif %}
+
       </form>
     </div>
   </div>
