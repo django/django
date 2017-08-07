@@ -1292,8 +1292,9 @@ class Query:
     def add_filtered_relation(self, filtered_relation):
         for lookup in chain((filtered_relation.relation_name,),
                             dict(filtered_relation.condition.children).keys()):
-            lookups, parts, _ = self.solve_lookup_type(lookup)
-            if len(parts) > (1 + len(lookups)):
+            lookup_parts, field_parts, _ = self.solve_lookup_type(lookup)
+            shift = 2 if not lookup_parts else 1
+            if len(field_parts) > (shift + len(lookup_parts)):
                 raise FieldError("Filtered relation %r cannot operate on foreign key %r." % (
                     filtered_relation.alias, lookup))
         self._filtered_relations[filtered_relation.alias] = filtered_relation
