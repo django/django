@@ -472,7 +472,6 @@ class FormatStylePlaceholderCursor:
             query = query[:-1]
         if params is None:
             params = []
-            query = query
         elif hasattr(params, 'keys'):
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
