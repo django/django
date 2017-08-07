@@ -195,7 +195,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         response = self.client.get('/')
         self.assertContains(
             response,
-            "<h2>Congratulations on your first Django-powered page.</h2>"
+            "<h2>The install worked successfully! Congratulations!</h2>"
         )
 
     @override_settings(ROOT_URLCONF='view_tests.regression_21530_urls')

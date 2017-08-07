@@ -14,13 +14,16 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import gettext as _
+from django.utils.version import get_docs_version
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting. Templates are
 # read directly from the filesystem so that the error handler
 # works even if the template loader is broken.
-DEBUG_ENGINE = Engine(debug=True)
+DEBUG_ENGINE = Engine(
+    debug=True,
+    libraries={'i18n': 'django.templatetags.i18n'},
+)
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
@@ -504,16 +507,7 @@ def default_urlconf(request):
     with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open() as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
-        "title": _("Welcome to Django"),
-        "heading": _("It worked!"),
-        "subheading": _("Congratulations on your first Django-powered page."),
-        "instructions": _(
-            "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."
-        ),
-        "explanation": _(
-            "You're seeing this message because you have <code>DEBUG = True</code> in your "
-            "Django settings file and you haven't configured any URLs. Get to work!"
-        ),
+        'version': get_docs_version(),
     })
 
     return HttpResponse(t.render(c), content_type='text/html')
