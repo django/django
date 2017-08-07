@@ -235,6 +235,11 @@ class BaseDatabaseFeatures:
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
 
+    # SQL to create a procedure for use by the Django test suite. The
+    # functionality of the procedure isn't important.
+    create_test_procedure_without_params_sql = None
+    create_test_procedure_with_int_param_sql = None
+
     def __init__(self, connection):
         self.connection = connection
 
