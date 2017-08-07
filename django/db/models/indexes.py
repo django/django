@@ -58,7 +58,7 @@ class Index:
     def get_sql_create_template_values(self, model, schema_editor, using):
         connection = schema_editor.connection
         query = ExpressionIndexQuery(model)
-        compiler = connection.ops.compiler('SQLCompiler')(query, connection, 'default')
+        compiler = connection.ops.compiler('SQLCompiler')(query, connection, using)
 
         columns = []
         supports_expression_indexes = connection.features.supports_expression_indexes
