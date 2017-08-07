@@ -1206,8 +1206,8 @@ need to use::
             on_delete=models.CASCADE,
         )
 
-This sort of reference can be useful when resolving circular import
-dependencies between two applications.
+This sort of reference, called a lazy relationship, can be useful when
+resolving circular import dependencies between two applications.
 
 A database index is automatically created on the ``ForeignKey``. You can
 disable this by setting :attr:`~Field.db_index` to ``False``.  You may want to
