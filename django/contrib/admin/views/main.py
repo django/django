@@ -100,7 +100,7 @@ class ChangeList:
         use_distinct = False
 
         for key, value in lookup_params.items():
-            if not self.model_admin.lookup_allowed(key, value):
+            if not self.model_admin.lookup_allowed(request, key, value):
                 raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []

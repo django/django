@@ -590,6 +590,8 @@ Miscellaneous
   the relative order of elements in each list <form-media-asset-order>`.
   ``MediaOrderConflictWarning`` is issued if the order can't be preserved.
 
+* A ``request`` parameter is now required by ``ModelAdmin.lookup_allowed``.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
