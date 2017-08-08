@@ -109,7 +109,7 @@
             lastChecked = target;
             updateCounter();
         });
-        $('form#changelist-form table#result_list tr').find('td:gt(0) :input').change(function() {
+        $('form#changelist-form table#result_list tr').on('change', 'td:gt(0) :input', function() {
             list_editable_changed = true;
         });
         $('form#changelist-form button[name="index"]').click(function(event) {
