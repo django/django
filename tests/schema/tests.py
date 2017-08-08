@@ -1,6 +1,7 @@
 import datetime
 import itertools
 import unittest
+import warnings
 from copy import copy
 from unittest import mock
 
@@ -19,7 +20,7 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.models.functions import Lower
-from django.db.models.indexes import ExpressionIndexNotSupported, Index
+from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -1864,9 +1865,13 @@ class SchemaTests(TransactionTestCase):
 
         for index in indexes:
             with self.subTest(index=index):
-                with self.assertRaisesMessage(ExpressionIndexNotSupported, "Not creating expression index:"):
+                with warnings.catch_warnings(record=True) as warns:
+                    warnings.simplefilter('always')
+
                     with connection.schema_editor() as editor:
                         index.create_sql(Author, editor)
+                self.assertEqual(len(warns), 1)
+                self.assertIn('Not creating expression index:', warns[0].message.args[0])
 
     @skipIfDBFeature('supports_expression_indexes')
     def test_no_expression_index_support_accepted(self):
