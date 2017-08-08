@@ -158,7 +158,7 @@ class Field(RegisterLookupMixin):
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
-        self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
+        self._db_tablespace = db_tablespace
         self.auto_created = auto_created
 
         # Adjust the appropriate creation counter, and save our local copy.
@@ -423,7 +423,7 @@ class Field(RegisterLookupMixin):
             "choices": [],
             "help_text": '',
             "db_column": None,
-            "db_tablespace": settings.DEFAULT_INDEX_TABLESPACE,
+            "db_tablespace": None,
             "auto_created": False,
             "validators": [],
             "error_messages": None,
@@ -433,8 +433,9 @@ class Field(RegisterLookupMixin):
             "error_messages": "_error_messages",
             "validators": "_validators",
             "verbose_name": "_verbose_name",
+            "db_tablespace": "_db_tablespace",
         }
-        equals_comparison = {"choices", "validators", "db_tablespace"}
+        equals_comparison = {"choices", "validators"}
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
             # Unroll anything iterable for choices into a concrete list
@@ -687,6 +688,10 @@ class Field(RegisterLookupMixin):
     @property
     def unique(self):
         return self._unique or self.primary_key
+
+    @property
+    def db_tablespace(self):
+        return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
 
     def set_attributes_from_name(self, name):
         if not self.name:
