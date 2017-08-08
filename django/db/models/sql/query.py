@@ -2089,4 +2089,4 @@ class ExpressionIndexQuery:
         if not any(f.name == name for f in self.model._meta.concrete_fields):
             raise ValueError("Invalid reference to field '%s' on model '%s'" % (name, self.model._meta.label))
         source_field = self.model._meta.get_field(name)
-        return Col(name, source_field, index_col=True)
+        return Col(None, source_field, index_col=True)  # None refers to the table alias we don't have here

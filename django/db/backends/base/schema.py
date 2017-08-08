@@ -1,6 +1,5 @@
 import hashlib
 import logging
-import warnings
 from datetime import datetime
 
 from django.db.backends.ddl_references import (
@@ -8,7 +7,6 @@ from django.db.backends.ddl_references import (
 )
 from django.db.backends.utils import strip_quotes
 from django.db.models import Index
-from django.db.models.indexes import ExpressionIndexNotSupported
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -323,11 +321,8 @@ class BaseDatabaseSchemaEditor:
 
     def add_index(self, model, index):
         """Add an index on a model."""
-        try:
-            sql = index.create_sql(model, self)
-        except ExpressionIndexNotSupported as e:
-            warnings.warn(str(e), RuntimeWarning)
-        else:
+        sql = index.create_sql(model, self)
+        if sql is not None:
             self.execute(sql)
 
     def remove_index(self, model, index):
@@ -935,12 +930,10 @@ class BaseDatabaseSchemaEditor:
             output.append(self._create_index_sql(model, fields, suffix="_idx"))
 
         for index in model._meta.indexes:
-            try:
-                sql = index.create_sql(model, self)
-            except ExpressionIndexNotSupported as e:
-                warnings.warn(str(e), RuntimeWarning)
-            else:
+            sql = index.create_sql(model, self)
+            if sql is not None:
                 output.append(sql)
+
         return output
 
     def _field_indexes_sql(self, model, field):

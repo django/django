@@ -1,4 +1,5 @@
 import hashlib
+import warnings
 
 from django.db import NotSupportedError
 from django.db.models import F
@@ -94,8 +95,19 @@ class Index:
 
     def create_sql(self, model, schema_editor, using=''):
         sql_create_index = schema_editor.sql_create_index
-        sql_parameters = self.get_sql_create_template_values(model, schema_editor, using)
-        return sql_create_index % sql_parameters
+        try:
+            sql_parameters = self.get_sql_create_template_values(model, schema_editor, using)
+        except ExpressionIndexNotSupported as e:
+            # While it's an error on platforms w/o support for expression
+            # indexes to create one, the presence of an index is often not
+            # required. Thus, we're raising a warning instead of blowing up.
+            # That also seems to be the only way to allow 3rd party packages
+            # using expression indexes while supporting all databases for
+            # everything else.
+            warnings.warn(str(e), RuntimeWarning)
+            return None
+        else:
+            return sql_create_index % sql_parameters
 
     def remove_sql(self, model, schema_editor):
         quote_name = schema_editor.quote_name
