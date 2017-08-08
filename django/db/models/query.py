@@ -102,8 +102,9 @@ class ValuesIterable(BaseIterable):
         # extra(select=...) cols are always at the start of the row.
         names = extra_names + field_names + annotation_names
 
+        indexes = range(len(names))
         for row in compiler.results_iter():
-            yield dict(zip(names, row))
+            yield {names[i]: row[i] for i in indexes}
 
 
 class ValuesListIterable(BaseIterable):
