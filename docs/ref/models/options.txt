@@ -417,6 +417,12 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.index_together
 
+    .. admonition:: Use the :attr:`~Options.indexes` option instead.
+
+        The newer :attr:`~Options.indexes` option provides more functionality
+        than ``index_together``. ``index_together`` may be deprecated in the
+        future.
+
     Sets of field names that, taken together, are indexed::
 
         index_together = [
