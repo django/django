@@ -66,7 +66,8 @@ def make_immutable_fields_list(name, data):
 
 class Options:
     FORWARD_PROPERTIES = {
-        'fields', 'many_to_many', 'concrete_fields', 'local_concrete_fields',
+        'fields', 'many_to_many', 'concrete_fields',
+        'concrete_fields_attnames_enumerated', 'local_concrete_fields',
         '_forward_fields_map', 'managers', 'managers_map', 'base_manager',
         'default_manager',
     }
@@ -464,6 +465,17 @@ class Options:
         """
         return make_immutable_fields_list(
             "concrete_fields", (f for f in self.fields if f.concrete)
+        )
+
+    @cached_property
+    def concrete_fields_attnames_enumerated(self):
+        """
+        Return a list of enumerated attribute names of concrete fields.
+
+        Private API intended only to be used by Django itself.
+        """
+        return make_immutable_fields_list(
+            "concrete_fields_attnames_enumerated", list(enumerate(f.attname for f in self.concrete_fields))
         )
 
     @cached_property
