@@ -66,6 +66,8 @@ class BaseDatabaseSchemaEditor:
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
+    sql_delete_procedure = 'DROP PROCEDURE %(procedure)s'
+
     def __init__(self, connection, collect_sql=False, atomic=True):
         self.connection = connection
         self.collect_sql = collect_sql
@@ -1027,3 +1029,10 @@ class BaseDatabaseSchemaEditor:
             ))
         for constraint_name in constraint_names:
             self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))
+
+    def remove_procedure(self, procedure_name, param_types=()):
+        sql = self.sql_delete_procedure % {
+            'procedure': self.quote_name(procedure_name),
+            'param_types': ','.join(param_types),
+        }
+        self.execute(sql)

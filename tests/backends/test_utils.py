@@ -1,8 +1,11 @@
 """Tests for django.db.backends.utils"""
 from decimal import Decimal, Rounded
 
+from django.db import connection
 from django.db.backends.utils import format_number, truncate_name
-from django.test import SimpleTestCase
+from django.test import (
+    SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
+)
 
 
 class TestUtils(SimpleTestCase):
@@ -45,3 +48,25 @@ class TestUtils(SimpleTestCase):
             equal('0.1234567890', 5, None, '0.12346')
         with self.assertRaises(Rounded):
             equal('1234567890.1234', 5, None, '1234600000')
+
+
+class CursorWrapperTests(TransactionTestCase):
+    available_apps = []
+
+    def _test_procedure(self, procedure_sql, params, param_types):
+        with connection.cursor() as cursor:
+            cursor.execute(procedure_sql)
+        # Use a new cursor because in MySQL a procedure can't be used in the
+        # same cursor in which it was created.
+        with connection.cursor() as cursor:
+            cursor.callproc('test_procedure', params)
+        with connection.schema_editor() as editor:
+            editor.remove_procedure('test_procedure', param_types)
+
+    @skipUnlessDBFeature('create_test_procedure_without_params_sql')
+    def test_callproc_without_params(self):
+        self._test_procedure(connection.features.create_test_procedure_without_params_sql, [], [])
+
+    @skipUnlessDBFeature('create_test_procedure_with_int_param_sql')
+    def test_callproc_with_int_params(self):
+        self._test_procedure(connection.features.create_test_procedure_with_int_param_sql, [1], ['INTEGER'])

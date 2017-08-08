@@ -33,6 +33,22 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_clone_databases = True
     supports_temporal_subtraction = True
     supports_slicing_ordering_in_compound = True
+    create_test_procedure_without_params_sql = """
+        CREATE FUNCTION test_procedure () RETURNS void AS $$
+        DECLARE
+            V_I INTEGER;
+        BEGIN
+            V_I := 1;
+        END;
+    $$ LANGUAGE plpgsql;"""
+    create_test_procedure_with_int_param_sql = """
+        CREATE FUNCTION test_procedure (P_I INTEGER) RETURNS void AS $$
+        DECLARE
+            V_I INTEGER;
+        BEGIN
+            V_I := P_I;
+        END;
+    $$ LANGUAGE plpgsql;"""
 
     @cached_property
     def has_select_for_update_skip_locked(self):
