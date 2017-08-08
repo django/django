@@ -8,7 +8,9 @@ __all__ = [
 
 
 class StatAggregate(Aggregate):
-    def __init__(self, y, x, output_field=FloatField(), filter=None):
+    output_field = FloatField()
+
+    def __init__(self, y, x, output_field=None, filter=None):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')
         super().__init__(y, x, output_field=output_field, filter=filter)
@@ -37,9 +39,7 @@ class RegrAvgY(StatAggregate):
 
 class RegrCount(StatAggregate):
     function = 'REGR_COUNT'
-
-    def __init__(self, y, x, filter=None):
-        super().__init__(y=y, x=x, output_field=IntegerField(), filter=filter)
+    output_field = IntegerField()
 
     def convert_value(self, value, expression, connection):
         if value is None:

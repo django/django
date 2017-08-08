@@ -467,8 +467,10 @@ class DurationExpression(CombinedExpression):
 
 
 class TemporalSubtraction(CombinedExpression):
+    output_field = fields.DurationField()
+
     def __init__(self, lhs, rhs):
-        super().__init__(lhs, self.SUB, rhs, output_field=fields.DurationField())
+        super().__init__(lhs, self.SUB, rhs)
 
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
@@ -692,8 +694,7 @@ class Star(Expression):
 
 
 class Random(Expression):
-    def __init__(self):
-        super().__init__(output_field=fields.FloatField())
+    output_field = fields.FloatField()
 
     def __repr__(self):
         return "Random()"
@@ -1017,6 +1018,7 @@ class Subquery(Expression):
 
 class Exists(Subquery):
     template = 'EXISTS(%(subquery)s)'
+    output_field = fields.BooleanField()
 
     def __init__(self, *args, negated=False, **kwargs):
         self.negated = negated
@@ -1024,10 +1026,6 @@ class Exists(Subquery):
 
     def __invert__(self):
         return type(self)(self.queryset, negated=(not self.negated), **self.extra)
-
-    @property
-    def output_field(self):
-        return fields.BooleanField()
 
     def resolve_expression(self, query=None, **kwargs):
         # As a performance optimization, remove ordering since EXISTS doesn't

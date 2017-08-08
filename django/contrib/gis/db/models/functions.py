@@ -16,12 +16,9 @@ NUMERIC_TYPES = (int, float, Decimal)
 
 class GeoFuncMixin:
     function = None
-    output_field_class = None
     geom_param_pos = (0,)
 
     def __init__(self, *expressions, **extra):
-        if 'output_field' not in extra and self.output_field_class:
-            extra['output_field'] = self.output_field_class()
         super().__init__(*expressions, **extra)
 
         # Ensure that value expressions are geometric.
@@ -137,13 +134,13 @@ class Area(OracleToleranceMixin, GeoFunc):
 
 
 class Azimuth(GeoFunc):
-    output_field_class = FloatField
+    output_field = FloatField()
     arity = 2
     geom_param_pos = (0, 1)
 
 
 class AsGeoJSON(GeoFunc):
-    output_field_class = TextField
+    output_field = TextField()
 
     def __init__(self, expression, bbox=False, crs=False, precision=8, **extra):
         expressions = [expression]
@@ -163,7 +160,7 @@ class AsGeoJSON(GeoFunc):
 
 class AsGML(GeoFunc):
     geom_param_pos = (1,)
-    output_field_class = TextField
+    output_field = TextField()
 
     def __init__(self, expression, version=2, precision=8, **extra):
         expressions = [version, expression]
@@ -189,7 +186,7 @@ class AsKML(AsGML):
 
 
 class AsSVG(GeoFunc):
-    output_field_class = TextField
+    output_field = TextField()
 
     def __init__(self, expression, relative=False, precision=8, **extra):
         relative = relative if hasattr(relative, 'resolve_expression') else int(relative)
@@ -281,7 +278,7 @@ class ForceRHR(GeomOutputGeoFunc):
 
 
 class GeoHash(GeoFunc):
-    output_field_class = TextField
+    output_field = TextField()
 
     def __init__(self, expression, precision=None, **extra):
         expressions = [expression]
@@ -345,7 +342,7 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
 
 
 class LineLocatePoint(GeoFunc):
-    output_field_class = FloatField
+    output_field = FloatField()
     arity = 2
     geom_param_pos = (0, 1)
 
@@ -355,17 +352,17 @@ class MakeValid(GeoFunc):
 
 
 class MemSize(GeoFunc):
-    output_field_class = IntegerField
+    output_field = IntegerField()
     arity = 1
 
 
 class NumGeometries(GeoFunc):
-    output_field_class = IntegerField
+    output_field = IntegerField()
     arity = 1
 
 
 class NumPoints(GeoFunc):
-    output_field_class = IntegerField
+    output_field = IntegerField()
     arity = 1
 
 
