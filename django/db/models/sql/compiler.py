@@ -51,6 +51,7 @@ class SQLCompiler:
         order_by = self.get_order_by()
         self.where, self.having = self.query.where.split_having()
         extra_select = self.get_extra_select(order_by, self.select)
+        self.has_extra_select = bool(extra_select)
         group_by = self.get_group_by(self.select + extra_select, order_by)
         return extra_select, order_by, group_by
 
@@ -1025,7 +1026,7 @@ class SQLCompiler:
 
         result = cursor_iter(
             cursor, self.connection.features.empty_fetchmany_value,
-            self.col_count,
+            self.col_count if self.has_extra_select else None,
             chunk_size,
         )
         if not chunked_fetch and not self.connection.features.can_use_chunked_reads:
@@ -1394,6 +1395,6 @@ def cursor_iter(cursor, sentinel, col_count, itersize):
     """
     try:
         for rows in iter((lambda: cursor.fetchmany(itersize)), sentinel):
-            yield [r[0:col_count] for r in rows]
+            yield rows if col_count is None else [r[:col_count] for r in rows]
     finally:
         cursor.close()
