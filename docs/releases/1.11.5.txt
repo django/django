@@ -2,9 +2,9 @@
 Django 1.11.5 release notes
 ===========================
 
-*Under development*
+*September 5, 2017*
 
-Django 1.11.5 fixes several bugs in 1.11.4.
+Django 1.11.5 fixes a security issue and several bugs in 1.11.4.
 
 Bugfixes
 ========
