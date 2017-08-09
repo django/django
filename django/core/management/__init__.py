@@ -82,8 +82,9 @@ def call_command(command_name, *args, **options):
 
     This is the primary API you should use for calling specific commands.
 
-    `name` may be a string or a command object. Using a string is preferred
-    unless the command object is required for further processing or testing.
+    `command_name` may be a string or a command object. Using a string is
+    preferred unless the command object is required for further processing or
+    testing.
 
     Some examples:
         call_command('migrate')
