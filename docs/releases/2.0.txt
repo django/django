@@ -109,7 +109,7 @@ Minor features
   operation.
 
 * :class:`django.contrib.postgres.indexes.GinIndex` now supports the
-  ``fast_update`` and ``gin_pending_list_limit`` parameters.
+  ``fastupdate`` and ``gin_pending_list_limit`` parameters.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
