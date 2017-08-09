@@ -5,9 +5,9 @@ from contextlib import suppress
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import utils
-from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import aggregates, fields
+from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.duration import duration_string
@@ -206,7 +206,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
             converters.append(self.convert_timefield_value)
-        elif internal_type == 'DecimalField':
+        # Converter for Col is added with Database.register_converter()
+        # in base.py.
+        elif internal_type == 'DecimalField' and not isinstance(expression, Col):
             converters.append(self.convert_decimalfield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
@@ -237,7 +239,8 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_decimalfield_value(self, value, expression, connection):
         if value is not None:
             value = expression.output_field.format_number(value)
-            value = backend_utils.typecast_decimal(value)
+            # Value is not converted to Decimal here as it will be converted
+            # later in BaseExpression.convert_value().
         return value
 
     def convert_uuidfield_value(self, value, expression, connection):
