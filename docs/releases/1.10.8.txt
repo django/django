@@ -1,0 +1,7 @@
+===========================
+Django 1.10.8 release notes
+===========================
+
+*September 5, 2017*
+
+Django 1.10.8 fixes a security issue in 1.10.7.
