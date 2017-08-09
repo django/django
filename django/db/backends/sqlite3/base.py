@@ -33,7 +33,7 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode())
 
 
-Database.register_converter("bool", decoder(lambda s: s == '1'))
+Database.register_converter("bool", lambda s: s == b'1')
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("date", decoder(parse_date))
 Database.register_converter("datetime", decoder(parse_datetime))
