@@ -161,7 +161,7 @@ def typecast_timestamp(s):  # does NOT store time zone information
 
 
 def typecast_decimal(s):
-    if s is None or s == '':
+    if s is None:
         return None
     return decimal.Decimal(s)
 
