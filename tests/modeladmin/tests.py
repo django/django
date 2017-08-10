@@ -682,3 +682,18 @@ class ModelAdminPermissionTests(SimpleTestCase):
             self.assertFalse(ma.has_module_permission(request))
         finally:
             ma.opts.app_label = original_app_label
+
+    def test_has_delete_permission_group_actions(self):
+        """
+        has_delete_permission returns True - group action "delete_selected"
+        is hide and False group action "delete_selected" is show
+        """
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.GET = {}
+        request.user = self.MockAddUser()
+        self.assertNotIn('delete_selected', ma.get_actions(request))
+        request.user = self.MockChangeUser()
+        self.assertNotIn('delete_selected', ma.get_actions(request))
+        request.user = self.MockDeleteUser()
+        self.assertIn('delete_selected', ma.get_actions(request))
