@@ -477,16 +477,16 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         {% for friend in person.friends %}
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
-    the view and the template are the same, ``@cached_property`` can avoid
-    that::
+    the view and the template are the same, decorating the ``friends()`` method
+    with ``@cached_property`` can avoid that::
 
         from django.utils.functional import cached_property
 
-        @cached_property
-        def friends(self):
-            # expensive computation
-            ...
-            return friends
+        class Person(models.Model):
+
+            @cached_property
+            def friends(self):
+                ...
 
     Note that as the method is now a property, in Python code it will need to
     be invoked appropriately::
