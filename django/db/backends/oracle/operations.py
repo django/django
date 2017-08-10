@@ -165,7 +165,15 @@ END;
             converters.append(self.convert_timefield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
-        converters.append(self.convert_empty_values)
+        # Oracle stores empty strings as null. If the field accepts the empty
+        # string, undo this to adhere to the Django convention of using
+        # the empty string instead of null.
+        if expression.field.empty_strings_allowed:
+            converters.append(
+                self.convert_empty_bytes
+                if internal_type == 'BinaryField' else
+                self.convert_empty_string
+            )
         return converters
 
     def convert_textfield_value(self, value, expression, connection):
@@ -208,17 +216,13 @@ END;
             value = uuid.UUID(value)
         return value
 
-    def convert_empty_values(self, value, expression, connection):
-        # Oracle stores empty strings as null. We need to undo this in
-        # order to adhere to the Django convention of using the empty
-        # string instead of null, but only if the field accepts the
-        # empty string.
-        field = expression.output_field
-        if value is None and field.empty_strings_allowed:
-            value = ''
-            if field.get_internal_type() == 'BinaryField':
-                value = b''
-        return value
+    @staticmethod
+    def convert_empty_string(value, expression, connection):
+        return '' if value is None else value
+
+    @staticmethod
+    def convert_empty_bytes(value, expression, connection):
+        return b'' if value is None else value
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
