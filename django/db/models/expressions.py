@@ -10,6 +10,19 @@ from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property
 
 
+class SQLiteNumericMixin:
+    """
+    Some expressions with output_field=DecimalField() must be cast to
+    numeric to be properly filtered.
+    """
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = self.as_sql(compiler, connection, **extra_context)
+        with suppress(FieldError):
+            if self.output_field.get_internal_type() == 'DecimalField':
+                sql = 'CAST(%s AS NUMERIC)' % sql
+        return sql, params
+
+
 class Combinable:
     """
     Provide the ability to combine one or two objects with
@@ -352,7 +365,7 @@ class Expression(BaseExpression, Combinable):
     pass
 
 
-class CombinedExpression(Expression):
+class CombinedExpression(SQLiteNumericMixin, Expression):
 
     def __init__(self, lhs, connector, rhs, output_field=None):
         super().__init__(output_field=output_field)
@@ -506,7 +519,7 @@ class OuterRef(F):
         return self
 
 
-class Func(Expression):
+class Func(SQLiteNumericMixin, Expression):
     """An SQL function call."""
     function = None
     template = '%(function)s(%(expressions)s)'
@@ -573,13 +586,6 @@ class Func(Expression):
         arg_joiner = arg_joiner or data.get('arg_joiner', self.arg_joiner)
         data['expressions'] = data['field'] = arg_joiner.join(sql_parts)
         return template % data, params
-
-    def as_sqlite(self, compiler, connection, **extra_context):
-        sql, params = self.as_sql(compiler, connection, **extra_context)
-        with suppress(FieldError):
-            if self.output_field.get_internal_type() == 'DecimalField':
-                sql = 'CAST(%s AS NUMERIC)' % sql
-        return sql, params
 
     def copy(self):
         copy = super().copy()

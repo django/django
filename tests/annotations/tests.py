@@ -244,6 +244,10 @@ class NonAggregateAnnotationTestCase(TestCase):
                 sum_rating=Sum('rating')
             ).filter(sum_rating=F('nope')))
 
+    def test_filter_decimal_annotation(self):
+        qs = Book.objects.annotate(new_price=F('price') + 1).filter(new_price=Decimal(31)).values_list('new_price')
+        self.assertEqual(qs.get(), (Decimal(31),))
+
     def test_combined_annotation_commutative(self):
         book1 = Book.objects.annotate(adjusted_rating=F('rating') + 2).get(pk=self.b1.pk)
         book2 = Book.objects.annotate(adjusted_rating=2 + F('rating')).get(pk=self.b1.pk)
