@@ -25,7 +25,7 @@ class Profile(models.Model):
 
 
 class Tag(models.Model):
-    text = models.CharField(max_length=255, unique=True)
+    text = models.CharField(max_length=150, unique=True)
 
 
 class Thing(models.Model):

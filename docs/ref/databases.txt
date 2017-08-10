@@ -281,10 +281,11 @@ Django supports MySQL 5.6 and higher.
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
 
-Django expects the database to support Unicode (UTF-8 encoding) and delegates to
-it the task of enforcing transactions and referential integrity. It is important
-to be aware of the fact that the two latter ones aren't actually enforced by
-MySQL when using the MyISAM storage engine, see the next section.
+Django expects the database to support Unicode (UTF-8 encoding, preferably with
+the ``utf8mb4`` character set) and delegates to it the task of enforcing
+transactions and referential integrity. It is important to be aware of the fact
+that the two latter ones aren't actually enforced by MySQL when using the
+MyISAM storage engine, see the next section.
 
 .. _mysql-storage-engines:
 
@@ -362,9 +363,11 @@ Creating your database
 
 You can `create your database`_ using the command-line tools and this SQL::
 
-  CREATE DATABASE <dbname> CHARACTER SET utf8;
+  CREATE DATABASE <dbname> CHARACTER SET utf8mb4;
 
-This ensures all tables and columns will use UTF-8 by default.
+This ensures all tables and columns will use UTF-8 by default. The ``utf8``
+character set is also supported, but then only Unicode characters stored with
+up to three bytes can be stored in the database.
 
 .. _create your database: https://dev.mysql.com/doc/refman/en/create-database.html
 
@@ -383,21 +386,21 @@ the model definition.
 .. _documented thoroughly: https://dev.mysql.com/doc/refman/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci`` collation. This results in all string equality
+``utf8mb4_general_ci`` collation. This results in all string equality
 comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
 ``"AA"`` into the same column, since they compare as equal (and, hence,
 non-unique) with the default collation. If you want case-sensitive comparisons
 on a particular column or table, change the column or table to use the
-``utf8_bin`` collation.
+``utf8mb4_bin`` collation.
 
 Please note that according to `MySQL Unicode Character Sets`_, comparisons for
-the ``utf8_general_ci`` collation are faster, but slightly less correct, than
-comparisons for ``utf8_unicode_ci``. If this is acceptable for your application,
-you should use ``utf8_general_ci`` because it is faster. If this is not acceptable
-(for example, if you require German dictionary order), use ``utf8_unicode_ci``
-because it is more accurate.
+the ``utf8mb4_general_ci`` collation are faster, but slightly less correct, than
+comparisons for ``utf8mb4_unicode_ci``. If this is acceptable for your
+application, you should use ``utf8mb4_general_ci`` because it is faster. If this
+is not acceptable (for example, if you require German dictionary order), use
+``utf8mb4_unicode_ci`` because it is more accurate.
 
 .. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/en/charset-unicode-sets.html
 
@@ -407,6 +410,46 @@ because it is more accurate.
     using a case-insensitive collation, a formset with unique field values that
     differ only by case will pass validation, but upon calling ``save()``, an
     ``IntegrityError`` will be raised.
+
+.. _mysql-convert-charset-collation:
+
+Converting the charset and/or collation for an existing database
+----------------------------------------------------------------
+
+You can write migrations to change the character set or the collation of
+existing MySQL databases. Here's an example migration::
+
+    from django.conf import settings
+    from django.db import migrations
+
+    def to_utf8mb4(apps, schema_editor):
+        if not schema_editor.connection.vendor == 'mysql':
+            return
+
+        # Only if you want to change the database default, this doesn't convert any existing columns.
+        db_name = settings.DATABASES['default']['NAME']
+        schema_editor.execute(
+            'ALTER DATABASE %s CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci' % db_name,
+            params=None
+        )
+
+        tables = [
+            apps.get_model("applabel", "Model1")._meta.db_table,
+            apps.get_model("applabel", "Model2")._meta.db_table,
+        ]
+        for table_name in tables:
+            schema_editor.execute(
+                'ALTER TABLE %s CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci' % table_name,
+                params=None
+            )
+
+    class Migration(migrations.Migration):
+        dependencies = [
+            ('applabel', '0003_some_previous_migration'),
+        ]
+
+        # Writing a reverse migration is an exercise left to the reader!
+        operations = [migrations.RunPython(to_utf8mb4, migrations.RunPython.noop, atomic=False)]
 
 Connecting to the database
 --------------------------
@@ -442,7 +485,7 @@ Here's a sample configuration which uses a MySQL option file::
     database = NAME
     user = USER
     password = PASSWORD
-    default-character-set = utf8
+    default-character-set = utf8mb4
 
 Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``.
@@ -552,12 +595,14 @@ these methods in no-op's based in the results of such detection.
 Notes on specific fields
 ------------------------
 
-Character fields
-~~~~~~~~~~~~~~~~
+Indexes for character fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Any fields that are stored with ``VARCHAR`` column types have their
-``max_length`` restricted to 255 characters if you are using ``unique=True``
-for the field. This affects :class:`~django.db.models.CharField`,
+On most default MySQL installations, index length is limited to 767 bytes. That
+means that fields stored with ``VARCHAR`` column types will only index the 191
+first characters of the fields. Avoid using ``unique=True`` on fields having
+more than 191 characters, because the unicity will only be checked on the 191
+first characters. This affects :class:`~django.db.models.CharField` and
 :class:`~django.db.models.SlugField`.
 
 ``TextField`` limitations

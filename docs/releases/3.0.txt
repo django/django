@@ -296,6 +296,13 @@ upload handler is used.
 ``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
 inconsistency.
 
+MySQL defaults to ``utf8mb4`` character set
+-------------------------------------------
+
+The MySQL backend now uses ``utf8mb4`` as the default character as it allows
+storing the full range of Unicode characters. If needed, :ref:`write a
+migration to convert existing databases <mysql-convert-charset-collation>`.
+
 Miscellaneous
 -------------
 

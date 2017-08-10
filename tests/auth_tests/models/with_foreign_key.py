@@ -3,7 +3,7 @@ from django.db import models
 
 
 class Email(models.Model):
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    email = models.EmailField(verbose_name='email address', max_length=150, unique=True)
 
 
 class CustomUserWithFKManager(BaseUserManager):

@@ -34,7 +34,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser):
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+    email = models.EmailField(verbose_name='email address', max_length=150, unique=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     date_of_birth = models.DateField()
@@ -93,7 +93,7 @@ class RemoveGroupsAndPermissions:
 
 class CustomUserWithoutIsActiveField(AbstractBaseUser):
     username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(max_length=150, unique=True)
 
     objects = UserManager()
 

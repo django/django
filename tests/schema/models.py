@@ -9,7 +9,7 @@ new_apps = Apps()
 
 
 class Author(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=150)
     height = models.PositiveIntegerField(null=True, blank=True)
     weight = models.IntegerField(null=True, blank=True)
     uuid = models.UUIDField(null=True)
@@ -147,7 +147,7 @@ class NoteRename(models.Model):
 
 
 class Tag(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True)
 
     class Meta:
@@ -155,7 +155,7 @@ class Tag(models.Model):
 
 
 class TagIndexed(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True)
 
     class Meta:

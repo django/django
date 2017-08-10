@@ -9,13 +9,11 @@ from .client import DatabaseClient
 class DatabaseCreation(BaseDatabaseCreation):
 
     def sql_table_creation_suffix(self):
-        suffix = []
         test_settings = self.connection.settings_dict['TEST']
-        if test_settings['CHARSET']:
-            suffix.append('CHARACTER SET %s' % test_settings['CHARSET'])
-        if test_settings['COLLATION']:
-            suffix.append('COLLATE %s' % test_settings['COLLATION'])
-        return ' '.join(suffix)
+        return ' '.join([
+            'CHARACTER SET %s' % (test_settings['CHARSET'] or 'utf8mb4'),
+            'COLLATE %s' % (test_settings['COLLATION'] or 'utf8mb4_general_ci'),
+        ])
 
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
         try:
