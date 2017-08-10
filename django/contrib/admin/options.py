@@ -800,6 +800,12 @@ class ModelAdmin(BaseModelAdmin):
             for func, name, desc in actions
         )
 
+        # Hide actions without permissions
+        model_perms = self.get_model_perms(request)
+        if not model_perms['delete']:
+            if 'delete_selected' in actions:
+                del actions['delete_selected']
+
         return actions
 
     def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
