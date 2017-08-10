@@ -8,7 +8,7 @@ from django.contrib.admin.filters import (
 )
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.options import (
-    HORIZONTAL, VERTICAL, ModelAdmin, StackedInline, TabularInline,
+    HORIZONTAL, VERTICAL, ModelAdmin, StackedInline, TabularInline, ApproximateWith,
 )
 from django.contrib.admin.sites import AdminSite, site
 from django.utils.module_loading import autodiscover_modules
@@ -18,7 +18,7 @@ __all__ = [
     "StackedInline", "TabularInline", "AdminSite", "site", "ListFilter",
     "SimpleListFilter", "FieldListFilter", "BooleanFieldListFilter",
     "RelatedFieldListFilter", "ChoicesFieldListFilter", "DateFieldListFilter",
-    "AllValuesFieldListFilter", "RelatedOnlyFieldListFilter", "autodiscover",
+    "AllValuesFieldListFilter", "RelatedOnlyFieldListFilter", "autodiscover", "ApproximateWith",
 ]
 
 
