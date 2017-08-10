@@ -72,6 +72,8 @@ Bugfixes
 * Fixed crash when overriding the template of
   ``django.views.static.directory_index()`` (:ticket:`28122`).
 
+* Fixed unexpected data loss when saving parent object after setting on child (:ticket:`28147`).
+
 * Fixed a regression in formset ``min_num`` validation with unchanged forms
   that have initial data (:ticket:`28130`).
 

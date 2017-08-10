@@ -660,14 +660,19 @@ class Model(metaclass=ModelBase):
                 # database to raise an IntegrityError if applicable. If
                 # constraints aren't supported by the database, there's the
                 # unavoidable risk of data corruption.
-                if obj and obj.pk is None:
-                    # Remove the object from a related instance cache.
-                    if not field.remote_field.multiple:
-                        delattr(obj, field.remote_field.get_cache_name())
-                    raise ValueError(
-                        "save() prohibited to prevent data loss due to "
-                        "unsaved related object '%s'." % field.name
-                    )
+                if obj:
+                    if obj.pk is None:
+                        # Remove the object from a related instance cache.
+                        if not field.remote_field.multiple:
+                            delattr(obj, field.remote_field.get_cache_name())
+                        raise ValueError(
+                            "save() prohibited to prevent data loss due to "
+                            "unsaved related object '%s'." % field.name
+                        )
+                    elif getattr(self, field.attname) is None:
+                        # Grab pk from related object if it has been saved after
+                        # the original assignment
+                        setattr(self, field.attname, obj.pk)
 
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
