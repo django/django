@@ -8,7 +8,7 @@ from pathlib import Path
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import force_escape, pprint
+from django.template.defaultfilters import pprint
 from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -271,7 +271,7 @@ class ExceptionReporter:
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
-                    frame_vars.append((k, force_escape(v)))
+                    frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame
 
