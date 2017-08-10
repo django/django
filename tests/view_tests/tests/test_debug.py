@@ -375,6 +375,27 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(implicit_exc.format("Second exception"), text)
         self.assertEqual(3, text.count('<p>Final exception</p>'))
 
+    def test_reporting_frames_without_source(self):
+        try:
+            source = "def funcName():\n    raise Error('Whoops')\nfuncName()"
+            namespace = {}
+            code = compile(source, 'generated', 'exec')
+            exec(code, namespace)
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        frames = reporter.get_traceback_frames()
+        last_frame = frames[-1]
+        self.assertEqual(last_frame['context_line'], '<source code not available>')
+        self.assertEqual(last_frame['filename'], 'generated')
+        self.assertEqual(last_frame['function'], 'funcName')
+        self.assertEqual(last_frame['lineno'], 2)
+        html = reporter.get_traceback_html()
+        self.assertIn('generated in funcName', html)
+        text = reporter.get_traceback_text()
+        self.assertIn('"generated" in funcName', text)
+
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
         request = self.rf.get('/test_view/')

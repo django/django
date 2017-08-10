@@ -418,22 +418,26 @@ class ExceptionReporter:
             pre_context_lineno, pre_context, context_line, post_context = self._get_lines_from_file(
                 filename, lineno, 7, loader, module_name,
             )
-            if pre_context_lineno is not None:
-                frames.append({
-                    'exc_cause': explicit_or_implicit_cause(exc_value),
-                    'exc_cause_explicit': getattr(exc_value, '__cause__', True),
-                    'tb': tb,
-                    'type': 'django' if module_name.startswith('django.') else 'user',
-                    'filename': filename,
-                    'function': function,
-                    'lineno': lineno + 1,
-                    'vars': self.filter.get_traceback_frame_variables(self.request, tb.tb_frame),
-                    'id': id(tb),
-                    'pre_context': pre_context,
-                    'context_line': context_line,
-                    'post_context': post_context,
-                    'pre_context_lineno': pre_context_lineno + 1,
-                })
+            if pre_context_lineno is None:
+                pre_context_lineno = lineno
+                pre_context = []
+                context_line = '<source code not available>'
+                post_context = []
+            frames.append({
+                'exc_cause': explicit_or_implicit_cause(exc_value),
+                'exc_cause_explicit': getattr(exc_value, '__cause__', True),
+                'tb': tb,
+                'type': 'django' if module_name.startswith('django.') else 'user',
+                'filename': filename,
+                'function': function,
+                'lineno': lineno + 1,
+                'vars': self.filter.get_traceback_frame_variables(self.request, tb.tb_frame),
+                'id': id(tb),
+                'pre_context': pre_context,
+                'context_line': context_line,
+                'post_context': post_context,
+                'pre_context_lineno': pre_context_lineno + 1,
+            })
 
             # If the traceback for current exception is consumed, try the
             # other exception.
