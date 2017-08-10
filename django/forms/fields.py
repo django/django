@@ -5,6 +5,7 @@ Field classes.
 import copy
 import datetime
 import itertools
+import math
 import os
 import re
 import uuid
@@ -306,12 +307,10 @@ class FloatField(IntegerField):
 
     def validate(self, value):
         super().validate(value)
-
-        # Check for NaN (which is the only thing not equal to itself) and +/- infinity
-        if value != value or value in (Decimal('Inf'), Decimal('-Inf')):
+        if value in self.empty_values:
+            return
+        if not math.isfinite(value):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
-
-        return value
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
@@ -352,10 +351,7 @@ class DecimalField(IntegerField):
         super().validate(value)
         if value in self.empty_values:
             return
-        # Check for NaN, Inf and -Inf values. We can't compare directly for NaN,
-        # since it is never equal to itself. However, NaN is the only value that
-        # isn't equal to itself, so we can use this to identify NaN
-        if value != value or value == Decimal("Inf") or value == Decimal("-Inf"):
+        if not math.isfinite(value):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
     def widget_attrs(self, widget):
