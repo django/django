@@ -346,3 +346,29 @@ is equivalent to::
         c.execute(...)
     finally:
         c.close()
+
+Calling stored procedures
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: CursorWrapper.callproc(procname, params=None)
+
+    Calls a database stored procedure with the given name and optional sequence
+    of input parameters.
+
+    For example, given this stored procedure in an Oracle database:
+
+    .. code-block:: sql
+
+        CREATE PROCEDURE "TEST_PROCEDURE"(v_i INTEGER, v_text NVARCHAR2(10)) AS
+            p_i INTEGER;
+            p_text NVARCHAR2(10);
+        BEGIN
+            p_i := v_i;
+            p_text := v_text;
+            ...
+        END;
+
+    This will call it::
+
+        with connection.cursor() as cursor:
+            cursor.callproc('test_procedure', [1, 'test'])
