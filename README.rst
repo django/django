@@ -25,6 +25,8 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
+ * Help? all STH is need own!! test case
+
 * Join the ``#django`` channel on irc.freenode.net. Lots of helpful people hang out
   there. Read the archives at https://botbot.me/freenode/django/.
 
