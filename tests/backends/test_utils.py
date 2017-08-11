@@ -3,8 +3,9 @@ from decimal import Decimal, Rounded
 
 from django.db import connection
 from django.db.backends.utils import format_number, truncate_name
+from django.db.utils import NotSupportedError
 from django.test import (
-    SimpleTestCase, TransactionTestCase, skipUnlessDBFeature,
+    SimpleTestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
 
@@ -53,13 +54,13 @@ class TestUtils(SimpleTestCase):
 class CursorWrapperTests(TransactionTestCase):
     available_apps = []
 
-    def _test_procedure(self, procedure_sql, params, param_types):
+    def _test_procedure(self, procedure_sql, params, param_types, kparams=None):
         with connection.cursor() as cursor:
             cursor.execute(procedure_sql)
         # Use a new cursor because in MySQL a procedure can't be used in the
         # same cursor in which it was created.
         with connection.cursor() as cursor:
-            cursor.callproc('test_procedure', params)
+            cursor.callproc('test_procedure', params, kparams)
         with connection.schema_editor() as editor:
             editor.remove_procedure('test_procedure', param_types)
 
@@ -70,3 +71,14 @@ class CursorWrapperTests(TransactionTestCase):
     @skipUnlessDBFeature('create_test_procedure_with_int_param_sql')
     def test_callproc_with_int_params(self):
         self._test_procedure(connection.features.create_test_procedure_with_int_param_sql, [1], ['INTEGER'])
+
+    @skipUnlessDBFeature('create_test_procedure_with_int_param_sql', 'supports_callproc_kwargs')
+    def test_callproc_kparams(self):
+        self._test_procedure(connection.features.create_test_procedure_with_int_param_sql, [], ['INTEGER'], {'P_I': 1})
+
+    @skipIfDBFeature('supports_callproc_kwargs')
+    def test_unsupported_callproc_kparams_raises_error(self):
+        msg = 'Keyword parameters for callproc are not supported on this database backend.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with connection.cursor() as cursor:
+                cursor.callproc('test_procedure', [], {'P_I': 1})

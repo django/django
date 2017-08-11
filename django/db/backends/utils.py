@@ -6,6 +6,7 @@ import re
 from time import time
 
 from django.conf import settings
+from django.db.utils import NotSupportedError
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
@@ -45,13 +46,23 @@ class CursorWrapper:
     # The following methods cannot be implemented in __getattr__, because the
     # code must run when the method is invoked, not just when it is accessed.
 
-    def callproc(self, procname, params=None):
+    def callproc(self, procname, params=None, kparams=None):
+        # Keyword parameters for callproc aren't supported in PEP 249, but the
+        # database driver may support them (e.g. cx_Oracle).
+        if kparams is not None and not self.db.features.supports_callproc_kwargs:
+            raise NotSupportedError(
+                'Keyword parameters for callproc are not supported on this '
+                'database backend.'
+            )
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
-            if params is None:
+            if params is None and kparams is None:
                 return self.cursor.callproc(procname)
-            else:
+            elif kparams is None:
                 return self.cursor.callproc(procname, params)
+            else:
+                params = params or ()
+                return self.cursor.callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()

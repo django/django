@@ -240,6 +240,9 @@ class BaseDatabaseFeatures:
     create_test_procedure_without_params_sql = None
     create_test_procedure_with_int_param_sql = None
 
+    # Does the backend support keyword parameters for cursor.callproc()?
+    supports_callproc_kwargs = False
+
     def __init__(self, connection):
         self.connection = connection
 
