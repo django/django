@@ -1500,9 +1500,9 @@ message file under the directory listed first in :setting:`LOCALE_PATHS` or
 will generate an error if :setting:`LOCALE_PATHS` is empty.
 
 By default :djadmin:`django-admin makemessages <makemessages>` examines every
-file that has the ``.html`` or ``.txt`` file extension. In case you want to
-override that default, use the ``--extension`` or ``-e`` option to specify the
-file extensions to examine::
+file that has the ``.html``, ``.txt`` or ``.py`` file extension. If you want to
+override that default, use the :option:`--extension <makemessages --extension>`
+or ``-e`` option to specify the file extensions to examine::
 
     django-admin makemessages -l de -e txt
 
