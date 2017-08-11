@@ -1,9 +1,9 @@
 import copy
 import datetime
 from contextlib import suppress
+from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet, FieldError
-from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
@@ -289,7 +289,7 @@ class BaseExpression:
         elif internal_type.endswith('IntegerField'):
             return int(value)
         elif internal_type == 'DecimalField':
-            return backend_utils.typecast_decimal(value)
+            return Decimal(value)
         return value
 
     def get_lookup(self, lookup):
