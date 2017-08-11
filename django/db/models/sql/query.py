@@ -970,25 +970,18 @@ class Query:
         return self.get_compiler(connection=connection).as_sql()
 
     def resolve_lookup_value(self, value, can_reuse, allow_joins):
-        used_joins = set()
         if hasattr(value, 'resolve_expression'):
-            pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
-            used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}
         elif isinstance(value, (list, tuple)):
             # The items of the iterable may be expressions and therefore need
             # to be resolved independently.
             processed_values = []
             for sub_value in value:
                 if hasattr(sub_value, 'resolve_expression'):
-                    pre_joins = self.alias_refcount.copy()
                     processed_values.append(
                         sub_value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
                     )
-                    # The used_joins for a tuple of expressions is the union of
-                    # the used_joins for the individual expressions.
-                    used_joins.update(k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0))
-        return value, used_joins
+        return value
 
     def solve_lookup_type(self, lookup):
         """
@@ -1136,7 +1129,9 @@ class Query:
         if not allow_joins and len(parts) > 1:
             raise FieldError("Joined field references are not permitted in this query")
 
-        value, used_joins = self.resolve_lookup_value(value, can_reuse, allow_joins)
+        pre_joins = self.alias_refcount.copy()
+        value = self.resolve_lookup_value(value, can_reuse, allow_joins)
+        used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}
 
         clause = self.where_class()
         if reffed_expression:
