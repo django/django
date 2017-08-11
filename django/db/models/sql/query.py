@@ -1136,8 +1136,6 @@ class Query:
         if not allow_joins and len(parts) > 1:
             raise FieldError("Joined field references are not permitted in this query")
 
-        # Work out the lookup type and remove it from the end of 'parts',
-        # if necessary.
         value, used_joins = self.resolve_lookup_value(value, can_reuse, allow_joins)
 
         clause = self.where_class()
