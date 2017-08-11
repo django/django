@@ -27,7 +27,7 @@ release to support Python 3.6. We **highly recommend** and only officially
 support the latest release of each series.
 
 The Django 1.11.x series is the last to support Python 2. The next major
-release, Django 2.0, will only support Python 3.5+.
+release, Django 2.0, will only support Python 3.4+.
 
 Deprecating warnings are no longer loud by default
 ==================================================

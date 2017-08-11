@@ -49,7 +49,8 @@ Django version Python versions
 1.8            2.7, 3.2 (until the end of 2016), 3.3, 3.4, 3.5
 1.9, 1.10      2.7, 3.4, 3.5
 1.11           2.7, 3.4, 3.5, 3.6
-2.0            3.5+
+2.0            3.4, 3.5, 3.6
+2.1            3.5, 3.6, 3.7
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
