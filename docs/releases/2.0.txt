@@ -269,6 +269,10 @@ Models
 * The new ``field_name`` parameter of :meth:`.QuerySet.in_bulk` allows fetching
   results based on any unique model field.
 
+* :meth:`.CursorWrapper.callproc()` now takes an optional dictionary of keyword
+  parameters, if the backend supports this feature. Of Django's built-in
+  backends, only Oracle supports it.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

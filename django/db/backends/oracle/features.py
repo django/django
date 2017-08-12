@@ -54,3 +54,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     """
+    supports_callproc_kwargs = True
