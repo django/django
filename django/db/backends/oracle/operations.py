@@ -518,8 +518,7 @@ END;
         AutoFields that aren't Oracle identity columns.
         """
         name_length = self.max_name_length() - 3
-        sequence_name = '%s_SQ' % strip_quotes(table)
-        return truncate_name(sequence_name, name_length).upper()
+        return '%s_SQ' % truncate_name(strip_quotes(table), name_length).upper()
 
     def _get_sequence_name(self, cursor, table, pk_name):
         cursor.execute("""
