@@ -88,8 +88,9 @@ Usage examples::
 Accepts a list of at least two text fields or expressions and returns the
 concatenated text. Each argument must be of a text or char type. If you want
 to concatenate a ``TextField()`` with a ``CharField()``, then be sure to tell
-Django that the ``output_field`` should be a ``TextField()``. This is also
-required when concatenating a ``Value`` as in the example below.
+Django that the ``output_field`` should be a ``TextField()``. Specifying an
+``output_field`` is also required when concatenating a ``Value`` as in the
+example below.
 
 This function will never have a null result. On backends where a null argument
 results in the entire expression being null, Django will ensure that each null
@@ -102,8 +103,11 @@ Usage example::
     >>> from django.db.models.functions import Concat
     >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
     >>> author = Author.objects.annotate(
-    ...    screen_name=Concat('name', V(' ('), 'goes_by', V(')'),
-    ...    output_field=CharField())).get()
+    ...     screen_name=Concat(
+    ...         'name', V(' ('), 'goes_by', V(')'),
+    ...         output_field=CharField()
+    ...     )
+    ... ).get()
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
 
