@@ -661,7 +661,7 @@ Let's see what that looks like, assuming we
 have a ChatMessage model with ``message`` and ``room`` fields::
 
     # In consumers.py
-    from channels import Channel
+    from channels import Channel, Group
     from channels.sessions import channel_session
     from .models import ChatMessage
 
