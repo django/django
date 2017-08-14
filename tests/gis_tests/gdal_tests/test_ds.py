@@ -195,6 +195,7 @@ class DataSourceTest(unittest.TestCase):
                         # Making sure we get the proper OGR Field instance, using
                         # a string value index for the feature.
                         self.assertIsInstance(feat[k], v)
+                    self.assertIsInstance(feat.fields[0], str)
 
                     # Testing Feature.__iter__
                     for fld in feat:
