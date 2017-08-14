@@ -63,8 +63,6 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
-from operator import attrgetter
-
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
@@ -334,11 +332,8 @@ class ReverseOneToOneDescriptor:
             queryset = self.get_queryset()
         queryset._add_hints(instance=instances[0])
 
-        rel_obj_attr = attrgetter(self.related.field.attname)
-
-        def instance_attr(obj):
-            return obj.pk
-
+        rel_obj_attr = self.related.field.get_local_related_value
+        instance_attr = self.related.field.get_foreign_related_value
         instances_dict = {instance_attr(inst): inst for inst in instances}
         query = {'%s__in' % self.related.field.name: instances}
         queryset = queryset.filter(**query)
