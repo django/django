@@ -568,6 +568,22 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_blank_username_non_interactive(self):
+        new_io = StringIO()
+
+        def test(self):
+            with self.assertRaisesMessage(CommandError, 'Username cannot be blank.'):
+                call_command(
+                    'createsuperuser',
+                    username='',
+                    interactive=False,
+                    stdin=MockTTY(),
+                    stdout=new_io,
+                    stderr=new_io,
+                )
+
+        test(self)
+
     def test_password_validation_bypass(self):
         """
         Password validation can be bypassed by entering 'y' at the prompt.
@@ -671,6 +687,19 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             )
 
         test(self)
+
+    def test_existing_username_non_interactive(self):
+        """Creation fails if the username already exists."""
+        User.objects.create(username='janet')
+        new_io = StringIO()
+        with self.assertRaisesMessage(CommandError, "Error: That username is already taken."):
+            call_command(
+                'createsuperuser',
+                username='janet',
+                email='',
+                interactive=False,
+                stdout=new_io,
+            )
 
     def test_validation_mismatched_passwords(self):
         """
