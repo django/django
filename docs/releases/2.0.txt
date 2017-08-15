@@ -32,7 +32,7 @@ Third-party library support for older version of Django
 
 Following the release of Django 2.0, we suggest that third-party app authors
 drop support for all versions of Django prior to 1.11. At that time, you should
-be able run your package's tests using ``python -Wd`` so that deprecation
+be able to run your package's tests using ``python -Wd`` so that deprecation
 warnings do appear. After making the deprecation warning fixes, your app should
 be compatible with Django 2.0.
 
