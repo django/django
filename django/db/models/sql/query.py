@@ -461,16 +461,12 @@ class Query:
         compiler = outer_query.get_compiler(using)
         result = compiler.execute_sql(SINGLE)
         if result is None:
-            result = [None for q in outer_query.annotation_select.items()]
+            result = [None] * len(outer_query.annotation_select)
 
         converters = compiler.get_converters(outer_query.annotation_select.values())
         result = next(compiler.apply_converters((result,), converters))
 
-        return {
-            alias: val
-            for (alias, annotation), val
-            in zip(outer_query.annotation_select.items(), result)
-        }
+        return dict(zip(outer_query.annotation_select, result))
 
     def get_count(self, using):
         """
