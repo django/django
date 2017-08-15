@@ -1784,7 +1784,7 @@ class Query:
 
     def append_annotation_mask(self, names):
         if self.annotation_select_mask is not None:
-            self.set_annotation_mask(set(names).union(self.annotation_select_mask))
+            self.set_annotation_mask(self.annotation_select_mask.union(names))
 
     def set_extra_mask(self, names):
         """
