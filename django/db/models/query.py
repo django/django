@@ -1704,12 +1704,12 @@ class RelatedPopulator:
             obj = None
         else:
             obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
-        if obj and self.related_populators:
-            for rel_iter in self.related_populators:
-                rel_iter.populate(row, obj)
+            if self.related_populators:
+                for rel_iter in self.related_populators:
+                    rel_iter.populate(row, obj)
+            if self.remote_field:
+                self.remote_field.set_cached_value(obj, from_obj)
         self.field.set_cached_value(from_obj, obj)
-        if obj and self.remote_field:
-            self.remote_field.set_cached_value(obj, from_obj)
 
 
 def get_related_populators(klass_info, select, db):
