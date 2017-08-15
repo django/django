@@ -97,6 +97,8 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
 
+        # Cursor must be closed before closing connection.
+        cursor.close()
         self._maindb_connection.close()  # done with main user -- test user and tablespaces created
         self._switch_to_test_user(parameters)
         return self.connection.settings_dict['NAME']
@@ -182,6 +184,8 @@ class DatabaseCreation(BaseDatabaseCreation):
             if verbosity >= 1:
                 print('Destroying test database tables...')
             self._execute_test_db_destruction(cursor, parameters, verbosity)
+        # Cursor must be closed before closing connection.
+        cursor.close()
         self._maindb_connection.close()
 
     def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
