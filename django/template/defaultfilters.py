@@ -224,6 +224,8 @@ def stringformat(value, arg):
     for documentation of Python string formatting.
     """
     try:
+        if isinstance(value, tuple):
+            return ('%' + str(arg)) % str(value)
         return ("%" + str(arg)) % value
     except (ValueError, TypeError):
         return ""
