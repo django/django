@@ -724,8 +724,6 @@ escaping HTML.
 
     Converts a positive integer to a base 36 string.
 
-    .. _sys.maxint: https://docs.python.org/2/library/sys.html#sys.maxint
-
 .. function:: urlsafe_base64_encode(s)
 
     Encodes a bytestring in base64 for use in URLs, stripping any trailing
