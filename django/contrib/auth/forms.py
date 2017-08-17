@@ -155,10 +155,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = UsernameField(
-        max_length=254,
-        widget=forms.TextInput(attrs={'autofocus': True}),
-    )
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
     password = forms.CharField(
         label=_("Password"),
         strip=False,
@@ -182,8 +179,9 @@ class AuthenticationForm(forms.Form):
         self.user_cache = None
         super().__init__(*args, **kwargs)
 
-        # Set the label for the "username" field.
+        # Set the max length and label for the "username" field.
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        self.fields['username'].max_length = self.username_field.max_length or 254
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
