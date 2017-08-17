@@ -10,17 +10,19 @@ from django.utils.inspect import func_supports_parameter
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
+from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
 
 
-class ArrayField(Field):
+class ArrayField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
         'item_invalid': _('Item %(nth)s in the array did not validate: '),
         'nested_array_mismatch': _('Nested arrays must have the same length.'),
     }
+    _default_hint = ('list', '[]')
 
     def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field

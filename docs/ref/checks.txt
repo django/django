@@ -687,6 +687,8 @@ fields:
 
 * **postgres.E001**: Base field for array has errors: ...
 * **postgres.E002**: Base field for array cannot be a related field.
+* **postgres.E003**: ``<field>`` default should be a callable instead of an
+  instance so that it's not shared between all field instances.
 
 ``sites``
 ---------

@@ -9,6 +9,8 @@ from django.db.models import (
 )
 from django.utils.translation import gettext_lazy as _
 
+from .mixins import CheckFieldDefaultMixin
+
 __all__ = ['JSONField']
 
 
@@ -25,12 +27,13 @@ class JsonAdapter(Json):
         return json.dumps(obj, **options)
 
 
-class JSONField(Field):
+class JSONField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _('A JSON object')
     default_error_messages = {
         'invalid': _("Value must be valid JSON."),
     }
+    _default_hint = ('dict', '{}')
 
     def __init__(self, verbose_name=None, name=None, encoder=None, **kwargs):
         if encoder and not callable(encoder):

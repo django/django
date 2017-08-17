@@ -2,13 +2,14 @@ import datetime
 import uuid
 from decimal import Decimal
 
-from django.core import exceptions, serializers
+from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import CharField, Form, widgets
+from django.test.utils import isolate_apps
 from django.utils.html import escape
 
 from . import PostgreSQLTestCase
-from .models import JSONModel
+from .models import JSONModel, PostgreSQLModel
 
 try:
     from django.contrib.postgres import forms
@@ -257,6 +258,42 @@ class TestQuerying(PostgreSQLTestCase):
 
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
+
+
+@isolate_apps('postgres_tests')
+class TestChecks(PostgreSQLTestCase):
+
+    def test_invalid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = JSONField(default={})
+
+        model = MyModel()
+        self.assertEqual(model.check(), [
+            checks.Warning(
+                msg=(
+                    "JSONField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint='Use a callable instead, e.g., use `dict` instead of `{}`.',
+                obj=MyModel._meta.get_field('field'),
+                id='postgres.E003',
+            )
+        ])
+
+    def test_valid_default(self):
+        class MyModel(PostgreSQLModel):
+            field = JSONField(default=dict)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
+    def test_valid_default_none(self):
+        class MyModel(PostgreSQLModel):
+            field = JSONField(default=None)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
 
 
 class TestSerialization(PostgreSQLTestCase):

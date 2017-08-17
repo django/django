@@ -41,7 +41,7 @@ class PostgreSQLModel(models.Model):
 
 
 class IntegerArrayModel(PostgreSQLModel):
-    field = ArrayField(models.IntegerField(), default=[], blank=True)
+    field = ArrayField(models.IntegerField(), default=list, blank=True)
 
 
 class NullableIntegerArrayModel(PostgreSQLModel):
