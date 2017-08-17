@@ -132,7 +132,7 @@ messages over a network via what is essentially a message or service bus.
 
 It's a specification that allows for a set of different
 implementions to be swapped in based on the end-user's requirements and
-infrastructure, and is fully specified in :doc:`/asgi/channel_layer.rst`.
+infrastructure, and is fully specified in :doc:`/asgi/channel_layer`.
 
 Each application instance is assigned an *application channel* by the protocol
 server when it is created, and the protocol server will listen for messages
@@ -177,8 +177,9 @@ implementations, as a class::
         def __call__(self, message):
             ...
 
-The application interface is defined as two callables, though, to allow more
-flexibility for things like factory functions or type-based dispatchers.
+The application interface is specified as the more generic case of two callables
+to allow more flexibility for things like factory functions or type-based
+dispatchers.
 
 Both the application instance and the ``reply`` callable passed to the instance
 on instantiation take messages - these are defined in protocol specifications,
@@ -279,20 +280,8 @@ two exact types.
 Some serializers, such as ``json``, cannot differentiate between byte
 strings and unicode strings; these should include logic to box one type as
 the other (for example, encoding byte strings as base64 unicode strings with
-a preceding special character, e.g. U+FFFF).
-
-Channel and group names are always unicode strings, with the additional
-limitation that they only use the following characters:
-
-* ASCII letters
-* The digits ``0`` through ``9``
-* Hyphen ``-``
-* Underscore ``_``
-* Period ``.``
-* Question mark ``?`` (only to delineiate single-reader channel names,
-  and only one per name)
-* Exclamation mark ``!`` (only to delineate process-specific channel names,
-  and only one per name)
+a preceding special character, e.g. U+FFFF), so the distinction is always
+preserved even across the network.
 
 
 Copyright
