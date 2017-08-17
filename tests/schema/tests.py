@@ -1054,7 +1054,7 @@ class SchemaTests(TransactionTestCase):
         Author.objects.create(name='Foo')
         Author.objects.create(name='Bar')
 
-    def test_alter_int_pk_to_SmallAutoField_pk(self):
+    def test_alter_int_pk_to_small_authfield_pk(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
         SmallAutoField(primary_key=True).

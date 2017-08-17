@@ -79,7 +79,7 @@ class MigrationQuestioner:
         return None
 
     def ask_small_to_big_autofield(self, field_name, model_name):
-        """Upgrading a AutoField to a BigAutoField on a model."""
+        """Upgrading an AutoField to a BigAutoField on a model."""
         return self.defaults.get("ask_small_to_big_autofield", False)
 
 
@@ -201,7 +201,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 "The database needs to upgrade from int to bigint, which may take a while, if you have a lot of rows ".format(model_name, field_name),
                 [
                     "Create upgrade migration (may take a while to apply)",
-                    "Quit, and let me specifity SmallAutoField in models.py",
+                    "Quit, and let me specify SmallAutoField in models.py",
                 ]
             )
             if choice == 2:
