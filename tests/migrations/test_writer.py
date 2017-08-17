@@ -446,10 +446,10 @@ class WriterTests(SimpleTestCase):
         self.serialize_round_trip(validator)
 
         # Test a string regex with flag
-        validator = RegexValidator(r'^[0-9]+$', flags=re.S)
+        validator = RegexValidator(r'^[0-9]+$', flags=re.DOTALL)
         string = MigrationWriter.serialize(validator)[0]
         if PY36:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(16))")
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag['DOTALL'])")
         else:
             self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=16)")
         self.serialize_round_trip(validator)
