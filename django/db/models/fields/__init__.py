@@ -39,8 +39,8 @@ __all__ = [
     'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField',
     'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
     'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
-    'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
-    'TimeField', 'URLField', 'UUIDField',
+    'PositiveSmallIntegerField', 'SlugField', 'SmallAutoField',
+    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField',
 ]
 
 
@@ -873,7 +873,7 @@ class Field(RegisterLookupMixin):
         return getattr(obj, self.attname)
 
 
-class AutoField(Field):
+class SmallAutoField(Field):
     description = _("Integer")
 
     empty_strings_allowed = False
@@ -950,7 +950,7 @@ class AutoField(Field):
         return None
 
 
-class BigAutoField(AutoField):
+class BigAutoField(SmallAutoField):
     description = _("Big (8 byte) integer")
 
     def get_internal_type(self):
@@ -958,6 +958,10 @@ class BigAutoField(AutoField):
 
     def rel_db_type(self, connection):
         return BigIntegerField().db_type(connection=connection)
+
+
+# Aliased for backwards compabitbility.
+AutoField = SmallAutoField
 
 
 class BooleanField(Field):

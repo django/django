@@ -158,7 +158,7 @@ class RenamedField(models.Model):
 
 
 class VerboseNameField(models.Model):
-    id = models.AutoField("verbose pk", primary_key=True)
+    id = models.BigAutoField("verbose pk", primary_key=True)
     field1 = models.BigIntegerField("verbose field1")
     field2 = models.BooleanField("verbose field2", default=False)
     field3 = models.CharField("verbose field3", max_length=10)

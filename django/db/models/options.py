@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import connections
 from django.db.models import Manager
-from django.db.models.fields import AutoField
+from django.db.models.fields import BigAutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
@@ -241,7 +241,7 @@ class Options:
                         'Add parent_link=True to %s.' % field,
                     )
             else:
-                auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
+                auto = BigAutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
 
     def add_manager(self, manager):
