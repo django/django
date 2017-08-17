@@ -39,6 +39,9 @@ The ASGI design decision is to transport both request and response headers as
 lists of 2-element ``[name, value]`` lists and preserve headers exactly as they
 were provided.
 
+The HTTP protocol should be signified to ASGI applications with a ``type`` value
+of ``http``.
+
 
 Request
 '''''''
@@ -206,6 +209,9 @@ should store them in a cache or database.
 
 WebSocket protocol servers should handle PING/PONG requests themselves, and
 send PING frames as necessary to ensure the connection is alive.
+
+The WebSocket protocol should be signified to ASGI applications with
+a ``type`` value of ``websocket``.
 
 
 Connection
