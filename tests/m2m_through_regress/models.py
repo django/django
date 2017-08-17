@@ -14,7 +14,7 @@ class Membership(models.Model):
 
 # using custom id column to test ticket #11107
 class UserMembership(models.Model):
-    id = models.AutoField(db_column='usermembership_id', primary_key=True)
+    id = models.BigAutoField(db_column='usermembership_id', primary_key=True)
     user = models.ForeignKey(User, models.CASCADE)
     group = models.ForeignKey('Group', models.CASCADE)
     price = models.IntegerField(default=100)

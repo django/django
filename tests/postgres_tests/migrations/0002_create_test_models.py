@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CharArrayModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', ArrayField(models.CharField(max_length=10), size=None)),
             ],
             options={
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DateTimeArrayModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('datetimes', ArrayField(models.DateTimeField(), size=None)),
                 ('dates', ArrayField(models.DateField(), size=None)),
                 ('times', ArrayField(models.TimeField(), size=None)),
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='HStoreModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', HStoreField(blank=True, null=True)),
                 ('array_field', ArrayField(HStoreField(), null=True)),
             ],
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OtherTypesArrayModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('ips', ArrayField(models.GenericIPAddressField(), size=None)),
                 ('uuids', ArrayField(models.UUIDField(), size=None)),
                 ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None)),
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='IntegerArrayModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', ArrayField(models.IntegerField(), size=None)),
             ],
             options={
@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='NestedIntegerArrayModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', ArrayField(ArrayField(models.IntegerField(), size=None), size=None)),
             ],
             options={
@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='NullableIntegerArrayModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', ArrayField(models.IntegerField(), size=None, null=True, blank=True)),
             ],
             options={
@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CharFieldModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', models.CharField(max_length=16)),
             ],
             options=None,
@@ -111,7 +111,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TextFieldModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', models.TextField()),
             ],
             options=None,
@@ -120,7 +120,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Scene',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('scene', models.CharField(max_length=255)),
                 ('setting', models.CharField(max_length=255)),
             ],
@@ -130,7 +130,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Character',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=255)),
             ],
             options=None,
@@ -152,7 +152,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Line',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('scene', models.ForeignKey('postgres_tests.Scene', on_delete=models.SET_NULL)),
                 ('character', models.ForeignKey('postgres_tests.Character', on_delete=models.SET_NULL)),
                 ('dialogue', models.TextField(blank=True, null=True)),
@@ -167,7 +167,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AggregateTestModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('boolean_field', models.NullBooleanField()),
                 ('char_field', models.CharField(max_length=30, blank=True)),
                 ('integer_field', models.IntegerField(null=True)),
@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='StatTestModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('int1', models.IntegerField()),
                 ('int2', models.IntegerField()),
                 ('related_field', models.ForeignKey(
@@ -189,21 +189,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='NowTestModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('when', models.DateTimeField(null=True, default=None)),
             ]
         ),
         migrations.CreateModel(
             name='UUIDTestModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('uuid', models.UUIDField(default=None, null=True)),
             ]
         ),
         migrations.CreateModel(
             name='RangesModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('ints', IntegerRangeField(null=True, blank=True)),
                 ('bigints', BigIntegerRangeField(null=True, blank=True)),
                 ('floats', FloatRangeField(null=True, blank=True)),
@@ -237,7 +237,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='JSONModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', JSONField(null=True, blank=True)),
                 ('field_custom', JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
             ],

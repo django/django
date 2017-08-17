@@ -75,7 +75,7 @@ class IntrospectionTests(TransactionTestCase):
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
-            ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
+            ['BigAutoField' if connection.features.can_introspect_autofield else 'IntegerField',
              'CharField', 'CharField', 'CharField',
              'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
              'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
@@ -101,7 +101,7 @@ class IntrospectionTests(TransactionTestCase):
         )
 
     @skipUnlessDBFeature('can_introspect_autofield')
-    def test_bigautofield(self):
+    def test_BigAutoField(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
         self.assertIn('BigAutoField', [datatype(r[1], r) for r in desc])

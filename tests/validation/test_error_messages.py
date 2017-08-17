@@ -11,8 +11,8 @@ class ValidationMessagesTest(TestCase):
             field.clean(value, None)
         self.assertEqual(cm.exception.messages, expected)
 
-    def test_autofield_field_raises_error_message(self):
-        f = models.AutoField(primary_key=True)
+    def test_BigAutoField_field_raises_error_message(self):
+        f = models.BigAutoField(primary_key=True)
         self._test_validation_messages(f, 'fõo', ["'fõo' value must be an integer."])
 
     def test_integer_field_raises_error_message(self):

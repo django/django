@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Author',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=50)),
             ],
         ),

@@ -324,7 +324,7 @@ class StateTests(SimpleTestCase):
             app_label="migrations",
             name="Tag",
             fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
                 ("hidden", models.BooleanField()),
             ],
@@ -353,7 +353,7 @@ class StateTests(SimpleTestCase):
             app_label="migrations",
             name="Food",
             fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ],
             managers=[
                 # The ordering we really want is objects, mgr1, mgr2
@@ -693,7 +693,7 @@ class StateTests(SimpleTestCase):
             "migrations",
             "Tag",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
                 ("hidden", models.BooleanField()),
             ],
@@ -714,7 +714,7 @@ class StateTests(SimpleTestCase):
             "migrations",
             "Tag",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(max_length=99)),
                 ("hidden", models.BooleanField()),
             ],
@@ -873,7 +873,7 @@ class StateTests(SimpleTestCase):
             app_label="migrations",
             name="Tag",
             fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("hidden", models.BooleanField()),
             ],
             managers=[

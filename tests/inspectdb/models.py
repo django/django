@@ -41,7 +41,7 @@ class SpecialName(models.Model):
 
 
 class ColumnTypes(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     big_int_field = models.BigIntegerField()
     bool_field = models.BooleanField(default=False)
     null_bool_field = models.NullBooleanField()

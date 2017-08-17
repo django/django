@@ -3678,8 +3678,8 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
 
-    def test_explicit_autofield_inline(self):
-        "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
+    def test_explicit_BigAutoField_inline(self):
+        "A model with an explicit BigAutoField primary key can be saved as inlines. Regression for #8093"
         # First add a new inline
         self.post_data['grommet_set-0-name'] = "Grommet 1"
         collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))

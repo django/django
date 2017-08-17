@@ -10,7 +10,7 @@ from django.db import (
 from django.db.models import Model
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
-    AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
+    BigAutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
     CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
     SlugField, TextField, TimeField,
 )
@@ -579,7 +579,7 @@ class SchemaTests(TransactionTestCase):
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-        # Change AutoField to IntegerField
+        # Change BigAutoField to IntegerField
         old_field = Author._meta.get_field('id')
         new_field = IntegerField(primary_key=True)
         new_field.set_attributes_from_name('id')
@@ -591,7 +591,7 @@ class SchemaTests(TransactionTestCase):
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(Author)
-        # Change AutoField to CharField
+        # Change BigAutoField to CharField
         old_field = Author._meta.get_field('id')
         new_field = CharField(primary_key=True, max_length=50)
         new_field.set_attributes_from_name('id')
@@ -1044,7 +1044,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
 
         old_field = Author._meta.get_field("id")
-        new_field = AutoField(primary_key=True)
+        new_field = BigAutoField(primary_key=True)
         new_field.set_attributes_from_name("id")
         new_field.model = Author
         with connection.schema_editor() as editor:
@@ -1054,23 +1054,23 @@ class SchemaTests(TransactionTestCase):
         Author.objects.create(name='Foo')
         Author.objects.create(name='Bar')
 
-    def test_alter_int_pk_to_autofield_pk(self):
+    def test_alter_int_pk_to_BigAutoField_pk(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
-        AutoField(primary_key=True).
+        BigAutoField(primary_key=True).
         """
         with connection.schema_editor() as editor:
             editor.create_model(IntegerPK)
 
         old_field = IntegerPK._meta.get_field('i')
-        new_field = AutoField(primary_key=True)
+        new_field = BigAutoField(primary_key=True)
         new_field.model = IntegerPK
         new_field.set_attributes_from_name('i')
 
         with connection.schema_editor() as editor:
             editor.alter_field(IntegerPK, old_field, new_field, strict=True)
 
-    def test_alter_int_pk_to_bigautofield_pk(self):
+    def test_alter_int_pk_to_BigAutoField_pk(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
         BigAutoField(primary_key=True).
@@ -2307,7 +2307,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')
-        new_field = AutoField(primary_key=True)
+        new_field = BigAutoField(primary_key=True)
         new_field.set_attributes_from_name('id')
         with connection.schema_editor() as editor:
             editor.alter_field(Node, old_field, new_field, strict=True)

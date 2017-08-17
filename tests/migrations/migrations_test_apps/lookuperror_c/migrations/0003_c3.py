@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='C3',
             fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('id', models.BigAutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
             ],
         ),
     ]

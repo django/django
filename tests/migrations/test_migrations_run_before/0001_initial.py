@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             "Salamander",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("size", models.IntegerField(default=0)),
                 ("silly_field", models.BooleanField(default=False)),
             ],

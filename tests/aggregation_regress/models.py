@@ -59,13 +59,13 @@ class Store(models.Model):
 
 
 class Entries(models.Model):
-    EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
+    EntryID = models.BigAutoField(primary_key=True, db_column='Entry ID')
     Entry = models.CharField(unique=True, max_length=50)
     Exclude = models.BooleanField(default=False)
 
 
 class Clues(models.Model):
-    ID = models.AutoField(primary_key=True)
+    ID = models.BigAutoField(primary_key=True)
     EntryID = models.ForeignKey(Entries, models.CASCADE, verbose_name='Entry', db_column='Entry ID')
     Clue = models.CharField(max_length=150)
 
@@ -73,7 +73,7 @@ class Clues(models.Model):
 class WithManualPK(models.Model):
     # The generic relations regression test needs two different model
     # classes with the same PK value, and there are some (external)
-    # DB backends that don't work nicely when assigning integer to AutoField
+    # DB backends that don't work nicely when assigning integer to BigAutoField
     # column (MSSQL at least).
     id = models.IntegerField(primary_key=True)
 

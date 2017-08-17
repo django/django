@@ -522,7 +522,7 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
-    def test_fk_to_bigautofield(self):
+    def test_fk_to_BigAutoField(self):
         ch = City.objects.create(name='Chicago')
         District.objects.create(city=ch, name='Far South')
         District.objects.create(city=ch, name='North')

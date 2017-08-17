@@ -110,4 +110,4 @@ class OrderedObject(models.Model):
 
 
 class CustomIdUser(models.Model):
-    uuid = models.AutoField(primary_key=True)
+    uuid = models.BigAutoField(primary_key=True)

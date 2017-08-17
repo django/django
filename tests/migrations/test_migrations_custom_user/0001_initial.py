@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             "Author",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(max_length=255)),
             ],
         ),
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             "Tribble",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("author", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, to_field="id")),
             ],
         )

@@ -48,7 +48,7 @@ class SelfReferChildSibling(SelfRefer):
     pass
 
 
-# Many-to-Many relation between models, where one of the PK's isn't an Autofield
+# Many-to-Many relation between models, where one of the PK's isn't an BigAutoField
 class Line(models.Model):
     name = models.CharField(max_length=100)
 

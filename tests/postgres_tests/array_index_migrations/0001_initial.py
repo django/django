@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CharTextArrayIndexModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('char', django.contrib.postgres.fields.ArrayField(
                     models.CharField(max_length=10), db_index=True, size=100)
                  ),

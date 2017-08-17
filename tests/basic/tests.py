@@ -51,7 +51,7 @@ class ModelInstanceCreationTests(TestCase):
         self.assertEqual(a.headline, 'Third article')
         self.assertEqual(a.pub_date, datetime(2005, 7, 30, 0, 0))
 
-    def test_autofields_generate_different_values_for_each_instance(self):
+    def test_BigAutoFields_generate_different_values_for_each_instance(self):
         a1 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
         a2 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
         a3 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
@@ -74,9 +74,9 @@ class ModelInstanceCreationTests(TestCase):
                 foo='bar',
             )
 
-    def test_can_leave_off_value_for_autofield_and_it_gets_value_on_save(self):
+    def test_can_leave_off_value_for_BigAutoField_and_it_gets_value_on_save(self):
         """
-        You can leave off the value for an AutoField when creating an
+        You can leave off the value for an BigAutoField when creating an
         object, because it'll get filled in automatically when you save().
         """
         a = Article(headline='Article 5', pub_date=datetime(2005, 7, 31))

@@ -331,7 +331,7 @@ class AutoIncrementResetTest(TransactionTestCase):
     """
     Here we test creating the same model two times in different test methods,
     and check that both times they get "1" as their PK value. That is, we test
-    that AutoField values start from 1 for each transactional test case.
+    that BigAutoField values start from 1 for each transactional test case.
     """
 
     available_apps = ['test_runner']

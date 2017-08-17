@@ -97,7 +97,7 @@ class Place(models.Model):
 
 
 class Owner(models.Model):
-    auto_id = models.AutoField(primary_key=True)
+    auto_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
     place = models.ForeignKey(Place, models.CASCADE)
 

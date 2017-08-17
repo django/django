@@ -53,7 +53,7 @@ class OperationTestCase(TransactionTestCase):
 
     def set_up_test_model(self, force_raster_creation=False):
         test_fields = [
-            ('id', models.AutoField(primary_key=True)),
+            ('id', models.BigAutoField(primary_key=True)),
             ('name', models.CharField(max_length=100, unique=True)),
             ('geom', fields.MultiPolygonField(srid=4326))
         ]

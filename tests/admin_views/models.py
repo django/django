@@ -394,7 +394,7 @@ class DooHickey(models.Model):
 
 
 class Grommet(models.Model):
-    code = models.AutoField(primary_key=True)
+    code = models.BigAutoField(primary_key=True)
     owner = models.ForeignKey(Collector, models.CASCADE)
     name = models.CharField(max_length=100)
 

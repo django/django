@@ -741,7 +741,7 @@ class ThreadTests(TransactionTestCase):
 
 class MySQLPKZeroTests(TestCase):
     """
-    Zero as id for AutoField should raise exception in MySQL, because MySQL
+    Zero as id for BigAutoField should raise exception in MySQL, because MySQL
     does not allow zero for autoincrement primary key.
     """
     @skipIfDBFeature('allows_auto_pk_0')

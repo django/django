@@ -40,99 +40,99 @@ class AutodetectorTests(TestCase):
     Tests the migration autodetector.
     """
 
-    author_empty = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
+    author_empty = ModelState("testapp", "Author", [("id", models.BigAutoField(primary_key=True))])
     author_name = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
     ])
     author_name_null = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, null=True)),
     ])
     author_name_longer = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=400)),
     ])
     author_name_renamed = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("names", models.CharField(max_length=200)),
     ])
     author_name_default = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
     author_dates_of_birth_auto_now = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("date_of_birth", models.DateField(auto_now=True)),
         ("date_time_of_birth", models.DateTimeField(auto_now=True)),
         ("time_of_birth", models.TimeField(auto_now=True)),
     ])
     author_dates_of_birth_auto_now_add = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("date_of_birth", models.DateField(auto_now_add=True)),
         ("date_time_of_birth", models.DateTimeField(auto_now_add=True)),
         ("time_of_birth", models.TimeField(auto_now_add=True)),
     ])
     author_name_deconstructible_1 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject())),
     ])
     author_name_deconstructible_2 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject())),
     ])
     author_name_deconstructible_3 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=models.IntegerField())),
     ])
     author_name_deconstructible_4 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=models.IntegerField())),
     ])
     author_name_deconstructible_list_1 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=[DeconstructibleObject(), 123])),
     ])
     author_name_deconstructible_list_2 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=[DeconstructibleObject(), 123])),
     ])
     author_name_deconstructible_list_3 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=[DeconstructibleObject(), 999])),
     ])
     author_name_deconstructible_tuple_1 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=(DeconstructibleObject(), 123))),
     ])
     author_name_deconstructible_tuple_2 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=(DeconstructibleObject(), 123))),
     ])
     author_name_deconstructible_tuple_3 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=(DeconstructibleObject(), 999))),
     ])
     author_name_deconstructible_dict_1 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default={
             'item': DeconstructibleObject(), 'otheritem': 123
         })),
     ])
     author_name_deconstructible_dict_2 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default={
             'item': DeconstructibleObject(), 'otheritem': 123
         })),
     ])
     author_name_deconstructible_dict_3 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default={
             'item': DeconstructibleObject(), 'otheritem': 999
         })),
     ])
     author_name_nested_deconstructible_1 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject(
             DeconstructibleObject(1),
             (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
@@ -141,7 +141,7 @@ class AutodetectorTests(TestCase):
         ))),
     ])
     author_name_nested_deconstructible_2 = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject(
             DeconstructibleObject(1),
             (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
@@ -150,7 +150,7 @@ class AutodetectorTests(TestCase):
         ))),
     ])
     author_name_nested_deconstructible_changed_arg = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject(
             DeconstructibleObject(1),
             (DeconstructibleObject('t1'), DeconstructibleObject('t2-changed'),),
@@ -159,7 +159,7 @@ class AutodetectorTests(TestCase):
         ))),
     ])
     author_name_nested_deconstructible_extra_arg = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject(
             DeconstructibleObject(1),
             (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
@@ -169,7 +169,7 @@ class AutodetectorTests(TestCase):
         ))),
     ])
     author_name_nested_deconstructible_changed_kwarg = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject(
             DeconstructibleObject(1),
             (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
@@ -178,7 +178,7 @@ class AutodetectorTests(TestCase):
         ))),
     ])
     author_name_nested_deconstructible_extra_kwarg = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructibleObject(
             DeconstructibleObject(1),
             (DeconstructibleObject('t1'), DeconstructibleObject('t2'),),
@@ -189,47 +189,47 @@ class AutodetectorTests(TestCase):
     ])
     author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
     author_with_biography_non_blank = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField()),
         ("biography", models.TextField()),
     ])
     author_with_biography_blank = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(blank=True)),
         ("biography", models.TextField(blank=True)),
     ])
     author_with_book = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     author_with_book_order_wrt = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ], options={"order_with_respect_to": "book"})
     author_renamed_with_book = ModelState("testapp", "Writer", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     author_with_publisher_string = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("publisher_name", models.CharField(max_length=200)),
     ])
     author_with_publisher = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
     ])
     author_with_user = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("user", models.ForeignKey("auth.User", models.CASCADE)),
     ])
     author_with_custom_user = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("user", models.ForeignKey("thirdapp.CustomUser", models.CASCADE)),
     ])
@@ -244,148 +244,148 @@ class AutodetectorTests(TestCase):
     author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
-    author_unmanaged_default_pk = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
+    author_unmanaged_default_pk = ModelState("testapp", "Author", [("id", models.BigAutoField(primary_key=True))])
     author_unmanaged_custom_pk = ModelState("testapp", "Author", [
         ("pk_field", models.IntegerField(primary_key=True)),
     ])
     author_with_m2m = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
     author_with_m2m_blank = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
     ])
     author_with_m2m_through = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract")),
     ])
     author_with_renamed_m2m_through = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Deal")),
     ])
     author_with_former_m2m = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("publishers", models.CharField(max_length=100)),
     ])
     author_with_options = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ], {
         "permissions": [('can_hire', 'Can hire')],
         "verbose_name": "Authi",
     })
     author_with_db_table_options = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ], {"db_table": "author_one"})
     author_with_new_db_table_options = ModelState("testapp", "Author", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ], {"db_table": "author_two"})
     author_renamed_with_db_table_options = ModelState("testapp", "NewAuthor", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ], {"db_table": "author_one"})
     author_renamed_with_new_db_table_options = ModelState("testapp", "NewAuthor", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ], {"db_table": "author_three"})
     contract = ModelState("testapp", "Contract", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
     ])
     contract_renamed = ModelState("testapp", "Deal", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
     ])
     publisher = ModelState("testapp", "Publisher", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("name", models.CharField(max_length=100)),
     ])
     publisher_with_author = ModelState("testapp", "Publisher", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
     publisher_with_aardvark_author = ModelState("testapp", "Publisher", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Aardvark", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
     publisher_with_book = ModelState("testapp", "Publisher", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("otherapp.Book", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
     other_pony = ModelState("otherapp", "Pony", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ])
     other_pony_food = ModelState("otherapp", "Pony", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
     ], managers=[
         ('food_qs', FoodQuerySet.as_manager()),
         ('food_mgr', FoodManager('a', 'b')),
         ('food_mgr_kwargs', FoodManager('x', 'y', 3, 4)),
     ])
-    other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
-    third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
+    other_stable = ModelState("otherapp", "Stable", [("id", models.BigAutoField(primary_key=True))])
+    third_thing = ModelState("thirdapp", "Thing", [("id", models.BigAutoField(primary_key=True))])
     book = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_proxy_fk = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("thirdapp.AuthorProxy", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_proxy_proxy_fk = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.AAuthorProxyProxy", models.CASCADE)),
     ])
     book_migrations_fk = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("migrations.UnmigratedModel", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_no_author = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_author_renamed = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Writer", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("writer", models.ForeignKey("testapp.Writer", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_multiple_authors = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("authors", models.ManyToManyField("testapp.Author")),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")),
         ("title", models.CharField(max_length=200)),
     ])
     book_indexes = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
         "indexes": [models.Index(fields=["author", "title"], name="book_title_author_idx")],
     })
     book_unordered_indexes = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
         "indexes": [models.Index(fields=["title", "author"], name="book_author_title_idx")],
     })
     book_foo_together = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
@@ -393,7 +393,7 @@ class AutodetectorTests(TestCase):
         "unique_together": {("author", "title")},
     })
     book_foo_together_2 = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
@@ -401,7 +401,7 @@ class AutodetectorTests(TestCase):
         "unique_together": {("title", "author")},
     })
     book_foo_together_3 = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("newfield", models.IntegerField()),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
@@ -410,7 +410,7 @@ class AutodetectorTests(TestCase):
         "unique_together": {("title", "newfield")},
     })
     book_foo_together_4 = ModelState("otherapp", "Book", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("newfield2", models.IntegerField()),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
@@ -419,31 +419,31 @@ class AutodetectorTests(TestCase):
         "unique_together": {("title", "newfield2")},
     })
     attribution = ModelState("otherapp", "Attribution", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     edition = ModelState("thirdapp", "Edition", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     custom_user = ModelState("thirdapp", "CustomUser", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("username", models.CharField(max_length=255)),
     ], bases=(AbstractBaseUser, ))
     custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("username", models.CharField(max_length=255)),
     ])
-    aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
-    aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
+    aardvark = ModelState("thirdapp", "Aardvark", [("id", models.BigAutoField(primary_key=True))])
+    aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.BigAutoField(primary_key=True))])
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [
         ("id", models.OneToOneField("testapp.Author", models.CASCADE, primary_key=True)),
     ])
-    knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
+    knight = ModelState("eggs", "Knight", [("id", models.BigAutoField(primary_key=True))])
     rabbit = ModelState("eggs", "Rabbit", [
-        ("id", models.AutoField(primary_key=True)),
+        ("id", models.BigAutoField(primary_key=True)),
         ("knight", models.ForeignKey("eggs.Knight", models.CASCADE)),
         ("parent", models.ForeignKey("eggs.Rabbit", models.CASCADE)),
     ], {
@@ -729,11 +729,11 @@ class AutodetectorTests(TestCase):
 
         # An unchanged partial reference.
         before = [ModelState("testapp", "Author", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
         ])]
         after = [ModelState("testapp", "Author", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("file", models.FileField(max_length=200, upload_to=content_file_name('file'))),
         ])]
         changes = self.get_changes(before, after)
@@ -741,7 +741,7 @@ class AutodetectorTests(TestCase):
 
         # A changed partial reference.
         args_changed = [ModelState("testapp", "Author", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("file", models.FileField(max_length=200, upload_to=content_file_name('other-file'))),
         ])]
         changes = self.get_changes(before, args_changed)
@@ -758,7 +758,7 @@ class AutodetectorTests(TestCase):
         )
 
         kwargs_changed = [ModelState("testapp", "Author", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("file", models.FileField(max_length=200, upload_to=content_file_name('file', spam='eggs'))),
         ])]
         changes = self.get_changes(before, kwargs_changed)
@@ -878,20 +878,20 @@ class AutodetectorTests(TestCase):
         """
         before = [
             ModelState("testapp", "EntityA", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ]),
             ModelState("testapp", "EntityB", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("some_label", models.CharField(max_length=255)),
                 ("entity_a", models.ForeignKey("testapp.EntityA", models.CASCADE)),
             ]),
         ]
         after = [
             ModelState("testapp", "EntityA", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ]),
             ModelState("testapp", "RenamedEntityB", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("entity_a", models.ForeignKey("testapp.EntityA", models.CASCADE)),
                 ("some_label", models.CharField(max_length=255)),
             ]),
@@ -1075,7 +1075,7 @@ class AutodetectorTests(TestCase):
 
     def test_identical_regex_doesnt_alter(self):
         from_state = ModelState(
-            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
+            "testapp", "model", [("id", models.BigAutoField(primary_key=True, validators=[
                 RegexValidator(
                     re.compile('^[-a-zA-Z0-9_]+\\Z'),
                     "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
@@ -1084,7 +1084,7 @@ class AutodetectorTests(TestCase):
             ]))]
         )
         to_state = ModelState(
-            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[validate_slug]))]
+            "testapp", "model", [("id", models.BigAutoField(primary_key=True, validators=[validate_slug]))]
         )
         changes = self.get_changes([from_state], [to_state])
         # Right number/type of migrations?
@@ -1092,7 +1092,7 @@ class AutodetectorTests(TestCase):
 
     def test_different_regex_does_alter(self):
         from_state = ModelState(
-            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
+            "testapp", "model", [("id", models.BigAutoField(primary_key=True, validators=[
                 RegexValidator(
                     re.compile('^[a-z]+\\Z', 32),
                     "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
@@ -1101,7 +1101,7 @@ class AutodetectorTests(TestCase):
             ]))]
         )
         to_state = ModelState(
-            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[validate_slug]))]
+            "testapp", "model", [("id", models.BigAutoField(primary_key=True, validators=[validate_slug]))]
         )
         changes = self.get_changes([from_state], [to_state])
         self.assertNumberMigrations(changes, "testapp", 1)
@@ -1113,11 +1113,11 @@ class AutodetectorTests(TestCase):
         """
         # Explicitly testing for not specified, since this is the case after
         # a CreateModel operation w/o any definition on the original model
-        model_state_not_specified = ModelState("a", "model", [("id", models.AutoField(primary_key=True))])
+        model_state_not_specified = ModelState("a", "model", [("id", models.BigAutoField(primary_key=True))])
         # Explicitly testing for None, since this was the issue in #23452 after
         # a AlterFooTogether operation with e.g. () as value
         model_state_none = ModelState("a", "model", [
-            ("id", models.AutoField(primary_key=True))
+            ("id", models.BigAutoField(primary_key=True))
         ], {
             "index_together": None,
             "unique_together": None,
@@ -1125,7 +1125,7 @@ class AutodetectorTests(TestCase):
         # Explicitly testing for the empty set, since we now always have sets.
         # During removal (('col1', 'col2'),) --> () this becomes set([])
         model_state_empty = ModelState("a", "model", [
-            ("id", models.AutoField(primary_key=True))
+            ("id", models.BigAutoField(primary_key=True))
         ], {
             "index_together": set(),
             "unique_together": set(),
@@ -1155,7 +1155,7 @@ class AutodetectorTests(TestCase):
     def test_create_model_with_indexes(self):
         """Test creation of new model with indexes already defined."""
         author = ModelState('otherapp', 'Author', [
-            ('id', models.AutoField(primary_key=True)),
+            ('id', models.BigAutoField(primary_key=True)),
             ('name', models.CharField(max_length=200)),
         ], {'indexes': [models.Index(fields=['name'], name='create_model_with_indexes_idx')]})
         changes = self.get_changes([], [author])
@@ -1266,11 +1266,11 @@ class AutodetectorTests(TestCase):
 
     def test_create_model_and_unique_together(self):
         author = ModelState("otherapp", "Author", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("name", models.CharField(max_length=200)),
         ])
         book_with_author = ModelState("otherapp", "Book", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
             ("title", models.CharField(max_length=200)),
         ], {
@@ -1607,7 +1607,7 @@ class AutodetectorTests(TestCase):
             "testapp",
             "Author",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(
                     max_length=200,
                     # IntegerField intentionally not instantiated.
@@ -1902,8 +1902,8 @@ class AutodetectorTests(TestCase):
 
     def test_multiple_bases(self):
         """#23956 - Inheriting models doesn't move *_ptr fields into AddField operations."""
-        A = ModelState("app", "A", [("a_id", models.AutoField(primary_key=True))])
-        B = ModelState("app", "B", [("b_id", models.AutoField(primary_key=True))])
+        A = ModelState("app", "A", [("a_id", models.BigAutoField(primary_key=True))])
+        B = ModelState("app", "B", [("b_id", models.BigAutoField(primary_key=True))])
         C = ModelState("app", "C", [], bases=("app.A", "app.B"))
         D = ModelState("app", "D", [], bases=("app.A", "app.B"))
         E = ModelState("app", "E", [], bases=("app.A", "app.B"))
@@ -2009,18 +2009,18 @@ class AutodetectorTests(TestCase):
         before AddField and not become unsolvable.
         """
         address = ModelState("a", "Address", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("country", models.ForeignKey("b.DeliveryCountry", models.CASCADE)),
         ])
         person = ModelState("a", "Person", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
         ])
         apackage = ModelState("b", "APackage", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
             ("person", models.ForeignKey("a.Person", models.CASCADE)),
         ])
         country = ModelState("b", "DeliveryCountry", [
-            ("id", models.AutoField(primary_key=True)),
+            ("id", models.BigAutoField(primary_key=True)),
         ])
         changes = self.get_changes([], [address, person, apackage, country])
         # Right number/type of migrations?
@@ -2038,12 +2038,12 @@ class AutodetectorTests(TestCase):
         """
         with isolate_lru_cache(apps.get_swappable_settings_name):
             tenant = ModelState("a", "Tenant", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("primary_address", models.ForeignKey("b.Address", models.CASCADE))],
                 bases=(AbstractBaseUser, )
             )
             address = ModelState("b", "Address", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
             ])
             changes = self.get_changes([], [address, tenant])
@@ -2068,11 +2068,11 @@ class AutodetectorTests(TestCase):
         """
         with isolate_lru_cache(apps.get_swappable_settings_name):
             address = ModelState("a", "Address", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
             ])
             tenant = ModelState("b", "Tenant", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("primary_address", models.ForeignKey("a.Address", models.CASCADE))],
                 bases=(AbstractBaseUser, )
             )
@@ -2096,7 +2096,7 @@ class AutodetectorTests(TestCase):
         """
         with isolate_lru_cache(apps.get_swappable_settings_name):
             person = ModelState("a", "Person", [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='children'))
             ])
             changes = self.get_changes([], [person])

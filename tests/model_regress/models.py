@@ -23,8 +23,8 @@ class Article(models.Model):
 
 
 class Movie(models.Model):
-    # Test models with non-default primary keys / AutoFields #5218
-    movie_id = models.AutoField(primary_key=True)
+    # Test models with non-default primary keys / BigAutoFields #5218
+    movie_id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=60)
 
 

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='A3',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
+                ('id', models.BigAutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
                 ('b2', models.ForeignKey('lookuperror_b.B2', models.CASCADE)),
                 ('c2', models.ForeignKey('lookuperror_c.C2', models.CASCADE)),
             ],

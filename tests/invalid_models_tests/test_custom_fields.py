@@ -7,7 +7,7 @@ from django.test.utils import isolate_apps
 class CustomFieldTest(SimpleTestCase):
 
     def test_none_column(self):
-        class NoColumnField(models.AutoField):
+        class NoColumnField(models.BigAutoField):
             def db_type(self, connection):
                 # None indicates not to create a column in the database.
                 return None

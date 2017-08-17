@@ -247,6 +247,9 @@ class BaseDatabaseFeatures:
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
+    # Does the backend just alias bigint to integter.
+    bigint_is_integer = False
+
     def __init__(self, connection):
         self.connection = connection
 

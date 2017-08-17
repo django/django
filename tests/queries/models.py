@@ -624,13 +624,13 @@ class StaffUser(BaseUser):
 
 
 class Ticket21203Parent(models.Model):
-    parentid = models.AutoField(primary_key=True)
+    parentid = models.BigAutoField(primary_key=True)
     parent_bool = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now=True)
 
 
 class Ticket21203Child(models.Model):
-    childid = models.AutoField(primary_key=True)
+    childid = models.BigAutoField(primary_key=True)
     parent = models.ForeignKey(Ticket21203Parent, models.CASCADE)
 
 

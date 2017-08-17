@@ -791,7 +791,7 @@ class ModelFormsetTest(TestCase):
 
     def test_inline_formsets_with_multi_table_inheritance(self):
         # Test inline formsets where the inline-edited object uses multi-table
-        # inheritance, thus has a non AutoField yet auto-created primary key.
+        # inheritance, thus has a non BigAutoField yet auto-created primary key.
 
         AuthorBooksFormSet3 = inlineformset_factory(Author, AlternateBook, can_delete=False, extra=1, fields="__all__")
         author = Author.objects.create(pk=1, name='Charles Baudelaire')
@@ -1045,7 +1045,7 @@ class ModelFormsetTest(TestCase):
             '<input id="id_form-0-some_field" type="text" name="form-0-some_field" maxlength="100" /></p>'
         )
 
-        # Custom primary keys with ForeignKey, OneToOneField and AutoField ############
+        # Custom primary keys with ForeignKey, OneToOneField and BigAutoField ############
 
         place = Place.objects.create(pk=1, name='Giordanos', city='Chicago')
 

@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='B1',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
+                ('id', models.BigAutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
             ],
         ),
     ]

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             "Book",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ],
         )
 

@@ -31,6 +31,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_temporal_subtraction = True
     ignores_table_name_case = True
     supports_cast_with_precision = False
+    bigint_is_integer = True
 
     @cached_property
     def uses_savepoints(self):

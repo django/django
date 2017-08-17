@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 
 from django.db.models.fields import (
-    AutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
+    BigAutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
     DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
     IntegerField, IPAddressField, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
@@ -15,9 +15,9 @@ from django.utils.functional import lazy
 
 class PromiseTest(SimpleTestCase):
 
-    def test_AutoField(self):
+    def test_BigAutoField(self):
         lazy_func = lazy(lambda: 1, int)
-        self.assertIsInstance(AutoField(primary_key=True).get_prep_value(lazy_func()), int)
+        self.assertIsInstance(BigAutoField(primary_key=True).get_prep_value(lazy_func()), int)
 
     def test_BinaryField(self):
         lazy_func = lazy(lambda: b'', bytes)

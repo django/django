@@ -7,7 +7,7 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 
 from django.db import models
 
-from .fields import MyAutoField
+from .fields import MyBigAutoField
 
 
 class Employee(models.Model):
@@ -34,7 +34,7 @@ class Business(models.Model):
 
 
 class Bar(models.Model):
-    id = MyAutoField(primary_key=True, db_index=True)
+    id = MyBigAutoField(primary_key=True, db_index=True)
 
     def __str__(self):
         return repr(self.pk)

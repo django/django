@@ -5,7 +5,7 @@ from django.test import SimpleTestCase
 from .models import Person
 
 
-class HasAutoFieldTests(SimpleTestCase):
+class HasBigAutoFieldTests(SimpleTestCase):
 
     def test_get_warns(self):
         with warnings.catch_warnings(record=True) as warns:

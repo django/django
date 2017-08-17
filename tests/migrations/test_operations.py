@@ -90,7 +90,7 @@ class OperationTestBase(MigrationTestBase):
         operations = [migrations.CreateModel(
             "Pony",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
@@ -110,21 +110,21 @@ class OperationTestBase(MigrationTestBase):
             operations.append(migrations.CreateModel(
                 "Stable",
                 [
-                    ("id", models.AutoField(primary_key=True)),
+                    ("id", models.BigAutoField(primary_key=True)),
                 ]
             ))
         if third_model:
             operations.append(migrations.CreateModel(
                 "Van",
                 [
-                    ("id", models.AutoField(primary_key=True)),
+                    ("id", models.BigAutoField(primary_key=True)),
                 ]
             ))
         if related_model:
             operations.append(migrations.CreateModel(
                 "Rider",
                 [
-                    ("id", models.AutoField(primary_key=True)),
+                    ("id", models.BigAutoField(primary_key=True)),
                     ("pony", models.ForeignKey("Pony", models.CASCADE)),
                     ("friend", models.ForeignKey("self", models.CASCADE))
                 ],
@@ -157,7 +157,7 @@ class OperationTestBase(MigrationTestBase):
             operations.append(migrations.CreateModel(
                 "Food",
                 fields=[
-                    ("id", models.AutoField(primary_key=True)),
+                    ("id", models.BigAutoField(primary_key=True)),
                 ],
                 managers=[
                     ("food_qs", FoodQuerySet.as_manager()),
@@ -184,7 +184,7 @@ class OperationTests(OperationTestBase):
         operation = migrations.CreateModel(
             "Pony",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("pink", models.IntegerField(default=1)),
             ],
         )
@@ -219,7 +219,7 @@ class OperationTests(OperationTestBase):
             migrations.CreateModel(
                 "Pony",
                 [
-                    ("id", models.AutoField(primary_key=True)),
+                    ("id", models.BigAutoField(primary_key=True)),
                     ("pink", models.TextField()),
                     ("pink", models.IntegerField(default=1)),
                 ],
@@ -292,14 +292,14 @@ class OperationTests(OperationTestBase):
         operation1 = migrations.CreateModel(
             "Pony",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("pink", models.IntegerField(default=1)),
             ],
         )
         operation2 = migrations.CreateModel(
             "Rider",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("number", models.IntegerField(default=1)),
                 ("pony", models.ForeignKey("test_crmoua.Pony", models.CASCADE)),
             ],
@@ -336,7 +336,7 @@ class OperationTests(OperationTestBase):
         operation = migrations.CreateModel(
             "Stable",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("ponies", models.ManyToManyField("Pony", related_name="stables"))
             ]
         )
@@ -471,7 +471,7 @@ class OperationTests(OperationTestBase):
         operation = migrations.CreateModel(
             "Food",
             fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ],
             managers=[
                 ("food_qs", FoodQuerySet.as_manager()),
@@ -690,7 +690,7 @@ class OperationTests(OperationTestBase):
 
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel("ReflexivePony", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("ponies", models.ManyToManyField("self")),
             ]),
         ])
@@ -705,10 +705,10 @@ class OperationTests(OperationTestBase):
         app_label = "test_rename_model_with_m2m"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel("Rider", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ]),
             migrations.CreateModel("Pony", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("riders", models.ManyToManyField("Rider")),
             ]),
         ])
@@ -734,10 +734,10 @@ class OperationTests(OperationTestBase):
         app_label = "test_rename_m2m_target_model"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel("Rider", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ]),
             migrations.CreateModel("Pony", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("riders", models.ManyToManyField("Rider")),
             ]),
         ])
@@ -763,13 +763,13 @@ class OperationTests(OperationTestBase):
         app_label = "test_rename_through"
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel("Rider", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ]),
             migrations.CreateModel("Pony", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ]),
             migrations.CreateModel("PonyRider", fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("rider", models.ForeignKey("test_rename_through.Rider", models.CASCADE)),
                 ("pony", models.ForeignKey("test_rename_through.Pony", models.CASCADE)),
             ]),
@@ -1275,7 +1275,7 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterField("Pony", "id", models.IntegerField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.AutoField)
+        self.assertIsInstance(project_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.BigAutoField)
         self.assertIsInstance(new_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.IntegerField)
         # Test the database alteration
         with connection.schema_editor() as editor:
@@ -1294,7 +1294,7 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterField("Pony", "id", models.FloatField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpkfk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.AutoField)
+        self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.BigAutoField)
         self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
 
         def assertIdTypeEqualsFkType():
@@ -1309,7 +1309,13 @@ class OperationTests(OperationTestBase):
                     for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_rider")
                     if c.name == "pony_id"
                 ][0]
-            self.assertEqual(id_type, fk_type)
+
+            # Sqlite only allows primary keys of type integer, however, this is allows bigints.
+            if connection.features.bigint_is_integer and id_type == 'integer':
+                self.assertIn(fk_type, ['integer', 'bigint'])
+            else:
+                self.assertEqual(id_type, fk_type)
+
             self.assertEqual(id_null, fk_null)
 
         assertIdTypeEqualsFkType()
@@ -1721,7 +1727,7 @@ class OperationTests(OperationTestBase):
         create_operation = migrations.CreateModel(
             name="Rider",
             fields=[
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("pony", models.ForeignKey("Pony", models.CASCADE)),
             ],
         )
@@ -1783,7 +1789,7 @@ class OperationTests(OperationTestBase):
             "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%';"
             "DROP TABLE i_love_ponies",
 
-            state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
+            state_operations=[migrations.CreateModel("SomethingElse", [("id", models.BigAutoField(primary_key=True))])],
         )
         self.assertEqual(operation.describe(), "Raw SQL operation")
         # Test the state alteration
@@ -2081,7 +2087,7 @@ class OperationTests(OperationTestBase):
         create_author = migrations.CreateModel(
             "Author",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
             ],
             options={},
@@ -2089,7 +2095,7 @@ class OperationTests(OperationTestBase):
         create_book = migrations.CreateModel(
             "Book",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("title", models.CharField(max_length=100)),
                 ("author", models.ForeignKey("test_authors.Author", models.CASCADE))
             ],
@@ -2123,7 +2129,7 @@ class OperationTests(OperationTestBase):
             create_old_man.state_forwards("test_books", new_state)
             create_old_man.database_forwards("test_books", editor, project_state, new_state)
 
-    def test_model_with_bigautofield(self):
+    def test_model_with_BigAutoField(self):
         """
         A model with BigAutoField can be created.
         """
@@ -2175,9 +2181,9 @@ class OperationTests(OperationTestBase):
             fill_data.state_forwards("fill_data", new_state)
             fill_data.database_forwards("fill_data", editor, project_state, new_state)
 
-    def test_autofield_foreignfield_growth(self):
+    def test_BigAutoField_foreignfield_growth(self):
         """
-        A field may be migrated from AutoField to BigAutoField.
+        A field may be migrated from BigAutoField to BigAutoField.
         """
         def create_initial_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
@@ -2196,7 +2202,7 @@ class OperationTests(OperationTestBase):
         create_blog = migrations.CreateModel(
             "Blog",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
             ],
             options={},
@@ -2204,7 +2210,7 @@ class OperationTests(OperationTestBase):
         create_article = migrations.CreateModel(
             "Article",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("blog", models.ForeignKey(to="test_blog.Blog", on_delete=models.CASCADE)),
                 ("name", models.CharField(max_length=100)),
                 ("data", models.TextField(default="")),
@@ -2283,7 +2289,7 @@ class OperationTests(OperationTestBase):
             "CREATE TABLE i_love_ponies (id int, special_thing int);",
             "DROP TABLE i_love_ponies;"
         )
-        state_operation = migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])
+        state_operation = migrations.CreateModel("SomethingElse", [("id", models.BigAutoField(primary_key=True))])
         operation = migrations.SeparateDatabaseAndState(
             state_operations=[state_operation],
             database_operations=[database_operation]
@@ -2322,34 +2328,34 @@ class OperationTests(OperationTestBase):
         database_operations = [
             migrations.CreateModel(
                 "ILovePonies",
-                [("id", models.AutoField(primary_key=True))],
+                [("id", models.BigAutoField(primary_key=True))],
                 options={"db_table": "iloveponies"},
             ),
             migrations.CreateModel(
                 "ILoveMorePonies",
-                # We use IntegerField and not AutoField because
+                # We use IntegerField and not BigAutoField because
                 # the model is going to be deleted immediately
-                # and with an AutoField this fails on Oracle
+                # and with an BigAutoField this fails on Oracle
                 [("id", models.IntegerField(primary_key=True))],
                 options={"db_table": "ilovemoreponies"},
             ),
             migrations.DeleteModel("ILoveMorePonies"),
             migrations.CreateModel(
                 "ILoveEvenMorePonies",
-                [("id", models.AutoField(primary_key=True))],
+                [("id", models.BigAutoField(primary_key=True))],
                 options={"db_table": "iloveevenmoreponies"},
             ),
         ]
         state_operations = [
             migrations.CreateModel(
                 "SomethingElse",
-                [("id", models.AutoField(primary_key=True))],
+                [("id", models.BigAutoField(primary_key=True))],
                 options={"db_table": "somethingelse"},
             ),
             migrations.DeleteModel("SomethingElse"),
             migrations.CreateModel(
                 "SomethingCompletelyDifferent",
-                [("id", models.AutoField(primary_key=True))],
+                [("id", models.BigAutoField(primary_key=True))],
                 options={"db_table": "somethingcompletelydifferent"},
             ),
         ]
@@ -2407,7 +2413,7 @@ class SwappableOperationTests(OperationTestBase):
         operation = migrations.CreateModel(
             "Pony",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
                 ("pink", models.IntegerField(default=1)),
             ],
             options={

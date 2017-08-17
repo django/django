@@ -64,7 +64,7 @@ class Parent1(models.Model):
 
 class Parent2(models.Model):
     # Avoid having two "id" fields in the Child1 subclass
-    id2 = models.AutoField(primary_key=True)
+    id2 = models.BigAutoField(primary_key=True)
     name2 = models.CharField(max_length=50)
 
     def __str__(self):

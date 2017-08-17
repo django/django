@@ -33,7 +33,7 @@ class Coffee(models.Model):
 
 
 class MixedCaseIDColumn(models.Model):
-    id = models.AutoField(primary_key=True, db_column='MiXeD_CaSe_Id')
+    id = models.BigAutoField(primary_key=True, db_column='MiXeD_CaSe_Id')
 
 
 class Reviewer(models.Model):

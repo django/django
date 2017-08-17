@@ -20,7 +20,7 @@ class MyWrapper:
         return self.value == other
 
 
-class MyAutoField(models.CharField):
+class MyBigAutoField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 10

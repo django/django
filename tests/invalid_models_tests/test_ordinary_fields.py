@@ -8,11 +8,11 @@ from django.utils.timezone import now
 
 
 @isolate_apps('invalid_models_tests')
-class AutoFieldTests(SimpleTestCase):
+class BigAutoFieldTests(SimpleTestCase):
 
     def test_valid_case(self):
         class Model(models.Model):
-            id = models.AutoField(primary_key=True)
+            id = models.BigAutoField(primary_key=True)
 
         field = Model._meta.get_field('id')
         self.assertEqual(field.check(), [])
@@ -20,11 +20,11 @@ class AutoFieldTests(SimpleTestCase):
     def test_primary_key(self):
         # primary_key must be True. Refs #12467.
         class Model(models.Model):
-            field = models.AutoField(primary_key=False)
+            field = models.BigAutoField(primary_key=False)
 
-            # Prevent Django from autocreating `id` AutoField, which would
+            # Prevent Django from autocreating `id` BigAutoField, which would
             # result in an error, because a model must have exactly one
-            # AutoField.
+            # BigAutoField.
             another = models.IntegerField(primary_key=True)
 
         field = Model._meta.get_field('field')

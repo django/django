@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='B2',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('id', models.BigAutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('a1', models.ForeignKey('lookuperror_a.A1', models.CASCADE)),
             ],
         ),

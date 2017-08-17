@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             "Signal",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", models.BigAutoField(primary_key=True)),
             ],
         ),
     ]

@@ -53,7 +53,7 @@ class MultiDBOperationTests(OperationTestBase):
         """
         operation = migrations.CreateModel(
             "Pony",
-            [("id", models.AutoField(primary_key=True))],
+            [("id", models.BigAutoField(primary_key=True))],
         )
         # Test the state alteration
         project_state = ProjectState()

@@ -5,7 +5,7 @@ ops = [
     migrations.CreateModel(
         name='Neighborhood',
         fields=[
-            ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
             ('name', models.CharField(max_length=100, unique=True)),
             ('geom', models.MultiPolygonField(srid=4326)),
         ],
@@ -16,7 +16,7 @@ ops = [
     migrations.CreateModel(
         name='Household',
         fields=[
-            ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
             ('neighborhood', models.ForeignKey(
                 'gis_migrations.Neighborhood',
                 models.SET_NULL,
@@ -34,7 +34,7 @@ ops = [
     migrations.CreateModel(
         name='Family',
         fields=[
-            ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
             ('name', models.CharField(max_length=100, unique=True)),
         ],
         options={
@@ -54,7 +54,7 @@ if connection.features.supports_raster:
         migrations.CreateModel(
             name='Heatmap',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, unique=True)),
                 ('rast', models.fields.RasterField(srid=4326)),
             ],
