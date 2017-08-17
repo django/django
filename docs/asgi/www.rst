@@ -43,15 +43,9 @@ were provided.
 Request
 '''''''
 
-Sent once for each request that comes into the protocol server. If sending
-this raises ``ChannelFull``, the interface server must respond with a
-500-range error, preferably ``503 Service Unavailable``, and close the connection.
-
-Channel: ``http.request``
-
 Keys:
 
-* ``reply_channel``: Channel name for responses and server pushes.
+* ``type``: ``http.request``
 
 * ``http_version``: Unicode string, one of ``1.0``, ``1.1`` or ``2``.
 
@@ -77,15 +71,13 @@ Keys:
   Header names must be lowercased.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
-  If ``body_channel`` is set, treat as start of body and concatenate
+  If ``more_content`` is set, treat as start of body and concatenate
   on further chunks.
 
-* ``body_channel``: Name of a single-reader channel (containing ``?``) that contains
-  Request Body Chunk messages representing a large request body.
-  Optional, defaults to ``None``. Chunks append to ``body`` if set. Presence of
-  a channel indicates at least one Request Body Chunk message needs to be read,
-  and then further consumption keyed off of the ``more_content`` key in those
-  messages.
+* ``more_content``: Boolean value signifying if there is additional content
+  to come (as part of a Request Body Chunk message). If ``True``, the consuming
+  application should wait until it gets a chunk with this set to ``False``. If
+  ``False``, the request is complete and should be processed.
 
 * ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
   remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
@@ -99,14 +91,9 @@ Keys:
 Request Body Chunk
 ''''''''''''''''''
 
-Must be sent after an initial Response. If trying to send this raises
-``ChannelFull``, the interface server should wait and try again until it is
-accepted (the consumer at the other end of the channel may not be as fast
-consuming the data as the client is at sending it).
-
-Channel: ``http.request.body?``
-
 Keys:
+
+* ``type``: ``http.request.body``
 
 * ``content``: Byte string of HTTP body content, will be concatenated onto
   previously received ``content`` values and ``body`` key in Request.
@@ -117,21 +104,19 @@ Keys:
   Optional, defaults to ``False``.
 
 * ``more_content``: Boolean value signifying if there is additional content
-  to come (as part of a Request Body Chunk message). If ``False``, request will
-  be taken as complete, and any further messages on the channel
-  will be ignored. Optional, defaults to ``False``.
+  to come (as part of a Request Body Chunk message). If ``True``, the consuming
+  application should wait until it gets a chunk with this set to ``False``. If
+  ``False``, the request is complete and should be processed.
 
 
 Response
 ''''''''
 
-Send after any server pushes, and before any response chunks. If ``ChannelFull``
-is encountered, wait and try again later, optionally giving up after a
-predetermined timeout.
-
-Channel: Defined by server, suggested ``http.response.RANDOMPART!CLIENTID``
+Send after any server pushes, and before any response chunks.
 
 Keys:
+
+* ``type``: ``http.response``
 
 * ``status``: Integer HTTP status code.
 
@@ -152,12 +137,9 @@ Keys:
 Response Chunk
 ''''''''''''''
 
-Must be sent after an initial Response. If ``ChannelFull``
-is encountered, wait and try again later.
-
-Channel: Defined by server, suggested ``http.response.RANDOMPART!CLIENTID``
-
 Keys:
+
+* ``type``: ``http.response.body``
 
 * ``content``: Byte string of HTTP body content, will be concatenated onto
   previously received ``content`` values.
@@ -171,20 +153,15 @@ Keys:
 Server Push
 '''''''''''
 
-Must be sent before any Response or Response Chunk messages. If ``ChannelFull``
-is encountered, wait and try again later, optionally giving up after a
-predetermined timeout, and give up on the entire response this push is
-connected to.
+Must be sent before any Response or Response Chunk messages.
 
 When a server receives this message, it must treat the Request message in the
 ``request`` field of the Server Push as though it were a new HTTP request being
 received from the network. A server may, if it chooses, apply all of its
 internal logic to handling this request (e.g. the server may want to try to
 satisfy the request from a cache). Regardless, if the server is unable to
-satisfy the request itself it must create a new ``http.response!`` channel for
-the application to send the Response message on, fill that channel in on the
-``reply_channel`` field of the message, and then send the Request back to the
-application on the ``http.request`` channel.
+satisfy the request itself it must create a new ``http.request`` and ask the
+application to serve the request itself.
 
 This approach limits the amount of knowledge the application has to have about
 pushed responses: they essentially appear to the application like a normal HTTP
@@ -195,9 +172,9 @@ If the remote peer does not support server push, either because it's not a
 HTTP/2 peer or because SETTINGS_ENABLE_PUSH is set to 0, the server must do
 nothing in response to this message.
 
-Channel: Defined by server, suggested ``http.response.RANDOMPART!CLIENTID``
-
 Keys:
+
+* ``type``: ``http.server_push``
 
 * ``request``: A Request message. The ``body``, ``body_channel``, and
   ``reply_channel`` fields MUST be absent: bodies are not allowed on
@@ -211,15 +188,9 @@ Sent when a HTTP connection is closed. This is mainly useful for long-polling,
 where you may have added the response channel to a Group or other set of
 channels you want to trigger a reply to when data arrives.
 
-If ``ChannelFull`` is raised, then give up attempting to send the message;
-consumption is not required.
-
-Channel: ``http.disconnect``
-
 Keys:
 
-* ``reply_channel``: Channel name responses would have been sent on. No longer
-  valid after this message is sent; all messages to it will be dropped.
+* ``type``: ``http.disconnect``
 
 * ``path``: Unicode string HTTP path from URL, with percent escapes decoded
   and UTF8 byte sequences decoded into characters.
@@ -236,23 +207,16 @@ should store them in a cache or database.
 WebSocket protocol servers should handle PING/PONG requests themselves, and
 send PING frames as necessary to ensure the connection is alive.
 
-Note that you **must** ensure that websocket.connect is consumed; if an
-interface server gets ``ChannelFull`` on this channel it will drop the
-connection. Django Channels ships with a no-op consumer attached by default;
-we recommend other implementations do the same.
-
 
 Connection
 ''''''''''
 
 Sent when the client initially opens a connection and completes the
-WebSocket handshake. If sending this raises ``ChannelFull``, the interface
-server must close the connection with either HTTP status code ``503`` or
-WebSocket close code ``1013``.
+WebSocket handshake.
 
-This message must be responded to on the ``reply_channel`` with a
-*Send/Close/Accept* message before the socket will pass messages on the
-``receive`` channel. The protocol server should ideally send this message
+This message must be responded to with either an *Accept* message
+or a *Close* message before the socket will pass ``websocket.receive``
+messages. The protocol server should ideally send this message
 during the handshake phase of the WebSocket and not complete the handshake
 until it gets a reply, returning HTTP status code ``403`` if the connection is
 denied. If this is not possible, it must buffer WebSocket frames and not
@@ -263,7 +227,7 @@ Channel: ``websocket.connect``
 
 Keys:
 
-* ``reply_channel``: Channel name for sending data
+* ``type``: ``websocket.connect``
 
 * ``scheme``: Unicode string URL scheme portion (likely ``ws`` or ``wss``).
   Optional (but must not be empty), default is ``ws``.
