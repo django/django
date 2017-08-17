@@ -10,9 +10,9 @@ from django.db import (
 from django.db.models import Model
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
-    BigAutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
-    CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
-    SlugField, TextField, TimeField,
+    BigAutoField, BigIntegerField, BinaryField, BooleanField, CharField,
+    DateField, DateTimeField, IntegerField, PositiveIntegerField, SlugField,
+    TextField, TimeField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,

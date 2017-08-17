@@ -5,7 +5,7 @@ from django.db.models.fields import (
     BigAutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
     DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
     IntegerField, IPAddressField, NullBooleanField, PositiveIntegerField,
-    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    PositiveSmallIntegerField, SmallIntegerField, SlugField, TextField,
     TimeField, URLField,
 )
 from django.db.models.fields.files import FileField, ImageField
