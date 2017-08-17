@@ -12,7 +12,7 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
     BigAutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     DateField, DateTimeField, IntegerField, PositiveIntegerField, SlugField,
-    TextField, TimeField,
+    SmallAutoField, TextField, TimeField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
@@ -1054,16 +1054,16 @@ class SchemaTests(TransactionTestCase):
         Author.objects.create(name='Foo')
         Author.objects.create(name='Bar')
 
-    def test_alter_int_pk_to_BigAutoField_pk(self):
+    def test_alter_int_pk_to_SmallAutoField_pk(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
-        BigAutoField(primary_key=True).
+        SmallAutoField(primary_key=True).
         """
         with connection.schema_editor() as editor:
             editor.create_model(IntegerPK)
 
         old_field = IntegerPK._meta.get_field('i')
-        new_field = BigAutoField(primary_key=True)
+        new_field = SmallAutoField(primary_key=True)
         new_field.model = IntegerPK
         new_field.set_attributes_from_name('i')
 
