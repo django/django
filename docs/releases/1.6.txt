@@ -183,7 +183,7 @@ Minor features
   input type with localized numbers in current browsers, Django only uses it
   when numeric fields are not localized.
 
-* The ``number`` argument for :ref:`lazy plural translations
+* The ``number`` parameter for :ref:`lazy plural translations
   <lazy-plural-translations>` can be provided at translation time rather than
   at definition time.
 
@@ -273,7 +273,7 @@ Minor features
     to customize the default fields, see
     :ref:`modelforms-overriding-default-fields` for details.
 
-* The ``choices`` argument to model fields now accepts an iterable of iterables
+* The ``choices`` parameter to model fields now accepts an iterable of iterables
   instead of requiring an iterable of lists or tuples.
 
 * The reason phrase can be customized in HTTP responses using
@@ -298,7 +298,7 @@ Minor features
   :class:`~django.views.generic.base.RedirectView` now support HTTP ``PATCH``
   method.
 
-* ``GenericForeignKey`` now takes an optional ``for_concrete_model`` argument,
+* ``GenericForeignKey`` now takes an optional ``for_concrete_model`` parameter,
   which when set to ``False`` allows the field to reference proxy models. The
   default is ``True`` to retain the old behavior.
 
@@ -782,7 +782,7 @@ You may also want to add the shim to support the old style reset links. Using
 the example above, you would modify the existing url by replacing
 ``django.contrib.auth.views.password_reset_confirm`` with
 ``django.contrib.auth.views.password_reset_confirm_uidb36`` and also remove
-the ``name`` argument so it doesn't conflict with the new url::
+the ``name`` parameter so it doesn't conflict with the new url::
 
     url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'django.contrib.auth.views.password_reset_confirm_uidb36'),

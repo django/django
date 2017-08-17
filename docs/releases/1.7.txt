@@ -617,7 +617,7 @@ Forms
   option ``"----------"`` will be omitted in this case.
 
 * :class:`~django.forms.MultiValueField` allows optional subfields by setting
-  the ``require_all_fields`` argument to ``False``. The ``required`` attribute
+  the ``require_all_fields`` parameter to ``False``. The ``required`` attribute
   for each individual field will be respected, and a new ``incomplete``
   validation error will be raised when any required fields are empty.
 
@@ -700,7 +700,7 @@ Management Commands
 
 * The new :option:`dumpdata --natural-foreign` and :option:`dumpdata
   --natural-primary` options, and the new ``use_natural_foreign_keys`` and
-  ``use_natural_primary_keys`` arguments for ``serializers.serialize()``, allow
+  ``use_natural_primary_keys`` parameters for ``serializers.serialize()``, allow
   the use of natural primary keys when serializing.
 
 * It is no longer necessary to provide the cache table name or the
@@ -802,7 +802,7 @@ Models
 Signals
 ~~~~~~~
 
-* The ``enter`` argument was added to the
+* The ``enter`` parameter was added to the
   :data:`~django.test.signals.setting_changed` signal.
 
 * The model signals can be now be connected to using a ``str`` of the
@@ -887,7 +887,7 @@ Tests
   :attr:`~django.test.runner.DiscoverRunner.test_runner`, which facilitate
   overriding the way tests are collected and run.
 
-* The ``fetch_redirect_response`` argument was added to
+* The ``fetch_redirect_response`` parameter was added to
   :meth:`~django.test.SimpleTestCase.assertRedirects`. Since the test
   client can't fetch externals URLs, this allows you to use ``assertRedirects``
   with redirects that aren't part of your Django app.
@@ -895,7 +895,7 @@ Tests
 * Correct handling of scheme when making comparisons in
   :meth:`~django.test.SimpleTestCase.assertRedirects`.
 
-* The ``secure`` argument was added to all the request methods of
+* The ``secure`` parameter was added to all the request methods of
   :class:`~django.test.Client`. If ``True``, the request will be made
   through HTTPS.
 
@@ -928,7 +928,7 @@ Validators
   used when compiling a regular expression string.
 
 * :class:`~django.core.validators.URLValidator` now accepts an optional
-  ``schemes`` argument which allows customization of the accepted URI schemes
+  ``schemes`` parameter which allows customization of the accepted URI schemes
   (instead of the defaults ``http(s)`` and ``ftp(s)``).
 
 * :func:`~django.core.validators.validate_email` now accepts addresses with
@@ -1085,8 +1085,8 @@ following changes that take effect immediately:
 * ``get_model`` raises :exc:`LookupError` instead of returning ``None`` when no
   model is found.
 
-* The ``only_installed`` argument of ``get_model`` and ``get_models`` no
-  longer exists, nor does the ``seed_cache`` argument of ``get_model``.
+* The ``only_installed`` parameter of ``get_model`` and ``get_models`` no
+  longer exists, nor does the ``seed_cache`` parameter of ``get_model``.
 
 Management commands and order of :setting:`INSTALLED_APPS`
 ----------------------------------------------------------
@@ -1372,7 +1372,7 @@ Miscellaneous
   you relied on the default field ordering while having fields defined on both
   the current class *and* on a parent ``Form``.
 
-* The ``required`` argument of
+* The ``required`` parameter of
   :class:`~django.forms.SelectDateWidget` has been removed.
   This widget now respects the form field's ``is_required`` attribute like
   other widgets.
@@ -1412,13 +1412,13 @@ Miscellaneous
 
 * ``django.utils.translation.get_language_from_path()`` and
   ``django.utils.translation.trans_real.get_supported_language_variant()``
-  now no longer have a ``supported`` argument.
+  now no longer have a ``supported`` parameter.
 
 * The ``shortcut`` view in ``django.contrib.contenttypes.views`` now supports
   protocol-relative URLs (e.g. ``//example.com``).
 
 * :class:`~django.contrib.contenttypes.fields.GenericRelation` now supports an
-  optional ``related_query_name`` argument. Setting ``related_query_name`` adds
+  optional ``related_query_name`` parameter. Setting ``related_query_name`` adds
   a relation from the related object back to the content type for filtering,
   ordering and other query operations.
 
@@ -1454,7 +1454,7 @@ Miscellaneous
   the default project template (pre-1.7.2 only), a database must be created
   before accessing a page using :djadmin:`runserver`.
 
-* The addition of the ``schemes`` argument to ``URLValidator`` will appear
+* The addition of the ``schemes`` parameter to ``URLValidator`` will appear
   as a backwards-incompatible change if you were previously using a custom
   regular expression to validate schemes. Any scheme not listed in ``schemes``
   will fail validation, even if the regular expression matches the given URL.
@@ -1625,11 +1625,11 @@ Natural key serialization options
 The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` have been
 deprecated. Use :option:`dumpdata --natural-foreign` instead.
 
-Similarly, the ``use_natural_keys`` argument for ``serializers.serialize()``
+Similarly, the ``use_natural_keys`` parameter for ``serializers.serialize()``
 has been deprecated. Use ``use_natural_foreign_keys`` instead.
 
-Merging of ``POST`` and ``GET`` arguments into ``WSGIRequest.REQUEST``
-----------------------------------------------------------------------
+Merging of ``POST`` and ``GET`` parameters into ``WSGIRequest.REQUEST``
+-----------------------------------------------------------------------
 
 It was already strongly suggested that you use ``GET`` and ``POST`` instead of
 ``REQUEST``, because the former are more explicit. The property ``REQUEST`` is

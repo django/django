@@ -41,7 +41,7 @@ Common changes to your models file:
 Rename ``maxlength`` to ``max_length``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Rename your ``maxlength`` argument to ``max_length`` (this was changed to be
+Rename your ``maxlength`` parameter to ``max_length`` (this was changed to be
 consistent with form fields):
 
 Replace ``__str__`` with ``__unicode__``
@@ -53,14 +53,14 @@ make sure you `use Unicode`_ (``u'foo'``) in that method.
 Remove ``prepopulated_from``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Remove the ``prepopulated_from`` argument on model fields. It's no longer valid
+Remove the ``prepopulated_from`` parameter on model fields. It's no longer valid
 and has been moved to the ``ModelAdmin`` class in ``admin.py``. See `the
 admin`_, below, for more details about changes to the admin.
 
 Remove ``core``
 ~~~~~~~~~~~~~~~
 
-Remove the ``core`` argument from your model fields. It is no longer
+Remove the ``core`` parameter from your model fields. It is no longer
 necessary, since the equivalent functionality (part of :ref:`inline editing
 <admin-inlines>`) is handled differently by the admin interface now. You don't
 have to worry about inline editing until you get to `the admin`_ section,
@@ -533,7 +533,7 @@ New (1.0)::
         ...
 
 If you forget to make this change, you will see errors about ``FloatField``
-not taking a ``max_digits`` attribute in ``__init__``, because the new
+not taking a ``max_digits`` parameter in ``__init__``, because the new
 ``FloatField`` takes no precision-related arguments.
 
 If you're using MySQL or PostgreSQL, no further changes are needed. The

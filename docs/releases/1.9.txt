@@ -102,11 +102,11 @@ implementation, though:
   supported.
 
 * The :meth:`~django.contrib.auth.mixins.AccessMixin.handle_no_permission`
-  method does not take a ``request`` argument. The current request is available
+  method does not take a ``request`` parameter. The current request is available
   in ``self.request``.
 
 * The custom ``test_func()`` of :class:`~django.contrib.auth.mixins.UserPassesTestMixin`
-  does not take a ``user`` argument. The current user is available in
+  does not take a ``user`` parameter. The current user is available in
   ``self.request.user``.
 
 * The :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
@@ -1192,11 +1192,11 @@ versions:
 Its parsing caused bugs with the current syntax, so support for the old syntax
 will be removed in Django 1.10 following an accelerated deprecation.
 
-``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
------------------------------------------------------------
+``ForeignKey`` and ``OneToOneField`` ``on_delete`` parameter
+------------------------------------------------------------
 
 In order to increase awareness about cascading model deletion, the
-``on_delete`` argument of ``ForeignKey`` and ``OneToOneField`` will be required
+``on_delete`` parameter of ``ForeignKey`` and ``OneToOneField`` will be required
 in Django 2.0.
 
 Update models and existing migrations to explicitly set the argument. Since the
@@ -1237,7 +1237,7 @@ Passing a 3-tuple or an ``app_name`` to :func:`~django.conf.urls.include()`
 ---------------------------------------------------------------------------
 
 The instance namespace part of passing a tuple as an argument to ``include()``
-has been replaced by passing the ``namespace`` argument to ``include()``. For
+has been replaced by passing the ``namespace`` parameter to ``include()``. For
 example::
 
     polls_patterns = [
@@ -1258,10 +1258,10 @@ becomes::
         url(r'^polls/', include(polls_patterns, namespace='author-polls')),
     ]
 
-The ``app_name`` argument to ``include()`` has been replaced by passing a
+The ``app_name`` parameter to ``include()`` has been replaced by passing a
 2-tuple (as above), or passing an object or module with an ``app_name``
 attribute (as below). If the ``app_name`` is set in this new way, the
-``namespace`` argument is no longer required. It will default to the value of
+``namespace`` parameter is no longer required. It will default to the value of
 ``app_name``. For example, the URL patterns in the tutorial are changed from:
 
 .. snippet::
@@ -1339,7 +1339,7 @@ it doesn't provide the legacy GeoIP-Python API compatibility methods.
 Miscellaneous
 -------------
 
-* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` has
+* The ``weak`` parameter to ``django.dispatch.signals.Signal.disconnect()`` has
   been deprecated as it has no effect.
 
 * The ``check_aggregate_support()`` method of
@@ -1387,7 +1387,7 @@ Miscellaneous
   return value instead.
 
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
-  deprecated. Use the new ``enclosures`` argument which accepts a list of
+  deprecated. Use the new ``enclosures`` parameter which accepts a list of
   ``Enclosure`` objects instead of a single one.
 
 * The ``django.template.loader.LoaderOrigin`` and
@@ -1462,7 +1462,7 @@ remove usage of these features.
 
 * The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` are removed.
 
-* The ``use_natural_keys`` argument for ``serializers.serialize()`` is removed.
+* The ``use_natural_keys`` parameter for ``serializers.serialize()`` is removed.
 
 * Private API ``django.forms.forms.get_declared_fields()`` is removed.
 

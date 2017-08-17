@@ -32,7 +32,7 @@ Bugfixes
   ``allow_migrate()`` method to crash (:ticket:`25686`).
 
 * Fixed a regression in 1.8.6 by restoring the ability to use ``Manager``
-  objects for the ``queryset`` argument of ``ModelChoiceField``
+  objects for the ``queryset`` parameter of ``ModelChoiceField``
   (:ticket:`25683`).
 
 * Fixed a regression in 1.8.6 that caused an application with South migrations
