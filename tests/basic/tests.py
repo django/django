@@ -51,7 +51,7 @@ class ModelInstanceCreationTests(TestCase):
         self.assertEqual(a.headline, 'Third article')
         self.assertEqual(a.pub_date, datetime(2005, 7, 30, 0, 0))
 
-    def test_BigAutoFields_generate_different_values_for_each_instance(self):
+    def test_bigautofields_generate_different_values_for_each_instance(self):
         a1 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
         a2 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))
         a3 = Article.objects.create(headline='First', pub_date=datetime(2005, 7, 30, 0, 0))

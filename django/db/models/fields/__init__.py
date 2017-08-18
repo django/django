@@ -950,7 +950,7 @@ class SmallAutoField(Field):
         return None
 
 
-# Aliased for backwards compabitbility.
+# Aliased for backwards compatibility.
 AutoField = SmallAutoField
 
 

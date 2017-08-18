@@ -895,7 +895,6 @@ class MigrationAutodetector:
             if old_field_dec != new_field_dec:
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
-
                 if both_m2m or neither_m2m:
                     # Either both fields are m2m or neither is
                     preserve_default = True
@@ -921,11 +920,10 @@ class MigrationAutodetector:
                 elif isinstance(old_field, models.SmallAutoField) and isinstance(new_field, models.BigAutoField):
                     if not self.questioner.ask_small_to_big_autofield(field_name, model_name):
                         raise RuntimeError(
-                            "Automatic upgrade to BigAutoField refused. \nIf you do not want to upgrade, "
-                            "please define {0} = models.SmallAutoField in your model definition.\n\nPlease see the "
-                            "Django release notes for more information.".format(field_name)
+                            'Automatic upgrade to BigAutoField refused. \nIf you do not want to upgrade, '
+                            'please define {0} = models.SmallAutoField in your model definition.\n\nPlease see the '
+                            'Django release notes for more information.'.format(field_name)
                         )
-
                 else:
                     # We cannot alter between m2m and concrete fields
                     self._generate_removed_field(app_label, model_name, field_name)
