@@ -108,7 +108,7 @@ class BulkCreateTests(TestCase):
         """
         valid_country = Country(name='Germany', iso_two_letter='DE')
         invalid_country = Country(id=0, name='Poland', iso_two_letter='PL')
-        msg = 'The database backend does not accept 0 as a value for BigAutoField.'
+        msg = 'The database backend does not accept 0 as a value for AutoField.'
         with self.assertRaisesMessage(ValueError, msg):
             Country.objects.bulk_create([valid_country, invalid_country])
 
