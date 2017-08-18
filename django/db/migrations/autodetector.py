@@ -920,7 +920,11 @@ class MigrationAutodetector:
 
                 elif isinstance(old_field, models.SmallAutoField) and isinstance(new_field, models.BigAutoField):
                     if not self.questioner.ask_small_to_big_autofield(field_name, model_name):
-                        raise RuntimeError("Automatic upgrade to BigAutoField refused. \nIf you do not want to upgrade, please define {0} = models.SmallAutoField in your model definition.\n\nPlease see the Django release notes for more information.".format(field_name))
+                        raise RuntimeError(
+                            "Automatic upgrade to BigAutoField refused. \nIf you do not want to upgrade, "
+                            "please define {0} = models.SmallAutoField in your model definition.\n\nPlease see the "
+                            "Django release notes for more information.".format(field_name)
+                        )
 
                 else:
                     # We cannot alter between m2m and concrete fields

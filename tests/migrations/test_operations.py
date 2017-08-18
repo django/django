@@ -1310,7 +1310,7 @@ class OperationTests(OperationTestBase):
                     if c.name == "pony_id"
                 ][0]
 
-            # Sqlite only allows primary keys of type integer, however, this is allows bigints.
+            # Sqlite only allows primary keys of type integer, however, this allows bigints.
             if connection.features.bigint_is_integer and id_type == 'integer':
                 self.assertIn(fk_type, ['integer', 'bigint'])
             else:

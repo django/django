@@ -192,13 +192,13 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return self._boolean_input(msg % (model_name, old_name, model_name, new_name,
                                           field_instance.__class__.__name__), False)
 
-
     def ask_small_to_big_autofield(self, field_name, model_name):
-        """Adding an auto_now_add field to a model."""
+        """Upgrading an AutoField to a BigAutoField."""
         if not self.dry_run:
             choice = self._choice_input(
-                "You have upgraded Django, which will change the field {}.{} to a BigAutoField'. "
-                "The database needs to upgrade from int to bigint, which may take a while, if you have a lot of rows ".format(model_name, field_name),
+                "You are changing the field {}.{} from a SmallAutoField to a BigAutofield "
+                "(perhaps as a result of upgrading Django). The database needs to upgrade from int to bigint, "
+                "which may take a while, if you have a lot of rows ".format(model_name, field_name),
                 [
                     "Create upgrade migration (may take a while to apply)",
                     "Quit, and let me specify SmallAutoField in models.py",
@@ -207,7 +207,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             if choice == 2:
                 return False
             else:
-                return True
+                return choice == 1
         return None
 
     def ask_rename_model(self, old_model_state, new_model_state):

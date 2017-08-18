@@ -950,6 +950,10 @@ class SmallAutoField(Field):
         return None
 
 
+# Aliased for backwards compabitbility.
+AutoField = SmallAutoField
+
+
 class BigAutoField(SmallAutoField):
     description = _("Big (8 byte) integer")
 
@@ -958,10 +962,6 @@ class BigAutoField(SmallAutoField):
 
     def rel_db_type(self, connection):
         return BigIntegerField().db_type(connection=connection)
-
-
-# Aliased for backwards compabitbility.
-AutoField = SmallAutoField
 
 
 class BooleanField(Field):
