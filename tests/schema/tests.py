@@ -1070,7 +1070,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(IntegerPK, old_field, new_field, strict=True)
 
-    def test_alter_int_pk_to_BigAutoField_pk(self):
+    def test_alter_int_pk_to_bigautofield_pk(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
         BigAutoField(primary_key=True).
