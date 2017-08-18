@@ -199,7 +199,9 @@ the directories which were searched::
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
-files and the following new options.
+files. File serving doesn't run through :setting:`MIDDLEWARE`.
+
+The command adds these options:
 
 .. django-admin-option:: --nostatic
 
