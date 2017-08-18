@@ -303,10 +303,14 @@ class SimpleTestCase(unittest.TestCase):
                         "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
                         % (url, domain)
                     )
-                redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
 
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
+                if response.client.extra is not None:
+                    extra = response.client.extra
+                else:
+                    extra = {}
+                redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'), **extra)
                 self.assertEqual(
                     redirect_response.status_code, target_status_code,
                     msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"

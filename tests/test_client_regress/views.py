@@ -151,3 +151,17 @@ def render_template_multiple_times(request):
     """A view that renders a template multiple times."""
     return HttpResponse(
         render_to_string('base.html') + render_to_string('base.html'))
+
+def redirect_based_on_headers_1_view(request):
+    """A view that redirects iff HTTP_REDIRECT is set"""
+    if "HTTP_REDIRECT" in request.META:
+        return HttpResponseRedirect('/redirect_based_on_headers_2/')
+    else:
+        return HttpResponse("")
+
+def redirect_based_on_headers_2_view(request):
+    """A view that redirects iff HTTP_REDIRECT is set"""
+    if "HTTP_REDIRECT" in request.META:
+        return HttpResponseRedirect('/redirects/further/more/')
+    else:
+        return HttpResponse("")

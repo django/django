@@ -508,6 +508,15 @@ class AssertRedirectsTests(SimpleTestCase):
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
 
+    def test_redirect_fetch_redirect_response(self):
+        "if original request follow=false and fetch_redirect_response=True then test client will preserver HTTP headers."
+        response = self.client.get('/redirect_based_on_headers_1/', follow=False, HTTP_REDIRECT="val")
+        self.assertRedirects(
+            response, '/redirect_based_on_headers_2/',
+            fetch_redirect_response=True,
+            status_code=302, target_status_code=302
+        )
+
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertFormErrorTests(SimpleTestCase):
