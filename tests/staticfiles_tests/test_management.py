@@ -11,7 +11,9 @@ from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.contrib.staticfiles import storage
-from django.contrib.staticfiles.management.commands import collectstatic
+from django.contrib.staticfiles.management.commands import (
+    collectstatic, runserver,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import override_settings
@@ -120,6 +122,14 @@ class TestConfiguration(StaticFilesTestCase):
             staticfiles_storage._wrapped = empty
             collectstatic.staticfiles_storage = staticfiles_storage
             storage.staticfiles_storage = staticfiles_storage
+
+
+class TestRunserver(StaticFilesTestCase):
+    def test_middleware_loaded_only_once(self):
+        command = runserver.Command()
+        with mock.patch('django.middleware.common.CommonMiddleware') as mocked:
+            command.get_handler(use_static_handler=True, insecure_serving=True)
+            self.assertEqual(mocked.call_count, 1)
 
 
 class TestCollectionHelpSubcommand(AdminScriptTestCase):

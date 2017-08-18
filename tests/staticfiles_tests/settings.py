@@ -24,5 +24,5 @@ TEST_SETTINGS = {
     ],
     # In particular, AuthenticationMiddleware can't be used because
     # contrib.auth isn't in INSTALLED_APPS.
-    'MIDDLEWARE': [],
+    'MIDDLEWARE': ['django.middleware.common.CommonMiddleware'],
 }
