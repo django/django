@@ -25,6 +25,8 @@ urlpatterns = [
     path('circular_redirect_2/', RedirectView.as_view(url='/circular_redirect_3/')),
     path('circular_redirect_3/', RedirectView.as_view(url='/circular_redirect_1/')),
     path('redirect_other_host/', RedirectView.as_view(url='https://otherserver:8443/no_template_view/')),
+    path('redirect_based_on_extra_headers_1/', views.redirect_based_on_extra_headers_1_view),
+    path('redirect_based_on_extra_headers_2/', views.redirect_based_on_extra_headers_2_view),
     path('set_session/', views.set_session_view),
     path('check_session/', views.check_session_view),
     path('request_methods/', views.request_methods_view),
