@@ -290,6 +290,15 @@ class ConnectionRouter(object):
         return obj1._state.db == obj2._state.db
 
     def allow_migrate(self, db, app_label, **hints):
+
+        try:
+            db_app_mapping = settings.DB_MAPPING.get(app_label, DEFAULT_DB_ALIAS)
+            #if database are mapped and dabase is the diferrente no test attributes ,
+            if db_app_mapping != db:
+                return False
+        except Exception as Error:
+            print " Error contro ", repr(Error)
+
         for router in self.routers:
             try:
                 method = router.allow_migrate
