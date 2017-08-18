@@ -128,7 +128,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def data_types(self):
         if self.features.supports_microsecond_precision:
-            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
+            return self._data_types.update({'DateTimeField': 'datetime(6)', 'TimeField': 'time(6)'})
         else:
             return self._data_types
 
