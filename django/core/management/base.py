@@ -2,6 +2,7 @@
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
+import logging
 import os
 import sys
 from argparse import ArgumentParser
@@ -206,6 +207,7 @@ class BaseCommand:
     def __init__(self, stdout=None, stderr=None, no_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
         self.stderr = OutputWrapper(stderr or sys.stderr)
+        self.output = logging.getLogger('django.commands')
         if no_color:
             self.style = no_style()
         else:

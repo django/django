@@ -45,12 +45,26 @@ DEFAULT_LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'cmd_stdout': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',
+         },
+        'cmd_stderr': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+        },
     },
     'loggers': {
         'django': {
             'handlers': ['console', 'mail_admins'],
             'level': 'INFO',
+        },
+        'django.commands': {
+            'handlers': ['cmd_stdout', 'cmd_stderr'],
+            'level': 'INFO',
+            'propagate': False,
         },
         'django.server': {
             'handlers': ['django.server'],
