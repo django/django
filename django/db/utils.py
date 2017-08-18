@@ -292,12 +292,12 @@ class ConnectionRouter(object):
     def allow_migrate(self, db, app_label, **hints):
 
         try:
-            db_app_mapping = settings.DB_MAPPING.get(app_label, DEFAULT_DB_ALIAS)
+            db_app_mapping = settings.DB_APPS_MAPPING.get(app_label, DEFAULT_DB_ALIAS)
             #if database are mapped and dabase is the diferrente no test attributes ,
             if db_app_mapping != db:
                 return False
-        except Exception as Error:
-            print " Error contro ", repr(Error)
+        except AttributeError:
+            pass
 
         for router in self.routers:
             try:
