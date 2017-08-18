@@ -1294,7 +1294,8 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterField("Pony", "id", models.FloatField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpkfk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.BigAutoField)
+        self.assertIsInstance(
+            project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.BigAutoField)
         self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
 
         def assertIdTypeEqualsFkType():
@@ -1789,7 +1790,8 @@ class OperationTests(OperationTestBase):
             "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%';"
             "DROP TABLE i_love_ponies",
 
-            state_operations=[migrations.CreateModel("SomethingElse", [("id", models.BigAutoField(primary_key=True))])],
+            state_operations=[migrations.CreateModel("SomethingElse", [
+                ("id", models.BigAutoField(primary_key=True))])],
         )
         self.assertEqual(operation.describe(), "Raw SQL operation")
         # Test the state alteration
