@@ -118,7 +118,6 @@ class ValuesListIterable(BaseIterable):
         query = queryset.query
         compiler = query.get_compiler(queryset.db)
 
-        results = compiler.results_iter()
         if queryset._fields:
             field_names = list(query.values_select)
             extra_names = list(query.extra_select)
@@ -132,8 +131,8 @@ class ValuesListIterable(BaseIterable):
                 # Reorder according to fields.
                 index_map = {name: idx for idx, name in enumerate(names)}
                 rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
-                results = map(rowfactory, results)
-        return results
+                return map(rowfactory, compiler.results_iter())
+        return compiler.results_iter(tuple_expected=True)
 
 
 class FlatValuesListIterable(BaseIterable):
