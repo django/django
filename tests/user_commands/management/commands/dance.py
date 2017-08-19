@@ -17,7 +17,7 @@ class Command(BaseCommand):
         if example == "raise":
             raise CommandError()
         if options['verbosity'] > 0:
-            self.stdout.write("I don't feel like dancing %s." % options["style"])
-            self.stdout.write(','.join(options))
+            self.output.info("I don't feel like dancing %s." % options["style"])
+            self.output.info(','.join(options))
         if options['integer'] > 0:
-            self.stdout.write("You passed %d as a positional argument." % options['integer'])
+            self.output.info("You passed %d as a positional argument." % options['integer'])
