@@ -115,7 +115,7 @@ class Command(BaseCommand):
 
         # If they want to merge and there's nothing to merge, then politely exit
         if self.merge and not conflicts:
-            self.stdout.write("No conflicts detected to merge.")
+            self.output.info("No conflicts detected to merge.")
             return
 
         # If they want to merge and there is something to merge, then
@@ -163,11 +163,11 @@ class Command(BaseCommand):
             # No changes? Tell them.
             if self.verbosity >= 1:
                 if len(app_labels) == 1:
-                    self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                    self.output.info("No changes detected in app '%s'" % app_labels.pop())
                 elif len(app_labels) > 1:
-                    self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                    self.output.info("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
-                    self.stdout.write("No changes detected")
+                    self.output.info("No changes detected")
         else:
             self.write_migration_files(changes)
             if check_changes:
