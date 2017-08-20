@@ -1,4 +1,5 @@
 import functools
+import json
 import re
 import sys
 import types
@@ -6,7 +7,7 @@ from contextlib import suppress
 from pathlib import Path
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.urls import Resolver404, resolve
@@ -88,7 +89,10 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     the values returned from sys.exc_info() and friends.
     """
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-    if request.is_ajax():
+    if 'application/json' in request.META.get('HTTP_ACCEPT', request.content_type):
+        data = reporter.get_traceback_json()
+        return JsonResponse(data, status=status_code)
+    elif request.is_ajax():
         text = reporter.get_traceback_text()
         return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
     else:
@@ -326,6 +330,32 @@ class ExceptionReporter:
         if frames:
             c['lastframe'] = frames[-1]
         return c
+
+    def get_traceback_json(self):
+        data = self.get_traceback_data()
+        if data.get('request'):
+            # we cannot dump WSGIRequest, so convert to dict
+            data['request_GET_items'] = data['request'].GET.dict()
+            data['request_COOKIES_items'] = data['request'].COOKIES
+            data['request'] = str(data['request'])
+            data.pop('request_FILES_items', None)
+        if data.get('frames'):
+            # remove traceback from frames
+            frames = []
+            for fr in data['frames']:
+                frame = {
+                    'filename': fr['filename'],
+                    'function': fr['function'],
+                }
+                if fr['context_line']:
+                    frame['filename'] += ':' + str(fr['lineno'])
+                    frame['context_line'] = fr['context_line']
+                if fr['exc_cause']:
+                    frame['exc_cause'] = fr['exc_cause']
+                frames.append(frame)
+            data['frames'] = frames
+            data['lastframe'] = frames[-1]
+        return data
 
     def get_traceback_html(self):
         """Return HTML version of debug 500 HTTP error page."""

@@ -1147,3 +1147,62 @@ class HelperFunctionTests(SimpleTestCase):
         initial = {'login': 'cooper', 'password': 'secret'}
         expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
         self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
+
+
+
+
+class JsonResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
+    """
+    Sensitive information can be filtered out of error reports.
+
+    Here we specifically test the plain text 500 debug-only error page served
+    when it has been detected the request was sent by JS code. We don't check
+    for (non)existence of frames vars in the traceback information section of
+    the response content because we don't include them in these error pages.
+    Refs #14614.
+    """
+    rf = RequestFactory(HTTP_ACCEPT='application/json')
+
+    def test_non_sensitive_request(self):
+        """
+        Request info can bee seen in the default error reports for
+        non-sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(non_sensitive_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_unsafe_response(non_sensitive_view, check_for_vars=False)
+
+    def test_sensitive_request(self):
+        """
+        Sensitive POST parameters cannot be seen in the default
+        error reports for sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(sensitive_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(sensitive_view, check_for_vars=False)
+
+    def test_paranoid_request(self):
+        """
+        No POST parameters can be seen in the default error reports
+        for "paranoid" requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(paranoid_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_paranoid_response(paranoid_view, check_for_vars=False)
+
+    def test_custom_exception_reporter_filter(self):
+        """
+        It's possible to assign an exception reporter filter to
+        the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(custom_exception_reporter_filter_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_unsafe_response(custom_exception_reporter_filter_view, check_for_vars=False)
