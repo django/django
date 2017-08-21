@@ -200,9 +200,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                              settings_dict['PASSWORD'], dsn)
 
     def get_connection_params(self):
-        conn_params = self.settings_dict['OPTIONS'].copy()
-        if 'use_returning_into' in conn_params:
-            del conn_params['use_returning_into']
+        # Specify encoding to support unicode in DSN.
+        conn_params = {'encoding': 'UTF-8', 'nencoding': 'UTF-8'}
+        user_params = self.settings_dict['OPTIONS'].copy()
+        if 'use_returning_into' in user_params:
+            del user_params['use_returning_into']
+        conn_params.update(user_params)
         return conn_params
 
     def get_new_connection(self, conn_params):
@@ -359,6 +362,8 @@ class OracleParam(object):
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
+        elif isinstance(param, decimal.Decimal):
+            self.input_size = Database.NUMBER
         else:
             self.input_size = None
 

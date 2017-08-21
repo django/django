@@ -117,6 +117,14 @@ class OracleTests(unittest.TestCase):
         connection.ensure_connection()
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
+        # Client encoding may be changed in OPTIONS.
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['encoding'] = 'ISO-8859-2'
+        new_connection.settings_dict['OPTIONS']['nencoding'] = 'ASCII'
+        new_connection.ensure_connection()
+        self.assertEqual(new_connection.connection.encoding, 'ISO-8859-2')
+        self.assertEqual(new_connection.connection.nencoding, 'ASCII')
+        new_connection.close()
 
     def test_order_of_nls_parameters(self):
         # an 'almost right' datetime should work with configured
