@@ -10,7 +10,7 @@ from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
-from django.test import SimpleTestCase, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
 
 from .models import Band, Concert
@@ -38,6 +38,7 @@ class ModelAdminTests(TestCase):
             sign_date=date(1965, 1, 1),
         )
         self.site = AdminSite()
+        self.request_factory = RequestFactory()
 
     def test_modeladmin_str(self):
         ma = ModelAdmin(Band, self.site)
@@ -94,7 +95,34 @@ class ModelAdminTests(TestCase):
             fields = ['name']
 
         ma = BandAdmin(Band, self.site)
-        self.assertTrue(ma.lookup_allowed('name__nonexistent', 'test_value'))
+        request = self.request_factory.get('/')
+        self.assertTrue(ma.lookup_allowed(request, 'name__nonexistent', 'test_value'))
+
+    def test_lookup_allowed_considers_dynamic_list_filter(self):
+        """
+        Ensure lookup_allowed uses get_list_filter method (#22569).
+        """
+        class ConcertAdmin(ModelAdmin):
+            list_filter = ['main_band__sign_date']
+
+            def get_list_filter(self, request):
+                return self.list_filter + ['main_band__name']
+
+        model_admin = ConcertAdmin(Concert, self.site)
+        request = self.request_factory.get('/', {'main_band__name': 'test'})
+        self.assertTrue(
+            model_admin.lookup_allowed(request, 'main_band__sign_date', '?')
+        )
+        self.assertTrue(
+            model_admin.lookup_allowed(request, 'main_band__name', '?')
+        )
+        changelist = model_admin.get_changelist_instance(request)
+        # ensure doesn't raise DisallowedModelAdminLookup:
+        changelist_filters = changelist.get_filters(request)
+        self.assertEqual(
+            changelist_filters[0][1].lookup_kwarg,
+            'main_band__name'
+        )
 
     @isolate_apps('modeladmin')
     def test_lookup_allowed_onetoone(self):
@@ -118,10 +146,11 @@ class ModelAdminTests(TestCase):
             ]
 
         ma = EmployeeProfileAdmin(EmployeeProfile, self.site)
+        request = self.request_factory.get('/')
         # Reverse OneToOneField
-        self.assertIs(ma.lookup_allowed('employee__employeeinfo__description', 'test_value'), True)
+        self.assertIs(ma.lookup_allowed(request, 'employee__employeeinfo__description', 'test_value'), True)
         # OneToOneField and ForeignKey
-        self.assertIs(ma.lookup_allowed('employee__department__code', 'test_value'), True)
+        self.assertIs(ma.lookup_allowed(request, 'employee__department__code', 'test_value'), True)
 
     def test_field_arguments(self):
         # If fields is specified, fieldsets_add and fieldsets_change should
