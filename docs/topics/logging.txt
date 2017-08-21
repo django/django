@@ -656,7 +656,7 @@ Python logging module.
 Filters
 -------
 
-Django provides two log filters in addition to those provided by the Python
+Django provides some log filters in addition to those provided by the Python
 logging module.
 
 .. class:: CallbackFilter(callback)
