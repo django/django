@@ -1487,6 +1487,16 @@ templates used by the :class:`ModelAdmin` views:
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
 
+.. method:: ModelAdmin.lookup_allowed(request, lookup, value)
+
+    The ``lookup_allowed`` method is given the ``HttpRequest``, a lookup
+    path (e.g. ``user__email``) and a value, and returns a boolean indicating
+    whether this request should be allowed to filter the queryset using
+    these parameters. If ``lookup_allowed`` returns ``False``, a
+    ``DisallowedModelAdminLookup``
+    (subclass of :exc:`~django.core.exceptions.SuspiciousOperation`)
+    will be raised, terminating that request.
+
 .. method:: ModelAdmin.get_list_select_related(request)
 
     The ``get_list_select_related`` method is given the ``HttpRequest`` and

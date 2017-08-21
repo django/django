@@ -47,7 +47,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* A new ``ModelAdmin.get_changelist_instance`` method now instantiates the
+  ``ChangeList`` for ``ModelAdmin.changelist_view`` so that other code can
+  reproduce the QuerySet for a particular request.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -587,6 +589,8 @@ Miscellaneous
   ``Media`` by concatenating the two. The combining now tries to :ref:`preserve
   the relative order of elements in each list <form-media-asset-order>`.
   ``MediaOrderConflictWarning`` is issued if the order can't be preserved.
+
+* A ``request`` parameter is now required by ``ModelAdmin.lookup_allowed``.
 
 .. _deprecated-features-2.0:
 
