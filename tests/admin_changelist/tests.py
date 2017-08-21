@@ -114,7 +114,7 @@ class ChangeListTests(TestCase):
         Regression test for #14982: EMPTY_CHANGELIST_VALUE should be honored
         for relationship fields
         """
-        new_child = Child.objects.create(name='name', parent=None)
+        new_child = Child.objects.create(name='', parent=None)
         request = self.factory.get('/child/')
         m = ChildAdmin(Child, custom_site)
         cl = ChangeList(request, Child, *get_changelist_args(m))
@@ -124,7 +124,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = (
-            '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
+            '<tbody><tr class="row1"><th class="field-name"><a href="%s">-</a></th>'
             '<td class="field-parent nowrap">-</td></tr></tbody>' % link
         )
         self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
@@ -154,7 +154,7 @@ class ChangeListTests(TestCase):
         """
         Empty value display can be set in ModelAdmin or individual fields.
         """
-        new_child = Child.objects.create(name='name', parent=None)
+        new_child = Child.objects.create(name='', parent=None)
         request = self.factory.get('/child/')
         m = EmptyValueChildAdmin(Child, admin.site)
         cl = ChangeList(request, Child, *get_changelist_args(m))
@@ -164,7 +164,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = (
-            '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
+            '<tbody><tr class="row1"><th class="field-name"><a href="%s">-empty-</a></th>'
             '<td class="field-age_display">&amp;dagger;</td><td class="field-age">-empty-</td></tr></tbody>' % link
         )
         self.assertNotEqual(table_output.find(row_html), -1, 'Failed to find expected row element: %s' % table_output)
