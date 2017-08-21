@@ -66,13 +66,11 @@ class CheckRegistry:
         checks = self.get_checks(include_deployment_checks)
 
         if tags is not None:
-            checks = [check for check in checks
-                      if hasattr(check, 'tags') and not set(check.tags).isdisjoint(tags)]
+            checks = [check for check in checks if not set(check.tags).isdisjoint(tags)]
         else:
             # By default, 'database'-tagged checks are not run as they do more
             # than mere static code analysis.
-            checks = [check for check in checks
-                      if not hasattr(check, 'tags') or Tags.database not in check.tags]
+            checks = [check for check in checks if Tags.database not in check.tags]
 
         for check in checks:
             new_errors = check(app_configs=app_configs)
@@ -88,7 +86,6 @@ class CheckRegistry:
     def tags_available(self, deployment_checks=False):
         return set(chain.from_iterable(
             check.tags for check in self.get_checks(deployment_checks)
-            if hasattr(check, 'tags')
         ))
 
     def get_checks(self, include_deployment_checks=False):
