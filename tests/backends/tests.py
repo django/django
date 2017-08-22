@@ -128,6 +128,14 @@ class OracleTests(unittest.TestCase):
             cursor.execute(query)
             self.assertEqual(cursor.fetchone()[0], 1)
 
+    def test_sequence_name_truncation(self):
+        seq_name = connection.ops._get_sequence_name('schema_authorwithevenlongee869')
+        self.assertEqual(seq_name, 'SCHEMA_AUTHORWITHEVENLOB0B8_SQ')
+
+    def test_trigger_name_truncation(self):
+        trigger_name = connection.ops._get_trigger_name('schema_authorwithevenlongee869')
+        self.assertEqual(trigger_name, 'SCHEMA_AUTHORWITHEVENLOB0B8_TR')
+
 
 @unittest.skipUnless(connection.vendor == 'sqlite', "Test only for SQLite")
 class SQLiteTests(TestCase):
