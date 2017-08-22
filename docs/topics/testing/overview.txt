@@ -343,3 +343,10 @@ the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
+
+Preserving the test database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :option:`test --keepdb` option preserves the test database between test
+runs. It skips the create and destroy actions which can greatly decrease the
+time to run tests.
