@@ -36,11 +36,11 @@ from .models import (
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
     PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
     PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question,
-    ReadablePizza, Recipe, Recommendation, Recommender, ReferencedByGenRel,
-    ReferencedByInline, ReferencedByParent, RelatedPrepopulated,
-    RelatedWithUUIDPKModel, Report, Reservation, Restaurant,
-    RowLevelChangePermissionModel, Section, ShortMessage, Simple, Sketch,
-    State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
+    ReadablePizza, ReadOnlyPizza, Recipe, Recommendation, Recommender,
+    ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
+    RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
+    Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
+    Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
     Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
     UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
@@ -500,6 +500,19 @@ class PizzaAdmin(admin.ModelAdmin):
 
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ('name',)
+
+
+class ReadOnlyPizzaAdmin(admin.ModelAdmin):
+    readonly_fields = ('name', 'toppings')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return True
 
 
 class WorkHourAdmin(admin.ModelAdmin):
@@ -1001,6 +1014,7 @@ site.register(Book, inlines=[ChapterInline])
 site.register(Promo)
 site.register(ChapterXtra1, ChapterXtra1Admin)
 site.register(Pizza, PizzaAdmin)
+site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)

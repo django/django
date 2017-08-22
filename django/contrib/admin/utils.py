@@ -149,10 +149,10 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link
 
-            p = '%s.%s' % (opts.app_label,
-                           get_permission_codename('delete', opts))
-            if not user.has_perm(p):
-                perms_needed.add(opts.verbose_name)
+            if 'delete' in opts.default_permissions:
+                p = '%s.%s' % (opts.app_label, get_permission_codename('delete', opts))
+                if not user.has_perm(p):
+                    perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
             return format_html('{}: <a href="{}">{}</a>',
                                capfirst(opts.verbose_name),

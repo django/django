@@ -48,9 +48,9 @@ from .models import (
     MainPrepopulated, Media, ModelWithStringPrimaryKey, OtherStory, Paper,
     Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
     Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, Promo, Question, ReadablePizza, Recommendation,
-    Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
-    Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
+    PrePopulatedPost, Promo, Question, ReadablePizza, ReadOnlyPizza,
+    Recommendation, Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel,
+    Report, Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
     ShortMessage, Simple, State, Story, SuperSecretHideout, SuperVillain,
     Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
     UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
@@ -1819,6 +1819,23 @@ class AdminViewPermissionsTest(TestCase):
         article_ct = ContentType.objects.get_for_model(Article)
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
         self.assertEqual(logged.object_id, str(self.a1.pk))
+
+    def test_delete_view_with_no_default_permissions(self):
+        """
+        The delete view allows users to delete collected objects without a
+        'delete' permission (ReadOnlyPizza.Meta.default_permissions is empty).
+        """
+        pizza = ReadOnlyPizza.objects.create(name='Double Cheese')
+        delete_url = reverse('admin:admin_views_readonlypizza_delete', args=(pizza.pk,))
+        self.client.force_login(self.adduser)
+        response = self.client.get(delete_url)
+        self.assertContains(response, 'admin_views/readonlypizza/%s/' % pizza.pk)
+        self.assertContains(response, '<h2>Summary</h2>')
+        self.assertContains(response, '<li>Read only pizzas: 1</li>')
+        self.assertEqual(response.status_code, 200)
+        post = self.client.post(delete_url, {'post': 'yes'})
+        self.assertRedirects(post, reverse('admin:admin_views_readonlypizza_changelist'))
+        self.assertEqual(ReadOnlyPizza.objects.count(), 0)
 
     def test_delete_view_nonexistent_obj(self):
         self.client.force_login(self.deleteuser)
