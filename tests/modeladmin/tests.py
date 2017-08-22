@@ -586,7 +586,7 @@ class ModelAdminTests(TestCase):
         mock_request.user = User.objects.create(username='bill')
         self.assertEqual(ma.log_addition(mock_request, self.band, 'added'), LogEntry.objects.latest('id'))
         self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
+        self.assertEqual(ma.log_deletion(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
 
 
 class ModelAdminPermissionTests(SimpleTestCase):
