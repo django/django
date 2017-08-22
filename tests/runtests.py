@@ -103,7 +103,7 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels, parallel):
+def setup(verbosity, test_labels, parallel, start_at, start_after):
     # Reduce the given test labels to just the app module path.
     test_labels_set = set()
     for label in test_labels:
@@ -185,12 +185,20 @@ def setup(verbosity, test_labels, parallel):
     # Load all the test model apps.
     test_modules = get_test_modules()
 
+    found_start = not (start_at or start_after)
     installed_app_names = set(get_installed())
     for modpath, module_name in test_modules:
         if modpath:
             module_label = modpath + '.' + module_name
         else:
             module_label = module_name
+        if start_at and (module_label == start_at or module_label.startswith(start_at + '.')):
+            found_start = True
+        elif start_after and (module_label == start_after or module_label.startswith(start_after + '.')):
+            found_start = True
+            continue
+        elif not found_start:
+            continue
         # if the module (or an ancestor) was named on the command line, or
         # no modules were named (i.e., run all), import
         # this module and add it to INSTALLED_APPS.
@@ -261,8 +269,9 @@ class ActionSelenium(argparse.Action):
 
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
-                 test_labels, debug_sql, parallel, tags, exclude_tags):
-    state = setup(verbosity, test_labels, parallel)
+                 test_labels, debug_sql, parallel, tags, exclude_tags,
+                 start_at, start_after):
+    state = setup(verbosity, test_labels, parallel, start_at, start_after)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
@@ -446,11 +455,33 @@ if __name__ == "__main__":
         '--exclude-tag', dest='exclude_tags', action='append',
         help='Do not run tests with the specified tag. Can be used multiple times.',
     )
+    parser.add_argument(
+        '--start-after', dest='start_after',
+        help='Run tests starting after the specified top-level module.'
+    )
+    parser.add_argument(
+        '--start-at', dest='start_at',
+        help='Run tests starting at the specified top-level module.'
+    )
 
     options = parser.parse_args()
 
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
+    if options.start_at:
+        options.start_at = os.path.normpath(options.start_at)
+    if options.start_after:
+        options.start_after = os.path.normpath(options.start_after)
+
+    if options.start_at and options.start_after:
+        print('Aborting: cannot use both --start-at and --start-after.')
+        sys.exit(1)
+    if options.start_at and '.' in options.start_at:
+        print('Aborting: --start-at must be a top-level module.')
+        sys.exit(1)
+    if options.start_after and '.' in options.start_after:
+        print('Aborting: --start-after must be a top-level module.')
+        sys.exit(1)
 
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -475,7 +506,7 @@ if __name__ == "__main__":
             options.verbosity, options.interactive, options.failfast,
             options.keepdb, options.reverse, options.modules,
             options.debug_sql, options.parallel, options.tags,
-            options.exclude_tags,
+            options.exclude_tags, options.start_at, options.start_after,
         )
         if failures:
             sys.exit(1)
