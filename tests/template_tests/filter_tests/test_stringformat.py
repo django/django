@@ -29,6 +29,9 @@ class FunctionTests(SimpleTestCase):
 
     def test_format(self):
         self.assertEqual(stringformat(1, '03d'), '001')
+        self.assertEqual(stringformat((1, 2, 3), 's'), '(1, 2, 3)')
+        self.assertEqual(stringformat((1,), 's'), '(1,)')
 
     def test_invalid(self):
         self.assertEqual(stringformat(1, 'z'), '')
+        self.assertEqual(stringformat((1, 2, 3), 'd'), '')

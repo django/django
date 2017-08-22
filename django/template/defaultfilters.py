@@ -249,6 +249,8 @@ def stringformat(value, arg):
     See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
     """
+    if isinstance(value, tuple):
+        value = six.text_type(value)
     try:
         return ("%" + six.text_type(arg)) % value
     except (ValueError, TypeError):
