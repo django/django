@@ -128,34 +128,34 @@ class MigrationAutodetector:
         # proxy models and ignoring unmigrated apps.
         self.old_apps = self.from_state.concrete_apps
         self.new_apps = self.to_state.apps
-        self.old_model_keys = []
-        self.old_proxy_keys = []
-        self.old_unmanaged_keys = []
-        self.new_model_keys = []
-        self.new_proxy_keys = []
-        self.new_unmanaged_keys = []
-        for al, mn in sorted(self.from_state.models):
+        self.old_model_keys = set()
+        self.old_proxy_keys = set()
+        self.old_unmanaged_keys = set()
+        self.new_model_keys = set()
+        self.new_proxy_keys = set()
+        self.new_unmanaged_keys = set()
+        for al, mn in self.from_state.models:
             model = self.old_apps.get_model(al, mn)
             if not model._meta.managed:
-                self.old_unmanaged_keys.append((al, mn))
+                self.old_unmanaged_keys.add((al, mn))
             elif al not in self.from_state.real_apps:
                 if model._meta.proxy:
-                    self.old_proxy_keys.append((al, mn))
+                    self.old_proxy_keys.add((al, mn))
                 else:
-                    self.old_model_keys.append((al, mn))
+                    self.old_model_keys.add((al, mn))
 
-        for al, mn in sorted(self.to_state.models):
+        for al, mn in self.to_state.models:
             model = self.new_apps.get_model(al, mn)
             if not model._meta.managed:
-                self.new_unmanaged_keys.append((al, mn))
+                self.new_unmanaged_keys.add((al, mn))
             elif (
                 al not in self.from_state.real_apps or
                 (convert_apps and al in convert_apps)
             ):
                 if model._meta.proxy:
-                    self.new_proxy_keys.append((al, mn))
+                    self.new_proxy_keys.add((al, mn))
                 else:
-                    self.new_model_keys.append((al, mn))
+                    self.new_model_keys.add((al, mn))
 
         # Renames have to come first
         self.generate_renamed_models()
@@ -201,18 +201,23 @@ class MigrationAutodetector:
         in the old state so dependencies can be made from the through model
         deletion to the field that uses it.
         """
-        self.kept_model_keys = set(self.old_model_keys).intersection(self.new_model_keys)
-        self.kept_proxy_keys = set(self.old_proxy_keys).intersection(self.new_proxy_keys)
-        self.kept_unmanaged_keys = set(self.old_unmanaged_keys).intersection(self.new_unmanaged_keys)
+        self.kept_model_keys = self.old_model_keys & self.new_model_keys
+        self.kept_proxy_keys = self.old_proxy_keys & self.new_proxy_keys
+        self.kept_unmanaged_keys = self.old_unmanaged_keys & self.new_unmanaged_keys
         self.through_users = {}
-        self.old_field_keys = set()
-        self.new_field_keys = set()
-        for app_label, model_name in sorted(self.kept_model_keys):
-            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
-            new_model_state = self.to_state.models[app_label, model_name]
-            self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
-            self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
+        self.old_field_keys = {
+            (app_label, model_name, x)
+            for app_label, model_name in self.kept_model_keys
+            for x, y in self.from_state.models[
+                app_label,
+                self.renamed_models.get((app_label, model_name), model_name)
+            ].fields
+        }
+        self.new_field_keys = {
+            (app_label, model_name, x)
+            for app_label, model_name in self.kept_model_keys
+            for x, y in self.to_state.models[app_label, model_name].fields
+        }
 
     def _generate_through_model_map(self):
         """Through model map generation."""
@@ -451,12 +456,12 @@ class MigrationAutodetector:
         """
         self.renamed_models = {}
         self.renamed_models_rel = {}
-        added_models = set(self.new_model_keys).difference(self.old_model_keys)
+        added_models = self.new_model_keys - self.old_model_keys
         for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
             model_fields_def = self.only_relation_agnostic_fields(model_state.fields)
 
-            removed_models = set(self.old_model_keys).difference(self.new_model_keys)
+            removed_models = self.old_model_keys - self.new_model_keys
             for rem_app_label, rem_model_name in removed_models:
                 if rem_app_label == app_label:
                     rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
@@ -477,7 +482,7 @@ class MigrationAutodetector:
                                 model_state.name,
                             )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
-                            self.old_model_keys.append((app_label, model_name))
+                            self.old_model_keys.add((app_label, model_name))
                             break
 
     def generate_created_models(self):
@@ -490,9 +495,9 @@ class MigrationAutodetector:
         Defer any model options that refer to collections of fields that might
         be deferred (e.g. unique_together, index_together).
         """
-        old_keys = set(self.old_model_keys).union(self.old_unmanaged_keys)
-        added_models = set(self.new_model_keys) - old_keys
-        added_unmanaged_models = set(self.new_unmanaged_keys) - old_keys
+        old_keys = self.old_model_keys | self.old_unmanaged_keys
+        added_models = self.new_model_keys - old_keys
+        added_unmanaged_models = self.new_unmanaged_keys - old_keys
         all_added_models = chain(
             sorted(added_models, key=self.swappable_first_key, reverse=True),
             sorted(added_unmanaged_models, key=self.swappable_first_key, reverse=True)
@@ -642,7 +647,7 @@ class MigrationAutodetector:
         models it's safe to skip all the pointless field stuff and just chuck
         out an operation.
         """
-        added = set(self.new_proxy_keys).difference(self.old_proxy_keys)
+        added = self.new_proxy_keys - self.old_proxy_keys
         for app_label, model_name in sorted(added):
             model_state = self.to_state.models[app_label, model_name]
             assert model_state.options.get("proxy")
@@ -679,9 +684,9 @@ class MigrationAutodetector:
         Also bring forward removal of any model options that refer to
         collections of fields - the inverse of generate_created_models().
         """
-        new_keys = set(self.new_model_keys).union(self.new_unmanaged_keys)
-        deleted_models = set(self.old_model_keys) - new_keys
-        deleted_unmanaged_models = set(self.old_unmanaged_keys) - new_keys
+        new_keys = self.new_model_keys | self.new_unmanaged_keys
+        deleted_models = self.old_model_keys - new_keys
+        deleted_unmanaged_models = self.old_unmanaged_keys - new_keys
         all_deleted_models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
         for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
@@ -764,7 +769,7 @@ class MigrationAutodetector:
 
     def generate_deleted_proxies(self):
         """Make DeleteModel options for proxy models."""
-        deleted = set(self.old_proxy_keys).difference(self.new_proxy_keys)
+        deleted = self.old_proxy_keys - self.new_proxy_keys
         for app_label, model_name in sorted(deleted):
             model_state = self.from_state.models[app_label, model_name]
             assert model_state.options.get("proxy")
@@ -868,7 +873,7 @@ class MigrationAutodetector:
         Make AlterField operations, or possibly RemovedField/AddField if alter
         isn's possible.
         """
-        for app_label, model_name, field_name in sorted(self.old_field_keys.intersection(self.new_field_keys)):
+        for app_label, model_name, field_name in sorted(self.old_field_keys & self.new_field_keys):
             # Did the field change?
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
@@ -988,19 +993,17 @@ class MigrationAutodetector:
             new_model_state = self.to_state.models[app_label, model_name]
 
             # We run the old version through the field renames to account for those
-            old_value = old_model_state.options.get(option_name) or set()
-            if old_value:
-                old_value = {
-                    tuple(
-                        self.renamed_fields.get((app_label, model_name, n), n)
-                        for n in unique
-                    )
-                    for unique in old_value
-                }
+            old_value = old_model_state.options.get(option_name)
+            old_value = {
+                tuple(
+                    self.renamed_fields.get((app_label, model_name, n), n)
+                    for n in unique
+                )
+                for unique in old_value
+            } if old_value else set()
 
-            new_value = new_model_state.options.get(option_name) or set()
-            if new_value:
-                new_value = set(new_value)
+            new_value = new_model_state.options.get(option_name)
+            new_value = set(new_value) if new_value else set()
 
             if old_value != new_value:
                 dependencies = []
@@ -1026,7 +1029,7 @@ class MigrationAutodetector:
         self._generate_altered_foo_together(operations.AlterIndexTogether)
 
     def generate_altered_db_table(self):
-        models_to_check = self.kept_model_keys.union(self.kept_proxy_keys).union(self.kept_unmanaged_keys)
+        models_to_check = self.kept_model_keys.union(self.kept_proxy_keys, self.kept_unmanaged_keys)
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
@@ -1049,15 +1052,12 @@ class MigrationAutodetector:
         migrations needs them).
         """
         models_to_check = self.kept_model_keys.union(
-            self.kept_proxy_keys
-        ).union(
-            self.kept_unmanaged_keys
-        ).union(
+            self.kept_proxy_keys,
+            self.kept_unmanaged_keys,
             # unmanaged converted to managed
-            set(self.old_unmanaged_keys).intersection(self.new_model_keys)
-        ).union(
+            self.old_unmanaged_keys & self.new_model_keys,
             # managed converted to unmanaged
-            set(self.old_model_keys).intersection(self.new_unmanaged_keys)
+            self.old_model_keys & self.new_unmanaged_keys,
         )
 
         for app_label, model_name in sorted(models_to_check):
@@ -1189,8 +1189,7 @@ class MigrationAutodetector:
         old_required_apps = None
         while old_required_apps != required_apps:
             old_required_apps = set(required_apps)
-            for app_label in list(required_apps):
-                required_apps.update(app_dependencies.get(app_label, set()))
+            required_apps.update(*[app_dependencies.get(app_label, ()) for app_label in required_apps])
         # Remove all migrations that aren't needed
         for app_label in list(changes):
             if app_label not in required_apps:
