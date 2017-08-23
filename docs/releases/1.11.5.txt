@@ -12,7 +12,7 @@ Bugfixes
 * Fixed GEOS version parsing if the version has a commit hash at the end (new
   in GEOS 3.6.2) (:ticket:`28441`).
 
-* Fixed test database creation with ``cx_Oracle`` 6 (:ticket:`28498`).
+* Added compatibility for ``cx_Oracle`` 6 (:ticket:`28498`).
 
 * Fixed select widget rendering when option values are tuples (:ticket:`28502`).
 
