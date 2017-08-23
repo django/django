@@ -942,16 +942,15 @@ class SQLCompiler:
     def apply_converters(self, rows, converters):
         connection = self.connection
         converters = list(converters.items())
-        for row in rows:
-            row = list(row)
+        for row in map(list, rows):
             for pos, (convs, expression) in converters:
                 value = row[pos]
                 for converter in convs:
                     value = converter(value, expression, connection)
                 row[pos] = value
-            yield tuple(row)
+            yield row
 
-    def results_iter(self, results=None):
+    def results_iter(self, results=None, tuple_expected=False):
         """Return an iterator over the results from executing this query."""
         if results is None:
             results = self.execute_sql(MULTI)
@@ -960,6 +959,8 @@ class SQLCompiler:
         rows = chain.from_iterable(results)
         if converters:
             rows = self.apply_converters(rows, converters)
+            if tuple_expected:
+                rows = map(tuple, rows)
         return rows
 
     def has_results(self):
