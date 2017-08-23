@@ -51,7 +51,7 @@ def normalize_together(option_together):
             return ()
         if not isinstance(option_together, (tuple, list)):
             raise TypeError
-        first_element = next(iter(option_together))
+        first_element = option_together[0]
         if not isinstance(first_element, (tuple, list)):
             option_together = (option_together,)
         # Normalize everything to tuples

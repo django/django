@@ -279,7 +279,7 @@ class JavaScriptCatalog(View):
         trans_cat = self.translation._catalog
         trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
         seen_keys = set()
-        for key, value in itertools.chain(iter(trans_cat.items()), iter(trans_fallback_cat.items())):
+        for key, value in itertools.chain(trans_cat.items(), trans_fallback_cat.items()):
             if key == '' or key in seen_keys:
                 continue
             if isinstance(key, str):

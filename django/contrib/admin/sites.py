@@ -169,7 +169,7 @@ class AdminSite:
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return iter(self._actions.items())
+        return self._actions.items()
 
     @property
     def empty_value_display(self):
