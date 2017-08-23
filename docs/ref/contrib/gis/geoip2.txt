@@ -48,34 +48,6 @@ Here is an example of its usage::
     >>> g.geos('24.124.1.80').wkt
     'POINT (-97 38)'
 
-Settings
-========
-
-.. setting:: GEOIP_PATH
-
-``GEOIP_PATH``
---------------
-
-A string specifying the directory where the GeoIP data files are
-located. This setting is *required* unless manually specified
-with ``path`` keyword when initializing the :class:`GeoIP2` object.
-
-.. setting:: GEOIP_COUNTRY
-
-``GEOIP_COUNTRY``
------------------
-
-The basename to use for the GeoIP country data file. Defaults to
-``'GeoLite2-Country.mmdb'``.
-
-.. setting:: GEOIP_CITY
-
-``GEOIP_CITY``
---------------
-
-The basename to use for the GeoIP city data file. Defaults to
-``'GeoLite2-City.mmdb'``.
-
 API Reference
 =============
 
@@ -167,6 +139,34 @@ Returns a coordinate tuple of (latitude, longitude),
 
 Returns a :class:`~django.contrib.gis.geos.Point` object corresponding to the
 query.
+
+Settings
+========
+
+.. setting:: GEOIP_PATH
+
+``GEOIP_PATH``
+--------------
+
+A string specifying the directory where the GeoIP data files are
+located. This setting is *required* unless manually specified
+with ``path`` keyword when initializing the :class:`GeoIP2` object.
+
+.. setting:: GEOIP_COUNTRY
+
+``GEOIP_COUNTRY``
+-----------------
+
+The basename to use for the GeoIP country data file. Defaults to
+``'GeoLite2-Country.mmdb'``.
+
+.. setting:: GEOIP_CITY
+
+``GEOIP_CITY``
+--------------
+
+The basename to use for the GeoIP city data file. Defaults to
+``'GeoLite2-City.mmdb'``.
 
 .. rubric:: Footnotes
 .. [#] GeoIP(R) is a registered trademark of MaxMind, Inc.
