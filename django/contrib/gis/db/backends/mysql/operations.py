@@ -3,7 +3,9 @@ from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import GeometryField, aggregates
+from django.contrib.gis.db.models import aggregates
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.mysql.operations import DatabaseOperations
 from django.utils.functional import cached_property
@@ -29,12 +31,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         return self.connection.mysql_version < (5, 7, 6)
 
     @cached_property
-    def uses_invalid_empty_geometry_collection(self):
-        return self.connection.mysql_version >= (5, 7, 5)
-
-    @cached_property
     def select(self):
-        return self.geom_func_prefix + 'AsText(%s)'
+        return self.geom_func_prefix + 'AsBinary(%s)'
 
     @cached_property
     def from_text(self):
@@ -97,15 +95,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             dist_param = value
         return [dist_param]
 
-    def get_db_converters(self, expression):
-        converters = super().get_db_converters(expression)
-        if isinstance(expression.output_field, GeometryField) and self.uses_invalid_empty_geometry_collection:
-            converters.append(self.convert_invalid_empty_geometry_collection)
-        return converters
+    def get_geometry_converter(self, expression):
+        read = wkb_r().read
+        srid = expression.output_field.srid
+        if srid == -1:
+            srid = None
 
-    # https://dev.mysql.com/doc/refman/en/spatial-function-argument-handling.html
-    # MySQL 5.7.5 adds support for the empty geometry collections, but they are represented with invalid WKT.
-    def convert_invalid_empty_geometry_collection(self, value, expression, connection):
-        if value == b'GEOMETRYCOLLECTION()':
-            return b'GEOMETRYCOLLECTION EMPTY'
-        return value
+        def converter(value, expression, connection):
+            return None if value is None else GEOSGeometry(read(memoryview(value)), srid)
+        return converter

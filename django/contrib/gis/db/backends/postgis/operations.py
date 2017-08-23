@@ -7,6 +7,8 @@ from django.contrib.gis.db.backends.base.operations import (
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import GeometryField, RasterField
 from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
@@ -131,6 +133,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     unsupported_functions = set()
+
+    @cached_property
+    def select(self):
+        return '%s::bytea'
+
+    select_extent = None
 
     def __init__(self, connection):
         super().__init__(connection)
@@ -381,3 +389,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             isinstance(arg, GDALRaster)
         )
         return ST_Polygon(arg) if is_raster else arg
+
+    def get_geometry_converter(self, expression):
+        read = wkb_r().read
+        return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))

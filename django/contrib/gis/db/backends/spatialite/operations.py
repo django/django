@@ -10,6 +10,8 @@ from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import wkb_r, wkt_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
@@ -35,7 +37,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     unionagg = 'GUnion'
 
     from_text = 'GeomFromText'
-    select = 'AsText(%s)'
 
     gis_operators = {
         # Binary predicates
@@ -62,6 +63,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     disallowed_aggregates = (aggregates.Extent3D,)
+
+    @cached_property
+    def select(self):
+        return 'CAST (AsEWKB(%s) AS BLOB)' if self.spatial_version >= (4, 3, 0) else 'AsText(%s)'
 
     @cached_property
     def function_names(self):
@@ -192,3 +197,14 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
         return SpatialiteSpatialRefSys
+
+    def get_geometry_converter(self, expression):
+        if self.spatial_version >= (4, 3, 0):
+            read = wkb_r().read
+            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))
+        else:
+            read = wkt_r().read
+            srid = expression.output_field.srid
+            if srid == -1:
+                srid = None
+            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value), srid)

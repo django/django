@@ -51,23 +51,6 @@ def get_srid_info(srid, connection):
     return _srid_cache[alias][srid]
 
 
-class GeoSelectFormatMixin:
-    def select_format(self, compiler, sql, params):
-        """
-        Return the selection format string, depending on the requirements
-        of the spatial backend.  For example, Oracle and MySQL require custom
-        selection formats in order to retrieve geometries in OGC WKT. For all
-        other fields, return a simple '%s' format string.
-        """
-        connection = compiler.connection
-        if connection.ops.select:
-            # This allows operations to be done on fields in the SELECT,
-            # overriding their values -- used by the Oracle and MySQL
-            # spatial backends to get database values as WKT.
-            sql = connection.ops.select % sql
-        return sql, params
-
-
 class BaseSpatialField(Field):
     """
     The Base GIS Field.
@@ -205,7 +188,7 @@ class BaseSpatialField(Field):
         return obj
 
 
-class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
+class GeometryField(BaseSpatialField):
     """
     The base Geometry field -- maps to the OpenGIS Specification Geometry type.
     """
@@ -255,14 +238,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             kwargs['geography'] = self.geography
         return name, path, args, kwargs
 
-    def from_db_value(self, value, expression, connection):
-        if value:
-            value = Geometry(value)
-            srid = value.srid
-            if not srid and self.srid != -1:
-                value.srid = self.srid
-        return value
-
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
 
@@ -279,6 +254,15 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
                 not getattr(defaults['form_class'].widget, 'supports_3d', False)):
             defaults['widget'] = forms.Textarea
         return super().formfield(**defaults)
+
+    def select_format(self, compiler, sql, params):
+        """
+        Return the selection format string, depending on the requirements
+        of the spatial backend. For example, Oracle and MySQL require custom
+        selection formats in order to retrieve geometries in OGC WKB.
+        """
+        select = compiler.connection.ops.select
+        return select % sql if select else sql, params
 
 
 # The OpenGIS Geometry Type Fields
@@ -324,13 +308,17 @@ class GeometryCollectionField(GeometryField):
     description = _("Geometry collection")
 
 
-class ExtentField(GeoSelectFormatMixin, Field):
+class ExtentField(Field):
     "Used as a return value from an extent aggregate"
 
     description = _("Extent Aggregate Field")
 
     def get_internal_type(self):
         return "ExtentField"
+
+    def select_format(self, compiler, sql, params):
+        select = compiler.connection.ops.select_extent
+        return select % sql if select else sql, params
 
 
 class RasterField(BaseSpatialField):
