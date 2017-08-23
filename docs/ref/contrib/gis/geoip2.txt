@@ -48,8 +48,8 @@ Here is an example of its usage::
     >>> g.geos('24.124.1.80').wkt
     'POINT (-97 38)'
 
-``GeoIP`` Settings
-==================
+Settings
+========
 
 .. setting:: GEOIP_PATH
 
@@ -76,7 +76,7 @@ The basename to use for the GeoIP country data file. Defaults to
 The basename to use for the GeoIP city data file. Defaults to
 ``'GeoLite2-City.mmdb'``.
 
-``GeoIP`` API
+API Reference
 =============
 
 .. class:: GeoIP2(path=None, cache=0, country=None, city=None)
@@ -111,8 +111,8 @@ Keyword Arguments    Description
                      the :setting:`GEOIP_CITY` setting.
 ===================  =======================================================
 
-``GeoIP`` Methods
-=================
+Methods
+=======
 
 Instantiating
 -------------
