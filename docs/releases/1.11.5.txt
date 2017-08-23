@@ -19,7 +19,7 @@ Bugfixes
 * Django 1.11 inadvertently changed the sequence and trigger naming scheme on
   Oracle. This causes errors on INSERTs for some tables if
   ``'use_returning_into': False`` is in the ``OPTIONS`` part of ``DATABASES``.
-  The pre-11.1 naming scheme is now restored. Unfortunately, it necessarily
+  The pre-1.11 naming scheme is now restored. Unfortunately, it necessarily
   requires an update to Oracle tables created with Django 1.11.[1-4]. Use the
   upgrade script in :ticket:`28451` comment 8 to update sequence and trigger
-  names to use the pre-1.11 naming scheme
+  names to use the pre-1.11 naming scheme.
