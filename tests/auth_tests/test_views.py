@@ -922,6 +922,12 @@ class LogoutTest(AuthViewsTestCase):
         self.assertContains(response, 'Logged out')
         self.confirm_logged_out()
 
+    def test_logout_with_post(self):
+        self.login()
+        response = self.client.post('/logout/')
+        self.assertContains(response, 'Logged out')
+        self.confirm_logged_out()
+
     def test_14377(self):
         # Bug 14377
         self.login()
