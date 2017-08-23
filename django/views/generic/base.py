@@ -190,20 +190,9 @@ class RedirectView(View):
             )
             return HttpResponseGone()
 
-    def head(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
-    def options(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
-
-    def patch(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
+    delete = get
+    head = get
+    options = get
+    patch = get
+    post = get
+    put = get
