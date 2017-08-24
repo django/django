@@ -34,6 +34,19 @@ class TestEncodingUtils(unittest.TestCase):
         s = SimpleLazyObject(lambda: 'x')
         self.assertTrue(issubclass(type(force_text(s)), six.text_type))
 
+    def test_force_bytes(self):
+        """
+        Verify that force_bytes handles UTF-8 and non-UTF-8 encodings properly.
+        """
+        s = b'\xc6u vi komprenas?'
+        if six.PY3:
+            u = 'Ĉu vi komprenas?'
+        else:
+            u = 'Ĉu vi komprenas?'.encode('utf-8')
+        self.assertEqual(force_bytes(u).decode('utf-8'), u)
+        self.assertEqual(force_bytes(u, encoding='utf-8').decode('utf-8'), u)
+        self.assertEqual(force_bytes(s, encoding='latin3').decode('utf-8'), u)
+
     def test_force_bytes_exception(self):
         """
         force_bytes knows how to convert to bytes an exception

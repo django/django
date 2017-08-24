@@ -121,7 +121,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
         if encoding == 'utf-8':
             return s
         else:
-            return s.decode('utf-8', errors).encode(encoding, errors)
+            return s.decode(encoding, errors).encode('utf-8', errors)
     if strings_only and is_protected_type(s):
         return s
     if isinstance(s, six.memoryview):
