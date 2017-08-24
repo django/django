@@ -23,3 +23,6 @@ Bugfixes
   requires an update to Oracle tables created with Django 1.11.[1-4]. Use the
   upgrade script in :ticket:`28451` comment 8 to update sequence and trigger
   names to use the pre-1.11 naming scheme.
+
+* Added POST request support to ``LogoutView``, for equivalence with the
+  function-based ``logout()`` view (:ticket:`28513`).
