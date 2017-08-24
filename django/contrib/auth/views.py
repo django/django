@@ -159,6 +159,10 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
             return HttpResponseRedirect(next_page)
         return super(LogoutView, self).dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        """Logout may be done via POST."""
+        return self.get(request, *args, **kwargs)
+
     def get_next_page(self):
         if self.next_page is not None:
             next_page = resolve_url(self.next_page)
