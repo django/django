@@ -21,8 +21,8 @@ class Tags:
 class CheckRegistry:
 
     def __init__(self):
-        self.registered_checks = []
-        self.deployment_checks = []
+        self.registered_checks = set()
+        self.deployment_checks = set()
 
     def register(self, check=None, *tags, **kwargs):
         """
@@ -44,11 +44,8 @@ class CheckRegistry:
 
         def inner(check):
             check.tags = tags
-            if kwargs['deploy']:
-                if check not in self.deployment_checks:
-                    self.deployment_checks.append(check)
-            elif check not in self.registered_checks:
-                self.registered_checks.append(check)
+            checks = self.deployment_checks if kwargs['deploy'] else self.registered_checks
+            checks.add(check)
             return check
 
         if callable(check):
