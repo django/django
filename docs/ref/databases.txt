@@ -276,7 +276,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.5 and higher.
+Django supports MySQL 5.6 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -294,35 +294,19 @@ Storage engines
 MySQL has several `storage engines`_. You can change the default storage engine
 in the server configuration.
 
-Until MySQL 5.5.4, the default engine was MyISAM_ [#]_. The main drawbacks of
-MyISAM are that it doesn't support transactions or enforce foreign-key
-constraints. On the plus side, it was the only engine that supported full-text
-indexing and searching until MySQL 5.6.4.
+MySQL's default storage engine is InnoDB_. This engine is fully transactional
+and supports foreign key references. It's the recommended choice. However, the
+InnoDB autoincrement counter is lost on a MySQL restart because it does not
+remember the ``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1".
+This may result in an inadvertent reuse of :class:`~django.db.models.AutoField`
+values.
 
-Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
-transactional and supports foreign key references. It's probably the best
-choice at this point. However, note that the InnoDB autoincrement counter
-is lost on a MySQL restart because it does not remember the
-``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
-result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
-
-If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
-tables, ensure that your tables are using the same storage engine (i.e. MyISAM
-vs. InnoDB). Specifically, if tables that have a ``ForeignKey`` between them
-use different storage engines, you may see an error like the following when
-running ``migrate``::
-
-    _mysql_exceptions.OperationalError: (
-        1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
-    )
+The main drawbacks of MyISAM_ are that it doesn't support transactions or
+enforce foreign-key constraints.
 
 .. _storage engines: https://dev.mysql.com/doc/refman/en/storage-engines.html
 .. _MyISAM: https://dev.mysql.com/doc/refman/en/myisam-storage-engine.html
 .. _InnoDB: https://dev.mysql.com/doc/refman/en/innodb-storage-engine.html
-
-.. [#] Unless this was changed by the packager of your MySQL package. We've
-   had reports that the Windows Community Server installer sets up InnoDB as
-   the default storage engine, for example.
 
 .. _mysql-db-api-drivers:
 

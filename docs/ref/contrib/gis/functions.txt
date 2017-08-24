@@ -208,7 +208,7 @@ value of the geometry.
 
 .. class:: Difference(expr1, expr2, **extra)
 
-*Availability*: MySQL (≥ 5.6.1), `PostGIS
+*Availability*: MySQL, `PostGIS
 <https://postgis.net/docs/ST_Difference.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
@@ -220,8 +220,8 @@ geometry B.
 
 .. class:: Distance(expr1, expr2, spheroid=None, **extra)
 
-*Availability*: MySQL (≥ 5.6.1), `PostGIS
-<https://postgis.net/docs/ST_Distance.html>`__, Oracle, SpatiaLite
+*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_Distance.html>`__,
+Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the distance between
 them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a raw
@@ -307,7 +307,7 @@ __ https://en.wikipedia.org/wiki/Geohash
 
 .. class:: Intersection(expr1, expr2, **extra)
 
-*Availability*: MySQL (≥ 5.6.1), `PostGIS
+*Availability*: MySQL, `PostGIS
 <https://postgis.net/docs/ST_Intersection.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
@@ -480,7 +480,7 @@ Number of Arguments  Description
 
 .. class:: SymDifference(expr1, expr2, **extra)
 
-*Availability*: MySQL (≥ 5.6.1), `PostGIS
+*Availability*: MySQL, `PostGIS
 <https://postgis.net/docs/ST_SymDifference.html>`__, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
@@ -522,8 +522,8 @@ parameters.
 
 .. class:: Union(expr1, expr2, **extra)
 
-*Availability*: MySQL (≥ 5.6.1), `PostGIS
-<https://postgis.net/docs/ST_Union.html>`__, Oracle, SpatiaLite
+*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_Union.html>`__,
+Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the union of both
 geometries.

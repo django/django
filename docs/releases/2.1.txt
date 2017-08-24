@@ -200,6 +200,12 @@ Database backend API
 
 * ...
 
+Dropped support for MySQL 5.5
+-----------------------------
+
+The end of upstream support for MySQL 5.5 is December 2018. Django 2.1 supports
+MySQL 5.6 and higher.
+
 Miscellaneous
 -------------
 
