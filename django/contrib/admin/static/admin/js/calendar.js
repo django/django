@@ -1,4 +1,4 @@
-/*global gettext, pgettext, get_format, quickElement, removeChildren, addEvent*/
+/*global gettext, pgettext, get_format, quickElement, removeChildren*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
@@ -130,7 +130,7 @@ depends on core.js for utility functions like removeChildren or quickElement
 
                 var cell = quickElement('td', tableRow, '', 'class', todayClass);
                 var link = quickElement('a', cell, currentDay, 'href', '#');
-                addEvent(link, 'click', calendarMonth(year, month));
+                link.addEventListener('click', calendarMonth(year, month));
                 currentDay++;
             }
 
