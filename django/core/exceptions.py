@@ -179,6 +179,36 @@ class ValidationError(Exception):
     def __repr__(self):
         return 'ValidationError(%s)' % self
 
+    def __eq__(self, other):
+        if hasattr(self, 'error_dict'):
+            if not hasattr(other, 'error_dict'):
+                return False
+            return self.error_dict == other.error_dict
+        elif hasattr(self, 'message'):
+            return (
+                hasattr(other, 'message') and
+                self.message == other.message and
+                self.code == other.code and
+                self.params == other.params
+            )
+
+        if not hasattr(other, 'error_list'):
+            return False
+        if len(self.error_list) != len(other.error_list):
+            return False
+        # error order in error_list doesn't matter for equality
+        other_error_list = other.error_list.copy()
+        for self_error in self.error_list:
+            found_eq_error = False
+            for other_error in other_error_list:
+                if self_error == other_error:
+                    found_eq_error = True
+                    other_error_list.remove(other_error)
+                    break
+            if not found_eq_error:
+                return False
+        return True
+
 
 class EmptyResultSet(Exception):
     """A database query predicate is impossible."""
