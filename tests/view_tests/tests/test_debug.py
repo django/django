@@ -670,7 +670,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertIn(
             'Template error:\n'
             'In template %(path)s, error at line 2\n'
-            '   \'cycle\' tag requires at least two arguments\n'
+            '   Template: %(path)s, \'cycle\' tag requires at least two arguments\n'
             '   1 : Template with error:\n'
             '   2 :  {%% cycle %%} \n'
             '   3 : ' % {'path': templ_path},
