@@ -36,12 +36,12 @@
           {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% trans "View on site" %}</a>{% endif %}
             </p>{% endif %}
           {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
-          {{ inline_admin_form.fk_field.field }}
+          {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
           {% spaceless %}
           {% for fieldset in inline_admin_form %}
             {% for line in fieldset %}
               {% for field in line %}
-                {% if field.field.is_hidden %} {{ field.field }} {% endif %}
+                {% if not field.is_readonly and field.field.is_hidden %}{{ field.field }}{% endif %}
               {% endfor %}
             {% endfor %}
           {% endfor %}
@@ -50,7 +50,7 @@
         {% for fieldset in inline_admin_form %}
           {% for line in fieldset %}
             {% for field in line %}
-              {% if not field.field.is_hidden %}
+              {% if field.is_readonly or not field.field.is_hidden %}
               <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
               {% if field.is_readonly %}
                   <p>{{ field.contents }}</p>

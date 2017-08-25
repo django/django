@@ -154,8 +154,12 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
+        else:
+            context['related_url'] = None
         if context['widget']['value']:
             context['link_label'], context['link_url'] = self.label_and_url_for_value(value)
+        else:
+            context['link_label'] = None
         return context
 
     def base_url_parameters(self):

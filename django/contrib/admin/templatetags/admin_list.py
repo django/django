@@ -418,6 +418,7 @@ def date_hierarchy(cl):
             years = getattr(cl.queryset, 'dates')(field_name, 'year')
             return {
                 'show': True,
+                'back': None,
                 'choices': [{
                     'link': link({year_field: str(year.year)}),
                     'title': str(year.year),
