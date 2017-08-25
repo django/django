@@ -19,7 +19,8 @@ class BrinIndex(Index):
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
-        kwargs['pages_per_range'] = self.pages_per_range
+        if self.pages_per_range is not None:
+            kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
 
     def create_sql(self, model, schema_editor, using=''):
