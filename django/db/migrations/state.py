@@ -224,11 +224,7 @@ class ProjectState:
         return cls(app_models)
 
     def __eq__(self, other):
-        if set(self.models) != set(other.models):
-            return False
-        if set(self.real_apps) != set(other.real_apps):
-            return False
-        return all(model == other.models[key] for key, model in self.models.items())
+        return self.models == other.models and set(self.real_apps) == set(other.real_apps)
 
 
 class AppConfigStub(AppConfig):
