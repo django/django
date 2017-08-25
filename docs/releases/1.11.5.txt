@@ -26,3 +26,6 @@ Bugfixes
 
 * Added POST request support to ``LogoutView``, for equivalence with the
   function-based ``logout()`` view (:ticket:`28513`).
+
+* Omitted ``pages_per_range`` from ``BrinIndex.deconstruct()`` if it's ``None``
+  (:ticket:`25809`).

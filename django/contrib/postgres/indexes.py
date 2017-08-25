@@ -31,7 +31,8 @@ class BrinIndex(Index):
 
     def deconstruct(self):
         path, args, kwargs = super(BrinIndex, self).deconstruct()
-        kwargs['pages_per_range'] = self.pages_per_range
+        if self.pages_per_range is not None:
+            kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
 
     def get_sql_create_template_values(self, model, schema_editor, using):

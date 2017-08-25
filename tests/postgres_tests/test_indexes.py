@@ -39,7 +39,7 @@ class BrinIndexTests(PostgreSQLTestCase):
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.contrib.postgres.indexes.BrinIndex')
         self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_brin', 'pages_per_range': None})
+        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_brin'})
 
     def test_deconstruction_with_pages_per_range(self):
         index = BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=16)
