@@ -190,7 +190,6 @@
 {% if template_info %}
 <div id="template">
    <h2>Error during template rendering</h2>
-   <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
    <h3>{{ template_info.message }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}
       {% if template_info.bottom != template_info.total %} cut-bottom{% endif %}">
