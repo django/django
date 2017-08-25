@@ -4,7 +4,7 @@ from django.contrib.gis.db.backends.base.operations import (
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.mysql.operations import DatabaseOperations
@@ -100,7 +100,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         srid = expression.output_field.srid
         if srid == -1:
             srid = None
+        geom_class = expression.output_field.geom_class
 
         def converter(value, expression, connection):
-            return None if value is None else GEOSGeometry(read(memoryview(value)), srid)
+            if value is not None:
+                geom = GEOSGeometryBase(read(memoryview(value)), geom_class)
+                if srid:
+                    geom.srid = srid
+                return geom
         return converter
