@@ -198,7 +198,7 @@ class Template:
             return parser.parse()
         except Exception as e:
             if self.origin.name != UNKNOWN_SOURCE:
-                template_path = "Template : %s, " % self.origin.name
+                template_path = "Template: %s, " % self.origin.name
                 e.args = (template_path + e.args[0],)
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
