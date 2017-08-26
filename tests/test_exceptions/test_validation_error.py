@@ -20,8 +20,12 @@ class TestValidationError(unittest.TestCase):
         exception_b = ValidationError('message')
         self.assertEqual(exception_a, exception_b)
 
-        exception_a = ValidationError('e1 %(parm1)s %(parm2)s', code='my_code', params={'parm1': 'val1', 'parm2': 'val2'})
-        exception_b = ValidationError('e1 %(parm1)s %(parm2)s', code='my_code', params={'parm2': 'val2', 'parm1': 'val1'})
+        exception_a = ValidationError(
+            'e1 %(parm1)s %(parm2)s', code='my_code', params={'parm1': 'val1', 'parm2': 'val2'}
+        )
+        exception_b = ValidationError(
+            'e1 %(parm1)s %(parm2)s', code='my_code', params={'parm2': 'val2', 'parm1': 'val1'}
+        )
         self.assertEqual(exception_a, exception_b)
 
         exception_b = ValidationError('e1 %(parm1)s %(parm2)s', params={'parm2': 'val2', 'parm1': 'val1'})
@@ -41,7 +45,10 @@ class TestValidationError(unittest.TestCase):
         exception_b = ValidationError({'field1': 'field error'})
         self.assertNotEqual(exception_a, exception_b)
 
-        error_dict = {'field1': ValidationError('nice error %(parm1)s', code='my_code', params={'parm1': 'val1'}), 'field2': 'err'}
+        error_dict = {
+            'field1': ValidationError('nice error %(parm1)s', code='my_code', params={'parm1': 'val1'}),
+            'field2': 'err'
+        }
         exception_a = ValidationError(error_dict)
         exception_b = ValidationError(dict(error_dict))
         self.assertEqual(exception_a, exception_b)
@@ -60,6 +67,8 @@ class TestValidationError(unittest.TestCase):
         # message type is referring to `message` being either a simple str, an `error_list` or `error_dict`
         exception_str = ValidationError('e1 %(parm1)s', code='my_code', params={'parm1': 'val1'})
         exception_list = ValidationError([ValidationError('e1 %(parm1)s', code='my_code', params={'parm1': 'val1'})])
-        exception_dict = ValidationError({'field1': ValidationError('e1 %(parm1)s', code='my_code', params={'parm1': 'val1'})})
+        exception_dict = ValidationError(
+            {'field1': ValidationError('e1 %(parm1)s', code='my_code', params={'parm1': 'val1'})}
+        )
         self.assertNotEqual(exception_str, exception_list)
         self.assertNotEqual(exception_list, exception_dict)
