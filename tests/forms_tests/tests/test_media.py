@@ -25,6 +25,11 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>"""
         )
+        self.assertEqual(
+            repr(m),
+            "Media(css={'all': ('path/to/css1', '/path/to/css2')}, "
+            "js=('/path/to/js1', 'http://media.other.com/path/to/js2', 'https://secure.other.com/path/to/js3'))"
+        )
 
         class Foo:
             css = {

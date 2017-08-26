@@ -52,6 +52,9 @@ class Media:
         self._css = css
         self._js = js
 
+    def __repr__(self):
+        return 'Media(css=%r, js=%r)' % (self._css, self._js)
+
     def __str__(self):
         return self.render()
 
