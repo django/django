@@ -103,7 +103,7 @@ depends on core.js for utility functions like removeChildren or quickElement
             function calendarMonth(y, m) {
                 function onClick(e) {
                     e.preventDefault();
-                    callback(y, m, django.jQuery(this).text());
+                    callback(y, m, this.textContent);
                 }
                 return onClick;
             }
