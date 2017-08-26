@@ -26,3 +26,6 @@ Bugfixes
 
 * Added POST request support to ``LogoutView``, for equivalence with the
   function-based ``logout()`` view (:ticket:`28513`).
+
+* Fixed ``UnicodeDecodeError`` raised when ``force_bytes`` decodes
+  strings encoded with character encodings other than UTF-8 (:ticket: `28487`).
