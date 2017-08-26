@@ -84,6 +84,13 @@ class GinIndexTests(PostgreSQLTestCase):
             }
         )
 
+    def test_deconstruct_no_args(self):
+        index = GinIndex(fields=['title'], name='test_title_gin')
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.indexes.GinIndex')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_gin'})
+
 
 class SchemaTests(PostgreSQLTestCase):
 
