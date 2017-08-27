@@ -197,15 +197,8 @@ class ValidationError(Exception):
         if len(self.error_list) != len(other.error_list):
             return False
         # error order in error_list doesn't matter for equality
-        other_error_list = other.error_list.copy()
-        for self_error in self.error_list:
-            found_eq_error = False
-            for other_error in other_error_list:
-                if self_error == other_error:
-                    found_eq_error = True
-                    other_error_list.remove(other_error)
-                    break
-            if not found_eq_error:
+        for error in self.error_list:
+            if error not in other.error_list:
                 return False
         return True
 

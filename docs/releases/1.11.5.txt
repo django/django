@@ -6,11 +6,6 @@ Django 1.11.5 release notes
 
 Django 1.11.5 fixes several bugs in 1.11.4.
 
-Minor feature
-=============
-
-* Added equality testing between ValidationErrors (:ticket:`28507`).
-
 Bugfixes
 ========
 
