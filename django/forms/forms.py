@@ -277,6 +277,15 @@ class BaseForm:
             help_text_html='<br /><span class="helptext">%s</span>',
             errors_on_separate_row=False)
 
+    def as_table_row(self):
+        "Return this form rendered as HTML <td>s -- excluding the <table></table>."
+        return self._html_output(
+            normal_row='<td%(html_class_attr)s>%(label)s %(field)s%(help_text)s</td>',
+            error_row='<td colspan=10000>%s</td>',
+            row_ender='</p>',
+            help_text_html=' <span class="helptext">%s</span>',
+            errors_on_separate_row=False)
+
     def as_ul(self):
         "Return this form rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
