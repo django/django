@@ -354,7 +354,9 @@ class EmailMessage:
             encoding = self.encoding or settings.DEFAULT_CHARSET
             body_msg = msg
             msg = SafeMIMEMultipart(_subtype=self.mixed_subtype, encoding=encoding)
-            if self.body:
+            # Attach the body_msg if self.body isn't empty or
+            # body_msg is a list of SafeMIMEText or SafeMIMEMultipart objects.
+            if self.body or body_msg.is_multipart():
                 msg.attach(body_msg)
             for attachment in self.attachments:
                 if isinstance(attachment, MIMEBase):
