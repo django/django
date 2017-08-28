@@ -284,8 +284,8 @@ class BaseForm:
             error_row='<td colspan=10000>%s</td>',
             row_ender='</p>',
             help_text_html=' <span class="helptext">%s</span>',
-            errors_on_separate_row=False)    
-    
+            errors_on_separate_row=False)
+
     def as_ul(self):
         "Return this form rendered as HTML <li>s -- excluding the <ul></ul>."
         return self._html_output(
