@@ -5,13 +5,14 @@ import os
 import shutil
 import sys
 import tempfile
+import unittest
 from importlib import import_module
 
 from django import conf
 from django.contrib import admin
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import extend_sys_path
-from django.utils import autoreload
+from django.utils import autoreload, six
 from django.utils._os import npath, upath
 from django.utils.six.moves import _thread
 from django.utils.translation import trans_real
@@ -258,6 +259,13 @@ class ResetTranslationsTests(SimpleTestCase):
 
 class TestRestartWithReloader(SimpleTestCase):
 
+    def setUp(self):
+        self._orig_environ = os.environ.copy()
+
+    def tearDown(self):
+        os.environ.clear()
+        os.environ.update(self._orig_environ)
+
     def test_environment(self):
         """"
         With Python 2 on Windows, restart_with_reloader() coerces environment
@@ -268,3 +276,24 @@ class TestRestartWithReloader(SimpleTestCase):
         os.environ['SPAM'] = 'spam'
         with mock.patch.object(sys, 'argv', ['-c', 'pass']):
             autoreload.restart_with_reloader()
+
+    @unittest.skipUnless(six.PY2 and sys.platform == 'win32', 'This is a Python 2 + Windows-specific issue.')
+    def test_environment_decoding(self):
+        """The system encoding is used for decoding."""
+        os.environ['SPAM'] = 'spam'
+        os.environ['EGGS'] = b'\xc6u vi komprenas?'
+        with mock.patch('locale.getdefaultlocale') as default_locale:
+            # Latin-3 is the correct mapping.
+            default_locale.return_value = ('eo', 'latin3')
+            with mock.patch.object(sys, 'argv', ['-c', 'pass']):
+                autoreload.restart_with_reloader()
+            # CP1252 interprets latin3's C circumflex as AE ligature.
+            # It's incorrect but doesn't raise an error.
+            default_locale.return_value = ('en_US', 'cp1252')
+            with mock.patch.object(sys, 'argv', ['-c', 'pass']):
+                autoreload.restart_with_reloader()
+            # Interpreting the string as UTF-8 is fatal.
+            with self.assertRaises(UnicodeDecodeError):
+                default_locale.return_value = ('en_US', 'utf-8')
+                with mock.patch.object(sys, 'argv', ['-c', 'pass']):
+                    autoreload.restart_with_reloader()

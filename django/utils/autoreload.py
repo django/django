@@ -40,7 +40,7 @@ from django.conf import settings
 from django.core.signals import request_finished
 from django.utils import six
 from django.utils._os import npath
-from django.utils.encoding import force_bytes, get_system_encoding
+from django.utils.encoding import get_system_encoding
 from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
@@ -290,8 +290,8 @@ def restart_with_reloader():
             # Environment variables on Python 2 + Windows must be str.
             encoding = get_system_encoding()
             for key in new_environ.keys():
-                str_key = force_bytes(key, encoding=encoding)
-                str_value = force_bytes(new_environ[key], encoding=encoding)
+                str_key = key.decode(encoding).encode('utf-8')
+                str_value = new_environ[key].decode(encoding).encode('utf-8')
                 del new_environ[key]
                 new_environ[str_key] = str_value
         new_environ["RUN_MAIN"] = 'true'

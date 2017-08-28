@@ -32,3 +32,6 @@ Bugfixes
 
 * Fixed a regression where ``SelectDateWidget`` localized the years in the
   select box (:ticket:`28530`).
+
+* Fixed a regression in 1.11.4 where ``runserver`` crashed with non-Unicode
+  system encodings on Python 2 + Windows (:ticket:`28487`).
