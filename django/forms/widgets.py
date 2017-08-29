@@ -943,7 +943,7 @@ class SelectDateWidget(Widget):
     def get_context(self, name, value, attrs):
         context = super(SelectDateWidget, self).get_context(name, value, attrs)
         date_context = {}
-        year_choices = [(i, i) for i in self.years]
+        year_choices = [(i, force_text(i)) for i in self.years]
         if self.is_required is False:
             year_choices.insert(0, self.year_none_value)
         year_attrs = context['widget']['attrs'].copy()
