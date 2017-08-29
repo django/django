@@ -1,5 +1,5 @@
 import threading
-from ctypes import POINTER, Structure, byref, c_char, c_char_p, c_int, c_size_t
+from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
 
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
@@ -54,7 +54,7 @@ wkt_writer_set_outdim = GEOSFuncFactory(
     'GEOSWKTWriter_setOutputDimension', argtypes=[WKT_WRITE_PTR, c_int]
 )
 
-wkt_writer_set_trim = GEOSFuncFactory('GEOSWKTWriter_setTrim', argtypes=[WKT_WRITE_PTR, c_char])
+wkt_writer_set_trim = GEOSFuncFactory('GEOSWKTWriter_setTrim', argtypes=[WKT_WRITE_PTR, c_byte])
 wkt_writer_set_precision = GEOSFuncFactory('GEOSWKTWriter_setRoundingPrecision', argtypes=[WKT_WRITE_PTR, c_int])
 
 # WKBReader routines
@@ -106,8 +106,8 @@ wkb_writer_get_byteorder = WKBWriterGet('GEOSWKBWriter_getByteOrder')
 wkb_writer_set_byteorder = WKBWriterSet('GEOSWKBWriter_setByteOrder')
 wkb_writer_get_outdim = WKBWriterGet('GEOSWKBWriter_getOutputDimension')
 wkb_writer_set_outdim = WKBWriterSet('GEOSWKBWriter_setOutputDimension')
-wkb_writer_get_include_srid = WKBWriterGet('GEOSWKBWriter_getIncludeSRID', restype=c_char)
-wkb_writer_set_include_srid = WKBWriterSet('GEOSWKBWriter_setIncludeSRID', argtypes=[WKB_WRITE_PTR, c_char])
+wkb_writer_get_include_srid = WKBWriterGet('GEOSWKBWriter_getIncludeSRID', restype=c_byte)
+wkb_writer_set_include_srid = WKBWriterSet('GEOSWKBWriter_setIncludeSRID', argtypes=[WKB_WRITE_PTR, c_byte])
 
 
 # ### Base I/O Class ###
@@ -194,7 +194,7 @@ class WKTWriter(IOBase):
     def trim(self, flag):
         if bool(flag) != self._trim:
             self._trim = bool(flag)
-            wkt_writer_set_trim(self.ptr, b'\x01' if flag else b'\x00')
+            wkt_writer_set_trim(self.ptr, self._trim)
 
     @property
     def precision(self):
@@ -277,15 +277,11 @@ class WKBWriter(IOBase):
     # Property for getting/setting the include srid flag.
     @property
     def srid(self):
-        return bool(ord(wkb_writer_get_include_srid(self.ptr)))
+        return bool(wkb_writer_get_include_srid(self.ptr))
 
     @srid.setter
     def srid(self, include):
-        if include:
-            flag = b'\x01'
-        else:
-            flag = b'\x00'
-        wkb_writer_set_include_srid(self.ptr, flag)
+        wkb_writer_set_include_srid(self.ptr, bool(include))
 
 
 # `ThreadLocalIO` object holds instances of the WKT and WKB reader/writer
