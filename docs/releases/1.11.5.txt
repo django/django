@@ -29,3 +29,6 @@ Bugfixes
 
 * Omitted ``pages_per_range`` from ``BrinIndex.deconstruct()`` if it's ``None``
   (:ticket:`25809`).
+
+* Fixed a regression where ``SelectDateWidget`` localized the years in the
+  select box (:ticket:`28530`).
