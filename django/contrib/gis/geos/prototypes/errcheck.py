@@ -43,10 +43,9 @@ def check_minus_one(result, func, cargs):
 
 def check_predicate(result, func, cargs):
     "Error checking for unary/binary predicate functions."
-    val = ord(result)  # getting the ordinal from the character
-    if val == 1:
+    if result == 1:
         return True
-    elif val == 0:
+    elif result == 0:
         return False
     else:
         raise GEOSException('Error encountered on GEOS C predicate function "%s".' % func.__name__)
