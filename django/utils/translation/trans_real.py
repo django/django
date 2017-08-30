@@ -58,21 +58,27 @@ def reset_cache(**kwargs):
 
 
 def to_locale(language, to_lower=False):
-    """
-    Turn a language name (en-us) into a locale name (en_US). If 'to_lower' is
-    True, the last component is lower-cased (en_us).
-    """
-    p = language.find('-')
-    if p >= 0:
-        if to_lower:
-            return language[:p].lower() + '_' + language[p + 1:].lower()
+    lang_code = ''
+    parts = language.split('-')
+
+    if to_lower:
+        lang_code = parts[0] + '_' + '-'.join(parts[1:])
+    # If languge code is only the country code return lower
+    elif len(parts) == 1:
+        lang_code = language.lower()
+    # languge code is long form
+    elif len(parts) > 1:
+        lang_code += parts[0] + '_'
+        # language code format 'sr-latn-x-informal'
+        if len(parts[1]) > 2:
+            parts[1] = parts[1].title()
+        # language code format 'nl-nl-x-informal'
         else:
-            # Get correct locale for sr-latn
-            if len(language[p + 1:]) > 2:
-                return language[:p].lower() + '_' + language[p + 1].upper() + language[p + 2:].lower()
-            return language[:p].lower() + '_' + language[p + 1:].upper()
-    else:
-        return language.lower()
+            parts[1] = parts[1].upper()
+
+        lang_code += '-'.join(parts[1:])
+
+    return lang_code
 
 
 def to_language(locale):
