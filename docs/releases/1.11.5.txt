@@ -35,3 +35,8 @@ Bugfixes
 
 * Fixed a regression in 1.11.4 where ``runserver`` crashed with non-Unicode
   system encodings on Python 2 + Windows (:ticket:`28487`).
+
+* Fixed a regression in Django 1.10 where changes to a ``ManyToManyField``
+  weren't logged in the admin change history (:ticket:`27998`) and prevented
+  ``ManyToManyField`` initial data in model forms from being affected by
+  subsequent model changes (:ticket:`28543`).

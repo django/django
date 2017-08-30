@@ -84,6 +84,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     fields will be excluded from the returned dict, even if they are listed in
     the ``fields`` argument.
     """
+    from django.db import models
     opts = instance._meta
     data = {}
     for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
@@ -94,6 +95,10 @@ def model_to_dict(instance, fields=None, exclude=None):
         if exclude and f.name in exclude:
             continue
         data[f.name] = f.value_from_object(instance)
+        # Evaluate ManyToManyField QuerySets to prevent subsequent model
+        # alteration of that field from being reflected in the data.
+        if isinstance(f, models.ManyToManyField):
+            data[f.name] = list(data[f.name])
     return data
 
 
