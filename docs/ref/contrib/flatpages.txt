@@ -147,7 +147,7 @@ can do all of the work.
 Note that the order of :setting:`MIDDLEWARE` matters. Generally, you can put
 :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at the
 end of the list. This means it will run first when processing the response, and
-ensures that any other response-processing middlewares see the real flatpage
+ensures that any other response-processing middleware see the real flatpage
 response rather than the 404.
 
 For more on middleware, read the :doc:`middleware docs
