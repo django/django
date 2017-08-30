@@ -1944,7 +1944,7 @@ To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE` setting. Because middleware order matters, follow
 these guidelines:
 
-* Make sure it's one of the first middlewares installed.
+* Make sure it's one of the first middleware installed.
 * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
   makes use of session data. And it should come before ``CommonMiddleware``
   because ``CommonMiddleware`` needs an activated language in order

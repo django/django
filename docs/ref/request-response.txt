@@ -1006,7 +1006,7 @@ with the following notable differences:
 :class:`StreamingHttpResponse` should only be used in situations where it is
 absolutely required that the whole content isn't iterated before transferring
 the data to the client. Because the content can't be accessed, many
-middlewares can't function normally. For example the ``ETag`` and
+middleware can't function normally. For example the ``ETag`` and
 ``Content-Length`` headers can't be generated for streaming responses.
 
 Attributes
