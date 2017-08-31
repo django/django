@@ -649,7 +649,7 @@ class Query:
             # models.
             workset = {}
             for model, values in seen.items():
-                for field in model._meta.fields:
+                for field in model._meta.local_fields:
                     if field in values:
                         continue
                     m = field.model._meta.concrete_model
