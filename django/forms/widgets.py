@@ -583,7 +583,7 @@ class ChoiceWidget(Widget):
         groups = []
         has_selected = False
 
-        for index, (option_value, option_label) in enumerate(chain(self.choices)):
+        for index, (option_value, option_label) in enumerate(self.choices):
             if option_value is None:
                 option_value = ''
 
