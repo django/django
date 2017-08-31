@@ -4,7 +4,6 @@ import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
-from itertools import chain
 
 from django.apps import apps
 from django.conf import settings
@@ -786,18 +785,15 @@ class Options:
                     fields.append(field.remote_field)
 
         if forward:
-            fields.extend(
-                field for field in chain(self.local_fields, self.local_many_to_many)
-            )
+            fields += self.local_fields
+            fields += self.local_many_to_many
             # Private fields are recopied to each child model, and they get a
             # different model as field.model in each child. Hence we have to
             # add the private fields separately from the topmost call. If we
             # did this recursively similar to local_fields, we would get field
             # instances with field.model != self.model.
             if topmost_call:
-                fields.extend(
-                    f for f in self.private_fields
-                )
+                fields += self.private_fields
 
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
