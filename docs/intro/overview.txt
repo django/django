@@ -209,9 +209,9 @@ matches the requested URL. (If none of them matches, Django calls a
 special-case 404 view.) This is blazingly fast, because the regular expressions
 are compiled at load time.
 
-Once one of the regexes matches, Django imports and calls the given view, which
-is a simple Python function. Each view gets passed a request object --
-which contains request metadata -- and the values captured in the regex.
+Once one of the regexes matches, Django calls the given view, which is a Python
+function. Each view gets passed a request object -- which contains request
+metadata -- and the values captured in the regex.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
 would call the function ``news.views.article_detail(request,
