@@ -1591,9 +1591,7 @@ class ManyToManyField(RelatedField):
         pass
 
     def value_from_object(self, obj):
-        if obj.pk is None:
-            return self.related_model.objects.none()
-        return getattr(obj, self.attname).all()
+        return [] if obj.pk is None else list(getattr(obj, self.attname).all())
 
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)

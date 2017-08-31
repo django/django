@@ -360,6 +360,10 @@ class AllFieldsModel(models.Model):
     gr = GenericRelation(DataModel)
 
 
+class ManyToMany(models.Model):
+    m2m = models.ManyToManyField('self')
+
+
 ###############################################################################
 
 

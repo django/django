@@ -1468,10 +1468,6 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
-                if not add:
-                    # Evalute querysets in form.initial so that changes to
-                    # ManyToManyFields are reflected in this change's LogEntry.
-                    form.has_changed()
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
                 change_message = self.construct_change_message(request, form, formsets, add)
