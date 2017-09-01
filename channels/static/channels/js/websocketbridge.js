@@ -115,7 +115,12 @@ var ReconnectingWebsocket = function (url, protocols, options) {
     var connect = function () {
         log('connect');
         var oldWs = ws;
-        ws = new config.constructor(url, protocols);
+        if (protocols === undefined) {
+          ws = new config.constructor(url);
+        } else {
+          ws = new config.constructor(url, protocols);
+        }
+        
         connectingTimeout = setTimeout(function () {
             log('timeout');
             ws.close();
