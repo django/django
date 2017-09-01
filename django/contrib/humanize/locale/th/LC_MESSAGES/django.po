@@ -183,7 +183,7 @@ msgstr "เมื่อวานนี้"
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s ago"
-msgstr " %(delta)s  ที่ผ่านมา"
+msgstr "%(delta)s  ที่ผ่านมา"
 
 msgid "now"
 msgstr "ขณะนี้"
