@@ -61,7 +61,7 @@
     "eslint-plugin-jsx-a11y": "^1.5.3",
     "eslint-plugin-react": "^5.2.2",
     "jest": "^19.0.1",
-    "mock-socket": "^6.0.4",
+    "mock-socket": "6.0.4",
     "react": "^15.4.0",
     "react-cookie": "^0.4.8",
     "react-dom": "^15.4.0",
