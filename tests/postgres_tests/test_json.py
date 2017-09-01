@@ -410,3 +410,8 @@ class TestFormField(PostgreSQLTestCase):
         for json_string in tests:
             val = field.clean(json_string)
             self.assertEqual(field.clean(val), val)
+
+    def test_has_changed(self):
+        field = forms.JSONField()
+        self.assertIs(field.has_changed({'a': True}, '{"a": 1}'), True)
+        self.assertIs(field.has_changed({'a': 1, 'b': 2}, '{"b": 2, "a": 1}'), False)
