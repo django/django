@@ -38,6 +38,17 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
+class BooleanFieldTests(SimpleTestCase):
+
+    def test_nullable_boolean_field(self):
+        class Model(models.Model):
+            field = models.BooleanField(null=True)
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [])
+
+
+@isolate_apps('invalid_models_tests')
 class CharFieldTests(TestCase):
 
     def test_valid_field(self):
