@@ -1094,7 +1094,7 @@ msgid "It worked!"
 msgstr "設定成功！"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr "觀迎來到你的第一個 Django 頁面。"
+msgstr "歡迎來到你的第一個 Django 頁面。"
 
 msgid ""
 "Next, start your first app by running <code>python manage.py startapp "
