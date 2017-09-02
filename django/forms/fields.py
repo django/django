@@ -9,7 +9,6 @@ import math
 import os
 import re
 import uuid
-import distutils.util
 from contextlib import suppress
 from decimal import Decimal, DecimalException
 from io import BytesIO
@@ -28,7 +27,7 @@ from django.forms.widgets import (
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, TextInput, TimeInput,
     URLInput,
 )
-from django.utils import formats
+from django.utils import formats, typecasting
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
@@ -690,12 +689,7 @@ class BooleanField(Field):
     widget = CheckboxInput
 
     def to_python(self, value):
-        """Return a Python boolean object."""
-        if isinstance(value, str):
-            return distutils.util.strtobool(value)
-        else:
-            value = bool(value)
-        return super().to_python(value)
+        return typecasting.cast_boolean(value)
 
     def validate(self, value):
         if not value and self.required:
@@ -716,23 +710,8 @@ class NullBooleanField(BooleanField):
     """
     widget = NullBooleanSelect
 
-    def to_python(self, value):
-        """
-        Explicitly check for the string 'True' and 'False', which is what a
-        hidden field will submit for True and False, for 'true' and 'false',
-        which are likely to be returned by JavaScript serializations of forms,
-        and for '1' and '0', which is what a RadioField will submit. Unlike
-        the Booleanfield, this field must check for True because it doesn't
-        use the bool() function.
-        """
-        if value in (True, 'True', 'true', '1'):
-            return True
-        elif value in (False, 'False', 'false', '0'):
-            return False
-        else:
-            return None
-
     def validate(self, value):
+        """Disable `required` validation"""
         pass
 
 

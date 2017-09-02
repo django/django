@@ -20,7 +20,7 @@ from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
-from django.utils import timezone
+from django.utils import timezone, typecasting
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
@@ -974,13 +974,9 @@ class BooleanField(Field):
     def to_python(self, value):
         if self.null and value in self.empty_values:
             return None
-        elif value in (True, False):
-            # if value is 1 or 0 than it's equal to True or False, but we want
-            # to return a true bool for semantic reasons.
-            return bool(value)
-        elif isinstance(value, str):
-            return distutils.util.strtobool(value)
-        else:
+        try:
+            return typecasting.force_cast_boolean(value)
+        except TypeError:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
