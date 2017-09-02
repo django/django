@@ -38,24 +38,6 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class BooleanFieldTests(SimpleTestCase):
-
-    def test_nullable_boolean_field(self):
-        class Model(models.Model):
-            field = models.BooleanField(null=True)
-
-        field = Model._meta.get_field('field')
-        self.assertEqual(field.check(), [
-            Error(
-                'BooleanFields do not accept null values.',
-                hint='Use a NullBooleanField instead.',
-                obj=field,
-                id='fields.E110',
-            ),
-        ])
-
-
-@isolate_apps('invalid_models_tests')
 class CharFieldTests(TestCase):
 
     def test_valid_field(self):

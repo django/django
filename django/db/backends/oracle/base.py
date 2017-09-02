@@ -110,8 +110,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'UUIDField': 'VARCHAR2(32)',
     }
     data_type_check_constraints = {
-        'BooleanField': '%(qn_column)s IN (0,1)',
-        'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
+        # 'BooleanField': '%(qn_column)s IN (0,1)',
+        # 'NullBooleanField': '(%(qn_column)s IN (0,1)) OR (%(qn_column)s IS NULL)',
         'PositiveIntegerField': '%(qn_column)s >= 0',
         'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }

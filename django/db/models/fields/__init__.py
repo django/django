@@ -967,37 +967,12 @@ class BooleanField(Field):
     }
     description = _("Boolean (Either True or False)")
 
-    def __init__(self, *args, **kwargs):
-        kwargs['blank'] = True
-        super().__init__(*args, **kwargs)
-
-    def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_null(**kwargs))
-        return errors
-
-    def _check_null(self, **kwargs):
-        if getattr(self, 'null', False):
-            return [
-                checks.Error(
-                    'BooleanFields do not accept null values.',
-                    hint='Use a NullBooleanField instead.',
-                    obj=self,
-                    id='fields.E110',
-                )
-            ]
-        else:
-            return []
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs['blank']
-        return name, path, args, kwargs
-
     def get_internal_type(self):
         return "BooleanField"
 
     def to_python(self, value):
+        if self.null and value in self.empty_values:
+            return None
         if value in (True, False):
             # if value is 1 or 0 than it's equal to True or False, but we want
             # to return a true bool for semantic reasons.
@@ -1021,11 +996,19 @@ class BooleanField(Field):
     def formfield(self, **kwargs):
         # Unlike most fields, BooleanField figures out include_blank from
         # self.null instead of self.blank.
-        if self.choices:
-            include_blank = not (self.has_default() or 'initial' in kwargs)
-            defaults = {'choices': self.get_choices(include_blank=include_blank)}
+        defaults = {'form_class': forms.NullBooleanField if self.null else forms.BooleanField}
+        if self.blank or self.choices:
+            if self.choices:
+                include_blank = not (self.has_default() or 'initial' in kwargs)
+                defaults = {'choices': self.get_choices(include_blank=include_blank)}
+            else:
+                defaults.update({'required': False})
         else:
-            defaults = {'form_class': forms.BooleanField}
+            # In the checkbox case, 'required' means "must be checked (=> true)",
+            # which is different from the choices case ("must select some value").
+            # Since we want to allow both True and False (checked/unchecked) choices,
+            # set 'required' to False.
+            defaults.update({'required': False})
         defaults.update(kwargs)
         return super().formfield(**defaults)
 

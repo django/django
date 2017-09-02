@@ -276,6 +276,9 @@ Models
 * The new ``filter`` argument for built-in aggregates allows :ref:`adding
   different conditionals <conditional-aggregation>` to multiple aggregations
   over the same fields or relations.
+* :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
+  encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
+  likely be deprecated in the future.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

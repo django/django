@@ -164,7 +164,7 @@ class HasLinkThing(HasLinks):
 
 
 class A(models.Model):
-    flag = models.NullBooleanField()
+    flag = models.BooleanField(null=True)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
