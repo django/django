@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
@@ -17,7 +16,6 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
@@ -166,19 +164,10 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         return context
 
 
-_sentinel = object()
-
-
-def logout_then_login(request, login_url=None, extra_context=_sentinel):
+def logout_then_login(request, login_url=None):
     """
     Log out the user if they are logged in. Then redirect to the login page.
     """
-    if extra_context is not _sentinel:
-        warnings.warn(
-            "The unused `extra_context` parameter to `logout_then_login` "
-            "is deprecated.", RemovedInDjango21Warning
-        )
-
     if not login_url:
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)

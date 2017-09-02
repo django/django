@@ -28,7 +28,6 @@ from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
@@ -820,10 +819,6 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         response = logout_then_login(req, login_url='/custom/')
         self.confirm_logged_out()
         self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
-
-    def test_deprecated_extra_context(self):
-        with self.assertRaisesMessage(RemovedInDjango21Warning, 'The unused `extra_context` parameter'):
-            logout_then_login(None, extra_context={})
 
 
 class LoginRedirectAuthenticatedUser(AuthViewsTestCase):

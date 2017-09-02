@@ -229,3 +229,6 @@ how to remove usage of these features.
 * ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
   ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
   ``password_reset_confirm()``, and ``password_reset_complete()`` are removed.
+
+* The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
+  is removed.

@@ -1126,7 +1126,7 @@ implementation details see :ref:`using-the-views`.
       :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
-.. function:: logout_then_login(request, login_url=None, extra_context=None)
+.. function:: logout_then_login(request, login_url=None)
 
     Logs a user out, then redirects to the login page.
 
@@ -1136,14 +1136,6 @@ implementation details see :ref:`using-the-views`.
 
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
-
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
-
-    .. deprecated:: 1.11
-
-        The unused ``extra_context`` parameter is deprecated and will be
-        removed in Django 2.1.
 
 .. class:: PasswordChangeView
 
