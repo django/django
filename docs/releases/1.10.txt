@@ -225,7 +225,7 @@ Minor features
   not worry about whether or not the ``staticfiles`` app is installed.
 
 * You can :ref:`more easily customize <customize-staticfiles-ignore-patterns>`
-  the ``collectstatic --ignore_patterns`` option with a custom ``AppConfig``.
+  the ``collectstatic --ignore`` option with a custom ``AppConfig``.
 
 Cache
 ~~~~~
