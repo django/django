@@ -479,14 +479,6 @@ the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
         }
     }
 
-.. versionchanged:: 1.11
-
-    Memcached backends can now be configured using ``OPTIONS``.
-
-    In older versions, you could pass ``pylibmc`` behavior settings directly
-    inside ``OPTIONS``. This is deprecated in favor of setting them under a
-    ``behaviors`` key within ``OPTIONS`` instead.
-
 .. _the-per-site-cache:
 
 The per-site cache

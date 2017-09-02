@@ -1308,24 +1308,6 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
         self.assertTrue(cache._cache.binary)
         self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
 
-    @override_settings(CACHES=caches_setting_for_tests(
-        base=PyLibMCCache_params,
-        exclude=memcached_excluded_caches,
-        OPTIONS={'tcp_nodelay': True},
-    ))
-    def test_pylibmc_legacy_options(self):
-        deprecation_message = (
-            "Specifying pylibmc cache behaviors as a top-level property "
-            "within `OPTIONS` is deprecated. Move `tcp_nodelay` into a dict named "
-            "`behaviors` inside `OPTIONS` instead."
-        )
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter("always")
-            self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
-        self.assertEqual(len(warns), 1)
-        self.assertIsInstance(warns[0].message, RemovedInDjango21Warning)
-        self.assertEqual(str(warns[0].message), deprecation_message)
-
 
 @override_settings(CACHES=caches_setting_for_tests(
     BACKEND='django.core.cache.backends.filebased.FileBasedCache',

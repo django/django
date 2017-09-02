@@ -236,3 +236,6 @@ how to remove usage of these features.
 * ``django.test.runner.setup_databases()`` is removed.
 
 * ``django.utils.translation.string_concat()`` is removed.
+
+* ``django.core.cache.backends.memcached.PyLibMCCache`` no longer supports
+  passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
