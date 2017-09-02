@@ -35,10 +35,10 @@ class Feature(GDALBase):
         """
         if isinstance(index, str):
             i = self.index(index)
-        else:
-            if index < 0 or index > self.num_fields:
-                raise OGRIndexError('index out of range')
+        elif 0 <= index < self.num_fields:
             i = index
+        else:
+            raise OGRIndexError('index out of range')
         return Field(self, i)
 
     def __iter__(self):

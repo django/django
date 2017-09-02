@@ -1346,15 +1346,20 @@ use an explicit :class:`~django.db.models.AutoField` in the base models::
     class BookReview(Book, Article):
         pass
 
-Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
+Or use a common ancestor to hold the :class:`~django.db.models.AutoField`. This
+requires using an explicit :class:`~django.db.models.OneToOneField` from each
+parent model to the common ancestor to avoid a clash between the fields that
+are automatically generated and inherited by the child::
 
     class Piece(models.Model):
         pass
 
     class Article(Piece):
+        article_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
         ...
 
     class Book(Piece):
+        book_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
         ...
 
     class BookReview(Book, Article):

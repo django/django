@@ -10,10 +10,6 @@ class GDALException(Exception):
     pass
 
 
-# Legacy name
-OGRException = GDALException
-
-
 class SRSException(Exception):
     pass
 
