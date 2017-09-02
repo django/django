@@ -284,7 +284,7 @@ Forms
   :mod:`django.contrib.staticfiles` if installed.
 
 * The ``<input>`` tag rendered by :class:`~django.forms.CharField` now includes
-  a ``minlength`` attribute if the field has a ``min_length``.
+  a ``min_length`` attribute if the field has a ``min_length``.
 
 * Required form fields now have the ``required`` HTML attribute. Set the new
   :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
