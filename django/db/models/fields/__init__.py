@@ -978,7 +978,7 @@ class BooleanField(Field):
             # if value is 1 or 0 than it's equal to True or False, but we want
             # to return a true bool for semantic reasons.
             return bool(value)
-        elif type(value) == str:
+        elif isinstance(value, str):
             return distutils.util.strtobool(value)
         else:
             raise exceptions.ValidationError(
