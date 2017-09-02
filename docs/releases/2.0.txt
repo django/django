@@ -588,6 +588,9 @@ Miscellaneous
   the relative order of elements in each list <form-media-asset-order>`.
   ``MediaOrderConflictWarning`` is issued if the order can't be preserved.
 
+* ``django.contrib.gis.gdal.OGRException`` is removed. It's been an alias for
+  ``GDALException`` since Django 1.8.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
