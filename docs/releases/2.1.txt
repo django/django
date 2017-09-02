@@ -223,3 +223,9 @@ Features removed in 2.1
 These features have reached the end of their deprecation cycle and are removed
 in Django 2.1. See :ref:`deprecated-features-1.11` for details, including how
 to remove usage of these features.
+in Django 2.1. See :ref:`deprecated-features-1.11` and for details, including
+how to remove usage of these features.
+
+* ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
+  ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()`` are removed.

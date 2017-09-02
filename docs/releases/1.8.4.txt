@@ -10,7 +10,7 @@ Denial-of-service possibility in ``logout()`` view by filling session store
 ===========================================================================
 
 Previously, a session could be created when anonymously accessing the
-:func:`django.contrib.auth.views.logout` view (provided it wasn't decorated
+``django.contrib.auth.views.logout()`` view (provided it wasn't decorated
 with :func:`~django.contrib.auth.decorators.login_required` as done in the
 admin). This could allow an attacker to easily create many new session records
 by sending repeated requests, potentially filling up the session store or
