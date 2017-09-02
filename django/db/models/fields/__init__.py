@@ -974,17 +974,18 @@ class BooleanField(Field):
     def to_python(self, value):
         if self.null and value in self.empty_values:
             return None
-        if value in (True, False):
+        elif value in (True, False):
             # if value is 1 or 0 than it's equal to True or False, but we want
             # to return a true bool for semantic reasons.
             return bool(value)
-        if type(value) == str:
+        elif type(value) == str:
             return distutils.util.strtobool(value)
-        raise exceptions.ValidationError(
-            self.error_messages['invalid'],
-            code='invalid',
-            params={'value': value},
-        )
+        else:
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
