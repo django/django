@@ -996,7 +996,10 @@ class BooleanField(Field):
     def formfield(self, **kwargs):
         # Unlike most fields, BooleanField figures out include_blank from
         # self.null instead of self.blank.
-        defaults = {'form_class': forms.NullBooleanField if self.null else forms.BooleanField}
+        defaults = {
+            'form_class': forms.NullBooleanField
+            if self.null else forms.BooleanField
+        }
         if self.blank or self.choices:
             if self.choices:
                 include_blank = not (self.has_default() or 'initial' in kwargs)
