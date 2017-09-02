@@ -79,7 +79,7 @@ class SignalTestCase(TestCase):
         user.username = "This username shouldn't get saved"
         request = RequestFactory().get('/login')
         signals.user_logged_in.send(sender=user.__class__, request=request, user=user)
-        user.refresh_from_db()
+        user = User.objects.get(pk=user.pk)
         self.assertEqual(user.username, 'staff')
         self.assertNotEqual(user.last_login, old_last_login)
 
