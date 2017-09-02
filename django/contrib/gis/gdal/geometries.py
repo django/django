@@ -564,7 +564,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise IndexError('index out of range: %s' % index)
+            raise IndexError('Index out of range when accessing points of a line string: %s.' % index)
 
     def __len__(self):
         "Return the number of points in the LineString."
@@ -616,7 +616,7 @@ class Polygon(OGRGeometry):
         if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
         else:
-            raise IndexError('index out of range: %s' % index)
+            raise IndexError('Index out of range when accessing rings of a polygon: %s.' % index)
 
     # Polygon Properties
     @property
@@ -655,7 +655,7 @@ class GeometryCollection(OGRGeometry):
         if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
         else:
-            raise IndexError('index out of range: %s' % index)
+            raise IndexError('Index out of range when accessing geometry in a collection: %s.' % index)
 
     def __len__(self):
         "Return the number of geometries in this Geometry Collection."
