@@ -176,6 +176,13 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
 
+* :class:`~django.forms.FileField` as well as :class:`~django.forms.FileInput`
+  and :class:`~django.forms.ClearableFileInput` support a new ``multiple``
+  argument. It allows uploading multiple files using a single file input.
+  The :ref:`recommended method<topics-multi-file-upload>` to upload multiple
+  files does no longer require you to explicitly set
+  ``attrs={'multiple': True}``.
+
 Generic Views
 ~~~~~~~~~~~~~
 

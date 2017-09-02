@@ -2433,7 +2433,7 @@ Password: <input type="password" name="password" required>
         self.assertHTMLEqual(
             f.as_table(),
             '<tr><th>File1:</th><td>'
-            '<ul class="errorlist"><li>The submitted file is empty.</li></ul>'
+            '<ul class="errorlist"><li>The submitted file &39;name&39; is empty.</li></ul>'
             '<input type="file" name="file1" required></td></tr>'
         )
 

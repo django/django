@@ -531,7 +531,7 @@ class FileField(Field):
     default_error_messages = {
         'invalid': _("No file was submitted. Check the encoding type on the form."),
         'missing': _("No file was submitted."),
-        'empty': _("The submitted file is empty."),
+        'empty': _("The submitted file '%(file_name)s' is empty."),
         'max_length': ngettext_lazy(
             'Ensure this filename has at most %(max)d character (it has %(length)d).',
             'Ensure this filename has at most %(max)d characters (it has %(length)d).',
@@ -539,10 +539,12 @@ class FileField(Field):
         'contradiction': _('Please either submit a file or check the clear checkbox, not both.')
     }
 
-    def __init__(self, *, max_length=None, allow_empty_file=False, **kwargs):
+    def __init__(self, *, max_length=None, allow_empty_file=False, multiple=False, **kwargs):
         self.max_length = max_length
         self.allow_empty_file = allow_empty_file
+        self.multiple = multiple
         super().__init__(**kwargs)
+        self.widget.multiple = multiple
 
     def to_python(self, data):
         if data in self.empty_values:
@@ -561,7 +563,8 @@ class FileField(Field):
         if not file_name:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         if not self.allow_empty_file and not file_size:
-            raise ValidationError(self.error_messages['empty'], code='empty')
+            params = {'file_name': file_name}
+            raise ValidationError(self.error_messages['empty'], code='empty', params=params)
 
         return data
 
@@ -582,6 +585,9 @@ class FileField(Field):
             data = None
         if not data and initial:
             return initial
+        if self.multiple:
+            # We need to call super with an explicit target inside a generator
+            return [super(FileField, self).clean(value) for value in data]
         return super().clean(data)
 
     def bound_data(self, data, initial):

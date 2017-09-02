@@ -1,7 +1,7 @@
 import pickle
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import FileField, ValidationError
+from django.forms import ClearableFileInput, FileField, ValidationError
 from django.test import SimpleTestCase
 
 
@@ -27,9 +27,9 @@ class FileFieldTest(SimpleTestCase):
         self.assertEqual('files/test3.pdf', f.clean(None, 'files/test3.pdf'))
         with self.assertRaisesMessage(ValidationError, no_file_msg):
             f.clean('some content that is not a file')
-        with self.assertRaisesMessage(ValidationError, "'The submitted file is empty.'"):
+        with self.assertRaisesMessage(ValidationError, '["The submitted file \'name\' is empty."]'):
             f.clean(SimpleUploadedFile('name', None))
-        with self.assertRaisesMessage(ValidationError, "'The submitted file is empty.'"):
+        with self.assertRaisesMessage(ValidationError, '["The submitted file \'name\' is empty."]'):
             f.clean(SimpleUploadedFile('name', b''))
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'))))
         self.assertIsInstance(
@@ -80,3 +80,34 @@ class FileFieldTest(SimpleTestCase):
 
     def test_file_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)
+
+    def test_multiple(self):
+        f = FileField(multiple=True)
+        files = [SimpleUploadedFile('file_%s' % i, ('%s' % i).encode('utf-8')) for i in range(2)]
+        self.assertEqual(files, f.clean(files))
+
+        # ensure validation is executed for all files
+        f = FileField(multiple=True)
+        files = [SimpleUploadedFile('file_%s' % i, b'') for i in range(2)]
+        with self.assertRaisesMessage(ValidationError, "The submitted file 'file_0' is empty."):
+            f.clean(files)
+
+        def test_validator(value):
+            if value.size > 10:
+                raise ValidationError('File %s too large.', params=value.name)
+
+        f = FileField(multiple=True, validators=[test_validator])
+
+        files = [
+            SimpleUploadedFile('file_1', bytes(range(100))),
+            SimpleUploadedFile('file_2', b'foo')
+        ]
+        with self.assertRaisesMessage(ValidationError, 'File file_1 too large.'):
+            f.clean(files)
+
+    def test_multiple_widget(self):
+        self.assertIs(FileField(multiple=True).widget.multiple, True)
+        self.assertIs(FileField(multiple=True, widget=ClearableFileInput).widget.multiple, True)
+        self.assertIs(FileField(multiple=True, widget=ClearableFileInput(multiple=True)).widget.multiple, True)
+        # widget attribute will always be overwritten
+        self.assertIs(FileField(multiple=True, widget=ClearableFileInput(multiple=False)).widget.multiple, True)

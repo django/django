@@ -16,6 +16,7 @@ class FakeFieldFile:
 
 
 class ClearableFileInputTest(WidgetTest):
+    widget_cls = ClearableFileInput
     widget = ClearableFileInput()
 
     def test_clear_input_renders(self):
@@ -29,6 +30,22 @@ class ClearableFileInputTest(WidgetTest):
             <input type="checkbox" name="myfile-clear" id="myfile-clear_id">
             <label for="myfile-clear_id">Clear</label><br>
             Change: <input type="file" name="myfile">
+            """
+        ))
+        self.check_html(self.widget_cls(multiple=True), 'myfile', [FakeFieldFile()], html=(
+            """
+            Currently: <a href="something">something</a>
+            <input type="checkbox" name="myfile-clear" id="myfile-clear_id" />
+            <label for="myfile-clear_id">Clear</label><br />
+            Change: <input multiple type="file" name="myfile" />
+            """
+        ))
+        self.check_html(self.widget_cls(multiple=True), 'myfile', [FakeFieldFile(), FakeFieldFile()], html=(
+            """
+            Currently: 2 files
+            <input type="checkbox" name="myfile-clear" id="myfile-clear_id" />
+            <label for="myfile-clear_id">Clear</label><br />
+            Change: <input multiple type="file" name="myfile" />
             """
         ))
 
@@ -64,6 +81,19 @@ class ClearableFileInputTest(WidgetTest):
             """
             Currently: <a href="something">something</a> <br>
             Change: <input type="file" name="myfile">
+            """
+        ))
+        widget.multiple = True
+        self.check_html(widget, 'myfile', [FakeFieldFile()], html=(
+            """
+            Currently: <a href="something">something</a> <br />
+            Change: <input type="file" name="myfile" />
+            """
+        ))
+        self.check_html(widget, 'myfile', [FakeFieldFile(), FakeFieldFile()], html=(
+            """
+            Currently: 2 files <br />
+            Change: <input type="file" name="myfile" />
             """
         ))
 
@@ -161,3 +191,29 @@ class ClearableFileInputTest(WidgetTest):
         self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
         self.assertIs(widget.value_omitted_from_data({}, {'field': 'x'}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field-clear': 'y'}, {}, 'field'), False)
+
+    def test_context(self):
+        context = ClearableFileInput().get_context('name', None, {})
+        self.assertNotIn('initial_text_file_count', context['widget'])
+
+        context = ClearableFileInput(multiple=True).get_context('name', [], {})
+        self.assertNotIn('initial_text_file_count', context['widget'])
+
+        context = ClearableFileInput(multiple=True).get_context('name', [
+            SimpleUploadedFile('file1', b''),
+            SimpleUploadedFile('file2', b''),
+        ], {})
+        self.assertIn('initial_text_file_count', context['widget'])
+        self.assertEqual(context['widget']['initial_text_file_count'], '2 files')
+
+    def test_format_value(self):
+        file = SimpleUploadedFile('file', b'')
+        file.url = 'file'  # fake url to bypass 'is_initial'
+        value = ClearableFileInput().format_value(file)
+        self.assertEqual(value, file)
+
+        value = ClearableFileInput(multiple=True).format_value([file])
+        self.assertEqual(value, file)
+
+        value = ClearableFileInput(multiple=True).format_value([file, file])
+        self.assertEqual(value, [file, file])

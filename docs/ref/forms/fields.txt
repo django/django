@@ -606,10 +606,13 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
       ``max_length``
 
-    Has two optional arguments for validation, ``max_length`` and
-    ``allow_empty_file``. If provided, these ensure that the file name is at
-    most the given length, and that validation will succeed even if the file
-    content is empty.
+    .. versionchanged:: 3.0
+
+    Has three optional arguments for validation, ``max_length``,
+    ``allow_empty_file`` and ``multiple``. If provided, these ensure that the
+    file name is at most the given length, that validation will succeed even
+    if the file content is empty, and allow uploading multiple files using a
+    single file input.
 
     To learn more about the ``UploadedFile`` object, see the :doc:`file uploads
     documentation </topics/http/file-uploads>`.

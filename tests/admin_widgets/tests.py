@@ -458,6 +458,23 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
             '<input type="file" name="test">',
         )
 
+    def test_render_multiple(self):
+        w = widgets.AdminFileWidget(multiple=True)
+        self.assertHTMLEqual(
+            w.render('test', [self.album.cover_art, self.album.cover_art]),
+            '<p class="file-upload">Currently: 2 files'
+            '<span class="clearable-file-input">'
+            '<input type="checkbox" name="test-clear" id="test-clear_id"> '
+            '<label for="test-clear_id">Clear</label></span><br>'
+            'Change: <input multiple type="file" name="test"></p>' % {
+                'STORAGE_URL': default_storage.url(''),
+            },
+        )
+        self.assertHTMLEqual(
+            w.render('test', SimpleUploadedFile('test', b'content')),
+            '<input multiple type="file" name="test">',
+        )
+
     def test_render_required(self):
         widget = widgets.AdminFileWidget()
         widget.is_required = True

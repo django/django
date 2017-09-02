@@ -127,11 +127,13 @@ field in the model::
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
+.. _topics-multi-file-upload:
+
 Uploading multiple files
 ------------------------
 
-If you want to upload multiple files using one form field, set the ``multiple``
-HTML attribute of field's widget:
+If you want to upload multiple files using one form filed, pass
+``multiple=True`` to :class:`~django.forms.FileField`:
 
 .. code-block:: python
     :caption: forms.py
@@ -139,9 +141,9 @@ HTML attribute of field's widget:
     from django import forms
 
     class FileFieldForm(forms.Form):
-        file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+        file_field = forms.FileField(widget=forms.ClearableFileInput(multiple=True))
 
-Then override the ``post`` method of your
+Then override the ``from_valid`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
 uploads:
 
@@ -156,16 +158,10 @@ uploads:
         template_name = 'upload.html'  # Replace with your template.
         success_url = '...'  # Replace with your URL or reverse().
 
-        def post(self, request, *args, **kwargs):
-            form_class = self.get_form_class()
-            form = self.get_form(form_class)
-            files = request.FILES.getlist('file_field')
-            if form.is_valid():
-                for f in files:
-                    ...  # Do something with each file.
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
+        def form_valid(self, form):
+            for f in form.cleaned_data['file_field']:
+                ...  # Do something with each file.
+            return super().form_valid(form)
 
 Upload Handlers
 ===============

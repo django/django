@@ -376,13 +376,30 @@ class FileInput(Input):
     needs_multipart_form = True
     template_name = 'django/forms/widgets/file.html'
 
+    def __init__(self, attrs=None, multiple=False):
+        if attrs is None:
+            attrs = {}
+        self.multiple = multiple
+        if multiple:
+            attrs['multiple'] = True
+        super().__init__(attrs=attrs)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['widget']['multiple'] = self.multiple
+        return context
+
     def format_value(self, value):
         """File input never renders a value."""
         return
 
     def value_from_datadict(self, data, files, name):
-        "File widgets take data from FILES, not POST"
-        return files.get(name)
+        """
+        Return single file or a list of files associated with the input.
+
+        File widgets take data from FILES, not POST.
+        """
+        return files.getlist(name) if self.multiple else files.get(name)
 
     def value_omitted_from_data(self, data, files, name):
         return name not in files
@@ -394,6 +411,7 @@ FILE_INPUT_CONTRADICTION = object()
 class ClearableFileInput(FileInput):
     clear_checkbox_label = _('Clear')
     initial_text = _('Currently')
+    initial_text_file_count = _('%(count)s files')
     input_text = _('Change')
     template_name = 'django/forms/widgets/clearable_file_input.html'
 
@@ -414,13 +432,17 @@ class ClearableFileInput(FileInput):
         """
         Return whether value is considered to be initial value.
         """
-        return bool(value and getattr(value, 'url', False))
+        if not self.multiple:
+            value = [value]
+        return any(v and getattr(v, 'url', False) for v in value)
 
     def format_value(self, value):
         """
         Return the file object if it has a defined url attribute.
         """
         if self.is_initial(value):
+            if self.multiple and len(value) == 1:
+                return value[0]
             return value
 
     def get_context(self, name, value, attrs):
@@ -435,6 +457,10 @@ class ClearableFileInput(FileInput):
             'initial_text': self.initial_text,
             'clear_checkbox_label': self.clear_checkbox_label,
         })
+        if self.multiple and len(value) > 1:
+            context['widget']['initial_text_file_count'] = self.initial_text_file_count % {
+                'count': len(value),
+            }
         return context
 
     def value_from_datadict(self, data, files, name):
