@@ -232,3 +232,5 @@ how to remove usage of these features.
 
 * The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
   is removed.
+
+* ``django.test.runner.setup_databases()`` is removed.
