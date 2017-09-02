@@ -2,10 +2,8 @@
 Internationalization support.
 """
 import re
-import warnings
 from contextlib import ContextDecorator
 
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import lazy
 
 __all__ = [
@@ -214,21 +212,6 @@ def templatize(src, **kwargs):
 
 def deactivate_all():
     return _trans.deactivate_all()
-
-
-def _string_concat(*strings):
-    """
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
-    """
-    warnings.warn(
-        'django.utils.translate.string_concat() is deprecated in '
-        'favor of django.utils.text.format_lazy().',
-        RemovedInDjango21Warning, stacklevel=2)
-    return ''.join(str(s) for s in strings)
-
-
-string_concat = lazy(_string_concat, str)
 
 
 def get_language_info(lang_code):

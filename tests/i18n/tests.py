@@ -12,11 +12,9 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
-    override_settings,
+    RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
@@ -27,8 +25,8 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, string_concat, to_locale, trans_real,
-    ugettext, ugettext_lazy, ungettext, ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, to_locale, trans_real, ugettext,
+    ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -215,10 +213,6 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(pgettext("month name", "May"), "Mai")
             self.assertEqual(pgettext("verb", "May"), "Kann")
             self.assertEqual(npgettext("search", "%d result", "%d results", 4) % 4, "4 Resultate")
-
-    @ignore_warnings(category=RemovedInDjango21Warning)
-    def test_string_concat(self):
-        self.assertEqual(str(string_concat('dja', 'ngo')), 'django')
 
     def test_empty_value(self):
         """Empty value must stay empty after being translated (#23196)."""

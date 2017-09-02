@@ -1057,17 +1057,6 @@ functions without the ``u``.
 
     See :ref:`lazy translations documentation <lazy-translations>`.
 
-.. function:: string_concat(*strings)
-
-    .. deprecated:: 1.11
-
-        Use :meth:`django.utils.text.format_lazy` instead.
-        ``string_concat(*strings)`` can be replaced by
-        ``format_lazy('{}' * len(strings), *strings)``.
-
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
-
 .. function:: activate(language)
 
     Fetches the translation object for a given language and activates it as

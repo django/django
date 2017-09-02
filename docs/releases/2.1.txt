@@ -234,3 +234,5 @@ how to remove usage of these features.
   is removed.
 
 * ``django.test.runner.setup_databases()`` is removed.
+
+* ``django.utils.translation.string_concat()`` is removed.
