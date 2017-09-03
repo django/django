@@ -994,6 +994,8 @@ class BooleanField(Field):
         return self.to_python(value)
 
     def formfield(self, **kwargs):
+        # Unlike most fields, BooleanField figures out include_blank from
+        # self.null instead of self.blank.
         defaults = {'form_class': forms.BooleanField}
         if self.blank or self.null:
             defaults.update({'null': True})
