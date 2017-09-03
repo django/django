@@ -19,7 +19,7 @@ from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
-from django.utils import timezone, typecasting
+from django.utils import timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
@@ -971,19 +971,21 @@ class BooleanField(Field):
         return 'NullBooleanField' if self.null else 'BooleanField'
 
     def to_python(self, value):
-        if self.blank and value in self.empty_values:
+        if self.null and value in self.empty_values:
             return None
-        try:
-            return typecasting.force_cast_boolean(
-                value,
-                nullable=self.blank or self.null,
-            )
-        except (TypeError, ValueError):
-            raise exceptions.ValidationError(
-                self.error_messages['invalid'],
-                code='invalid',
-                params={'value': value},
-            )
+        if value in (True, False):
+            # if value is 1 or 0 than it's equal to True or False, but we want
+            # to return a true bool for semantic reasons.
+            return bool(value)
+        if value in ('t', 'True', '1'):
+            return True
+        if value in ('f', 'False', '0'):
+            return False
+        raise exceptions.ValidationError(
+            self.error_messages['invalid'],
+            code='invalid',
+            params={'value': value},
+        )
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)

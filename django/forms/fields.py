@@ -27,7 +27,7 @@ from django.forms.widgets import (
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, TextInput, TimeInput,
     URLInput,
 )
-from django.utils import formats, typecasting
+from django.utils import formats
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
@@ -703,7 +703,29 @@ class BooleanField(Field):
         super().__init__(**kwargs)
 
     def to_python(self, value):
-        return typecasting.cast_boolean_from_field(value, nullable=self.null)
+        if not self.null:
+            # Explicitly check for the string 'False', which is what a hidden field
+            # will submit for False. Also check for '0', since this is what
+            # RadioSelect will provide. Because bool("True") == bool('1') == True,
+            # we don't need to handle that explicitly.
+            if isinstance(value, str) and value.lower() in ('false', '0'):
+                value = False
+            else:
+                value = bool(value)
+            return super().to_python(value)
+        else:
+            # Explicitly check for the string 'True' and 'False', which is what a
+            # hidden field will submit for True and False, for 'true' and 'false',
+            # which are likely to be returned by JavaScript serializations of forms,
+            # and for '1' and '0', which is what a RadioField will submit. Unlike
+            # the Booleanfield, this field must check for True because it doesn't
+            # use the bool() function.
+            if value in (True, 'True', 'true', '1'):
+                return True
+            elif value in (False, 'False', 'false', '0'):
+                return False
+            else:
+                return None
 
     def validate(self, value):
         if not value and self.required and not self.null:

@@ -12,7 +12,7 @@ from itertools import chain
 from django.conf import settings
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
-from django.utils import datetime_safe, formats, typecasting
+from django.utils import datetime_safe, formats
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
@@ -529,8 +529,12 @@ class CheckboxInput(Input):
             # A missing value means False because HTML form submission does not
             # send results for unselected checkboxes.
             return False
-        else:
-            return typecasting.cast_boolean_from_html(data.get(name))
+        value = data.get(name)
+        # Translate true and false strings to boolean values.
+        values = {'true': True, 'false': False}
+        if isinstance(value, str):
+            value = values.get(value.lower(), value)
+        return bool(value)
 
     def value_omitted_from_data(self, data, files, name):
         # HTML checkboxes don't appear in POST data if not checked, so it's
