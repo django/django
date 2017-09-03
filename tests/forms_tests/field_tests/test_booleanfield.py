@@ -17,7 +17,7 @@ class BooleanFieldTest(SimpleTestCase):
                 f.clean(value)
 
     def test_booleanfield_clean_null(self):
-        f = BooleanField(required=False)
+        f = BooleanField(required=False, null=True)
         self.assertIs(f.clean(None), None)
         self.assertIs(f.clean(''), None)
 

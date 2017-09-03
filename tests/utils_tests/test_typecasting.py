@@ -18,7 +18,10 @@ class BooleanCastingTests(SimpleTestCase):
         self.assertIs(cast_boolean_from_field('True'), True)
 
     def test_string_casting(self):
-        self.assertIs(cast_boolean_from_field('kittens'), True)
+        self.assertIs(cast_boolean_from_field('kittens', nullable=False), True)
+
+    def test_string_casting_nullable(self):
+        self.assertIs(cast_boolean_from_field('kittens'), None)
 
     def test_string_casting_uses_strtobool(self):
         with patch('django.utils.typecasting.strtobool') as mock_strtobool:

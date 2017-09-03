@@ -7,21 +7,24 @@ def _force_cast_boolean_string(value):
     return bool(strtobool(value))
 
 
-def _cast_boolean_string(value):
+def _cast_boolean_string(value, nullable=False):
     if value == '':
         return None
     try:
         return _force_cast_boolean_string(value)
     except BaseException:
-        return bool(value)
+        if not nullable:
+            return bool(value)
+        else:
+            return None
 
 
-def _cast_boolean(value):
+def _cast_boolean(value, nullable=False):
     # cast to true boolean types for convenience
     if value in (0, 1):
         return bool(value)
     elif isinstance(value, str):
-        return _cast_boolean_string(value)
+        return _cast_boolean_string(value, nullable)
     else:
         return value
 
@@ -34,7 +37,7 @@ def cast_boolean_from_field(value, nullable=True):
     if value == '':
         value = None
     else:
-        value = _cast_boolean(value)
+        value = _cast_boolean(value, nullable)
     if not nullable and value is None:
         return False
     else:

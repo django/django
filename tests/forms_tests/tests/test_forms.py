@@ -29,18 +29,6 @@ class Person(Form):
     birthday = DateField()
 
 
-class PersonMaybeCool(Form):
-    name = CharField()
-    is_cool = NullBooleanField()
-
-
-class CoolPersonWithDemographics(Form):
-    name = CharField()
-    is_cool = NullBooleanField()
-    email = EmailField(required=False)
-    age = IntegerField()
-
-
 class PersonNew(Form):
     first_name = CharField(widget=TextInput(attrs={'id': 'first_name_id'}))
     last_name = CharField()
@@ -50,11 +38,6 @@ class PersonNew(Form):
 class MultiValueDictLike(dict):
     def getlist(self, key):
         return [self[key]]
-
-
-class SignupForm(Form):
-    email = EmailField()
-    get_spam = BooleanField()
 
 
 class FormsTestCase(SimpleTestCase):
@@ -433,12 +416,15 @@ class FormsTestCase(SimpleTestCase):
 <input type="text" name="birthday" id="birthday" required /></li>"""
         )
 
-    def test_various_boolean_values_1(self):
+    def test_various_boolean_values(self):
+        class SignupForm(Form):
+            email = EmailField()
+            get_spam = BooleanField()
+
         f = SignupForm(auto_id=False)
         self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" required />')
         self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" required />')
 
-    def test_various_boolean_values_2(self):
         f = SignupForm({'email': 'test@example.com', 'get_spam': True}, auto_id=False)
         self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" value="test@example.com" required />')
         self.assertHTMLEqual(
@@ -446,7 +432,6 @@ class FormsTestCase(SimpleTestCase):
             '<input checked type="checkbox" name="get_spam" required />',
         )
 
-    def test_various_boolean_values_3(self):
         # 'True' or 'true' should be rendered without a value attribute
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'True'}, auto_id=False)
         self.assertHTMLEqual(
@@ -454,21 +439,17 @@ class FormsTestCase(SimpleTestCase):
             '<input checked type="checkbox" name="get_spam" required />',
         )
 
-    def test_various_boolean_values_4(self):
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'true'}, auto_id=False)
         self.assertHTMLEqual(
             str(f['get_spam']), '<input checked type="checkbox" name="get_spam" required />')
 
-    def test_various_boolean_values_5(self):
         # A value of 'False' or 'false' should be rendered unchecked
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'False'}, auto_id=False)
         self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" required />')
 
-    def test_various_boolean_values_6(self):
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'false'}, auto_id=False)
         self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" required />')
 
-    def test_various_boolean_values_7(self):
         # A value of '0' should be interpreted as a True value (#16820)
         f = SignupForm({'email': 'test@example.com', 'get_spam': '0'})
         self.assertTrue(f.is_valid())
@@ -2366,50 +2347,44 @@ Password: <input type="password" name="password" required />
         p = Person(prefix='bar')
         self.assertEqual(p.prefix, 'bar')
 
-    def test_forms_with_null_boolean_1(self):
+    def test_forms_with_null_boolean(self):
         # NullBooleanField is a bit of a special case because its presentation (widget)
         # is different than its data. This is handled transparently, though.
-        p = PersonMaybeCool({'name': 'Joe'}, auto_id=False)
+        class Person(Form):
+            name = CharField()
+            is_cool = NullBooleanField()
+
+        p = Person({'name': 'Joe'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
-
-    def test_forms_with_null_boolean_2(self):
-        p = PersonMaybeCool({'name': 'Joe', 'is_cool': '1'}, auto_id=False)
+        p = Person({'name': 'Joe', 'is_cool': '1'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
-
-    def test_forms_with_null_boolean_3(self):
-        p = PersonMaybeCool({'name': 'Joe', 'is_cool': '2'}, auto_id=False)
+        p = Person({'name': 'Joe', 'is_cool': '2'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
-
-    def test_forms_with_null_boolean_4(self):
-        p = PersonMaybeCool({'name': 'Joe', 'is_cool': '3'}, auto_id=False)
+        p = Person({'name': 'Joe', 'is_cool': '3'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected>No</option>
 </select>""")
-
-    def test_forms_with_null_boolean_5(self):
-        p = PersonMaybeCool({'name': 'Joe', 'is_cool': True}, auto_id=False)
+        p = Person({'name': 'Joe', 'is_cool': True}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
-
-    def test_forms_with_null_boolean_6(self):
-        p = PersonMaybeCool({'name': 'Joe', 'is_cool': False}, auto_id=False)
+        p = Person({'name': 'Joe', 'is_cool': False}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
@@ -2758,8 +2733,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<input type="hidden" name="initial-field1" id="initial-id_field1" /></td></tr>'
         )
 
-    def test_error_html_required_html_classes_ul(self):
-        p = CoolPersonWithDemographics({})
+    def test_error_html_required_html_classes(self):
+        class Person(Form):
+            name = CharField()
+            is_cool = NullBooleanField()
+            email = EmailField(required=False)
+            age = IntegerField()
+
+        p = Person({})
         p.error_css_class = 'error'
         p.required_css_class = 'required'
 
@@ -2778,11 +2759,6 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <label class="required" for="id_age">Age:</label> <input type="number" name="age" id="id_age" required /></li>"""
         )
 
-    def test_error_html_required_html_classes_p(self):
-        p = CoolPersonWithDemographics({})
-        p.error_css_class = 'error'
-        p.required_css_class = 'required'
-
         self.assertHTMLEqual(
             p.as_p(),
             """<ul class="errorlist"><li>This field is required.</li></ul>
@@ -2799,11 +2775,6 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <p class="required error"><label class="required" for="id_age">Age:</label>
 <input type="number" name="age" id="id_age" required /></p>"""
         )
-
-    def test_error_html_required_html_classes_table(self):
-        p = CoolPersonWithDemographics({})
-        p.error_css_class = 'error'
-        p.required_css_class = 'required'
 
         self.assertHTMLEqual(
             p.as_table(),
