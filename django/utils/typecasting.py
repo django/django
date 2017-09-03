@@ -4,43 +4,67 @@ INVALID_TYPE_ERROR = "'{value}' could not be cast to a boolean value."
 
 
 def _force_cast_boolean_string(value):
-    if value == '':
-        return None
-    else:
-        return bool(strtobool(value))
+    return bool(strtobool(value))
+
 
 def _cast_boolean_string(value):
+    if value == '':
+        return None
     try:
         return _force_cast_boolean_string(value)
     except BaseException:
         return bool(value)
 
-def cast_boolean(value):
-    '''
-    basic casting is used for form field inputs, where invalid input
-    should be passsed through, and exceptions ignored
-    '''
+
+def _cast_boolean(value):
+    # cast to true boolean types for convenience
     if value in (0, 1):
         return bool(value)
-    # A value of '0' should be interpreted as a True value
-    # (#16820) https://code.djangoproject.com/ticket/16820
-    elif value == '0':
-        return True
     elif isinstance(value, str):
         return _cast_boolean_string(value)
     else:
         return value
 
+
+def cast_boolean_from_field(value, nullable=True):
+    '''
+    basic casting is used for form field inputs,
+    where invalid input should be passsed through
+    '''
+    if value == '':
+        value = None
+    else:
+        value = _cast_boolean(value)
+    if not nullable and value is None:
+        return False
+    else:
+        return value
+
+
+def cast_boolean_from_html(value):
+    '''
+    html casting is used for form widgets, and should handle
+    the idiosyncrasies of HTML POST data
+    '''
+    # A value of '0' should be interpreted as a True value (#16820)
+    if value == '0':
+        return True
+    if value == '':
+        return None
+    else:
+        return _cast_boolean(value)
+
+
 def force_cast_boolean(value):
     '''
-    forced casting is used for model field inputs, where invalid input
-    should raise an exception
+    forced casting is used for model field inputs,
+    where invalid input should raise an exception
     '''
     if isinstance(value, str):
         return _force_cast_boolean_string(value)
-    elif isinstance(cast_boolean(value), bool):
-        return cast_boolean(value)
-    elif cast_boolean(value) == None:
+    elif isinstance(_cast_boolean(value), bool):
+        return _cast_boolean(value)
+    elif _cast_boolean(value) is None:
         return None
     else:
         raise TypeError(INVALID_TYPE_ERROR.format(value=value))

@@ -703,7 +703,7 @@ class BooleanField(Field):
         super().__init__(**kwargs)
 
     def to_python(self, value):
-        return typecasting.cast_boolean(value)
+        return typecasting.cast_boolean_from_field(value, nullable=self.null)
 
     def validate(self, value):
         if not value and self.required and not self.null:

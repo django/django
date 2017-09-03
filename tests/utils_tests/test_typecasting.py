@@ -4,41 +4,41 @@ Tests for django/utils/typecasting.py
 from unittest.mock import call, patch
 
 from django.test import SimpleTestCase
-from django.utils.typecasting import cast_boolean, force_cast_boolean
+from django.utils.typecasting import cast_boolean_from_field, force_cast_boolean
 
 
 class BooleanCastingTests(SimpleTestCase):
 
     def test_falsey_string_casting(self):
-        self.assertIsInstance(cast_boolean('False'), bool)
-        self.assertIs(cast_boolean('False'), False)
+        self.assertIsInstance(cast_boolean_from_field('False'), bool)
+        self.assertIs(cast_boolean_from_field('False'), False)
 
     def test_truthy_string_casting(self):
-        self.assertIsInstance(cast_boolean('True'), bool)
-        self.assertIs(cast_boolean('True'), True)
+        self.assertIsInstance(cast_boolean_from_field('True'), bool)
+        self.assertIs(cast_boolean_from_field('True'), True)
 
     def test_string_casting(self):
-        self.assertIs(cast_boolean('kittens'), True)
+        self.assertIs(cast_boolean_from_field('kittens'), True)
 
     def test_string_casting_uses_strtobool(self):
         with patch('django.utils.typecasting.strtobool') as mock_strtobool:
-            cast_boolean('False')
+            cast_boolean_from_field('False')
             mock_strtobool.assert_has_calls([call('False')])
 
     def test_empty_string_casting(self):
-        self.assertIs(cast_boolean(''), None)
+        self.assertIs(cast_boolean_from_field(''), None)
 
     def test_none_casting(self):
-        self.assertIs(cast_boolean(None), None)
+        self.assertIs(cast_boolean_from_field(None), None)
 
     def test_int_casting(self):
-        self.assertIsInstance(cast_boolean(1), bool)
-        self.assertIs(cast_boolean(1), True)
-        self.assertIsInstance(cast_boolean(0), bool)
-        self.assertIs(cast_boolean(0), False)
+        self.assertIsInstance(cast_boolean_from_field(1), bool)
+        self.assertIs(cast_boolean_from_field(1), True)
+        self.assertIsInstance(cast_boolean_from_field(0), bool)
+        self.assertIs(cast_boolean_from_field(0), False)
 
     def test_invalid_object_casting(self):
-        self.assertEqual(cast_boolean([]), [])
+        self.assertEqual(cast_boolean_from_field([]), [])
 
 
 class BooleanForcedCastingTests(SimpleTestCase):
@@ -61,7 +61,8 @@ class BooleanForcedCastingTests(SimpleTestCase):
             mock_strtobool.assert_has_calls([call('False')])
 
     def test_forced_empty_string_casting(self):
-        self.assertIs(force_cast_boolean(''), None)
+        with self.assertRaises(BaseException):
+            force_cast_boolean('')
 
     def test_forced_none_casting(self):
         self.assertIs(force_cast_boolean(None), None)
