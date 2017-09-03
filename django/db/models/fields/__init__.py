@@ -968,7 +968,7 @@ class BooleanField(Field):
     description = _("Boolean (Either True or False)")
 
     def get_internal_type(self):
-        return "BooleanField"
+        return 'NullBooleanField' if self.null else 'BooleanField'
 
     def to_python(self, value):
         if self.blank and value in self.empty_values:
