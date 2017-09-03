@@ -48,12 +48,12 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.BooleanField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {})
+        self.assertEqual(kwargs, {'blank': True})
         field = models.BooleanField(default=True)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.BooleanField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"default": True})
+        self.assertEqual(kwargs, {"default": True, 'blank': True})
 
     def test_char_field(self):
         field = models.CharField(max_length=65)
