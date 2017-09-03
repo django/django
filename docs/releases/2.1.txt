@@ -254,3 +254,5 @@ how to remove usage of these features.
 
 * The ``USE_ETAGS`` setting is removed. ``CommonMiddleware`` and
   ``django.utils.cache.patch_response_headers()`` no longer set ETags.
+
+* The ``Model._meta.has_auto_field`` attribute is removed.

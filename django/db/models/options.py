@@ -1,6 +1,5 @@
 import copy
 import inspect
-import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 
@@ -13,7 +12,6 @@ from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
@@ -817,19 +815,6 @@ class Options:
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
         return fields
-
-    @property
-    def has_auto_field(self):
-        warnings.warn(
-            'Model._meta.has_auto_field is deprecated in favor of checking if '
-            'Model._meta.auto_field is not None.',
-            RemovedInDjango21Warning, stacklevel=2
-        )
-        return self.auto_field is not None
-
-    @has_auto_field.setter
-    def has_auto_field(self, value):
-        pass
 
     @cached_property
     def _property_names(self):
