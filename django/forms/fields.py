@@ -686,7 +686,6 @@ class URLField(CharField):
 
 
 class BooleanField(Field):
-
     widget = CheckboxInput # TODO!!! allow NullBooleanSelect when null=True
 
     def to_python(self, value):
@@ -710,7 +709,10 @@ class NullBooleanField(BooleanField):
     to None.
     """
     widget = NullBooleanSelect
-    required = False
+
+    def __init__(self, **kwargs):
+        kwargs.update({'required': False})
+        super().__init__(**kwargs)
 
 
 class CallableChoiceIterator:
