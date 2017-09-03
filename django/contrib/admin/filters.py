@@ -250,7 +250,7 @@ class BooleanFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg2]),
                 'display': title,
             }
-        if self.field.null or isinstance(self.field, models.NullBooleanField):
+        if self.field.null:
             yield {
                 'selected': self.lookup_val2 == 'True',
                 'query_string': changelist.get_query_string({
