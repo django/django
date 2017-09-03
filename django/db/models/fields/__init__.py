@@ -971,15 +971,14 @@ class BooleanField(Field):
         return "BooleanField"
 
     def to_python(self, value):
-        '''
-        Differs from the forms.fields implementation because of including
-        the `in self.empty_values` check
-        '''
         if self.blank and value in self.empty_values:
             return None
         try:
-            return typecasting.force_cast_boolean(value)
-        except TypeError:
+            return typecasting.force_cast_boolean(
+                value,
+                nullable=self.blank or self.null,
+            )
+        except (TypeError, AttributeError):
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',

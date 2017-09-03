@@ -56,28 +56,32 @@ class BooleanForcedCastingTests(SimpleTestCase):
         self.assertIsInstance(force_cast_boolean('True'), bool)
         self.assertIs(force_cast_boolean('True'), True)
 
-    def test_forced_string_casting(self):
-        with self.assertRaises(BaseException):
-            force_cast_boolean('kittens')
-
     def test_forced_string_casting_uses_strtobool(self):
         with patch('django.utils.typecasting.strtobool') as mock_strtobool:
             force_cast_boolean('False')
             mock_strtobool.assert_has_calls([call('False')])
 
+    def test_forced_string_casting(self):
+        with self.assertRaises(ValueError):
+            force_cast_boolean('kittens')
+
     def test_forced_empty_string_casting(self):
-        with self.assertRaises(BaseException):
+        with self.assertRaises(ValueError):
             force_cast_boolean('')
 
+    def test_forced_invalid_object_casting(self):
+        with self.assertRaises(TypeError):
+            force_cast_boolean([])
+
     def test_forced_none_casting(self):
-        self.assertIs(force_cast_boolean(None), None)
+        with self.assertRaises(TypeError):
+            self.assertIs(force_cast_boolean(None), None)
+
+    def test_forced_none_nullable_casting(self):
+        self.assertIs(force_cast_boolean(None, nullable=True), None)
 
     def test_forced_int_casting(self):
         self.assertIsInstance(force_cast_boolean(1), bool)
         self.assertIs(force_cast_boolean(1), True)
         self.assertIsInstance(force_cast_boolean(0), bool)
         self.assertIs(force_cast_boolean(0), False)
-
-    def test_forced_invalid_object_casting(self):
-        with self.assertRaises(BaseException):
-            force_cast_boolean([])

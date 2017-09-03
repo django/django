@@ -3,15 +3,11 @@ from distutils.util import strtobool
 INVALID_TYPE_ERROR = "'{value}' could not be cast to a boolean value."
 
 
-def _force_cast_boolean_string(value):
-    return bool(strtobool(value))
-
-
 def _cast_boolean_string(value, nullable=False):
     if value == '':
         return None
     try:
-        return _force_cast_boolean_string(value)
+        return bool(strtobool(value))
     except BaseException:
         if not nullable:
             return bool(value)
@@ -34,10 +30,12 @@ def cast_boolean_from_field(value, nullable=True):
     basic casting is used for form field inputs,
     where invalid input should be passsed through
     '''
+    # obtain value
     if value == '':
         value = None
     else:
         value = _cast_boolean(value, nullable)
+    # evaluate nullable
     if not nullable and value is None:
         return False
     else:
@@ -58,16 +56,25 @@ def cast_boolean_from_html(value):
         return _cast_boolean(value)
 
 
-def force_cast_boolean(value):
+def force_cast_boolean(value, nullable=False):
     '''
     forced casting is used for model field inputs,
     where invalid input should raise an exception
     '''
+    # obtain value
     if isinstance(value, str):
-        return _force_cast_boolean_string(value)
-    elif isinstance(_cast_boolean(value), bool):
-        return _cast_boolean(value)
-    elif _cast_boolean(value) is None:
+        value = bool(strtobool(value))
+    elif isinstance(_cast_boolean(value, nullable), bool):
+        value = _cast_boolean(value, nullable)
+    elif _cast_boolean(value, nullable) is None:
+        value = None
+    # evaluate nullable, boolean
+    if nullable and value is None:
         return None
-    else:
+    elif (
+        not nullable and value is None
+        or not isinstance(value, bool)
+    ):
         raise TypeError(INVALID_TYPE_ERROR.format(value=value))
+    else:
+        return value
