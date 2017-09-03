@@ -43,3 +43,6 @@ Bugfixes
 
 * Fixed non-deterministic results or an ``AssertionError`` crash in some
   queries with multiple joins (:ticket:`26522`).
+
+* Fixed a regression in ``contrib.auth``'s ``login()`` and ``logout()`` views
+  where they ignored positional arguments (:ticket:`28550`).

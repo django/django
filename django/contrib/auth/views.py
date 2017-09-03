@@ -133,12 +133,21 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
 
 
 @deprecate_current_app
-def login(request, *args, **kwargs):
+def login(request, template_name='registration/login.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm,
+          extra_context=None, redirect_authenticated_user=False):
     warnings.warn(
         'The login() view is superseded by the class-based LoginView().',
         RemovedInDjango21Warning, stacklevel=2
     )
-    return LoginView.as_view(**kwargs)(request, *args, **kwargs)
+    return LoginView.as_view(
+        template_name=template_name,
+        redirect_field_name=redirect_field_name,
+        form_class=authentication_form,
+        extra_context=extra_context,
+        redirect_authenticated_user=redirect_authenticated_user,
+    )(request)
 
 
 class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
@@ -202,12 +211,20 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
 
 
 @deprecate_current_app
-def logout(request, *args, **kwargs):
+def logout(request, next_page=None,
+           template_name='registration/logged_out.html',
+           redirect_field_name=REDIRECT_FIELD_NAME,
+           extra_context=None):
     warnings.warn(
         'The logout() view is superseded by the class-based LogoutView().',
         RemovedInDjango21Warning, stacklevel=2
     )
-    return LogoutView.as_view(**kwargs)(request, *args, **kwargs)
+    return LogoutView.as_view(
+        next_page=next_page,
+        template_name=template_name,
+        redirect_field_name=redirect_field_name,
+        extra_context=extra_context,
+    )(request)
 
 
 _sentinel = object()
