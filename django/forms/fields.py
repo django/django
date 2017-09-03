@@ -686,7 +686,8 @@ class URLField(CharField):
 
 
 class BooleanField(Field):
-    widget = CheckboxInput
+
+    widget = CheckboxInput # TODO!!! allow NullBooleanSelect when null=True
 
     def to_python(self, value):
         return typecasting.cast_boolean(value)
@@ -709,10 +710,7 @@ class NullBooleanField(BooleanField):
     to None.
     """
     widget = NullBooleanSelect
-
-    def validate(self, value):
-        """Disable `required` validation"""
-        pass
+    required = False
 
 
 class CallableChoiceIterator:
