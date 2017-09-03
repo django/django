@@ -239,3 +239,5 @@ how to remove usage of these features.
 
 * ``django.core.cache.backends.memcached.PyLibMCCache`` no longer supports
   passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
+
+* The ``host`` parameter of ``django.utils.http.is_safe_url()`` is removed.
