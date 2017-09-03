@@ -246,3 +246,6 @@ how to remove usage of these features.
   tag is removed.
 
 * ``DatabaseIntrospection.get_indexes()`` is removed.
+
+* The ``authenticate()`` method of authentication backends requires ``request``
+  as the first positional argument.
