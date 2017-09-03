@@ -750,10 +750,10 @@ class ListFiltersTests(TestCase):
         modeladmin = BookAdmin2(Book, site)
 
         request = self.request_factory.get('/')
-        changelist = self.get_changelist(request, Book, modeladmin)
+        changelist = modeladmin.get_changelist_instance(request)
 
         request = self.request_factory.get('/', {'is_best_seller2__exact': 0})
-        changelist = self.get_changelist(request, Book, modeladmin)
+        changelist = modeladmin.get_changelist_instance(request)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
@@ -767,7 +767,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['query_string'], '?is_best_seller2__exact=0')
 
         request = self.request_factory.get('/', {'is_best_seller2__exact': 1})
-        changelist = self.get_changelist(request, Book, modeladmin)
+        changelist = modeladmin.get_changelist_instance(request)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
@@ -781,7 +781,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['query_string'], '?is_best_seller2__exact=1')
 
         request = self.request_factory.get('/', {'is_best_seller2__isnull': 'True'})
-        changelist = self.get_changelist(request, Book, modeladmin)
+        changelist = modeladmin.get_changelist_instance(request)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
