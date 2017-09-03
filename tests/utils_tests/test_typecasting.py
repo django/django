@@ -4,7 +4,9 @@ Tests for django/utils/typecasting.py
 from unittest.mock import call, patch
 
 from django.test import SimpleTestCase
-from django.utils.typecasting import cast_boolean_from_field, force_cast_boolean
+from django.utils.typecasting import (
+    cast_boolean_from_field, force_cast_boolean,
+)
 
 
 class BooleanCastingTests(SimpleTestCase):
