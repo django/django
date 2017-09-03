@@ -86,6 +86,9 @@ class DataSourceTest(unittest.TestCase):
             with self.assertRaises(IndexError):
                 ds[len(ds)]
 
+            with self.assertRaises(IndexError):
+                ds['invalid']
+
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
         for source in bad_ds:

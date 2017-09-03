@@ -28,7 +28,7 @@ destroy_ds = void_output(lgdal.OGR_DS_Destroy, [c_void_p], errcheck=False)
 release_ds = void_output(lgdal.OGRReleaseDataSource, [c_void_p])
 get_ds_name = const_string_output(lgdal.OGR_DS_GetName, [c_void_p])
 get_layer = voidptr_output(lgdal.OGR_DS_GetLayer, [c_void_p, c_int])
-get_layer_by_name = voidptr_output(lgdal.OGR_DS_GetLayerByName, [c_void_p, c_char_p])
+get_layer_by_name = voidptr_output(lgdal.OGR_DS_GetLayerByName, [c_void_p, c_char_p], errcheck=False)
 get_layer_count = int_output(lgdal.OGR_DS_GetLayerCount, [c_void_p])
 
 # Layer Routines
