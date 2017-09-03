@@ -23,7 +23,7 @@ class BooleanFieldTest(SimpleTestCase):
         self.assertTrue(f.clean('Django rocks'))
         self.assertTrue(f.clean('True'))
 
-    def test_booleanfield_clean_booleans(self):
+    def test_booleanfield_clean_booleans_none(self):
         f = BooleanField(required=False)
         self.assertIs(f.clean(None), None)
         self.assertIs(f.clean(True), True)

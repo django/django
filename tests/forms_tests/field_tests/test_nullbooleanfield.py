@@ -6,17 +6,23 @@ from . import FormFieldAssertionsMixin
 
 class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
-    def test_nullbooleanfield_clean(self):
+    def test_nullbooleanfield_clean_none(self):
         f = NullBooleanField()
         self.assertIsNone(f.clean(''))
-        self.assertTrue(f.clean(True))
-        self.assertFalse(f.clean(False))
         self.assertIsNone(f.clean(None))
-        self.assertFalse(f.clean('0'))
-        self.assertTrue(f.clean('1'))
         self.assertIsNone(f.clean('2'))
         self.assertIsNone(f.clean('3'))
         self.assertIsNone(f.clean('hello'))
+
+    def test_nullbooleanfield_clean_booleans_none(self):
+        f = NullBooleanField()
+        self.assertTrue(f.clean(True))
+        self.assertFalse(f.clean(False))
+
+    def test_booleanfield_clean_strings(self):
+        f = NullBooleanField()
+        self.assertFalse(f.clean('0'))
+        self.assertTrue(f.clean('1'))
         self.assertTrue(f.clean('true'))
         self.assertFalse(f.clean('false'))
 
