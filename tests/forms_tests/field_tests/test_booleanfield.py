@@ -6,31 +6,34 @@ from django.test import SimpleTestCase
 
 class BooleanFieldTest(SimpleTestCase):
 
-    def test_booleanfield_clean_1(self):
+    def test_booleanfield_clean_false_required(self):
+        f = BooleanField(required=True)
+        test_values = ['', None, False, 0, 'False']
+        for value in test_values:
+            with self.assertRaisesMessage(
+                ValidationError,
+                'This field is required.',
+            ):
+                f.clean(value)
+
+    def test_booleanfield_clean_true(self):
         f = BooleanField()
-        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
-            f.clean('')
-        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
-            f.clean(None)
         self.assertTrue(f.clean(True))
-        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
-            f.clean(False)
         self.assertTrue(f.clean(1))
-        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
-            f.clean(0)
         self.assertTrue(f.clean('Django rocks'))
         self.assertTrue(f.clean('True'))
-        with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
-            f.clean('False')
 
-    def test_booleanfield_clean_2(self):
+    def test_booleanfield_clean_booleans(self):
         f = BooleanField(required=False)
-        self.assertIs(f.clean(''), False)
-        self.assertIs(f.clean(None), False)
+        self.assertIs(f.clean(None), None)
         self.assertIs(f.clean(True), True)
         self.assertIs(f.clean(False), False)
         self.assertIs(f.clean(1), True)
         self.assertIs(f.clean(0), False)
+
+    def test_booleanfield_clean_strings(self):
+        f = BooleanField(required=False)
+        self.assertIs(f.clean(''), None)
         self.assertIs(f.clean('1'), True)
         self.assertIs(f.clean('0'), False)
         self.assertIs(f.clean('Django rocks'), True)
@@ -41,22 +44,30 @@ class BooleanFieldTest(SimpleTestCase):
     def test_boolean_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(BooleanField())), BooleanField)
 
-    def test_booleanfield_changed(self):
+    def test_booleanfield_has_changed_empty_value(self):
         f = BooleanField()
         self.assertFalse(f.has_changed(None, None))
         self.assertFalse(f.has_changed(None, ''))
         self.assertFalse(f.has_changed('', None))
         self.assertFalse(f.has_changed('', ''))
+        self.assertTrue(f.has_changed(True, ''))
+
+    def test_booleanfield_has_changed_advanced_truthy_strings(self):
+        # Initial value may have mutated to a string due to show_hidden_initial (#19537)
+        f = BooleanField()
+        self.assertTrue(f.has_changed('False', 'on'))
         self.assertTrue(f.has_changed(False, 'on'))
         self.assertFalse(f.has_changed(True, 'on'))
-        self.assertTrue(f.has_changed(True, ''))
-        # Initial value may have mutated to a string due to show_hidden_initial (#19537)
-        self.assertTrue(f.has_changed('False', 'on'))
-        # HiddenInput widget sends string values for boolean but doesn't clean them in value_from_datadict
-        self.assertFalse(f.has_changed(False, 'False'))
-        self.assertFalse(f.has_changed(True, 'True'))
+
+    def test_booleanfield_has_changed_basic_truthy_strings(self):
+        f = BooleanField()
         self.assertTrue(f.has_changed(False, 'True'))
         self.assertTrue(f.has_changed(True, 'False'))
+
+    def test_booleanfield_has_not_changed_basic_truthy_strings(self):
+        f = BooleanField()
+        self.assertFalse(f.has_changed(False, 'False'))
+        self.assertFalse(f.has_changed(True, 'True'))
 
     def test_disabled_has_changed(self):
         f = BooleanField(disabled=True)
