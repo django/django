@@ -5,7 +5,6 @@ import decimal
 import itertools
 import uuid
 import warnings
-import distutils.util
 from base64 import b64decode, b64encode
 from functools import total_ordering
 
