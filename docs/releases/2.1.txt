@@ -249,3 +249,5 @@ how to remove usage of these features.
 
 * The ``authenticate()`` method of authentication backends requires ``request``
   as the first positional argument.
+
+* The ``django.db.models.permalink()`` decorator is removed.
