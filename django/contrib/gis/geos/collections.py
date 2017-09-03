@@ -34,7 +34,7 @@ class GeometryCollection(GEOSGeometry):
         self._check_allowed(init_geoms)
 
         # Creating the geometry pointer array.
-        collection = self._create_collection(len(init_geoms), iter(init_geoms))
+        collection = self._create_collection(len(init_geoms), init_geoms)
         super().__init__(collection, **kwargs)
 
     def __iter__(self):

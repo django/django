@@ -1137,10 +1137,10 @@ Django also defines a set of fields that represent relations.
 ``ForeignKey``
 --------------
 
-.. class:: ForeignKey(othermodel, on_delete, **options)
+.. class:: ForeignKey(to, on_delete, **options)
 
-A many-to-one relationship. Requires a positional argument: the class to which
-the model is related.
+A many-to-one relationship. Requires two positional arguments: the class to
+which the model is related and the :attr:`~ForeignKey.on_delete` option.
 
 .. _recursive-relationships:
 
@@ -1430,7 +1430,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 ``ManyToManyField``
 -------------------
 
-.. class:: ManyToManyField(othermodel, **options)
+.. class:: ManyToManyField(to, **options)
 
 A many-to-many relationship. Requires a positional argument: the class to
 which the model is related, which works exactly the same as it does for
@@ -1633,7 +1633,7 @@ relationship at the database level.
 ``OneToOneField``
 -----------------
 
-.. class:: OneToOneField(othermodel, on_delete, parent_link=False, **options)
+.. class:: OneToOneField(to, on_delete, parent_link=False, **options)
 
 A one-to-one relationship. Conceptually, this is similar to a
 :class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the

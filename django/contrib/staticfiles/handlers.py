@@ -21,6 +21,11 @@ class StaticFilesHandler(WSGIHandler):
         self.base_url = urlparse(self.get_base_url())
         super().__init__()
 
+    def load_middleware(self):
+        # Middleware are already loaded for self.application; no need to reload
+        # them for self.
+        pass
+
     def get_base_url(self):
         utils.check_settings()
         return settings.STATIC_URL

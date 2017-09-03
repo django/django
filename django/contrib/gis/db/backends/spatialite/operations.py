@@ -10,11 +10,19 @@ from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import wkb_r, wkt_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
+
+
+class SpatialiteNullCheckOperator(SpatialOperator):
+    def as_sql(self, connection, lookup, template_params, sql_params):
+        sql, params = super().as_sql(connection, lookup, template_params, sql_params)
+        return '%s > 0' % sql, params
 
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
@@ -29,19 +37,18 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     unionagg = 'GUnion'
 
     from_text = 'GeomFromText'
-    select = 'AsText(%s)'
 
     gis_operators = {
         # Binary predicates
-        'equals': SpatialOperator(func='Equals'),
-        'disjoint': SpatialOperator(func='Disjoint'),
-        'touches': SpatialOperator(func='Touches'),
-        'crosses': SpatialOperator(func='Crosses'),
-        'within': SpatialOperator(func='Within'),
-        'overlaps': SpatialOperator(func='Overlaps'),
-        'contains': SpatialOperator(func='Contains'),
-        'intersects': SpatialOperator(func='Intersects'),
-        'relate': SpatialOperator(func='Relate'),
+        'equals': SpatialiteNullCheckOperator(func='Equals'),
+        'disjoint': SpatialiteNullCheckOperator(func='Disjoint'),
+        'touches': SpatialiteNullCheckOperator(func='Touches'),
+        'crosses': SpatialiteNullCheckOperator(func='Crosses'),
+        'within': SpatialiteNullCheckOperator(func='Within'),
+        'overlaps': SpatialiteNullCheckOperator(func='Overlaps'),
+        'contains': SpatialiteNullCheckOperator(func='Contains'),
+        'intersects': SpatialiteNullCheckOperator(func='Intersects'),
+        'relate': SpatialiteNullCheckOperator(func='Relate'),
         # Returns true if B's bounding box completely contains A's bounding box.
         'contained': SpatialOperator(func='MbrWithin'),
         # Returns true if A's bounding box completely contains B's bounding box.
@@ -49,13 +56,17 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         # Returns true if A's bounding box overlaps B's bounding box.
         'bboverlaps': SpatialOperator(func='MbrOverlaps'),
         # These are implemented here as synonyms for Equals
-        'same_as': SpatialOperator(func='Equals'),
-        'exact': SpatialOperator(func='Equals'),
+        'same_as': SpatialiteNullCheckOperator(func='Equals'),
+        'exact': SpatialiteNullCheckOperator(func='Equals'),
         # Distance predicates
         'dwithin': SpatialOperator(func='PtDistWithin'),
     }
 
     disallowed_aggregates = (aggregates.Extent3D,)
+
+    @cached_property
+    def select(self):
+        return 'CAST (AsEWKB(%s) AS BLOB)' if self.spatial_version >= (4, 3, 0) else 'AsText(%s)'
 
     @cached_property
     def function_names(self):
@@ -186,3 +197,14 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def spatial_ref_sys(self):
         from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys
         return SpatialiteSpatialRefSys
+
+    def get_geometry_converter(self, expression):
+        if self.spatial_version >= (4, 3, 0):
+            read = wkb_r().read
+            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))
+        else:
+            read = wkt_r().read
+            srid = expression.output_field.srid
+            if srid == -1:
+                srid = None
+            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value), srid)

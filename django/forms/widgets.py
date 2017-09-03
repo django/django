@@ -52,6 +52,9 @@ class Media:
         self._css = css
         self._js = js
 
+    def __repr__(self):
+        return 'Media(css=%r, js=%r)' % (self._css, self._js)
+
     def __str__(self):
         return self.render()
 
@@ -580,7 +583,7 @@ class ChoiceWidget(Widget):
         groups = []
         has_selected = False
 
-        for index, (option_value, option_label) in enumerate(chain(self.choices)):
+        for index, (option_value, option_label) in enumerate(self.choices):
             if option_value is None:
                 option_value = ''
 
@@ -955,7 +958,7 @@ class SelectDateWidget(Widget):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         date_context = {}
-        year_choices = [(i, i) for i in self.years]
+        year_choices = [(i, str(i)) for i in self.years]
         if not self.is_required:
             year_choices.insert(0, self.year_none_value)
         year_attrs = context['widget']['attrs'].copy()

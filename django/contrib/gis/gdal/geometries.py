@@ -555,7 +555,7 @@ class LineString(OGRGeometry):
 
     def __getitem__(self, index):
         "Return the Point at the given index."
-        if index >= 0 and index < self.point_count:
+        if 0 <= index < self.point_count:
             x, y, z = c_double(), c_double(), c_double()
             capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
             dim = self.coord_dim
@@ -625,10 +625,10 @@ class Polygon(OGRGeometry):
 
     def __getitem__(self, index):
         "Get the ring at the specified index."
-        if index < 0 or index >= self.geom_count:
-            raise OGRIndexError('index out of range: %s' % index)
-        else:
+        if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
+        else:
+            raise OGRIndexError('index out of range: %s' % index)
 
     # Polygon Properties
     @property
@@ -664,10 +664,10 @@ class GeometryCollection(OGRGeometry):
 
     def __getitem__(self, index):
         "Get the Geometry at the specified index."
-        if index < 0 or index >= self.geom_count:
-            raise OGRIndexError('index out of range: %s' % index)
-        else:
+        if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
+        else:
+            raise OGRIndexError('index out of range: %s' % index)
 
     def __iter__(self):
         "Iterate over each Geometry."

@@ -1,4 +1,6 @@
+from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.functions import Distance
+from django.utils.functional import cached_property
 
 
 class BaseSpatialOperations:
@@ -12,6 +14,10 @@ class BaseSpatialOperations:
 
     # How the geometry column should be selected.
     select = None
+
+    @cached_property
+    def select_extent(self):
+        return self.select
 
     # Does the spatial database have a geometry or geography type?
     geography = False
@@ -117,3 +123,15 @@ class BaseSpatialOperations:
         raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method')
 
     distance_expr_for_lookup = staticmethod(Distance)
+
+    def get_db_converters(self, expression):
+        converters = super().get_db_converters(expression)
+        if isinstance(expression.output_field, GeometryField):
+            converters.append(self.get_geometry_converter(expression))
+        return converters
+
+    def get_geometry_converter(self, expression):
+        raise NotImplementedError(
+            'Subclasses of BaseSpatialOperations must provide a '
+            'get_geometry_converter() method.'
+        )

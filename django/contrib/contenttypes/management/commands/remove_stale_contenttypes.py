@@ -47,7 +47,7 @@ class Command(BaseCommand):
                                 len(objs),
                                 obj_type._meta.label,
                             ))
-                        content_type_display = '\n'.join(ct_info)
+                    content_type_display = '\n'.join(ct_info)
                     self.stdout.write("""Some content types in your database are stale and can be deleted.
 Any objects that depend on these content types will also be deleted.
 The content types and dependent objects that would be deleted are:

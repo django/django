@@ -320,7 +320,7 @@ class Token:
 
     def split_contents(self):
         split = []
-        bits = iter(smart_split(self.contents))
+        bits = smart_split(self.contents)
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):

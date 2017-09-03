@@ -357,8 +357,8 @@ class SQLCompiler:
 
     def get_extra_select(self, order_by, select):
         extra_select = []
-        select_sql = [t[1] for t in select]
         if self.query.distinct and not self.query.distinct_fields:
+            select_sql = [t[1] for t in select]
             for expr, (sql, params, is_ref) in order_by:
                 without_ordering = self.ordering_parts.search(sql).group(1)
                 if not is_ref and (without_ordering, params) not in select_sql:
@@ -942,16 +942,15 @@ class SQLCompiler:
     def apply_converters(self, rows, converters):
         connection = self.connection
         converters = list(converters.items())
-        for row in rows:
-            row = list(row)
+        for row in map(list, rows):
             for pos, (convs, expression) in converters:
                 value = row[pos]
                 for converter in convs:
                     value = converter(value, expression, connection)
                 row[pos] = value
-            yield tuple(row)
+            yield row
 
-    def results_iter(self, results=None):
+    def results_iter(self, results=None, tuple_expected=False):
         """Return an iterator over the results from executing this query."""
         if results is None:
             results = self.execute_sql(MULTI)
@@ -960,6 +959,8 @@ class SQLCompiler:
         rows = chain.from_iterable(results)
         if converters:
             rows = self.apply_converters(rows, converters)
+            if tuple_expected:
+                rows = map(tuple, rows)
         return rows
 
     def has_results(self):

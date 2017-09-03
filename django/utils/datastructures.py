@@ -10,7 +10,7 @@ class OrderedSet:
     """
 
     def __init__(self, iterable=None):
-        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
+        self.dict = OrderedDict.fromkeys(iterable or ())
 
     def add(self, item):
         self.dict[item] = None

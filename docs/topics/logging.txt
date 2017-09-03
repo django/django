@@ -456,8 +456,8 @@ Django provides several built-in loggers.
 ``django``
 ~~~~~~~~~~
 
-``django`` is the catch-all logger. No messages are posted directly to
-this logger.
+The catch-all logger for messages in the  ``django`` hierarchy. No messages are
+posted using this name but instead using one of the loggers below.
 
 .. _django-request-logger:
 
@@ -656,7 +656,7 @@ Python logging module.
 Filters
 -------
 
-Django provides two log filters in addition to those provided by the Python
+Django provides some log filters in addition to those provided by the Python
 logging module.
 
 .. class:: CallbackFilter(callback)
@@ -734,18 +734,19 @@ By default, Django configures the following logging:
 
 When :setting:`DEBUG` is ``True``:
 
-* The ``django`` catch-all logger sends all messages at the ``INFO`` level or
-  higher to the console.
+* The ``django`` logger sends messages in the ``django`` hierarchy (except
+  ``django.server``) at the ``INFO`` level or higher to the console.
 
 When :setting:`DEBUG` is ``False``:
 
-* The ``django`` logger send messages with ``ERROR`` or ``CRITICAL`` level to
+* The ``django`` logger sends messages in the ``django`` hierarchy (except
+  ``django.server``)  with ``ERROR`` or ``CRITICAL`` level to
   :class:`AdminEmailHandler`.
 
 Independent of the value of :setting:`DEBUG`:
 
-* The :ref:`django-server-logger` logger sends all messages at the ``INFO``
-  level or higher to the console.
+* The :ref:`django-server-logger` logger sends messages at the ``INFO`` level
+  or higher to the console.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

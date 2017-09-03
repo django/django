@@ -19,7 +19,8 @@ class BrinIndex(Index):
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
-        kwargs['pages_per_range'] = self.pages_per_range
+        if self.pages_per_range is not None:
+            kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
 
     def create_sql(self, model, schema_editor, using=''):
@@ -41,8 +42,10 @@ class GinIndex(Index):
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
-        kwargs['fastupdate'] = self.fastupdate
-        kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
+        if self.fastupdate is not None:
+            kwargs['fastupdate'] = self.fastupdate
+        if self.gin_pending_list_limit is not None:
+            kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
         return path, args, kwargs
 
     def create_sql(self, model, schema_editor, using=''):

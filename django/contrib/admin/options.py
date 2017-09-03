@@ -627,8 +627,8 @@ class ModelAdmin(BaseModelAdmin):
         exclude = exclude or None
 
         # Remove declared form fields which are in readonly_fields.
-        new_attrs = OrderedDict(
-            (f, None) for f in readonly_fields
+        new_attrs = OrderedDict.fromkeys(
+            f for f in readonly_fields
             if f in self.form.declared_fields
         )
         form = type(self.form.__name__, (self.form,), new_attrs)
@@ -658,6 +658,32 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.views.main import ChangeList
         return ChangeList
+
+    def get_changelist_instance(self, request):
+        """
+        Return a `ChangeList` instance based on `request`. May raise
+        `IncorrectLookupParameters`.
+        """
+        list_display = self.get_list_display(request)
+        list_display_links = self.get_list_display_links(request, list_display)
+        # Add the action checkboxes if any actions are available.
+        if self.get_actions(request):
+            list_display = ['action_checkbox'] + list(list_display)
+        ChangeList = self.get_changelist(request)
+        return ChangeList(
+            request,
+            self.model,
+            list_display,
+            list_display_links,
+            self.get_list_filter(request),
+            self.date_hierarchy,
+            self.get_search_fields(request),
+            self.get_list_select_related(request),
+            self.list_per_page,
+            self.list_max_show_all,
+            self.list_editable,
+            self,
+        )
 
     def get_object(self, request, object_id, from_field=None):
         """
@@ -1442,10 +1468,6 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
-                if not add:
-                    # Evalute querysets in form.initial so that changes to
-                    # ManyToManyFields are reflected in this change's LogEntry.
-                    form.has_changed()
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
                 change_message = self.construct_change_message(request, form, formsets, add)
@@ -1522,26 +1544,8 @@ class ModelAdmin(BaseModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
 
-        list_display = self.get_list_display(request)
-        list_display_links = self.get_list_display_links(request, list_display)
-        list_filter = self.get_list_filter(request)
-        search_fields = self.get_search_fields(request)
-        list_select_related = self.get_list_select_related(request)
-
-        # Check actions to see if any are available on this changelist
-        actions = self.get_actions(request)
-        if actions:
-            # Add the action checkboxes if there are any actions available.
-            list_display = ['action_checkbox'] + list(list_display)
-
-        ChangeList = self.get_changelist(request)
         try:
-            cl = ChangeList(
-                request, self.model, list_display,
-                list_display_links, list_filter, self.date_hierarchy,
-                search_fields, list_select_related, self.list_per_page,
-                self.list_max_show_all, self.list_editable, self,
-            )
+            cl = self.get_changelist_instance(request)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -1562,6 +1566,7 @@ class ModelAdmin(BaseModelAdmin):
         action_failed = False
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
 
+        actions = self.get_actions(request)
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
                 'index' in request.POST and '_save' not in request.POST):

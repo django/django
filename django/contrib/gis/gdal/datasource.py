@@ -96,9 +96,10 @@ class DataSource(GDALBase):
             if not layer:
                 raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):
-            if index < 0 or index >= self.layer_count:
+            if 0 <= index < self.layer_count:
+                layer = capi.get_layer(self._ptr, index)
+            else:
                 raise OGRIndexError('index out of range')
-            layer = capi.get_layer(self._ptr, index)
         else:
             raise TypeError('Invalid index type: %s' % type(index))
         return Layer(layer, self)

@@ -1832,3 +1832,15 @@ Settings
 A string specifying the location of the GDAL library.  Typically,
 this setting is only used if the GDAL library is in a non-standard
 location (e.g., ``/home/john/lib/libgdal.so``).
+
+Exceptions
+==========
+
+.. exception:: GDALException
+
+    The base GDAL exception, indicating a GDAL-related error.
+
+.. exception:: SRSException
+
+    An exception raised when an error occurs when constructing or using a
+    spatial reference system object.
