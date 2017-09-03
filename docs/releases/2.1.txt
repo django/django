@@ -258,3 +258,6 @@ how to remove usage of these features.
 * The ``Model._meta.has_auto_field`` attribute is removed.
 
 * Support for regular expression groups with ``iLmsu#`` in ``url()`` is removed.
+
+* Support for ``Widget.render()`` methods without the ``renderer`` argument
+  is removed.

@@ -274,11 +274,6 @@ foundation for custom widgets.
         ``None``, the renderer from the :setting:`FORM_RENDERER` setting is
         used.
 
-        .. versionchanged:: 1.11
-
-            The ``renderer`` argument was added. Support for subclasses that
-            don't accept it will be removed in Django 2.1.
-
     .. method:: value_from_datadict(data, files, name)
 
         Given a dictionary of data and this widget's name, returns the value
