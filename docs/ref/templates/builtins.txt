@@ -1468,11 +1468,6 @@ used. Assuming the same settings as the previous example::
 outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
 ``es`` locale is ``r'j \d\e F \d\e Y'``.
 
-.. versionchanged:: 1.10
-
-    In older versions, the :setting:`DATE_FORMAT` setting (without
-    localization) is always used when a format string isn't given.
-
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
 
@@ -2184,11 +2179,6 @@ used::
 is the same as::
 
     {{ value|time:"TIME_FORMAT" }}
-
-.. versionchanged:: 1.10
-
-    In older versions, the :setting:`TIME_FORMAT` setting (without
-    localization) is always used when a format string isn't given.
 
 .. templatefilter:: timesince
 
