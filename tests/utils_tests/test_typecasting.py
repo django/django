@@ -1,10 +1,10 @@
 '''
 Tests for django/utils/typecasting.py
 '''
-from unittest.mock import patch, call
+from unittest.mock import call, patch
 
-from django.utils.typecasting import cast_boolean, force_cast_boolean
 from django.test import SimpleTestCase
+from django.utils.typecasting import cast_boolean, force_cast_boolean
 
 
 class BooleanCastingTests(SimpleTestCase):
