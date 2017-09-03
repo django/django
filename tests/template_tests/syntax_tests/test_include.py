@@ -1,10 +1,7 @@
-import warnings
-
 from django.template import (
     Context, Engine, TemplateDoesNotExist, TemplateSyntaxError, loader,
 )
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.test import SimpleTestCase
 
 from ..utils import setup
 from .test_basic import basic_templates
@@ -39,24 +36,8 @@ class IncludeTagTests(SimpleTestCase):
     @setup({'include04': 'a{% include "nonexistent" %}b'})
     def test_include04(self):
         template = self.engine.get_template('include04')
-
-        if self.engine.debug:
-            with self.assertRaises(TemplateDoesNotExist):
-                template.render(Context({}))
-        else:
-            with warnings.catch_warnings(record=True) as warns:
-                warnings.simplefilter('always')
-                output = template.render(Context({}))
-
-            self.assertEqual(output, "ab")
-
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns[0].message),
-                "Rendering {% include 'include04' %} raised "
-                "TemplateDoesNotExist. In Django 2.1, this exception will be "
-                "raised rather than silenced and rendered as an empty string.",
-            )
+        with self.assertRaises(TemplateDoesNotExist):
+            template.render(Context({}))
 
     @setup({
         'include 05': 'template with a space',
@@ -178,48 +159,28 @@ class IncludeTagTests(SimpleTestCase):
     @setup({'include-error07': '{% include "include-fail1" %}'}, include_fail_templates)
     def test_include_error07(self):
         template = self.engine.get_template('include-error07')
-
-        if self.engine.debug:
-            with self.assertRaises(RuntimeError):
-                template.render(Context())
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(Context()), '')
+        with self.assertRaises(RuntimeError):
+            template.render(Context())
 
     @setup({'include-error08': '{% include "include-fail2" %}'}, include_fail_templates)
     def test_include_error08(self):
         template = self.engine.get_template('include-error08')
-
-        if self.engine.debug:
-            with self.assertRaises(TemplateSyntaxError):
-                template.render(Context())
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(Context()), '')
+        with self.assertRaises(TemplateSyntaxError):
+            template.render(Context())
 
     @setup({'include-error09': '{% include failed_include %}'}, include_fail_templates)
     def test_include_error09(self):
         context = Context({'failed_include': 'include-fail1'})
         template = self.engine.get_template('include-error09')
-
-        if self.engine.debug:
-            with self.assertRaises(RuntimeError):
-                template.render(context)
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(context), '')
+        with self.assertRaises(RuntimeError):
+            template.render(context)
 
     @setup({'include-error10': '{% include failed_include %}'}, include_fail_templates)
     def test_include_error10(self):
         context = Context({'failed_include': 'include-fail2'})
         template = self.engine.get_template('include-error10')
-
-        if self.engine.debug:
-            with self.assertRaises(TemplateSyntaxError):
-                template.render(context)
-        else:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertEqual(template.render(context), '')
+        with self.assertRaises(TemplateSyntaxError):
+            template.render(context)
 
 
 class IncludeTests(SimpleTestCase):

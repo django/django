@@ -241,3 +241,6 @@ how to remove usage of these features.
   passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
 
 * The ``host`` parameter of ``django.utils.http.is_safe_url()`` is removed.
+
+* Silencing of exceptions raised while rendering the ``{% include %}`` template
+  tag is removed.

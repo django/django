@@ -711,21 +711,6 @@ available to the included template::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
-If the included template causes an exception while it's rendered (including
-if it's missing or has syntax errors), the behavior varies depending on the
-:class:`template engine's <django.template.Engine>` ``debug`` option (if not
-set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
-turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
-:exc:`~django.template.TemplateSyntaxError` will be raised. When debug mode
-is turned off, ``{% include %}`` logs a warning to the ``django.template``
-logger with the exception that happens while rendering the included template
-and returns an empty string.
-
-.. deprecated:: 1.11
-
-    Silencing exceptions raised while rendering the ``{% include %}`` template
-    tag is deprecated. In Django 2.1, the exception will be raised.
-
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
     "render this subtemplate and include the HTML", not as "parse this
