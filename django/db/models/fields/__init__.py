@@ -971,7 +971,11 @@ class BooleanField(Field):
         return "BooleanField"
 
     def to_python(self, value):
-        if self.null and value in self.empty_values:
+        '''
+        Differs from the forms.fields implementation because of including
+        the `in self.empty_values` check
+        '''
+        if self.blank and value in self.empty_values:
             return None
         try:
             return typecasting.force_cast_boolean(value)
@@ -989,24 +993,14 @@ class BooleanField(Field):
         return self.to_python(value)
 
     def formfield(self, **kwargs):
-        # Unlike most fields, BooleanField figures out include_blank from
-        # self.null instead of self.blank.
-        defaults = {
-            'form_class': forms.NullBooleanField
-            if self.null else forms.BooleanField
-        }
+        defaults = {'form_class': forms.BooleanField}
         if self.blank or self.choices:
-            if self.choices:
-                include_blank = not (self.has_default() or 'initial' in kwargs)
-                defaults = {'choices': self.get_choices(include_blank=include_blank)}
-            else:
-                defaults.update({'required': False})
-        else:
-            # In the checkbox case, 'required' means "must be checked (=> true)",
-            # which is different from the choices case ("must select some value").
-            # Since we want to allow both True and False (checked/unchecked) choices,
-            # set 'required' to False.
             defaults.update({'required': False})
+        if self.choices:
+            include_blank = not (self.has_default() or 'initial' in kwargs)
+            defaults.update({
+                'choices': self.get_choices(include_blank=include_blank),
+            })
         defaults.update(kwargs)
         return super().formfield(**defaults)
 
