@@ -1,4 +1,3 @@
-import warnings
 from collections import namedtuple
 
 from MySQLdb.constants import FIELD_TYPE
@@ -8,7 +7,6 @@ from django.db.backends.base.introspection import (
 )
 from django.db.models.indexes import Index
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango21Warning
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'is_unsigned'))
 InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
@@ -138,33 +136,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 AND referenced_column_name IS NOT NULL""", [table_name])
         key_columns.extend(cursor.fetchall())
         return key_columns
-
-    def get_indexes(self, cursor, table_name):
-        warnings.warn(
-            "get_indexes() is deprecated in favor of get_constraints().",
-            RemovedInDjango21Warning, stacklevel=2
-        )
-        cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
-        # Do a two-pass search for indexes: on first pass check which indexes
-        # are multicolumn, on second pass check which single-column indexes
-        # are present.
-        rows = list(cursor.fetchall())
-        multicol_indexes = set()
-        for row in rows:
-            if row[3] > 1:
-                multicol_indexes.add(row[2])
-        indexes = {}
-        for row in rows:
-            if row[2] in multicol_indexes:
-                continue
-            if row[4] not in indexes:
-                indexes[row[4]] = {'primary_key': False, 'unique': False}
-            # It's possible to have the unique and PK constraints in separate indexes.
-            if row[2] == 'PRIMARY':
-                indexes[row[4]]['primary_key'] = True
-            if not row[1]:
-                indexes[row[4]]['unique'] = True
-        return indexes
 
     def get_storage_engine(self, cursor, table_name):
         """

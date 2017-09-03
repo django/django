@@ -244,3 +244,5 @@ how to remove usage of these features.
 
 * Silencing of exceptions raised while rendering the ``{% include %}`` template
   tag is removed.
+
+* ``DatabaseIntrospection.get_indexes()`` is removed.
