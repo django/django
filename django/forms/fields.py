@@ -686,7 +686,19 @@ class URLField(CharField):
 
 
 class BooleanField(Field):
-    widget = CheckboxInput # TODO!!! allow NullBooleanSelect when null=True
+    """
+    A Field that displays a checkbox by default, and returns True or False
+
+    But if given required=False or choices, it displays a Select instead
+    and by default returns True, False, None
+    """
+    widget = CheckboxInput
+    null_widget = NullBooleanSelect
+
+    def __init__(self, required=True, **kwargs):
+        if not required:
+            self.widget = self.null_widget
+        super().__init__(required=required, **kwargs)
 
     def to_python(self, value):
         return typecasting.cast_boolean(value)
@@ -705,10 +717,8 @@ class BooleanField(Field):
 
 class NullBooleanField(BooleanField):
     """
-    A field whose valid values are None, True, and False. Clean invalid values
-    to None.
+    A BooleanField that forces required=False
     """
-    widget = NullBooleanSelect
 
     def __init__(self, **kwargs):
         kwargs.update({'required': False})
