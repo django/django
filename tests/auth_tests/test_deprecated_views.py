@@ -9,9 +9,10 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
+from django.contrib.auth.views import login, logout
 from django.core import mail
 from django.http import QueryDict
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import ignore_warnings, patch_logger
 from django.utils.deprecation import RemovedInDjango21Warning
 
@@ -440,3 +441,48 @@ class SessionAuthenticationTests(AuthViewsTestCase):
         })
         # if the hash isn't updated, retrieving the redirection page will fail.
         self.assertRedirects(response, '/password_change/done/')
+
+
+@ignore_warnings(category=RemovedInDjango21Warning)
+class TestLogin(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request = self.factory.get('/')
+
+    def test_template_name(self):
+        response = login(self.request, 'template.html')
+        self.assertEqual(response.template_name, ['template.html'])
+
+    def test_form_class(self):
+        class NewForm(AuthenticationForm):
+            def confirm_login_allowed(self, user):
+                pass
+        response = login(self.request, 'template.html', None, NewForm)
+        self.assertEqual(response.context_data['form'].__class__.__name__, 'NewForm')
+
+    def test_extra_context(self):
+        extra_context = {'fake_context': 'fake_context'}
+        response = login(self.request, 'template.html', None, AuthenticationForm, extra_context)
+        self.assertEqual(response.resolve_context('fake_context'), 'fake_context')
+
+
+@ignore_warnings(category=RemovedInDjango21Warning)
+class TestLogout(AuthViewsTestCase):
+    def setUp(self):
+        self.login()
+        self.factory = RequestFactory()
+        self.request = self.factory.post('/')
+        self.request.session = self.client.session
+
+    def test_template_name(self):
+        response = logout(self.request, None, 'template.html')
+        self.assertEqual(response.template_name, ['template.html'])
+
+    def test_next_page(self):
+        response = logout(self.request, 'www.next_page.com')
+        self.assertEqual(response.url, 'www.next_page.com')
+
+    def test_extra_context(self):
+        extra_context = {'fake_context': 'fake_context'}
+        response = logout(self.request, None, 'template.html', None, extra_context)
+        self.assertEqual(response.resolve_context('fake_context'), 'fake_context')

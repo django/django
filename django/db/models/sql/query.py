@@ -11,7 +11,9 @@ from contextlib import suppress
 from itertools import chain, count, product
 from string import ascii_uppercase
 
-from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.core.exceptions import (
+    EmptyResultSet, FieldDoesNotExist, FieldError,
+)
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
@@ -25,7 +27,7 @@ from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, SINGLE,
 )
 from django.db.models.sql.datastructures import (
-    BaseTable, Empty, EmptyResultSet, Join, MultiJoin,
+    BaseTable, Empty, Join, MultiJoin,
 )
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
