@@ -32,15 +32,13 @@ from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
-    ignore_warnings, override_settings,
+    override_settings,
 )
 from django.test.signals import setting_changed
 from django.utils import timezone, translation
 from django.utils.cache import (
-    get_cache_key, learn_cache_key, patch_cache_control,
-    patch_response_headers, patch_vary_headers,
+    get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
 )
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
@@ -1838,11 +1836,9 @@ class CacheI18nTest(TestCase):
                 "Cache keys should include the time zone name when time zones are active"
             )
 
-    @ignore_warnings(category=RemovedInDjango21Warning)  # USE_ETAGS=True
     @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX="test",
         CACHE_MIDDLEWARE_SECONDS=60,
-        USE_ETAGS=True,
         USE_I18N=True,
     )
     def test_middleware(self):
@@ -1884,14 +1880,6 @@ class CacheI18nTest(TestCase):
         # The cache can be recovered
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, en_message.encode())
-        # ETags are used.
-        self.assertTrue(get_cache_data.has_header('ETag'))
-        # ETags can be disabled.
-        with self.settings(USE_ETAGS=False):
-            request._cache_update_cache = True
-            set_cache(request, 'en', en_message)
-            get_cache_data = FetchFromCacheMiddleware().process_request(request)
-            self.assertFalse(get_cache_data.has_header('ETag'))
         # change the session language and set content
         request = self.factory.get(self.path)
         request._cache_update_cache = True
@@ -1911,7 +1899,6 @@ class CacheI18nTest(TestCase):
     @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX="test",
         CACHE_MIDDLEWARE_SECONDS=60,
-        USE_ETAGS=True,
     )
     def test_middleware_doesnt_cache_streaming_response(self):
         request = self.factory.get(self.path)
@@ -2231,27 +2218,6 @@ class TestWithTemplateResponse(SimpleTestCase):
             'views.decorators.cache.cache_page.settingsprefix.GET.'
             '0f1c2d56633c943073c4569d9a9502fe.d41d8cd98f00b204e9800998ecf8427e'
         )
-
-    @override_settings(USE_ETAGS=False)
-    def test_without_etag(self):
-        template = engines['django'].from_string("This is a test")
-        response = TemplateResponse(HttpRequest(), template)
-        self.assertFalse(response.has_header('ETag'))
-        patch_response_headers(response)
-        self.assertFalse(response.has_header('ETag'))
-        response = response.render()
-        self.assertFalse(response.has_header('ETag'))
-
-    @ignore_warnings(category=RemovedInDjango21Warning)
-    @override_settings(USE_ETAGS=True)
-    def test_with_etag(self):
-        template = engines['django'].from_string("This is a test")
-        response = TemplateResponse(HttpRequest(), template)
-        self.assertFalse(response.has_header('ETag'))
-        patch_response_headers(response)
-        self.assertFalse(response.has_header('ETag'))
-        response = response.render()
-        self.assertTrue(response.has_header('ETag'))
 
 
 class TestMakeTemplateFragmentKey(SimpleTestCase):

@@ -251,3 +251,6 @@ how to remove usage of these features.
   as the first positional argument.
 
 * The ``django.db.models.permalink()`` decorator is removed.
+
+* The ``USE_ETAGS`` setting is removed. ``CommonMiddleware`` and
+  ``django.utils.cache.patch_response_headers()`` no longer set ETags.

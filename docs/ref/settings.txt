@@ -2593,23 +2593,6 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-.. setting:: USE_ETAGS
-
-``USE_ETAGS``
--------------
-
-Default: ``False``
-
-A boolean that specifies whether to output the ``ETag`` header. This saves
-bandwidth but slows down performance. This is used by the
-:class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
-framework </topics/cache>`.
-
-.. deprecated:: 1.11
-
-    This setting is deprecated in favor of using ``ConditionalGetMiddleware``,
-    which sets an ETag regardless of this setting.
-
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -3438,7 +3421,6 @@ HTTP
   * :setting:`SECURE_SSL_HOST`
   * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`
-* :setting:`USE_ETAGS`
 * :setting:`USE_X_FORWARDED_HOST`
 * :setting:`USE_X_FORWARDED_PORT`
 * :setting:`WSGI_APPLICATION`
