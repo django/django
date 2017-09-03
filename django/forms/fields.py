@@ -690,7 +690,7 @@ class BooleanField(Field):
     A Field that displays a Checkbox by default, and
     returns True or False
 
-    But if given null=False, it displays a Select instead and
+    But if given null=True, it displays a Select instead and
     returns True, False, or None
     """
     widget = CheckboxInput
