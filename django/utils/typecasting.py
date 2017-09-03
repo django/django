@@ -22,6 +22,10 @@ def cast_boolean(value):
     '''
     if value in (0, 1):
         return bool(value)
+    # A value of '0' should be interpreted as a True value
+    # (#16820) https://code.djangoproject.com/ticket/16820
+    elif value == '0':
+        return True
     elif isinstance(value, str):
         return _cast_boolean_string(value)
     else:
