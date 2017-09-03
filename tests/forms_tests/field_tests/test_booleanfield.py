@@ -16,20 +16,20 @@ class BooleanFieldTest(SimpleTestCase):
             ):
                 f.clean(value)
 
-    def test_booleanfield_clean_true(self):
-        f = BooleanField()
-        self.assertTrue(f.clean(True))
-        self.assertTrue(f.clean(1))
-        self.assertTrue(f.clean('Django rocks'))
-        self.assertTrue(f.clean('True'))
-
-    def test_booleanfield_clean_booleans_none(self):
+    def test_booleanfield_clean_general(self):
         f = BooleanField(required=False)
         self.assertIs(f.clean(None), None)
         self.assertIs(f.clean(True), True)
         self.assertIs(f.clean(False), False)
         self.assertIs(f.clean(1), True)
         self.assertIs(f.clean(0), False)
+
+    def test_booleanfield_clean_true(self):
+        f = BooleanField()
+        self.assertTrue(f.clean(True))
+        self.assertTrue(f.clean(1))
+        self.assertTrue(f.clean('Django rocks'))
+        self.assertTrue(f.clean('True'))
 
     def test_booleanfield_clean_strings(self):
         f = BooleanField(required=False)

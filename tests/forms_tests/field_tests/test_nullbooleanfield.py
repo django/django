@@ -10,11 +10,8 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = NullBooleanField()
         self.assertIsNone(f.clean(''))
         self.assertIsNone(f.clean(None))
-        self.assertIsNone(f.clean('2'))
-        self.assertIsNone(f.clean('3'))
-        self.assertIsNone(f.clean('hello'))
 
-    def test_nullbooleanfield_clean_booleans_none(self):
+    def test_nullbooleanfield_clean_booleans(self):
         f = NullBooleanField()
         self.assertTrue(f.clean(True))
         self.assertFalse(f.clean(False))
@@ -22,9 +19,12 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_booleanfield_clean_strings(self):
         f = NullBooleanField()
         self.assertFalse(f.clean('0'))
-        self.assertTrue(f.clean('1'))
-        self.assertTrue(f.clean('true'))
         self.assertFalse(f.clean('false'))
+        self.assertTrue(f.clean('1'))
+        self.assertTrue(f.clean('2'))
+        self.assertTrue(f.clean('3'))
+        self.assertTrue(f.clean('hello'))
+        self.assertTrue(f.clean('true'))
 
     def test_nullbooleanfield_2(self):
         # The internal value is preserved if using HiddenInput (#7753).
