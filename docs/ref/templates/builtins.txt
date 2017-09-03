@@ -887,11 +887,6 @@ attribute and calling the result ``country_list``.
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
 
-.. versionchanged:: 1.11
-
-    The group object was changed from a dictionary to a
-    :py:func:`~collections.namedtuple`.
-
 Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
 you can also write the previous example as::
 
@@ -981,8 +976,6 @@ attribute, allowing  you to group on the display string rather than the
 
 ``resetcycle``
 --------------
-
-.. versionadded:: 1.11
 
 Resets a previous `cycle`_ so that it restarts from its first item at its next
 encounter. Without arguments, ``{% resetcycle %}`` will reset the last

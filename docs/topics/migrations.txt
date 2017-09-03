@@ -670,10 +670,6 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 1.11
-
-    Serialization support for ``uuid.UUID`` was added.
-
 Django cannot serialize:
 
 - Nested classes

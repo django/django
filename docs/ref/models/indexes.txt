@@ -6,8 +6,6 @@ Model index reference
 
 .. currentmodule:: django.db.models
 
-.. versionadded:: 1.11
-
 Index classes ease creating database indexes. They can be added using the
 :attr:`Meta.indexes <django.db.models.Options.indexes>` option. This document
 explains the API references of :class:`Index` which includes the `index

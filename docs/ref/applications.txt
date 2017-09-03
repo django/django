@@ -240,10 +240,6 @@ Methods
     ``require_ready`` argument is set to ``False``. ``require_ready`` behaves
     exactly as in :meth:`apps.get_model()`.
 
-    .. versionadded:: 1.11
-
-        The ``require_ready`` keyword argument was added.
-
 .. method:: AppConfig.ready()
 
     Subclasses can override this method to perform initialization tasks such
@@ -372,10 +368,6 @@ Application registry
     example) until the app registry is fully populated. For this reason, it's
     best to leave ``require_ready`` to the default value of ``True`` whenever
     possible.
-
-    .. versionadded:: 1.11
-
-        The ``require_ready`` keyword argument was added.
 
 .. _app-loading-process:
 

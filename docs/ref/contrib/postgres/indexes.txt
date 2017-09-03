@@ -4,8 +4,6 @@ PostgreSQL specific model indexes
 
 .. module:: django.contrib.postgres.indexes
 
-.. versionadded:: 1.11
-
 The following are PostgreSQL specific :doc:`indexes </ref/models/indexes>`
 available from the ``django.contrib.postgres.indexes`` module.
 

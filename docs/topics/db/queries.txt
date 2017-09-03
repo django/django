@@ -660,10 +660,6 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 
     >>> F('somefield').bitand(16)
 
-.. versionchanged:: 1.11
-
-    Support for ``.bitrightshift()`` and ``.bitleftshift()`` was added.
-
 The ``pk`` lookup shortcut
 --------------------------
 

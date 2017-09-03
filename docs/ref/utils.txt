@@ -60,10 +60,6 @@ need to distinguish caches by the ``Accept-language`` header.
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
 
-    .. versionchanged:: 1.11
-
-        In older versions, the ``Last-Modified`` header was also set.
-
 .. function:: add_never_cache_headers(response)
 
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``
@@ -390,11 +386,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         Returns the latest ``pubdate`` or ``updateddate`` for all items in the
         feed. If no items have either of these attributes this returns the
         current UTC date/time.
-
-        .. versionchanged:: 1.11
-
-            In older versions, it returned the current date/time without any
-            timezone information.
 
 ``Enclosure``
 -------------
@@ -795,10 +786,6 @@ appropriate entities.
         >>> type(mystr)
         <type 'str'>
 
-    .. versionchanged:: 1.11
-
-        Added support for decorator usage.
-
 ``django.utils.text``
 =====================
 
@@ -806,8 +793,6 @@ appropriate entities.
     :synopsis: Text manipulation.
 
 .. function:: format_lazy(format_string, *args, **kwargs)
-
-    .. versionadded:: 1.11
 
     A version of :meth:`str.format` for when ``format_string``, ``args``,
     and/or ``kwargs`` contain lazy objects. The first argument is the string to
@@ -921,13 +906,7 @@ appropriate entities.
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
 
-    .. versionchanged:: 1.11
-
-        In older versions, ``value`` is a required argument.
-
 .. function:: localdate(value=None, timezone=None)
-
-    .. versionadded:: 1.11
 
     Uses :func:`localtime` to convert an aware :class:`~datetime.datetime` to a
     :meth:`~datetime.datetime.date` in a different time zone, by default the

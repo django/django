@@ -19,11 +19,6 @@ Program                   Description                           Required        
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
 
-.. versionchanged:: 1.11
-
-    In older versions, GDAL is required only for SQLite. Now it's required for
-    all databases.
-
 ..
     Libs release dates:
     GEOS 3.4.0 2013-08-11

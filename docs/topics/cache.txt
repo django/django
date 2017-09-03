@@ -168,11 +168,6 @@ permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
 
-.. versionchanged:: 1.11
-
-    The :setting:`LOCATION <CACHES-LOCATION>` setting now supports defining
-    multiple servers as a comma-delimited string.
-
 .. _database-caching:
 
 Database caching
@@ -527,10 +522,6 @@ Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
 
 * Sets the ``Cache-Control`` header to give a max age for the page --
   again, from the :setting:`CACHE_MIDDLEWARE_SECONDS` setting.
-
-.. versionchanged:: 1.11
-
-    In older versions, the ``Last-Modified`` header was also set.
 
 See :doc:`/topics/http/middleware` for more on middleware.
 

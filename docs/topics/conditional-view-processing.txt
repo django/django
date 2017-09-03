@@ -70,14 +70,6 @@ The decorator sets the ``ETag`` and ``Last-Modified`` headers on the response
 if they are not already set by the view and if the request's method is safe
 (``GET`` or ``HEAD``).
 
-.. versionchanged:: 1.11
-
-    In older versions, the return value from ``etag_func()`` was interpreted as
-    the unquoted part of the ETag. That prevented the use of weak ETags, which
-    have the format ``W/"<string>"``. The return value is now expected to be
-    an ETag as defined by the specification (including the quotes), although
-    the unquoted format is also accepted for backwards compatibility.
-
 Using this feature usefully is probably best explained with an example.
 Suppose you have this pair of models, representing a simple blog system::
 

@@ -29,10 +29,6 @@ Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
 True <USE_TZ>` in your settings file. Time zone support uses pytz_, which is
 installed when you install Django.
 
-.. versionchanged:: 1.11
-
-    Older versions don't require ``pytz`` or install it automatically.
-
 .. note::
 
     The default :file:`settings.py` file created by :djadmin:`django-admin

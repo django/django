@@ -44,11 +44,6 @@ GeoDjango's admin site
     Link to the URL of the OpenLayers JavaScript.  Defaults to
     ``'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js'``.
 
-    .. versionchanged:: 1.11
-
-        Older versions default to
-        ``'http://openlayers.org/api/2.13.1/OpenLayers.js'``.
-
     .. attribute:: modifiable
 
     Defaults to ``True``.  When set to ``False``, disables editing of

@@ -63,10 +63,6 @@ Adds a few conveniences for perfectionists:
 
 * Sets the ``Content-Length`` header for non-streaming responses.
 
-.. versionchanged:: 1.11
-
-    Older versions didn't set the ``Content-Length`` header.
-
 .. attribute:: CommonMiddleware.response_redirect_class
 
 Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
@@ -161,11 +157,6 @@ header, the middleware adds one if needed. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
-
-.. versionchanged:: 1.11
-
-    In older versions, the middleware set the ``Content-Length`` and ``Date``
-    headers and didn't set the ``ETag`` header.
 
 Locale middleware
 -----------------

@@ -136,10 +136,6 @@ Authenticating users
     ``request`` is an optional :class:`~django.http.HttpRequest` which is
     passed on the ``authenticate()`` method of the authentication backends.
 
-    .. versionchanged:: 1.11
-
-        The optional ``request`` argument was added.
-
     .. note::
 
         This is a low level way to authenticate a set of credentials; for
@@ -860,10 +856,6 @@ function.
             else:
                 ...
 
-    .. versionchanged:: 1.11
-
-        Rotating of the session key was added.
-
 .. note::
 
     Since
@@ -946,8 +938,6 @@ This is a list with all the views ``django.contrib.auth`` provides. For
 implementation details see :ref:`using-the-views`.
 
 .. class:: LoginView
-
-    .. versionadded:: 1.11
 
     **URL name:** ``login``
 
@@ -1085,8 +1075,6 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: LogoutView
 
-    .. versionadded:: 1.11
-
     Logs a user out.
 
     **URL name:** ``logout``
@@ -1139,8 +1127,6 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: PasswordChangeView
 
-    .. versionadded:: 1.11
-
     **URL name:** ``password_change``
 
     Allows a user to change their password.
@@ -1168,8 +1154,6 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: PasswordChangeDoneView
 
-    .. versionadded:: 1.11
-
     **URL name:** ``password_change_done``
 
     The page shown after a user has changed their password.
@@ -1184,8 +1168,6 @@ implementation details see :ref:`using-the-views`.
       default context data passed to the template.
 
 .. class:: PasswordResetView
-
-    .. versionadded:: 1.11
 
     **URL name:** ``password_reset``
 
@@ -1285,8 +1267,6 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: PasswordResetDoneView
 
-    .. versionadded:: 1.11
-
     **URL name:** ``password_reset_done``
 
     The page shown after a user has been emailed a link to reset their
@@ -1309,8 +1289,6 @@ implementation details see :ref:`using-the-views`.
       default context data passed to the template.
 
 .. class:: PasswordResetConfirmView
-
-    .. versionadded:: 1.11
 
     **URL name:** ``password_reset_confirm``
 
@@ -1359,8 +1337,6 @@ implementation details see :ref:`using-the-views`.
       ``token``) is valid or unused yet.
 
 .. class:: PasswordResetCompleteView
-
-    .. versionadded:: 1.11
 
     **URL name:** ``password_reset_complete``
 

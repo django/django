@@ -176,8 +176,6 @@ using a migration, use the
 Server-side cursors
 -------------------
 
-.. versionadded:: 1.11
-
 When using :meth:`QuerySet.iterator()
 <django.db.models.query.QuerySet.iterator>`, Django opens a :ref:`server-side
 cursor <psycopg2:server-side-cursors>`. By default, PostgreSQL assumes that
@@ -193,8 +191,6 @@ cursor query is controlled with the `cursor_tuple_fraction`_ option.
 
 Transaction pooling and server-side cursors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.11.1
 
 Using a connection pooler in transaction pooling mode (e.g. `pgBouncer`_)
 requires disabling server-side cursors for that connection.
@@ -253,8 +249,6 @@ management command generates the SQL statements to do that.
 
 Test database templates
 -----------------------
-
-.. versionadded:: 1.11
 
 You can use the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to specify
 a `template`_ (e.g. ``'template0'``) from which to create a test database.
@@ -494,8 +488,6 @@ like other MySQL options: either in a config file or with the entry
 
 Isolation level
 ~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.11
 
 When running concurrent loads, database transactions from different sessions
 (say, separate threads handling different requests) may interact with each

@@ -610,10 +610,6 @@ You can also refer to fields on related models with reverse relations through
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
 
-.. versionchanged:: 1.11
-
-    Support for ``**expressions`` was added.
-
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -683,10 +679,6 @@ not having any author::
 
     >>> Entry.objects.values_list('authors')
     <QuerySet [('Noam Chomsky',), ('George Orwell',), (None,)]>
-
-.. versionchanged:: 1.11
-
-    Support for expressions in ``*fields`` was added.
 
 .. versionchanged:: 2.0
 
@@ -809,8 +801,6 @@ query by calling ``all()`` on a previously evaluated ``QuerySet``.
 
 .. method:: union(*other_qs, all=False)
 
-.. versionadded:: 1.11
-
 Uses SQL's ``UNION`` operator to combine the results of two or more
 ``QuerySet``\s. For example:
 
@@ -831,16 +821,10 @@ slicing, :meth:`count`, and :meth:`order_by`) are allowed on the resulting
 allowed in the combined queries. For example, most databases don't allow
 ``LIMIT`` or ``OFFSET`` in the combined queries.
 
-.. versionchanged:: 1.11.4
-
-    ``COUNT(*)`` support was added.
-
 ``intersection()``
 ~~~~~~~~~~~~~~~~~~
 
 .. method:: intersection(*other_qs)
-
-.. versionadded:: 1.11
 
 Uses SQL's ``INTERSECT`` operator to return the shared elements of two or more
 ``QuerySet``\s. For example:
@@ -853,8 +837,6 @@ See :meth:`union` for some restrictions.
 ~~~~~~~~~~~~~~~~
 
 .. method:: difference(*other_qs)
-
-.. versionadded:: 1.11
 
 Uses SQL's ``EXCEPT`` operator to keep only elements present in the
 ``QuerySet`` but not in some other ``QuerySet``\s. For example::
@@ -1076,10 +1058,6 @@ database.
     :meth:`~django.db.models.fields.related.RelatedManager.set`, on
     :class:`related managers<django.db.models.fields.related.RelatedManager>`,
     any prefetched cache for the relation will be cleared.
-
-    .. versionchanged:: 1.11
-
-        The clearing of the prefetched cache described above was added.
 
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
@@ -1686,10 +1664,6 @@ raised if ``select_for_update()`` is used in autocommit mode.
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
 
-.. versionchanged:: 1.11
-
-    The ``skip_locked`` argument was added.
-
 .. versionchanged:: 2.0
 
     The ``of`` argument was added.
@@ -1895,10 +1869,6 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
-.. versionchanged:: 1.11
-
-    Added support for callable values in ``defaults``.
-
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1944,10 +1914,6 @@ For detailed description how names passed in ``kwargs`` are resolved see
 As described above in :meth:`get_or_create`, this method is prone to a
 race-condition which can result in multiple rows being inserted simultaneously
 if uniqueness is not enforced at the database level.
-
-.. versionchanged:: 1.11
-
-    Added support for callable values in ``defaults``.
 
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
@@ -2096,10 +2062,6 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
     is going to fetch less than 100KB of data, which seems a good compromise
     between the number of rows transferred and the data discarded if the loop
     is exited early.
-
-.. versionchanged:: 1.11
-
-    PostgreSQL support for server-side cursors was added.
 
 .. versionchanged:: 2.0
 
@@ -2831,8 +2793,6 @@ in the database <database-time-zone-definitions>`.
 ``week``
 ~~~~~~~~
 
-.. versionadded:: 1.11
-
 For date and datetime fields, return the week number (1-52 or 53) according
 to `ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e., weeks start
 on a Monday and the first week starts on or before Thursday.
@@ -2901,8 +2861,6 @@ in the database <database-time-zone-definitions>`.
 
 ``time``
 ~~~~~~~~
-
-.. versionadded:: 1.11
 
 For datetime fields, casts the value as time. Allows chaining additional field
 lookups. Takes a :class:`datetime.time` value.

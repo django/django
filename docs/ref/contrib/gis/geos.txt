@@ -173,11 +173,6 @@ Geometries support set-like operators::
         >>> ls3 == ls2  # different SRIDs
         False
 
-    .. versionchanged:: 1.11
-
-        Older versions didn't check the ``srid`` when comparing
-        ``GEOSGeometry`` objects using the equality operator.
-
 Geometry Objects
 ================
 
@@ -237,8 +232,6 @@ isn't provided, the SRID defaults to 4326.
 .. _GeoJSON: https://tools.ietf.org/html/rfc7946
 
 .. classmethod:: GEOSGeometry.from_gml(gml_string)
-
-    .. versionadded:: 1.11
 
     Constructs a :class:`GEOSGeometry` from the given GML string.
 

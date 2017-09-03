@@ -46,11 +46,6 @@ field as an :class:`~django.contrib.gis.measure.Area` measure.
 MySQL and SpatiaLite without LWGEOM don't support area calculations on
 geographic SRSes.
 
-.. versionchanged:: 1.11
-
-    In older versions, a raw value was returned on MySQL when used on
-    projected SRS.
-
 ``AsGeoJSON``
 =============
 
@@ -117,10 +112,6 @@ Keyword Argument       Description
 =====================  =====================================================
 
 __ https://en.wikipedia.org/wiki/Geography_Markup_Language
-
-.. versionchanged:: 1.11
-
-    Oracle support was added.
 
 ``AsKML``
 =========
@@ -201,10 +192,6 @@ polygon that can fully contain the geometry.
 
 The ``num_seg`` parameter is used only on PostGIS.
 
-.. versionchanged:: 1.11
-
-    Oracle support was added.
-
 ``Centroid``
 ============
 
@@ -273,11 +260,6 @@ queryset is calculated::
     in kilometers. See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
 
-.. versionchanged:: 1.11
-
-    In older versions, a raw value was returned on MySQL when used on
-    projected SRS.
-
 ``Envelope``
 ============
 
@@ -342,10 +324,6 @@ intersection between them.
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
-.. versionchanged:: 1.11
-
-    SpatiaLite and Oracle support was added.
-
 .. versionchanged:: 2.0
 
     MySQL support was added.
@@ -368,10 +346,6 @@ accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive) with the ``spheroid`` keyword argument.
 
 MySQL doesn't support length calculations on geographic SRSes.
-
-.. versionchanged:: 1.11
-
-    In older versions, a raw value was returned on MySQL.
 
 ``LineLocatePoint``
 ===================
@@ -398,10 +372,6 @@ Accepts a geographic field or expression and attempts to convert the value into
 a valid geometry without losing any of the input vertices. Geometries that are
 already valid are returned without changes. Simple polygons might become a
 multipolygon and the result might be of lower dimension than the input.
-
-.. versionchanged:: 1.11
-
-    SpatiaLite support was added.
 
 ``MemSize``
 ===========
@@ -439,10 +409,6 @@ Accepts a single geographic field or expression and returns the number of points
 in a geometry.
 
 On MySQL, returns ``None`` for any non-``LINESTRING`` geometry.
-
-.. versionchanged:: 1.11
-
-    SpatiaLite support for non-``LINESTRING`` geometries was added.
 
 ``Perimeter``
 =============

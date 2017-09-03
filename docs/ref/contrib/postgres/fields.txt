@@ -255,8 +255,6 @@ A more useful index is a ``GIN`` index, which you should create using a
 
 .. class:: CIText(**options)
 
-    .. versionadded:: 1.11
-
     A mixin to create case-insensitive text fields backed by the citext_ type.
     Read about `the performance considerations`_ prior to using it.
 
@@ -297,10 +295,6 @@ A more useful index is a ``GIN`` index, which you should create using a
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
     step, or ``type "hstore" does not exist`` if you skip the second.
-
-    .. versionchanged:: 1.11
-
-        Added the ability to store nulls. Previously, they were cast to strings.
 
 .. note::
 
@@ -481,8 +475,6 @@ using in conjunction with lookups on
     and ``None``.
 
     .. attribute:: encoder
-
-        .. versionadded:: 1.11
 
         An optional JSON-encoding class to serialize data types not supported
         by the standard JSON serializer (``datetime``, ``uuid``, etc.). For

@@ -238,8 +238,6 @@ foundation for custom widgets.
 
     .. method:: get_context(name, value, attrs)
 
-        .. versionadded:: 1.11
-
         Returns a dictionary of values to use when rendering the widget
         template. By default, the dictionary contains a single key,
         ``'widget'``, which is a dictionary representation of the widget

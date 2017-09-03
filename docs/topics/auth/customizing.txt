@@ -509,10 +509,6 @@ different user model.
                 from myapp import some_module
                 some_module.UserModel = get_user_model()
 
-    .. versionchanged:: 1.11
-
-        The ability to call ``get_user_model()`` at import time was added.
-
 .. _specifying-custom-user-model:
 
 Specifying a custom user model
@@ -572,8 +568,6 @@ password resets. You must then provide some key implementation details:
         existing instance.
 
     .. attribute:: EMAIL_FIELD
-
-        .. versionadded:: 1.11
 
         A string describing the name of the email field on the ``User`` model.
         This value is returned by
@@ -663,8 +657,6 @@ The following attributes and methods are available on any subclass of
 
     .. classmethod:: get_email_field_name()
 
-       .. versionadded:: 1.11
-
        Returns the name of the email field specified by the
        :attr:`~models.CustomUser.EMAIL_FIELD` attribute. Defaults to
        ``'email'`` if ``EMAIL_FIELD`` isn't specified.
@@ -738,8 +730,6 @@ The following attributes and methods are available on any subclass of
 .. class:: models.AbstractUser
 
     .. method:: clean()
-
-        .. versionadded:: 1.11
 
         Normalizes the email by calling
         :meth:`.BaseUserManager.normalize_email`. If you override this method,
