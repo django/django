@@ -687,24 +687,26 @@ class URLField(CharField):
 
 class BooleanField(Field):
     """
-    A Field that displays a checkbox by default, and returns True or False
+    A Field that displays a Checkbox by default, and
+    returns True or False
 
-    But if given required=False or choices, it displays a Select instead
-    and by default returns True, False, None
+    But if given null=False, it displays a Select instead and
+    returns True, False, or None
     """
     widget = CheckboxInput
     null_widget = NullBooleanSelect
 
-    def __init__(self, required=True, **kwargs):
-        if not required:
+    def __init__(self, null=False, **kwargs):
+        self.null = null
+        if null:
             self.widget = self.null_widget
-        super().__init__(required=required, **kwargs)
+        super().__init__(**kwargs)
 
     def to_python(self, value):
         return typecasting.cast_boolean(value)
 
     def validate(self, value):
-        if not value and self.required:
+        if not value and self.required and not self.null:
             raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
@@ -717,12 +719,11 @@ class BooleanField(Field):
 
 class NullBooleanField(BooleanField):
     """
-    A BooleanField that forces required=False
+    A BooleanField that forces an optional NullBooleanSelect widget
     """
 
     def __init__(self, **kwargs):
-        kwargs.update({'required': False})
-        super().__init__(**kwargs)
+        super().__init__(null=True, **kwargs)
 
 
 class CallableChoiceIterator:
