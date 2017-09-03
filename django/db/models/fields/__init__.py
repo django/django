@@ -978,7 +978,7 @@ class BooleanField(Field):
                 value,
                 nullable=self.blank or self.null,
             )
-        except (TypeError, AttributeError):
+        except (TypeError, ValueError):
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
