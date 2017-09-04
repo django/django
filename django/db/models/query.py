@@ -1739,9 +1739,10 @@ class RelatedPopulator:
         #    model's fields.
         #  - related_populators: a list of RelatedPopulator instances if
         #    select_related() descends to related models from this model.
-        #  - field, remote_field: the fields to use for populating the
-        #    internal fields cache. If remote_field is set then we also
-        #    set the reverse link.
+        #  - local_setter, remote_setter: Methods to set cached values on
+        #    the object being populated, and the remote object. Usually
+        #    these are Field.set_cached_value methods, but that doesn't
+        #    need to be the case.
         select_fields = klass_info['select_fields']
         from_parent = klass_info['from_parent']
         if not from_parent:
@@ -1760,11 +1761,8 @@ class RelatedPopulator:
         self.model_cls = klass_info['model']
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
-        reverse = klass_info['reverse']
-        field = klass_info['field']
-        field = klass_info['field']
-        self.cache_name = klass_info['cache_name']
-        self.reverse_cache_name = klass_info['reverse_cache_name']
+        self.local_setter = klass_info['local_setter']
+        self.remote_setter = klass_info['remote_setter']
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:
@@ -1778,9 +1776,8 @@ class RelatedPopulator:
             if self.related_populators:
                 for rel_iter in self.related_populators:
                     rel_iter.populate(row, obj)
-            if self.remote_field:
-                self.remote_field.set_cached_value(obj, from_obj)
-        self.field.set_cached_value(from_obj, obj)
+            self.remote_setter(obj, from_obj)
+        self.local_setter(from_obj, obj)
 
 
 def get_related_populators(klass_info, select, db):

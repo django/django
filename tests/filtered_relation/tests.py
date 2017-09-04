@@ -44,7 +44,7 @@ class FilteredRelationTests(TestCase):
         qs = Author.objects.filtered_relation(
             'book', 'book_join', condition=Q()
         ).select_related(
-            'book_join__editor'
+            'book_join__editor',
         ).order_by('pk', 'book_join__pk')
         with self.assertNumQueries(1):
             expected = [

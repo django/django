@@ -788,9 +788,9 @@ class SQLCompiler:
             klass_info = {
                 'model': f.remote_field.model,
                 'field': f,
+                'local_setter': f.set_cached_value,
+                'remote_setter': f.remote_field.set_cached_value if f.unique else lambda x, y: None,
                 'from_parent': False,
-                'cache_name': f.get_cache_name(),
-                'reverse_cache_name': f.remote_field.get_cache_name() if f.unique else None
             }
             related_klass_infos.append(klass_info)
             select_fields = []
@@ -826,9 +826,9 @@ class SQLCompiler:
                 klass_info = {
                     'model': model,
                     'field': f,
+                    'local_setter': f.remote_field.set_cached_value,
+                    'remote_setter': f.set_cached_value,
                     'from_parent': from_parent,
-                    'cache_name': f.remote_field.get_cache_name(),
-                    'reverse_cache_name': f.get_cache_name()
                 }
                 related_klass_infos.append(klass_info)
                 select_fields = []
@@ -854,12 +854,18 @@ class SQLCompiler:
                     model = join_opts.model
                     alias = joins[-1]
                     from_parent = issubclass(model, opts.model) and model is not opts.model
+
+                    def local_setter(obj, from_obj):
+                        f.remote_field.set_cached_value(from_obj, obj)
+
+                    def remote_setter(obj, from_obj):
+                        setattr(from_obj, name, obj)
                     klass_info = {
                         'model': model,
                         'field': f,
+                        'local_setter': local_setter,
+                        'remote_setter': remote_setter,
                         'from_parent': from_parent,
-                        'cache_name': name,
-                        'reverse_cache_name': f.remote_field.get_cache_name()
                     }
                     related_klass_infos.append(klass_info)
                     select_fields = []

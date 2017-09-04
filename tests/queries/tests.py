@@ -584,7 +584,7 @@ class Queries1Tests(TestCase):
             Tag.objects.select_related('parent').order_by('name'),
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
         )
-
+    
     def test_ticket9926(self):
         self.assertQuerysetEqual(
             Tag.objects.select_related("parent", "category").order_by('name'),
@@ -1716,6 +1716,16 @@ class SelectRelatedTests(TestCase):
         # default upper bound.
         self.assertQuerysetEqual(X.objects.all(), [])
         self.assertQuerysetEqual(X.objects.select_related(), [])
+
+    def test_select_related_reverse_caching(self):
+        t1 = Tag.objects.create(name='t1')
+        t2 = Tag.objects.create(name='t2', parent=t1)
+        tag = Tag.objects.select_related('parent').filter(name=t2.name).first()
+        with self.assertNumQueries(0):
+            self.assertEqual(tag.parent.name, t1.name)
+        self.assertNotIn('children', tag.parent._state.fields_cache)
+        with self.assertNumQueries(1):
+            self.assertEqual(list(tag.parent.children.all())[0].name, t2.name)
 
 
 class SubclassFKTests(TestCase):
