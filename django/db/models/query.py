@@ -1789,7 +1789,7 @@ def get_related_populators(klass_info, select, db):
     return iterators
 
 
-class FilteredRelation(object):
+class FilteredRelation:
     def __init__(self, relation_name, alias, condition):
         if not relation_name:
             raise exceptions.FieldError("FilterRelation expects a non-empty relation_name")

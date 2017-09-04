@@ -1254,24 +1254,38 @@ a ``JOIN`` is performed.
 It does not act on the default relationship but on the given alias only.
 ``alias`` and ``condition`` are required and must be passed as named argument.
 
-
 Example::
 
     >>> Restaurant.objects.filtered_relation(
     ...    'pizzas',
     ...    alias='pizzas_vegetarian',
-    ...    condition=Q(pizzas__vegetarian=True)).filter(pizzas_vegetarian__name__icontains='Mozzarella')
+    ...    condition=Q(pizzas__vegetarian=True)
+    ... ).filter(pizzas_vegetarian__name__icontains='Mozzarella')
 
 This query will join the model Restaurant only to Pizzas that have vegetarian
-flag to True.  This results into a performance improvement, noticeable if the
-join is performed through a large number of rows.  Because the filtering from
+flag to True. This results into a performance improvement, noticeable if the
+join is performed through a large number of rows. Because the filtering from
 the ``WHERE`` clause will only operate on a subset of Pizzas (the vegetarian
 ones).
 
-You need to be aware of some limitations.
-The :meth:`filtered_relation()` can not have condition that
-span over deep relations. The condition can only apply on fields that have
-``Field.is_relation is False``.
+.. admonition:: You need to be aware of some limitations.
+
+    The :meth:`filtered_relation()` can not contain conditions that
+    span over deep relations. The condition can only apply on fields that have
+    ``Field.is_relation is False``.
+
+    Example::
+
+        >>> Restaurant.objects.filtered_relation(
+        ...    'pizzas__toppings',
+        ...    alias='pizzas_with_toppings_startswith_n',
+        ...    condition=Q(pizzas__toppings__name__startswith='n')
+        ... ).filter(pizzas_with_toppings_startswith_n__isnull=False)
+
+
+    Will raise ``FieldError`` "Filtered relation
+    'pizzas_with_toppings_startswith_n' cannot operate on foreign key
+    'pizzas__toppings'".
 
 ``extra()``
 ~~~~~~~~~~~

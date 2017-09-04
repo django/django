@@ -6,7 +6,8 @@ class Author(models.Model):
     favourite_books = models.ManyToManyField(
         'Book',
         related_name='preferred_by_authors',
-        related_query_name='preferred_by_authors')
+        related_query_name='preferred_by_authors',
+    )
 
     def __str__(self):
         return self.name
@@ -39,7 +40,8 @@ class Book(models.Model):
         Author,
         related_name='books',
         related_query_name='book',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
     state = models.CharField(max_length=9, choices=STATES, default=AVAILABLE)
 
@@ -69,12 +71,14 @@ class Reservation(models.Model):
         Borrower,
         related_name='reservations',
         related_query_name='reservation',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     book = models.ForeignKey(
         Book,
         related_name='reservations',
         related_query_name='reservation',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
 
     def __str__(self):
@@ -93,12 +97,14 @@ class RentalSession(models.Model):
         Borrower,
         related_name='rental_sessions',
         related_query_name='rental_session',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     book = models.ForeignKey(
         Book,
         related_name='rental_sessions',
         related_query_name='rental_session',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+    )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
 
     def __str__(self):
