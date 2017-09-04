@@ -173,6 +173,41 @@ class FilteredRelationTests(TestCase):
         ).extra(where=["1 = 1"]).order_by('-book_alice__id'),
             ["<Author: Alice>", "<Author: Jane>"])
 
+    @skipUnlessDBFeature('supports_select_union')
+    def test_filtered_relation_union(self):
+        qs1 = Author.objects.filtered_relation(
+            'book', alias='book_alice',
+            condition=Q(book__title__iexact='poem by alice')
+        ).filter(book_alice__isnull=False).order_by()
+        qs2 = Author.objects.filtered_relation(
+            'book', alias='book_jane',
+            condition=Q(book__title__iexact='the book by jane a')
+        ).filter(book_jane__isnull=False).order_by()
+        self.assertQuerysetEqual(qs1.union(qs2).order_by('id'), ["<Author: Alice>", "<Author: Jane>"])
+
+    @skipUnlessDBFeature('supports_select_intersection')
+    def test_filtered_relation_intersection(self):
+        qs1 = Author.objects.filtered_relation(
+            'book', alias='book_alice',
+            condition=Q(book__title__iexact='poem by alice')
+        ).filter(book_alice__isnull=False).order_by()
+        qs2 = Author.objects.filtered_relation(
+            'book', alias='book_jane',
+            condition=Q(book__title__iexact='the book by jane a')
+        ).filter(book_jane__isnull=False).order_by()
+        self.assertQuerysetEqual(qs1.intersection(qs2).order_by('id'), [])
+
+    def test_filtered_relation_difference(self):
+        qs1 = Author.objects.filtered_relation(
+            'book', alias='book_alice',
+            condition=Q(book__title__iexact='poem by alice')
+        ).filter(book_alice__isnull=False).order_by()
+        qs2 = Author.objects.filtered_relation(
+            'book', alias='book_jane',
+            condition=Q(book__title__iexact='the book by jane a')
+        ).filter(book_jane__isnull=False).order_by()
+        self.assertQuerysetEqual(qs1.difference(qs2).order_by('id'), ["<Author: Alice>"])
+
     def test_filtered_relation_defer(self):
         # One query for the list, and one query to fetch the
         # deferred title.
