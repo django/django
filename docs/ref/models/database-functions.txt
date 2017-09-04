@@ -532,8 +532,8 @@ the Melbourne timezone (UTC +10:00), which changes the day, weekday, and hour
 values that are returned::
 
     >>> import pytz
-    >>> tzinfo = pytz.timezone('Australia/Melbourne')  # UTC+10:00
-    >>> with timezone.override(tzinfo):
+    >>> melb = pytz.timezone('Australia/Melbourne')  # UTC+10:00
+    >>> with timezone.override(melb):
     ...    Experiment.objects.annotate(
     ...        day=ExtractDay('start_datetime'),
     ...        weekday=ExtractWeekDay('start_datetime'),
@@ -547,7 +547,7 @@ Explicitly passing the timezone to the ``Extract`` function behaves in the same
 way, and takes priority over an active timezone::
 
     >>> import pytz
-    >>> tzinfo = pytz.timezone('Australia/Melbourne')
+    >>> melb = pytz.timezone('Australia/Melbourne')
     >>> Experiment.objects.annotate(
     ...     day=ExtractDay('start_datetime', tzinfo=melb),
     ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
