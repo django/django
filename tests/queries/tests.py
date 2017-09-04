@@ -584,7 +584,7 @@ class Queries1Tests(TestCase):
             Tag.objects.select_related('parent').order_by('name'),
             ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
         )
-    
+
     def test_ticket9926(self):
         self.assertQuerysetEqual(
             Tag.objects.select_related("parent", "category").order_by('name'),
