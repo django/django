@@ -150,12 +150,28 @@ class FilteredRelationTests(TestCase):
         ).filter(favourite_books_written_by_jane__editor__name='b').distinct()
         self.assertQuerysetEqual(qs, ["<Author: Alice>"])
 
-    def test_filtered_relation_values(self):
+    def test_filtered_relation_values_list(self):
         self.assertQuerysetEqual(Author.objects.filtered_relation(
             'book', alias='book_alice',
             condition=Q(book__title__iexact='poem by alice')
         ).values_list('book_alice__title', flat=True).order_by('-book_alice__title'),
             ["Poem by Alice", None], lambda x: x)
+
+    def test_filtered_relation_values(self):
+        self.assertQuerysetEqual(Author.objects.filtered_relation(
+            'book', alias='book_alice',
+            condition=Q(book__title__iexact='poem by alice')
+        ).values().order_by('-book_alice__id'),
+            [{'id': 1, 'name': 'Alice'},
+             {'id': 2, 'name': 'Jane'}],
+            lambda x: x)
+
+    def test_filtered_relation_extra(self):
+        self.assertQuerysetEqual(Author.objects.filtered_relation(
+            'book', alias='book_alice',
+            condition=Q(book__title__iexact='poem by alice')
+        ).extra(where=["1 = 1"]).order_by('-book_alice__id'),
+            ["<Author: Alice>", "<Author: Jane>"])
 
     def test_filtered_relation_defer(self):
         # One query for the list, and one query to fetch the
