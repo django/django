@@ -176,6 +176,29 @@ Django provides a single API to control database transactions.
         If you catch exceptions raised by raw SQL queries, Django's behavior
         is unspecified and database-dependent.
 
+    .. admonition:: You may need to manually revert model state when rolling back a transaction.
+
+        The values of a model's fields won't be reverted when a transaction
+        rollback happens. This could lead to an inconsistent model state unless
+        you manually restore the original field values.
+
+        For example, given ``MyModel`` with an ``active`` field, this snippet
+        ensures that the ``if obj.active`` check at the end uses the correct
+        value if updating ``active`` to ``True`` fails in the transaction::
+
+            from django.db import DatabaseError, transaction
+
+            obj = MyModel(active=False)
+            obj.active = True
+            try:
+                with transaction.atomic():
+                    obj.save()
+            except DatabaseError:
+                obj.active = False
+
+            if obj.active:
+                ...
+
     In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
     to commit, roll back, or change the autocommit state of the database
     connection within an ``atomic`` block will raise an exception.
