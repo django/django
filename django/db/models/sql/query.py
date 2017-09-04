@@ -629,6 +629,8 @@ class Query:
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
+                if name in self._filtered_relations:
+                    name = self._filtered_relations[name].relation_name
                 source = opts.get_field(name)
                 if is_reverse_o2o(source):
                     cur_model = source.related_model

@@ -163,6 +163,28 @@ class FilteredRelationTests(TestCase):
         self.assertQuerysetEqual(
             qs, ["<Author: Alice>"])
 
+    def test_filtered_relation_values(self):
+        self.assertQuerysetEqual(
+            Author.objects
+            .filtered_relation(
+                'book', alias='book_alice',
+                condition=Q(book__title__iexact='poem by alice')
+            ).values_list('book_alice__title', flat=True).order_by('-book_alice__title'),
+            ["Poem by Alice", None], lambda x: x)
+
+    def test_filtered_relation_defer(self):
+        # One query for the list, and one query to fetch the
+        # deferred title.
+        with self.assertNumQueries(2):
+            self.assertQuerysetEqual(
+                Author.objects
+                .filtered_relation(
+                    'book', alias='book_alice',
+                    condition=Q(book__title__iexact='poem by alice')
+                ).select_related('book_alice').defer('book_alice__title')
+                .order_by('-book_alice__title'),
+                ["Poem by Alice", None], lambda author: getattr(author.book_alice, 'title', None))
+
     def test_filtered_relation_as_subquery(self):
         inner_qs = (Author.objects
                     .filtered_relation('book', alias='book_alice',

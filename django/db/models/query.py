@@ -1776,8 +1776,8 @@ class RelatedPopulator:
             if self.related_populators:
                 for rel_iter in self.related_populators:
                     rel_iter.populate(row, obj)
-            self.remote_setter(obj, from_obj)
         self.local_setter(from_obj, obj)
+        self.remote_setter(obj, from_obj)
 
 
 def get_related_populators(klass_info, select, db):
