@@ -1391,6 +1391,15 @@ templates used by the :class:`ModelAdmin` views:
     operations. Call ``super().delete_model()`` to delete the object using
     :meth:`.Model.delete`.
 
+.. method:: ModelAdmin.delete_queryset(request, queryset)
+
+    .. versionadded:: 2.1
+
+    The ``delete_queryset()`` method is given the ``HttpRequest`` and a
+    ``QuerySet`` of objects to be deleted. Override this method to customize
+    the deletion process for the "delete selected objects" :doc:`action
+    <actions>`.
+
 .. method:: ModelAdmin.save_formset(request, form, formset, change)
 
     The ``save_formset`` method is given the ``HttpRequest``, the parent

@@ -37,6 +37,9 @@ Minor features
 
 * jQuery is upgraded from version 2.2.3 to 3.2.1.
 
+* The new :meth:`.ModelAdmin.delete_queryset` method allows customizing the
+  deletion process of the "delete selected objects" action.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

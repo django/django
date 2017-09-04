@@ -45,7 +45,7 @@ def delete_selected(modeladmin, request, queryset):
             for obj in queryset:
                 obj_display = str(obj)
                 modeladmin.log_deletion(request, obj, obj_display)
-            queryset.delete()
+            modeladmin.delete_queryset(request, queryset)
             modeladmin.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
                 "count": n, "items": model_ngettext(modeladmin.opts, n)
             }, messages.SUCCESS)

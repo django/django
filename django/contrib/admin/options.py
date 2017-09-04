@@ -1043,6 +1043,10 @@ class ModelAdmin(BaseModelAdmin):
         """
         obj.delete()
 
+    def delete_queryset(self, request, queryset):
+        """Given a queryset, delete it from the database."""
+        queryset.delete()
+
     def save_formset(self, request, form, formset, change):
         """
         Given an inline formset save it to the database.

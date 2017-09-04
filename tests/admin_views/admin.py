@@ -232,6 +232,10 @@ class SubscriberAdmin(admin.ModelAdmin):
     actions = ['mail_admin']
     action_form = MediaActionForm
 
+    def delete_queryset(self, request, queryset):
+        SubscriberAdmin.overridden = True
+        super().delete_queryset(request, queryset)
+
     def mail_admin(self, request, selected):
         EmailMessage(
             'Greetings from a ModelAdmin action',
