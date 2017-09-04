@@ -314,6 +314,8 @@ class Query:
         if 'subq_aliases' in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
+        obj.context = self.context.copy()
+        obj._filtered_relations = self._filtered_relations.copy()
         # Clear the cached_property
         try:
             del obj.base_table
@@ -334,8 +336,6 @@ class Query:
         obj.filter_is_sticky = False
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
-        obj.context = self.context.copy()
-        obj._filtered_relations = self._filtered_relations.copy()
         return obj
 
     def relabeled_clone(self, change_map):
@@ -1297,7 +1297,7 @@ class Query:
             lookup_parts, field_parts, _ = self.solve_lookup_type(lookup)
             shift = 2 if not lookup_parts else 1
             if len(field_parts) > (shift + len(lookup_parts)):
-                raise FieldError("Filtered relation %r cannot operate on foreign key %r." % (
+                raise ValueError("Filtered relation %r cannot operate on foreign key %r." % (
                     filtered_relation.alias, lookup))
         self._filtered_relations[filtered_relation.alias] = filtered_relation
 

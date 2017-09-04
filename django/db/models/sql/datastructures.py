@@ -163,5 +163,6 @@ class BaseTable:
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
 
     def equals(self, other, with_filtered_relation):
-        return (isinstance(self, other.__class__) and self.table_name == other.table_name and
+        return (isinstance(self, other.__class__) and
+                self.table_name == other.table_name and
                 self.table_alias == other.table_alias)

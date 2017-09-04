@@ -1283,7 +1283,7 @@ ones).
         ... ).filter(pizzas_with_toppings_startswith_n__isnull=False)
 
 
-    Will raise ``FieldError`` "Filtered relation
+    Will raise ``ValueError`` "Filtered relation
     'pizzas_with_toppings_startswith_n' cannot operate on foreign key
     'pizzas__toppings'".
 

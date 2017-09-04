@@ -1792,23 +1792,22 @@ def get_related_populators(klass_info, select, db):
 class FilteredRelation:
     def __init__(self, relation_name, alias, condition):
         if not relation_name:
-            raise exceptions.FieldError("FilterRelation expects a non-empty relation_name")
+            raise ValueError("relation_name cannot be empty")
         if not alias:
-            raise exceptions.FieldError("FilterRelation expects a non-empty alias")
+            raise ValueError("alias cannot be empty")
         if relation_name == alias:
-            raise exceptions.FieldError("FilterRelation must be used with an alias %r"
-                                        " different from relation_name %r" % (alias, relation_name))
+            raise ValueError("alias %r must be different to relation_name %r" % (alias, relation_name))
         self.relation_name = relation_name
         self.alias = alias
         self.condition = condition
         self.path = []
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (self.relation_name == other.relation_name and
-                    self.alias == other.alias and
-                    self.condition == other.condition)
-        return False
+        return (
+            isinstance(other, self.__class__) and
+            self.relation_name == other.relation_name and
+            self.alias == other.alias and
+            self.condition == other.condition)
 
     def clone(self):
         clone = FilteredRelation(self.relation_name, self.alias, self.condition)

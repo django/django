@@ -1,6 +1,5 @@
 import unittest
 
-from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import Case, Count, F, Q, When
 from django.test import TestCase
@@ -176,7 +175,7 @@ class FilteredRelationTests(TestCase):
         self.assertQuerysetEqual(qs, ["<Author: Alice>"])
 
     def test_filtered_relation_with_foreign_key_error(self):
-        with self.assertRaisesMessage(FieldError, "Filtered relation 'alice_favourite_books'"
+        with self.assertRaisesMessage(ValueError, "Filtered relation 'alice_favourite_books'"
                                       " cannot operate on foreign key 'author__favourite_books__author'."):
             list(Book.objects.filtered_relation('author__favourite_books',
                                                 alias='alice_favourite_books',
@@ -184,7 +183,7 @@ class FilteredRelationTests(TestCase):
                                                 ).filter(alice_favourite_books__title__icontains='poem'))
 
     def test_filtered_relation_with_foreign_key_on_condition_error(self):
-        with self.assertRaisesMessage(FieldError, "Filtered relation 'book_edited_by_b'"
+        with self.assertRaisesMessage(ValueError, "Filtered relation 'book_edited_by_b'"
                                       " cannot operate on foreign key 'book__editor__name__icontains'."):
             list(Author.objects.filtered_relation(
                 'book',
@@ -193,11 +192,11 @@ class FilteredRelationTests(TestCase):
             ).filter(book_edited_by_b__isnull=False))
 
     def test_filtered_relation_with_empty_relation_name_error(self):
-        with self.assertRaisesMessage(FieldError, 'FilterRelation expects a non-empty relation_name'):
+        with self.assertRaisesMessage(ValueError, 'relation_name cannot be empty'):
             Book.objects.filtered_relation('', alias='blank', condition=Q(blank=''))
 
     def test_filtered_relation_with_empty_alias_error(self):
-        with self.assertRaisesMessage(FieldError, 'FilterRelation expects a non-empty alias'):
+        with self.assertRaisesMessage(ValueError, 'alias cannot be empty'):
             Book.objects.filtered_relation('favourite_books', alias='', condition=Q(blank=''))
 
 
