@@ -208,6 +208,13 @@ class FilteredRelationTests(TestCase):
         ).filter(book_jane__isnull=False).order_by()
         self.assertQuerysetEqual(qs1.difference(qs2).order_by('id'), ["<Author: Alice>"])
 
+    def test_filtered_relation_select_for_update(self):
+        self.assertQuerysetEqual(Author.objects.filtered_relation(
+            'book', alias='book_jane',
+            condition=Q(book__title__iexact='the book by jane a')
+        ).filter(book_jane__isnull=False).select_for_update(),
+            ['<Author: Jane>'])
+
     def test_filtered_relation_defer(self):
         # One query for the list, and one query to fetch the
         # deferred title.
