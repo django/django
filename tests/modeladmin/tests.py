@@ -1,9 +1,10 @@
 from datetime import date
 
 from django import forms
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
+    get_content_type_for_model,
 )
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
@@ -615,9 +616,27 @@ class ModelAdminTests(TestCase):
         ma = ModelAdmin(Band, self.site)
         mock_request = MockRequest()
         mock_request.user = User.objects.create(username='bill')
-        self.assertEqual(ma.log_addition(mock_request, self.band, 'added'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
+        content_type = get_content_type_for_model(self.band)
+        tests = (
+            (ma.log_addition, ADDITION, {'added': {}}),
+            (ma.log_change, CHANGE, {'changed': {'fields': ['name', 'bio']}}),
+            (ma.log_deletion, DELETION, str(self.band)),
+        )
+        for method, flag, message in tests:
+            with self.subTest(name=method.__name__):
+                created = method(mock_request, self.band, message)
+                fetched = LogEntry.objects.filter(action_flag=flag).latest('id')
+                self.assertEqual(created, fetched)
+                self.assertEqual(fetched.action_flag, flag)
+                self.assertEqual(fetched.content_type, content_type)
+                self.assertEqual(fetched.object_id, str(self.band.pk))
+                self.assertEqual(fetched.user, mock_request.user)
+                if flag == DELETION:
+                    self.assertEqual(fetched.change_message, '')
+                    self.assertEqual(fetched.object_repr, message)
+                else:
+                    self.assertEqual(fetched.change_message, str(message))
+                    self.assertEqual(fetched.object_repr, str(self.band))
 
 
 class ModelAdminPermissionTests(SimpleTestCase):
