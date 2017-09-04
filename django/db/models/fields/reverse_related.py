@@ -163,9 +163,6 @@ class ForeignObjectRel(FieldCacheMixin):
             return self.related_name
         return opts.model_name + ('_set' if self.multiple else '')
 
-    def get_cache_name(self):
-        return "_%s_cache" % self.get_accessor_name()
-
     def get_path_info(self, filtered_relation=None):
         return self.field.get_reverse_path_info(filtered_relation)
 
