@@ -1287,6 +1287,8 @@ ones).
     'pizzas_with_toppings_startswith_n' cannot operate on foreign key
     'pizzas__toppings'".
 
+.. admonition:: prefetch_related() is not yet supported.
+
 ``extra()``
 ~~~~~~~~~~~
 
