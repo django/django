@@ -1,6 +1,7 @@
 import unittest
 
 from django.db import connection
+from django.db.models.fields import BooleanField, NullBooleanField
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
@@ -53,3 +54,10 @@ class Tests(unittest.TestCase):
             # wasn't the case.
             cursor.execute(query)
             self.assertEqual(cursor.fetchone()[0], 1)
+
+    def test_boolean_constraints(self):
+        """Boolean fields have check constraints on their values."""
+        for field in (BooleanField(), NullBooleanField()):
+            with self.subTest(field=field):
+                field.set_attributes_from_name('is_nice')
+                self.assertIn('"IS_NICE" IN (0,1)', field.db_check(connection))
