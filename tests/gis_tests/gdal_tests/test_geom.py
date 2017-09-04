@@ -4,9 +4,10 @@ import unittest
 from binascii import b2a_hex
 
 from django.contrib.gis.gdal import (
-    CoordTransform, GDALException, OGRGeometry, OGRGeomType, OGRIndexError,
-    SpatialReference,
+    CoordTransform, GDALException, OGRGeometry, OGRGeomType, SpatialReference,
 )
+from django.template import Context
+from django.template.engine import Engine
 
 from ..test_data import TestDataMixin
 
@@ -157,7 +158,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(ls.coords, linestr.tuple)
             self.assertEqual(linestr, OGRGeometry(ls.wkt))
             self.assertNotEqual(linestr, prev)
-            with self.assertRaises(OGRIndexError):
+            with self.assertRaises(IndexError):
                 linestr.__getitem__(len(linestr))
             prev = linestr
 
@@ -182,7 +183,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             for ls in mlinestr:
                 self.assertEqual(2, ls.geom_type)
                 self.assertEqual('LINESTRING', ls.geom_name)
-            with self.assertRaises(OGRIndexError):
+            with self.assertRaises(IndexError):
                 mlinestr.__getitem__(len(mlinestr))
 
     def test_linearring(self):
@@ -232,6 +233,14 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             for r in poly:
                 self.assertEqual('LINEARRING', r.geom_name)
 
+    def test_polygons_templates(self):
+        # Accessing Polygon attributes in templates should work.
+        engine = Engine()
+        template = engine.from_string('{{ polygons.0.wkt }}')
+        polygons = [OGRGeometry(p.wkt) for p in self.geometries.multipolygons[:2]]
+        content = template.render(Context({'polygons': polygons}))
+        self.assertIn('MULTIPOLYGON (((100', content)
+
     def test_closepolygons(self):
         "Testing closing Polygon objects."
         # Both rings in this geometry are not closed.
@@ -254,7 +263,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             if mp.valid:
                 self.assertEqual(mp.n_p, mpoly.point_count)
                 self.assertEqual(mp.num_geom, len(mpoly))
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaises(IndexError):
                     mpoly.__getitem__(len(mpoly))
                 for p in mpoly:
                     self.assertEqual('POLYGON', p.geom_name)

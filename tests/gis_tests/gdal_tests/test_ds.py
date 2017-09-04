@@ -4,7 +4,6 @@ import unittest
 
 from django.contrib.gis.gdal import (
     GDAL_VERSION, DataSource, Envelope, GDALException, OGRGeometry,
-    OGRIndexError,
 )
 from django.contrib.gis.gdal.field import OFTInteger, OFTReal, OFTString
 
@@ -84,7 +83,7 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(source.driver, str(ds.driver))
 
             # Making sure indexing works
-            with self.assertRaises(OGRIndexError):
+            with self.assertRaises(IndexError):
                 ds[len(ds)]
 
     def test02_invalid_shp(self):
@@ -120,9 +119,9 @@ class DataSourceTest(unittest.TestCase):
                     self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaises(IndexError):
                     layer.__getitem__(-1)
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaises(IndexError):
                     layer.__getitem__(50000)
 
                 if hasattr(source, 'field_values'):

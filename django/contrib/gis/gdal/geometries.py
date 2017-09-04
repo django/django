@@ -44,9 +44,7 @@ from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import (
-    GDALException, OGRIndexError, SRSException,
-)
+from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
@@ -566,12 +564,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
-
-    def __iter__(self):
-        "Iterate over each point in the LineString."
-        for i in range(self.point_count):
-            yield self[i]
+            raise IndexError('index out of range: %s' % index)
 
     def __len__(self):
         "Return the number of points in the LineString."
@@ -618,17 +611,12 @@ class Polygon(OGRGeometry):
         "Return the number of interior rings in this Polygon."
         return self.geom_count
 
-    def __iter__(self):
-        "Iterate through each ring in the Polygon."
-        for i in range(self.geom_count):
-            yield self[i]
-
     def __getitem__(self, index):
         "Get the ring at the specified index."
         if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
+            raise IndexError('index out of range: %s' % index)
 
     # Polygon Properties
     @property
@@ -667,12 +655,7 @@ class GeometryCollection(OGRGeometry):
         if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
-
-    def __iter__(self):
-        "Iterate over each Geometry."
-        for i in range(self.geom_count):
-            yield self[i]
+            raise IndexError('index out of range: %s' % index)
 
     def __len__(self):
         "Return the number of geometries in this Geometry Collection."
