@@ -908,7 +908,7 @@ Miscellaneous
   a new :meth:`.AbstractBaseUser.clean` method.
 
 * Private API ``django.forms.models.model_to_dict()`` returns a queryset rather
-  than a list of primary keys for ``ManyToManyField``\s .
+  than a list of primary keys for ``ManyToManyField``\s.
 
 * If ``django.contrib.staticfiles`` is
   installed, the :ttag:`static`  template tag uses the ``staticfiles`` storage
