@@ -14,28 +14,39 @@ Installation
 
 To install the redirects app, follow these steps:
 
-1. Ensure that the ``django.contrib.sites`` framework
-   :ref:`is installed <enabling-the-sites-framework>`.
-2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
-3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
+1. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
+2. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE` setting.
-4. Run the command :djadmin:`manage.py migrate <migrate>`.
+3. Run the command :djadmin:`manage.py migrate <migrate>`.
+
+.. admonition:: Sites data migration
+
+    If you have existing redirects data with
+    :class:`~django.contrib.sites.models.Site` model
+    references, you need to install :mod:`django.contrib.sites` app for
+    data migration. After that you can safely uninstall it.
+
+.. versionchanged:: 2.0
+
+    ``django.contrib.sites`` app is no longer required.
 
 How it works
 ============
 
 ``manage.py migrate`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+is a simple lookup table with ``domain``, ``old_path`` and ``new_path`` fields.
 
 The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404
 error, this middleware checks the redirects database for the requested
 URL as a last resort. Specifically, it checks for a redirect with the
-given ``old_path`` with a site ID that corresponds to the
-:setting:`SITE_ID` setting.
+given ``old_path`` and ``domain`` that either matches request domain name or
+is blank.
 
-* If it finds a match, and ``new_path`` is not empty, it redirects to
-  ``new_path`` using a 301 ("Moved Permanently") redirect. You can subclass
+* If there are 2 matched redirects with the same ``old_path`` and
+  different domains, the redirect with non-empty domain is used.
+* If ``new_path`` is not empty, it redirects to ``new_path`` using a
+  301 ("Moved Permanently") redirect. You can subclass
   :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
   and set
   :attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class`
@@ -45,6 +56,10 @@ given ``old_path`` with a site ID that corresponds to the
   HTTP header and empty (content-less) response.
 * If it doesn't find a match, the request continues to be processed as
   usual.
+
+.. versionchanged:: 2.0
+
+    ``site`` foreign key replaced with ``domain`` field.
 
 The middleware only gets activated for 404s -- not for 500s or responses of any
 other status code.
@@ -65,6 +80,13 @@ Via the admin interface
 If you've activated the automatic Django admin interface, you should see a
 "Redirects" section on the admin index page. Edit redirects as you edit any
 other object in the system.
+
+"sites" framework support
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have :doc:`django.contrib.sites </ref/contrib/sites>` app installed, you
+can fill redirect ``domain`` field automatically by choosing appropriate site.
+This will work only if ``domain`` field is empty.
 
 Via the Python API
 ------------------

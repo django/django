@@ -418,10 +418,6 @@ to its ID in your :setting:`SITE_ID` setting.
 
 Here's how Django uses the sites framework:
 
-* In the :mod:`redirects framework <django.contrib.redirects>`, each
-  redirect object is associated with a particular site. When Django searches
-  for a redirect, it takes into account the current site.
-
 * In the :mod:`flatpages framework <django.contrib.flatpages>`, each
   flatpage is associated with a particular site. When a flatpage is created,
   you specify its :class:`~django.contrib.sites.models.Site`, and the

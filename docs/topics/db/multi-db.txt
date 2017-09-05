@@ -711,7 +711,7 @@ how you can split these models across databases:
   database as ``ContentType``.
 - ``admin`` depends on ``auth``, so its models must be in the same database
   as ``auth``.
-- ``flatpages`` and ``redirects`` depend on ``sites``, so their models must be
+- ``flatpages`` depend on ``sites``, so its models must be
   in the same database as ``sites``.
 
 In addition, some objects are automatically created just after
