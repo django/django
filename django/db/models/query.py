@@ -231,7 +231,7 @@ class QuerySet:
                - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
                  using cursor.fetchmany(). This part is responsible for
                  doing some column masking, and returning the rows in chunks.
-            2. sql/compiler.results_iter()
+            2. sql.compiler.results_iter()
                - Returns one row at time. At this point the rows are still just
                  tuples. In some cases the return values are converted to
                  Python values at this location.
