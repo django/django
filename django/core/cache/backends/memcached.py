@@ -89,11 +89,8 @@ class BaseMemcachedCache(BaseCache):
         new_keys = [self.make_key(x, version=version) for x in keys]
         ret = self._cache.get_multi(new_keys)
         if ret:
-            _ = {}
             m = dict(zip(new_keys, keys))
-            for k, v in ret.items():
-                _[m[k]] = v
-            ret = _
+            return {m[k]: v for k, v in ret.items()}
         return ret
 
     def close(self, **kwargs):
@@ -137,10 +134,10 @@ class BaseMemcachedCache(BaseCache):
         return val
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        safe_data = {}
-        for key, value in data.items():
-            key = self.make_key(key, version=version)
-            safe_data[key] = value
+        safe_data = {
+            self.make_key(key, version=version): value
+            for key, value in data.items()
+        }
         self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
 
     def delete_many(self, keys, version=None):
