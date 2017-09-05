@@ -1056,10 +1056,7 @@ class SQLCompiler:
 
 
 class SQLInsertCompiler(SQLCompiler):
-
-    def __init__(self, *args, **kwargs):
-        self.return_id = False
-        super().__init__(*args, **kwargs)
+    return_id = False
 
     def field_as_sql(self, field, val):
         """

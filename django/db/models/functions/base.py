@@ -52,9 +52,6 @@ class ConcatPair(Func):
     """
     function = 'CONCAT'
 
-    def __init__(self, left, right, **extra):
-        super().__init__(left, right, **extra)
-
     def as_sqlite(self, compiler, connection):
         coalesced = self.coalesce()
         return super(ConcatPair, coalesced).as_sql(

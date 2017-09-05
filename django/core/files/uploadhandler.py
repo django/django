@@ -132,9 +132,6 @@ class TemporaryFileUploadHandler(FileUploadHandler):
     """
     Upload handler that streams data into a temporary file.
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def new_file(self, *args, **kwargs):
         """
         Create the file object to append to as data is coming in.
