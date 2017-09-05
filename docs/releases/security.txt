@@ -833,3 +833,15 @@ Versions affected
 * Django 1.10 `(patch) <https://github.com/django/django/commit/2a9f6ef71b8e23fd267ee2be1be26dde8ab67037>`__
 * Django 1.9 `(patch) <https://github.com/django/django/commit/5f1ffb07afc1e59729ce2b283124116d6c0659e4>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/4a6b945dffe8d10e7cec107d93e6efaebfbded29>`__
+
+September 5, 2017 - :cve:`2017-12794`
+-------------------------------------
+
+Possible XSS in traceback section of technical 500 debug page. `Full
+description <https://www.djangoproject.com/weblog/2017/sep/05/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.11 `(patch) <https://github.com/django/django/commit/e35a0c56086924f331e9422daa266e907a4784cc>`__
+* Django 1.10 `(patch) <https://github.com/django/django/commit/58e08e80e362db79eb0fd775dc81faad90dca47a>`__
