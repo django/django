@@ -97,7 +97,7 @@ class GeoFunc(GeoFuncMixin, Func):
 class GeomOutputGeoFunc(GeoFunc):
     @cached_property
     def output_field(self):
-        return self.geo_field
+        return GeometryField(srid=self.geo_field.srid)
 
 
 class SQLiteDecimalToFloatMixin:

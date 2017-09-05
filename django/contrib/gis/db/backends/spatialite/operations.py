@@ -10,7 +10,7 @@ from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r, wkt_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
@@ -199,12 +199,22 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return SpatialiteSpatialRefSys
 
     def get_geometry_converter(self, expression):
+        geom_class = expression.output_field.geom_class
         if self.spatial_version >= (4, 3, 0):
             read = wkb_r().read
-            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))
+
+            def converter(value, expression, connection):
+                return None if value is None else GEOSGeometryBase(read(value), geom_class)
         else:
             read = wkt_r().read
             srid = expression.output_field.srid
             if srid == -1:
                 srid = None
-            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value), srid)
+
+            def converter(value, expression, connection):
+                if value is not None:
+                    geom = GEOSGeometryBase(read(value), geom_class)
+                    if srid:
+                        geom.srid = srid
+                    return geom
+        return converter

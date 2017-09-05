@@ -1,5 +1,8 @@
-from django.contrib.gis.db.models.fields import ExtentField
+from django.contrib.gis.db.models.fields import (
+    ExtentField, GeometryCollectionField, GeometryField, LineStringField,
+)
 from django.db.models.aggregates import Aggregate
+from django.utils.functional import cached_property
 
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 
@@ -7,6 +10,10 @@ __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
 class GeoAggregate(Aggregate):
     function = None
     is_extent = False
+
+    @cached_property
+    def output_field(self):
+        return self.output_field_class(self.source_expressions[0].output_field.srid)
 
     def as_sql(self, compiler, connection, function=None, **extra_context):
         # this will be called again in parent, but it's needed now - before
@@ -34,6 +41,7 @@ class GeoAggregate(Aggregate):
 
 class Collect(GeoAggregate):
     name = 'Collect'
+    output_field_class = GeometryCollectionField
 
 
 class Extent(GeoAggregate):
@@ -60,7 +68,9 @@ class Extent3D(GeoAggregate):
 
 class MakeLine(GeoAggregate):
     name = 'MakeLine'
+    output_field_class = LineStringField
 
 
 class Union(GeoAggregate):
     name = 'Union'
+    output_field_class = GeometryField
