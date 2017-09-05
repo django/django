@@ -9,21 +9,21 @@ class Author(models.Model):
         related_query_name='preferred_by_authors',
     )
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class Editor(models.Model):
     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class Book(models.Model):
@@ -45,21 +45,21 @@ class Book(models.Model):
     editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
     state = models.CharField(max_length=9, choices=STATES, default=AVAILABLE)
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.title
 
 
 class Borrower(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class Reservation(models.Model):
@@ -81,11 +81,11 @@ class Reservation(models.Model):
     )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
 
-    def __str__(self):
-        return '-'.join(self.book.name, self.borrower.name, self.state)
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return '-'.join(self.book.name, self.borrower.name, self.state)
 
 
 class RentalSession(models.Model):
@@ -107,8 +107,8 @@ class RentalSession(models.Model):
     )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
 
-    def __str__(self):
-        return '-'.join(self.book.name, self.borrower.name, self.state)
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return '-'.join(self.book.name, self.borrower.name, self.state)

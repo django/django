@@ -1272,15 +1272,15 @@ class Query:
         Adds a Q-object to the current filter.
         """
         connector = q_object.connector
-        current_negated = current_negated ^ q_object.negated
+        current_negated ^= q_object.negated
         branch_negated = branch_negated or q_object.negated
-        target_clause = self.where_class(connector=connector,
-                                         negated=q_object.negated)
+        target_clause = self.where_class(connector=connector, negated=q_object.negated)
         for child in q_object.children:
             if isinstance(child, Node):
                 child_clause, _ = self._build_filtered_relation_q(
                     child, force_reuse=force_reuse, branch_negated=branch_negated,
-                    current_negated=current_negated)
+                    current_negated=current_negated,
+                )
             else:
                 child_clause, _ = self.build_filter(
                     child, force_reuse=force_reuse, branch_negated=branch_negated,
@@ -1297,7 +1297,7 @@ class Query:
             lookup_parts, field_parts, _ = self.solve_lookup_type(lookup)
             shift = 2 if not lookup_parts else 1
             if len(field_parts) > (shift + len(lookup_parts)):
-                raise ValueError("Filtered relation %r cannot operate on foreign key %r." % (
+                raise ValueError('Filtered relation %r cannot operate on foreign key %r.' % (
                     filtered_relation.alias, lookup))
         self._filtered_relations[filtered_relation.alias] = filtered_relation
 

@@ -1268,7 +1268,7 @@ join is performed through a large number of rows. Because the filtering from
 the ``WHERE`` clause will only operate on a subset of Pizzas (the vegetarian
 ones).
 
-.. admonition:: You need to be aware of some limitations.
+.. admonition:: You need to be aware of some limitations
 
     The :meth:`filtered_relation()` can not contain conditions that
     span over deep relations. The condition can only apply on fields that have
@@ -1282,12 +1282,13 @@ ones).
         ...    condition=Q(pizzas__toppings__name__startswith='n')
         ... ).filter(pizzas_with_toppings_startswith_n__isnull=False)
 
-
     Will raise ``ValueError`` "Filtered relation
     'pizzas_with_toppings_startswith_n' cannot operate on foreign key
     'pizzas__toppings'".
 
-.. admonition:: prefetch_related() is not yet supported.
+.. admonition:: prefetch_related() is not yet supported
+
+    We might consider adding support for this feature in future releases.
 
 ``extra()``
 ~~~~~~~~~~~
