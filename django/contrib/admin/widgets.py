@@ -120,7 +120,6 @@ def url_params_from_lookup_dict(lookups):
     """
     params = {}
     if lookups and hasattr(lookups, 'items'):
-        items = []
         for k, v in lookups.items():
             if callable(v):
                 v = v()
@@ -130,8 +129,7 @@ def url_params_from_lookup_dict(lookups):
                 v = ('0', '1')[v]
             else:
                 v = str(v)
-            items.append((k, v))
-        params.update(dict(items))
+            params[k] = v
     return params
 
 
