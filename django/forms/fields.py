@@ -233,11 +233,12 @@ class CharField(Field):
 
     def to_python(self, value):
         "Returns a Unicode object."
+        if value not in self.empty_values:
+            value = force_text(value)
+            if self.strip:
+                value = value.strip()
         if value in self.empty_values:
             return self.empty_value
-        value = force_text(value)
-        if self.strip:
-            value = value.strip()
         return value
 
     def widget_attrs(self, widget):
