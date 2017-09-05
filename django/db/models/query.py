@@ -985,7 +985,10 @@ class QuerySet:
             if alias in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                                  "the model." % alias)
-            clone.query.add_annotation(annotation, alias, is_summary=False)
+            if isinstance(annotation, FilteredRelation):
+                clone.query.add_filtered_relation(annotation, alias)
+            else:
+                clone.query.add_annotation(annotation, alias, is_summary=False)
 
         for alias, annotation in clone.query.annotations.items():
             if alias in annotations and annotation.contains_aggregate:
@@ -1069,14 +1072,6 @@ class QuerySet:
         """Select which database this QuerySet should execute against."""
         clone = self._chain()
         clone._db = alias
-        return clone
-
-    def filtered_relation(self, relation_name, alias=None, condition=None):
-        """
-        Allows to add extra filter on relations.
-        """
-        clone = self._clone()
-        clone.query.add_filtered_relation(FilteredRelation(relation_name, alias, condition))
         return clone
 
     ###################################
@@ -1790,15 +1785,13 @@ def get_related_populators(klass_info, select, db):
 
 
 class FilteredRelation:
-    def __init__(self, relation_name, alias, condition):
+    """Specify custom filtering on the ``ON`` clause of SQL joins."""
+
+    def __init__(self, relation_name, condition):
         if not relation_name:
             raise ValueError("relation_name cannot be empty")
-        if not alias:
-            raise ValueError("alias cannot be empty")
-        if relation_name == alias:
-            raise ValueError("alias %r must be different to relation_name %r" % (alias, relation_name))
         self.relation_name = relation_name
-        self.alias = alias
+        self.alias = None
         self.condition = condition
         self.path = []
 
@@ -1810,9 +1803,17 @@ class FilteredRelation:
             self.condition == other.condition)
 
     def clone(self):
-        clone = FilteredRelation(self.relation_name, self.alias, self.condition)
+        clone = FilteredRelation(self.relation_name, self.condition)
+        clone.alias = self.alias
         clone.path = self.path[:]
         return clone
+
+    def resolve_expression(self, *args, **kwargs):
+        """
+        annotate accepts only expressions like parameters.
+        Pretend FilteredRelation is one of them.
+        """
+        raise NotImplementedError
 
     def as_sql(self, compiler, connection):
         # The condition in self.filtered_relation needs to be resolved.

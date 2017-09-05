@@ -241,10 +241,6 @@ Models
 * The new :class:`~django.db.models.functions.StrIndex` database function
   finds the starting index of a string inside another string.
 
-* Added the :meth:`QuerySet.filtered_relation
-  <django.db.models.query.QuerySet.filtered_relation>` method to querysets that
-  allows to pass custom filtering inside the ``ON`` SQL clause.
-
 * On Oracle, ``AutoField`` and ``BigAutoField`` are now created as `identity
   columns`_.
 
@@ -303,6 +299,11 @@ Pagination
 
 * Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
   to provide the documented pattern of handling invalid page numbers.
+
+* Added the :class:`.FilteredRelation`
+  Passed to :meth:`.QuerySet.annotate()`, this new argument type
+  allows to specify custom filtering inside the ``ON`` SQL clause.
+
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

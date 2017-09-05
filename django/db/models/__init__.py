@@ -18,7 +18,7 @@ from django.db.models.indexes import __all__ as indexes_all
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.manager import Manager
 from django.db.models.query import (
-    Prefetch, Q, QuerySet, prefetch_related_objects,
+    FilteredRelation, Prefetch, Q, QuerySet, prefetch_related_objects,
 )
 
 # Imports that would create circular imports if sorted
@@ -68,6 +68,6 @@ __all__ += [
     'OuterRef', 'Subquery', 'Value', 'When',
     'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
     'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
-    'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
+    'FilteredRelation', 'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
     'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel', 'permalink',
 ]

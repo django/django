@@ -1291,7 +1291,8 @@ class Query:
                 target_clause.add(child_clause, connector)
         return target_clause
 
-    def add_filtered_relation(self, filtered_relation):
+    def add_filtered_relation(self, filtered_relation, alias):
+        filtered_relation.alias = alias
         for lookup in chain((filtered_relation.relation_name,),
                             dict(filtered_relation.condition.children).keys()):
             lookup_parts, field_parts, _ = self.solve_lookup_type(lookup)
