@@ -3,6 +3,7 @@ import unittest
 from django.db import connection
 from django.db.models import Case, Count, F, Q, When
 from django.test import TestCase
+from django.test.testcases import skipUnlessDBFeature
 
 from .models import Author, Book, Borrower, Editor, RentalSession, Reservation
 
@@ -154,23 +155,21 @@ class FilteredRelationTests(TestCase):
         self.assertQuerysetEqual(Author.objects.filtered_relation(
             'book', alias='book_alice',
             condition=Q(book__title__iexact='poem by alice')
-        ).values_list('book_alice__title', flat=True).order_by('-book_alice__title'),
+        ).values_list('book_alice__title', flat=True).order_by(F('book_alice__title').desc(nulls_last=True)),
             ["Poem by Alice", None], lambda x: x)
 
     def test_filtered_relation_values(self):
         self.assertQuerysetEqual(Author.objects.filtered_relation(
             'book', alias='book_alice',
-            condition=Q(book__title__iexact='poem by alice')
-        ).values().order_by('-book_alice__id'),
-            [{'id': 1, 'name': 'Alice'},
-             {'id': 2, 'name': 'Jane'}],
-            lambda x: x)
+            condition=Q(book__title__iexact='poem by alice')).filter(book_alice__isnull=False).values(),
+            [{'id': 1, 'name': 'Alice'}], lambda x: x)
 
     def test_filtered_relation_extra(self):
         self.assertQuerysetEqual(Author.objects.filtered_relation(
             'book', alias='book_alice',
             condition=Q(book__title__iexact='poem by alice')
-        ).extra(where=["1 = 1"]).order_by('-book_alice__id'),
+        ).extra(where=["1 = 1"]).order_by(
+            F('book_alice__id').desc(nulls_last=True)),
             ["<Author: Alice>", "<Author: Jane>"])
 
     @skipUnlessDBFeature('supports_select_union')
@@ -197,6 +196,7 @@ class FilteredRelationTests(TestCase):
         ).filter(book_jane__isnull=False).order_by()
         self.assertQuerysetEqual(qs1.intersection(qs2).order_by('id'), [])
 
+    @skipUnlessDBFeature('supports_select_difference')
     def test_filtered_relation_difference(self):
         qs1 = Author.objects.filtered_relation(
             'book', alias='book_alice',
@@ -222,7 +222,8 @@ class FilteredRelationTests(TestCase):
             self.assertQuerysetEqual(Author.objects.filtered_relation(
                 'book', alias='book_alice',
                 condition=Q(book__title__iexact='poem by alice')
-            ).select_related('book_alice').defer('book_alice__title').order_by('-book_alice__title'),
+            ).select_related('book_alice').defer('book_alice__title').order_by(
+                F('book_alice__title').desc(nulls_last=True)),
                 ["Poem by Alice", None], lambda author: getattr(author.book_alice, 'title', None))
 
     def test_filtered_relation_only(self):
@@ -232,7 +233,8 @@ class FilteredRelationTests(TestCase):
             self.assertQuerysetEqual(Author.objects.filtered_relation(
                 'book', alias='book_alice',
                 condition=Q(book__title__iexact='poem by alice')
-            ).select_related('book_alice').only('book_alice__title').order_by('-book_alice__title'),
+            ).select_related('book_alice').only('book_alice__title').order_by(
+                F('book_alice__title').desc(nulls_last=True)),
                 ["available", None], lambda author: getattr(author.book_alice, 'state', None))
 
     def test_filtered_relation_as_subquery(self):
