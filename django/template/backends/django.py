@@ -1,4 +1,5 @@
 from importlib import import_module
+from operator import attrgetter
 from pkgutil import walk_packages
 
 from django.apps import apps
@@ -51,9 +52,7 @@ class Template:
         self.template = template
         self.backend = backend
 
-    @property
-    def origin(self):
-        return self.template.origin
+    origin = property(attrgetter('template.origin'))
 
     def render(self, context=None, request=None):
         context = make_context(context, request, autoescape=self.backend.engine.autoescape)

@@ -1,5 +1,6 @@
 from ctypes import byref, c_int
 from datetime import date, datetime, time
+from operator import methodcaller
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
@@ -93,11 +94,10 @@ class Field(GDALBase):
         "Return the OGR field type name for this Field."
         return capi.get_field_type_name(self.type)
 
-    @property
-    def value(self):
+    value = property(
+        methodcaller('as_string'), None, None,
         "Return the value of this Field."
-        # Default is to get the field as a string.
-        return self.as_string()
+    )
 
     @property
     def width(self):
@@ -131,10 +131,10 @@ class OFTInteger(Field):
 
 
 class OFTReal(Field):
-    @property
-    def value(self):
+    value = property(
+        methodcaller('as_double'), None, None,
         "Return a float contained in this field."
-        return self.as_double()
+    )
 
 
 # String & Binary fields, just subclasses

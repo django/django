@@ -11,6 +11,7 @@
  Lower left (min_x, min_y) o----------+
 """
 from ctypes import Structure, c_double
+from operator import attrgetter
 
 from django.contrib.gis.gdal.error import GDALException
 
@@ -133,25 +134,22 @@ class Envelope:
         else:
             raise GDALException('Incorrect number (%d) of arguments.' % len(args[0]))
 
-    @property
-    def min_x(self):
+    min_x = property(
+        attrgetter('_envelope.MinX'), None, None,
         "Return the value of the minimum X coordinate."
-        return self._envelope.MinX
-
-    @property
-    def min_y(self):
+    )
+    min_y = property(
+        attrgetter('_envelope.MinY'), None, None,
         "Return the value of the minimum Y coordinate."
-        return self._envelope.MinY
-
-    @property
-    def max_x(self):
+    )
+    max_x = property(
+        attrgetter('_envelope.MaxX'), None, None,
         "Return the value of the maximum X coordinate."
-        return self._envelope.MaxX
-
-    @property
-    def max_y(self):
+    )
+    max_y = property(
+        attrgetter('_envelope.MaxY'), None, None,
         "Return the value of the maximum Y coordinate."
-        return self._envelope.MaxY
+    )
 
     @property
     def ur(self):

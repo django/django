@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
@@ -129,10 +131,10 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             raise TypeError('Dimension mismatch.')
 
     # #### Sequence Properties ####
-    @property
-    def tuple(self):
+    tuple = property(
+        attrgetter('_cs.tuple'), None, None,
         "Return a tuple version of the geometry from the coordinate sequence."
-        return self._cs.tuple
+    )
     coords = tuple
 
     def _listarr(self, func):

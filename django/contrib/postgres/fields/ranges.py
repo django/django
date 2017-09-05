@@ -1,5 +1,6 @@
 import datetime
 import json
+from operator import attrgetter
 
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
 
@@ -229,20 +230,14 @@ class AdjacentToLookup(lookups.PostgresSimpleLookup):
 class RangeStartsWith(models.Transform):
     lookup_name = 'startswith'
     function = 'lower'
-
-    @property
-    def output_field(self):
-        return self.lhs.output_field.base_field
+    output_field = property(attrgetter('lhs.output_field.base_field'))
 
 
 @RangeField.register_lookup
 class RangeEndsWith(models.Transform):
     lookup_name = 'endswith'
     function = 'upper'
-
-    @property
-    def output_field(self):
-        return self.lhs.output_field.base_field
+    output_field = property(attrgetter('lhs.output_field.base_field'))
 
 
 @RangeField.register_lookup

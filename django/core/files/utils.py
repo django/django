@@ -1,3 +1,6 @@
+from operator import attrgetter
+
+
 class FileProxyMixin:
     """
     A mixin class used to forward file methods to an underlaying file
@@ -8,20 +11,20 @@ class FileProxyMixin:
                 self.file = file
     """
 
-    encoding = property(lambda self: self.file.encoding)
-    fileno = property(lambda self: self.file.fileno)
-    flush = property(lambda self: self.file.flush)
-    isatty = property(lambda self: self.file.isatty)
-    newlines = property(lambda self: self.file.newlines)
-    read = property(lambda self: self.file.read)
-    readinto = property(lambda self: self.file.readinto)
-    readline = property(lambda self: self.file.readline)
-    readlines = property(lambda self: self.file.readlines)
-    seek = property(lambda self: self.file.seek)
-    tell = property(lambda self: self.file.tell)
-    truncate = property(lambda self: self.file.truncate)
-    write = property(lambda self: self.file.write)
-    writelines = property(lambda self: self.file.writelines)
+    encoding = property(attrgetter('file.encoding'))
+    fileno = property(attrgetter('file.fileno'))
+    flush = property(attrgetter('file.flush'))
+    isatty = property(attrgetter('file.isatty'))
+    newlines = property(attrgetter('file.newlines'))
+    read = property(attrgetter('file.read'))
+    readinto = property(attrgetter('file.readinto'))
+    readline = property(attrgetter('file.readline'))
+    readlines = property(attrgetter('file.readlines'))
+    seek = property(attrgetter('file.seek'))
+    tell = property(attrgetter('file.tell'))
+    truncate = property(attrgetter('file.truncate'))
+    write = property(attrgetter('file.write'))
+    writelines = property(attrgetter('file.writelines'))
 
     @property
     def closed(self):

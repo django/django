@@ -1,4 +1,5 @@
 from ctypes import c_uint
+from operator import attrgetter
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import prototypes as capi
@@ -137,10 +138,10 @@ class Point(GEOSGeometry):
         self._cs.setOrdinate(2, 0, value)
 
     # ### Tuple setting and retrieval routines. ###
-    @property
-    def tuple(self):
+    tuple = property(
+        attrgetter('_cs.tuple'), None, None,
         "Return a tuple of the point."
-        return self._cs.tuple
+    )
 
     @tuple.setter
     def tuple(self, tup):

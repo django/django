@@ -7,6 +7,7 @@ import sys
 from argparse import ArgumentParser
 from contextlib import suppress
 from io import TextIOBase
+from operator import attrgetter
 
 import django
 from django.core import checks
@@ -77,9 +78,7 @@ class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
     """
-    @property
-    def style_func(self):
-        return self._style_func
+    style_func = property(attrgetter('_style_func'))
 
     @style_func.setter
     def style_func(self, style_func):

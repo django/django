@@ -62,6 +62,7 @@ and two directions (forward and reverse) for a total of six combinations.
    If you're looking for ``ForwardManyToManyDescriptor`` or
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
+from operator import attrgetter
 
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
@@ -725,12 +726,10 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
 
         self.reverse = reverse
 
-    @property
-    def through(self):
-        # through is provided so that you have easy access to the through
-        # model (Book.authors.through) for inlines, etc. This is done as
-        # a property to ensure that the fully resolved value is returned.
-        return self.rel.through
+    # through is provided so that you have easy access to the through
+    # model (Book.authors.through) for inlines, etc. This is done as
+    # a property to ensure that the fully resolved value is returned.
+    through = property(attrgetter('rel.through'))
 
     @cached_property
     def related_manager_cls(self):

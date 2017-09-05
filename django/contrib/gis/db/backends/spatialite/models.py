@@ -1,6 +1,8 @@
 """
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
+from operator import attrgetter
+
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
 
@@ -54,9 +56,7 @@ class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     proj4text = models.CharField(max_length=2048)
     srtext = models.CharField(max_length=2048)
 
-    @property
-    def wkt(self):
-        return self.srtext
+    wkt = property(attrgetter('srtext'))
 
     class Meta:
         app_label = 'gis'

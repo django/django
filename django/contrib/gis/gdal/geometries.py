@@ -41,6 +41,7 @@
 import sys
 from binascii import a2b_hex, b2a_hex
 from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
+from operator import attrgetter, itemgetter, methodcaller
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
@@ -227,15 +228,14 @@ class OGRGeometry(GDALBase):
         "Return the number of Points in this Geometry."
         return capi.get_point_count(self.ptr)
 
-    @property
-    def num_points(self):
+    num_points = property(
+        attrgetter('point_count'), None, None,
         "Alias for `point_count` (same name method in GEOS API.)"
-        return self.point_count
-
-    @property
-    def num_coords(self):
+    )
+    num_coords = property(
+        attrgetter('point_count'), None, None,
         "Alias for `point_count`."
-        return self.point_count
+    )
 
     @property
     def geom_type(self):
@@ -262,10 +262,10 @@ class OGRGeometry(GDALBase):
     def empty(self):
         return capi.is_empty(self.ptr)
 
-    @property
-    def extent(self):
+    extent = property(
+        attrgetter('envelope.tuple'), None, None,
         "Return the envelope as a 4-tuple, instead of as an Envelope object."
-        return self.envelope.tuple
+    )
 
     # #### SpatialReference-related Properties ####
 
@@ -470,18 +470,17 @@ class OGRGeometry(GDALBase):
         else:
             return OGRGeometry(gen_func(self.ptr), self.srs)
 
-    @property
-    def boundary(self):
+    boundary = property(
+        methodcaller('_geomgen', capi.get_boundary), None, None,
         "Return the boundary of this geometry."
-        return self._geomgen(capi.get_boundary)
-
-    @property
-    def convex_hull(self):
+    )
+    convex_hull = property(
+        methodcaller('_geomgen', capi.geom_convex_hull), None, None,
         """
         Return the smallest convex Polygon that contains all the points in
         this Geometry.
         """
-        return self._geomgen(capi.geom_convex_hull)
+    )
 
     def difference(self, other):
         """
@@ -583,15 +582,14 @@ class LineString(OGRGeometry):
         """
         return [func(self.ptr, i) for i in range(len(self))]
 
-    @property
-    def x(self):
+    x = property(
+        methodcaller('_listarr', capi.getx), None, None,
         "Return the X coordinates in a list."
-        return self._listarr(capi.getx)
-
-    @property
-    def y(self):
+    )
+    y = property(
+        methodcaller('_listarr', capi.gety), None, None,
         "Return the Y coordinates in a list."
-        return self._listarr(capi.gety)
+    )
 
     @property
     def z(self):
@@ -619,10 +617,10 @@ class Polygon(OGRGeometry):
             raise IndexError('Index out of range when accessing rings of a polygon: %s.' % index)
 
     # Polygon Properties
-    @property
-    def shell(self):
+    shell = property(
+        itemgetter(0), None, None,
         "Return the shell of this Polygon."
-        return self[0]  # First ring is the shell
+    )
     exterior_ring = shell
 
     @property

@@ -27,6 +27,7 @@
   NAD83 / Texas South Central
 """
 from ctypes import byref, c_char_p, c_int
+from operator import attrgetter
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
@@ -308,10 +309,10 @@ class SpatialReference(GDALBase):
         "Return the PROJ.4 representation for this Spatial Reference."
         return capi.to_proj(self.ptr, byref(c_char_p()))
 
-    @property
-    def proj4(self):
+    proj4 = property(
+        attrgetter('proj'), None, None,
         "Alias for proj()."
-        return self.proj
+    )
 
     @property
     def xml(self, dialect=''):

@@ -3,6 +3,7 @@ import json
 import operator
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
+from operator import methodcaller
 from urllib.parse import quote as urlquote
 
 from django import forms
@@ -571,9 +572,7 @@ class ModelAdmin(BaseModelAdmin):
         ]
         return urlpatterns
 
-    @property
-    def urls(self):
-        return self.get_urls()
+    urls = property(methodcaller('get_urls'))
 
     @property
     def media(self):

@@ -1,4 +1,5 @@
 from ctypes import byref, c_uint
+from operator import itemgetter
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
@@ -153,16 +154,12 @@ class Polygon(GEOSGeometry):
         # Getting the number of rings
         return capi.get_nrings(self.ptr)
 
-    def _get_ext_ring(self):
-        "Get the exterior ring of the Polygon."
-        return self[0]
-
     def _set_ext_ring(self, ring):
         "Set the exterior ring of the Polygon."
         self[0] = ring
 
     # Properties for the exterior ring/shell.
-    exterior_ring = property(_get_ext_ring, _set_ext_ring)
+    exterior_ring = property(itemgetter(0), _set_ext_ring)
     shell = exterior_ring
 
     @property

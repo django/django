@@ -6,6 +6,7 @@ and database field objects.
 from collections import OrderedDict
 from contextlib import suppress
 from itertools import chain
+from operator import attrgetter
 
 from django.core.exceptions import (
     NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
@@ -1192,14 +1193,11 @@ class ModelChoiceField(ChoiceField):
             result.queryset = self.queryset.all()
         return result
 
-    def _get_queryset(self):
-        return self._queryset
-
     def _set_queryset(self, queryset):
         self._queryset = queryset
         self.widget.choices = self.choices
 
-    queryset = property(_get_queryset, _set_queryset)
+    queryset = property(attrgetter('_queryset'), _set_queryset)
 
     # this method will be used to create object labels by the QuerySetIterator.
     # Override it to customize the label.

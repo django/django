@@ -1,4 +1,5 @@
 from decimal import Decimal
+from operator import attrgetter
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
@@ -44,9 +45,7 @@ class GeoFuncMixin:
             if not output_field:
                 self.source_expressions[pos] = Value(geom, output_field=GeometryField(srid=geom.srid))
 
-    @property
-    def name(self):
-        return self.__class__.__name__
+    name = property(attrgetter('__class__.__name__'))
 
     @cached_property
     def geo_field(self):

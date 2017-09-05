@@ -3,6 +3,7 @@ import logging
 import string
 from contextlib import suppress
 from datetime import datetime, timedelta
+from operator import attrgetter
 
 from django.conf import settings
 from django.contrib.sessions.exceptions import SuspiciousSession
@@ -167,20 +168,17 @@ class SessionBase:
         """
         return key and len(key) >= 8
 
-    def _get_session_key(self):
-        return self.__session_key
-
     def _set_session_key(self, value):
         """
         Validate session key on assignment. Invalid values will set to None.
         """
         if self._validate_session_key(value):
-            self.__session_key = value
+            self._session_key_ = value
         else:
-            self.__session_key = None
+            self._session_key_ = None
 
-    session_key = property(_get_session_key)
-    _session_key = property(_get_session_key, _set_session_key)
+    session_key = property(attrgetter('_session_key_'))
+    _session_key = property(attrgetter('_session_key_'), _set_session_key)
 
     def _get_session(self, no_load=False):
         """

@@ -4,6 +4,7 @@
 """
 import re
 from ctypes import addressof, byref, c_double
+from operator import attrgetter
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
@@ -195,10 +196,10 @@ class GEOSGeometryBase(GEOSBase):
         "Return the number of coordinates in the Geometry."
         return capi.get_num_coords(self.ptr)
 
-    @property
-    def num_points(self):
+    num_points = property(
+        attrgetter('num_coords'), None, None,
         "Return the number points, or coordinates, in the Geometry."
-        return self.num_coords
+    )
 
     @property
     def dims(self):
@@ -370,12 +371,12 @@ class GEOSGeometryBase(GEOSBase):
         """
         return ewkb_w(dim=3 if self.hasz else 2).write_hex(self)
 
-    @property
-    def json(self):
+    json = property(
+        attrgetter('ogr.json'), None, None,
         """
         Return GeoJSON representation of this Geometry.
         """
-        return self.ogr.json
+    )
     geojson = json
 
     @property
@@ -402,13 +403,13 @@ class GEOSGeometryBase(GEOSBase):
         gtype = self.geom_type
         return '<%s>%s</%s>' % (gtype, self.coord_seq.kml, gtype)
 
-    @property
-    def prepared(self):
+    prepared = property(
+        PreparedGeometry, None, None,
         """
         Return a PreparedGeometry corresponding to this geometry -- it is
         optimized for the contains, intersects, and covers operations.
         """
-        return PreparedGeometry(self)
+    )
 
     # #### GDAL-specific output routines ####
     def _ogr_ptr(self):
@@ -429,10 +430,10 @@ class GEOSGeometryBase(GEOSBase):
                 pass
         return None
 
-    @property
-    def crs(self):
+    crs = property(
+        attrgetter('srs'), None, None,
         "Alias for `srs` property."
-        return self.srs
+    )
 
     def transform(self, ct, clone=False):
         """

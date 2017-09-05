@@ -1,5 +1,6 @@
 import datetime
 import warnings
+from operator import attrgetter
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
@@ -201,10 +202,10 @@ class BoundField:
             extra_classes.add(self.form.required_css_class)
         return ' '.join(extra_classes)
 
-    @property
-    def is_hidden(self):
+    is_hidden = property(
+        attrgetter('field.widget.is_hidden'), None, None,
         """Return True if this BoundField's widget is hidden."""
-        return self.field.widget.is_hidden
+    )
 
     @property
     def auto_id(self):

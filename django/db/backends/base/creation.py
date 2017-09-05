@@ -1,5 +1,6 @@
 import sys
 from io import StringIO
+from operator import attrgetter
 
 from django.apps import apps
 from django.conf import settings
@@ -19,12 +20,12 @@ class BaseDatabaseCreation:
     def __init__(self, connection):
         self.connection = connection
 
-    @property
-    def _nodb_connection(self):
+    _nodb_connection = property(
+        attrgetter('connection._nodb_connection'), None, None,
         """
         Used to be defined here, now moved to DatabaseWrapper.
         """
-        return self.connection._nodb_connection
+    )
 
     def create_test_db(self, verbosity=1, autoclobber=False, serialize=True, keepdb=False):
         """
