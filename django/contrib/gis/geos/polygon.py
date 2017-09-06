@@ -2,7 +2,7 @@ from ctypes import byref, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import GEOM_PTR, get_pointer_arr
+from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.linestring import LinearRing
 
 
@@ -86,10 +86,8 @@ class Polygon(GEOSGeometry):
 
         n_holes = length - 1
         if n_holes:
-            holes = get_pointer_arr(n_holes)
-            for i, r in enumerate(rings):
-                holes[i] = self._clone(r)
-                holes_param = byref(holes)
+            holes = (GEOM_PTR * n_holes)(*[self._clone(r) for r in rings])
+            holes_param = byref(holes)
         else:
             holes_param = None
 
