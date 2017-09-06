@@ -145,17 +145,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Loop over the key table, collecting things as constraints. The column
         # array must return column names in the same order in which they were
         # created.
-        # The subquery containing generate_series can be replaced with
-        # "WITH ORDINALITY" when support for PostgreSQL 9.3 is dropped.
         cursor.execute("""
             SELECT
                 c.conname,
                 array(
                     SELECT attname
-                    FROM (
-                        SELECT unnest(c.conkey) AS colid,
-                               generate_series(1, array_length(c.conkey, 1)) AS arridx
-                    ) AS cols
+                    FROM unnest(c.conkey) WITH ORDINALITY cols(colid, arridx)
                     JOIN pg_attribute AS ca ON cols.colid = ca.attnum
                     WHERE ca.attrelid = c.conrelid
                     ORDER BY cols.arridx
@@ -183,17 +178,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "options": options,
             }
         # Now get indexes
-        # The row_number() function for ordering the index fields can be
-        # replaced by WITH ORDINALITY in the unnest() functions when support
-        # for PostgreSQL 9.3 is dropped.
         cursor.execute("""
             SELECT
-                indexname, array_agg(attname ORDER BY rnum), indisunique, indisprimary,
-                array_agg(ordering ORDER BY rnum), amname, exprdef, s2.attoptions
+                indexname, array_agg(attname ORDER BY arridx), indisunique, indisprimary,
+                array_agg(ordering ORDER BY arridx), amname, exprdef, s2.attoptions
             FROM (
                 SELECT
-                    row_number() OVER () as rnum, c2.relname as indexname,
-                    idx.*, attr.attname, am.amname,
+                    c2.relname as indexname, idx.*, attr.attname, am.amname,
                     CASE
                         WHEN idx.indexprs IS NOT NULL THEN
                             pg_get_indexdef(idx.indexrelid)
@@ -206,9 +197,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     END as ordering,
                     c2.reloptions as attoptions
                 FROM (
-                    SELECT
-                        *, unnest(i.indkey) as key, unnest(i.indoption) as option
-                    FROM pg_index i
+                    SELECT *
+                    FROM pg_index i, unnest(i.indkey, i.indoption) WITH ORDINALITY koi(key, option, arridx)
                 ) idx
                 LEFT JOIN pg_class c ON idx.indrelid = c.oid
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid

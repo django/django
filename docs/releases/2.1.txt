@@ -206,6 +206,12 @@ Dropped support for MySQL 5.5
 The end of upstream support for MySQL 5.5 is December 2018. Django 2.1 supports
 MySQL 5.6 and higher.
 
+Dropped support for PostgreSQL 9.3
+----------------------------------
+
+The end of upstream support for PostgreSQL 9.3 is September 2018. Django 2.1
+supports PostgreSQL 9.4 and higher.
+
 Miscellaneous
 -------------
 
