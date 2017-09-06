@@ -906,7 +906,7 @@ class Query:
         """
         if force_reuse:
             reuse = [a for a, j in self.alias_map.items()
-                     if (a in force_reuse) and j.equals(join, with_filtered_relation=False)]
+                     if a in force_reuse and j.equals(join, with_filtered_relation=False)]
         else:
             reuse = [a for a, j in self.alias_map.items()
                      if (reuse is None or a in reuse) and j == join]

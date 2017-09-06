@@ -30,11 +30,11 @@ class Book(models.Model):
     AVAILABLE = 'available'
     RESERVED = 'reserved'
     RENTED = 'rented'
-    STATES = [
+    STATES = (
         (AVAILABLE, 'Available'),
         (RESERVED, 'reserved'),
         (RENTED, 'Rented'),
-    ]
+    )
     title = models.CharField(max_length=255)
     author = models.ForeignKey(
         Author,
@@ -65,8 +65,10 @@ class Borrower(models.Model):
 class Reservation(models.Model):
     NEW = 'new'
     STOPPED = 'stopped'
-    STATES = [(NEW, 'New'),
-              (STOPPED, 'Stopped')]
+    STATES = (
+        (NEW, 'New'),
+        (STOPPED, 'Stopped'),
+    )
     borrower = models.ForeignKey(
         Borrower,
         related_name='reservations',
@@ -85,14 +87,16 @@ class Reservation(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return '-'.join(self.book.name, self.borrower.name, self.state)
+        return '-'.join((self.book.name, self.borrower.name, self.state))
 
 
 class RentalSession(models.Model):
     NEW = 'new'
     STOPPED = 'stopped'
-    STATES = [(NEW, 'New'),
-              (STOPPED, 'Stopped')]
+    STATES = (
+        (NEW, 'New'),
+        (STOPPED, 'Stopped'),
+    )
     borrower = models.ForeignKey(
         Borrower,
         related_name='rental_sessions',
@@ -111,4 +115,4 @@ class RentalSession(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return '-'.join(self.book.name, self.borrower.name, self.state)
+        return '-'.join((self.book.name, self.borrower.name, self.state))
