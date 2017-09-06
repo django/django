@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import partialmethod
 from io import StringIO
 from unittest import mock
 
@@ -9,7 +10,6 @@ from django.db import connection, transaction
 from django.http import HttpResponse
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
-from django.utils.functional import curry
 
 from .models import (
     Actor, Article, Author, AuthorProfile, BaseModel, Category, ComplexModel,
@@ -405,4 +405,4 @@ def register_tests(test_class, method_name, test_func, exclude=None):
             (exclude is None or f not in exclude))
     ]
     for format_ in formats:
-        setattr(test_class, method_name % format_, curry(test_func, format_))
+        setattr(test_class, method_name % format_, partialmethod(test_func, format_))

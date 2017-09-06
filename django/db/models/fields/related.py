@@ -12,7 +12,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
-from django.utils.functional import cached_property, curry
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
@@ -1567,7 +1567,7 @@ class ManyToManyField(RelatedField):
         setattr(cls, self.name, ManyToManyDescriptor(self.remote_field, reverse=False))
 
         # Set up the accessor for the m2m table name for the relation.
-        self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
+        self.m2m_db_table = partial(self._get_m2m_db_table, cls._meta)
 
     def contribute_to_related_class(self, cls, related):
         # Internal M2Ms (i.e., those with a related name ending with '+')
@@ -1576,15 +1576,15 @@ class ManyToManyField(RelatedField):
             setattr(cls, related.get_accessor_name(), ManyToManyDescriptor(self.remote_field, reverse=True))
 
         # Set up the accessors for the column names on the m2m table.
-        self.m2m_column_name = curry(self._get_m2m_attr, related, 'column')
-        self.m2m_reverse_name = curry(self._get_m2m_reverse_attr, related, 'column')
+        self.m2m_column_name = partial(self._get_m2m_attr, related, 'column')
+        self.m2m_reverse_name = partial(self._get_m2m_reverse_attr, related, 'column')
 
-        self.m2m_field_name = curry(self._get_m2m_attr, related, 'name')
-        self.m2m_reverse_field_name = curry(self._get_m2m_reverse_attr, related, 'name')
+        self.m2m_field_name = partial(self._get_m2m_attr, related, 'name')
+        self.m2m_reverse_field_name = partial(self._get_m2m_reverse_attr, related, 'name')
 
-        get_m2m_rel = curry(self._get_m2m_attr, related, 'remote_field')
+        get_m2m_rel = partial(self._get_m2m_attr, related, 'remote_field')
         self.m2m_target_field_name = lambda: get_m2m_rel().field_name
-        get_m2m_reverse_rel = curry(self._get_m2m_reverse_attr, related, 'remote_field')
+        get_m2m_reverse_rel = partial(self._get_m2m_reverse_attr, related, 'remote_field')
         self.m2m_reverse_target_field_name = lambda: get_m2m_reverse_rel().field_name
 
     def set_attributes_from_rel(self):

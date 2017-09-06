@@ -1,6 +1,7 @@
 import copy
 import inspect
 import warnings
+from functools import partialmethod
 from itertools import chain
 
 from django.apps import apps
@@ -27,7 +28,6 @@ from django.db.models.signals import (
 )
 from django.db.models.utils import make_model_tuple
 from django.utils.encoding import force_text
-from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -328,8 +328,8 @@ class ModelBase(type):
         opts._prepare(cls)
 
         if opts.order_with_respect_to:
-            cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
-            cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
+            cls.get_next_in_order = partialmethod(cls._get_next_or_previous_in_order, is_next=True)
+            cls.get_previous_in_order = partialmethod(cls._get_next_or_previous_in_order, is_next=False)
 
             # Defer creating accessors on the foreign class until it has been
             # created and registered. If remote_field is None, we're ordering
@@ -1670,7 +1670,7 @@ class Model(metaclass=ModelBase):
 
 # ORDERING METHODS #########################
 
-def method_set_order(ordered_obj, self, id_list, using=None):
+def method_set_order(self, ordered_obj, id_list, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     order_wrt = ordered_obj._meta.order_with_respect_to
@@ -1682,7 +1682,7 @@ def method_set_order(ordered_obj, self, id_list, using=None):
             ordered_obj.objects.filter(pk=j, **filter_args).update(_order=i)
 
 
-def method_get_order(ordered_obj, self):
+def method_get_order(self, ordered_obj):
     order_wrt = ordered_obj._meta.order_with_respect_to
     filter_args = order_wrt.get_forward_related_filter(self)
     pk_name = ordered_obj._meta.pk.name
@@ -1693,12 +1693,12 @@ def make_foreign_order_accessors(model, related_model):
     setattr(
         related_model,
         'get_%s_order' % model.__name__.lower(),
-        curry(method_get_order, model)
+        partialmethod(method_get_order, model)
     )
     setattr(
         related_model,
         'set_%s_order' % model.__name__.lower(),
-        curry(method_set_order, model)
+        partialmethod(method_set_order, model)
     )
 
 ########

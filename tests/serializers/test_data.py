@@ -390,7 +390,7 @@ class SerializerDataTests(TestCase):
     pass
 
 
-def serializerTest(format, self):
+def serializerTest(self, format):
 
     # Create all the objects defined in the test data
     objects = []

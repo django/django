@@ -6,7 +6,7 @@ import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
-from functools import total_ordering
+from functools import partialmethod, total_ordering
 
 from django import forms
 from django.apps import apps
@@ -26,7 +26,7 @@ from django.utils.dateparse import (
 )
 from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.functional import Promise, cached_property, curry
+from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
@@ -717,7 +717,7 @@ class Field(RegisterLookupMixin):
                 setattr(cls, self.attname, DeferredAttribute(self.attname, cls))
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
-                    curry(cls._get_FIELD_display, field=self))
+                    partialmethod(cls._get_FIELD_display, field=self))
 
     def get_filter_kwargs_for_object(self, obj):
         """
@@ -1254,11 +1254,11 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.null:
             setattr(
                 cls, 'get_next_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
+                partialmethod(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
             )
             setattr(
                 cls, 'get_previous_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
+                partialmethod(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
             )
 
     def get_prep_value(self, value):
