@@ -267,10 +267,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return nodb_connection
 
     @cached_property
-    def psycopg2_version(self):
-        return PSYCOPG2_VERSION
-
-    @cached_property
     def pg_version(self):
         with self.temporary_connection():
             return self.connection.server_version
