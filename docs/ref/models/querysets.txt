@@ -312,15 +312,6 @@ identical to::
 
     Entry.objects.order_by('blog__name')
 
-It is also possible to order a queryset by a related field, without incurring
-the cost of a JOIN, by referring to the ``_id`` of the related field::
-
-    # No Join
-    Entry.objects.order_by('blog_id')
-
-    # Join
-    Entry.objects.order_by('blog__id')
-
 You can also order by :doc:`query expressions </ref/models/expressions>` by
 calling ``asc()`` or ``desc()`` on the expression::
 
