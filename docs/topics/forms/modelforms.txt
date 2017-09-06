@@ -100,6 +100,12 @@ Model field                         Form field
 
 :class:`NullBooleanField`           :class:`~django.forms.NullBooleanField`
 
+:class:`PositiveAutoField`          Not represented in the form
+
+:class:`PositiveBigAutoField`       Not represented in the form
+
+:class:`PositiveBigIntegerField`    :class:`~django.forms.IntegerField`
+
 :class:`PositiveIntegerField`       :class:`~django.forms.IntegerField`
 
 :class:`PositiveSmallIntegerField`  :class:`~django.forms.IntegerField`

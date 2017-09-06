@@ -42,12 +42,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_type = super().get_field_type(data_type, description)
         if 'auto_increment' in description.extra:
             if field_type == 'IntegerField':
+                if description.is_unsigned:
+                    return 'PositiveAutoField'
                 return 'AutoField'
             elif field_type == 'BigIntegerField':
+                if description.is_unsigned:
+                    return 'PositiveBigAutoField'
                 return 'BigAutoField'
         if description.is_unsigned:
             if field_type == 'IntegerField':
                 return 'PositiveIntegerField'
+            elif field_type == 'BigIntegerField':
+                return 'PositiveBigIntegerField'
             elif field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'
         return field_type

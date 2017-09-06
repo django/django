@@ -60,7 +60,9 @@ class LayerMapping:
     # counterparts.
     FIELD_TYPES = {
         models.AutoField: OFTInteger,
+        models.PositiveAutoField: OFTInteger,
         models.BigAutoField: OFTInteger64,
+        models.PositiveBigAutoField: OFTInteger64,
         models.IntegerField: (OFTInteger, OFTReal, OFTString),
         models.FloatField: (OFTInteger, OFTReal),
         models.DateField: OFTDate,
@@ -73,6 +75,7 @@ class LayerMapping:
         models.TextField: OFTString,
         models.URLField: OFTString,
         models.BigIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveBigIntegerField: (OFTInteger, OFTReal, OFTString),
         models.SmallIntegerField: (OFTInteger, OFTReal, OFTString),
         models.PositiveSmallIntegerField: (OFTInteger, OFTReal, OFTString),
     }

@@ -9,8 +9,40 @@ class City(models.Model):
         return self.name
 
 
+class PositiveCity(models.Model):
+    id = models.PositiveAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class PositiveBigCity(models.Model):
+    id = models.PositiveBigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class PositiveDistrict(models.Model):
+    city = models.ForeignKey(PositiveCity, models.CASCADE, primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+class PositiveBigDistrict(models.Model):
+    city = models.ForeignKey(PositiveBigCity, models.CASCADE, primary_key=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):

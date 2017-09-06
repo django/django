@@ -38,7 +38,8 @@ __all__ = [
     'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
     'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField',
     'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
-    'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
+    'NOT_PROVIDED', 'NullBooleanField', 'PositiveAutoField',
+    'PositiveBigAutoField', 'PositiveBigIntegerField', 'PositiveIntegerField',
     'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
     'TimeField', 'URLField', 'UUIDField',
 ]
@@ -2032,6 +2033,38 @@ class PositiveIntegerRelDbTypeMixin:
             return self.db_type(connection)
         else:
             return IntegerField().db_type(connection=connection)
+
+
+class PositiveAutoField(AutoField):
+    description = _("Positive integer")
+
+    def get_internal_type(self):
+        return "PositiveAutoField"
+
+    def rel_db_type(self, connection):
+        return PositiveIntegerField().db_type(connection=connection)
+
+
+class PositiveBigAutoField(BigAutoField):
+    description = _("Positive Big (8 byte) integer")
+
+    def get_internal_type(self):
+        return "PositiveBigAutoField"
+
+    def rel_db_type(self, connection):
+        return PositiveBigIntegerField().db_type(connection=connection)
+
+
+class PositiveBigIntegerField(BigIntegerField):
+    description = _("Positive Big (8 byte) integer")
+
+    def get_internal_type(self):
+        return "PositiveBigIntegerField"
+
+    def formfield(self, **kwargs):
+        defaults = {'min_value': 0}
+        defaults.update(kwargs)
+        return super().formfield(**defaults)
 
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):

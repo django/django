@@ -1010,6 +1010,32 @@ Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
 this instead of a :class:`BooleanField` with ``null=True``. The default form
 widget for this field is a :class:`~django.forms.NullBooleanSelect`.
 
+``PositiveAutoField``
+---------------------
+
+.. class:: PositiveAutoField(**options)
+
+Like an :class:`AutoField`, but must not be negative.
+Values from ``1`` to ``2147483647`` are safe in all databases supported by
+Django.
+
+``PositiveBigAutoField``
+------------------------
+
+.. class:: PositiveBigAutoField(**options)
+
+A 64-bit integer, much like an :class:`PositiveAutoField` except that it is
+guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+
+``PositiveBigIntegerField``
+---------------------------
+
+.. class:: PositiveBigIntegerField(**options)
+
+Like an :class:`BigIntegerField`, but must be either positive or zero (``0``).
+Values from ``0`` to ``9223372036854775807`` are safe in all databases
+supported by Django.
+
 ``PositiveIntegerField``
 ------------------------
 

@@ -7,7 +7,10 @@ from django.test import TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango21Warning
 
-from .models import Article, ArticleReporter, City, District, Reporter
+from .models import (
+    Article, ArticleReporter, City, District, PositiveBigCity,
+    PositiveBigDistrict, PositiveCity, PositiveDistrict, Reporter,
+)
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -106,6 +109,20 @@ class IntrospectionTests(TransactionTestCase):
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
         self.assertIn('BigAutoField', [datatype(r[1], r) for r in desc])
 
+    @skipUnlessDBFeature('can_introspect_positive_integer_field')
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_positiveautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, PositiveCity._meta.db_table)
+        self.assertIn('PositiveAutoField', [datatype(r[1], r) for r in desc])
+
+    @skipUnlessDBFeature('can_introspect_positive_integer_field')
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_positivebigautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, PositiveBigCity._meta.db_table)
+        self.assertIn('PositiveBigAutoField', [datatype(r[1], r) for r in desc])
+
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):
@@ -166,8 +183,13 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
             pk_fk_column = connection.introspection.get_primary_key_column(cursor, District._meta.db_table)
+            pos_pk_fk_column = connection.introspection.get_primary_key_column(cursor, PositiveDistrict._meta.db_table)
+            pos_big_pk_fk_column = connection.introspection.get_primary_key_column(
+                cursor, PositiveBigDistrict._meta.db_table)
         self.assertEqual(primary_key_column, 'id')
         self.assertEqual(pk_fk_column, 'city_id')
+        self.assertEqual(pos_pk_fk_column, 'city_id')
+        self.assertEqual(pos_big_pk_fk_column, 'city_id')
 
     @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes(self):

@@ -110,6 +110,10 @@ class PositiveIntegerModel(models.Model):
     value = models.PositiveIntegerField()
 
 
+class PositiveBigIntegerModel(models.Model):
+    value = models.PositiveBigIntegerField()
+
+
 class Post(models.Model):
     title = models.CharField(max_length=100)
     body = models.TextField()
