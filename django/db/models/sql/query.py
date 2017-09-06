@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 from collections import Counter, Iterator, Mapping, OrderedDict, namedtuple
-from contextlib import suppress
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -313,8 +312,10 @@ class Query:
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
         # Clear the cached_property
-        with suppress(AttributeError):
+        try:
             del obj.base_table
+        except AttributeError:
+            pass
         return obj
 
     def chain(self, klass=None):

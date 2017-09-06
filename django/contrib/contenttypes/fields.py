@@ -1,5 +1,4 @@
 from collections import defaultdict
-from contextlib import suppress
 
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
@@ -237,8 +236,10 @@ class GenericForeignKey(FieldCacheMixin):
                 rel_obj = None
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
-            with suppress(ObjectDoesNotExist):
+            try:
                 rel_obj = ct.get_object_for_this_type(pk=pk_val)
+            except ObjectDoesNotExist:
+                pass
         self.set_cached_value(instance, rel_obj)
         return rel_obj
 

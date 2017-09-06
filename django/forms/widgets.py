@@ -6,7 +6,6 @@ import copy
 import datetime
 import re
 import warnings
-from contextlib import suppress
 from itertools import chain
 
 from django.conf import settings
@@ -651,8 +650,10 @@ class ChoiceWidget(Widget):
     def value_from_datadict(self, data, files, name):
         getter = data.get
         if self.allow_multiple_selected:
-            with suppress(AttributeError):
+            try:
                 getter = data.getlist
+            except AttributeError:
+                pass
         return getter(name)
 
     def format_value(self, value):

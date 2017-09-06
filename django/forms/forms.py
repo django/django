@@ -4,7 +4,6 @@ Form classes
 
 import copy
 from collections import OrderedDict
-from contextlib import suppress
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 # BoundField is imported for backwards compatibility in Django 1.9
@@ -126,8 +125,10 @@ class BaseForm:
             return
         fields = OrderedDict()
         for key in field_order:
-            with suppress(KeyError):  # ignore unknown fields
+            try:
                 fields[key] = self.fields.pop(key)
+            except KeyError:  # ignore unknown fields
+                pass
         fields.update(self.fields)  # add remaining fields in original order
         self.fields = fields
 

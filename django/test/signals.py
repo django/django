@@ -2,7 +2,6 @@ import os
 import threading
 import time
 import warnings
-from contextlib import suppress
 
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
@@ -64,10 +63,14 @@ def update_connections_time_zone(**kwargs):
     # Reset the database connections' time zone
     if kwargs['setting'] in {'TIME_ZONE', 'USE_TZ'}:
         for conn in connections.all():
-            with suppress(AttributeError):
+            try:
                 del conn.timezone
-            with suppress(AttributeError):
+            except AttributeError:
+                pass
+            try:
                 del conn.timezone_name
+            except AttributeError:
+                pass
             conn.ensure_timezone()
 
 
@@ -86,8 +89,10 @@ def reset_template_engines(**kwargs):
         'INSTALLED_APPS',
     }:
         from django.template import engines
-        with suppress(AttributeError):
+        try:
             del engines.templates
+        except AttributeError:
+            pass
         engines._templates = None
         engines._engines = {}
         from django.template.engine import Engine

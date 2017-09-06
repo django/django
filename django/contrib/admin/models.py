@@ -1,5 +1,4 @@
 import json
-from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.admin.utils import quote
@@ -138,6 +137,8 @@ class LogEntry(models.Model):
         """
         if self.content_type and self.object_id:
             url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)
-            with suppress(NoReverseMatch):
+            try:
                 return reverse(url_name, args=(quote(self.object_id),))
+            except NoReverseMatch:
+                pass
         return None

@@ -7,7 +7,6 @@ import operator
 import sys
 import warnings
 from collections import OrderedDict, namedtuple
-from contextlib import suppress
 from functools import lru_cache
 from itertools import chain
 
@@ -521,8 +520,10 @@ class QuerySet:
             return obj, True
         except IntegrityError:
             exc_info = sys.exc_info()
-            with suppress(self.model.DoesNotExist):
+            try:
                 return self.get(**lookup), False
+            except self.model.DoesNotExist:
+                pass
             raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
     def _extract_model_params(self, defaults, **kwargs):
@@ -1337,8 +1338,11 @@ class RawQuerySet:
         # Adjust any column names which don't match field names
         for (query_name, model_name) in self.translations.items():
             # Ignore translations for nonexistent column names
-            with suppress(ValueError):
+            try:
                 index = columns.index(query_name)
+            except ValueError:
+                pass
+            else:
                 columns[index] = model_name
         return columns
 

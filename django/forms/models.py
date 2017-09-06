@@ -4,7 +4,6 @@ and database field objects.
 """
 
 from collections import OrderedDict
-from contextlib import suppress
 from itertools import chain
 
 from django.core.exceptions import (
@@ -615,8 +614,10 @@ class BaseModelFormSet(BaseFormSet):
                 kwargs['instance'] = self.get_queryset()[i]
         elif self.initial_extra:
             # Set initial values for extra forms
-            with suppress(IndexError):
+            try:
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
+            except IndexError:
+                pass
         form = super()._construct_form(i, **kwargs)
         if pk_required:
             form.fields[self.model._meta.pk.name].required = True
