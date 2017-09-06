@@ -6,7 +6,7 @@ import copy
 import operator
 import sys
 import warnings
-from collections import OrderedDict, deque
+from collections import OrderedDict
 from contextlib import suppress
 from itertools import chain
 
@@ -1361,8 +1361,6 @@ def prefetch_related_objects(model_instances, *related_lookups):
     if len(model_instances) == 0:
         return  # nothing to do
 
-    related_lookups = normalize_prefetch_lookups(related_lookups)
-
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
@@ -1371,9 +1369,9 @@ def prefetch_related_objects(model_instances, *related_lookups):
     auto_lookups = set()  # we add to this as we go through.
     followed_descriptors = set()  # recursion protection
 
-    all_lookups = deque(related_lookups)
+    all_lookups = normalize_prefetch_lookups(reversed(related_lookups))
     while all_lookups:
-        lookup = all_lookups.popleft()
+        lookup = all_lookups.pop()
         if lookup.prefetch_to in done_queries:
             if lookup.queryset:
                 raise ValueError("'%s' lookup was already seen with a different queryset. "
@@ -1446,9 +1444,9 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 # the new lookups from relationships we've seen already.
                 if not (lookup in auto_lookups and descriptor in followed_descriptors):
                     done_queries[prefetch_to] = obj_list
-                    new_lookups = normalize_prefetch_lookups(additional_lookups, prefetch_to)
+                    new_lookups = normalize_prefetch_lookups(reversed(additional_lookups), prefetch_to)
                     auto_lookups.update(new_lookups)
-                    all_lookups.extendleft(new_lookups)
+                    all_lookups.extend(new_lookups)
                 followed_descriptors.add(descriptor)
             else:
                 # Either a singly related object that has already been fetched
