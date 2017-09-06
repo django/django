@@ -31,25 +31,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_temporal_subtraction = True
     ignores_table_name_case = True
     supports_cast_with_precision = False
-
-    @cached_property
-    def uses_savepoints(self):
-        return Database.sqlite_version_info >= (3, 6, 8)
-
-    @cached_property
-    def supports_index_column_ordering(self):
-        return Database.sqlite_version_info >= (3, 3, 0)
-
-    @cached_property
-    def can_release_savepoints(self):
-        return self.uses_savepoints
-
-    @cached_property
-    def can_share_in_memory_db(self):
-        return (
-            Database.__name__ == 'sqlite3.dbapi2' and
-            Database.sqlite_version_info >= (3, 7, 13)
-        )
+    uses_savepoints = Database.sqlite_version_info >= (3, 6, 8)
+    supports_index_column_ordering = Database.sqlite_version_info >= (3, 3, 0)
+    can_release_savepoints = uses_savepoints
+    can_share_in_memory_db = (
+        Database.__name__ == 'sqlite3.dbapi2' and
+        Database.sqlite_version_info >= (3, 7, 13)
+    )
 
     @cached_property
     def supports_stddev(self):

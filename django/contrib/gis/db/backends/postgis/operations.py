@@ -134,10 +134,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     unsupported_functions = set()
 
-    @cached_property
-    def select(self):
-        return '%s::bytea'
-
+    select = '%s::bytea'
     select_extent = None
 
     def __init__(self, connection):

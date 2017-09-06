@@ -68,17 +68,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def select(self):
         return 'CAST (AsEWKB(%s) AS BLOB)' if self.spatial_version >= (4, 3, 0) else 'AsText(%s)'
 
-    @cached_property
-    def function_names(self):
-        return {
-            'Length': 'ST_Length',
-            'LineLocatePoint': 'ST_Line_Locate_Point',
-            'NumPoints': 'ST_NPoints',
-            'Reverse': 'ST_Reverse',
-            'Scale': 'ScaleCoords',
-            'Translate': 'ST_Translate',
-            'Union': 'ST_Union',
-        }
+    function_names = {
+        'Length': 'ST_Length',
+        'LineLocatePoint': 'ST_Line_Locate_Point',
+        'NumPoints': 'ST_NPoints',
+        'Reverse': 'ST_Reverse',
+        'Scale': 'ScaleCoords',
+        'Translate': 'ST_Translate',
+        'Union': 'ST_Union',
+    }
 
     @cached_property
     def unsupported_functions(self):
