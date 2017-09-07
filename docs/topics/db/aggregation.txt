@@ -517,6 +517,13 @@ include the aggregate column.
 Interaction with default ordering or ``order_by()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. deprecated:: 2.0
+
+    In Django 3.0, the default ordering from ``Meta.ordering`` won't be used
+    in ``values().annotate()`` queries. Since Django 2.0, these queries issue
+    a deprecation warning. Add an explicit ``order_by()`` to the queryset
+    to silence the warning.
+
 Fields that are mentioned in the ``order_by()`` part of a queryset (or which
 are used in the default ordering on a model) are used when selecting the
 output data, even if they are not otherwise specified in the ``values()``
