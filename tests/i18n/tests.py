@@ -268,6 +268,8 @@ class TranslationTests(SimpleTestCase):
             ('sr-latn', 'sr_Latn'),
             ('sr-LATN', 'sr_Latn'),
             # With private use subtag (x-informal).
+            ('nl-nl-x-informal', 'nl_NL-x-informal'),
+            ('NL-NL-X-INFORMAL', 'nl_NL-x-informal'),
             ('sr-latn-x-informal', 'sr_Latn-x-informal'),
             ('SR-LATN-X-INFORMAL', 'sr_Latn-x-informal'),
         )

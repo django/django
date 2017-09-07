@@ -58,14 +58,19 @@ def reset_cache(**kwargs):
 
 def to_locale(language):
     """Turn a language name (en-us) into a locale name (en_US)."""
-    p = language.find('-')
-    if p >= 0:
-        # Get correct locale for sr-latn
-        if len(language[p + 1:]) > 2:
-            return language[:p].lower() + '_' + language[p + 1].upper() + language[p + 2:].lower()
-        return language[:p].lower() + '_' + language[p + 1:].upper()
+    language = language.lower()
+    parts = language.split('-')
+    try:
+        country = parts[1]
+    except IndexError:
+        return language
     else:
-        return language.lower()
+        # A language with > 2 characters after the dash only has its first
+        # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
+        # A language with 2 characters after the dash has both characters
+        # capitalized; e.g. en-us becomes en_US.
+        parts[1] = country.title() if len(country) > 2 else country.upper()
+    return parts[0] + '_' + '-'.join(parts[1:])
 
 
 def to_language(locale):
