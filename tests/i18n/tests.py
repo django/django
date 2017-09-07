@@ -259,8 +259,18 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual('Catalan Win\nEOF\n', gettext('Win\r\nEOF\r\n'))
 
     def test_to_locale(self):
-        self.assertEqual(to_locale('en-us'), 'en_US')
-        self.assertEqual(to_locale('sr-lat'), 'sr_Lat')
+        tests = (
+            ('EN', 'en'),
+            ('en-us', 'en_US'),
+            # A language with > 2 characters after the dash.
+            ('sr-latn', 'sr_Latn'),
+            # Language with private use subtag (x-informal).
+            ('nl-nl-x-informal', 'nl_NL-x-informal'),
+            ('sr-latn-x-informal', 'sr_Latn-x-informal'),
+        )
+        for lang, output in tests:
+            with self.subTest(lang=lang):
+                self.assertEqual(to_locale(lang), output)
 
     def test_to_language(self):
         self.assertEqual(trans_real.to_language('en_US'), 'en-us')
