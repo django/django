@@ -14,7 +14,9 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, NotSupportedError
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.deprecation import (
+    RemovedInDjango30Warning, RemovedInDjango31Warning,
+)
 from django.utils.inspect import func_supports_parameter
 
 FORCE = object()
@@ -34,6 +36,7 @@ class SQLCompiler:
         self.annotation_col_map = None
         self.klass_info = None
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
+        self._meta_ordering = None
 
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
@@ -266,8 +269,13 @@ class SQLCompiler:
             ordering = self.query.extra_order_by
         elif not self.query.default_ordering:
             ordering = self.query.order_by
+        elif self.query.order_by:
+            ordering = self.query.order_by
+        elif self.query.get_meta().ordering:
+            ordering = self.query.get_meta().ordering
+            self._meta_ordering = ordering
         else:
-            ordering = (self.query.order_by or self.query.get_meta().ordering or [])
+            ordering = []
         if self.query.standard_ordering:
             asc, desc = ORDER_DIR['ASC']
         else:
@@ -536,7 +544,18 @@ class SQLCompiler:
                         raise NotImplementedError('annotate() + distinct(fields) is not implemented.')
                     order_by = order_by or self.connection.ops.force_no_ordering()
                     result.append('GROUP BY %s' % ', '.join(grouping))
-
+                    if self._meta_ordering:
+                        # When the deprecation ends, replace with:
+                        # order_by = None
+                        warnings.warn(
+                            "%s QuerySet won't use Meta.ordering in Django 3.1. "
+                            "Add .order_by('%s') to retain the current query." % (
+                                self.query.model.__name__,
+                                "', '".join(self._meta_ordering)
+                            ),
+                            RemovedInDjango31Warning,
+                            stacklevel=4,
+                        )
                 if having:
                     result.append('HAVING %s' % having)
                     params.extend(h_params)

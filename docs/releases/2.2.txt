@@ -289,6 +289,15 @@ Miscellaneous
 Features deprecated in 2.2
 ==========================
 
+Model ``Meta.ordering`` will no longer affect ``GROUP BY`` queries
+------------------------------------------------------------------
+
+A model's ``Meta.ordering`` affecting ``GROUP BY`` queries (such as
+``.annotate().values()``) is a common source of confusion. Such queries now
+issue a deprecation warning with the advice to add an ``order_by()`` to retain
+the current query. ``Meta.ordering`` will be ignored in such queries starting
+in Django 3.1.
+
 Miscellaneous
 -------------
 
