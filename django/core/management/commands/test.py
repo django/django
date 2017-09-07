@@ -10,10 +10,7 @@ class Command(BaseCommand):
 
     # DiscoverRunner runs the checks after databases are set up.
     requires_system_checks = False
-
-    def __init__(self):
-        self.test_runner = None
-        super().__init__()
+    test_runner = None
 
     def run_from_argv(self, argv):
         """

@@ -103,6 +103,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     Adapter = PostGISAdapter
 
+    collect = geom_func_prefix + 'Collect'
+    extent = geom_func_prefix + 'Extent'
+    extent3d = geom_func_prefix + '3DExtent'
+    length3d = geom_func_prefix + '3DLength'
+    makeline = geom_func_prefix + 'MakeLine'
+    perimeter3d = geom_func_prefix + '3DPerimeter'
+    unionagg = geom_func_prefix + 'Union'
+
     gis_operators = {
         'bbcontains': PostGISOperator(op='~', raster=True),
         'bboverlaps': PostGISOperator(op='&&', geography=True, raster=True),
@@ -136,19 +144,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     select = '%s::bytea'
     select_extent = None
-
-    def __init__(self, connection):
-        super().__init__(connection)
-
-        prefix = self.geom_func_prefix
-
-        self.collect = prefix + 'Collect'
-        self.extent = prefix + 'Extent'
-        self.extent3d = prefix + '3DExtent'
-        self.length3d = prefix + '3DLength'
-        self.makeline = prefix + 'MakeLine'
-        self.perimeter3d = prefix + '3DPerimeter'
-        self.unionagg = prefix + 'Union'
 
     @cached_property
     def function_names(self):

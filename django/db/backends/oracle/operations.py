@@ -23,6 +23,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
     }
+    set_operators = dict(BaseDatabaseOperations.set_operators, difference='MINUS')
 
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     _sequence_reset_sql = """
@@ -51,10 +52,6 @@ END;
 
     # Oracle doesn't support string without precision; use the max string size.
     cast_char_field_without_max_length = 'NVARCHAR2(2000)'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_operators['difference'] = 'MINUS'
 
     def cache_key_culling_sql(self):
         return """
