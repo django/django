@@ -3,7 +3,6 @@ import json
 import re
 import sys
 import time
-from contextlib import suppress
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlparse
@@ -137,8 +136,10 @@ class HttpResponseBase:
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
-        with suppress(KeyError):
+        try:
             del self._headers[header.lower()]
+        except KeyError:
+            pass
 
     def __getitem__(self, header):
         return self._headers[header.lower()][1]
@@ -237,8 +238,10 @@ class HttpResponseBase:
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
         for closable in self._closable_objects:
-            with suppress(Exception):
+            try:
                 closable.close()
+            except Exception:
+                pass
         self.closed = True
         signals.request_finished.send(sender=self._handler_class)
 
@@ -304,8 +307,10 @@ class HttpResponse(HttpResponseBase):
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, str)):
             content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
-                with suppress(Exception):
+                try:
                     value.close()
+                except Exception:
+                    pass
         else:
             content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().

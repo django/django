@@ -1,4 +1,3 @@
-from contextlib import suppress
 from ctypes import byref, c_double
 
 from django.contrib.gis.gdal.base import GDALBase
@@ -77,8 +76,10 @@ class Layer(GDALBase):
         """
         if self._random_read:
             # If the Layer supports random reading, return.
-            with suppress(GDALException):
+            try:
                 return Feature(capi.get_feature(self.ptr, feat_id), self)
+            except GDALException:
+                pass
         else:
             # Random access isn't supported, have to increment through
             # each feature until the given feature ID is encountered.

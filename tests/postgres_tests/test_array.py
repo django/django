@@ -2,7 +2,6 @@ import decimal
 import json
 import unittest
 import uuid
-from contextlib import suppress
 
 from django import forms
 from django.core import exceptions, serializers, validators
@@ -20,11 +19,13 @@ from .models import (
     PostgreSQLModel, Tag,
 )
 
-with suppress(ImportError):
+try:
     from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+except ImportError:
+    pass
 
 
 class TestSaveLoad(PostgreSQLTestCase):

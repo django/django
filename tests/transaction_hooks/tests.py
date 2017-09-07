@@ -1,5 +1,3 @@
-from contextlib import suppress
-
 from django.db import connection, transaction
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
@@ -50,10 +48,12 @@ class TestConnectionOnCommit(TransactionTestCase):
         self.assertDone([1])
 
     def test_does_not_execute_if_transaction_rolled_back(self):
-        with suppress(ForcedError):
+        try:
             with transaction.atomic():
                 self.do(1)
                 raise ForcedError()
+        except ForcedError:
+            pass
 
         self.assertDone([])
 
@@ -71,10 +71,12 @@ class TestConnectionOnCommit(TransactionTestCase):
             with transaction.atomic():
                 self.do(1)
             # one failed savepoint
-            with suppress(ForcedError):
+            try:
                 with transaction.atomic():
                     self.do(2)
                     raise ForcedError()
+            except ForcedError:
+                pass
             # another successful savepoint
             with transaction.atomic():
                 self.do(3)
@@ -84,21 +86,25 @@ class TestConnectionOnCommit(TransactionTestCase):
 
     def test_no_hooks_run_from_failed_transaction(self):
         """If outer transaction fails, no hooks from within it run."""
-        with suppress(ForcedError):
+        try:
             with transaction.atomic():
                 with transaction.atomic():
                     self.do(1)
                 raise ForcedError()
+        except ForcedError:
+            pass
 
         self.assertDone([])
 
     def test_inner_savepoint_rolled_back_with_outer(self):
         with transaction.atomic():
-            with suppress(ForcedError):
+            try:
                 with transaction.atomic():
                     with transaction.atomic():
                         self.do(1)
                     raise ForcedError()
+            except ForcedError:
+                pass
             self.do(2)
 
         self.assertDone([2])
@@ -107,9 +113,11 @@ class TestConnectionOnCommit(TransactionTestCase):
         with transaction.atomic():
             with transaction.atomic():
                 self.do(1)
-                with suppress(ForcedError):
+                try:
                     with transaction.atomic(savepoint=False):
                         raise ForcedError()
+                except ForcedError:
+                    pass
 
         self.assertDone([])
 
@@ -117,9 +125,11 @@ class TestConnectionOnCommit(TransactionTestCase):
         with transaction.atomic():
             with transaction.atomic():
                 self.do(1)
-                with suppress(ForcedError):
+                try:
                     with transaction.atomic():
                         raise ForcedError()
+                except ForcedError:
+                    pass
 
         self.assertDone([1])
 
@@ -141,10 +151,12 @@ class TestConnectionOnCommit(TransactionTestCase):
         self.assertDone([1, 2])  # not [1, 1, 2]
 
     def test_hooks_cleared_after_rollback(self):
-        with suppress(ForcedError):
+        try:
             with transaction.atomic():
                 self.do(1)
                 raise ForcedError()
+        except ForcedError:
+            pass
 
         with transaction.atomic():
             self.do(2)
@@ -165,9 +177,11 @@ class TestConnectionOnCommit(TransactionTestCase):
         self.assertDone([2])
 
     def test_error_in_hook_doesnt_prevent_clearing_hooks(self):
-        with suppress(ForcedError):
+        try:
             with transaction.atomic():
                 transaction.on_commit(lambda: self.notify('error'))
+        except ForcedError:
+            pass
 
         with transaction.atomic():
             self.do(1)

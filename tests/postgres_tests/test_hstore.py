@@ -1,5 +1,4 @@
 import json
-from contextlib import suppress
 
 from django.core import exceptions, serializers
 from django.forms import Form
@@ -8,10 +7,12 @@ from django.test.utils import modify_settings
 from . import PostgreSQLTestCase
 from .models import HStoreModel
 
-with suppress(ImportError):
+try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import HStoreField
     from django.contrib.postgres.validators import KeysValidator
+except ImportError:
+    pass
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})

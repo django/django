@@ -1,7 +1,6 @@
 import ipaddress
 import os
 import re
-from contextlib import suppress
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
@@ -215,9 +214,11 @@ class EmailValidator:
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
             ip_address = literal_match.group(1)
-            with suppress(ValidationError):
+            try:
                 validate_ipv46_address(ip_address)
                 return True
+            except ValidationError:
+                pass
         return False
 
     def __eq__(self, other):

@@ -1,5 +1,4 @@
 from collections import defaultdict, namedtuple
-from contextlib import suppress
 
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
@@ -157,8 +156,10 @@ class BaseSpatialField(Field):
         if isinstance(value, gdal.GDALRaster):
             return value
         elif is_candidate:
-            with suppress(GDALException):
+            try:
                 return gdal.GDALRaster(value)
+            except GDALException:
+                pass
         elif isinstance(value, dict):
             try:
                 return gdal.GDALRaster(value)
