@@ -12,7 +12,7 @@ from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, cached_property
 from django.utils.version import get_version_tuple
 
 logger = logging.getLogger('django.contrib.gis')
@@ -148,14 +148,12 @@ class GEOSFuncFactory:
             self.argtypes = argtypes
         self.args = args
         self.kwargs = kwargs
-        self.func = None
 
     def __call__(self, *args, **kwargs):
-        if self.func is None:
-            self.func = self.get_func(*self.args, **self.kwargs)
         return self.func(*args, **kwargs)
 
-    def get_func(self, *args, **kwargs):
+    @cached_property
+    def func(self):
         from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
         func = GEOSFunc(self.func_name)
         func.argtypes = self.argtypes or []
