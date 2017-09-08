@@ -999,11 +999,23 @@ class ModelAdmin(BaseModelAdmin):
         """
         return form.save(commit=False)
 
+    def get_update_fields(self, obj, add):
+        if add:
+            return None
+        deferred_fields = self.model.get_deferred_fields(self.model)
+        field_names = set()
+        for field in self.model._meta.concrete_fields:
+            if (not field.primary_key and not hasattr(field, 'through')) or getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
+                if field.editable and not field.name in self.readonly_fields:
+                    field_names.add(field.attname)
+        update_fields = field_names.difference(deferred_fields)
+        return update_fields
+
     def save_model(self, request, obj, form, change):
         """
         Given a model instance save it to the database.
         """
-        obj.save()
+        obj.save(update_fields=self.get_update_fields(obj, not change))
 
     def delete_model(self, request, obj):
         """
