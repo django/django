@@ -118,9 +118,7 @@ class IOBase(GEOSBase):
         self.ptr = self._constructor()
         # Loading the real destructor function at this point as doing it in
         # __del__ is too late (import error).
-        self.destructor.func = self.destructor.get_func(
-            *self.destructor.args, **self.destructor.kwargs
-        )
+        self.destructor.func
 
 # ### Base WKB/WKT Reading and Writing objects ###
 

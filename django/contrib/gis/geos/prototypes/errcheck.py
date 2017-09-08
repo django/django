@@ -81,11 +81,3 @@ def check_string(result, func, cargs):
     # Freeing the memory allocated within GEOS
     free(result)
     return s
-
-
-def check_zero(result, func, cargs):
-    "Error checking on routines that should not return 0."
-    if result == 0:
-        raise GEOSException('Error encountered in GEOS C function "%s".' % func.__name__)
-    else:
-        return result
