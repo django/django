@@ -583,8 +583,8 @@ domain):
   translations shipped with applications by using the :setting:`LOCALE_PATHS`
   setting is now possible for this domain too. These translations have higher
   precedence than the translations of Python packages passed to the
-  :ref:`javascript_catalog view <javascript_catalog-view>`.  Paths listed first
-  have higher precedence than the ones listed later.
+  ``javascript_catalog()`` view. Paths listed first have higher precedence than
+  the ones listed later.
 
 * Translations under the ``locale`` subdirectory of the *project directory*
   have never been taken in account for JavaScript translations and remain in

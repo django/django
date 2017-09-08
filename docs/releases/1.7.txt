@@ -1742,7 +1742,7 @@ will be removed in Django 1.9. You can simply remove the
 --------------------------------------
 
 ``javascript_quote()`` was an undocumented function present in ``django.utils.text``.
-It was used internally in the :ref:`javascript_catalog view <javascript_catalog-view>`
+It was used internally in the ``javascript_catalog()`` view
 whose implementation was changed to make use of ``json.dumps()`` instead.
 If you were relying on this function to provide safe output from untrusted
 strings, you should use ``django.utils.html.escapejs`` or the

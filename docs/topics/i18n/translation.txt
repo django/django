@@ -960,8 +960,6 @@ The main solution to these problems is the following ``JavaScriptCatalog`` view,
 which generates a JavaScript code library with functions that mimic the
 ``gettext`` interface, plus an array of translation strings.
 
-.. _javascript_catalog-view:
-
 The ``JavaScriptCatalog`` view
 ------------------------------
 
@@ -2071,9 +2069,8 @@ translations for the same literal:
 .. seealso::
 
     The translations for literals included in JavaScript assets are looked up
-    following a similar but not identical algorithm. See the
-    :ref:`javascript_catalog view documentation <javascript_catalog-view>` for
-    more details.
+    following a similar but not identical algorithm. See
+    :class:`.JavaScriptCatalog` for more details.
 
 In all cases the name of the directory containing the translation is expected to
 be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
