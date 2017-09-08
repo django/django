@@ -1628,6 +1628,12 @@ specify the related objects you want to lock in ``select_for_update(of=(...))``
 using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
 to refer to the queryset's model.
 
+It is not possible to use ``select_for_update()`` when selecting nullable
+related objects. If you know that the related objects are not null, you can
+overcome this problem by excluding null values. For example::
+
+    entries = Person.objects.select_for_update().exclude(hometown=None)
+
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL doesn't support the
 ``nowait``, ``skip_locked``, and ``of`` arguments.
