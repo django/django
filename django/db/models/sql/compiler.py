@@ -34,6 +34,7 @@ class SQLCompiler:
         self.annotation_col_map = None
         self.klass_info = None
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
+        self._meta_ordering = None
 
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.alias_map):
@@ -261,8 +262,13 @@ class SQLCompiler:
             ordering = self.query.extra_order_by
         elif not self.query.default_ordering:
             ordering = self.query.order_by
+        elif self.query.order_by:
+            ordering = self.query.order_by
+        elif self.query.get_meta().ordering:
+            ordering = self.query.get_meta().ordering
+            self._meta_ordering = ordering
         else:
-            ordering = (self.query.order_by or self.query.get_meta().ordering or [])
+            ordering = []
         if self.query.standard_ordering:
             asc, desc = ORDER_DIR['ASC']
         else:
@@ -519,7 +525,19 @@ class SQLCompiler:
                     if not order_by:
                         order_by = self.connection.ops.force_no_ordering()
                     result.append('GROUP BY %s' % ', '.join(grouping))
-
+                    if self. _meta_ordering:
+                        import warnings
+                        from django.utils.deprecation import RemovedInDjango30Warning
+                        warnings.warn(
+                            "%s QuerySet won't use Meta.ordering in Django 3.0. "
+                            "Add an explicity order_by('%s') to retain the "
+                            "current query." % (
+                                self.query.model.__name__,
+                                "', '".join(self._meta_ordering)
+                            ),
+                            RemovedInDjango30Warning,
+                            stacklevel=4,
+                        )
                 if having:
                     result.append('HAVING %s' % having)
                     params.extend(h_params)

@@ -1,7 +1,7 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import F
+from django.db.models import Count, F
 from django.db.models.functions import Upper
 from django.test import TestCase
 
@@ -378,3 +378,6 @@ class OrderingTests(TestCase):
             articles, ['Article 1', 'Article 4', 'Article 3', 'Article 2'],
             attrgetter('headline')
         )
+
+    def test_deprecated_values_annotate(self):
+        print(Article.objects.values('author').annotate(Count('headline')).query)
