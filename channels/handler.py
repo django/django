@@ -167,12 +167,10 @@ class AsgiHandler(base.BaseHandler):
     # Size to chunk response bodies into for multiple response messages
     chunk_size = 512 * 1024
 
-    def __init__(self, type, reply, channel_layer, consumer_channel):
+    def __init__(self, type, reply):
         if type != "http":
             raise ValueError("The AsgiHandler can only handle HTTP requests")
         self.reply = reply
-        self.channel_layer = channel_layer
-        self.consumer_channel = consumer_channel
         super(AsgiHandler, self).__init__()
         self.load_middleware()
 

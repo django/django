@@ -4,26 +4,60 @@ import importlib
 import re
 
 from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
 from django.utils import six
 
 from .utils import name_that_thing
 
 
-class Router(object):
+def application_decorator(cls):
     """
-    Manages the available consumers in the project and which channels they
-    listen to.
-
-    Generally this is attached to a backend instance as ".router"
-
-    Anything can be a routable object as long as it provides a match()
-    method that either returns (callable, kwargs) or None.
+    Decorates a router class so that it becomes a valid ASGI application.
+    This is done by handling the ASGI application constructor automatically
+    and using 
     """
 
-    def __init__(self, routing):
-        self.root = Include(routing)
 
-    def __call__(self, type, reply, channel_layer, consumer_channel):
+
+class ProtocolTypeRouter(object):
+
+    def __init__(self, routes):
+        self.routes = routes
+        self._validate_routes()
+
+    def _validate_routes(self):
+        """
+        Calculates routes if needed.
+        """
+        try:
+            for protocol_type, target_app in self.routes.items():
+                assert isinstance(protocol_type, six.text_type)
+                assert callable(target_app)
+        except (AttributeError, AssertionError):
+            raise RuntimeError("")
+
+    @classmethod
+    def resolve_routing(cls, routing):
+        """
+        Takes a routing - if it's a string, it imports it, and if it's a
+        dict, converts it to a list of route()s. Used by this class and Include.
+        """
+        # If the routing was a string, import it
+        if isinstance(routing, six.string_types):
+            module_name, variable_name = routing.rsplit(".", 1)
+            try:
+                routing = getattr(importlib.import_module(module_name), variable_name)
+            except (ImportError, AttributeError) as e:
+                raise ImproperlyConfigured("Cannot import channel routing %r: %s" % (routing, e))
+        # If the routing is a dict, convert it
+        if isinstance(routing, dict):
+            routing = [
+                Route(channel, consumer)
+                for channel, consumer in routing.items()
+            ]
+        return routing
+
+    def __call__(self, message):
         pass
 
     def add_route(self, route):
@@ -59,27 +93,6 @@ class Router(object):
         self.add_route(Route("websocket.connect", connect_consumer))
         self.add_route(Route("websocket.receive", null_consumer))
         self.add_route(Route("websocket.disconnect", null_consumer))
-
-    @classmethod
-    def resolve_routing(cls, routing):
-        """
-        Takes a routing - if it's a string, it imports it, and if it's a
-        dict, converts it to a list of route()s. Used by this class and Include.
-        """
-        # If the routing was a string, import it
-        if isinstance(routing, six.string_types):
-            module_name, variable_name = routing.rsplit(".", 1)
-            try:
-                routing = getattr(importlib.import_module(module_name), variable_name)
-            except (ImportError, AttributeError) as e:
-                raise ImproperlyConfigured("Cannot import channel routing %r: %s" % (routing, e))
-        # If the routing is a dict, convert it
-        if isinstance(routing, dict):
-            routing = [
-                Route(channel, consumer)
-                for channel, consumer in routing.items()
-            ]
-        return routing
 
     @classmethod
     def normalise_re_arg(cls, value):

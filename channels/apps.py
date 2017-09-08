@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from .binding.base import BindingMetaclass
+#from .binding.base import BindingMetaclass
 from .package_checks import check_all
 
 
@@ -14,6 +14,6 @@ class ChannelsConfig(AppConfig):
         check_all()
         # Do django monkeypatches
         from .hacks import monkeypatch_django
-        monkeypatch_django()
+        #monkeypatch_django()
         # Instantiate bindings
-        BindingMetaclass.register_all()
+        #BindingMetaclass.register_all()

@@ -4,7 +4,7 @@ import django
 from django.conf import settings
 from django.utils.module_loading import import_string
 
-from .routing import Router
+#from .routing import Router
 from .utils import name_that_thing
 
 
@@ -94,7 +94,6 @@ class ChannelLayerWrapper(object):
         self.channel_layer = channel_layer
         self.alias = alias
         self.routing = routing
-        self.router = Router(self.routing)
 
     def __getattr__(self, name):
         return getattr(self.channel_layer, name)
