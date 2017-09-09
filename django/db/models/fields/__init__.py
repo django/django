@@ -971,7 +971,7 @@ class BooleanField(Field):
         super().__init__(*args, blank=blank, **kwargs)
 
     def get_internal_type(self):
-        return 'BooleanField'
+        return "BooleanField"
 
     def to_python(self, value):
         if self.null and value in self.empty_values:
