@@ -11,6 +11,11 @@ want to be aware of when upgrading from Django 1.11 or earlier. We've
 their deprecation cycle, and we've :ref:`begun the deprecation process for some
 features <deprecated-features-2.0>`.
 
+This release starts Django's use of a :ref:`loose form of semantic versioning
+<internal-release-cadence>`, however, there aren't any major backwards
+incompatible changes that might be expected of a 2.0 release. Upgrading should
+be a similar amount of effort as past feature releases.
+
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
