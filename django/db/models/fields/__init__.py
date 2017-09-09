@@ -986,17 +986,16 @@ class BooleanField(Field):
         if value in ('f', 'False', '0'):
             return False
         if self.null:
-            raise exceptions.ValidationError(
-                self.error_messages['invalid_nullable'],
-                code='invalid',
-                params={'value': value},
-            )
+            self._to_python_validation_error('invalid_nullable', value)
         else:
-            raise exceptions.ValidationError(
-                self.error_messages['invalid'],
-                code='invalid',
-                params={'value': value},
-            )
+            self._to_python_validation_error('invalid', value)
+
+    def _to_python_validation_error(self, message_type, value):
+        raise exceptions.ValidationError(
+            self.error_messages[message_type],
+            code='invalid',
+            params={'value': value},
+        )
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
