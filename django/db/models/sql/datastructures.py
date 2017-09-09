@@ -116,14 +116,13 @@ class Join:
             self.join_field, self.nullable, filtered_relation=filtered_relation)
 
     def equals(self, other, with_filtered_relation):
-        if isinstance(other, self.__class__):
-            return (
-                self.table_name == other.table_name and
-                self.parent_alias == other.parent_alias and
-                self.join_field == other.join_field and
-                (not with_filtered_relation or self.filtered_relation == other.filtered_relation)
-            )
-        return False
+        return (
+            isinstance(other, self.__class__) and
+            self.table_name == other.table_name and
+            self.parent_alias == other.parent_alias and
+            self.join_field == other.join_field and
+            (not with_filtered_relation or self.filtered_relation == other.filtered_relation)
+        )
 
     def __eq__(self, other):
         return self.equals(other, with_filtered_relation=True)

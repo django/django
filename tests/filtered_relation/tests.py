@@ -144,11 +144,13 @@ class FilteredRelationTests(TestCase):
         self.assertQuerysetEqual(qs, ["<Author: Alice>"])
 
     def test_filtered_relation_values_list(self):
-        self.assertSequenceEqual(Author.objects.annotate(
-            book_alice=FilteredRelation(
-                'book', condition=Q(book__title__iexact='poem by alice'),
-            )).values_list('book_alice__title', flat=True).order_by(F('book_alice__title').desc(nulls_last=True)),
-            ["Poem by Alice", None])
+        self.assertSequenceEqual(
+            Author.objects.annotate(
+                book_alice=FilteredRelation(
+                    'book', condition=Q(book__title__iexact='poem by alice'),
+                )).filter(book_alice__isnull=False).values_list(
+                    'book_alice__title', flat=True),
+            ["Poem by Alice"])
 
     def test_filtered_relation_values(self):
         self.assertSequenceEqual(Author.objects.annotate(
@@ -158,48 +160,48 @@ class FilteredRelationTests(TestCase):
             [{'id': 1, 'name': 'Alice'}])
 
     def test_filtered_relation_extra(self):
-        self.assertQuerysetEqual(Author.objects.annotate(
+        self.assertSequenceEqual(Author.objects.annotate(
             book_alice=FilteredRelation(
                 'book', condition=Q(book__title__iexact='poem by alice'),
             )).extra(where=["1 = 1"]).order_by(
-            F('book_alice__id').desc(nulls_last=True)),
-            ["<Author: Alice>", "<Author: Jane>"])
+            F('book_alice__id').desc()),
+            [self.author1, self.author2])
 
     @skipUnlessDBFeature('supports_select_union')
     def test_filtered_relation_union(self):
         qs1 = Author.objects.annotate(
             book_alice=FilteredRelation(
                 'book', condition=Q(book__title__iexact='poem by alice'),
-            )).filter(book_alice__isnull=False).order_by()
+            )).filter(book_alice__isnull=False)
         qs2 = Author.objects.annotate(
             book_jane=FilteredRelation(
                 'book', condition=Q(book__title__iexact='the book by jane a'),
-            )).filter(book_jane__isnull=False).order_by()
-        self.assertQuerysetEqual(qs1.union(qs2).order_by('id'), ["<Author: Alice>", "<Author: Jane>"])
+            )).filter(book_jane__isnull=False)
+        self.assertSequenceEqual(qs1.union(qs2), [self.author1, self.author2])
 
     @skipUnlessDBFeature('supports_select_intersection')
     def test_filtered_relation_intersection(self):
         qs1 = Author.objects.annotate(
             book_alice=FilteredRelation(
                 'book', condition=Q(book__title__iexact='poem by alice'),
-            )).filter(book_alice__isnull=False).order_by()
+            )).filter(book_alice__isnull=False)
         qs2 = Author.objects.annotate(
             book_jane=FilteredRelation(
                 'book', condition=Q(book__title__iexact='the book by jane a'),
-            )).filter(book_jane__isnull=False).order_by()
-        self.assertQuerysetEqual(qs1.intersection(qs2).order_by('id'), [])
+            )).filter(book_jane__isnull=False)
+        self.assertQuerysetEqual(qs1.intersection(qs2), [])
 
     @skipUnlessDBFeature('supports_select_difference')
     def test_filtered_relation_difference(self):
         qs1 = Author.objects.annotate(
             book_alice=FilteredRelation(
                 'book', condition=Q(book__title__iexact='poem by alice'),
-            )).filter(book_alice__isnull=False).order_by()
+            )).filter(book_alice__isnull=False)
         qs2 = Author.objects.annotate(
             book_jane=FilteredRelation(
                 'book', condition=Q(book__title__iexact='the book by jane a'),
-            )).filter(book_jane__isnull=False).order_by()
-        self.assertQuerysetEqual(qs1.difference(qs2).order_by('id'), ["<Author: Alice>"])
+            )).filter(book_jane__isnull=False)
+        self.assertSequenceEqual(qs1.difference(qs2), [self.author1])
 
     def test_filtered_relation_select_for_update(self):
         self.assertQuerysetEqual(Author.objects.annotate(
@@ -215,9 +217,9 @@ class FilteredRelationTests(TestCase):
             self.assertQuerysetEqual(Author.objects.annotate(
                 book_alice=FilteredRelation(
                     'book', condition=Q(book__title__iexact='poem by alice'),
-                )).select_related('book_alice').defer('book_alice__title').order_by(
-                    F('book_alice__title').desc(nulls_last=True)),
-                ["Poem by Alice", None], lambda author: getattr(author.book_alice, 'title', None))
+                )).filter(book_alice__isnull=False).select_related(
+                    'book_alice').defer('book_alice__title'),
+                ["Poem by Alice"], lambda author: author.book_alice.title)
 
     def test_filtered_relation_only(self):
         # One query for the list, and one query to fetch the
@@ -226,9 +228,8 @@ class FilteredRelationTests(TestCase):
             self.assertQuerysetEqual(Author.objects.annotate(
                 book_alice=FilteredRelation(
                     'book', condition=Q(book__title__iexact='poem by alice'),
-                )).select_related('book_alice').only('book_alice__title').order_by(
-                    F('book_alice__title').desc(nulls_last=True)),
-                ["available", None], lambda author: getattr(author.book_alice, 'state', None))
+                )).filter(book_alice__isnull=False).select_related('book_alice').only(
+                    'book_alice__title'), ["available"], lambda author: author.book_alice.state)
 
     def test_filtered_relation_as_subquery(self):
         inner_qs = Author.objects.annotate(
@@ -268,9 +269,11 @@ class FilteredRelationTests(TestCase):
     def test_filtered_relation_with_prefetch_related(self):
         qs = Author.objects.annotate(
             book_title_contains_b=FilteredRelation(
-                'book', condition=Q(book__title__icontains='b'))).filter(
-                    book_title_contains_b__isnull=False
-                ).prefetch_related('book_title_contains_b__editor')
+                'book',
+                condition=Q(book__title__icontains='b'),
+            )).filter(
+                book_title_contains_b__isnull=False
+        ).prefetch_related('book_title_contains_b__editor')
 
         msg = ("Cannot find 'book_title_contains_b' on Author object,"
                " 'book_title_contains_b__editor' is an invalid parameter to prefetch_related()")

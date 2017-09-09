@@ -294,16 +294,15 @@ Models
 * The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
   results as named tuples.
 
+* Added the :class:`.FilteredRelation` class that can be
+  passed to :meth:`~.QuerySet.annotate()` to specify
+  custom filtering of relations in the ``ON`` SQL clause.
+
 Pagination
 ~~~~~~~~~~
 
 * Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
   to provide the documented pattern of handling invalid page numbers.
-
-* Added the :class:`.FilteredRelation`
-  Passed to :meth:`.QuerySet.annotate()`, this new argument type
-  allows to specify custom filtering inside the ``ON`` SQL clause.
-
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

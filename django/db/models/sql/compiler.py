@@ -871,15 +871,17 @@ class SQLCompiler:
                     related_klass_infos.append(klass_info)
                     select_fields = []
                     columns = self.get_default_columns(
-                        start_alias=alias, opts=model._meta, from_parent=opts.model)
+                        start_alias=alias, opts=model._meta, from_parent=opts.model,
+                    )
                     for col in columns:
                         select_fields.append(len(select))
                         select.append((col, None))
                     klass_info['select_fields'] = select_fields
-                    next = requested.get(name, {})
+                    next_requested = requested.get(name, {})
                     next_klass_infos = self.get_related_selections(
-                        select, model._meta, alias, cur_depth + 1,
-                        next, restricted)
+                        select, opts=model._meta, root_alias=alias, cur_depth=cur_depth + 1,
+                        requested=next_requested, restricted=restricted,
+                    )
                     get_related_klass_infos(klass_info, next_klass_infos)
             # somehow check query.filtered_relation...
             fields_not_found = set(requested.keys()).difference(fields_found)

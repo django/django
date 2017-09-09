@@ -896,25 +896,26 @@ class Query:
         reusable, or it can be a set containing the aliases that can be reused.
 
         The 'force_reuse' parameter is the same type of 'reuse' but with difference
-        that it bypasses the 'reuse' paramter. It is used when computing.
+        that it bypasses the 'reuse' parameter. It is used when computing
+        FilteredRelation's instances.
 
         A join is always created as LOUTER if the lhs alias is LOUTER to make
         sure chains like t1 LOUTER t2 INNER t3 aren't generated. All new
         joins are created as LOUTER if the join is nullable.
         """
         if force_reuse:
-            reuse = [
+            reuse_aliases = [
                 a for a, j in self.alias_map.items()
                 if a in force_reuse and j.equals(join, with_filtered_relation=False)
             ]
         else:
-            reuse = [
+            reuse_aliases = [
                 a for a, j in self.alias_map.items()
                 if (reuse is None or a in reuse) and j == join
             ]
-        if reuse:
-            self.ref_alias(reuse[0])
-            return reuse[0]
+        if reuse_aliases:
+            self.ref_alias(reuse_aliases[0])
+            return reuse_aliases[0]
 
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(join.table_name, create=True, filtered_relation=join.filtered_relation)
