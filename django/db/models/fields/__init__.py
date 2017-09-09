@@ -964,6 +964,7 @@ class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
         'invalid': _("'%(value)s' value must be either True or False."),
+        'invalid_nullable': _("'%(value)s' value must be either None, True or False."),
     }
     description = _("Boolean (Either True or False)")
 
@@ -984,11 +985,18 @@ class BooleanField(Field):
             return True
         if value in ('f', 'False', '0'):
             return False
-        raise exceptions.ValidationError(
-            self.error_messages['invalid'],
-            code='invalid',
-            params={'value': value},
-        )
+        if self.null:
+            raise exceptions.ValidationError(
+                self.error_messages['invalid_nullable'],
+                code='invalid',
+                params={'value': value},
+            )
+        else:
+            raise exceptions.ValidationError(
+                self.error_messages['invalid'],
+                code='invalid',
+                params={'value': value},
+            )
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
