@@ -411,6 +411,20 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(kwargs, {"to": "auth.Permission"})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
+    def test_default_boolean_field(self):
+        field = models.BooleanField()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.BooleanField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'blank': True})
+
+    def test_nulled_boolean_field(self):
+        field = models.BooleanField(null=True)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.BooleanField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {'blank': True, 'null': True})
+
     def test_null_boolean_field(self):
         field = models.NullBooleanField()
         name, path, args, kwargs = field.deconstruct()
