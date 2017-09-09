@@ -18,6 +18,11 @@ class PostgresConfig(AppConfig):
             if conn.vendor == 'postgresql':
                 conn.introspection.data_types_reverse.update({
                     3802: 'django.contrib.postgresql.fields.JSONField',
+                    3904: 'django.contrib.postgresql.fields.IntegerRangeField',
+                    3906: 'django.contrib.postgresql.fields.FloatRangeField',
+                    3910: 'django.contrib.postgresql.fields.DateTimeRangeField',
+                    3912: 'django.contrib.postgresql.fields.DateRangeField',
+                    3926: 'django.contrib.postgresql.fields.BigIntegerRangeField',
                 })
                 if conn.connection is not None:
                     register_type_handlers(conn)
