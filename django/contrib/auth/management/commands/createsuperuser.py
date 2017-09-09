@@ -163,7 +163,9 @@ class Command(BaseCommand):
                         validate_password(password2, self.UserModel(**fake_user_data))
                     except exceptions.ValidationError as err:
                         self.stderr.write('\n'.join(err.messages))
-                        password = None
+                        response = input('Bypass password validation and create user anyway? [y/N]: ')
+                        if response.lower() != 'y':
+                            password = None
 
             except KeyboardInterrupt:
                 self.stderr.write("\nOperation cancelled.")

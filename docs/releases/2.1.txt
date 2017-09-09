@@ -42,7 +42,8 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`createsuperuser` now gives a prompt to allow bypassing the
+  :setting:`AUTH_PASSWORD_VALIDATORS` checks.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
