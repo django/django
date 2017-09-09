@@ -66,6 +66,8 @@ def load_geos():
     # geos/prototypes/threadsafe.py.
     _lgeos.initGEOS_r.restype = CONTEXT_PTR
     _lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+    # Set restype for compatibility across 32 and 64-bit platforms.
+    _lgeos.GEOSversion.restype = c_char_p
     return _lgeos
 
 
@@ -163,9 +165,9 @@ class GEOSFuncFactory:
         return func
 
 
-# Return the string version of the GEOS library. Have to set the restype
-# explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
-geos_version = GEOSFuncFactory('GEOSversion', restype=c_char_p)
+def geos_version():
+    """Return the string version of the GEOS library."""
+    return lgeos.GEOSversion()
 
 
 def geos_version_tuple():
