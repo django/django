@@ -986,11 +986,11 @@ class BooleanField(Field):
         if value in ('f', 'False', '0'):
             return False
         if self.null:
-            self._to_python_validation_error('invalid_nullable', value)
+            self._to_python_validation_error(value, 'invalid_nullable')
         else:
-            self._to_python_validation_error('invalid', value)
+            self._to_python_validation_error(value, 'invalid')
 
-    def _to_python_validation_error(self, message_type, value):
+    def _to_python_validation_error(self, value, message_type):
         raise exceptions.ValidationError(
             self.error_messages[message_type],
             code='invalid',
