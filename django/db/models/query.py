@@ -1819,5 +1819,5 @@ class FilteredRelation:
     def as_sql(self, compiler, connection):
         # The condition in self.filtered_relation needs to be resolved.
         query = compiler.query
-        where = query.build_filtered_relation_q(self.condition, force_reuse=set(self.path))
+        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
         return compiler.compile(where)
