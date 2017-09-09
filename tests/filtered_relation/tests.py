@@ -1,5 +1,3 @@
-import unittest
-
 from django.db import connection
 from django.db.models import Case, Count, F, FilteredRelation, Q, When
 from django.test import TestCase
@@ -21,22 +19,26 @@ class FilteredRelationTests(TestCase):
         cls.book1 = Book.objects.create(
             title='Poem by Alice',
             editor=cls.editor_a,
-            author=cls.author1)
+            author=cls.author1,
+        )
 
         cls.book2 = Book.objects.create(
             title='The book by Jane A',
             editor=cls.editor_b,
-            author=cls.author2)
+            author=cls.author2,
+        )
 
         cls.book3 = Book.objects.create(
             title='The book by Jane B',
             editor=cls.editor_b,
-            author=cls.author2)
+            author=cls.author2,
+        )
 
         cls.book4 = Book.objects.create(
             title='The book by Alice',
             editor=cls.editor_a,
-            author=cls.author1)
+            author=cls.author1,
+        )
         cls.author1.favourite_books.add(cls.book2)
         cls.author1.favourite_books.add(cls.book3)
 
@@ -49,7 +51,7 @@ class FilteredRelationTests(TestCase):
                 (self.author1, self.book1, self.editor_a, self.author1),
                 (self.author1, self.book4, self.editor_a, self.author1),
                 (self.author2, self.book2, self.editor_b, self.author2),
-                (self.author2, self.book3, self.editor_b, self.author2)
+                (self.author2, self.book3, self.editor_b, self.author2),
             ]
             self.assertQuerysetEqual(
                 qs, expected, lambda x: (x, x.book_join, x.book_join.editor, x.book_join.author)
@@ -72,11 +74,11 @@ class FilteredRelationTests(TestCase):
             )
 
     def test_filtered_relation_wo_join(self):
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.annotate(
                 book_alice=FilteredRelation(
                     'book', condition=Q(book__title__iexact='poem by alice'),
-                )), ["<Author: Alice>", "<Author: Jane>"])
+                )), [self.author1, self.author2])
 
     def test_filered_relation_with_join(self):
         self.assertQuerysetEqual(
@@ -85,20 +87,16 @@ class FilteredRelationTests(TestCase):
                     'book', condition=Q(book__title__iexact='poem by alice'),
                 )).filter(book_alice__isnull=False), ["<Author: Alice>"])
 
-    @unittest.skipUnless(connection.vendor != 'mysql', 'Non MySQL specific test.')
     def test_filtered_relation_alias_mapping_other(self):
         queryset = Author.objects.annotate(
             book_alice=FilteredRelation(
                 'book', condition=Q(book__title__iexact='poem by alice'),
             )).filter(book_alice__isnull=False)
-        self.assertIn('INNER JOIN "filtered_relation_book" book_alice ON', str(queryset.query))
-
-    @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL specific test.')
-    def test_filtered_relation_alias_mapping_mysql(self):
-        queryset = (Author.objects.annotate(
-            book_alice=FilteredRelation('book', condition=Q(book__title__iexact='poem by alice'))
-        ).filter(book_alice__isnull=False))
-        self.assertIn('INNER JOIN `filtered_relation_book` book_alice ON', str(queryset.query))
+        self.assertIn(
+            'INNER JOIN {} book_alice ON'.format(
+                connection.ops.quote_name('filtered_relation_book'),
+            ),
+            str(queryset.query))
 
     def test_filtered_relation_with_multiple_filter(self):
         self.assertQuerysetEqual(
@@ -241,24 +239,43 @@ class FilteredRelationTests(TestCase):
         self.assertQuerysetEqual(qs, ["<Author: Alice>"])
 
     def test_filtered_relation_with_foreign_key_error(self):
-        with self.assertRaisesMessage(ValueError, "Filtered relation 'alice_favourite_books'"
-                                      " cannot operate on foreign key 'author__favourite_books__author'."):
-            list(Book.objects.annotate(
-                alice_favourite_books=FilteredRelation(
-                    'author__favourite_books', condition=Q(author__favourite_books__author=self.author1),
-                )).filter(alice_favourite_books__title__icontains='poem'))
+        msg = ("Filtered relation 'alice_favourite_books' cannot operate on foreign key"
+               " 'author__favourite_books__author'.")
+        with self.assertRaisesMessage(ValueError, msg):
+            list(
+                Book.objects.annotate(
+                    alice_favourite_books=FilteredRelation(
+                        'author__favourite_books',
+                        condition=Q(author__favourite_books__author=self.author1),
+                    )).filter(alice_favourite_books__title__icontains='poem')
+            )
 
     def test_filtered_relation_with_foreign_key_on_condition_error(self):
-        with self.assertRaisesMessage(ValueError, "Filtered relation 'book_edited_by_b'"
-                                      " cannot operate on foreign key 'book__editor__name__icontains'."):
-            list(Author.objects.annotate(
-                book_edited_by_b=FilteredRelation(
-                    'book', condition=Q(book__editor__name__icontains='b'),
-                )).filter(book_edited_by_b__isnull=False))
+        msg = ("Filtered relation 'book_edited_by_b' cannot operate on foreign key"
+               " 'book__editor__name__icontains'.")
+        with self.assertRaisesMessage(ValueError, msg):
+            list(
+                Author.objects.annotate(
+                    book_edited_by_b=FilteredRelation(
+                        'book', condition=Q(book__editor__name__icontains='b'),
+                    )).filter(book_edited_by_b__isnull=False)
+            )
 
     def test_filtered_relation_with_empty_relation_name_error(self):
         with self.assertRaisesMessage(ValueError, 'relation_name cannot be empty'):
             FilteredRelation('', condition=Q(blank=''))
+
+    def test_filtered_relation_with_prefetch_related(self):
+        qs = Author.objects.annotate(
+            book_title_contains_b=FilteredRelation(
+                'book', condition=Q(book__title__icontains='b'))).filter(
+                    book_title_contains_b__isnull=False
+                ).prefetch_related('book_title_contains_b__editor')
+
+        msg = ("Cannot find 'book_title_contains_b' on Author object,"
+               " 'book_title_contains_b__editor' is an invalid parameter to prefetch_related()")
+        with self.assertRaisesMessage(AttributeError, msg):
+            list(qs)
 
 
 class FilteredRelationWithAggregationTests(TestCase):
@@ -266,15 +283,12 @@ class FilteredRelationWithAggregationTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.author1 = Author.objects.create(name='Alice')
-
         cls.editor_a = Editor.objects.create(name='a')
-
         cls.book1 = Book.objects.create(
             title='Poem by Alice',
             editor=cls.editor_a,
             author=cls.author1,
         )
-
         cls.borrower1 = Borrower.objects.create(name='Jenny')
         cls.borrower2 = Borrower.objects.create(name='Kevin')
         # borrower 1 reserve, rent and return book1

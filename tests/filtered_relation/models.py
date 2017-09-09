@@ -9,18 +9,12 @@ class Author(models.Model):
         related_query_name='preferred_by_authors',
     )
 
-    class Meta:
-        ordering = ['id']
-
     def __str__(self):
         return self.name
 
 
 class Editor(models.Model):
     name = models.CharField(max_length=255)
-
-    class Meta:
-        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -38,15 +32,12 @@ class Book(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(
         Author,
+        models.CASCADE,
         related_name='books',
         related_query_name='book',
-        on_delete=models.CASCADE,
     )
-    editor = models.ForeignKey(Editor, on_delete=models.CASCADE)
+    editor = models.ForeignKey(Editor, models.CASCADE)
     state = models.CharField(max_length=9, choices=STATES, default=AVAILABLE)
-
-    class Meta:
-        ordering = ['id']
 
     def __str__(self):
         return self.title
@@ -54,9 +45,6 @@ class Book(models.Model):
 
 class Borrower(models.Model):
     name = models.CharField(max_length=50, unique=True)
-
-    class Meta:
-        ordering = ['id']
 
     def __str__(self):
         return self.name
@@ -71,20 +59,17 @@ class Reservation(models.Model):
     )
     borrower = models.ForeignKey(
         Borrower,
+        models.CASCADE,
         related_name='reservations',
         related_query_name='reservation',
-        on_delete=models.CASCADE,
     )
     book = models.ForeignKey(
         Book,
+        models.CASCADE,
         related_name='reservations',
         related_query_name='reservation',
-        on_delete=models.CASCADE,
     )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
-
-    class Meta:
-        ordering = ['id']
 
     def __str__(self):
         return '-'.join((self.book.name, self.borrower.name, self.state))
@@ -99,20 +84,17 @@ class RentalSession(models.Model):
     )
     borrower = models.ForeignKey(
         Borrower,
+        models.CASCADE,
         related_name='rental_sessions',
         related_query_name='rental_session',
-        on_delete=models.CASCADE,
     )
     book = models.ForeignKey(
         Book,
+        models.CASCADE,
         related_name='rental_sessions',
         related_query_name='rental_session',
-        on_delete=models.CASCADE,
     )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
-
-    class Meta:
-        ordering = ['id']
 
     def __str__(self):
         return '-'.join((self.book.name, self.borrower.name, self.state))

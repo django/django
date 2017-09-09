@@ -270,12 +270,20 @@ Aggregation </topics/db/aggregation>`.
 .. class:: FilteredRelation(relation_name, condition=Q())
 
     .. versionadded:: 2.0
+    .. attribute:: FilteredRelation.relation_name
+
+        The name of the field on which you'd like to filter the relation.
+    .. attribute:: FilteredRelation.condition
+
+        A :class:`~django.db.models.Q` object to control the filtering.
 
 Annotate supports also a new kind of argument that is an instance of
-:class:`.FilteredRelation` .
+:class:`.FilteredRelation`.
+
 This kind of parameter allows to pass filtering options inside the the ``ON``
 clause when a ``JOIN`` is performed.
-It does not act on the default relationship but on the given ``alias``.
+It does not act on the default relationship but on the given ``alias`` given
+as name of the parameter (``pizzas_vegetarian`` in example below).
 
 Example::
 
@@ -312,9 +320,8 @@ ones).
 
 .. admonition:: :meth:`~.QuerySet.prefetch_related()` is not yet supported
 
-    We might consider adding support of
-    :meth:`~.QuerySet.prefetch_related()` in combination of
-    :class:`.FilteredRelation` in the future.
+    If you intend to prefetch related objects from the alias,
+    ``AttributeError`` will be raised.
 
 .. currentmodule:: django.db.models.query.QuerySet
 

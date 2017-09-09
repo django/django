@@ -1772,7 +1772,8 @@ class RelatedPopulator:
                 for rel_iter in self.related_populators:
                     rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
-        self.remote_setter(obj, from_obj)
+        if obj is not None:
+            self.remote_setter(obj, from_obj)
 
 
 def get_related_populators(klass_info, select, db):
@@ -1787,7 +1788,7 @@ def get_related_populators(klass_info, select, db):
 class FilteredRelation:
     """Specify custom filtering on the ``ON`` clause of SQL joins."""
 
-    def __init__(self, relation_name, condition):
+    def __init__(self, relation_name, condition=Q()):
         if not relation_name:
             raise ValueError("relation_name cannot be empty")
         self.relation_name = relation_name

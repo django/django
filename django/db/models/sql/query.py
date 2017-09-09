@@ -210,7 +210,6 @@ class Query:
         # load.
         self.deferred_loading = (frozenset(), True)
 
-        self.context = {}
         self._filtered_relations = {}
 
     @property
@@ -314,7 +313,6 @@ class Query:
         if 'subq_aliases' in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
-        obj.context = self.context.copy()
         obj._filtered_relations = self._filtered_relations.copy()
         # Clear the cached_property
         try:
@@ -905,11 +903,15 @@ class Query:
         joins are created as LOUTER if the join is nullable.
         """
         if force_reuse:
-            reuse = [a for a, j in self.alias_map.items()
-                     if a in force_reuse and j.equals(join, with_filtered_relation=False)]
+            reuse = [
+                a for a, j in self.alias_map.items()
+                if a in force_reuse and j.equals(join, with_filtered_relation=False)
+            ]
         else:
-            reuse = [a for a, j in self.alias_map.items()
-                     if (reuse is None or a in reuse) and j == join]
+            reuse = [
+                a for a, j in self.alias_map.items()
+                if (reuse is None or a in reuse) and j == join
+            ]
         if reuse:
             self.ref_alias(reuse[0])
             return reuse[0]
@@ -1159,8 +1161,10 @@ class Query:
         allow_many = not branch_negated or not split_subq
 
         try:
-            join_info = self.setup_joins(parts, opts, alias, can_reuse=can_reuse, force_reuse=force_reuse,
-                                         allow_many=allow_many)
+            join_info = self.setup_joins(
+                parts, opts, alias, can_reuse=can_reuse, force_reuse=force_reuse,
+                allow_many=allow_many,
+            )
 
             # Prevent iterator from being consumed by check_related_objects()
             if isinstance(value, Iterator):
@@ -1171,8 +1175,10 @@ class Query:
             # lookup parts
             self._lookup_joins = join_info.joins
         except MultiJoin as e:
-            return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
-                                      can_reuse, e.names_with_path)
+            return self.split_exclude(
+                filter_expr, LOOKUP_SEP.join(parts[:e.level]),
+                can_reuse, e.names_with_path,
+            )
 
         # Update used_joins before trimming since they are reused to determine
         # which joins could be later promoted to INNER.
@@ -1269,7 +1275,7 @@ class Query:
 
     def build_filtered_relation_q(self, q_object, force_reuse, branch_negated=False, current_negated=False):
         """
-        Adds a Q-object to the current filter.
+        Adds a FilteredRelation object to the current filter.
         """
         connector = q_object.connector
         current_negated ^= q_object.negated
