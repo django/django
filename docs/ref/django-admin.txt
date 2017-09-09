@@ -366,7 +366,9 @@ output:
 * If ``inspectdb`` cannot map a column's type to a model field type, it'll
   use ``TextField`` and will insert the Python comment
   ``'This field type is a guess.'`` next to the field in the generated
-  model.
+  model. The recognized fields may depend on apps listed in
+  :setting:`INSTALLED_APPS`. For example, :mod:`django.contrib.postgres` adds
+  recognition for several PostgreSQL-specific field types.
 
 * If the database column name is a Python reserved word (such as
   ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append

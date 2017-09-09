@@ -15,8 +15,12 @@ class PostgresConfig(AppConfig):
     def ready(self):
         # Connections may already exist before we are called.
         for conn in connections.all():
-            if conn.connection is not None:
-                register_type_handlers(conn)
+            if conn.vendor == 'postgresql':
+                conn.introspection.data_types_reverse.update({
+                    3802: 'django.contrib.postgresql.fields.JSONField',
+                })
+                if conn.connection is not None:
+                    register_type_handlers(conn)
         connection_created.connect(register_type_handlers)
         CharField.register_lookup(Unaccent)
         TextField.register_lookup(Unaccent)

@@ -123,6 +123,9 @@ Minor features
   operation installs the ``btree_gist`` extension to add support for operator
   classes that aren't built-in.
 
+* :djadmin:`inspectdb` can now introspect ``JSONField``
+  (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
