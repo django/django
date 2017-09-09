@@ -641,7 +641,7 @@ class LoginTest(AuthViewsTestCase):
         Makes sure that a login rotates the currently-used CSRF token.
         """
         # Do a GET to establish a CSRF token
-        # TestClient isn't used here as we're testing middleware, essentially.
+        # The test client isn't used here as it's a test for middleware.
         req = HttpRequest()
         CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
         # get_token() triggers CSRF token inclusion in the response

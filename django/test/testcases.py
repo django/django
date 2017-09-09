@@ -245,9 +245,9 @@ class SimpleTestCase(unittest.TestCase):
         Assert that a response redirected to a specific URL and that the
         redirect URL can be loaded.
 
-        Won't work for external links since it uses TestClient to do a request
-        (use fetch_redirect_response=False to check such links without fetching
-        them).
+        Won't work for external links since it uses the test client to do a
+        request (use fetch_redirect_response=False to check such links without
+        fetching them).
         """
         if msg_prefix:
             msg_prefix += ": "
