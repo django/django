@@ -1801,7 +1801,8 @@ class FilteredRelation:
             isinstance(other, self.__class__) and
             self.relation_name == other.relation_name and
             self.alias == other.alias and
-            self.condition == other.condition)
+            self.condition == other.condition
+        )
 
     def clone(self):
         clone = FilteredRelation(self.relation_name, self.condition)
