@@ -2,6 +2,7 @@ import os
 import re
 import types
 from datetime import datetime, timedelta
+from decimal import Decimal
 from unittest import TestCase, skipUnless
 
 from django.core.exceptions import ValidationError
@@ -258,6 +259,17 @@ TEST_DATA = [
     (FileExtensionValidator(['txt']), ContentFile('contents', name='file.TXT'), None),
     (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.txt'), None),
     (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
+
+    (DecimalValidator(max_digits=2, decimal_places=2), Decimal('0.99'), None),
+    (DecimalValidator(max_digits=2, decimal_places=1), Decimal('0.99'), ValidationError),
+    (DecimalValidator(max_digits=3, decimal_places=1), Decimal('999'), ValidationError),
+    (DecimalValidator(max_digits=4, decimal_places=1), Decimal('999'), None),
+    (DecimalValidator(max_digits=20, decimal_places=2), Decimal('742403889818000000'), None),
+    (DecimalValidator(max_digits=20, decimal_places=2), Decimal('7424742403889818000000'), ValidationError),
+    (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-1'), None),
+    (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-3'), ValidationError),
+    (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-5'), None),
+    (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-6'), ValidationError),
 
     (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
