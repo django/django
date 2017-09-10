@@ -31,3 +31,4 @@ API Reference
    utils
    validators
    views
+   paginator
