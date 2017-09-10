@@ -163,9 +163,9 @@ class FilteredRelationTests(TestCase):
         self.assertSequenceEqual(Author.objects.annotate(
             book_alice=FilteredRelation(
                 'book', condition=Q(book__title__iexact='poem by alice'),
-            )).extra(where=["1 = 1"]).order_by(
-            F('book_alice__id').desc()),
-            [self.author1, self.author2])
+            )).filter(book_alice__isnull=False).extra(
+                where=["1 = 1"]),
+            [self.author1])
 
     @skipUnlessDBFeature('supports_select_union')
     def test_filtered_relation_union(self):
