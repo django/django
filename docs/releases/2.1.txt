@@ -236,6 +236,9 @@ Models
   encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
   likely be deprecated in the future.
 
+* The new :meth:`.QuerySet.explain` method displays the database's execution
+  plan of a queryset's query.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

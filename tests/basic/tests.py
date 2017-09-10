@@ -555,6 +555,7 @@ class ManagerTest(SimpleTestCase):
         'only',
         'using',
         'exists',
+        'explain',
         '_insert',
         '_update',
         'raw',
