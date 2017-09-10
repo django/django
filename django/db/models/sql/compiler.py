@@ -455,7 +455,7 @@ class SQLCompiler:
                 result = ['SELECT']
                 params = []
 
-                if self.query.distinct:
+                if self.query.distinct and not ((self.query.subquery or self.query.values_select) and extra_select):
                     result.append(self.connection.ops.distinct_sql(distinct_fields))
 
                 out_cols = []
@@ -539,13 +539,14 @@ class SQLCompiler:
             if for_update_part and not self.connection.features.for_update_after_from:
                 result.append(for_update_part)
 
-            if self.query.subquery and extra_select:
-                # If the query is used as a subquery, the extra selects would
-                # result in more columns than the left-hand side expression is
-                # expecting. This can happen when a subquery uses a combination
-                # of order_by() and distinct(), forcing the ordering expressions
-                # to be selected as well. Wrap the query in another subquery
-                # to exclude extraneous selects.
+            if (self.query.subquery or self.query.values_select) and extra_select:
+                # If the query is used as a subquery or has a limited list of
+                # columns, the extra selects would result in more columns than
+                # the left-hand side expression is expecting. This can happen
+                # when a subquery uses a combination of order_by(), values() or
+                # values_list(), and distinct(), forcing the ordering
+                # expressions to be selected as well. Wrap the query in another
+                # subquery to exclude extraneous selects.
                 sub_selects = []
                 sub_params = []
                 for select, _, alias in self.select:
@@ -559,7 +560,8 @@ class SQLCompiler:
                         subselect, subparams = select_clone.as_sql(self, self.connection)
                         sub_selects.append(subselect)
                         sub_params.extend(subparams)
-                return 'SELECT %s FROM (%s) subquery' % (
+                return 'SELECT %s%s FROM (%s) subquery' % (
+                    '%s ' % self.connection.ops.distinct_sql(distinct_fields) if self.query.distinct else '',
                     ', '.join(sub_selects),
                     ' '.join(result),
                 ), sub_params + params

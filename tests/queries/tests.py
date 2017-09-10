@@ -519,17 +519,6 @@ class Queries1Tests(TestCase):
             ['<Item: four>']
         )
 
-    def test_tickets_5321_7070(self):
-        # Ordering columns must be included in the output columns. Note that
-        # this means results that might otherwise be distinct are not (if there
-        # are multiple values in the ordering cols), as in this example. This
-        # isn't a bug; it's a warning to be careful with the selection of
-        # ordering columns.
-        self.assertSequenceEqual(
-            Note.objects.values('misc').distinct().order_by('note', '-misc'),
-            [{'misc': 'foo'}, {'misc': 'bar'}, {'misc': 'foo'}]
-        )
-
     def test_ticket4358(self):
         # If you don't pass any fields to values(), relation fields are
         # returned as "foo_id" keys, not "foo". For consistency, you should be
@@ -1171,6 +1160,16 @@ class Queries1Tests(TestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(unknown_field__name='generic')
+
+    def test_ordered_query_with_values_and_distinct(self):
+        self.assertSequenceEqual(
+            Tag.objects.filter(parent=self.t1).order_by('name').values('parent__pk').distinct(),
+            [{'parent__pk': self.t1.pk}]
+        )
+        self.assertSequenceEqual(
+            Tag.objects.filter(parent=self.t1).order_by('name').values_list('parent__pk').distinct(),
+            [(self.t1.pk,)]
+        )
 
 
 class Queries2Tests(TestCase):
