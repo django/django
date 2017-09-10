@@ -367,7 +367,13 @@ class GenericRelation(ForeignObject):
         target = parent_opts.pk
         path.append(
             PathInfo(
-                self.model._meta, parent_opts, (target,), self.remote_field, True, False, filtered_relation,
+                from_opts=self.model._meta,
+                to_opts=parent_opts,
+                target_fields=(target,),
+                join_field=self.remote_field,
+                m2m=True,
+                direct=False,
+                filtered_relation=filtered_relation,
             )
         )
         # Collect joins needed for the parent -> child chain. This is easiest
