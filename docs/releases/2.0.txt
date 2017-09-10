@@ -617,6 +617,8 @@ Miscellaneous
 * ``django.contrib.gis.gdal.OGRException`` is removed. It's been an alias for
   ``GDALException`` since Django 1.8.
 
+* Support for GEOS 3.3.x is dropped.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
