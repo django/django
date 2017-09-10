@@ -2,8 +2,56 @@
 Pagination
 ==========
 
-Django provides high-level and low-level ways to help you manage paginated dat
+Django provides high-level and low-level ways to help you manage paginated data
 -- that is, data that's split across several pages, with "Previous/Next" links.
+
+Paginating a `ListView`
+=======================
+
+:class:`django.views.generic.list.ListView` provides a built-in way to
+paginate the displayed list. You can use it by adding to ``paginate_by``
+attribute to your view class, like so::
+
+    from django.views.generic import ListView
+    from books.models import Publisher
+
+    class PublisherList(ListView):
+        paginate_by = 2
+        model = Publisher
+
+Assuming you were able to view the full list of publishers before this change,
+the example above already works! The only thing your users will be missing is
+a way to get to the next or previous page comfortably.
+
+To achieve this, add links to the next and previous page, like shown in the
+example ``publisher_list.html`` below::
+
+    <h1>Publishers</h1>
+
+    {% for publisher in object_list %}
+    {{ publisher.name }}<br>
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+        </span>
+    </div>
+
+Note that a ``page_obj`` as well as a ``paginator`` variable have been inserted into
+the context here. To learn more about them, please refer to the section below
+as well as the :doc:`Paginator </ref/paginator>` reference.
+
 
 The `Paginator` class
 =====================
