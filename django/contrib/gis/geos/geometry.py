@@ -613,7 +613,7 @@ class GEOSGeometryBase(GEOSBase):
 
     def clone(self):
         "Clone this Geometry."
-        return GEOSGeometry(capi.geom_clone(self.ptr), srid=self.srid)
+        return GEOSGeometry(capi.geom_clone(self.ptr))
 
 
 class LinearGeometryMixin:
