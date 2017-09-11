@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
-from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import FieldError
 from django.db.models import (
     BooleanField, FloatField, IntegerField, TextField, Transform,
@@ -31,7 +31,7 @@ class GeoFuncMixin:
             except FieldError:
                 output_field = None
             geom = expr.value
-            if not isinstance(geom, Geometry) or output_field and not isinstance(output_field, GeometryField):
+            if not isinstance(geom, GEOSGeometry) or output_field and not isinstance(output_field, GeometryField):
                 raise TypeError("%s function requires a geometric argument in position %d." % (self.name, pos + 1))
             if not geom.srid and not output_field:
                 raise ValueError("SRID is required for all geometries.")

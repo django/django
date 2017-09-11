@@ -3,10 +3,9 @@ from collections import defaultdict, namedtuple
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.contrib.gis.geos import (
-    GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon,
-    Point, Polygon,
+    GeometryCollection, GEOSException, GEOSGeometry, LineString,
+    MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
 )
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.fields import Field
@@ -170,7 +169,7 @@ class BaseSpatialField(Field):
         obj = super().get_prep_value(value)
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
-        if isinstance(obj, Geometry):
+        if isinstance(obj, GEOSGeometry):
             pass
         else:
             # Check if input is a candidate for conversion to raster or geometry.
@@ -182,8 +181,8 @@ class BaseSpatialField(Field):
                 obj = raster
             elif is_candidate:
                 try:
-                    obj = Geometry(obj)
-                except (GeometryException, GDALException):
+                    obj = GEOSGeometry(obj)
+                except (GEOSException, GDALException):
                     raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
             else:
                 raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
@@ -248,7 +247,7 @@ class GeometryField(BaseSpatialField):
         super().contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
-        setattr(cls, self.attname, SpatialProxy(Geometry, self))
+        setattr(cls, self.attname, SpatialProxy(GEOSGeometry, self))
 
     def formfield(self, **kwargs):
         defaults = {'form_class': self.form_class,

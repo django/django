@@ -5,7 +5,7 @@ from psycopg2 import Binary
 from psycopg2.extensions import ISQLQuote
 
 from django.contrib.gis.db.backends.postgis.pgraster import to_pgraster
-from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos import GEOSGeometry
 
 
 class PostGISAdapter:
@@ -13,7 +13,7 @@ class PostGISAdapter:
         """
         Initialize on the spatial object.
         """
-        self.is_geometry = isinstance(obj, (Geometry, PostGISAdapter))
+        self.is_geometry = isinstance(obj, (GEOSGeometry, PostGISAdapter))
 
         # Getting the WKB (in string form, to allow easy pickling of
         # the adaptor) and the SRID from the geometry or raster.

@@ -9,8 +9,7 @@ from django.contrib.gis.db.backends.base.operations import (
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.geos.geometry import GEOSGeometryBase
+from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r, wkt_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
@@ -107,7 +106,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """
         if box is None:
             return None
-        shell = Geometry(box).shell
+        shell = GEOSGeometry(box).shell
         xmin, ymin = shell[0][:2]
         xmax, ymax = shell[2][:2]
         return (xmin, ymin, xmax, ymax)

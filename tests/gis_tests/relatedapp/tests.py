@@ -1,5 +1,4 @@
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
@@ -177,8 +176,8 @@ class RelatedGeoModelTest(TestCase):
         for m, d, t in zip(gqs, gvqs, gvlqs):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
-            self.assertIsInstance(d['point'], Geometry)
-            self.assertIsInstance(t[1], Geometry)
+            self.assertIsInstance(d['point'], GEOSGeometry)
+            self.assertIsInstance(t[1], GEOSGeometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
 
