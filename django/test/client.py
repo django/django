@@ -697,7 +697,7 @@ class Client(RequestFactory):
                     'Content-Type header is "{0}", not "application/json"'
                     .format(response.get('Content-Type'))
                 )
-            response._json = json.loads(response.content.decode(), **extra)
+            response._json = json.loads(response.content.decode('utf-8'), **extra)
         return response._json
 
     def _handle_redirects(self, response, **extra):
