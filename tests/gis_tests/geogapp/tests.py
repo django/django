@@ -11,7 +11,7 @@ from django.db import connection
 from django.db.models.functions import Cast
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import oracle, postgis, spatialite
+from ..utils import FuncTestMixin, oracle, postgis, spatialite
 from .models import City, County, Zipcode
 
 
@@ -86,7 +86,7 @@ class GeographyTest(TestCase):
             self.assertEqual(state, c.state)
 
 
-class GeographyFunctionTests(TestCase):
+class GeographyFunctionTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     @skipUnlessDBFeature("supports_extent_aggr")
