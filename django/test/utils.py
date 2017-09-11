@@ -178,7 +178,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                 if parallel > 1:
                     for index in range(parallel):
                         connection.creation.clone_test_db(
-                            number=index + 1,
+                            suffix=str(index + 1),
                             verbosity=verbosity,
                             keepdb=keepdb,
                         )
@@ -292,7 +292,7 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
             if parallel > 1:
                 for index in range(parallel):
                     connection.creation.destroy_test_db(
-                        number=index + 1,
+                        suffix=str(index + 1),
                         verbosity=verbosity,
                         keepdb=keepdb,
                     )

@@ -404,6 +404,12 @@ backends.
   :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
   ``max_length`` argument isn't provided.
 
+* The first argument of ``DatabaseCreation._clone_test_db()`` and
+  ``get_test_db_clone_settings()`` is now ``suffix`` rather
+  than ``number`` (in case you want to rename the signatures in your backend
+  for consistency). ``django.test`` also now passes those values as strings
+  rather than as integers.
+
 Dropped support for Oracle 11.2
 -------------------------------
 
