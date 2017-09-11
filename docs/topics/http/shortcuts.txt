@@ -111,6 +111,8 @@ This example is equivalent to::
    * An absolute or relative URL, which will be used as-is for the redirect
      location.
 
+   URLs are automatically encoded.
+
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
    permanent redirect.
 
