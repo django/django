@@ -98,6 +98,28 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Table name comparison is case insensitive under Oracle."""
         return name.lower()
 
+    def get_sequences(self, cursor, table_name):
+        cursor.execute("""
+            SELECT
+                user_tab_identity_cols.sequence_name,
+                user_tab_identity_cols.column_name
+            FROM
+                user_tab_identity_cols,
+                user_constraints,
+                user_cons_columns cols
+            WHERE
+                user_constraints.constraint_name = cols.constraint_name
+                AND user_constraints.table_name = user_tab_identity_cols.table_name
+                AND cols.column_name = user_tab_identity_cols.column_name
+                AND user_constraints.constraint_type = 'P'
+                AND user_tab_identity_cols.table_name = UPPER(%s)
+        """, [table_name])
+        # Oracle allows only one identity column per table.
+        row = cursor.fetchone()
+        return [] if row is None else [
+            {'name': row[0].lower(), 'table': table_name, 'column': row[1].lower()}
+        ]
+
     def get_relations(self, cursor, table_name):
         """
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
