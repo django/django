@@ -323,6 +323,12 @@ ones).
     If you intend to prefetch related objects from the alias,
     ``AttributeError`` will be raised.
 
+
+.. admonition:: :meth:`~.QuerySet.only()` is not yet supported
+
+    If you intend use :meth:`~.QuerySet.only()` using the filtered_relation
+    alias, ``AttributeError`` will be raised.
+
 .. currentmodule:: django.db.models.query.QuerySet
 
 ``order_by()``

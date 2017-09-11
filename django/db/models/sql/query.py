@@ -1859,7 +1859,7 @@ class Query:
 
     def get_loaded_field_names_cb(self, target, model, fields):
         """Callback used by get_deferred_field_names()."""
-        target[model] = {f.attname if not f.one_to_many else f.remote_field.attname for f in fields}
+        target[model] = {f.attname for f in fields}
 
     def set_annotation_mask(self, names):
         """Set the mask of annotations that will be returned by the SELECT."""

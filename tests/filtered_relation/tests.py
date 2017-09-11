@@ -221,15 +221,15 @@ class FilteredRelationTests(TestCase):
                     'book_alice').defer('book_alice__title'),
                 ["Poem by Alice"], lambda author: author.book_alice.title)
 
-    def test_filtered_relation_only(self):
-        # One query for the list, and one query to fetch the
-        # deffered state.
-        with self.assertNumQueries(2):
-            self.assertQuerysetEqual(Author.objects.annotate(
+    def test_filtered_relation_only_not_supported(self):
+        msg = "'ManyToOneRel' object has no attribute 'attname'"
+        with self.assertRaisesMessage(AttributeError, msg):
+            list(Author.objects.annotate(
                 book_alice=FilteredRelation(
                     'book', condition=Q(book__title__iexact='poem by alice'),
                 )).filter(book_alice__isnull=False).select_related('book_alice').only(
-                    'book_alice__title'), ["available"], lambda author: author.book_alice.state)
+                    'book_alice__state')
+            )
 
     def test_filtered_relation_as_subquery(self):
         inner_qs = Author.objects.annotate(
