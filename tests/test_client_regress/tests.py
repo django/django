@@ -1233,6 +1233,10 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.get('/json_response/')
         self.assertIs(response.json(), response.json())
 
+    def test_unicode_json(self):
+        response = self.client.get('/unicode_json_response/')
+        self.assertEqual(response.json(), {'峠': 'とうげ tōge "mountain pass"'})
+
     def test_json_wrong_header(self):
         response = self.client.get('/body/')
         msg = 'Content-Type header is "text/html; charset=utf-8", not "application/json"'

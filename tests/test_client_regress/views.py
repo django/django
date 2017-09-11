@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import json
 
 from django.conf import settings
@@ -109,6 +111,13 @@ def return_json_response(request):
     content_type = request.GET.get('content_type')
     kwargs = {'content_type': content_type} if content_type else {}
     return JsonResponse({'key': 'value'}, **kwargs)
+
+
+def return_unicode_json_response(request):
+    content_type = request.GET.get('content_type')
+    kwargs = {'content_type': content_type} if content_type else {}
+    kwargs['json_dumps_params'] = {'ensure_ascii': False}
+    return JsonResponse({'峠': 'とうげ tōge "mountain pass"'}, **kwargs)
 
 
 def return_json_file(request):
