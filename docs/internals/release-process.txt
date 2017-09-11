@@ -59,6 +59,8 @@ security purposes, please see :doc:`our security policies <security>`.
 
     .. _the download page: https://www.djangoproject.com/download/
 
+.. _internal-release-cadence:
+
 Release cadence
 ===============
 
