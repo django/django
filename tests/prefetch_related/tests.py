@@ -71,6 +71,52 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         normal_books = [a.first_book for a in Author.objects.all()]
         self.assertEqual(books, normal_books)
 
+    def test_foreignkey_forward_auto(self):
+        with self.assertNumQueries(2):
+            books = [a.first_book for a in Author.objects.auto_prefetch_related()]
+
+        normal_books = [a.first_book for a in Author.objects.all()]
+        self.assertEqual(books, normal_books)
+
+    def test_onetoone_forward_auto(self):
+        Bio.objects.bulk_create([
+            Bio(author=self.author1),
+            Bio(author=self.author2),
+            Bio(author=self.author3),
+            Bio(author=self.author4),
+        ])
+        with self.assertNumQueries(2):
+            authors = [b.author for b in Bio.objects.auto_prefetch_related()]
+
+        normal_authors = [b.author for b in Bio.objects.all()]
+        self.assertEqual(authors, normal_authors)
+
+    def test_onetoone_reverse_auto(self):
+        Bio.objects.bulk_create([
+            Bio(author=self.author1),
+            Bio(author=self.author2),
+            Bio(author=self.author3),
+            Bio(author=self.author4),
+        ])
+        with self.assertNumQueries(2):
+            bios = [a.bio for a in Author.objects.auto_prefetch_related()]
+
+        normal_bios = [a.bio for a in Author.objects.all()]
+        self.assertEqual(bios, normal_bios)
+
+    def test_auto_chaining(self):
+        Bio.objects.bulk_create([
+            Bio(author=self.author1),
+            Bio(author=self.author2),
+            Bio(author=self.author3),
+            Bio(author=self.author4),
+        ])
+        with self.assertNumQueries(3):
+            books = [b.author.first_book for b in Bio.objects.auto_prefetch_related()]
+
+        normal_books = [b.author.first_book for b in Bio.objects.all()]
+        self.assertEqual(books, normal_books)
+
     def test_foreignkey_reverse(self):
         with self.assertNumQueries(2):
             [list(b.first_time_authors.all())

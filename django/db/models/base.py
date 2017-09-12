@@ -399,6 +399,13 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
+    prefetch_related_peers = ()
+
+    def __getstate__(self):
+        """Hook to allow choosing the attributes to pickle."""
+        obj_dict = self.__dict__.copy()
+        obj_dict.pop('prefetch_related_peers', None)
+        return obj_dict
 
 
 class Model(metaclass=ModelBase):

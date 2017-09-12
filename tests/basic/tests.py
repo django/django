@@ -586,6 +586,7 @@ class ManagerTest(SimpleTestCase):
         'select_for_update',
         'select_related',
         'prefetch_related',
+        'auto_prefetch_related',
         'values',
         'values_list',
         'update',

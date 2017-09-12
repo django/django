@@ -5,6 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
+import weakref
 from collections import namedtuple
 from functools import lru_cache
 from itertools import chain
@@ -194,6 +195,7 @@ class QuerySet:
         self._for_write = False
         self._prefetch_related_lookups = ()
         self._prefetch_done = False
+        self._auto_prefetch_related = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
@@ -1067,6 +1069,15 @@ class QuerySet:
             clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
         return clone
 
+    def auto_prefetch_related(self, value=True):
+        """
+        Return a new QuerySet instance that will prefetch any Many-To-One
+        related objects when they are accessed.
+        """
+        clone = self._chain()
+        clone._auto_prefetch_related = value
+        return clone
+
     def annotate(self, *args, **kwargs):
         """
         Return a query set in which the returned objects have been annotated
@@ -1282,6 +1293,7 @@ class QuerySet:
         c._sticky_filter = self._sticky_filter
         c._for_write = self._for_write
         c._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        c._auto_prefetch_related = self._auto_prefetch_related
         c._known_related_objects = self._known_related_objects
         c._iterable_class = self._iterable_class
         c._fields = self._fields
@@ -1290,6 +1302,12 @@ class QuerySet:
     def _fetch_all(self):
         if self._result_cache is None:
             self._result_cache = list(self._iterable_class(self))
+            # If we're fetching objects tell them about each other so they can
+            # prefetch for each other during attribute access.
+            if issubclass(self._iterable_class, ModelIterable) and self._auto_prefetch_related:
+                peers = [weakref.ref(p) for p in self._result_cache]
+                for peer in self._result_cache:
+                    peer._state.prefetch_related_peers = peers
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_objects()
 

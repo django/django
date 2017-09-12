@@ -1151,7 +1151,7 @@ class ModelChoiceIterator:
             yield ("", self.field.empty_label)
         queryset = self.queryset
         # Can't use iterator() when queryset uses prefetch_related()
-        if not queryset._prefetch_related_lookups:
+        if not queryset._prefetch_related_lookups and not queryset._auto_prefetch_related:
             queryset = queryset.iterator()
         for obj in queryset:
             yield self.choice(obj)
