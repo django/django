@@ -318,16 +318,16 @@ ones).
     'pizzas_with_toppings_startswith_n' cannot operate on foreign key
     'pizzas__toppings'".
 
-.. admonition:: :meth:`~.QuerySet.prefetch_related()` is not yet supported
+.. admonition:: :meth:`~.QuerySet.prefetch_related()` is not supported
 
-    If you intend to prefetch related objects from the alias,
-    ``AttributeError`` will be raised.
+    If you try to use :meth:`~.QuerySet.prefetch_related()` with a
+    FilteredRelation alias, ``AttributeError`` will be raised
 
 
-.. admonition:: :meth:`~.QuerySet.only()` is not yet supported
+.. admonition:: :meth:`~.QuerySet.only()` is not supported
 
-    If you intend use :meth:`~.QuerySet.only()` using the filtered_relation
-    alias, ``AttributeError`` will be raised.
+    If you try to use :meth:`~.QuerySet.only()` with a FilteredRelation alias,
+    ``AttributeError`` will be raised
 
 .. currentmodule:: django.db.models.query.QuerySet
 
