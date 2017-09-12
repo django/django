@@ -106,12 +106,10 @@ This example is equivalent to::
      function will be called.
 
    * A view name, possibly with arguments: :func:`~django.urls.reverse` will be
-     used to reverse-resolve the name.
+     used to reverse-resolve the name. The resulting URL is encoded.
 
    * An absolute or relative URL, which will be used as-is for the redirect
      location.
-
-   URLs are automatically encoded.
 
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
    permanent redirect.
