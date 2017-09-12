@@ -146,6 +146,11 @@ thead th.sorted .text {
     float: right;
 }
 
+.aligned p.file-upload {
+    margin-left: auto;
+    margin-right: 170px;
+}
+
 .submit-row {
     text-align: left
 }
