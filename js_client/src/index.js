@@ -30,7 +30,7 @@ export class WebSocketBridge {
    * @param      {String}  [url]     The url of the websocket. Defaults to
    * `window.location.host`
    * @param      {String[]|String}  [protocols] Optional string or array of protocols.
-   * @param      {Object} options Object of options for [`reconnecting-websocket`](https://github.com/joewalnes/reconnecting-websocket#options-1).
+   * @param      {Object} options Object of options for [`reconnecting-websocket`](https://github.com/pladaria/reconnecting-websocket#configure).
    * @example
    * const webSocketBridge = new WebSocketBridge();
    * webSocketBridge.connect();
