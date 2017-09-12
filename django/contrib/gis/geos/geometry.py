@@ -6,7 +6,7 @@ import re
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
-from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq

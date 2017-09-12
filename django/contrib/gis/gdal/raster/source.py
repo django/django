@@ -16,7 +16,7 @@ from django.contrib.gis.gdal.raster.const import (
     VSI_FILESYSTEM_BASE_PATH, VSI_TAKE_BUFFER_OWNERSHIP,
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
-from django.contrib.gis.geometry.regex import json_regex
+from django.contrib.gis.geometry import json_regex
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
