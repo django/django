@@ -72,7 +72,8 @@ var WebSocketBridge = function () {
           _url = url;
         }
       }
-      this.socket = new _reconnectingWebsocket2.default(_url, protocols, options);
+      var _protocols = protocols === undefined ? '' : protocols;
+      this.socket = new _reconnectingWebsocket2.default(_url, _protocols, options);
     }
 
     /**

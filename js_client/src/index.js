@@ -50,7 +50,10 @@ export class WebSocketBridge {
         _url = url;
       }
     }
-    this.socket = new ReconnectingWebSocket(_url, protocols, options);
+    // Some mobile devices (eg: HTC M8, SAMSUNG Galaxy S8) will get error code
+    // [1006] during handshake if `protocols` is `undefined`.
+    const _protocols = protocols === undefined ? '' : protocols;
+    this.socket = new ReconnectingWebSocket(_url, _protocols, options);
   }
 
   /**

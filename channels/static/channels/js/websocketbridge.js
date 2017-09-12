@@ -283,7 +283,10 @@ var WebSocketBridge = function () {
           _url = url;
         }
       }
-      this.socket = new _reconnectingWebsocket2.default(_url, protocols, options);
+      // Some mobile devices (eg: HTC M8, SAMSUNG Galaxy S8) will get error code
+      // [1006] during handshake if `protocols` is `undefined`.
+      var _protocols = protocols === undefined ? '' : protocols;
+      this.socket = new _reconnectingWebsocket2.default(_url, _protocols, options);
     }
 
     /**
