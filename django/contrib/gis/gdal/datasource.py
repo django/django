@@ -87,8 +87,9 @@ class DataSource(GDALBase):
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
         if isinstance(index, str):
-            layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
-            if not layer:
+            try:
+                layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
+            except GDALException:
                 raise IndexError('Invalid OGR layer name given: %s.' % index)
         elif isinstance(index, int):
             if 0 <= index < self.layer_count:
