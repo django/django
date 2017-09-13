@@ -61,7 +61,7 @@ created a URLconf for the polls application that includes this line:
 .. snippet::
     :filename: polls/urls.py
 
-    url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+    path('<int:question_id>/vote/', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
@@ -237,20 +237,20 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     app_name = 'polls'
     urlpatterns = [
-        url(r'^$', views.IndexView.as_view(), name='index'),
-        url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
-        url(r'^(?P<pk>[0-9]+)/results/$', views.ResultsView.as_view(), name='results'),
-        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+        path('', views.IndexView.as_view(), name='index'),
+        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+        path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
-Note that the name of the matched pattern in the regexes of the second and third
-patterns has changed from ``<question_id>`` to ``<pk>``.
+Note that the name of the matched pattern in the path strings of the second and
+third patterns has changed from ``<question_id>`` to ``<pk>``.
 
 Amend views
 -----------
