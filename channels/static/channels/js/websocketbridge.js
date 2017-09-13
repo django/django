@@ -3,6 +3,9 @@
  */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.channels = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+;
+;
+;
 var isWebSocket = function (constructor) {
     return constructor && constructor.CLOSING === 2;
 };
@@ -44,7 +47,9 @@ var reassignEventListeners = function (ws, oldWs, listeners) {
         });
     });
     if (oldWs) {
-        LEVEL_0_EVENTS.forEach(function (name) { ws[name] = oldWs[name]; });
+        LEVEL_0_EVENTS.forEach(function (name) {
+            ws[name] = oldWs[name];
+        });
     }
 };
 var ReconnectingWebsocket = function (url, protocols, options) {
@@ -72,7 +77,7 @@ var ReconnectingWebsocket = function (url, protocols, options) {
     var log = config.debug ? function () {
         var params = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            params[_i - 0] = arguments[_i];
+            params[_i] = arguments[_i];
         }
         return console.log.apply(console, ['RWS:'].concat(params));
     } : function () { };
@@ -94,7 +99,7 @@ var ReconnectingWebsocket = function (url, protocols, options) {
         }
     }, 0); };
     var handleClose = function () {
-        log('close');
+        log('handleClose', { shouldRetry: shouldRetry });
         retriesCount++;
         log('retries count:', retriesCount);
         if (retriesCount > config.maxRetries) {
@@ -107,15 +112,19 @@ var ReconnectingWebsocket = function (url, protocols, options) {
         else {
             reconnectDelay = updateReconnectionDelay(config, reconnectDelay);
         }
-        log('reconnectDelay:', reconnectDelay);
+        log('handleClose - reconnectDelay:', reconnectDelay);
         if (shouldRetry) {
             setTimeout(connect, reconnectDelay);
         }
     };
     var connect = function () {
+        if (!shouldRetry) {
+            return;
+        }
         log('connect');
         var oldWs = ws;
-        ws = new config.constructor(url, protocols);
+        var wsUrl = (typeof url === 'function') ? url() : url;
+        ws = new config.constructor(wsUrl, protocols);
         connectingTimeout = setTimeout(function () {
             log('timeout');
             ws.close();
@@ -147,10 +156,11 @@ var ReconnectingWebsocket = function (url, protocols, options) {
         if (code === void 0) { code = 1000; }
         if (reason === void 0) { reason = ''; }
         var _b = _a === void 0 ? {} : _a, _c = _b.keepClosed, keepClosed = _c === void 0 ? false : _c, _d = _b.fastClose, fastClose = _d === void 0 ? true : _d, _e = _b.delay, delay = _e === void 0 ? 0 : _e;
+        log('close - params:', { reason: reason, keepClosed: keepClosed, fastClose: fastClose, delay: delay, retriesCount: retriesCount, maxRetries: config.maxRetries });
+        shouldRetry = !keepClosed && retriesCount <= config.maxRetries;
         if (delay) {
             reconnectDelay = delay;
         }
-        shouldRetry = !keepClosed;
         ws.close(code, reason);
         if (fastClose) {
             var fakeCloseEvent_1 = {
@@ -205,6 +215,7 @@ var ReconnectingWebsocket = function (url, protocols, options) {
         }
         ws.removeEventListener(type, listener, options);
     };
+    return this;
 };
 module.exports = ReconnectingWebsocket;
 
@@ -259,7 +270,7 @@ var WebSocketBridge = function () {
    * @param      {String}  [url]     The url of the websocket. Defaults to
    * `window.location.host`
    * @param      {String[]|String}  [protocols] Optional string or array of protocols.
-   * @param      {Object} options Object of options for [`reconnecting-websocket`](https://github.com/joewalnes/reconnecting-websocket#options-1).
+   * @param      {Object} options Object of options for [`reconnecting-websocket`](https://github.com/pladaria/reconnecting-websocket#configure).
    * @example
    * const webSocketBridge = new WebSocketBridge();
    * webSocketBridge.connect();
