@@ -837,7 +837,7 @@ class BaseModelFormSet(BaseFormSet):
                         pk_value = None
                 except IndexError:
                     pk_value = None
-            if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
+            if isinstance(pk, (ForeignKey, OneToOneField)):
                 qs = pk.remote_field.model._default_manager.get_queryset()
             else:
                 qs = self.model._default_manager.get_queryset()

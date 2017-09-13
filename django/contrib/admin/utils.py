@@ -394,7 +394,7 @@ def display_for_field(value, field, empty_value_display):
         return dict(field.flatchoices).get(value, empty_value_display)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
-    elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
+    elif isinstance(field, (models.BooleanField, models.NullBooleanField)):
         return _boolean_icon(value)
     elif value is None:
         return empty_value_display
