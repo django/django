@@ -410,6 +410,10 @@ backends.
   for consistency). ``django.test`` also now passes those values as strings
   rather than as integers.
 
+* Third-party database backends should add a
+  ``DatabaseIntrospection.get_sequences()`` method based on the stub in
+  ``BaseDatabaseIntrospection``.
+
 Dropped support for Oracle 11.2
 -------------------------------
 
