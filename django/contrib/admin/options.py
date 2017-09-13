@@ -134,7 +134,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return self.formfield_for_choice_field(db_field, request, **kwargs)
 
         # ForeignKey or ManyToManyFields
-        if isinstance(db_field, models.ManyToManyField) or isinstance(db_field, models.ForeignKey):
+        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             # Combine the field kwargs with any options for formfield_overrides.
             # Make sure the passed in **kwargs override anything in
             # formfield_overrides because **kwargs is more specific, and should
