@@ -106,8 +106,8 @@ else:
     else:
         def lock(f, flags):
             ret = fcntl.flock(_fd(f), flags)
-            return (ret == 0)
+            return ret == 0
 
         def unlock(f):
             ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
-            return (ret == 0)
+            return ret == 0

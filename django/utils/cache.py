@@ -153,7 +153,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         if_modified_since = parse_http_date_safe(if_modified_since)
 
     # Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
-    if (if_match_etags and not _if_match_passes(etag, if_match_etags)):
+    if if_match_etags and not _if_match_passes(etag, if_match_etags):
         return _precondition_failed(request)
 
     # Step 2: Test the If-Unmodified-Since precondition.
@@ -162,7 +162,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         return _precondition_failed(request)
 
     # Step 3: Test the If-None-Match precondition.
-    if (if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags)):
+    if if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags):
         if request.method in ('GET', 'HEAD'):
             return _not_modified(request, response)
         else:
