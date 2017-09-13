@@ -1158,19 +1158,19 @@ class IncludeTests(SimpleTestCase):
 
     def test_include_namespace(self):
         msg = (
-            "Specifying a namespace in django.conf.urls.include() without "
-            "providing an app_name is not supported."
+            'Specifying a namespace in include() without providing an '
+            'app_name is not supported.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include(self.url_patterns, 'namespace')
 
     def test_include_4_tuple(self):
-        msg = 'Passing a 4-tuple to django.conf.urls.include() is not supported.'
+        msg = 'Passing a 4-tuple to include() is not supported.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, 'app_name', 'namespace', 'blah'))
 
     def test_include_3_tuple(self):
-        msg = 'Passing a 3-tuple to django.conf.urls.include() is not supported.'
+        msg = 'Passing a 3-tuple to include() is not supported.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, 'app_name', 'namespace'))
 

@@ -1,6 +1,51 @@
-======================================
-``django.conf.urls`` utility functions
-======================================
+=============================================
+``django.urls`` functions for use in URLconfs
+=============================================
+
+.. module:: django.urls.conf
+    :synopsis: Functions for use in URLconfs.
+
+.. currentmodule:: django.conf.urls
+
+``include()``
+=============
+
+.. function:: include(module, namespace=None)
+              include(pattern_list)
+              include((pattern_list, app_namespace), namespace=None)
+
+    A function that takes a full Python import path to another URLconf module
+    that should be "included" in this place. Optionally, the :term:`application
+    namespace` and :term:`instance namespace` where the entries will be included
+    into can also be specified.
+
+    Usually, the application namespace should be specified by the included
+    module. If an application namespace is set, the ``namespace`` argument
+    can be used to set a different instance namespace.
+
+    ``include()`` also accepts as an argument either an iterable that returns
+    URL patterns or a 2-tuple containing such iterable plus the names of the
+    application namespaces.
+
+    :arg module: URLconf module (or module name)
+    :arg namespace: Instance namespace for the URL entries being included
+    :type namespace: string
+    :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
+    :arg app_namespace: Application namespace for the URL entries being included
+    :type app_namespace: string
+    :arg instance_namespace: Instance namespace for the URL entries being included
+    :type instance_namespace: string
+
+See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
+
+.. versionchanged:: 2.0
+
+    In older versions, this function is located in ``django.conf.urls``. The
+    old location still works for backwards compatibility.
+
+==================================================
+``django.conf.urls`` functions for use in URLconfs
+==================================================
 
 .. module:: django.conf.urls
 
@@ -49,37 +94,6 @@ function or method. See :ref:`views-extra-options` for an example.
 
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
-
-``include()``
-=============
-
-.. function:: include(module, namespace=None)
-              include(pattern_list)
-              include((pattern_list, app_namespace), namespace=None)
-
-    A function that takes a full Python import path to another URLconf module
-    that should be "included" in this place. Optionally, the :term:`application
-    namespace` and :term:`instance namespace` where the entries will be included
-    into can also be specified.
-
-    Usually, the application namespace should be specified by the included
-    module. If an application namespace is set, the ``namespace`` argument
-    can be used to set a different instance namespace.
-
-    ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns or a 2-tuple containing such iterable plus the names of the
-    application namespaces.
-
-    :arg module: URLconf module (or module name)
-    :arg namespace: Instance namespace for the URL entries being included
-    :type namespace: string
-    :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
-    :arg app_namespace: Application namespace for the URL entries being included
-    :type app_namespace: string
-    :arg instance_namespace: Instance namespace for the URL entries being included
-    :type instance_namespace: string
-
-See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
 ``handler400``
 ==============
