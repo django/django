@@ -69,7 +69,7 @@ class ExecuteHookTests(TestCase):
     def test_hook_invoked(self):
         hook_factory = MagicMock()
         hook_factory.return_value = hook = MagicMock()
-        with connection.add_execute_hook(hook_factory):
+        with connection.execute_hook(hook_factory):
             self.call_execute(connection)
         self.assertTrue(hook_factory.called and hook.__enter__.called and hook.__exit__.called)
         _, kwargs = hook_factory.call_args
@@ -81,7 +81,7 @@ class ExecuteHookTests(TestCase):
     def test_hook_invoked_many(self):
         hook_factory = MagicMock()
         hook_factory.return_value = hook = MagicMock()
-        with connection.add_execute_hook(hook_factory):
+        with connection.execute_hook(hook_factory):
             self.call_executemany(connection)
         self.assertTrue(hook_factory.called and hook.__enter__.called and hook.__exit__.called)
         _, kwargs = hook_factory.call_args
@@ -97,7 +97,7 @@ class ExecuteHookTests(TestCase):
             __exit__ = MagicMock(return_value=None)
 
         hook = NonCallableHook()
-        with connection.add_execute_hook(hook):
+        with connection.execute_hook(hook):
             self.call_execute(connection)
             self.assertEqual((hook.__enter__.call_count, hook.__exit__.call_count), (1, 1))
             self.call_executemany(connection)
@@ -105,7 +105,7 @@ class ExecuteHookTests(TestCase):
 
     def test_hook_forsingle(self):
         hook = MagicMock()
-        with connection.add_execute_hook(hook, for_many=False):
+        with connection.execute_hook(hook, for_many=False):
             self.call_executemany(connection)
             self.assertFalse(hook.called)
             self.call_execute(connection)
@@ -113,7 +113,7 @@ class ExecuteHookTests(TestCase):
 
     def test_hook_formany(self):
         hook = MagicMock()
-        with connection.add_execute_hook(hook, for_many=True):
+        with connection.execute_hook(hook, for_many=True):
             self.call_execute(connection)
             self.assertFalse(hook.called)
             self.call_executemany(connection)
@@ -122,14 +122,14 @@ class ExecuteHookTests(TestCase):
     def test_hook_gets_sql(self):
         hook = MagicMock()
         sql = "SELECT 'aloha'" + connection.features.bare_select_suffix
-        with connection.add_execute_hook(hook):
+        with connection.execute_hook(hook):
             connection.cursor().execute(sql)
         _, kwargs = hook.call_args
         self.assertEqual(kwargs['sql'], sql)
 
     def test_hook_connection_specific(self):
         hook = MagicMock()
-        with connections['other'].add_execute_hook(hook):
+        with connections['other'].execute_hook(hook):
             self.call_execute(connection)
         self.assertFalse(hook.called)
         self.assertEqual(connection.get_execute_hooks(True), [])
