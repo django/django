@@ -1717,6 +1717,16 @@ class SelectRelatedTests(TestCase):
         self.assertQuerysetEqual(X.objects.all(), [])
         self.assertQuerysetEqual(X.objects.select_related(), [])
 
+    def test_select_related_reverse_caching(self):
+        t1 = Tag.objects.create(name='t1')
+        t2 = Tag.objects.create(name='t2', parent=t1)
+        tag = Tag.objects.select_related('parent').filter(name=t2.name).first()
+        with self.assertNumQueries(0):
+            self.assertEqual(tag.parent.name, t1.name)
+        self.assertNotIn('children', tag.parent._state.fields_cache)
+        with self.assertNumQueries(1):
+            self.assertEqual(list(tag.parent.children.all())[0].name, t2.name)
+
 
 class SubclassFKTests(TestCase):
     def test_ticket7778(self):

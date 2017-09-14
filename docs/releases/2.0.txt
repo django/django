@@ -302,6 +302,10 @@ Models
 * The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
   results as named tuples.
 
+* Added the :class:`.FilteredRelation` class that can be
+  passed to :meth:`~.QuerySet.annotate()` to specify
+  custom filtering of relations in the ``ON`` SQL clause.
+
 Pagination
 ~~~~~~~~~~
 

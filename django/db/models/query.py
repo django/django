@@ -57,6 +57,7 @@ class ModelIterable(BaseIterable):
                                                   compiler.annotation_col_map)
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
+        attr_name = klass_info.get('attr_name', '')
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
         init_list = [f[0].target.attname
                      for f in select[model_fields_start:model_fields_end]]
@@ -953,6 +954,11 @@ class QuerySet:
         if lookups == (None,):
             clone._prefetch_related_lookups = ()
         else:
+            for lookup in lookups:
+                lookup = lookup.split(LOOKUP_SEP)[:1][0]
+                if lookup in self.query._filtered_relations:
+                    raise ValueError(
+                        'prefetch_related() is not supported with filtered relation {!r}'.format(lookup))
             clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
         return clone
 
@@ -984,7 +990,10 @@ class QuerySet:
             if alias in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                                  "the model." % alias)
-            clone.query.add_annotation(annotation, alias, is_summary=False)
+            if isinstance(annotation, FilteredRelation):
+                clone.query.add_filtered_relation(annotation, alias)
+            else:
+                clone.query.add_annotation(annotation, alias, is_summary=False)
 
         for alias, annotation in clone.query.annotations.items():
             if alias in annotations and annotation.contains_aggregate:
@@ -1060,6 +1069,10 @@ class QuerySet:
             # Can only pass None to defer(), not only(), as the rest option.
             # That won't stop people trying to do this, so let's be explicit.
             raise TypeError("Cannot pass None as an argument to only().")
+        for field in fields:
+            field = field.split(LOOKUP_SEP)[:1][0]
+            if field in self.query._filtered_relations:
+                raise ValueError('only() is not supported with filtered relation {!r}'.format(field))
         clone = self._chain()
         clone.query.add_immediate_loading(fields)
         return clone
@@ -1730,9 +1743,10 @@ class RelatedPopulator:
         #    model's fields.
         #  - related_populators: a list of RelatedPopulator instances if
         #    select_related() descends to related models from this model.
-        #  - field, remote_field: the fields to use for populating the
-        #    internal fields cache. If remote_field is set then we also
-        #    set the reverse link.
+        #  - local_setter, remote_setter: Methods to set cached values on
+        #    the object being populated, and the remote object. Usually
+        #    these are Field.set_cached_value methods, but that doesn't
+        #    need to be the case.
         select_fields = klass_info['select_fields']
         from_parent = klass_info['from_parent']
         if not from_parent:
@@ -1751,16 +1765,8 @@ class RelatedPopulator:
         self.model_cls = klass_info['model']
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
-        reverse = klass_info['reverse']
-        field = klass_info['field']
-        self.remote_field = None
-        if reverse:
-            self.field = field.remote_field
-            self.remote_field = field
-        else:
-            self.field = field
-            if field.unique:
-                self.remote_field = field.remote_field
+        self.local_setter = klass_info['local_setter']
+        self.remote_setter = klass_info['remote_setter']
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:
@@ -1774,9 +1780,9 @@ class RelatedPopulator:
             if self.related_populators:
                 for rel_iter in self.related_populators:
                     rel_iter.populate(row, obj)
-            if self.remote_field:
-                self.remote_field.set_cached_value(obj, from_obj)
-        self.field.set_cached_value(from_obj, obj)
+        self.local_setter(from_obj, obj)
+        if obj is not None:
+            self.remote_setter(obj, from_obj)
 
 
 def get_related_populators(klass_info, select, db):
@@ -1786,3 +1792,42 @@ def get_related_populators(klass_info, select, db):
         rel_cls = RelatedPopulator(rel_klass_info, select, db)
         iterators.append(rel_cls)
     return iterators
+
+
+class FilteredRelation:
+    """Specify custom filtering on the ``ON`` clause of SQL joins."""
+
+    def __init__(self, relation_name, condition=Q()):
+        if not relation_name:
+            raise ValueError("relation_name cannot be empty")
+        self.relation_name = relation_name
+        self.alias = None
+        self.condition = condition
+        self.path = []
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self.relation_name == other.relation_name and
+            self.alias == other.alias and
+            self.condition == other.condition
+        )
+
+    def clone(self):
+        clone = FilteredRelation(self.relation_name, self.condition)
+        clone.alias = self.alias
+        clone.path = self.path[:]
+        return clone
+
+    def resolve_expression(self, *args, **kwargs):
+        """
+        annotate accepts only expressions like parameters.
+        Pretend FilteredRelation is one of them.
+        """
+        raise NotImplementedError
+
+    def as_sql(self, compiler, connection):
+        # The condition in self.filtered_relation needs to be resolved.
+        query = compiler.query
+        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
+        return compiler.compile(where)
