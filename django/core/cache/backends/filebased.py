@@ -10,6 +10,7 @@ import zlib
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files.move import file_move_safe
+from django.utils.url_config import parse_url
 
 
 class FileBasedCache(BaseCache):
@@ -140,3 +141,13 @@ class FileBasedCache(BaseCache):
         filelist = [os.path.join(self._dir, fname) for fname
                     in glob.glob1(self._dir, '*%s' % self.cache_suffix)]
         return filelist
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = parse_url(url)
+        path = '/' + result.path
+        if result.hostname:
+            path = '{0}:{1}'.format(result.hostname, path)
+
+        result = result._replace(hostname=path)
+        return super().config_from_url(engine, scheme, result)

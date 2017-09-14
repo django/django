@@ -6,6 +6,7 @@ import time
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.functional import cached_property
+from django.utils.url_config import parse_url
 
 
 class BaseMemcachedCache(BaseCache):
@@ -162,6 +163,14 @@ class MemcachedCache(BaseMemcachedCache):
             self._client = self._lib.Client(self._servers, **client_kwargs)
         return self._client
 
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = parse_url(url)
+        if result.path:
+            # We are dealing with a URI like memcached:///socket/path
+            result = result._replace(hostname='/{0}'.format(result.path))
+        return super().config_from_url(engine, scheme, result)
+
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
@@ -177,3 +186,10 @@ class PyLibMCCache(BaseMemcachedCache):
         # libmemcached manages its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
         pass
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        result = parse_url(url)
+        # We are dealing with a URI like memcached://unix:/abc
+        result = result._replace(path=None, hostname='{0}:/{1}'.format(result.hostname, result.path))
+        return super().config_from_url(engine, scheme, result)

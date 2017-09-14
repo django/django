@@ -1,5 +1,5 @@
+import inspect
 from collections import defaultdict, namedtuple
-
 from urllib import parse
 
 from django.core.exceptions import ImproperlyConfigured
@@ -7,11 +7,24 @@ from django.utils import module_loading
 
 BACKENDS = defaultdict(dict)
 
+BaseParsedURL = namedtuple('ParsedURL', 'scheme username password hostname port path options')
 
-ParsedURL = namedtuple('ParsedURL', 'scheme username password hostname port path options')
+
+class ParsedURL(BaseParsedURL):
+    @property
+    def netloc(self):
+        result = self.hostname
+        if self.port:
+            result += ':{0}'.format(self.port)
+        return result
 
 
 def parse_url(url):
+    """
+    A method to parse URLs into components that handles quirks
+    with the stdlib urlparse, such as lower-cased hostnames.
+    Also parses querystrings into typed components.
+    """
     if isinstance(url, ParsedURL):
         return url
     elif isinstance(url, parse.ParseResult):
@@ -73,7 +86,7 @@ def configure(backend_type, value):
     if not hasattr(handler, 'config_from_url'):
         raise TypeError('{0} has no config_from_url method'.format(backend_path))
 
-    if not isinstance(handler.config_from_url, classmethod):
+    if not inspect.ismethod(handler.config_from_url):
         raise TypeError('{0} is not a class method'.format(handler.config_from_url))
 
     return handler.config_from_url(backend_path, scheme, value)
@@ -111,9 +124,9 @@ register_db_backend('oracle+gis', 'django.contrib.gis.db.backends.oracle')
 register_db_backend('postgis', 'django.contrib.gis.db.backends.postgis')
 register_db_backend('spatialite', 'django.contrib.gis.db.backends.spatialite')
 
-
-register_cache_backend('db', 'django.core.cache.backends.db.DatabaseCache')
-register_cache_backend('memcached', 'django.core.cache.backends.memcached.MemcachedCache')
-register_cache_backend('file', 'django.core.cache.backends.filebased.FileBasedCache')
 register_cache_backend('memory', 'django.core.cache.backends.locmem.LocMemCache')
+register_cache_backend('db', 'django.core.cache.backends.db.DatabaseCache')
 register_cache_backend('dummy', 'django.core.cache.backends.dummy.DummyCache')
+register_cache_backend('memcached', 'django.core.cache.backends.memcached.MemcachedCache')
+register_cache_backend('memcached+pylibmccache', 'django.core.cache.backends.memcached.PyLibMCCache')
+register_cache_backend('file', 'django.core.cache.backends.filebased.FileBasedCache')

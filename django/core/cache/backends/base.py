@@ -2,10 +2,9 @@
 import time
 import warnings
 
-from urllib import parse
-
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
+from django.utils.url_config import parse_url
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):
@@ -279,7 +278,17 @@ class BaseCache:
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
-        if isinstance(url, parse.ParseResult):
-            parsed = url
-        else:
-            parsed = parse.urlparse(url)
+        result = parse_url(url)
+        returner = {
+            'BACKEND': engine
+        }
+        if result.hostname:
+            returner['LOCATION'] = result.netloc
+
+        for key in ('timeout', 'key_prefix', 'version'):
+            if key in result.options:
+                timeout = result.options.pop(key)
+                returner[key.upper()] = timeout
+
+        returner['OPTIONS'] = result.options
+        return returner

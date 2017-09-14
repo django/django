@@ -4,7 +4,7 @@
 import unittest
 
 from django.db import connection
-from django.utils.url_config import configure_db
+from django.utils.url_config import configure_cache, configure_db, parse_url
 
 GENERIC_TESTS = [
     (
@@ -201,3 +201,90 @@ class OracleTests(BaseURLTests, unittest.TestCase):
         url = configure_db(dsn)
 
         self.assertEqual(url['NAME'], dsn)
+
+
+class TestCaches(unittest.TestCase):
+    def test_local_caching_no_params(self):
+        result = configure_cache('memory://')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertNotIn('LOCATION', result)
+
+    def test_local_caching_with_location(self):
+        result = configure_cache('memory://abc')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(result['LOCATION'], 'abc')
+
+    def test_database_caching(self):
+        result = configure_cache('db://table-name')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.db.DatabaseCache')
+        self.assertEqual(result['LOCATION'], 'table-name')
+
+    def test_dummy_caching_no_params(self):
+        result = configure_cache('dummy://')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.dummy.DummyCache')
+        self.assertNotIn('LOCATION', result)
+
+    def test_dummy_caching_with_location(self):
+        result = configure_cache('dummy://abc')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.dummy.DummyCache')
+        self.assertEqual(result['LOCATION'], 'abc')
+
+    def test_memcached_with_ip(self):
+        result = configure_cache('memcached://1.2.3.4:1567')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(result['LOCATION'], '1.2.3.4:1567')
+
+    def test_memcached_without_port(self):
+        result = configure_cache('memcached://1.2.3.4')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(result['LOCATION'], '1.2.3.4')
+
+    def test_memcached_socket_path(self):
+        result = configure_cache('memcached:///tmp/memcached.sock')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(result['LOCATION'], '/tmp/memcached.sock')
+
+    def test_pylibmccache_memcached_unix_socket(self):
+        result = configure_cache('memcached+pylibmccache://unix:/tmp/memcached.sock')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.memcached.PyLibMCCache')
+        self.assertEqual(result['LOCATION'], 'unix:/tmp/memcached.sock')
+
+    def test_file_cache_windows_path(self):
+        result = configure_cache('file://C:/abc/def/xyz')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(result['LOCATION'], 'C:/abc/def/xyz')
+
+    def test_file_cache_unix_path(self):
+        result = configure_cache('file:///abc/def/xyz')
+        self.assertEqual(result['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(result['LOCATION'], '/abc/def/xyz')
+
+
+class TestParseURL(unittest.TestCase):
+    def test_hostname_sensitivity(self):
+        parsed = parse_url('http://CaseSensitive')
+        self.assertEqual(parsed.hostname, 'CaseSensitive')
+
+    def test_netloc_sensitivity(self):
+        parsed = parse_url('http://CaseSensitive:123')
+        self.assertEqual(parsed.netloc, 'CaseSensitive:123')
+
+    def test_path_strips_leading_slash(self):
+        parsed = parse_url('http://test/abc')
+        self.assertEqual(parsed.path, 'abc')
+
+    def test_query_parameters_integer(self):
+        parsed = parse_url('http://test/?a=1')
+        self.assertDictEqual(parsed.options, {'a': 1})
+
+    def test_query_parameters_boolean(self):
+        parsed = parse_url('http://test/?a=true&b=false')
+        self.assertDictEqual(parsed.options, {'a': True, 'b': False})
+
+    def test_query_last_parameter(self):
+        parsed = parse_url('http://test/?a=one&a=two')
+        self.assertDictEqual(parsed.options, {'a': 'two'})
+
+    def test_does_not_reparse(self):
+        parsed = parse_url('http://test/abc')
+        self.assertIs(parse_url(parsed), parsed)
