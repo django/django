@@ -222,14 +222,13 @@ class FilteredRelationTests(TestCase):
                 ["Poem by Alice"], lambda author: author.book_alice.title)
 
     def test_filtered_relation_only_not_supported(self):
-        msg = "'ManyToOneRel' object has no attribute 'attname'"
-        with self.assertRaisesMessage(AttributeError, msg):
-            list(Author.objects.annotate(
+        msg = "only() is not supported with filtered relation 'book_alice'"
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
                 book_alice=FilteredRelation(
                     'book', condition=Q(book__title__iexact='poem by alice'),
                 )).filter(book_alice__isnull=False).select_related('book_alice').only(
                     'book_alice__state')
-            )
 
     def test_filtered_relation_as_subquery(self):
         inner_qs = Author.objects.annotate(
@@ -267,18 +266,23 @@ class FilteredRelationTests(TestCase):
             FilteredRelation('', condition=Q(blank=''))
 
     def test_filtered_relation_with_prefetch_related(self):
-        qs = Author.objects.annotate(
-            book_title_contains_b=FilteredRelation(
-                'book',
-                condition=Q(book__title__icontains='b'),
-            )).filter(
-                book_title_contains_b__isnull=False
-        ).prefetch_related('book_title_contains_b__editor')
-
-        msg = ("Cannot find 'book_title_contains_b' on Author object,"
-               " 'book_title_contains_b__editor' is an invalid parameter to prefetch_related()")
-        with self.assertRaisesMessage(AttributeError, msg):
-            list(qs)
+        msg = ("prefetch_related() is not supported with filtered relation 'book_title_contains_b'")
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                book_title_contains_b=FilteredRelation(
+                    'book',
+                    condition=Q(book__title__icontains='b'),
+                )).filter(
+                    book_title_contains_b__isnull=False
+            ).prefetch_related('book_title_contains_b')
+        with self.assertRaisesMessage(ValueError, msg):
+            Author.objects.annotate(
+                book_title_contains_b=FilteredRelation(
+                    'book',
+                    condition=Q(book__title__icontains='b'),
+                )).filter(
+                    book_title_contains_b__isnull=False
+            ).prefetch_related('book_title_contains_b__editor')
 
 
 class FilteredRelationWithAggregationTests(TestCase):
