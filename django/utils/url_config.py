@@ -7,14 +7,14 @@ from django.utils import module_loading
 BACKENDS = defaultdict(dict)
 
 
-def add_backend(backend_type, scheme, path):
+def _register_backend(backend_type, scheme, path):
     if scheme in BACKENDS[backend_type]:
         raise ImproperlyConfigured('Scheme {0} has already been registered as a {1} handler'.format(scheme,
                                                                                                     backend_type))
     BACKENDS[backend_type][scheme] = path
 
 
-def get_backend(backend_type, scheme):
+def _get_backend(backend_type, scheme):
     if scheme not in BACKENDS[backend_type]:
         raise ImproperlyConfigured('No {0} handler configured for {1}'.format(backend_type, scheme))
     return BACKENDS[backend_type][scheme]
@@ -23,14 +23,14 @@ def get_backend(backend_type, scheme):
 def configure(backend_type, value):
     scheme = value.split(':', 1)[0]
 
-    backend_path = get_backend(backend_type, scheme)
+    backend_path = _get_backend(backend_type, scheme)
     handler = module_loading.import_string(backend_path + '.base.DatabaseWrapper')
 
     if not hasattr(handler, 'config_from_url'):
-        raise RuntimeError('{0} has no config_from_url method'.format(backend_path))
+        raise TypeError('{0} has no config_from_url method'.format(backend_path))
 
     if not inspect.ismethod(handler.config_from_url):
-        raise RuntimeError('{0} is not a class method'.format(handler.config_from_url))
+        raise TypeError('{0} is not a class method'.format(handler.config_from_url))
 
     return handler.config_from_url(backend_path, scheme, value)
 
@@ -47,11 +47,11 @@ def configure_cache(value):
 
 
 def register_db_backend(scheme, path):
-    add_backend('db', scheme, path)
+    _register_backend('db', scheme, path)
 
 
 def register_cache_backend(scheme, path):
-    add_backend('cache', scheme, path)
+    _register_backend('cache', scheme, path)
 
 
 register_db_backend('mysql', 'django.db.backends.mysql')

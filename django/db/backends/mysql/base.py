@@ -193,7 +193,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         result = super().config_from_url(engine, scheme, url)
 
         if 'ssl-ca' in result['OPTIONS']:
-            value = result['OPTIONS'].pop('ssl')
+            value = result['OPTIONS'].pop('ssl-ca')
             result['OPTIONS']['ssl'] = {'ca': value}
 
         return result

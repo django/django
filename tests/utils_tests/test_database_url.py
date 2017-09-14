@@ -184,13 +184,13 @@ class OracleTests(BaseURLTests, unittest.TestCase):
     STRING_PORTS = True
 
     def test_dsn_parsing(self):
-        url = (
-            'oracle://scott:tiger@/'
+        dsn = (
             '(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)'
             '(HOST=oraclehost)(PORT=1521)))'
             '(CONNECT_DATA=(SID=hr)))'
         )
-        url = configure_db(url)
+
+        url = configure_db('oracle://scott:tiger@/' + dsn)
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.oracle')
         self.assertEqual(url['USER'], 'scott')
@@ -198,11 +198,6 @@ class OracleTests(BaseURLTests, unittest.TestCase):
         self.assertEqual(url['HOST'], '')
         self.assertEqual(url['PORT'], '')
 
-        dsn = (
-            '(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)'
-            '(HOST=oraclehost)(PORT=1521)))'
-            '(CONNECT_DATA=(SID=hr)))'
-        )
+        url = configure_db(dsn)
 
         self.assertEqual(url['NAME'], dsn)
-
