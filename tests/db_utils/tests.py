@@ -54,12 +54,12 @@ class ExecuteHookTests(TestCase):
 
     @staticmethod
     def call_execute(connection, params=None):
-        ret_val = "1" if params is None else "%s"
-        sql = "SELECT " + ret_val + connection.features.bare_select_suffix
+        ret_val = '1' if params is None else '%s'
+        sql = 'SELECT ' + ret_val + connection.features.bare_select_suffix
         connection.cursor().execute(sql, params)
 
     def call_executemany(self, connection, params_list=((1,),) * 3):
-        sql = "GIBBERISH %s" + connection.features.bare_select_suffix
+        sql = 'GIBBERISH %s' + connection.features.bare_select_suffix
         # We need a no-op query, but it has to be DML. We could use a model
         # to make sure there's a table we can update, or we could just catch
         # the error.
