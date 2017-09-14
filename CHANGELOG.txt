@@ -1,6 +1,14 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+1.1.7 (2017-09-14)
+------------------
+
+* Fixed compatability with Django 1.10 and below
+
+* JS library: Fixed error with 1006 error code
+
+
 1.1.6 (2017-06-28)
 ------------------
 
