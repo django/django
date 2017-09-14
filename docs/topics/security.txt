@@ -5,29 +5,51 @@ Security in Django
 This document is an overview of Django's security features. It includes advice
 on securing a Django-powered site.
 
+..  note::
+
+    Django's web security implementations have been designed with security for
+    real-world applications in mind. Django is a general-purpose web
+    application framework, and its defaults reflect this - they will not be the
+    best solution for every particular case. Special cases deserve special
+    attention to their needs.
+
+    Web security requires a multi-layered approach. Neither a single layer of
+    protection, nor an apparent weakness in one, can on its own reflect on the
+    overall security of a Django website. This needs to be borne in mind
+    particularly when assessing individual points in security audits.
+
 .. _cross-site-scripting:
 
-Cross site scripting (XSS) protection
+Cross-site scripting (XSS) protection
 =====================================
 
 .. highlightlang:: html+django
 
-XSS attacks allow a user to inject client side scripts into the browsers of
-other users. This is usually achieved by storing the malicious scripts in the
-database where it will be retrieved and displayed to other users, or by getting
-users to click a link which will cause the attacker's JavaScript to be executed
-by the user's browser. However, XSS attacks can originate from any untrusted
-source of data, such as cookies or Web services, whenever the data is not
-sufficiently sanitized before including in a page.
+In a cross-site scripting attack, malicious code in the form of a client-side
+script is injected into another user's web browser, where it will be executed.
 
-Using Django templates protects you against the majority of XSS attacks.
-However, it is important to understand what protections it provides
-and its limitations.
+This is typically done by:
 
-Django templates :ref:`escape specific characters <automatic-html-escaping>`
-which are particularly dangerous to HTML. While this protects users from most
-malicious input, it is not entirely foolproof. For example, it will not
-protect the following:
+* storing the malicious script in the database where it will be retrieved and
+  presented to other users in their browsers, or
+* getting users to click a link which will cause the attacker's JavaScript to
+  be executed by the user's browser.
+
+Cross-site scripting attacks can originate from any untrusted source of data,
+including cookies or web services, if the data are not adequately sanitized
+before being published in a page.
+
+Django templates provide protection against the majority of cross-site
+scripting attacks by :ref:`automatically escaping characters that represent a
+risk <automatic-html-escaping>` (that is, HTML characters that could be
+*interpreted* by the browser to malicious effect are instead safely
+*displayed*).
+
+However, the extent of this protection and its limitations should be understood.
+
+Ambiguity, in browsers' interpretation of HTML and in developers' own
+intentions, can open a gap in which autoescaping can fail. Suppose that a
+developer creates:
 
 .. code-block:: text
 
@@ -35,40 +57,55 @@ protect the following:
 
 .. highlighting as html+django fails due to intentionally missing quotes.
 
-If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
-in unauthorized JavaScript execution, depending on how the browser renders
-imperfect HTML. (Quoting the attribute value would fix this case.)
+where a ``var`` containing something like ``'class1'`` seems to work. Not only
+might it fail to work at all in other browsers, if ``var`` were set to
+``'class1 onmouseover=javascript:func()'``, this could result in unauthorized
+JavaScript execution, depending on how the browser renders imperfect HTML.
 
-It is also important to be particularly careful when using ``is_safe`` with
-custom template tags, the :tfilter:`safe` template tag, :mod:`mark_safe
-<django.utils.safestring>`, and when autoescape is turned off.
+Explicit template design, in which the quotes are not left to the variable to
+provide:
 
-In addition, if you are using the template system to output something other
-than HTML, there may be entirely separate characters and words which require
-escaping.
+.. code-block:: html+django
+
+    <style class="{{ var }}">...</style>
+
+would eliminate this possibility.
+
+It is also important to be particularly careful when using the ``is_safe``
+attribute with custom template tags, the :tfilter:`safe` template tag,
+:mod:`mark_safe <django.utils.safestring>`, and when autoescape is turned off.
+
+Django's built-in escaping is intended to protect HTML output. If you are using
+the template system to output something other than HTML, the characters and
+strings that require escaping might be entirely different.
 
 You should also be very careful when storing HTML in the database, especially
-when that HTML is retrieved and displayed.
+when that HTML is retrieved and displayed. Unless the HTML is guaranteed to
+come from a trusted source - user input is *not* a trusted source - stored HTML
+should be checked and sanitized, preferably on input as well as output.
 
-Cross site request forgery (CSRF) protection
+Cross-site request forgery (CSRF) protection
 ============================================
 
-CSRF attacks allow a malicious user to execute actions using the credentials
-of another user without that user's knowledge or consent.
+* :ref:`Cross-site request forgery reference <csrf-protection-reference>`
+* :ref:`using-csrf`
+
+Cross-site request forgery attacks allow a malicious user to execute actions
+using the credentials of another user without that user's knowledge or consent.
 
 Django has built-in protection against most types of CSRF attacks, providing you
 have :ref:`enabled and used it <using-csrf>` where appropriate. However, as with
 any mitigation technique, there are limitations. For example, it is possible to
 disable the CSRF module globally or for particular views. You should only do
 this if you know what you are doing. There are other :ref:`limitations
-<csrf-limitations>` if your site has subdomains that are outside of your
+<csrf-subdomains>` if your site has subdomains that are outside of your
 control.
 
-:ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
-POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your website and have another logged in user unwittingly submit that
-form. The malicious user would have to know the secret, which is user specific
-(using a cookie).
+CSRF protection checks for a secret in each POST request. This ensures that a
+malicious user cannot simply "replay" a form POST to your website and have
+another logged in user unwittingly submit that form. The malicious user would
+have to know the secret, which is user-specific (using a cookie). See :ref:`How
+it works <how-csrf-works>` below for a fuller explanation.
 
 When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
 ``CsrfViewMiddleware`` will check that the HTTP referer header is set to a
@@ -85,61 +122,72 @@ it is absolutely necessary.
 How it works
 ------------
 
-The CSRF protection is based on the following things:
+Django's CSRF protection places a hidden field on its forms, that will be
+submitted when the form is POSTed. At the same time, it sets a CSRF cookie with
+a matching value.
 
-1. A CSRF cookie that is based on a random secret value, which other sites
-   will not have access to.
+When Django receives the form, along with the cookie, if the cookie and the
+hidden field don't match, the POST request will be rejected.
 
-   This cookie is set by ``CsrfViewMiddleware``. It is sent with every
-   response that has called ``django.middleware.csrf.get_token()`` (the
-   function used internally to retrieve the CSRF token), if it wasn't already
-   set on the request.
+This helps distinguish between legitimate (in which the user really did intend
+to submit such a form) and forged (in which a script or other mechanism is used
+to submit a malicious form using the victim's identity) requests.
 
-   In order to protect against `BREACH`_ attacks, the token is not simply the
-   secret; a random salt is prepended to the secret and used to scramble it.
+The technical details of this protection:
 
-   For security reasons, the value of the secret is changed each time a
-   user logs in.
+* Django creates a random secret value, which only the server will have access
+  to.
 
-2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
-   outgoing POST forms. The value of this field is, again, the value of the
-   secret, with a salt which is both added to it and used to scramble it. The
-   salt is regenerated on every call to ``get_token()`` so that the form field
-   value is changed in every such response.
+* A CSRF cookie based on this value is set by ``CsrfViewMiddleware``. It is
+  sent with every response that has called
+  ``django.middleware.csrf.get_token()`` (the function used internally to
+  retrieve the CSRF token), if it wasn't already set on the request.
 
-   This part is done by the template tag.
+  In order to protect against `BREACH`_ attacks, the cookie doesn't simply
+  contain the secret value; a random salt is prepended to the value and used to
+  scramble it.
 
-3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
-   TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
-   must be present and correct. If it isn't, the user will get a 403 error.
+  For security reasons, the secret value is changed each time a user logs in.
 
-   When validating the 'csrfmiddlewaretoken' field value, only the secret,
-   not the full token, is compared with the secret in the cookie value.
-   This allows the use of ever-changing tokens. While each request may use its
-   own token, the secret remains common to all.
+* A hidden form field named 'csrfmiddlewaretoken' is present in all outgoing
+  POST forms. The value of this field is, again, the value of the secret, with
+  a salt which is both added to it and used to scramble it. The salt is
+  regenerated on every call to ``get_token()`` so that the form field value is
+  changed in every such response.
 
-   This check is done by ``CsrfViewMiddleware``.
+  This is handled by the :ttag:`csrf_token` template tag.
 
-4. In addition, for HTTPS requests, strict referer checking is done by
-   ``CsrfViewMiddleware``. This means that even if a subdomain can set or
-   modify cookies on your domain, it can't force a user to post to your
-   application since that request won't come from your own exact domain.
+* For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
+  TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
+  must be present and correct. If it isn't, the user will get a 403 error.
 
-   This also addresses a man-in-the-middle attack that's possible under HTTPS
-   when using a session independent secret, due to the fact that HTTP
-   ``Set-Cookie`` headers are (unfortunately) accepted by clients even when
-   they are talking to a site under HTTPS. (Referer checking is not done for
-   HTTP requests because the presence of the ``Referer`` header isn't reliable
-   enough under HTTP.)
+  When validating the 'csrfmiddlewaretoken' field value, only the secret, not
+  the full token, is compared with the secret in the cookie value. This allows
+  the use of ever-changing tokens, based on the same secret. While each request
+  may use its own token, the secret remains common to all.
 
-   If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
-   against it. This setting supports subdomains. For example,
-   ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST requests from
-   ``www.example.com`` and ``api.example.com``. If the setting is not set, then
-   the referer must match the HTTP ``Host`` header.
+  This check is done by ``CsrfViewMiddleware``.
 
-   Expanding the accepted referers beyond the current host or cookie domain can
-   be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
+* In addition, for HTTPS requests, strict referer checking is done by
+  ``CsrfViewMiddleware``. This means that even if a subdomain can set or modify
+  cookies on your domain, it can't force a user to post to your application
+  since that request won't come from your own exact domain.
+
+  This also addresses a man-in-the-middle attack that's possible under HTTPS
+  when using a session independent secret, due to the fact that HTTP
+  ``Set-Cookie`` headers are (unfortunately) accepted by clients even when
+  they are talking to a site under HTTPS. (Referer checking is not done for
+  HTTP requests because the presence of the ``Referer`` header isn't reliable
+  enough under HTTP.)
+
+  If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
+  against it. This setting supports subdomains. For example,
+  ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST requests from
+  ``www.example.com`` and ``api.example.com``. If the setting is not set, then
+  the referer must match the HTTP ``Host`` header.
+
+  Expanding the accepted referers beyond the current host or cookie domain can
+  be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
 
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
@@ -172,18 +220,98 @@ vulnerability allows and much worse).
 .. _BREACH: http://breachattack.com/
 .. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
 
-.. _csrf-limitations:
+.. _csrf-subdomains:
 
-Limitations
-===========
+CSRF and subdomains
+-------------------
 
 Subdomains within a site will be able to set cookies on the client for the whole
-domain.  By setting the cookie and using a corresponding token, subdomains will
-be able to circumvent the CSRF protection.  The only way to avoid this is to
+domain. By setting the cookie and using a corresponding token, subdomains will
+be able to circumvent the CSRF protection. The only way to avoid this is to
 ensure that subdomains are controlled by trusted users (or, are at least unable
-to set cookies).  Note that even without CSRF, there are other vulnerabilities,
-such as session fixation, that make giving subdomains to untrusted parties a bad
-idea, and these vulnerabilities cannot easily be fixed with current browsers.
+to set cookies).
+
+Note that even without CSRF, there are other vulnerabilities, such as session
+fixation, that make giving subdomains to untrusted parties a bad idea, and
+these vulnerabilities cannot easily be fixed with current browsers.
+
+CSRF protection design policy
+-----------------------------
+
+CSRF token pairs (cookie and POST data) are:
+
+* arbitrary
+* not linked to sessions by default.
+
+Arbitrary CSRF token pairs
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This will occasionally be flagged in security audits as a vulnerability. That
+is, when Django checks the cookie against the POSTed hidden field, it only
+checks that they match *each other*, not that they match the server secret on
+which they are both based, or that they can be verified against the user's
+session.
+
+This means an attacker could assemble a POST request on a victim's machine,
+containing a matching cookie-field pair, that would pass the CSRF checks.
+
+It's possible to stage a 'proof' of such an attack by manipulating one's own
+cookies and constructing malicious POST requests that defeat CSRF protection.
+This would be akin to complaining of a weakness in one's own front-door by
+demonstrating that it can be opened by someone inside the house - in each case,
+an attack of this kind is predicated on a high level of access already.
+
+In a real CSRF attack, the attacker would need access to the victim's cookies
+to be able to achieve this, via (for example) a man-in-the-middle or cross-site
+scripting attack, in which case the victim has already been thoroughly
+compromised, and exploiting CSRF is almost certainly an unnecessary extra
+effort.
+
+CSRF tokens not associated with sessions by default
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CSRF tokens *can* be linked to sessions by using the
+:setting:`CSRF_USE_SESSIONS`, which stores them in the user's session cookie
+(note that this would provide no additional protection against the
+CSRF-defeating attacks described above).
+
+However this is not the default, because *not* linking CSRF protection to a
+session allows using the protection on sites (for example, pastebins such as
+`dpaste.com <http://dpaste.com>`_) that allow submissions from anonymous users
+who don't have a session.
+
+Rationale for Django's CSRF protection design decisions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Django's CSRF protection is realistic; it doesn't attempt to defend against
+  vulnerabilities that are premised upon much more serious compromises.
+* Django's defaults are stateless (that is, they don't depend on server state).
+  This allows it to scale well, for example in deployments based on multiple
+  application server instances.
+* Deployments at scale will often use backends that don't require synchronized
+  locking access to server side data.
+* Not tying CSRF protection to sessions allows developers to use different
+  session backends, without the risk of relying on a backend that may not
+  have implemented CSRF protection correctly.
+* Django's technique supports forms in multiple browser tabs, and not just for
+  the last form loaded.
+* Django doesn't oblige the site to create anonymous sessions to support forms,
+  helping eliminate a DoS (Denial of Service) vulnerability (creating many
+  anonymous sessions to cause session exhaustion on the server by opening lots
+  of forms is a common attack).
+* Django's technique allows the user to return to a half-completed form and
+  submit it even after a long gap. If the form were tied to a session that had
+  expired, the user could lose their data. More generally, the site owner would
+  be forced to choose between good practice (short anonymous session times) and
+  good user experience.
+
+Token rotation after login
+--------------------------
+
+For security reasons, CSRF tokens are rotated each time a user logs in. Any
+page with a form generated before a login will have an old, invalid CSRF token
+and need to be reloaded. This might happen if a user uses the back button after
+a login or if they log in in a different browser tab.
 
 .. _sql-injection-protection:
 
@@ -274,8 +402,8 @@ Host header validation
 ======================
 
 Django uses the ``Host`` header provided by the client to construct URLs in
-certain cases. While these values are sanitized to prevent Cross Site Scripting
-attacks, a fake ``Host`` value can be used for Cross-Site Request Forgery,
+certain cases. While these values are sanitized to prevent cross-site scripting
+attacks, a fake ``Host`` value can be used for cross-site request forgery,
 cache poisoning attacks, and poisoning links in emails.
 
 Because even seemingly-secure web server configurations are susceptible to fake
@@ -308,7 +436,7 @@ if your configuration requires it.
 Session security
 ================
 
-Similar to the :ref:`CSRF limitations <csrf-limitations>` requiring a site to
+Similar to the :ref:`CSRF limitations <csrf-subdomains>` requiring a site to
 be deployed such that untrusted users don't have access to any subdomains,
 :mod:`django.contrib.sessions` also has limitations. See :ref:`the session
 topic guide section on security <topics-session-security>` for details.
@@ -385,3 +513,4 @@ security protection of the Web server, operating system and other components.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
 .. _Top 10 list: https://www.owasp.org/index.php/Top_10_2013-Top_10
+

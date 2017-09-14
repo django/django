@@ -314,7 +314,7 @@ accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
 protection is safe from cross-subdomain attacks by default - please see the
-:ref:`CSRF limitations <csrf-limitations>` section.
+:ref:`CSRF and subdomains <csrf-subdomains>` section.
 
 .. setting:: CSRF_COOKIE_HTTPONLY
 
