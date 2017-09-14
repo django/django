@@ -18,6 +18,7 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.url_config import parse_url
 
 NO_DB_ALIAS = '__no_db__'
 
@@ -108,39 +109,15 @@ class BaseDatabaseWrapper:
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
-        if isinstance(url, parse.ParseResult):
-            parsed = url
-        else:
-            parsed = parse.urlparse(url)
-
-        # parsed.hostname always returns a lower-cased hostname
-        # this isn't correct if hostname is a file path, so use '_hostinfo'
-        # to get the actual host
-        hostname, port = parsed._hostinfo
-        query = parse.parse_qs(parsed.query)
-
-        options = {}
-        for key, values in query.items():
-            value = values[-1]
-            if value.isdigit():
-                value = int(value)
-            elif value.lower() == 'true':
-                value = True
-            elif value.lower() == 'false':
-                value = False
-
-            options[key] = value
-
-        path = parsed.path[1:]
-
+        parsed = parse_url(url)
         result = {
             'ENGINE': engine,
-            'NAME': parse.unquote(path or ''),
+            'NAME': parse.unquote(parsed.path or ''),
             'USER': parse.unquote(parsed.username or ''),
             'PASSWORD': parse.unquote(parsed.password or ''),
-            'HOST': hostname,
+            'HOST': parsed.hostname,
             'PORT': parsed.port or '',
-            'OPTIONS': options
+            'OPTIONS': parsed.options
         }
 
         return result

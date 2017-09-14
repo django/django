@@ -2,6 +2,8 @@
 import time
 import warnings
 
+from urllib import parse
+
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 
@@ -274,3 +276,10 @@ class BaseCache:
     def close(self, **kwargs):
         """Close the cache connection"""
         pass
+
+    @classmethod
+    def config_from_url(cls, engine, scheme, url):
+        if isinstance(url, parse.ParseResult):
+            parsed = url
+        else:
+            parsed = parse.urlparse(url)

@@ -1,10 +1,54 @@
-import inspect
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+
+from urllib import parse
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import module_loading
 
 BACKENDS = defaultdict(dict)
+
+
+ParsedURL = namedtuple('ParsedURL', 'scheme username password hostname port path options')
+
+
+def parse_url(url):
+    if isinstance(url, ParsedURL):
+        return url
+    elif isinstance(url, parse.ParseResult):
+        parsed = url
+    else:
+        parsed = parse.urlparse(url)
+
+    # parsed.hostname always returns a lower-cased hostname
+    # this isn't correct if hostname is a file path, so use '_hostinfo'
+    # to get the actual host
+    hostname, port = parsed._hostinfo
+
+    query = parse.parse_qs(parsed.query)
+
+    options = {}
+    for key, values in query.items():
+        value = values[-1]
+        if value.isdigit():
+            value = int(value)
+        elif value.lower() == 'true':
+            value = True
+        elif value.lower() == 'false':
+            value = False
+
+        options[key] = value
+
+    path = parsed.path[1:]
+
+    return ParsedURL(
+        parsed.scheme,
+        parsed.username,
+        parsed.password,
+        hostname,
+        port,
+        path,
+        options
+    )
 
 
 def _register_backend(backend_type, scheme, path):
@@ -24,12 +68,12 @@ def configure(backend_type, value):
     scheme = value.split(':', 1)[0]
 
     backend_path = _get_backend(backend_type, scheme)
-    handler = module_loading.import_string(backend_path + '.base.DatabaseWrapper')
+    handler = module_loading.import_string(backend_path)
 
     if not hasattr(handler, 'config_from_url'):
         raise TypeError('{0} has no config_from_url method'.format(backend_path))
 
-    if not inspect.ismethod(handler.config_from_url):
+    if not isinstance(handler.config_from_url, classmethod):
         raise TypeError('{0} is not a class method'.format(handler.config_from_url))
 
     return handler.config_from_url(backend_path, scheme, value)
@@ -47,6 +91,9 @@ def configure_cache(value):
 
 
 def register_db_backend(scheme, path):
+    if not path.endswith('.base.DatabaseWrapper'):
+        path += '.base.DatabaseWrapper'
+
     _register_backend('db', scheme, path)
 
 
@@ -63,3 +110,10 @@ register_db_backend('mysql+gis', 'django.contrib.gis.db.backends.mysql')
 register_db_backend('oracle+gis', 'django.contrib.gis.db.backends.oracle')
 register_db_backend('postgis', 'django.contrib.gis.db.backends.postgis')
 register_db_backend('spatialite', 'django.contrib.gis.db.backends.spatialite')
+
+
+register_cache_backend('db', 'django.core.cache.backends.db.DatabaseCache')
+register_cache_backend('memcached', 'django.core.cache.backends.memcached.MemcachedCache')
+register_cache_backend('file', 'django.core.cache.backends.filebased.FileBasedCache')
+register_cache_backend('memory', 'django.core.cache.backends.locmem.LocMemCache')
+register_cache_backend('dummy', 'django.core.cache.backends.dummy.DummyCache')

@@ -15,6 +15,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText
+from django.utils.url_config import parse_url
 from django.utils.version import get_version_tuple
 
 try:
@@ -145,25 +146,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @classmethod
     def config_from_url(cls, engine, scheme, url):
-        parsed = parse.urlparse(url)
-        host = parsed._hostinfo[0]
+        parsed = parse_url(url)
+        host = parsed.hostname
 
         # Handle postgres percent-encoded paths.
         if '%2f' in host.lower():
             host = parse.unquote(host)
-
-            username, password = parsed.username, parsed.password
-
-            # Recreate the host with the appropriate username and password
-            if username and password:
-                host = '{user}:{password}@{host}'.format(user=username,
-                                                         password=password,
-                                                         host=host)
-            elif username:
-                host = '{user}@{host}'.format(user=username,
-                                              host=host)
-
-            parsed = parsed._replace(netloc=host)
+            parsed = parsed._replace(hostname=host)
 
         result = super().config_from_url(engine, scheme, parsed)
 
