@@ -391,6 +391,7 @@ class DecimalValidator:
     expected, otherwise raise ValidationError.
     """
     messages = {
+        'invalid': _('Enter a number.'),
         'max_digits': ngettext_lazy(
             'Ensure that there are no more than %(max)s digit in total.',
             'Ensure that there are no more than %(max)s digits in total.',
@@ -414,6 +415,8 @@ class DecimalValidator:
 
     def __call__(self, value):
         digit_tuple, exponent = value.as_tuple()[1:]
+        if exponent in {'F', 'n', 'N'}:
+            raise ValidationError(self.messages['invalid'])
         if exponent >= 0:
             # A positive exponent adds that many trailing zeros.
             digits = len(digit_tuple) + exponent
