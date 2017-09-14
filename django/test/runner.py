@@ -348,7 +348,7 @@ class ParallelTestSuite(unittest.TestSuite):
         - make tracebacks picklable with tblib, if available
 
         Even with tblib, errors may still occur for dynamically created
-        exception classes such Model.DoesNotExist which cannot be unpickled.
+        exception classes.
         """
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
