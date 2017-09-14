@@ -50,7 +50,6 @@ escaping.
 You should also be very careful when storing HTML in the database, especially
 when that HTML is retrieved and displayed.
 
-
 Cross site request forgery (CSRF) protection
 ============================================
 
@@ -80,6 +79,111 @@ HSTS for supported browsers.
 
 Be very careful with marking views with the ``csrf_exempt`` decorator unless
 it is absolutely necessary.
+
+.. _how-csrf-works:
+
+How it works
+------------
+
+The CSRF protection is based on the following things:
+
+1. A CSRF cookie that is based on a random secret value, which other sites
+   will not have access to.
+
+   This cookie is set by ``CsrfViewMiddleware``. It is sent with every
+   response that has called ``django.middleware.csrf.get_token()`` (the
+   function used internally to retrieve the CSRF token), if it wasn't already
+   set on the request.
+
+   In order to protect against `BREACH`_ attacks, the token is not simply the
+   secret; a random salt is prepended to the secret and used to scramble it.
+
+   For security reasons, the value of the secret is changed each time a
+   user logs in.
+
+2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
+   outgoing POST forms. The value of this field is, again, the value of the
+   secret, with a salt which is both added to it and used to scramble it. The
+   salt is regenerated on every call to ``get_token()`` so that the form field
+   value is changed in every such response.
+
+   This part is done by the template tag.
+
+3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
+   TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
+   must be present and correct. If it isn't, the user will get a 403 error.
+
+   When validating the 'csrfmiddlewaretoken' field value, only the secret,
+   not the full token, is compared with the secret in the cookie value.
+   This allows the use of ever-changing tokens. While each request may use its
+   own token, the secret remains common to all.
+
+   This check is done by ``CsrfViewMiddleware``.
+
+4. In addition, for HTTPS requests, strict referer checking is done by
+   ``CsrfViewMiddleware``. This means that even if a subdomain can set or
+   modify cookies on your domain, it can't force a user to post to your
+   application since that request won't come from your own exact domain.
+
+   This also addresses a man-in-the-middle attack that's possible under HTTPS
+   when using a session independent secret, due to the fact that HTTP
+   ``Set-Cookie`` headers are (unfortunately) accepted by clients even when
+   they are talking to a site under HTTPS. (Referer checking is not done for
+   HTTP requests because the presence of the ``Referer`` header isn't reliable
+   enough under HTTP.)
+
+   If the :setting:`CSRF_COOKIE_DOMAIN` setting is set, the referer is compared
+   against it. This setting supports subdomains. For example,
+   ``CSRF_COOKIE_DOMAIN = '.example.com'`` will allow POST requests from
+   ``www.example.com`` and ``api.example.com``. If the setting is not set, then
+   the referer must match the HTTP ``Host`` header.
+
+   Expanding the accepted referers beyond the current host or cookie domain can
+   be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
+
+This ensures that only forms that have originated from trusted domains can be
+used to POST data back.
+
+It deliberately ignores GET requests (and other requests that are defined as
+'safe' by :rfc:`7231`). These requests ought never to have any potentially
+dangerous side effects , and so a CSRF attack with a GET request ought to be
+harmless. :rfc:`7231` defines POST, PUT, and DELETE as 'unsafe', and all other
+methods are also assumed to be unsafe, for maximum protection.
+
+The CSRF protection cannot protect against man-in-the-middle attacks, so use
+:ref:`HTTPS <security-recommendation-ssl>` with
+:ref:`http-strict-transport-security`. It also assumes :ref:`validation of
+the HOST header <host-headers-virtual-hosting>` and that there aren't any
+:ref:`cross-site scripting vulnerabilities <cross-site-scripting>` on your site
+(because XSS vulnerabilities already let an attacker do anything a CSRF
+vulnerability allows and much worse).
+
+.. admonition:: Removing the ``Referer`` header
+
+    To avoid disclosing the referrer URL to third-party sites, you might want
+    to `disable the referer`_ on your site's ``<a>`` tags. For example, you
+    might use the ``<meta name="referrer" content="no-referrer">`` tag or
+    include the ``Referrer-Policy: no-referrer`` header. Due to the CSRF
+    protection's strict referer checking on HTTPS requests, those techniques
+    cause a CSRF failure on requests with 'unsafe' methods. Instead, use
+    alternatives like ``<a rel="noreferrer" ...>"`` for links to third-party
+    sites.
+
+.. _BREACH: http://breachattack.com/
+.. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
+
+.. _csrf-limitations:
+
+Limitations
+===========
+
+Subdomains within a site will be able to set cookies on the client for the whole
+domain.  By setting the cookie and using a corresponding token, subdomains will
+be able to circumvent the CSRF protection.  The only way to avoid this is to
+ensure that subdomains are controlled by trusted users (or, are at least unable
+to set cookies).  Note that even without CSRF, there are other vulnerabilities,
+such as session fixation, that make giving subdomains to untrusted parties a bad
+idea, and these vulnerabilities cannot easily be fixed with current browsers.
 
 .. _sql-injection-protection:
 
