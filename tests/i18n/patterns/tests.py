@@ -154,7 +154,7 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translate_url('/en/nonexistent/', 'nl'), '/en/nonexistent/')
             self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
             # Namespaced URL
-            self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')
+            self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registreren/')
             self.assertEqual(translation.get_language(), 'en')
 
         with translation.override('nl'):
@@ -171,7 +171,7 @@ class URLNamespaceTests(URLTestCaseBase):
             self.assertEqual(reverse('account:register'), '/en/account/register/')
 
         with translation.override('nl'):
-            self.assertEqual(reverse('account:register'), '/nl/profiel/registeren/')
+            self.assertEqual(reverse('account:register'), '/nl/profiel/registreren/')
 
 
 class URLRedirectTests(URLTestCaseBase):
@@ -191,12 +191,12 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect_wrong_url(self):
-        response = self.client.get('/profiel/registeren/', HTTP_ACCEPT_LANGUAGE='en')
+        response = self.client.get('/profiel/registreren/', HTTP_ACCEPT_LANGUAGE='en')
         self.assertEqual(response.status_code, 404)
 
     def test_nl_redirect(self):
-        response = self.client.get('/profiel/registeren/', HTTP_ACCEPT_LANGUAGE='nl')
-        self.assertRedirects(response, '/nl/profiel/registeren/')
+        response = self.client.get('/profiel/registreren/', HTTP_ACCEPT_LANGUAGE='nl')
+        self.assertRedirects(response, '/nl/profiel/registreren/')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
@@ -303,13 +303,13 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
 
     def test_nl_url(self):
-        response = self.client.get('/nl/profiel/registeren/')
+        response = self.client.get('/nl/profiel/registreren/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-language'], 'nl')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'nl')
 
     def test_wrong_en_prefix(self):
-        response = self.client.get('/en/profiel/registeren/')
+        response = self.client.get('/en/profiel/registreren/')
         self.assertEqual(response.status_code, 404)
 
     def test_wrong_nl_prefix(self):

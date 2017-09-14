@@ -35,4 +35,4 @@ msgstr "^profiel/"
 
 #: urls/namespace.py:9 urls/wrong_namespace.py:10
 msgid "^register/$"
-msgstr "^registeren/$"
+msgstr "^registreren/$"
