@@ -240,7 +240,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         if db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
-        elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
+        elif db_field.name in list(self.filter_vertical) + list(self.filter_horizontal):
             kwargs['widget'] = widgets.FilteredSelectMultiple(
                 db_field.verbose_name,
                 db_field.name in self.filter_vertical

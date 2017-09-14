@@ -173,7 +173,7 @@ class Command(BaseCommand):
             progress_output = None
             object_count = 0
             # If dumpdata is outputting to stdout, there is no way to display progress
-            if (output and self.stdout.isatty() and options['verbosity'] > 0):
+            if output and self.stdout.isatty() and options['verbosity'] > 0:
                 progress_output = self.stdout
                 object_count = sum(get_objects(count_only=True))
             stream = open(output, 'w') if output else None

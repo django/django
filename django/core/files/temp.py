@@ -54,7 +54,7 @@ if os.name == 'nt':
                     pass
                 try:
                     self.unlink(self.name)
-                except (OSError):
+                except OSError:
                     pass
 
         def __del__(self):
