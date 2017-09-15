@@ -1,0 +1,100 @@
+======================
+Database execute hooks
+======================
+
+.. versionadded:: 2.0
+
+In order to help you understand and control the queries issued by your code,
+Django provides a mechanism for installing hooks to be invoked around the
+execution of database queries. Such hooks can be used to count queries, measure
+the time they take, log them, or even prevent their execution (e.g. to make
+sure that no new database queries are issued while rendering a template, when
+you expect it to use only data which has been fetched already).
+
+The hooks are defined as context managers -- they are entered before the query
+is executed, and exited after it returns. You can either install a context
+manager instance, or a callable returning one; if you use a callable, it will
+be called with keyword arguments providing information about the query to be
+executed (currently these are the connection, the cursor, the SQL text and the
+parameters).
+
+Installing a hook is itself done in a context manager -- so the hooks are
+temporary and can be made specific to some flow in your code.
+
+Probably the most trivial example of a hook is the execution blocker mentioned
+above.  It could look like this::
+
+    class Blocker:
+
+        def __enter__(self):
+            raise Exception("No database access allowed here")
+
+        def __exit__(self, *exc_info):
+            pass
+
+And it would be used in a view to block queries from the template like so::
+
+    def my_view(request):
+        context = generate_context(...)
+        template_name = "..."
+        with connection.execute_hook(Blocker()):
+            return render(request, template_name, context)
+
+A slightly more complex version would include the connection name in the error
+message::
+
+    @contextmanager
+    def blocker(connection, **kw):
+        raise Exception("Access to database '{}' blocked here".format(connection.alias))
+        yield
+
+You would use this as ``with connection.execute_hook(blocker):``, without
+calling ``blocker`` yourself, so that it is called later with the connection
+object.
+
+A logger of queries could look like this::
+
+    class QueryLogger:
+
+        def __init__(self):
+            self.queries = []
+
+        def log(sql, params, *kw):
+            self.queries.append([sql, params])
+            return self
+
+        def __enter__(self):
+            self.start = time.time()
+
+        def __exit__(self, *exc_info)
+            duration = time.time() - self.start
+            self.queries[-1].append(duration)
+
+To use this effectively, you would create a logger object and install its
+``log`` method as a hook::
+
+    ql = QueryLogger()
+    with connection.execute_hook(ql.log, for_many=False):
+        # interesting querying
+
+.. currentmodule:: django.db.backends.base.DatabaseWrapper
+
+Details of ``execute_hook()``
+---------------------------------
+
+.. method:: execute_hook(hook, for_many=None)
+
+Returns a context manager which, when entered, installs a hook around database
+query executions, and when exited, removes the hook. The hook is installed on
+the thread-local connection object.
+
+``hook``, as described above, is either a context manager or a callable
+returning one. If it is a callable, it is called for every query execution,
+with keyword parameters ``connection``, ``cursor``, ``sql``, and ``params`` (or
+``param_list`` if the call was an ``executemany()``).
+
+``for_many`` specifies if the hook should be applied to ``cursor.execute()`` or
+``cursor.executemany()`` calls (these are typically used only for
+:meth:`bulk_create()<django.db.models.query.QuerySet.bulk_create>`). The
+default, ``None``, means it should be applied to both; use ``True`` or
+``False`` to limit it.

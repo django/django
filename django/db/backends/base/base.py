@@ -98,6 +98,13 @@ class BaseDatabaseWrapper:
         self.introspection = self.introspection_class(self)
         self.ops = self.ops_class(self)
         self.validation = self.validation_class(self)
+        # A stack of contextmanagers to be invoked around execute()/executemany()
+        # calls.
+        # Each entry is a (cm, for_many) tuple, where cm is either a contextmanager
+        # or a callable which creates one, and for_many indicates whether cm
+        # should be applied to execute() calls (False), execute_many() calls (True),
+        # or both (None).
+        self.execute_hooks = []
 
     def ensure_timezone(self):
         """
@@ -641,3 +648,33 @@ class BaseDatabaseWrapper:
         if allow_thread_sharing is None:
             allow_thread_sharing = self.allow_thread_sharing
         return type(self)(settings_dict, alias, allow_thread_sharing)
+
+    def _push_execute_hook(self, hook, for_many=None):
+        self.execute_hooks.append((hook, for_many))
+
+    def _pop_execute_hook(self):
+        return self.execute_hooks.pop()
+
+    @contextmanager
+    def execute_hook(self, hook, for_many=None):
+        """
+        Return a context manager, under which the hook is applied to suitable
+        database query executions
+        """
+        self._push_execute_hook(hook, for_many)
+        yield
+        self._pop_execute_hook()
+
+    def get_execute_hooks(self, for_many):
+        """
+        Return a list of hooks suitable for the current query execution, based
+        on whether it is an execute() or an executemany()
+        """
+        # Note that in the below, for_many represents the kind of hooks we are
+        # looking for, and hook_for_many is each hook's flag which was supplied
+        # when the hook was installed -- the for_many argument of
+        # execute_hook()
+        return [
+            hook for (hook, hook_for_many) in self.execute_hooks
+            if hook_for_many is None or hook_for_many == for_many
+        ]

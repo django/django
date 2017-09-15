@@ -176,7 +176,9 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`execute_hook()
+  <django.db.backends.base.DatabaseWrapper.execute_hook>` method on connection
+  objects allows installing hooks around execution of database queries.
 
 Email
 ~~~~~
