@@ -740,7 +740,7 @@ class SQLCompiler:
             return chain(direct_choices, reverse_choices)
 
         related_klass_infos = []
-        if not restricted and self.query.max_depth and cur_depth > self.query.max_depth:
+        if not restricted and cur_depth > self.query.max_depth:
             # We've recursed far enough; bail out.
             return related_klass_infos
 
