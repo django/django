@@ -1,0 +1,23 @@
+1.1.8 Release Notes
+===================
+
+Channels 1.1.8 is a packaging release for the 1.1 series, released on
+September 15th, 2017.
+
+
+Major Changes
+-------------
+
+None.
+
+
+Minor Changes & Bugfixes
+------------------------
+
+* Reverted recent JS fixes for subprotocols on some phones as they do not work
+  in Chrome.
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

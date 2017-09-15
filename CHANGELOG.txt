@@ -1,6 +1,14 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+
+1.1.8 (2017-09-15)
+------------------
+
+* Reverted recent JS fixes for subprotocols on some phones as they do not work
+  in Chrome.
+
+
 1.1.7 (2017-09-14)
 ------------------
 

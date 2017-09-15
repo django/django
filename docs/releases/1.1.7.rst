@@ -1,7 +1,7 @@
 1.1.7 Release Notes
 ===================
 
-Channels 1.1.5 is a packaging release for the 1.1 series, released on
+Channels 1.1.7 is a bugfix release for the 1.1 series, released on
 September 14th, 2017.
 
 
