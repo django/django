@@ -308,6 +308,8 @@ Pagination
 * Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
   to provide the documented pattern of handling invalid page numbers.
 
+* Added :class:`~django.core.paginators.EstimatedCountPaginator`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

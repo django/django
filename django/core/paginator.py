@@ -2,6 +2,8 @@ import collections
 import warnings
 from math import ceil
 
+from django.db import connections
+from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -125,6 +127,53 @@ class Paginator:
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
+
+
+class EstimatedCountPaginator(Paginator):
+    """
+    A paginator that attempts to take advantage of database row estimations.
+    """
+
+    _supported_vendors = {"postgresql", "mysql"}
+
+    @property
+    def _supports_estimations(self):
+        if not isinstance(self.object_list, QuerySet):
+            # Non-queryset object lists are not supported, fall back to Paginator.count
+            return False
+
+        if self.object_list.query.where:
+            # Filtered querysets are not supported (they cannot easily be estimated)
+            return False
+
+        vendor = connections[self.object_list.db]
+        if vendor not in self._supported_vendors:
+            # Unsupported SQL engine
+            return False
+
+        return True
+
+    @cached_property
+    def count(self):
+        if not self._supports_estimations:
+            return super().count
+
+        connection = connections[self.object_list.db]
+        with connection.cursor() as cursor:
+            if connection.vendor == "postgresql":
+                sql = "SELECT reltuples FROM pg_class WHERE relname = %s"
+            elif connection.vendor == "mysql":
+                sql = "SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s"
+            else:
+                assert False, "Unsupported SQL vendor (how did you get here?)"
+
+            cursor.execute(sql, (self.object_list.model._meta.db_table, ))
+            result = cursor.fetchone()
+
+        if not result:
+            return 0
+
+        return int(result[0])
 
 
 class Page(collections.Sequence):
