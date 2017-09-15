@@ -23,7 +23,7 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
-    "reconnecting-websocket": "^3.2.1"
+    "reconnecting-websocket": "^3.0.3"
   },
   "jest": {
     "roots": [

@@ -30,7 +30,7 @@ export class WebSocketBridge {
    * @param      {String}  [url]     The url of the websocket. Defaults to
    * `window.location.host`
    * @param      {String[]|String}  [protocols] Optional string or array of protocols.
-   * @param      {Object} options Object of options for [`reconnecting-websocket`](https://github.com/pladaria/reconnecting-websocket#configure).
+   * @param      {Object} options Object of options for [`reconnecting-websocket`](https://github.com/joewalnes/reconnecting-websocket#options-1).
    * @example
    * const webSocketBridge = new WebSocketBridge();
    * webSocketBridge.connect();
@@ -50,10 +50,7 @@ export class WebSocketBridge {
         _url = url;
       }
     }
-    // Some mobile devices (eg: HTC M8, SAMSUNG Galaxy S8) will get error code
-    // [1006] during handshake if `protocols` is `undefined`.
-    const _protocols = protocols === undefined ? '' : protocols;
-    this.socket = new ReconnectingWebSocket(_url, _protocols, options);
+    this.socket = new ReconnectingWebSocket(_url, protocols, options);
   }
 
   /**
