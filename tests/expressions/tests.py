@@ -1338,6 +1338,10 @@ class ReprTests(TestCase):
             repr(Case(When(a=1))),
             "<Case: CASE WHEN <Q: (AND: ('a', 1))> THEN Value(None), ELSE Value(None)>"
         )
+        self.assertEqual(
+            repr(When(Q(age__gte=18), then=Value('legal'))),
+            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value(legal)>"
+        )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")
         self.assertEqual(repr(F('cost') + F('tax')), "<CombinedExpression: F(cost) + F(tax)>")
