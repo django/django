@@ -58,7 +58,7 @@ def parse_url(url):
         parsed.username,
         parsed.password,
         hostname,
-        port,
+        str(port),
         path,
         options
     )
@@ -88,6 +88,9 @@ def configure(backend_type, value):
 
     if not inspect.ismethod(handler.config_from_url):
         raise TypeError('{0} is not a class method'.format(handler.config_from_url))
+
+    if backend_path.endswith('.base.DatabaseWrapper'):
+        backend_path = backend_path.replace('.base.DatabaseWrapper', '')
 
     return handler.config_from_url(backend_path, scheme, value)
 
