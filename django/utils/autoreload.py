@@ -65,6 +65,18 @@ try:
 except ImportError:
     pass
 
+USE_WIN32_CHANGE_NOTIFICATION = False
+if sys.platform == "win32":
+    try:
+        # Test whether Python for Windows Extensions are available
+        import win32file
+        import win32event
+        import win32con
+
+        USE_WIN32_CHANGE_NOTIFICATION = True
+    except ImportError:
+        pass
+
 RUN_RELOADER = True
 
 FILE_MODIFIED = 1
@@ -198,6 +210,97 @@ def inotify_code_changed():
     return EventHandler.modified_code
 
 
+def win32_notify_code_changed():
+    """
+    Check for changed code using Windows API. After being called
+    it blocks until a change event has been fired.
+    """
+    # WaitForMultipleObjects() can wait for only 64 handles max
+    # This is why cannot monitor individual files neither each parent
+    # directory as this would exceed the limit for a django project.
+    #
+    # For this reason watch directories, not files and also watch common
+    # parent directories to further limit the number of items.
+    common_parent_dirs = ['\\site-packages\\', '\\lib\\']
+
+    def reduce_path_to_common_dir(dirpath):
+        for dirname in common_parent_dirs:
+            if dirname in dirpath:
+                dirpath = dirpath[:dirpath.rfind(dirname) + len(dirname) - 1]
+                break
+        return dirpath
+
+    dirs = set()
+    watched_dirs = []
+    handles = []
+    for filename in gen_filenames():
+        dirpath = os.path.dirname(filename)
+        dirpath = dirpath if dirpath else '.'
+        dirpath = reduce_path_to_common_dir(dirpath)
+        if dirpath not in dirs:
+            dirs.add(dirpath)
+            handle = win32file.FindFirstChangeNotification(
+                dirpath,
+                True,  # watch tree
+                win32con.FILE_NOTIFY_CHANGE_SIZE |
+                win32con.FILE_NOTIFY_CHANGE_LAST_WRITE
+            )
+            if handle != win32file.INVALID_HANDLE_VALUE:
+                handles.append(handle)
+                watched_dirs.append(dirpath)
+
+    dirs = None  # Free memory before wait
+    if len(handles) > win32event.MAXIMUM_WAIT_OBJECTS:
+        # Cannot watch all files for changes, some changes may not be detected
+        for handle in handles[win32event.MAXIMUM_WAIT_OBJECTS:]:
+            win32file.FindCloseChangeNotification(handle)
+        handles = handles[:win32event.MAXIMUM_WAIT_OBJECTS]
+
+    result = win32event.WaitForMultipleObjects(handles, False, win32event.INFINITE)
+    index = result - win32event.WAIT_OBJECT_0
+    changed_dir = watched_dirs[index]
+
+    def get_first_changed_file(changed_dir):
+        FILE_LIST_DIRECTORY = 0x0001
+        dir_handle = win32file.CreateFile(
+            changed_dir,
+            FILE_LIST_DIRECTORY,
+            win32con.FILE_SHARE_READ |
+            win32con.FILE_SHARE_WRITE |
+            win32con.FILE_SHARE_DELETE,
+            None,
+            win32con.OPEN_EXISTING,
+            win32con.FILE_FLAG_BACKUP_SEMANTICS,
+            None
+        )
+        results = win32file.ReadDirectoryChangesW(
+            dir_handle,
+            1024,
+            True,
+            win32con.FILE_NOTIFY_CHANGE_FILE_NAME |
+            win32con.FILE_NOTIFY_CHANGE_DIR_NAME |
+            win32con.FILE_NOTIFY_CHANGE_ATTRIBUTES |
+            win32con.FILE_NOTIFY_CHANGE_SIZE |
+            win32con.FILE_NOTIFY_CHANGE_LAST_WRITE |
+            win32con.FILE_NOTIFY_CHANGE_SECURITY,
+            None,
+            None
+        )
+        path = ''
+        for action, filename in results:
+            path = os.path.join(changed_dir, filename)
+            break
+
+        win32file.CloseHandle(dir_handle)
+        return path
+
+    for handle in handles:
+        win32file.FindCloseChangeNotification(handle)
+
+    filename = get_first_changed_file(changed_dir)
+    return I18N_MODIFIED if filename.endswith('.mo') else FILE_MODIFIED
+
+
 def code_changed():
     global _mtimes, _win
     for filename in gen_filenames():
@@ -268,6 +371,8 @@ def reloader_thread():
     ensure_echo_on()
     if USE_INOTIFY:
         fn = inotify_code_changed
+    elif USE_WIN32_CHANGE_NOTIFICATION:
+        fn = win32_notify_code_changed
     else:
         fn = code_changed
     while RUN_RELOADER:
