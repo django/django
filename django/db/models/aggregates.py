@@ -149,11 +149,6 @@ class StdDev(Aggregate):
         options = super()._get_repr_options()
         return dict(options, sample=self.function == 'STDDEV_SAMP')
 
-    def convert_value(self, value, expression, connection):
-        if value is None:
-            return value
-        return float(value)
-
 
 class Sum(Aggregate):
     function = 'SUM'
@@ -179,8 +174,3 @@ class Variance(Aggregate):
     def _get_repr_options(self):
         options = super()._get_repr_options()
         return dict(options, sample=self.function == 'VAR_SAMP')
-
-    def convert_value(self, value, expression, connection):
-        if value is None:
-            return value
-        return float(value)
