@@ -125,9 +125,7 @@ class Count(Aggregate):
         return dict(options, distinct=self.extra['distinct'] != '')
 
     def convert_value(self, value, expression, connection):
-        if value is None:
-            return 0
-        return int(value)
+        return 0 if value is None else value
 
 
 class Max(Aggregate):

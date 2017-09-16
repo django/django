@@ -42,9 +42,7 @@ class RegrCount(StatAggregate):
     output_field = IntegerField()
 
     def convert_value(self, value, expression, connection):
-        if value is None:
-            return 0
-        return int(value)
+        return 0 if value is None else value
 
 
 class RegrIntercept(StatAggregate):
