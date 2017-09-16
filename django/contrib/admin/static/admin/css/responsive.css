@@ -423,7 +423,7 @@ input[type="submit"], button {
         margin: 0;
     }
 
-    /* Gis */
+    /* GIS */
 
     div.olMap {
         max-width: calc(100vw - 30px);
@@ -706,8 +706,8 @@ input[type="submit"], button {
     }
 
     .selector ul.selector-chooser {
-        display: block; /* old */
-        float: none; /* old */
+        display: block;
+        float: none;
         width: 52px;
         height: 26px;
         padding: 0 2px;
@@ -719,8 +719,13 @@ input[type="submit"], button {
         float: left;
     }
 
-    .selector-remove        { background-position: 0 0; }
-    .selector-add           { background-position: 0 -40px; }
+    .selector-remove {
+        background-position: 0 0;
+    }
+
+    .selector-add  {
+        background-position: 0 -40px;
+    }
 
     /* Inlines */
 

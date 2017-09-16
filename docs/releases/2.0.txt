@@ -46,7 +46,7 @@ be compatible with Django 2.0.
 What's new in Django 2.0
 ========================
 
-Mobile friendly ``contrib.admin``
+Mobile-friendly ``contrib.admin``
 ---------------------------------
 
 The admin is now responsive and supports all major mobile devices.
