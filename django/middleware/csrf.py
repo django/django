@@ -201,14 +201,15 @@ class CsrfViewMiddleware(MiddlewareMixin):
             # Set the Vary header since content varies with the CSRF cookie.
             patch_vary_headers(response, ('Cookie',))
 
-    def process_view(self, request, callback, callback_args, callback_kwargs):
-        if getattr(request, 'csrf_processing_done', False):
-            return None
-
+    def process_request(self, request):
         csrf_token = self._get_token(request)
         if csrf_token is not None:
             # Use same token next time.
             request.META['CSRF_COOKIE'] = csrf_token
+
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        if getattr(request, 'csrf_processing_done', False):
+            return None
 
         # Wait until request.META["CSRF_COOKIE"] has been manipulated before
         # bailing out, so that get_token still works
@@ -285,6 +286,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                     reason = REASON_BAD_REFERER % referer.geturl()
                     return self._reject(request, reason)
 
+            csrf_token = request.META.get('CSRF_COOKIE')
             if csrf_token is None:
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
                 # and in this way we can avoid all CSRF attacks, including login
