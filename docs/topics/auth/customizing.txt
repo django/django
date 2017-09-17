@@ -840,6 +840,9 @@ The following forms are compatible with any subclass of
 * :class:`~django.contrib.auth.forms.SetPasswordForm`
 * :class:`~django.contrib.auth.forms.PasswordChangeForm`
 * :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
+* :class:`~django.contrib.auth.forms.UserCreationForm`
+* :class:`~django.contrib.auth.forms.UserChangeForm`
+
 
 The following forms make assumptions about the user model and can be used as-is
 if those assumptions are met:
@@ -850,24 +853,6 @@ if those assumptions are met:
   default) that can be used to identify the user and a boolean field named
   ``is_active`` to prevent password resets for inactive users.
 
-Finally, the following forms are tied to
-:class:`~django.contrib.auth.models.User` and need to be rewritten or extended
-to work with a custom user model:
-
-* :class:`~django.contrib.auth.forms.UserCreationForm`
-* :class:`~django.contrib.auth.forms.UserChangeForm`
-
-If your custom user model is a simple subclass of ``AbstractUser``, then you
-can extend these forms in this manner::
-
-    from django.contrib.auth.forms import UserCreationForm
-    from myapp.models import CustomUser
-
-    class CustomUserCreationForm(UserCreationForm):
-
-        class Meta(UserCreationForm.Meta):
-            model = CustomUser
-            fields = UserCreationForm.Meta.fields + ('custom_field',)
 
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
