@@ -84,6 +84,7 @@ class CsrfViewMiddlewareTestMixin:
         # does use the csrf request processor.  By using this, we are testing
         # that the view processor is properly lazy and doesn't call get_token()
         # until needed.
+        self.mw.process_request(req)
         self.mw.process_view(req, non_token_view_using_request_processor, (), {})
         resp = non_token_view_using_request_processor(req)
         resp2 = self.mw.process_response(req, resp)
@@ -99,6 +100,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         with patch_logger('django.security.csrf', 'warning') as logger_calls:
             req = self._get_POST_no_csrf_cookie_request()
+            self.mw.process_request(req)
             req2 = self.mw.process_view(req, post_form_view, (), {})
             self.assertEqual(403, req2.status_code)
             self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_NO_CSRF_COOKIE)
@@ -110,6 +112,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         with patch_logger('django.security.csrf', 'warning') as logger_calls:
             req = self._get_POST_csrf_cookie_request()
+            self.mw.process_request(req)
             req2 = self.mw.process_view(req, post_form_view, (), {})
             self.assertEqual(403, req2.status_code)
             self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)
@@ -119,6 +122,7 @@ class CsrfViewMiddlewareTestMixin:
         If both a cookie and a token is present, the middleware lets it through.
         """
         req = self._get_POST_request_with_token()
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -128,6 +132,7 @@ class CsrfViewMiddlewareTestMixin:
         has been applied to the view, the middleware lets it through
         """
         req = self._get_POST_csrf_cookie_request()
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, csrf_exempt(post_form_view), (), {})
         self.assertIsNone(req2)
 
@@ -137,6 +142,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         req = self._get_POST_csrf_cookie_request()
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -147,6 +153,7 @@ class CsrfViewMiddlewareTestMixin:
         """
         req = self._get_POST_csrf_cookie_request()
         req.META['HTTP_X_CSRFTOKEN_CUSTOMIZED'] = self._csrf_id
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -175,12 +182,14 @@ class CsrfViewMiddlewareTestMixin:
         req = self._get_GET_csrf_cookie_request()
         req.method = 'PUT'
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
         req = self._get_GET_csrf_cookie_request()
         req.method = 'DELETE'
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -214,6 +223,7 @@ class CsrfViewMiddlewareTestMixin:
         CsrfTokenNode works when a CSRF cookie is set.
         """
         req = self._get_GET_csrf_cookie_request()
+        self.mw.process_request(req)
         self.mw.process_view(req, token_view, (), {})
         resp = token_view(req)
         self._check_token_present(resp)
@@ -223,6 +233,7 @@ class CsrfViewMiddlewareTestMixin:
         get_token still works for a view decorated with 'csrf_exempt'.
         """
         req = self._get_GET_csrf_cookie_request()
+        self.mw.process_request(req)
         self.mw.process_view(req, csrf_exempt(token_view), (), {})
         resp = token_view(req)
         self._check_token_present(resp)
@@ -254,6 +265,7 @@ class CsrfViewMiddlewareTestMixin:
         requests. If it appears in the response, it should keep its value.
         """
         req = self._get_POST_request_with_token()
+        self.mw.process_request(req)
         self.mw.process_view(req, token_view, (), {})
         resp = token_view(req)
         resp = self.mw.process_response(req, resp)
@@ -327,6 +339,7 @@ class CsrfViewMiddlewareTestMixin:
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -341,6 +354,7 @@ class CsrfViewMiddlewareTestMixin:
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.example.com'
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -354,6 +368,7 @@ class CsrfViewMiddlewareTestMixin:
             'HTTP_X_FORWARDED_HOST': 'www.example.com',
             'HTTP_X_FORWARDED_PORT': '443',
         })
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -367,6 +382,7 @@ class CsrfViewMiddlewareTestMixin:
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
@@ -380,6 +396,7 @@ class CsrfViewMiddlewareTestMixin:
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
+        self.mw.process_request(req)
         response = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(response)
 
@@ -388,6 +405,7 @@ class CsrfViewMiddlewareTestMixin:
         req._is_secure_override = True
         req.META['HTTP_REFERER'] = 'https://foo.example.com/'
         req.META['SERVER_PORT'] = '443'
+        self.mw.process_request(req)
         response = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(response)
 
@@ -397,6 +415,7 @@ class CsrfViewMiddlewareTestMixin:
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://foo.example.com:4443/'
         req.META['SERVER_PORT'] = '4443'
+        self.mw.process_request(req)
         response = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(response)
 
@@ -461,11 +480,13 @@ class CsrfViewMiddlewareTestMixin:
         token = ('ABC' + self._csrf_id)[:CSRF_TOKEN_LENGTH]
 
         req = CsrfPostRequest(token, raise_error=False)
+        self.mw.process_request(req)
         resp = self.mw.process_view(req, post_form_view, (), {})
         self.assertIsNone(resp)
 
         req = CsrfPostRequest(token, raise_error=True)
         with patch_logger('django.security.csrf', 'warning') as logger_calls:
+            self.mw.process_request(req)
             resp = self.mw.process_view(req, post_form_view, (), {})
             self.assertEqual(resp.status_code, 403)
             self.assertEqual(logger_calls[0], 'Forbidden (%s): ' % REASON_BAD_TOKEN)
@@ -585,6 +606,7 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         The csrf token is reset from a bare secret.
         """
         req = self._get_POST_bare_secret_csrf_cookie_request_with_token()
+        self.mw.process_request(req)
         req2 = self.mw.process_view(req, token_view, (), {})
         self.assertIsNone(req2)
         resp = token_view(req)
@@ -656,7 +678,7 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
             'SessionMiddleware must appear before CsrfViewMiddleware in MIDDLEWARE.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.mw.process_view(HttpRequest(), None, (), {})
+            self.mw.process_request(HttpRequest())
 
     def test_process_response_get_token_used(self):
         """The ensure_csrf_cookie() decorator works without middleware."""
@@ -730,3 +752,16 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
             'Referer checking failed - Referer is insecure while host is secure.',
             status_code=403,
         )
+
+
+@override_settings(ROOT_URLCONF='csrf_tests.csrf_token_error_handler_urls', DEBUG=False)
+class CsrfInErrorHandlingViewsTests(SimpleTestCase):
+    def test_csrf_token_on_404_stays_constant(self):
+        response = self.client.get('/does not exist/')
+        # The error handler returns status code 599.
+        self.assertEqual(response.status_code, 599)
+        token1 = response.content
+        response = self.client.get('/does not exist/')
+        self.assertEqual(response.status_code, 599)
+        token2 = response.content
+        self.assertTrue(equivalent_tokens(token1.decode('ascii'), token2.decode('ascii')))
