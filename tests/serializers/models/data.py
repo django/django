@@ -249,8 +249,9 @@ class SmallPKData(models.Model):
 # class TextPKData(models.Model):
 #     data = models.TextField(primary_key=True)
 
-# class TimePKData(models.Model):
-#    data = models.TimeField(primary_key=True)
+
+class TimePKData(models.Model):
+    data = models.TimeField(primary_key=True)
 
 
 class UUIDData(models.Model):
