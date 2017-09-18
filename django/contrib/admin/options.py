@@ -1,5 +1,6 @@
 import copy
 import json
+import inspect
 import operator
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
@@ -16,7 +17,7 @@ from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, construct_change_message, flatten_fieldsets,
-    get_deleted_objects, lookup_needs_distinct, model_format_dict,
+    get_deleted_objects, model_format_dict,
     model_ngettext, quote, unquote,
 )
 from django.contrib.auth import get_permission_codename
@@ -25,8 +26,10 @@ from django.core.exceptions import (
 )
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
+from django.db.models import Lookup
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.utils import iter_lookup, fields_need_distinct
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
@@ -915,31 +918,63 @@ class ModelAdmin(BaseModelAdmin):
         Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
-        # Apply keyword searches.
         def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
+            lookups = {
+                '': 'icontains',
+                '!': '',
+                '^': 'istartswith',
+                '=': 'iexact',
+                '@': 'search',
+            }
+            prefix = ''
+            transform = str
+
+            if isinstance(field_name, (tuple, list)):
+                field_name, _transform = field_name
+
+                def transform(value):
+                    try:
+                        return _transform(value)
+                    except Exception:
+                        return str(value)
+
+            field_name = str(field_name)
+
+            if not field_name[0].isalpha():
+                prefix = field_name[0]
+                field_name = field_name[1:]
+
+            fields = list(iter_lookup(self.opts, field_name, True))
+            last = fields[-1]
+
+            if inspect.isclass(last) and not issubclass(last, Lookup):
+                if prefix not in lookups:
+                    raise FieldError('`%s` lookup prefix is not one of %s' % (prefix, ', '.join(lookups.keys())))
+                lookup_name = lookups[prefix]
+                lookup = last.get_lookup(lookup_name)
+
+                if lookup:
+                    fields.append(lookup)
+                    return '%s__%s' % (field_name, lookup_name), fields, transform
+                # do not throw error on default '' prefix
+                elif prefix:
+                    raise FieldError('`%s` is not a valid lookup for the field `%s`' % (field_name, lookup_name))
+            return field_name, fields, transform
 
         use_distinct = False
         search_fields = self.get_search_fields(request)
         if search_fields and search_term:
-            orm_lookups = [construct_search(str(search_field))
+            orm_lookups = [construct_search(search_field)
                            for search_field in search_fields]
             for bit in search_term.split():
-                or_queries = [models.Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
+                or_queries = [models.Q(**{orm_lookup: transform(bit)})
+                              for orm_lookup, _, transform in orm_lookups]
                 queryset = queryset.filter(reduce(operator.or_, or_queries))
-            if not use_distinct:
-                for search_spec in orm_lookups:
-                    if lookup_needs_distinct(self.opts, search_spec):
-                        use_distinct = True
-                        break
+
+            for _, fields, _ in orm_lookups:
+                if fields_need_distinct(fields):
+                    use_distinct = True
+                    break
 
         return queryset, use_distinct
 
@@ -1105,12 +1140,12 @@ class ModelAdmin(BaseModelAdmin):
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
             ], {
-                'popup_response_data': popup_response_data,
-            })
+                                        'popup_response_data': popup_response_data,
+                                    })
 
         elif "_continue" in request.POST or (
-                # Redirecting after "Save as new".
-                "_saveasnew" in request.POST and self.save_as_continue and
+            # Redirecting after "Save as new".
+                        "_saveasnew" in request.POST and self.save_as_continue and
                 self.has_change_permission(request, obj)
         ):
             msg = format_html(
@@ -1167,8 +1202,8 @@ class ModelAdmin(BaseModelAdmin):
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
             ], {
-                'popup_response_data': popup_response_data,
-            })
+                                        'popup_response_data': popup_response_data,
+                                    })
 
         opts = self.model._meta
         preserved_filters = self.get_preserved_filters(request)
@@ -1338,8 +1373,8 @@ class ModelAdmin(BaseModelAdmin):
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
             ], {
-                'popup_response_data': popup_response_data,
-            })
+                                        'popup_response_data': popup_response_data,
+                                    })
 
         self.message_user(
             request,
@@ -1569,7 +1604,7 @@ class ModelAdmin(BaseModelAdmin):
         actions = self.get_actions(request)
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
-                'index' in request.POST and '_save' not in request.POST):
+                    'index' in request.POST and '_save' not in request.POST):
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1584,8 +1619,8 @@ class ModelAdmin(BaseModelAdmin):
 
         # Actions with confirmation
         if (actions and request.method == 'POST' and
-                helpers.ACTION_CHECKBOX_NAME in request.POST and
-                'index' not in request.POST and '_save' not in request.POST):
+                    helpers.ACTION_CHECKBOX_NAME in request.POST and
+                    'index' not in request.POST and '_save' not in request.POST):
             if selected:
                 response = self.response_action(request, queryset=cl.get_queryset(request))
                 if response:
@@ -1625,9 +1660,9 @@ class ModelAdmin(BaseModelAdmin):
                         "%(count)s %(name)s were changed successfully.",
                         changecount
                     ) % {
-                        'count': changecount,
-                        'name': model_ngettext(opts, changecount),
-                    }
+                              'count': changecount,
+                              'name': model_ngettext(opts, changecount),
+                          }
                     self.message_user(request, msg, messages.SUCCESS)
 
                 return HttpResponseRedirect(request.get_full_path())

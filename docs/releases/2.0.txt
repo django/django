@@ -66,7 +66,10 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`ModelAdmin.search_fields<django.contrib.admin.ModelAdmin.search_fields>`
+  allows specifying custom lookups (check whether icontains is valid at all)
+  and transform functions. Added `!` operator for skipping default `icontains`
+  lookup.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
