@@ -3,7 +3,9 @@ from django.db import connection
 from . import PostgreSQLTestCase
 
 try:
-    from django.contrib.postgres.signals import get_hstore_oids, get_citext_oids
+    from django.contrib.postgres.signals import (
+        get_citext_oids, get_hstore_oids, register_type_handlers,
+    )
 except ImportError:
     pass  # pyscogp2 isn't installed.
 
@@ -31,3 +33,7 @@ class OIDTests(PostgreSQLTestCase):
     def test_citext_values(self):
         oids = get_citext_oids(connection.alias)
         self.assertOIDs(oids)
+
+    def test_register_type_handlers_no_db(self):
+        """Registering type handlers for the nodb connection does nothing."""
+        register_type_handlers(connection._nodb_connection)
