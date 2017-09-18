@@ -28,7 +28,7 @@ SEARCH_VAR = 'q'
 ERROR_FLAG = 'e'
 
 IGNORED_PARAMS = (
-    ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
+    ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR,)
 
 
 class ChangeList:
@@ -49,6 +49,8 @@ class ChangeList:
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
+        self.filter_params_defaults = model_admin.get_list_filter_defaults(request) or {}
+        self.filter_params_sentinel = model_admin.get_list_filter_sentinel(request)
 
         # Get search parameters from the query string.
         try:
@@ -93,6 +95,15 @@ class ChangeList:
         for ignored in IGNORED_PARAMS:
             if ignored in lookup_params:
                 del lookup_params[ignored]
+
+        # Add defaults to the the lookup params.
+        for param, default in self.filter_params_defaults.items():
+            if param not in lookup_params:
+                lookup_params[param] = default
+
+        lookup_params = dict(
+            (param, value) for param, value in lookup_params.items() if value != self.filter_params_sentinel
+        )
         return lookup_params
 
     def get_filters(self, request):

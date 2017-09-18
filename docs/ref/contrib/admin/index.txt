@@ -972,6 +972,32 @@ subclass::
     See the default template provided by Django (``admin/filter.html``) for
     a concrete example.
 
+.. attribute:: ModelAdmin.list_filter_defaults
+
+    .. versionadded:: 2.0
+
+    Set ``list_filter_defaults`` to specify defaults for the filters, when the
+    user has not specified a filter the default will automatically be used.
+
+    The value should be a dictionary with as key the list filter field and as
+    value the default.
+
+    If you want to specify a more dynamic value that depends on the request or
+    database query results you can use the
+    :meth:`~ModelAdmin.get_list_filter_defaults` method.
+
+.. attribute:: ModelAdmin.list_filter_sentinel
+
+    .. versionadded:: 2.0
+
+    Set the ``list_filter_sentinel`` to change the sentinel value used for
+    distinguishing between having no filter selected or the user wanting to
+    disable the filter. It should be a string value and defaults to ``_off_``.
+
+    If you want to specify a more dynamic value that depends on the request or
+    database query results you can use the
+    :meth:`~ModelAdmin.get_list_filter_sentinel` method.
+
 .. attribute:: ModelAdmin.list_max_show_all
 
     Set ``list_max_show_all`` to control how many items can appear on a "Show
@@ -1486,6 +1512,22 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_list_filter`` method is given the ``HttpRequest`` and is expected
     to return the same kind of sequence type as for the
     :attr:`~ModelAdmin.list_filter` attribute.
+
+.. method:: ModelAdmin.get_list_filter_defaults(request)
+
+    .. versionadded:: 1.11
+
+    The ``get_list_filter_defaults`` method is given the ``HttpRequest`` and
+    should return a dictionary as :attr:`ModelAdmin.list_filter_defaults`
+    does.
+
+.. method:: ModelAdmin.get_list_filter_sentinel(request)
+
+    .. versionadded:: 1.11
+
+    The ``get_list_filter_sentinel`` method is given the ``HttpRequest`` and
+    should return a string as :attr:`ModelAdmin.list_filter_sentinel`
+    does.
 
 .. method:: ModelAdmin.get_list_select_related(request)
 
