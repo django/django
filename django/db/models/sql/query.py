@@ -13,7 +13,7 @@ from string import ascii_uppercase
 from django.core.exceptions import (
     EmptyResultSet, FieldDoesNotExist, FieldError,
 )
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
@@ -1125,6 +1125,13 @@ class Query:
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
         lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+
+        if not getattr(reffed_expression, 'filterable', True):
+            raise NotSupportedError(
+                reffed_expression.__class__.__name__ + ' is disallowed in '
+                'the filter clause.'
+            )
+
         if not allow_joins and len(parts) > 1:
             raise FieldError("Joined field references are not permitted in this query")
 

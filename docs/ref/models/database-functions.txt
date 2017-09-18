@@ -819,3 +819,132 @@ Usage example::
      'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=<UTC>),
      'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=<UTC>)
     }
+
+.. _window-functions:
+
+Window functions
+================
+
+.. versionadded:: 2.0
+
+There are a number of functions to use in a
+:class:`~django.db.models.expressions.Window` expression for computing the rank
+of elements or the :class:`Ntile` of some rows.
+
+``CumeDist``
+------------
+
+.. class:: CumeDist(*expressions, **extra)
+
+Calculates the cumulative distribution of a value within a window or partition.
+The cumulative distribution is defined as the number of rows preceding or
+peered with the current row divided by the total number of rows in the frame.
+
+``DenseRank``
+-------------
+
+.. class:: DenseRank(*expressions, **extra)
+
+Equivalent to :class:`Rank` but does not have gaps.
+
+``FirstValue``
+--------------
+
+.. class:: FirstValue(expression, **extra)
+
+Returns the value evaluated at the row that's the first row of the window
+frame, or ``None`` if no such value exists.
+
+``Lag``
+-------
+
+.. class:: Lag(expression, offset=1, default=None, **extra)
+
+Calculates the value offset by ``offset``, and if no row exists there, returns
+``default``.
+
+``default`` must have the same type as the ``expression``, however, this is
+only validated by the database and not in Python.
+
+``LastValue``
+-------------
+
+.. class:: LastValue(expression, **extra)
+
+Comparable to :class:`FirstValue`, it calculates the last value in a given
+frame clause.
+
+``Lead``
+--------
+
+.. class:: Lead(expression, offset=1, default=None, **extra)
+
+Calculates the leading value in a given :ref:`frame <window-frames>`. Both
+``offset`` and ``default`` are evaluated with respect to the current row.
+
+``default`` must have the same type as the ``expression``, however, this is
+only validated by the database and not in Python.
+
+``NthValue``
+------------
+
+.. class:: NthValue(expression, nth=1, **extra)
+
+Computes the row relative to the offset ``nth`` (must be a positive value)
+within the window. Returns ``None`` if no row exists.
+
+Some databases may handle a nonexistent nth-value differently. For example,
+Oracle returns an empty string rather than ``None`` for character-based
+expressions. Django doesn't do any conversions in these cases.
+
+``Ntile``
+---------
+
+.. class:: Ntile(num_buckets=1, **extra)
+
+Calculates a partition for each of the rows in the frame clause, distributing
+numbers as evenly as possible between 1 and ``num_buckets``. If the rows don't
+divide evenly into a number of buckets, one or more buckets will be represented
+more frequently.
+
+``PercentRank``
+---------------
+
+.. class:: PercentRank(*expressions, **extra)
+
+Computes the percentile rank of the rows in the frame clause. This
+computation is equivalent to evaluating::
+
+    (rank - 1) / (total rows - 1)
+
+The following table explains the calculation for the percentile rank of a row:
+
+===== ===== ==== ============ ============
+Row # Value Rank Calculation  Percent Rank
+===== ===== ==== ============ ============
+1     15    1    (1-1)/(7-1)  0.0000
+2     20    2    (2-1)/(7-1)  0.1666
+3     20    2    (2-1)/(7-1)  0.1666
+4     20    2    (2-1)/(7-1)  0.1666
+5     30    5    (5-1)/(7-1)  0.6666
+6     30    5    (5-1)/(7-1)  0.6666
+7     40    7    (7-1)/(7-1)  1.0000
+===== ===== ==== ============ ============
+
+``Rank``
+--------
+
+.. class:: Rank(*expressions, **extra)
+
+Comparable to ``RowNumber``, this function ranks rows in the window. The
+computed rank contains gaps. Use :class:`DenseRank` to compute rank without
+gaps.
+
+``RowNumber``
+-------------
+
+.. class:: RowNumber(*expressions, **extra)
+
+Computes the row number according to the ordering of either the frame clause
+or the ordering of the whole query if there is no partitioning of the
+:ref:`window frame <window-frames>`.

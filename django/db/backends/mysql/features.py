@@ -82,6 +82,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return result and result[0] == 1
 
     @cached_property
+    def supports_over_clause(self):
+        return self.connection.mysql_version >= (8, 0, 2)
+
+    @cached_property
     def supports_transactions(self):
         """
         All storage engines except MyISAM support transactions.

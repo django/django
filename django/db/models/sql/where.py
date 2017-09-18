@@ -167,6 +167,16 @@ class WhereNode(tree.Node):
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
+    @classmethod
+    def _contains_over_clause(cls, obj):
+        if isinstance(obj, tree.Node):
+            return any(cls._contains_over_clause(c) for c in obj.children)
+        return obj.contains_over_clause
+
+    @cached_property
+    def contains_over_clause(self):
+        return self._contains_over_clause(self)
+
     @property
     def is_summary(self):
         return any(child.is_summary for child in self.children)

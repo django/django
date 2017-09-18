@@ -1681,6 +1681,11 @@ raised if ``select_for_update()`` is used in autocommit mode.
     ``select_for_update()`` you should use
     :class:`~django.test.TransactionTestCase`.
 
+.. admonition:: Certain expressions may not be supported
+
+    PostgreSQL doesn't support ``select_for_update()`` with
+    :class:`~django.db.models.expressions.Window` expressions.
+
 .. versionchanged:: 1.11
 
     The ``skip_locked`` argument was added.

@@ -48,6 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     $$ LANGUAGE plpgsql;"""
+    supports_over_clause = True
 
     @cached_property
     def supports_aggregate_filter_clause(self):

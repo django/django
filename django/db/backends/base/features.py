@@ -236,6 +236,9 @@ class BaseDatabaseFeatures:
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
 
+    # Does the backed support window expressions (expression OVER (...))?
+    supports_over_clause = False
+
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
 

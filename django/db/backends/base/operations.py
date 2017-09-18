@@ -4,7 +4,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import transaction
+from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
@@ -38,6 +38,13 @@ class BaseDatabaseOperations:
     cast_data_types = {}
     # CharField data type if the max_length argument isn't provided.
     cast_char_field_without_max_length = None
+
+    # Start and end points for window expressions.
+    PRECEDING = 'PRECEDING'
+    FOLLOWING = 'FOLLOWING'
+    UNBOUNDED_PRECEDING = 'UNBOUNDED ' + PRECEDING
+    UNBOUNDED_FOLLOWING = 'UNBOUNDED ' + FOLLOWING
+    CURRENT_ROW = 'CURRENT ROW'
 
     def __init__(self, connection):
         self.connection = connection
@@ -598,3 +605,34 @@ class BaseDatabaseOperations:
             rhs_sql, rhs_params = rhs
             return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         raise NotImplementedError("This backend does not support %s subtraction." % internal_type)
+
+    def window_frame_start(self, start):
+        if isinstance(start, int):
+            if start < 0:
+                return '%d %s' % (abs(start), self.PRECEDING)
+            elif start == 0:
+                return self.CURRENT_ROW
+        elif start is None:
+            return self.UNBOUNDED_PRECEDING
+        raise ValueError("start argument must be a negative integer, zero, or None, but got '%s'." % start)
+
+    def window_frame_end(self, end):
+        if isinstance(end, int):
+            if end == 0:
+                return self.CURRENT_ROW
+            elif end > 0:
+                return '%d %s' % (end, self.FOLLOWING)
+        elif end is None:
+            return self.UNBOUNDED_FOLLOWING
+        raise ValueError("end argument must be a positive integer, zero, or None, but got '%s'." % end)
+
+    def window_frame_rows_start_end(self, start=None, end=None):
+        """
+        Return SQL for start and end points in an OVER clause window frame.
+        """
+        if not self.connection.features.supports_over_clause:
+            raise NotSupportedError('This backend does not support window expressions.')
+        return self.window_frame_start(start), self.window_frame_end(end)
+
+    def window_frame_range_start_end(self, start=None, end=None):
+        return self.window_frame_rows_start_end(start, end)
