@@ -419,6 +419,7 @@ class Model(metaclass=ModelBase):
             # without changing the logic.
             for val, field in zip(args, fields_iter):
                 if val is _DEFERRED:
+                    _setattr(self, field.attname, field.default)
                     continue
                 _setattr(self, field.attname, val)
         else:
@@ -426,6 +427,7 @@ class Model(metaclass=ModelBase):
             fields_iter = iter(opts.fields)
             for val, field in zip(args, fields_iter):
                 if val is _DEFERRED:
+                    _setattr(self, field.attname, field.default)
                     continue
                 _setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
