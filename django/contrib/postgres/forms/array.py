@@ -1,5 +1,6 @@
 import copy
 from itertools import chain
+from operator import attrgetter
 
 from django import forms
 from django.contrib.postgres.validators import (
@@ -100,9 +101,7 @@ class SplitArrayWidget(forms.Widget):
         self.size = size
         super().__init__(**kwargs)
 
-    @property
-    def is_hidden(self):
-        return self.widget.is_hidden
+    is_hidden = property(attrgetter('widget.is_hidden'))
 
     def value_from_datadict(self, data, files, name):
         return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index))
@@ -141,18 +140,14 @@ class SplitArrayWidget(forms.Widget):
             )
         return context
 
-    @property
-    def media(self):
-        return self.widget.media
+    media = property(attrgetter('widget.media'))
 
     def __deepcopy__(self, memo):
         obj = super().__deepcopy__(memo)
         obj.widget = copy.deepcopy(self.widget)
         return obj
 
-    @property
-    def needs_multipart_form(self):
-        return self.widget.needs_multipart_form
+    needs_multipart_form = property(attrgetter('widget.needs_multipart_form'))
 
 
 class SplitArrayField(forms.Field):

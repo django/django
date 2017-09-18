@@ -1,6 +1,7 @@
 import copy
 import datetime
 from decimal import Decimal
+from operator import attrgetter
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import connection
@@ -253,9 +254,7 @@ class BaseExpression:
         """Hook used by Lookup.get_prep_lookup() to do custom preparation."""
         return self
 
-    @property
-    def field(self):
-        return self.output_field
+    field = property(attrgetter('output_field'))
 
     @cached_property
     def output_field(self):

@@ -1,4 +1,5 @@
 import json
+from operator import attrgetter
 
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
@@ -262,9 +263,7 @@ class IndexTransform(Transform):
         lhs, params = compiler.compile(self.lhs)
         return '%s[%s]' % (lhs, self.index), params
 
-    @property
-    def output_field(self):
-        return self.base_field
+    output_field = property(attrgetter('base_field'))
 
 
 class IndexTransformFactory:

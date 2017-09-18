@@ -9,6 +9,8 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
+from operator import attrgetter
+
 from django.core import exceptions
 from django.utils.functional import cached_property
 
@@ -59,9 +61,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def name(self):
         return self.field.related_query_name()
 
-    @property
-    def remote_field(self):
-        return self.field
+    remote_field = property(attrgetter('field'))
 
     @property
     def target_field(self):
@@ -103,9 +103,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_internal_type(self):
         return self.field.get_internal_type()
 
-    @property
-    def db_type(self):
-        return self.field.db_type
+    db_type = property(attrgetter('field.db_type'))
 
     def __repr__(self):
         return '<%s: %s.%s>' % (

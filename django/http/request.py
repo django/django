@@ -3,6 +3,7 @@ import re
 import warnings
 from io import BytesIO
 from itertools import chain
+from operator import attrgetter
 from urllib.parse import quote, urlencode, urljoin, urlsplit
 
 from django.conf import settings
@@ -205,9 +206,7 @@ class HttpRequest:
     def is_ajax(self):
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
-    @property
-    def encoding(self):
-        return self._encoding
+    encoding = property(attrgetter('_encoding'))
 
     @encoding.setter
     def encoding(self, val):

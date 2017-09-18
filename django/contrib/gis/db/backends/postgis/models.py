@@ -1,6 +1,8 @@
 """
  The GeometryColumns and SpatialRefSys models for the PostGIS backend.
 """
+from operator import attrgetter
+
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
 
@@ -61,6 +63,4 @@ class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
         db_table = 'spatial_ref_sys'
         managed = False
 
-    @property
-    def wkt(self):
-        return self.srtext
+    wkt = property(attrgetter('srtext'))

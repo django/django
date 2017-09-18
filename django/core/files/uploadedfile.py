@@ -4,6 +4,7 @@ Classes representing uploaded files.
 
 import os
 from io import BytesIO
+from operator import attrgetter
 
 from django.conf import settings
 from django.core.files import temp as tempfile
@@ -33,9 +34,6 @@ class UploadedFile(File):
     def __repr__(self):
         return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.content_type)
 
-    def _get_name(self):
-        return self._name
-
     def _set_name(self, name):
         # Sanitize the file name so that it can't be dangerous.
         if name is not None:
@@ -50,7 +48,7 @@ class UploadedFile(File):
 
         self._name = name
 
-    name = property(_get_name, _set_name)
+    name = property(attrgetter('_name'), _set_name)
 
 
 class TemporaryUploadedFile(UploadedFile):

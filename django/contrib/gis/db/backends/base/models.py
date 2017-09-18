@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from django.contrib.gis import gdal
 
 
@@ -33,18 +35,17 @@ class SpatialRefSysMixin:
 
             raise Exception('Could not get OSR SpatialReference from WKT: %s\nError:\n%s' % (self.wkt, msg))
 
-    @property
-    def ellipsoid(self):
+    ellipsoid = property(
+        attrgetter('srs.ellipsoid'), None, None,
         """
         Return a tuple of the ellipsoid parameters:
         (semimajor axis, semiminor axis, and inverse flattening).
         """
-        return self.srs.ellipsoid
-
-    @property
-    def name(self):
+    )
+    name = property(
+        attrgetter('srs.name'), None, None,
         "Return the projection name."
-        return self.srs.name
+    )
 
     @property
     def spheroid(self):
@@ -56,40 +57,34 @@ class SpatialRefSysMixin:
         "Return the datum for this spatial reference."
         return self.srs['datum']
 
-    @property
-    def projected(self):
+    projected = property(
+        attrgetter('srs.projected'), None, None,
         "Is this Spatial Reference projected?"
-        return self.srs.projected
-
-    @property
-    def local(self):
+    )
+    local = property(
+        attrgetter('srs.local'), None, None,
         "Is this Spatial Reference local?"
-        return self.srs.local
-
-    @property
-    def geographic(self):
+    )
+    geographic = property(
+        attrgetter('srs.geographic'), None, None,
         "Is this Spatial Reference geographic?"
-        return self.srs.geographic
-
-    @property
-    def linear_name(self):
+    )
+    linear_name = property(
+        attrgetter('srs.linear_name'), None, None,
         "Return the linear units name."
-        return self.srs.linear_name
-
-    @property
-    def linear_units(self):
+    )
+    linear_units = property(
+        attrgetter('srs.linear_units'), None, None,
         "Return the linear units."
-        return self.srs.linear_units
-
-    @property
-    def angular_name(self):
+    )
+    angular_name = property(
+        attrgetter('srs.angular_name'), None, None,
         "Return the name of the angular units."
-        return self.srs.angular_name
-
-    @property
-    def angular_units(self):
+    )
+    angular_units = property(
+        attrgetter('srs.angular_units'), None, None,
         "Return the angular units."
-        return self.srs.angular_units
+    )
 
     @property
     def units(self):

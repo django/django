@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.contenttypes.models import ContentType
@@ -395,13 +397,8 @@ class AnonymousUser:
     def check_password(self, raw_password):
         raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
-    @property
-    def groups(self):
-        return self._groups
-
-    @property
-    def user_permissions(self):
-        return self._user_permissions
+    groups = property(attrgetter('_groups'))
+    user_permissions = property(attrgetter('_user_permissions'))
 
     def get_group_permissions(self, obj=None):
         return set()

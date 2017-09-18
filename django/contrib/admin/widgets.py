@@ -2,6 +2,7 @@
 Form Widget classes specific to the Django admin site.
 """
 import copy
+from operator import attrgetter
 
 from django import forms
 from django.conf import settings
@@ -270,13 +271,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         memo[id(self)] = obj
         return obj
 
-    @property
-    def is_hidden(self):
-        return self.widget.is_hidden
-
-    @property
-    def media(self):
-        return self.widget.media
+    is_hidden = property(attrgetter('widget.is_hidden'))
+    media = property(attrgetter('widget.media'))
 
     def get_related_url(self, info, action, *args):
         return reverse("admin:%s_%s_%s" % (info + (action,)),

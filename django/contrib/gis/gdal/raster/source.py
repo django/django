@@ -5,6 +5,7 @@ import uuid
 from ctypes import (
     addressof, byref, c_buffer, c_char_p, c_double, c_int, c_void_p, string_at,
 )
+from operator import attrgetter, itemgetter
 
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
@@ -35,9 +36,7 @@ class TransformPoint(list):
         self._raster = raster
         self._prop = prop
 
-    @property
-    def x(self):
-        return self[0]
+    x = property(itemgetter(0))
 
     @x.setter
     def x(self, value):
@@ -45,9 +44,7 @@ class TransformPoint(list):
         gtf[self.indices[self._prop][0]] = value
         self._raster.geotransform = gtf
 
-    @property
-    def y(self):
-        return self[1]
+    y = property(itemgetter(1))
 
     @y.setter
     def y(self, value):
@@ -286,12 +283,12 @@ class GDALRaster(GDALRasterBase):
         capi.set_ds_projection_ref(self._ptr, srs.wkt.encode())
         self._flush()
 
-    @property
-    def srid(self):
+    srid = property(
+        attrgetter('srs.srid'), None, None,
         """
         Shortcut to access the srid of this GDALRaster.
         """
-        return self.srs.srid
+    )
 
     @srid.setter
     def srid(self, value):
@@ -359,9 +356,7 @@ class GDALRaster(GDALRasterBase):
 
         return xmin, ymin, xmax, ymax
 
-    @property
-    def bands(self):
-        return BandList(self)
+    bands = property(BandList)
 
     def warp(self, ds_input, resampling='NearestNeighbour', max_error=0.0):
         """

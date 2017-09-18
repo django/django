@@ -1,4 +1,5 @@
 import threading
+from operator import attrgetter
 
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import (
@@ -51,30 +52,21 @@ class GEOSFunc:
         return self.cfunc.__name__
 
     # argtypes property
-    def _get_argtypes(self):
-        return self.cfunc.argtypes
-
     def _set_argtypes(self, argtypes):
         new_argtypes = [CONTEXT_PTR]
         new_argtypes.extend(argtypes)
         self.cfunc.argtypes = new_argtypes
 
-    argtypes = property(_get_argtypes, _set_argtypes)
+    argtypes = property(attrgetter('cfunc.argtypes'), _set_argtypes)
 
     # restype property
-    def _get_restype(self):
-        return self.cfunc.restype
-
     def _set_restype(self, restype):
         self.cfunc.restype = restype
 
-    restype = property(_get_restype, _set_restype)
+    restype = property(attrgetter('cfunc.restype'), _set_restype)
 
     # errcheck property
-    def _get_errcheck(self):
-        return self.cfunc.errcheck
-
     def _set_errcheck(self, errcheck):
         self.cfunc.errcheck = errcheck
 
-    errcheck = property(_get_errcheck, _set_errcheck)
+    errcheck = property(attrgetter('cfunc.errcheck'), _set_errcheck)

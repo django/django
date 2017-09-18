@@ -1,4 +1,5 @@
 import json
+from operator import attrgetter
 
 from django import forms
 from django.conf import settings
@@ -51,13 +52,8 @@ class AdminForm:
                 **options
             )
 
-    @property
-    def errors(self):
-        return self.form.errors
-
-    @property
-    def non_field_errors(self):
-        return self.form.non_field_errors
+    errors = property(attrgetter('form.errors'))
+    non_field_errors = property(attrgetter('form.non_field_errors'))
 
     @property
     def media(self):
@@ -294,13 +290,8 @@ class InlineAdminFormSet:
             }
         })
 
-    @property
-    def forms(self):
-        return self.formset.forms
-
-    @property
-    def non_form_errors(self):
-        return self.formset.non_form_errors
+    forms = property(attrgetter('formset.forms'))
+    non_form_errors = property(attrgetter('formset.non_form_errors'))
 
     @property
     def media(self):

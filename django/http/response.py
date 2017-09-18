@@ -5,6 +5,7 @@ import sys
 import time
 from email.header import Header
 from http.client import responses
+from operator import itemgetter
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -409,7 +410,7 @@ class HttpResponseRedirectBase(HttpResponse):
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
 
-    url = property(lambda self: self['Location'])
+    url = property(itemgetter('Location'))
 
     def __repr__(self):
         return '<%(cls)s status_code=%(status_code)d%(content_type)s, url="%(url)s">' % {

@@ -1,4 +1,5 @@
 from functools import update_wrapper
+from operator import attrgetter
 from weakref import WeakSet
 
 from django.apps import apps
@@ -170,9 +171,7 @@ class AdminSite:
         """
         return self._actions.items()
 
-    @property
-    def empty_value_display(self):
-        return self._empty_value_display
+    empty_value_display = property(attrgetter('_empty_value_display'))
 
     @empty_value_display.setter
     def empty_value_display(self, empty_value_display):

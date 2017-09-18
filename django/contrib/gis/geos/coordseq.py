@@ -4,6 +4,7 @@
  LineString, and LinearRing geometries.
 """
 from ctypes import byref, c_double, c_uint
+from operator import attrgetter
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
@@ -161,13 +162,13 @@ class GEOSCoordSeq(GEOSBase):
         "Return the dimensions of this coordinate sequence."
         return capi.cs_getdims(self.ptr, byref(c_uint()))
 
-    @property
-    def hasz(self):
+    hasz = property(
+        attrgetter('_z'), None, None,
         """
         Return whether this coordinate sequence is 3D. This property value is
         inherited from the parent Geometry.
         """
-        return self._z
+    )
 
     # ### Other Methods ###
     def clone(self):

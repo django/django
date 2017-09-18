@@ -11,6 +11,7 @@ import re
 import uuid
 from decimal import Decimal, DecimalException
 from io import BytesIO
+from operator import attrgetter
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core import validators
@@ -496,9 +497,6 @@ class RegexField(CharField):
         super().__init__(**kwargs)
         self._set_regex(regex)
 
-    def _get_regex(self):
-        return self._regex
-
     def _set_regex(self, regex):
         if isinstance(regex, str):
             regex = re.compile(regex)
@@ -508,7 +506,7 @@ class RegexField(CharField):
         self._regex_validator = validators.RegexValidator(regex=regex)
         self.validators.append(self._regex_validator)
 
-    regex = property(_get_regex, _set_regex)
+    regex = property(attrgetter('_regex'), _set_regex)
 
 
 class EmailField(CharField):
@@ -776,7 +774,7 @@ class ChoiceField(Field):
 
         self._choices = self.widget.choices = value
 
-    choices = property(_get_choices, _set_choices)
+    choices = property(attrgetter('_choices'), _set_choices)
 
     def to_python(self, value):
         """Return a string."""

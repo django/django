@@ -1,5 +1,6 @@
 import threading
 from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
+from operator import attrgetter
 
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
@@ -184,9 +185,7 @@ class WKTWriter(IOBase):
             raise ValueError('WKT output dimension must be 2 or 3')
         wkt_writer_set_outdim(self.ptr, new_dim)
 
-    @property
-    def trim(self):
-        return self._trim
+    trim = property(attrgetter('_trim'))
 
     @trim.setter
     def trim(self, flag):
@@ -194,9 +193,7 @@ class WKTWriter(IOBase):
             self._trim = bool(flag)
             wkt_writer_set_trim(self.ptr, self._trim)
 
-    @property
-    def precision(self):
-        return self._precision
+    precision = property(attrgetter('_precision'))
 
     @precision.setter
     def precision(self, precision):

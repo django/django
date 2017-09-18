@@ -3,6 +3,7 @@ import inspect
 import warnings
 from functools import partialmethod
 from itertools import chain
+from operator import attrgetter
 
 from django.apps import apps
 from django.conf import settings
@@ -361,13 +362,8 @@ class ModelBase(type):
 
         class_prepared.send(sender=cls)
 
-    @property
-    def _base_manager(cls):
-        return cls._meta.base_manager
-
-    @property
-    def _default_manager(cls):
-        return cls._meta.default_manager
+    _base_manager = property(attrgetter('_meta.base_manager'))
+    _default_manager = property(attrgetter('_meta.default_manager'))
 
 
 class ModelStateFieldsCacheDescriptor:

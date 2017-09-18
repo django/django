@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.field import Field
@@ -54,9 +56,7 @@ class Feature(GDALBase):
         return bool(capi.feature_equal(self.ptr, other._ptr))
 
     # #### Feature Properties ####
-    @property
-    def encoding(self):
-        return self._layer._ds.encoding
+    encoding = property(attrgetter('_layer._ds.encoding'))
 
     @property
     def fid(self):
