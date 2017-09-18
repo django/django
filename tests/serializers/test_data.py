@@ -26,7 +26,7 @@ from .models import (
     ModifyingSaveData, NullBooleanData, O2OData, PositiveIntegerData,
     PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
-    Tag, TextData, TimeData, TimePKData, UniqueAnchor, UUIDData,
+    Tag, TextData, TimeData, UniqueAnchor, UUIDData,
 )
 from .tests import register_tests
 
@@ -346,7 +346,7 @@ The end."""),
     # It contains line breaks.
     # Several of them.
     # The end."""),
-    (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
+    # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
