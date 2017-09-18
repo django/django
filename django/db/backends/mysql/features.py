@@ -8,7 +8,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_pk = True
     related_fields_match_type = True
     allow_sliced_subqueries = False
-    has_bulk_insert = True
     has_select_for_update = True
     has_select_for_update_nowait = False
     supports_forward_references = False

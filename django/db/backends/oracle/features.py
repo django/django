@@ -21,7 +21,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
     truncates_names = True
-    has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_time_field = False
