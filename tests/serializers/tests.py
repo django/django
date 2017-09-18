@@ -1,7 +1,7 @@
 from datetime import datetime
 from functools import partialmethod
 from io import StringIO
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
@@ -393,16 +393,16 @@ class SerializersTransactionTestBase:
         self.assertEqual(art_obj.author.name, "Agnes")
 
 
-def register_tests(test_class, method_name, test_func, exclude=None):
+def register_tests(test_class, method_name, test_func, exclude=()):
     """
     Dynamically create serializer tests to ensure that all registered
     serializers are automatically tested.
     """
-    formats = [
-        f for f in serializers.get_serializer_formats()
-        if (not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and
-            f != 'geojson' and
-            (exclude is None or f not in exclude))
-    ]
-    for format_ in formats:
-        setattr(test_class, method_name % format_, partialmethod(test_func, format_))
+    for format_ in serializers.get_serializer_formats():
+        if format_ == 'geojson' or format_ in exclude:
+            continue
+        decorated_func = skipIf(
+            isinstance(serializers.get_serializer(format_), serializers.BadSerializer),
+            'The Python library for the %s serializer is not installed.' % format_,
+        )(test_func)
+        setattr(test_class, method_name % format_, partialmethod(decorated_func, format_))
