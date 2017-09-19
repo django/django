@@ -1133,7 +1133,7 @@ class MiscTests(SimpleTestCase):
         ]
         for value, expected in tests:
             with self.subTest(value=value):
-                self.assertEqual(trans_real.parse_accept_lang_header(value), expected)
+                self.assertEqual(trans_real.parse_accept_lang_header(value), tuple(expected))
 
     def test_parse_literal_http_header(self):
         """
