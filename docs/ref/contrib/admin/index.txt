@@ -1081,9 +1081,9 @@ subclass::
     ``ManyToManyField`` fields you would like to change to `Select2
     <https://select2.org/>`_ autocomplete inputs.
 
-    By default, the admin uses a select-box interface (``<select>``) for fields
-    that are . Sometimes you don't want to incur the overhead of selecting all
-    the related instances to display in the dropdown.
+    By default, the admin uses a select-box interface (``<select>``) for
+    those fields. Sometimes you don't want to incur the overhead of selecting
+    all the related instances to display in the dropdown.
 
     The Select2 input looks similar to the default input but comes with a
     search feature that loads the options asynchronously. This is faster and
