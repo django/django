@@ -10,7 +10,7 @@ from django.test import (
 )
 from django.utils.translation import gettext_lazy
 
-from .models import Article, ArticleSelectOnSave, SelfRef
+from .models import Article, ArticleSelectOnSave, FeaturedArticle, SelfRef
 
 
 class ModelInstanceCreationTests(TestCase):
@@ -711,3 +711,14 @@ class ModelRefreshTests(TestCase):
         a = Article.objects.create(pub_date=datetime.now())
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])
+
+    def test_refresh_clears_reverse_related(self):
+        """refresh_from_db() clear cached reverse relations."""
+        article = Article.objects.create(
+            headline='Parrot programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        self.assertFalse(hasattr(article, 'featured'))
+        FeaturedArticle.objects.create(article_id=article.pk)
+        article.refresh_from_db()
+        self.assertTrue(hasattr(article, 'featured'))

@@ -627,6 +627,12 @@ class Model(metaclass=ModelBase):
                 related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
                 if local_val != related_val or (local_val is None and related_val is None):
                     field.delete_cached_value(self)
+
+        # Clear cached relations.
+        for field in self._meta.related_objects:
+            if field.is_cached(self):
+                field.delete_cached_value(self)
+
         self._state.db = db_instance._state.db
 
     def serializable_value(self, field_name):
