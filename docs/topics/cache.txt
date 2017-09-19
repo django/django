@@ -895,7 +895,7 @@ from the cache, not just the keys set by your application. ::
 
 You can also increment or decrement a key that already exists using the
 ``incr()`` or ``decr()`` methods, respectively. By default, the existing cache
-value will incremented or decremented by 1. Other increment/decrement values
+value will be incremented or decremented by 1. Other increment/decrement values
 can be specified by providing an argument to the increment/decrement call. A
 ValueError will be raised if you attempt to increment or decrement a
 nonexistent cache key.::
