@@ -1551,6 +1551,22 @@ blue.
         ``GDT_UInt32``, ``GDT_Int32``, ``GDT_Float32``, ``GDT_Float64``,
         ``GDT_CInt16``, ``GDT_CInt32``, ``GDT_CFloat32``, and ``GDT_CFloat64``.
 
+    .. method:: color_interp(as_string=False)
+
+        .. versionadded:: 2.0
+
+        The color interpretation for the band, as an integer between 0and 16.
+        If ``as_string`` is ``True``, the data type is returned as a string
+        with the following possible values:
+        ``GCI_Undefined``, ``GCI_GrayIndex``, ``GCI_PaletteIndex``,
+        ``GCI_RedBand``, ``GCI_GreenBand``, ``GCI_BlueBand``, ``GCI_AlphaBand``,
+        ``GCI_HueBand``, ``GCI_SaturationBand``, ``GCI_LightnessBand``,
+        ``GCI_CyanBand``, ``GCI_MagentaBand``, ``GCI_YellowBand``,
+        ``GCI_BlackBand``, ``GCI_YCbCr_YBand``, ``GCI_YCbCr_CbBand``, and
+        ``GCI_YCbCr_CrBand``. ``GCI_YCbCr_CrBand`` also represents ``GCI_Max``
+        because both correspond to the integer 16, but only ``GCI_YCbCr_CrBand``
+        is returned as a string.
+
     .. method:: data(data=None, offset=None, size=None, shape=None)
 
         The accessor to the pixel values of the ``GDALBand``. Returns the complete

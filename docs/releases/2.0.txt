@@ -144,6 +144,10 @@ Minor features
   GDAL's internal virtual filesystem. Rasters can now be :ref:`created from and
   converted to binary data <gdal-raster-vsimem>` in-memory.
 
+* The new :meth:`GDALBand.color_interp()
+  <django.contrib.gis.gdal.GDALBand.color_interp>` method returns the color
+  interpretation for the band.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
