@@ -61,6 +61,9 @@ class TestUtilsHttp(unittest.TestCase):
         for n in ['#', ' ']:
             with self.assertRaises(ValueError):
                 http.base36_to_int(n)
+        with self.assertRaises(ValueError) as cm:
+            http.base36_to_int('1' * 14)
+        self.assertEqual('Base36 input too large', str(cm.exception))
         for n in [123, {1: 2}, (1, 2, 3), 3.141]:
             with self.assertRaises(TypeError):
                 http.base36_to_int(n)
