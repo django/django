@@ -75,6 +75,10 @@ class MigrationQuestioner:
         """Do you really want to merge these migrations?"""
         return self.defaults.get("ask_merge", False)
 
+    def ask_rebase(self, app_label):
+        """Do you really want to rebase these migrations?"""
+        return self.defaults.get("ask_rebase", False)
+
     def ask_auto_now_add_addition(self, field_name, model_name):
         """Adding an auto_now_add field to a model."""
         # None means quit
@@ -201,6 +205,14 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             "\nMerging will only work if the operations printed above do not conflict\n" +
             "with each other (working on different fields or models)\n" +
             "Do you want to merge these migration branches? [y/N]",
+            False,
+        )
+
+    def ask_rebase(self, app_label):
+        return self._boolean_input(
+            "\nRebasing will only work if the operations printed above do not conflict\n" +
+            "with each other (working on different fields or models)\n" +
+            "Do you want to rebase these migration branches? [y/N]",
             False,
         )
 

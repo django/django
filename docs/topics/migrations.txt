@@ -318,6 +318,26 @@ new migrations until it's fixed. When using multiple databases, you can use the
 <topics-db-multi-db-routing>` to control which databases
 :djadmin:`makemigrations` checks for consistent history.
 
+Solving migration conflicts
+---------------------------
+
+If you develop using multiple branches on VCS, there may be conflicts with your
+migrations files. In that case, you can choose from the following solutions.
+
+* Run :djadmin:`makemigrations` command with ``--merge`` option.
+* Run :djadmin:`makemigrations` command with ``--rebase`` option.
+* Delete one of the conflicting migration files, and execute the
+  :djadmin:`makemigrations` command again.
+
+The first solution using the ``--merge`` flag when executing :djadmin:`makemigrations`
+command generates a merged migration file while retaining the original conflicting migration.
+If you want to avoid retaining the conflicting migration file, you can select the
+``--rebase`` option. By adding this option, conflicting migration commits are
+reapplied and are prepended to the next one.  The conflicting migration file is deleted.
+However, this option cannot specify which conflicting migration commits are reapplied.
+If you want to specify the migrations, please delete the one that you wish to reapply,
+and execute command again.
+
 Adding migrations to apps
 =========================
 

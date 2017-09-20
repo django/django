@@ -1,5 +1,7 @@
 import os
+import re
 import sys
+from importlib import import_module
 from itertools import takewhile
 
 from django.apps import apps
@@ -34,7 +36,13 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--merge', action='store_true',
-            help="Enable fixing of migration conflicts.",
+            help="Fixes migration conflicts by generating a single new migration file"
+                 " while retaining the original conflicting files.",
+        )
+        parser.add_argument(
+            '--rebase', action='store_true', dest='rebase',
+            help="Fixes migration conflicts by deleting a conflicting migration "
+                 "and reapplying it to a new migration.",
         )
         parser.add_argument(
             '--empty', action='store_true',
@@ -63,6 +71,7 @@ class Command(BaseCommand):
         self.interactive = options['interactive']
         self.dry_run = options['dry_run']
         self.merge = options['merge']
+        self.rebase = options['rebase']
         self.empty = options['empty']
         self.migration_name = options['name']
         if self.migration_name and not self.migration_name.isidentifier():
@@ -111,7 +120,10 @@ class Command(BaseCommand):
                 if app_label in app_labels
             }
 
-        if conflicts and not self.merge:
+        if self.merge and self.rebase:
+            raise CommandError("You can only select either '--merge' or '--rebase' option.")
+
+        if conflicts and not (self.merge or self.rebase):
             name_str = "; ".join(
                 "%s in %s" % (", ".join(names), app)
                 for app, names in conflicts.items()
@@ -119,18 +131,24 @@ class Command(BaseCommand):
             raise CommandError(
                 "Conflicting migrations detected; multiple leaf nodes in the "
                 "migration graph: (%s).\nTo fix them run "
-                "'python manage.py makemigrations --merge'" % name_str
+                "'python manage.py makemigrations --merge' or "
+                "'python manage.py makemigrations --rebase'" % name_str
             )
 
         # If they want to merge and there's nothing to merge, then politely exit
         if self.merge and not conflicts:
             self.stdout.write("No conflicts detected to merge.")
             return
+        elif self.rebase and not conflicts:
+            self.stdout.write("No conflicts detected to rebase.")
+            return
 
         # If they want to merge and there is something to merge, then
         # divert into the merge code
         if self.merge and conflicts:
             return self.handle_merge(loader, conflicts)
+        elif self.rebase and conflicts:
+            return self.handle_rebase(loader, conflicts)
 
         if self.interactive:
             questioner = InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run)
@@ -308,3 +326,122 @@ class Command(BaseCommand):
                         "Full merge migrations file '%s':" % writer.filename) + "\n"
                     )
                     self.stdout.write("%s\n" % writer.as_string())
+
+    def handle_rebase(self, loader, conflicts):
+        """
+        Handles rebasing together conflicted migrations interactively,
+        if it's safe; otherwise, advises on how to fix it.
+        """
+        if self.interactive:
+            questioner = InteractiveMigrationQuestioner()
+        else:
+            questioner = MigrationQuestioner(defaults={'ask_rebase': True})
+
+        for app_label, migration_names in conflicts.items():
+            # Grab out the migrations in question, and work out their
+            # common ancestor.
+            rebase_migrations = []
+            for migration_name in migration_names:
+                migration = loader.get_migration(app_label, migration_name)
+                migration.ancestry = [
+                    mig for mig in loader.graph.forwards_plan((app_label, migration_name))
+                    if mig[0] == migration.app_label
+                ]
+                rebase_migrations.append(migration)
+
+            def all_items_equal(seq):
+                return all(item == seq[0] for item in seq[1:])
+
+            rebase_migrations_generations = zip(*(m.ancestry for m in rebase_migrations))
+            common_ancestor_count = sum(1 for common_ancestor_generation
+                                        in takewhile(all_items_equal, rebase_migrations_generations))
+            if not common_ancestor_count:
+                raise ValueError("Could not find common ancestor of %s" % migration_names)
+            # Now work out the operations along each divergent branch
+            for migration in rebase_migrations:
+                migration.branch = migration.ancestry[common_ancestor_count:]
+                migrations_ops = (loader.get_migration(node_app, node_name).operations
+                                  for node_app, node_name in migration.branch)
+                migration.rebased_operations = sum(migrations_ops, [])
+            # In future, this could use some of the Optimizer code
+            # (can_optimize_through) to automatically see if they're
+            # able to rebase. For now, we always just prompt the user.
+            if self.verbosity > 0:
+                self.stdout.write(self.style.MIGRATE_HEADING("Rebasing %s" % app_label))
+                for migration in rebase_migrations:
+                    self.stdout.write(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
+                    for operation in migration.rebased_operations:
+                        self.stdout.write("    - %s\n" % operation.describe())
+            if questioner.ask_rebase(app_label):
+                # If they still want to rebase it, then write out an empty
+                # file depending on the migrations needing merging.
+                numbers = [
+                    MigrationAutodetector.parse_number(migration.name)
+                    for migration in rebase_migrations
+                ]
+                try:
+                    biggest_number = max(x for x in numbers if x is not None)
+                except ValueError:
+                    biggest_number = 1
+
+                # Get a path to the directory of migration files.
+                module_name, explicit = MigrationLoader.migrations_module(app_label)
+                if module_name is None:
+                    continue
+                mod = import_module(module_name)
+
+                # PY3 will happily import empty dirs as namespaces.
+                if not hasattr(mod, '__file__'):
+                    continue
+                # Module is not a package (e.g. migrations.py).
+                if not hasattr(mod, '__path__'):
+                    continue
+                directory = os.path.dirname(mod.__file__)
+
+                writers = []
+                should_delete_migration_filenames = []
+                previous_migration = None
+
+                for i, migration in enumerate(rebase_migrations):
+                    if previous_migration is None:
+                        previous_migration = migration
+                        continue
+
+                    should_delete_migration_filenames.append(migration.name + ".py")
+
+                    # Remove dependencies which is in the application labeled with app_label and add a new dependency.
+                    migration.dependencies = [dep for dep in migration.dependencies if dep[0] != app_label]
+                    migration.dependencies.append([(previous_migration.app_label, previous_migration.name)])
+
+                    # Remove the number beginning of the new_migration's name.
+                    match = re.match(r'^\d+', migration.name)
+                    if match:
+                        migration.name = migration.name[len(match.group()):].lstrip("_")
+
+                    # Set the new number
+                    migration.name = "%04i_%s" % (biggest_number + i, migration.name)
+                    writers.append(MigrationWriter(migration, self.include_header))
+
+                if not self.dry_run:
+                    # Remove outdated migration files.
+                    for should_delete_migration_file in should_delete_migration_filenames:
+                        os.remove(os.path.join(directory, should_delete_migration_file))
+
+                    # Write the rebase migrations file to the disk
+                    for writer in writers:
+                        with open(writer.path, "w", encoding='utf-8') as fh:
+                            fh.write(writer.as_string())
+                    if self.verbosity > 0:
+                        self.stdout.write("\nCreated new rebase migrations:")
+                        for writer in writers:
+                            self.stdout.write("  - %s\n" % writer.path)
+                elif self.verbosity == 3:
+                    # Alternatively, makemigrations --rebase --dry-run --verbosity 3
+                    # will output the rebase migrations to stdout rather than saving
+                    # the file to the disk.
+                    for should_delete_migration_file, writer in zip(should_delete_migration_filenames, writers):
+                        self.stdout.write(self.style.MIGRATE_HEADING(
+                            "Full rebase migrations file from '%s' to '%s':" %
+                            (should_delete_migration_file, writer.filename)) + "\n"
+                        )
+                        self.stdout.write("%s\n" % writer.as_string())

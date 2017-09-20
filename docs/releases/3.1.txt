@@ -201,6 +201,8 @@ Migrations
 
 * Migrations are now loaded also from directories without ``__init__.py``
   files.
+* The new :option:`makemigrations --rebase` fixes migration conflicts by
+  deleting a conflicting migration and reapplying it to a new migration.
 
 Models
 ~~~~~~

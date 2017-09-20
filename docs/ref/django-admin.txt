@@ -768,7 +768,15 @@ the complete migrations files that would be written.
 
 .. django-admin-option:: --merge
 
-Enables fixing of migration conflicts.
+Fixes migration conflicts by generating a single new migration file while
+retaining the original conflicting files.
+
+.. django-admin-option:: --rebase
+
+.. versionadded:: 3.1
+
+Fixes migration conflicts by deleting a conflicting migration and reapplying
+it to a new migration.
 
 .. django-admin-option:: --name NAME, -n NAME
 

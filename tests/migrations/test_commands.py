@@ -979,7 +979,18 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn('0002_second', exception_message)
         self.assertIn('0002_conflicting_second', exception_message)
         self.assertIn('in migrations', exception_message)
-        self.assertIn("To fix them run 'python manage.py makemigrations --merge'", exception_message)
+        self.assertIn("To fix them run 'python manage.py makemigrations --merge' or"
+                      " 'python manage.py makemigrations --rebase'", exception_message)
+
+    def test_makemigrations_with_merge_and_rebase_option(self):
+        """
+        makemigrations fails when the both of merge option and rebase options are specified.
+        """
+        with self.temporary_migration_module(module="migrations.test_makemigrations_with_merge_and_rebase_option"):
+            with self.assertRaises(CommandError) as context:
+                call_command("makemigrations", "migrations", merge=True, rebase=True)
+        exception_message = str(context.exception)
+        self.assertIn("You can only select either '--merge' or '--rebase' option.", exception_message)
 
     def test_makemigrations_merge_no_conflict(self):
         """
@@ -989,6 +1000,15 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("makemigrations", merge=True, stdout=out)
         self.assertIn("No conflicts detected to merge.", out.getvalue())
+
+    def test_makemigrations_rebase_no_conflict(self):
+        """
+        makemigrations exits if in rebase mode with no conflicts.
+        """
+        out = io.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            call_command("makemigrations", rebase=True, stdout=out)
+        self.assertIn("No conflicts detected to rebase.", out.getvalue())
 
     def test_makemigrations_empty_no_app_specified(self):
         """
@@ -1073,7 +1093,7 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", stdout=out)
         self.assertIn("Migrations for 'migrations'", out.getvalue())
 
-    def test_makemigrations_no_common_ancestor(self):
+    def test_makemigrations_no_common_ancestor_with_merge_option(self):
         """
         makemigrations fails to merge migrations with no common ancestor.
         """
@@ -1085,9 +1105,21 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("0002_second", exception_message)
         self.assertIn("0002_conflicting_second", exception_message)
 
-    def test_makemigrations_interactive_reject(self):
+    def test_makemigrations_no_common_ancestor_with_rebase_option(self):
         """
-        makemigrations enters and exits interactive mode properly.
+        makemigrations fails to rebase migrations with no common ancestor.
+        """
+        with self.assertRaises(ValueError) as context:
+            with self.temporary_migration_module(module="migrations.test_migrations_no_ancestor"):
+                call_command("makemigrations", "migrations", rebase=True)
+        exception_message = str(context.exception)
+        self.assertIn("Could not find common ancestor of", exception_message)
+        self.assertIn("0002_second", exception_message)
+        self.assertIn("0002_conflicting_second", exception_message)
+
+    def test_makemigrations_interactive_reject_when_merging(self):
+        """
+        makemigrations --merge enters and exits interactive mode properly.
         """
         # Monkeypatch interactive questioner to auto reject
         with mock.patch('builtins.input', mock.Mock(return_value='N')):
@@ -1096,9 +1128,23 @@ class MakeMigrationsTests(MigrationTestBase):
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertFalse(os.path.exists(merge_file))
 
-    def test_makemigrations_interactive_accept(self):
+    def test_makemigrations_interactive_reject_when_rebasing(self):
         """
-        makemigrations enters interactive mode and merges properly.
+        makemigrations --rebase enters and exits interactive mode properly.
+        """
+        # Monkeypatch interactive questioner to auto reject
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", name="rebase", rebase=True, interactive=True, verbosity=0)
+                migration_files = os.listdir(migration_dir)
+                self.assertFalse(
+                    "0003_second.py" in migration_files or "0003_conflicting_second.py" in migration_files,
+                    "Don't rebase conflict files but got [%s]" % ", ".join(migration_files)
+                )
+
+    def test_makemigrations_interactive_accept_when_merging(self):
+        """
+        makemigrations --merge enters interactive mode and merges properly.
         """
         # Monkeypatch interactive questioner to auto accept
         with mock.patch('builtins.input', mock.Mock(return_value='y')):
@@ -1108,6 +1154,28 @@ class MakeMigrationsTests(MigrationTestBase):
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertTrue(os.path.exists(merge_file))
             self.assertIn("Created new merge migration", out.getvalue())
+
+    def test_makemigrations_interactive_accept_when_rebasing(self):
+        """
+        makemigrations --rebase enters interactive mode and rebase properly.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        with mock.patch('builtins.input', mock.Mock(return_value='y')):
+            out = io.StringIO()
+            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                call_command("makemigrations", "migrations", rebase=True, interactive=True, stdout=out)
+                # makemigrations --rebase does not guarantee any particular order of the rebased migrations.
+                migration_files = os.listdir(migration_dir)
+                self.assertTrue(
+                    "0002_second.py" in migration_files or "0002_conflicting_second.py" in migration_files,
+                    "One of conflicted migration files should be same number but got [%s]" % ", ".join(migration_files)
+                )
+                self.assertTrue(
+                    "0003_second.py" in migration_files or "0003_conflicting_second.py" in migration_files,
+                    "The number of one of the conflicted migration files should be"
+                    " incremented but got [%s]" % ", ".join(migration_files)
+                )
+            self.assertIn("Rebasing migrations", out.getvalue())
 
     @mock.patch('django.db.migrations.utils.datetime')
     def test_makemigrations_default_merge_name(self, mock_datetime):
@@ -1395,6 +1463,39 @@ class MakeMigrationsTests(MigrationTestBase):
                 )
             val = out.getvalue().lower()
             self.assertIn('merging conflicting_app_with_dependencies\n', val)
+            self.assertIn(
+                '  branch 0002_conflicting_second\n'
+                '    - create model something\n',
+                val
+            )
+            self.assertIn(
+                '  branch 0002_second\n'
+                '    - delete model tribble\n'
+                '    - remove field silly_field from author\n'
+                '    - add field rating to author\n'
+                '    - create model book\n',
+                val
+            )
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.conflicting_app_with_dependencies"])
+    def test_makemigrations_rebase_dont_output_dependency_operations(self):
+        """
+        makemigrations --rebase does not output any operations from apps that
+        don't belong to a given app.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
+            out = io.StringIO()
+            with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+                call_command(
+                    "makemigrations", "conflicting_app_with_dependencies",
+                    rebase=True, interactive=True, stdout=out
+                )
+            val = out.getvalue().lower()
+            self.assertIn('rebasing conflicting_app_with_dependencies\n', val)
             self.assertIn(
                 '  branch 0002_conflicting_second\n'
                 '    - create model something\n',
