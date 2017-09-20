@@ -85,6 +85,12 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
+        # Fix related to bug #28198.
+        # Remove duplicate public attributes from parent classes
+        for key in attrs.keys():
+            for parent in parents:
+                if hasattr(parent, key) and not key.startswith('__'):
+                    delattr(parent, key)
         new_class = super_new(cls, name, bases, new_attrs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
