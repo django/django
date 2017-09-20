@@ -132,7 +132,9 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             if '_' in k:
                 del self.headers[k]
 
-        return super(WSGIRequestHandler, self).get_environ()
+        environ = super(WSGIRequestHandler, self).get_environ()
+        environ[str("REQUEST_URI")] = self.path
+        return environ
 
     def handle(self):
         """Copy of WSGIRequestHandler, but with different ServerHandler"""
