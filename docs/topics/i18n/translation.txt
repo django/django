@@ -992,15 +992,15 @@ The ``JavaScriptCatalog`` view
         from django.views.i18n import JavaScriptCatalog
 
         urlpatterns = [
-            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+            path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
         ]
 
     **Example with custom packages**::
 
         urlpatterns = [
-            url(r'^jsi18n/myapp/$',
-                JavaScriptCatalog.as_view(packages=['your.app.label']),
-                name='javascript-catalog'),
+            path('jsi18n/myapp/',
+                 JavaScriptCatalog.as_view(packages=['your.app.label']),
+                 name='javascript-catalog'),
         ]
 
     If your root URLconf uses :func:`~django.conf.urls.i18n.i18n_patterns`,
@@ -1012,7 +1012,7 @@ The ``JavaScriptCatalog`` view
         from django.conf.urls.i18n import i18n_patterns
 
         urlpatterns = i18n_patterns(
-            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+            path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
         )
 
 The precedence of translations is such that the packages appearing later in the
@@ -1235,9 +1235,9 @@ URL::
 
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
-        url(r'^jsi18n/$',
-            cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
-            name='javascript-catalog'),
+        path('jsi18n/',
+             cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+             name='javascript-catalog'),
     ]
 
 Client-side caching will save bandwidth and make your site load faster. If
@@ -1253,9 +1253,9 @@ whenever you restart your application server::
     last_modified_date = timezone.now()
 
     urlpatterns = [
-        url(r'^jsi18n/$',
-            last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
-            name='javascript-catalog'),
+        path('jsi18n/',
+             last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
+             name='javascript-catalog'),
     ]
 
 You can even pre-generate the JavaScript catalog as part of your deployment
@@ -1302,26 +1302,26 @@ translations to existing site so that the current URLs won't change.
 
 Example URL patterns::
 
-    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
+    from django.urls import include, url
 
     from about import views as about_views
     from news import views as news_views
     from sitemap.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
+        path('sitemap.xml', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
-        url(r'^$', news_views.index, name='index'),
-        url(r'^category/(?P<slug>[\w-]+)/$', news_views.category, name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
+        path('', news_views.index, name='index'),
+        path('category/<slug>/', news_views.category, name='category'),
+        path('<slug>/', news_views.details, name='detail'),
     ], 'news')
 
     urlpatterns += i18n_patterns(
-        url(r'^about/$', about_views.main, name='about'),
-        url(r'^news/', include(news_patterns, namespace='news')),
+        path('about/', about_views.main, name='about'),
+        path('news/', include(news_patterns, namespace='news')),
     )
 
 After defining these URL patterns, Django will automatically add the
@@ -1371,8 +1371,8 @@ Translating URL patterns
 URL patterns can also be marked translatable using the
 :func:`~django.utils.translation.gettext_lazy` function. Example::
 
-    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
+    from django.urls import include, path
     from django.utils.translation import gettext_lazy as _
 
     from about import views as about_views
@@ -1380,18 +1380,18 @@ URL patterns can also be marked translatable using the
     from sitemaps.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
+        path('sitemap.xml', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
-        url(r'^$', news_views.index, name='index'),
-        url(_(r'^category/(?P<slug>[\w-]+)/$'), news_views.category, name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
+        path('', news_views.index, name='index'),
+        path(_('category/<slug>/'), news_views.category, name='category'),
+        path('<slug>/', news_views.details, name='detail'),
     ], 'news')
 
     urlpatterns += i18n_patterns(
-        url(_(r'^about/$'), about_views.main, name='about'),
-        url(_(r'^news/'), include(news_patterns, namespace='news')),
+        path(_('about/'), about_views.main, name='about'),
+        path(_('news/'), include(news_patterns, namespace='news')),
     )
 
 After you've created the translations, the :func:`~django.urls.reverse`
@@ -1750,7 +1750,7 @@ back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
-    url(r'^i18n/', include('django.conf.urls.i18n')),
+    path('i18n/', include('django.conf.urls.i18n')),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 

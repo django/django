@@ -1587,11 +1587,15 @@ templates used by the :class:`ModelAdmin` views:
     that ModelAdmin in the same way as a URLconf.  Therefore you can extend
     them as documented in :doc:`/topics/http/urls`::
 
+        from django.contrib import admin
+        from django.template.response import TemplateResponse
+        from django.urls import path
+
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    url(r'^my_view/$', self.my_view),
+                    path('my_view/', self.my_view),
                 ]
                 return my_urls + urls
 
@@ -1643,13 +1647,13 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+                    path('my_view/', self.admin_site.admin_view(self.my_view))
                 ]
                 return my_urls + urls
 
     Notice the wrapped view in the fifth line above::
 
-        url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+        path('my_view/', self.admin_site.admin_view(self.my_view))
 
     This wrapping will protect ``self.my_view`` from unauthorized access and
     will apply the :func:`django.views.decorators.cache.never_cache` decorator to
@@ -1659,7 +1663,7 @@ templates used by the :class:`ModelAdmin` views:
     performed, you can pass a ``cacheable=True`` argument to
     ``AdminSite.admin_view()``::
 
-        url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
+        path('my_view/', self.admin_site.admin_view(self.my_view, cacheable=True))
 
     ``ModelAdmin`` views have ``model_admin`` attributes. Other
     ``AdminSite`` views have ``admin_site`` attributes.
@@ -2767,17 +2771,17 @@ Hooking ``AdminSite`` instances into your URLconf
 The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
 ``AdminSite.urls`` method. It is not necessary to use
-:func:`~django.conf.urls.include()`.
+:func:`~django.urls.include()`.
 
 In this example, we register the default ``AdminSite`` instance
 ``django.contrib.admin.site`` at the URL ``/admin/`` ::
 
     # urls.py
-    from django.conf.urls import url
     from django.contrib import admin
+    from django.urls import path
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        path('admin/', admin.site.urls),
     ]
 
 .. _customizing-adminsite:
@@ -2809,12 +2813,12 @@ update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
 .. snippet::
     :filename: myproject/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from myapp.admin import admin_site
 
     urlpatterns = [
-        url(r'^myadmin/', admin_site.urls),
+        path('myadmin/', admin_site.urls),
     ]
 
 Note that you may not want autodiscovery of ``admin`` modules when using your
@@ -2838,12 +2842,12 @@ separate versions of the admin site -- using the ``AdminSite`` instances
 respectively::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.admin import basic_site, advanced_site
 
     urlpatterns = [
-        url(r'^basic-admin/', basic_site.urls),
-        url(r'^advanced-admin/', advanced_site.urls),
+        path('basic-admin/', basic_site.urls),
+        path('advanced-admin/', advanced_site.urls),
     ]
 
 ``AdminSite`` instances take a single argument to their constructor, their
@@ -2879,23 +2883,23 @@ your URLconf. Specifically, add these four patterns::
 
     from django.contrib.auth import views as auth_views
 
-    url(
-        r'^admin/password_reset/$',
+    path(
+        'admin/password_reset/',
         auth_views.PasswordResetView.as_view(),
         name='admin_password_reset',
     ),
-    url(
-        r'^admin/password_reset/done/$',
+    path(
+        'admin/password_reset/done/',
         auth_views.PasswordResetDoneView.as_view(),
         name='password_reset_done',
     ),
-    url(
-        r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+    path(
+        'reset/<uidb64>/<token>/',
         auth_views.PasswordResetConfirmView.as_view(),
         name='password_reset_confirm',
     ),
-    url(
-        r'^reset/done/$',
+    path(
+        'reset/done/',
         auth_views.PasswordResetCompleteView.as_view(),
         name='password_reset_complete',
     ),

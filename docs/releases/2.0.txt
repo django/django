@@ -46,6 +46,32 @@ be compatible with Django 2.0.
 What's new in Django 2.0
 ========================
 
+Simplified URL routing syntax
+-----------------------------
+
+The new :func:`django.urls.path()` function allows a simpler, more readable URL
+routing syntax. For example, this example from previous Django releases::
+
+    url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+
+could be written as::
+
+    path('articles/<int:year>/', views.year_archive),
+
+The new syntax supports type coercion of URL parameters. In the example, the
+view will receive the ``year`` keyword argument as an integer rather than as
+a string.
+
+The ``django.conf.urls.url()`` function from previous versions is now available
+as :func:`django.urls.re_path`, however, the old location remains for backwards
+compatibility, without an imminent deprecation. The old
+``django.conf.urls.include()`` function is now importable from ``django.urls``
+so you can use ``from django.urls import include, path, re_path`` in your
+URLconfs.
+
+The :doc:`/topics/http/urls` document is rewritten to feature the new syntax
+and provide more details.
+
 Mobile-friendly ``contrib.admin``
 ---------------------------------
 

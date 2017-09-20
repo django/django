@@ -63,15 +63,15 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
         from django.views.generic.dates import ArchiveIndexView
 
         from myapp.models import Article
 
         urlpatterns = [
-            url(r'^archive/$',
-                ArchiveIndexView.as_view(model=Article, date_field="pub_date"),
-                name="article_archive"),
+            path('archive/',
+                 ArchiveIndexView.as_view(model=Article, date_field="pub_date"),
+                 name="article_archive"),
         ]
 
     **Example myapp/article_archive.html**:
@@ -162,14 +162,14 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import ArticleYearArchiveView
 
         urlpatterns = [
-            url(r'^(?P<year>[0-9]{4})/$',
-                ArticleYearArchiveView.as_view(),
-                name="article_year_archive"),
+            path('<int:year>/',
+                 ArticleYearArchiveView.as_view(),
+                 name="article_year_archive"),
         ]
 
     **Example myapp/article_archive_year.html**:
@@ -254,19 +254,19 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import ArticleMonthArchiveView
 
         urlpatterns = [
-            # Example: /2012/aug/
-            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/$',
-                ArticleMonthArchiveView.as_view(),
-                name="archive_month"),
             # Example: /2012/08/
-            url(r'^(?P<year>[0-9]{4})/(?P<month>[0-9]+)/$',
-                ArticleMonthArchiveView.as_view(month_format='%m'),
-                name="archive_month_numeric"),
+            path('<int:year>/<int:month>/',
+                 ArticleMonthArchiveView.as_view(month_format='%m'),
+                 name="archive_month_numeric"),
+            # Example: /2012/aug/
+            path('<int:year>/<str:month>/',
+                 ArticleMonthArchiveView.as_view(),
+                 name="archive_month"),
         ]
 
     **Example myapp/article_archive_month.html**:
@@ -356,15 +356,15 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import ArticleWeekArchiveView
 
         urlpatterns = [
             # Example: /2012/week/23/
-            url(r'^(?P<year>[0-9]{4})/week/(?P<week>[0-9]+)/$',
-                ArticleWeekArchiveView.as_view(),
-                name="archive_week"),
+            path('<int:year>/week/<int:week>/',
+                 ArticleWeekArchiveView.as_view(),
+                 name="archive_week"),
         ]
 
     **Example myapp/article_archive_week.html**:
@@ -468,15 +468,15 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import ArticleDayArchiveView
 
         urlpatterns = [
             # Example: /2012/nov/10/
-            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/$',
-                ArticleDayArchiveView.as_view(),
-                name="archive_day"),
+            path('<int:year>/<str:month>/<int:day>/',
+                 ArticleDayArchiveView.as_view(),
+                 name="archive_day"),
         ]
 
     **Example myapp/article_archive_day.html**:
@@ -541,14 +541,14 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from myapp.views import ArticleTodayArchiveView
 
         urlpatterns = [
-            url(r'^today/$',
-                ArticleTodayArchiveView.as_view(),
-                name="archive_today"),
+            path('today/',
+                 ArticleTodayArchiveView.as_view(),
+                 name="archive_today"),
         ]
 
     .. admonition:: Where is the example template for ``TodayArchiveView``?
@@ -591,13 +591,13 @@ views for displaying drilldown pages for date-based data.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
         from django.views.generic.dates import DateDetailView
 
         urlpatterns = [
-            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
-                DateDetailView.as_view(model=Article, date_field="pub_date"),
-                name="archive_date_detail"),
+            path('<int:year>/<str:month>/<int:day>/<int:pk>/',
+                 DateDetailView.as_view(model=Article, date_field="pub_date"),
+                 name="archive_date_detail"),
         ]
 
     **Example myapp/article_detail.html**:
