@@ -14,6 +14,10 @@ class CheckUrlConfigTests(SimpleTestCase):
         result = check_url_config(None)
         self.assertEqual(result, [])
 
+    @override_settings(ROOT_URLCONF='check_framework.urls.no_warnings_i18n')
+    def test_no_warnings_i18n(self):
+        self.assertEqual(check_url_config(None), [])
+
     @override_settings(ROOT_URLCONF='check_framework.urls.warning_in_include')
     def test_check_resolver_recursive(self):
         # The resolver is checked recursively (examining url()s in include()).
