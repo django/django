@@ -75,3 +75,9 @@ class UnaccentExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'unaccent'
+
+
+class LtreeExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'ltree'
