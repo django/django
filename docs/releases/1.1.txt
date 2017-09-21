@@ -141,7 +141,7 @@ and expected.
 Permanent redirects and the ``redirect_to()`` generic view
 ----------------------------------------------------------
 
-Django 1.1 adds a ``permanent`` argument to the
+Django 1.1 adds a ``permanent`` parameter to the
 ``django.views.generic.simple.redirect_to()`` view. This is technically
 backwards-incompatible if you were using the ``redirect_to`` view with a
 format-string key called 'permanent', which is highly unlikely.
@@ -288,7 +288,7 @@ A couple of small -- but highly useful -- improvements have been made to the
 test client:
 
 * The test :class:`Client` now can automatically follow redirects with the
-  ``follow`` argument to :meth:`Client.get` and :meth:`Client.post`. This
+  ``follow`` parameter to :meth:`Client.get` and :meth:`Client.post`. This
   makes testing views that issue redirects simpler.
 
 * It's now easier to get at the template context in the response returned

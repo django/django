@@ -33,7 +33,7 @@ Other notable new features in Django 1.5 include:
 
 * `Support for saving a subset of model's fields`_ -
   :meth:`Model.save() <django.db.models.Model.save()>` now accepts an
-  ``update_fields`` argument, letting you specify which fields are
+  ``update_fields`` parameter, letting you specify which fields are
   written back to the database when you call ``save()``. This can help
   in high-concurrency operations, and can improve performance.
 
@@ -469,7 +469,7 @@ you must convert it to a query string and append it to the ``path`` parameter.
 
 If you were using the ``data`` parameter in a PUT request without a
 ``content_type``, you must encode your data before passing it to the test
-client and set the ``content_type`` argument.
+client and set the ``content_type`` parameter.
 
 .. _simplejson-incompatibilities:
 
@@ -653,7 +653,7 @@ deserializer.
 Formsets default ``max_num``
 ----------------------------
 
-A (default) value of ``None`` for the ``max_num`` argument to a formset factory
+A (default) value of ``None`` for the ``max_num`` parameter to a formset factory
 no longer defaults to allowing any number of forms in the formset. Instead, in
 order to prevent memory-exhaustion attacks, it now defaults to a limit of 1000
 forms. This limit can be raised by explicitly setting a higher value for
@@ -706,7 +706,7 @@ Miscellaneous
   :setting:`INSTALLED_APPS` contains ``django.contrib.sites``.
 
 * :meth:`BoundField.label_tag <django.forms.BoundField.label_tag>` now
-  escapes its ``contents`` argument. To avoid the HTML escaping, use
+  escapes its ``contents`` parameter. To avoid the HTML escaping, use
   :func:`django.utils.safestring.mark_safe` on the argument before passing it.
 
 * Accessing reverse one-to-one relations fetched via

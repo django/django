@@ -183,7 +183,7 @@ A number of improvements have been made to Django's built-in template tags:
 * The :ttag:`with` tag now allows you to define multiple context
   variables in a single :ttag:`with` block.
 
-* The :ttag:`load` tag now accepts a ``from`` argument, allowing
+* The :ttag:`load` tag now accepts a ``from`` parameter, allowing
   you to load a single tag or filter from a library.
 
 TemplateResponse
@@ -305,7 +305,7 @@ requests. These include:
   debug server error page.
 
 * :meth:`~django.template.Library.simple_tag` now accepts a
-  ``takes_context`` argument, making it easier to write simple
+  ``takes_context`` parameter, making it easier to write simple
   template tags that require access to template context.
 
 * A new :meth:`~django.shortcuts.render()` shortcut -- an alternative

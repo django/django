@@ -19,7 +19,7 @@ See :ref:`transaction-pooling-server-side-cursors` for more discussion.
 Bugfixes
 ========
 
-* Made migrations respect ``Index``’s ``name`` argument. If you created a
+* Made migrations respect ``Index``’s ``name`` parameter. If you created a
   named index with Django 1.11, ``makemigrations`` will create a migration to
   recreate the index with the correct name (:ticket:`28051`).
 

@@ -144,10 +144,10 @@ Minor features
 
 * The ``HttpRequest`` is now passed to :func:`~django.contrib.auth.authenticate`
   which in turn passes it to the authentication backend if it accepts a
-  ``request`` argument.
+  ``request`` parameter.
 
 * The :func:`~django.contrib.auth.signals.user_login_failed` signal now
-  receives a ``request`` argument.
+  receives a ``request`` parameter.
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm` supports custom user
   models that use an email field named something other than ``'email'``.
@@ -202,7 +202,7 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new ``distinct`` argument for
+* The new ``distinct`` parameter for
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
   concatenated values will be distinct.
 
@@ -248,7 +248,7 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update()`
+* Added the ``skip_locked`` parameter to :meth:`.QuerySet.select_for_update()`
   on PostgreSQL 9.5+ and Oracle to execute queries with
   ``FOR UPDATE SKIP LOCKED``.
 
@@ -320,7 +320,7 @@ Migrations
 Models
 ~~~~~~
 
-* Added support for callable values in the ``defaults`` argument of
+* Added support for callable values in the ``defaults`` parameter of
   :meth:`QuerySet.update_or_create()
   <django.db.models.query.QuerySet.update_or_create>` and
   :meth:`~django.db.models.query.QuerySet.get_or_create`.
@@ -497,7 +497,7 @@ backends.
   ``TimeField`` truncation. It accepts a ``lookup_type`` and ``field_name``
   arguments and returns the appropriate SQL to truncate the given time field
   ``field_name`` to a time object with only the given specificity. The
-  ``lookup_type`` argument can be either ``'hour'``, ``'minute'``, or
+  ``lookup_type`` parameter can be either ``'hour'``, ``'minute'``, or
   ``'second'``.
 
 * The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
@@ -635,7 +635,7 @@ Model state changes in migration operations
 To improve the speed of applying migrations, rendering of related models is
 delayed until an operation that needs them (e.g. ``RunPython``). If you have a
 custom operation that works with model classes or model instances from the
-``from_state`` argument in ``database_forwards()`` or ``database_backwards()``,
+``from_state`` parameter in ``database_forwards()`` or ``database_backwards()``,
 you must render model states using the ``clear_delayed_apps_cache()`` method as
 described in :ref:`writing your own migration operation
 <writing-your-own-migration-operation>`.
@@ -736,7 +736,7 @@ Miscellaneous
   models of all applications have been loaded. Previously they only required
   the target application's models to be loaded and thus could return models
   without all their relations set up. If you need the old behavior of
-  ``get_model()``, set the ``require_ready`` argument to ``False``.
+  ``get_model()``, set the ``require_ready`` parameter to ``False``.
 
 * The unused ``BaseCommand.can_import_settings`` attribute is removed.
 
@@ -833,7 +833,7 @@ Miscellaneous
 * ``DatabaseIntrospection.get_indexes()`` is deprecated in favor of
   ``DatabaseIntrospection.get_constraints()``.
 
-* :func:`~django.contrib.auth.authenticate` now passes a ``request`` argument
+* :func:`~django.contrib.auth.authenticate` now passes a ``request`` parameter
   to the ``authenticate()`` method of authentication backends. Support for
   methods that don't accept ``request`` as the first positional argument will
   be removed in Django 2.1.
@@ -854,6 +854,6 @@ Miscellaneous
   create a :data:`~django.conf.urls.handler404` that looks for uppercase
   characters in the URL and redirects to a lowercase equivalent.
 
-* The ``renderer`` argument is added to the :meth:`Widget.render()
+* The ``renderer`` parameter is added to the :meth:`Widget.render()
   <django.forms.Widget.render>` method. Methods that don't accept that argument
   will work through a deprecation period.
