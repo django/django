@@ -70,6 +70,7 @@ def subclass_exception(name, parents, module, attached_to=None):
 
 class ModelBase(type):
     """Metaclass for all models."""
+
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
 
@@ -85,6 +86,18 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
+        # Fix related to bug #28198.
+        # Remove duplicate public attributes from parent classes
+        attr_per_class = {}
+        for parent in parents:
+            attr_per_parent = {}
+            for key in attrs.keys():
+                if hasattr(parent, key) and not key.startswith('__') and not hasattr(getattr(parent, key),
+                                                                                     '__dict__'):
+                    attr_per_parent[key] = getattr(parent, key)
+                    delattr(parent, key)
+            if len(attr_per_parent.keys()) > 0:
+                attr_per_class[parent] = attr_per_parent
         new_class = super_new(cls, name, bases, new_attrs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
@@ -263,8 +276,8 @@ class ModelBase(type):
                 # Add fields from abstract base class if it wasn't overridden.
                 for field in parent_fields:
                     if (field.name not in field_names and
-                            field.name not in new_class.__dict__ and
-                            field.name not in inherited_attributes):
+                                field.name not in new_class.__dict__ and
+                                field.name not in inherited_attributes):
                         new_field = copy.deepcopy(field)
                         new_class.add_to_class(field.name, new_field)
                         # Replace parent links defined on this base by the new
@@ -307,6 +320,12 @@ class ModelBase(type):
 
         new_class._prepare()
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+        # restore attributes for all parent classes
+        if len(attr_per_class) > 0:
+            for parent in parents:
+                if parent in attr_per_class.keys():
+                    for attribute in attr_per_class[parent]:
+                        setattr(parent, attribute, attr_per_class[parent][attribute])
         return new_class
 
     def add_to_class(cls, name, value):
@@ -391,7 +410,6 @@ class ModelState:
 
 
 class Model(metaclass=ModelBase):
-
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
         cls = self.__class__
@@ -503,7 +521,7 @@ class Model(metaclass=ModelBase):
             values = [
                 next(values_iter) if f.attname in field_names else DEFERRED
                 for f in cls._meta.concrete_fields
-            ]
+                ]
         new = cls(*values)
         new._state.adding = False
         new._state.db = db
@@ -575,7 +593,7 @@ class Model(metaclass=ModelBase):
         return {
             f.attname for f in self._meta.concrete_fields
             if f.attname not in self.__dict__
-        }
+            }
 
     def refresh_from_db(self, using=None, fields=None):
         """
@@ -721,6 +739,7 @@ class Model(metaclass=ModelBase):
 
         self.save_base(using=using, force_insert=force_insert,
                        force_update=force_update, update_fields=update_fields)
+
     save.alters_data = True
 
     def save_base(self, raw=False, force_insert=False,
@@ -771,7 +790,7 @@ class Model(metaclass=ModelBase):
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (field and getattr(self, parent._meta.pk.attname) is None and
-                    getattr(self, field.attname) is not None):
+                        getattr(self, field.attname) is not None):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
             self._save_parents(cls=parent, using=using, update_fields=update_fields)
             self._save_table(cls=parent, using=using, update_fields=update_fields)
@@ -1484,7 +1503,7 @@ class Model(metaclass=ModelBase):
         # own fields_map instead of using get_field()
         forward_fields_map = {
             field.name: field for field in cls._meta._get_fields(reverse=False)
-        }
+            }
 
         errors = []
         for field_name in fields:
@@ -1701,6 +1720,7 @@ def make_foreign_order_accessors(model, related_model):
         'set_%s_order' % model.__name__.lower(),
         partialmethod(method_set_order, model)
     )
+
 
 ########
 # MISC #
