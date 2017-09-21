@@ -353,6 +353,9 @@ Models
 
 * The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
   results as named tuples.
+  
+ * Added the :attr:`~django.db.models.ManyToManyField.allow_duplicates` to 
+   :class:`~django.db.models.ManyToManyField` in order to allow for duplicate values. 
 
 Pagination
 ~~~~~~~~~~

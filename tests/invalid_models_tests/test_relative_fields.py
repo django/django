@@ -99,6 +99,7 @@ class RelativeFieldTests(SimpleTestCase):
                 null=True,
                 validators=[lambda x: x],
                 limit_choices_to={'name': 'test_name'},
+                allow_duplicates=True,
                 through='ThroughModel',
                 through_fields=('modelm2m', 'model'),
             )
@@ -124,6 +125,12 @@ class RelativeFieldTests(SimpleTestCase):
                 'with a through model.',
                 obj=field,
                 id='fields.W343',
+            ),
+            DjangoWarning(
+                'allow_duplicates has no effect on ManyToManyField '
+                'with a through model.',
+                obj=field,
+                id='fields.W344',
             ),
         ])
 

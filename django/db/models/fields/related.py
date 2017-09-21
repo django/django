@@ -1020,12 +1020,17 @@ def create_many_to_many_intermediary_model(field, klass):
         to = 'to_%s' % to
         from_ = 'from_%s' % from_
 
+    if field.allow_duplicates is True:
+        unique_together = ()
+    else:
+        unique_together = (from_, to)
+
     meta = type('Meta', (), {
         'db_table': field._get_m2m_db_table(klass._meta),
         'auto_created': klass,
         'app_label': klass._meta.app_label,
         'db_tablespace': klass._meta.db_tablespace,
-        'unique_together': (from_, to),
+        'unique_together': unique_together,
         'verbose_name': _('%(from)s-%(to)s relationship') % {'from': from_, 'to': to},
         'verbose_name_plural': _('%(from)s-%(to)s relationships') % {'from': from_, 'to': to},
         'apps': field.model._meta.apps,
@@ -1074,7 +1079,7 @@ class ManyToManyField(RelatedField):
     def __init__(self, to, related_name=None, related_query_name=None,
                  limit_choices_to=None, symmetrical=None, through=None,
                  through_fields=None, db_constraint=True, db_table=None,
-                 swappable=True, **kwargs):
+                 swappable=True, allow_duplicates=False, **kwargs):
         try:
             to._meta
         except AttributeError:
@@ -1108,6 +1113,7 @@ class ManyToManyField(RelatedField):
 
         self.db_table = db_table
         self.swappable = swappable
+        self.allow_duplicates = allow_duplicates
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)
@@ -1156,6 +1162,16 @@ class ManyToManyField(RelatedField):
                     'with a through model.',
                     obj=self,
                     id='fields.W343',
+                )
+            )
+        if (self.allow_duplicates and self.remote_field.through and
+                not self.remote_field.through._meta.auto_created):
+            warnings.append(
+                checks.Warning(
+                    'allow_duplicates has no effect on ManyToManyField '
+                    'with a through model.',
+                    obj=self,
+                    id='fields.W344',
                 )
             )
 
@@ -1397,6 +1413,8 @@ class ManyToManyField(RelatedField):
         # Handle the simpler arguments.
         if self.db_table is not None:
             kwargs['db_table'] = self.db_table
+        if self.allow_duplicates is not False:
+            kwargs['allow_duplicates'] = self.allow_duplicates
         if self.remote_field.db_constraint is not True:
             kwargs['db_constraint'] = self.remote_field.db_constraint
         # Rel needs more work.

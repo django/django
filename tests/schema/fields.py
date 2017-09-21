@@ -15,7 +15,8 @@ class CustomManyToManyField(RelatedField):
     many_to_many = True
 
     def __init__(self, to, db_constraint=True, swappable=True, related_name=None, related_query_name=None,
-                 limit_choices_to=None, symmetrical=None, through=None, through_fields=None, db_table=None, **kwargs):
+                 limit_choices_to=None, symmetrical=None, through=None, through_fields=None, db_table=None,
+                 allow_duplicates=False, **kwargs):
         try:
             to._meta
         except AttributeError:
@@ -32,6 +33,7 @@ class CustomManyToManyField(RelatedField):
         )
         self.swappable = swappable
         self.db_table = db_table
+        self.allow_duplicates = allow_duplicates
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
         super().__init__(**kwargs)
