@@ -554,7 +554,7 @@ class Query:
             # distinct joins for the same connection in rhs query, then the
             # combined query must have two joins, too.
             reuse.discard(new_alias)
-            if alias != new_alias:
+            if alias != new_alias and alias not in change_map.values():
                 change_map[alias] = new_alias
             if not rhs.alias_refcount[alias]:
                 # The alias was unused in the rhs query. Unref it so that it
@@ -897,8 +897,10 @@ class Query:
         reuse = [a for a, j in self.alias_map.items()
                  if (reuse is None or a in reuse) and j == join]
         if reuse:
-            self.ref_alias(reuse[0])
-            return reuse[0]
+            # Use the last and most recent table reference (alias) of a join.
+            # alias_map is a OrderedDict, so reuse will be ordered as well.
+            self.ref_alias(reuse[-1])
+            return reuse[-1]
 
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(join.table_name, create=True)
