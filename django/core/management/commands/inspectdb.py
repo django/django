@@ -92,6 +92,11 @@ class Command(BaseCommand):
                     column_name = row[0]
                     is_relation = column_name in relations
 
+                    comment = getattr(row, 'comment', None)
+                    comment = comment.replace('\n', ' ').replace('\r', ' ').strip() if comment is not None else None
+                    if comment:
+                        comment_notes.append('db-comment:%s' % comment)
+
                     att_name, params, notes = self.normalize_col_name(
                         column_name, used_column_names, is_relation)
                     extra_params.update(params)

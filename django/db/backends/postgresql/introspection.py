@@ -1,10 +1,13 @@
 import warnings
+from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
 from django.db.models.indexes import Index
 from django.utils.deprecation import RemovedInDjango21Warning
+
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('comment',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -72,13 +75,28 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         cursor.execute("""
-            SELECT column_name, is_nullable, column_default
-            FROM information_schema.columns
-            WHERE table_name = %s""", [table_name])
+             SELECT  col.column_name, col.is_nullable, col.column_default, info.description
+                FROM information_schema.columns AS col
+                LEFT JOIN
+                  (SELECT c.relname AS table_name,
+                          n.nspname AS table_schema,
+                          a.attname AS column_name,
+                          d.description AS description
+                  FROM pg_class AS c
+                  INNER JOIN pg_attribute AS a ON c.oid = a.attrelid
+                  LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+                  LEFT JOIN pg_tablespace AS t ON t.oid = c.reltablespace
+                  LEFT JOIN pg_description AS d ON (d.objoid = c.oid AND d.objsubid = a.attnum)
+                  WHERE  c.relkind = 'r') AS info
+                ON col.table_name = info.table_name
+                    AND col.table_schema = info.table_schema
+                    AND col.column_name = info.column_name
+                WHERE col.table_name = %s""", [table_name])
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
-            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1])))
+            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1],
+                        field_map[line.name][2])))
             for line in cursor.description
         ]
 

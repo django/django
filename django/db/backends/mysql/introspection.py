@@ -10,8 +10,9 @@ from django.db.models.indexes import Index
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
 
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'is_unsigned'))
-InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'is_unsigned', 'comment'))
+InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale '
+                                  'extra column_default is_unsigned comment')
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -75,7 +76,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 CASE
                     WHEN column_type LIKE '%% unsigned' THEN 1
                     ELSE 0
-                END AS is_unsigned
+                END AS is_unsigned, column_comment
             FROM information_schema.columns
             WHERE table_name = %s AND table_schema = DATABASE()""", [table_name])
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
@@ -100,6 +101,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         field_info[col_name].column_default,
                         field_info[col_name].extra,
                         field_info[col_name].is_unsigned,
+                        field_info[col_name].comment,
                     )
                 ))
             )
