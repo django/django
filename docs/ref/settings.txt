@@ -615,8 +615,9 @@ default port. Not used with SQLite.
 Default: ``None``
 
 A string representing the time zone for datetimes stored in this database
-(assuming that it doesn't support time zones) or ``None``. The same values are
-accepted as in the general :setting:`TIME_ZONE` setting.
+(assuming that it doesn't support time zones) or ``None``. This inner option of
+the :setting:`DATABASES` setting accepts the same values as the general
+:setting:`TIME_ZONE` setting.
 
 This allows interacting with third-party databases that store datetimes in
 local time rather than UTC. To avoid issues around DST changes, you shouldn't
