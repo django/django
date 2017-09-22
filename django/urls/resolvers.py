@@ -398,12 +398,12 @@ class URLResolver:
         # thread-local variable.
         if getattr(self._local, 'populating', False):
             return
-        self._local.populating = True
-        lookups = MultiValueDict()
-        namespaces = {}
-        apps = {}
-        language_code = get_language()
         try:
+            self._local.populating = True
+            lookups = MultiValueDict()
+            namespaces = {}
+            apps = {}
+            language_code = get_language()
             for url_pattern in reversed(self.url_patterns):
                 p_pattern = url_pattern.pattern.regex.pattern
                 if p_pattern.startswith('^'):
