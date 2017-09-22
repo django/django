@@ -85,6 +85,18 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
+        # Fix related to bug #28198.
+        # Remove duplicate public attributes from parent classes
+        attr_per_class = {}
+        for parent in parents:
+            attr_per_parent = {}
+            for key in attrs.keys():
+                if hasattr(parent, key) and not key.startswith('__') and not hasattr(getattr(parent, key),
+                                                                                     '__dict__'):
+                    attr_per_parent[key] = getattr(parent, key)
+                    delattr(parent, key)
+            if len(attr_per_parent.keys()) > 0:
+                attr_per_class[parent] = attr_per_parent
         new_class = super_new(cls, name, bases, new_attrs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
@@ -302,7 +314,12 @@ class ModelBase(type):
         for index in new_class._meta.indexes:
             if not index.name:
                 index.set_name_with_model(new_class)
-
+        # restore attributes for all parent classes
+        if len(attr_per_class) >0:
+            for parent in parents:
+                if parent in attr_per_class.keys():
+                    for attribute in attr_per_class[parent]:
+                        setattr(parent, attribute, attr_per_class[parent][attribute])
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a
