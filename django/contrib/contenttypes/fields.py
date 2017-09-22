@@ -348,7 +348,7 @@ class GenericRelation(ForeignObject):
         self.to_fields = [self.model._meta.pk.name]
         return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
-    def _get_path_info_with_parent(self):
+    def _get_path_info_with_parent(self, filtered_relation):
         """
         Return the path that joins the current model through any parent models.
         The idea is that if you have a GFK defined on a parent model then we
@@ -365,7 +365,15 @@ class GenericRelation(ForeignObject):
         opts = self.remote_field.model._meta.concrete_model._meta
         parent_opts = opts.get_field(self.object_id_field_name).model._meta
         target = parent_opts.pk
-        path.append(PathInfo(self.model._meta, parent_opts, (target,), self.remote_field, True, False))
+        path.append(PathInfo(
+            from_opts=self.model._meta,
+            to_opts=parent_opts,
+            target_fields=(target,),
+            join_field=self.remote_field,
+            m2m=True,
+            direct=False,
+            filtered_relation=filtered_relation,
+        ))
         # Collect joins needed for the parent -> child chain. This is easiest
         # to do if we collect joins for the child -> parent chain and then
         # reverse the direction (call to reverse() and use of
@@ -380,19 +388,35 @@ class GenericRelation(ForeignObject):
             path.extend(field.remote_field.get_path_info())
         return path
 
-    def get_path_info(self):
+    def get_path_info(self, filtered_relation=None):
         opts = self.remote_field.model._meta
         object_id_field = opts.get_field(self.object_id_field_name)
         if object_id_field.model != opts.model:
-            return self._get_path_info_with_parent()
+            return self._get_path_info_with_parent(filtered_relation)
         else:
             target = opts.pk
-            return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
+            return [PathInfo(
+                from_opts=self.model._meta,
+                to_opts=opts,
+                target_fields=(target,),
+                join_field=self.remote_field,
+                m2m=True,
+                direct=False,
+                filtered_relation=filtered_relation,
+            )]
 
-    def get_reverse_path_info(self):
+    def get_reverse_path_info(self, filtered_relation=None):
         opts = self.model._meta
         from_opts = self.remote_field.model._meta
-        return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
+        return [PathInfo(
+            from_opts=from_opts,
+            to_opts=opts,
+            target_fields=(opts.pk,),
+            join_field=self,
+            m2m=not self.unique,
+            direct=False,
+            filtered_relation=filtered_relation,
+        )]
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()

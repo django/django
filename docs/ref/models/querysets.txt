@@ -3318,3 +3318,60 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example::
     >>> from django.db.models import prefetch_related_objects
     >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
     >>> prefetch_related_objects(restaurants, 'pizzas__toppings')
+
+``FilteredRelation()`` objects
+------------------------------
+
+.. versionadded:: 2.0
+
+.. class:: FilteredRelation(relation_name, *, condition=Q())
+
+    .. attribute:: FilteredRelation.relation_name
+
+        The name of the field on which you'd like to filter the relation.
+
+    .. attribute:: FilteredRelation.condition
+
+        A :class:`~django.db.models.Q` object to control the filtering.
+
+``FilteredRelation`` is used with :meth:`~.QuerySet.annotate()` to create an
+``ON`` clause when a ``JOIN`` is performed. It doesn't act on the default
+relationship but on the annotation name (``pizzas_vegetarian`` in example
+below).
+
+For example, to find restaurants that have vegetarian pizzas with
+``'mozzarella'`` in the name::
+
+    >>> from django.db.models import FilteredRelation, Q
+    >>> Restaurant.objects.annotate(
+    ...    pizzas_vegetarian=FilteredRelation(
+    ...        'pizzas', condition=Q(pizzas__vegetarian=True),
+    ...    ),
+    ... ).filter(pizzas_vegetarian__name__icontains='mozzarella')
+
+If there are a large number of pizzas, this queryset performs better than::
+
+    >>> Restaurant.objects.filter(
+    ...     pizzas__vegetarian=True,
+    ...     pizzas__name__icontains='mozzarella',
+    ... )
+
+because the filtering in the ``WHERE`` clause of the first queryset will only
+operate on vegetarian pizzas.
+
+``FilteredRelation`` doesn't support:
+
+* Conditions that span relational fields. For example::
+
+    >>> Restaurant.objects.annotate(
+    ...    pizzas_with_toppings_startswith_n=FilteredRelation(
+    ...        'pizzas__toppings',
+    ...        condition=Q(pizzas__toppings__name__startswith='n'),
+    ...    ),
+    ... )
+    Traceback (most recent call last):
+    ...
+    ValueError: FilteredRelation's condition doesn't support nested relations (got 'pizzas__toppings__name__startswith').
+* :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
+* A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+  inherited from a parent model.
