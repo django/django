@@ -519,7 +519,7 @@ class BoundaryIter:
             raise StopIteration()
 
         chunk = b''.join(chunks)
-        boundary = self._find_boundary(chunk, len(chunk) < self._rollback)
+        boundary = self._find_boundary(chunk)
 
         if boundary:
             end, next = boundary
@@ -537,7 +537,7 @@ class BoundaryIter:
                 stream.unget(chunk[-rollback:])
                 return chunk[:-rollback]
 
-    def _find_boundary(self, data, eof=False):
+    def _find_boundary(self, data):
         """
         Find a multipart boundary in data.
 
