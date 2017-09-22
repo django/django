@@ -565,6 +565,21 @@ or '127.0.0.1' ('host' lines in ``pg_hba.conf``).
 On Windows, you should always define :setting:`HOST`, as UNIX domain sockets
 are not available.
 
+.. setting:: MAX_INDEX_CHARACTER_SIZE
+
+``MAX_INDEX_CHARACTER_SIZE``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.2
+
+On MySQL, the maximum index length depends on several factors which is not
+possible to introspect with full trust at runtime. If you get errors like
+``Specified key was too long; max key length is 767 bytes``, set this database
+option in accordance with your real database configuration. The value ranges
+between 191 and 1024 (in characters).
+
+This is a MySQL-specific setting.
+
 .. setting:: NAME
 
 ``NAME``

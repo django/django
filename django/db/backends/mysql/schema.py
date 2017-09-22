@@ -1,5 +1,17 @@
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.ddl_references import Columns
 from django.db.models import NOT_PROVIDED
+
+
+class ColumnWithSize(Columns):
+    """Custom Columns class representing a single column with a size suffix."""
+    def __init__(self, cols, size):
+        # cols is a Columns instance
+        self.size = size
+        super().__init__(cols.table, cols.columns, cols.quote_name)
+
+    def __str__(self):
+        return '%s(%d)' % (self.quote_name(self.columns[0]), self.size)
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -64,6 +76,31 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field.db_constraint):
             return False
         return not self._is_limited_data_type(field) and create_index
+
+    def _max_index_size(self):
+        """
+        Return the maximum index size, either from the user-provided
+        MAX_INDEX_CHARACTER_SIZE in the database settings, or try to guess the
+        number from the MySQL version and connection character set.
+        Generally ranges between 191 and 1024.
+        """
+        try:
+            return self.connection.settings_dict['MAX_INDEX_CHARACTER_SIZE']
+        except KeyError:
+            pass
+        size_in_bytes = 767 if self.connection.mysql_version < (5, 7, 7) else 3072
+        # *Guess* charset from connection charset
+        charset = self.connection.get_connection_params()['charset']
+        return int(size_in_bytes / 4) if charset == 'utf8mb4' else int(size_in_bytes / 3)
+
+    def _create_index_sql(self, model, fields, **kwargs):
+        statement = super()._create_index_sql(model, fields, **kwargs)
+        if len(fields) == 1 and fields[0].max_length is not None:
+            idx_size = self._max_index_size()
+            if fields[0].max_length > idx_size:
+                # Limit single-column index to the maximum allowed.
+                statement.parts['columns'] = ColumnWithSize(statement.parts['columns'], idx_size)
+        return statement
 
     def _delete_composed_index(self, model, fields, *args):
         """

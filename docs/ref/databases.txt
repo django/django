@@ -552,13 +552,28 @@ these methods in no-op's based in the results of such detection.
 Notes on specific fields
 ------------------------
 
-Character fields
-~~~~~~~~~~~~~~~~
+Indexes for character fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Any fields that are stored with ``VARCHAR`` column types have their
-``max_length`` restricted to 255 characters if you are using ``unique=True``
-for the field. This affects :class:`~django.db.models.CharField`,
-:class:`~django.db.models.SlugField`.
+On many default MySQL installations, index length is limited to 767 bytes. That
+means that fields stored with ``VARCHAR`` column types can only index the start
+of fields whose character length multiplied by the number of bytes per character
+overrides that maximal index size. The effective maximal index size can vary
+depending on several parameters (MySQL version, character set, database engine,
+global variables) and is typically between 191 and 1024 characters. Django tries
+to guess that size and use it to automatically shorten indexes when appropriate.
+If you know the effective maximal index size for your installation, you can
+force Django to use that size by setting the :setting:`MAX_INDEX_CHARACTER_SIZE
+<MAX_INDEX_CHARACTER_SIZE>` key of the :setting:`DATABASES` setting.
+
+.. versionchanged:: 2.2
+
+    On previous versions, it was not possible to have an index on a field whose
+    character length was over 255.
+
+Avoid using ``unique=True`` on fields whose index is shortened, because the
+uniqueness will only be checked on the first characters, so the uniqueness is
+not guaranteed for the full length of those fields.
 
 ``TextField`` limitations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
