@@ -9,6 +9,10 @@ except ImportError:  # Python < 3.5
     pass
 
 
+def index(request):
+    return HttpResponse(b"Index")
+
+
 def regular(request):
     return HttpResponse(b"regular content")
 

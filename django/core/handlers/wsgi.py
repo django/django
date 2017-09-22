@@ -66,13 +66,16 @@ class LimitedStream:
 class WSGIRequest(HttpRequest):
     def __init__(self, environ):
         script_name = get_script_name(environ)
-        path_info = get_path_info(environ)
+        path_info = environ_path_info = get_path_info(environ)
         if not path_info:
             # Sometimes PATH_INFO exists, but is empty (e.g. accessing
             # the SCRIPT_NAME URL without a trailing slash). We really need to
             # operate as if they'd requested '/'. Not amazingly nice to force
             # the path like this, but should be harmless.
+            self.path_info_is_empty = True
             path_info = '/'
+        else:
+            self.path_info_is_empty = False
         self.environ = environ
         self.path_info = path_info
         # be careful to only replace the first slash in the path because of
@@ -81,7 +84,7 @@ class WSGIRequest(HttpRequest):
         self.path = '%s/%s' % (script_name.rstrip('/'),
                                path_info.replace('/', '', 1))
         self.META = environ
-        self.META['PATH_INFO'] = path_info
+        self.META['PATH_INFO'] = environ_path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
         self.content_type, self.content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))

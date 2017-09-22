@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^suspicious/$', views.suspicious),
     url(r'^malformed_post/$', views.malformed_post),
     url(r'^httpstatus_enum/$', views.httpstatus_enum),
+    url(r'^$', views.index)
 ]

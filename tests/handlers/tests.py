@@ -92,6 +92,54 @@ class HandlerTests(SimpleTestCase):
         # Expect "bad request" response
         self.assertEqual(response.status_code, 400)
 
+    @override_settings(ROOT_URLCONF='handlers.urls')
+    def test_root_path_info_with_slash(self):
+        """
+        If PATH_INFO is '/' and APPEND_SLASH is True, and a url pattern
+        is defined for '^/$', then Django should render a response
+        from the corresponding view.
+        """
+        environ = RequestFactory().get('/').environ
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'Index')
+
+    @override_settings(ROOT_URLCONF='handlers.urls')
+    def test_root_path_info_without_slash(self):
+        """
+        If PATH_INFO is empty and APPEND_SLASH is True, and a url pattern
+        is defined for '^/$' but not for '^$', then Django should issue a
+        redirect.
+        """
+        environ = RequestFactory().get('').environ
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.url, '/')
+
+    @override_settings(APPEND_SLASH=False,
+                       ROOT_URLCONF='handlers.urls')
+    def test_root_path_info_nonempty_script_name_no_append_slash(self):
+        environ = RequestFactory().get('').environ
+        environ['SCRIPT_NAME'] = 'site-root'
+        environ['PATH_INFO'] = ''
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'Index')
+
+    @override_settings(APPEND_SLASH=True,
+                       ROOT_URLCONF='handlers.urls')
+    def test_root_path_info_nonempty_script_name_with_append_slash(self):
+        environ = RequestFactory().get('').environ
+        environ['SCRIPT_NAME'] = 'site-root'
+        environ['PATH_INFO'] = ''
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.url, 'site-root/')
+
 
 @override_settings(ROOT_URLCONF='handlers.urls', MIDDLEWARE=[])
 class TransactionsPerRequestTests(TransactionTestCase):
