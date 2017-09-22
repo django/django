@@ -70,9 +70,6 @@ class BaseDatabaseFeatures:
     # by returning the type used to store duration field?
     supports_temporal_subtraction = False
 
-    # Do time/datetime fields have microsecond precision?
-    supports_microsecond_precision = True
-
     # Does the __regex lookup support backreferencing and grouping?
     supports_regex_backreferencing = True
 

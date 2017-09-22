@@ -6,8 +6,7 @@ from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
 from django.utils.translation import gettext_lazy
 
@@ -164,42 +163,13 @@ class ModelTest(TestCase):
 
         self.assertNotEqual(Article.objects.get(id__exact=a1.id), Article.objects.get(id__exact=a2.id))
 
-    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_microsecond_precision(self):
-        # In PostgreSQL, microsecond-level precision is available.
         a9 = Article(
             headline='Article 9',
             pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
         )
         a9.save()
         self.assertEqual(Article.objects.get(pk=a9.pk).pub_date, datetime(2005, 7, 31, 12, 30, 45, 180))
-
-    @skipIfDBFeature('supports_microsecond_precision')
-    def test_microsecond_precision_not_supported(self):
-        # In MySQL, microsecond-level precision isn't always available. You'll
-        # lose microsecond-level precision once the data is saved.
-        a9 = Article(
-            headline='Article 9',
-            pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
-        )
-        a9.save()
-        self.assertEqual(
-            Article.objects.get(id__exact=a9.id).pub_date,
-            datetime(2005, 7, 31, 12, 30, 45),
-        )
-
-    @skipIfDBFeature('supports_microsecond_precision')
-    def test_microsecond_precision_not_supported_edge_case(self):
-        # In MySQL, microsecond-level precision isn't always available. You'll
-        # lose microsecond-level precision once the data is saved.
-        a = Article.objects.create(
-            headline='Article',
-            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
-        )
-        self.assertEqual(
-            Article.objects.get(pk=a.pk).pub_date,
-            datetime(2008, 12, 31, 23, 59, 59),
-        )
 
     def test_manually_specify_primary_key(self):
         # You can manually specify the primary key when creating a new object.
@@ -667,14 +637,10 @@ class SelectOnSaveTests(TestCase):
 
 
 class ModelRefreshTests(TestCase):
-    def _truncate_ms(self, val):
-        # MySQL < 5.6.4 removes microseconds from the datetimes which can cause
-        # problems when comparing the original value to that loaded from DB
-        return val - timedelta(microseconds=val.microsecond)
 
     def test_refresh(self):
-        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
-        Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        a = Article.objects.create(pub_date=datetime.now())
+        Article.objects.create(pub_date=datetime.now())
         Article.objects.filter(pk=a.pk).update(headline='new headline')
         with self.assertNumQueries(1):
             a.refresh_from_db()
@@ -722,7 +688,7 @@ class ModelRefreshTests(TestCase):
         self.assertEqual(s2.selfref, s1)
 
     def test_refresh_unsaved(self):
-        pub_date = self._truncate_ms(datetime.now())
+        pub_date = datetime.now()
         a = Article.objects.create(pub_date=pub_date)
         a2 = Article(id=a.pk)
         with self.assertNumQueries(1):
@@ -742,6 +708,6 @@ class ModelRefreshTests(TestCase):
         self.assertIsNone(s1.article)
 
     def test_refresh_no_fields(self):
-        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        a = Article.objects.create(pub_date=datetime.now())
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])

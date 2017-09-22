@@ -1,7 +1,7 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase
 
 from .models import (
     CustomMembership, Employee, Event, Friendship, Group, Ingredient,
@@ -196,7 +196,6 @@ class M2mThroughTests(TestCase):
             attrgetter("name")
         )
 
-    @skipUnlessDBFeature('supports_microsecond_precision')
     def test_order_by_relational_field_through_model(self):
         CustomMembership.objects.create(person=self.jim, group=self.rock)
         CustomMembership.objects.create(person=self.bob, group=self.rock)
