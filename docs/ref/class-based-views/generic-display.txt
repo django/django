@@ -59,7 +59,7 @@ many projects they are typically the most commonly used views.
         from article.views import ArticleDetailView
 
         urlpatterns = [
-            path('<slug>/', ArticleDetailView.as_view(), name='article-detail'),
+            path('<slug:slug>/', ArticleDetailView.as_view(), name='article-detail'),
         ]
 
     **Example myapp/article_detail.html**:
