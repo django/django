@@ -5,7 +5,8 @@ from django.test.utils import isolate_apps
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
-    Child4, Child5, Child6, Child7, RelatedModel, RelationModel,
+    Child4, Child5, Child6, Child7, RelatedModel, OldRelatedModel,
+    RelationModel,
 )
 
 
@@ -150,11 +151,16 @@ class ManagersRegressionTests(TestCase):
             ''.join([str(relation.pk)] * 3),
         )
 
-    def test_field_can_be_called_exact(self):
+    def test_field_can_be_called_exact_nulled_boolean(self):
         # Make sure related managers core filters don't include an
         # explicit `__exact` lookup that could be interpreted as a
         # reference to a foreign `exact` field. refs #23940.
         related = RelatedModel.objects.create(exact=False)
+        relation = related.test_fk.create()
+        self.assertEqual(related.test_fk.get(), relation)
+
+    def test_field_can_be_called_exact_nullboolean(self):
+        related = OldRelatedModel.objects.create(exact=False)
         relation = related.test_fk.create()
         self.assertEqual(related.test_fk.get(), relation)
 
