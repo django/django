@@ -10,11 +10,11 @@
         clockInputs: [],
         clockHours: {
             default_: [
-                ['Now', -1],
-                ['Midnight', 0],
-                ['6 a.m.', 6],
-                ['Noon', 12],
-                ['6 p.m.', 18]
+                [gettext_noop('Now'), -1],
+                [gettext_noop('Midnight'), 0],
+                [gettext_noop('6 a.m.'), 6],
+                [gettext_noop('Noon'), 12],
+                [gettext_noop('6 p.m.'), 18]
             ]
         },
         dismissClockFunc: [],
