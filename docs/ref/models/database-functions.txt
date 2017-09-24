@@ -259,10 +259,9 @@ Usage example::
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.create(name='Smith, Margaret')
     >>> Author.objects.create(name='Margaret Jackson')
-    >>> authors = Author.objects.annotate(
+    >>> Author.objects.filter(name='Margaret Jackson').annotate(
     ...     smith_index=StrIndex('name', V('Smith'))
-    ... ).order_by('smith_index')
-    >>> authors.first().smith_index
+    ... ).get().smith_index
     0
     >>> authors = Author.objects.annotate(
     ...    smith_index=StrIndex('name', V('Smith'))
