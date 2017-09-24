@@ -26,7 +26,7 @@ from .models import (
     ModifyingSaveData, NullBooleanData, O2OData, PositiveIntegerData,
     PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
-    Tag, TextData, TimeData, UniqueAnchor, UUIDData,
+    Tag, TextData, TimeData, UniqueAnchor, UUIDData, NulledBooleanData,
 )
 from .tests import register_tests
 
@@ -240,6 +240,9 @@ test_data = [
     (data_obj, 100, NullBooleanData, True),
     (data_obj, 101, NullBooleanData, False),
     (data_obj, 102, NullBooleanData, None),
+    (data_obj, 103, NulledBooleanData, True),
+    (data_obj, 104, NulledBooleanData, False),
+    (data_obj, 105, NulledBooleanData, None),
     (data_obj, 120, PositiveIntegerData, 123456789),
     (data_obj, 121, PositiveIntegerData, None),
     (data_obj, 130, PositiveSmallIntegerData, 12),
