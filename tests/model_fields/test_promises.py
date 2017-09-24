@@ -23,10 +23,6 @@ class PromiseTest(SimpleTestCase):
         lazy_func = lazy(lambda: b'', bytes)
         self.assertIsInstance(BinaryField().get_prep_value(lazy_func()), bytes)
 
-    def test_BooleanField(self):
-        lazy_func = lazy(lambda: True, bool)
-        self.assertIsInstance(BooleanField().get_prep_value(lazy_func()), bool)
-
     def test_CharField(self):
         lazy_func = lazy(lambda: '', str)
         self.assertIsInstance(CharField().get_prep_value(lazy_func()), str)
@@ -84,6 +80,14 @@ class PromiseTest(SimpleTestCase):
         self.assertIsInstance(GenericIPAddressField().get_prep_value(lazy_func()), str)
         lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(GenericIPAddressField().get_prep_value(lazy_func()), str)
+
+    def test_BooleanField(self):
+        lazy_func = lazy(lambda: True, bool)
+        self.assertIsInstance(BooleanField().get_prep_value(lazy_func()), bool)
+
+    def test_BooleanField_nulled(self):
+        lazy_func = lazy(lambda: True, bool)
+        self.assertIsInstance(BooleanField(null=True).get_prep_value(lazy_func()), bool)
 
     def test_NullBooleanField(self):
         lazy_func = lazy(lambda: True, bool)
