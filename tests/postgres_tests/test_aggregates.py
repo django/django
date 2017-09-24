@@ -19,10 +19,10 @@ with suppress(ImportError):  # psycopg2 is not installed
 class TestGeneralAggregate(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        AggregateTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
-        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo2', integer_field=1)
-        AggregateTestModel.objects.create(boolean_field=False, char_field='Foo3', integer_field=2)
-        AggregateTestModel.objects.create(boolean_field=True, char_field='Foo4', integer_field=0)
+        AggregateTestModel.objects.create(boolean_field=True, old_boolean_field=True, char_field='Foo1', integer_field=0)
+        AggregateTestModel.objects.create(boolean_field=False, old_boolean_field=False, char_field='Foo2', integer_field=1)
+        AggregateTestModel.objects.create(boolean_field=False, old_boolean_field=False, char_field='Foo3', integer_field=2)
+        AggregateTestModel.objects.create(boolean_field=True, old_boolean_field=True, char_field='Foo4', integer_field=0)
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
