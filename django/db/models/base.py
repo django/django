@@ -75,6 +75,23 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
+
+        # Fixed #28198 -- Model attributes does not overridden by
+        # attributes from parent classes
+        # For each parent class collect and remove the attributes which
+        # present in `attrs` and has implementation in this parent class
+        duplicate_attributes = {}
+        for parent in parents:
+            attributes_per_parent_class = {}
+            for attr_name in attrs:
+                if(hasattr(parent, attr_name) and not
+                    attr_name.startswith(LOOKUP_SEP) and not
+                    hasattr(getattr(parent, attr_name), '__dict__')
+                   ):
+                    attributes_per_parent_class[attr_name] = getattr(parent, attr_name)
+                    delattr(parent, attr_name)
+            if len(attributes_per_parent_class) > 0:
+                duplicate_attributes[parent] = attributes_per_parent_class
         new_class = super_new(cls, name, bases, new_attrs, **kwargs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
@@ -287,6 +304,14 @@ class ModelBase(type):
         # abstract model.
         new_class._meta.indexes = [copy.deepcopy(idx) for idx in new_class._meta.indexes]
 
+        # Fixed #28198 -- Model attributes does not overridden by
+        # attributes from parent classes
+        # Restore the attributes for each model parent class
+        if len(duplicate_attributes) > 0:
+            for parent in parents:
+                if parent in duplicate_attributes:
+                    for attribute in duplicate_attributes[parent]:
+                        setattr(parent, attribute, duplicate_attributes[parent][attribute])
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a

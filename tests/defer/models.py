@@ -14,6 +14,7 @@ class Primary(models.Model):
     name = models.CharField(max_length=50)
     value = models.CharField(max_length=50)
     related = models.ForeignKey(Secondary, models.CASCADE)
+    other = True
 
     def __str__(self):
         return self.name

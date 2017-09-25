@@ -271,3 +271,23 @@ class TestDefer2(AssertionMixin, TestCase):
             # access of any of them.
             self.assertEqual(rf2.name, 'new foo')
             self.assertEqual(rf2.value, 'new bar')
+
+    def test_field_not_overridden_by_parent(self):
+        """
+        Fixed #28198 -- Model attributes does not overridden by
+        attributes from parent classes
+
+        The defer field `other` must return value from db, instead
+        attribute value from parent model.
+        The attribute `other` for Child must be the same
+        as in parent model
+        """
+        s = Secondary.objects.create()
+        Child.objects.create(name='foo', value='bar', related=s)
+        BigChild.objects.create(other="False", related=s)
+
+        primary = Child.objects.get()
+        big_child = BigChild.objects.defer('other').get()
+        self.assertEqual(len(big_child.get_deferred_fields()), 1)
+        self.assertIs(primary.other, True)
+        self.assertEqual(big_child.other, "False")
