@@ -80,7 +80,7 @@ Here's a sample URLconf::
         path('articles/2003/', views.special_case_2003),
         path('articles/<int:year>/', views.year_archive),
         path('articles/<int:year>/<int:month>/', views.month_archive),
-        path('articles/<int:year>/<int:month>/<slug>/', views.article_detail),
+        path('articles/<int:year>/<int:month>/<slug:slug>/', views.article_detail),
     ]
 
 Notes:
@@ -200,7 +200,7 @@ Here's the example URLconf from earlier, rewritten using regular expressions::
         path('articles/2003/', views.special_case_2003),
         re_path('articles/(?P<year>[0-9]{4})/', views.year_archive),
         re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/', views.month_archive),
-        re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[^/]+)/', views.article_detail),
+        re_path('articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-_]+)/', views.article_detail),
     ]
 
 This accomplishes roughly the same thing as the previous example, except:
