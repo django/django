@@ -1315,8 +1315,8 @@ Example URL patterns::
 
     news_patterns = ([
         path('', news_views.index, name='index'),
-        path('category/<slug>/', news_views.category, name='category'),
-        path('<slug>/', news_views.details, name='detail'),
+        path('category/<slug:slug>/', news_views.category, name='category'),
+        path('<slug:slug>/', news_views.details, name='detail'),
     ], 'news')
 
     urlpatterns += i18n_patterns(
@@ -1385,8 +1385,8 @@ URL patterns can also be marked translatable using the
 
     news_patterns = ([
         path('', news_views.index, name='index'),
-        path(_('category/<slug>/'), news_views.category, name='category'),
-        path('<slug>/', news_views.details, name='detail'),
+        path(_('category/<slug:slug>/'), news_views.category, name='category'),
+        path('<slug:slug>/', news_views.details, name='detail'),
     ], 'news')
 
     urlpatterns += i18n_patterns(
