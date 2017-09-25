@@ -174,6 +174,11 @@ class BaseForm:
             self.full_clean()
         return self._errors
 
+    def clear_cached_bound_field(self, field_name):
+        "Clear cached bound field. It could be useful if there were any changes with fields after form construction"
+        if field_name in self._bound_fields_cache:
+            del self._bound_fields_cache[field_name]
+
     def is_valid(self):
         """Return True if the form has no errors, or False otherwise."""
         return self.is_bound and not self.errors
