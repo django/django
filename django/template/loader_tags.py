@@ -222,7 +222,7 @@ def construct_relative_path(current_template_name, relative_name):
     Convert a relative path (starting with './' or '../') to the full template
     name based on the current_template_name.
     """
-    if not any(relative_name.startswith(x) for x in ["'./", "'../", '"./', '"../']):
+    if not relative_name.startswith(("'./", "'../", '"./', '"../')):
         # relative_name is a variable or a literal that doesn't contain a
         # relative path.
         return relative_name

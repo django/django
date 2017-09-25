@@ -119,7 +119,7 @@ class CheckURLMixin:
             # Skip check as it can be useful to start a URL pattern with a slash
             # when APPEND_SLASH=False.
             return []
-        if any(regex_pattern.startswith(x) for x in ('/', '^/', '^\/')) and not regex_pattern.endswith('/'):
+        if regex_pattern.startswith(('/', '^/', '^\/')) and not regex_pattern.endswith('/'):
             warning = Warning(
                 "Your URL pattern {} has a route beginning with a '/'. Remove this "
                 "slash as it is unnecessary. If this pattern is targeted in an "
