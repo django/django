@@ -1621,6 +1621,12 @@ that control how the relationship functions.
 
     If in doubt, leave it to its default of ``True``.
 
+.. attribute:: ManyToManyField.allow_duplicates
+
+    Per default a :class:`ManyToManyField` behaves like a set. Setting this 
+    attribute ``True`` the :class:`ManyToManyField` will behave like a 
+    list and allow for duplicate values.
+
 :class:`ManyToManyField` does not support :attr:`~Field.validators`.
 
 :attr:`~Field.null` has no effect since there is no way to require a

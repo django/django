@@ -418,6 +418,12 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.Permission", "limit_choices_to": {'foo': 'bar'}})
+        # Test allow_duplicates
+        field = models.ManyToManyField("auth.Permission", allow_duplicates=True)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ManyToManyField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission", "allow_duplicates": True})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_many_to_many_field_swapped(self):
