@@ -566,12 +566,6 @@ Miscellaneous
   connection, those queries could be included as part of the
   ``assertNumQueries()`` count.
 
-* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is more properly respected in
-  ``contrib.auth`` password reset. Previously, resets were allowed for one day
-  longer than expected. For example, with the default of
-  ``PASSWORD_RESET_TIMEOUT_DAYS = 3``, password reset tokens are now valid for
-  72 hours rather than 96 hours.
-
 * The default size of the Oracle test tablespace is increased from 20M to 50M
   and the default autoextend size is increased from 10M to 25M.
 
