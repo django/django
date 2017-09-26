@@ -163,7 +163,7 @@ class BaseDatabaseOperations:
         duplicates.
         """
         if fields:
-            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+            raise NotSupportedError('DISTINCT ON fields is not supported by this database backend')
         else:
             return 'DISTINCT'
 
@@ -604,7 +604,7 @@ class BaseDatabaseOperations:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        raise NotImplementedError("This backend does not support %s subtraction." % internal_type)
+        raise NotSupportedError("This backend does not support %s subtraction." % internal_type)
 
     def window_frame_start(self, start):
         if isinstance(start, int):
