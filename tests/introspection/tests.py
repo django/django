@@ -44,9 +44,12 @@ class IntrospectionTests(TransactionTestCase):
                     self.fail("The test user has no CREATE VIEW privileges")
                 else:
                     raise
-
-        self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
-        self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+        try:
+            self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
+            self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP VIEW introspection_article_view')
 
     def test_unmanaged_through_model(self):
         tables = connection.introspection.django_table_names()
