@@ -679,6 +679,15 @@ The following checks are performed when a model contains a
   ``contenttypes.ContentType``.
 * **contenttypes.E005**: Model names must be at most 100 characters.
 
+``postgres``
+------------
+
+The following checks are performed on :mod:`django.contrib.postgres` model
+fields:
+
+* **postgres.E001**: Base field for array has errors: ...
+* **postgres.E002**: Base field for array cannot be a related field.
+
 ``sites``
 ---------
 
