@@ -214,6 +214,13 @@ class RequestSiteTests(SimpleTestCase):
         request.META = {'HTTP_HOST': 'example.com'}
         self.site = RequestSite(request)
 
+    def test_init_attributes(self):
+        self.assertEqual(self.site.domain, 'example.com')
+        self.assertEqual(self.site.name, 'example.com')
+
+    def test_str(self):
+        self.assertEqual(str(self.site), 'example.com')
+
     def test_save(self):
         msg = 'RequestSite cannot be saved.'
         with self.assertRaisesMessage(NotImplementedError, msg):
