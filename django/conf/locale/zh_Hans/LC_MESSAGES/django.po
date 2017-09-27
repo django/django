@@ -425,7 +425,7 @@ msgstr "此字段不能为空。"
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "具有 %(field_label)s 的 %(model_name)s 已存在。"
+msgstr "具有此 %(field_label)s 的 %(model_name)s 已存在。"
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
