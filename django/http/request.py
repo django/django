@@ -18,7 +18,7 @@ from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
 from django.utils.http import is_same_domain, limited_parse_qsl
 
 RAISE_ERROR = object()
-host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
+host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$")
 
 
 class UnreadablePostError(IOError):

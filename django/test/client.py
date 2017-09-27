@@ -31,7 +31,7 @@ __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'enc
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
-CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
+CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w[0-9]-]+);?')
 # JSON Vendor Tree spec: https://tools.ietf.org/html/rfc6838#section-3.2
 JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(vnd\..+\+)?json')
 

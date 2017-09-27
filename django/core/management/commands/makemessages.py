@@ -399,7 +399,7 @@ class Command(BaseCommand):
             ['xgettext', '--version'],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
         )
-        m = re.search(r'(\d+)\.(\d+)\.?(\d+)?', out)
+        m = re.search(r'([0-9]+)\.([0-9]+)\.?([0-9]+)?', out)
         if m:
             return tuple(int(d) for d in m.groups() if d is not None)
         else:
