@@ -189,6 +189,11 @@ Models
   :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
   failure to insert rows that fail uniqueness constraints or other checks.
 
+* The new :class:`~django.db.models.functions.ExtractIsoYear` function extracts
+  ISO-8601 week-numbering years from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_year`
+  lookup allows querying by an ISO-8601 week-numbering year.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

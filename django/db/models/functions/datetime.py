@@ -80,6 +80,11 @@ class ExtractYear(Extract):
     lookup_name = 'year'
 
 
+class ExtractIsoYear(Extract):
+    """Return the ISO-8601 week-numbering year."""
+    lookup_name = 'iso_year'
+
+
 class ExtractMonth(Extract):
     lookup_name = 'month'
 
@@ -126,6 +131,7 @@ DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
 DateField.register_lookup(ExtractWeek)
+DateField.register_lookup(ExtractIsoYear)
 DateField.register_lookup(ExtractQuarter)
 
 TimeField.register_lookup(ExtractHour)
@@ -141,6 +147,12 @@ ExtractYear.register_lookup(YearGt)
 ExtractYear.register_lookup(YearGte)
 ExtractYear.register_lookup(YearLt)
 ExtractYear.register_lookup(YearLte)
+
+ExtractIsoYear.register_lookup(YearExact)
+ExtractIsoYear.register_lookup(YearGt)
+ExtractIsoYear.register_lookup(YearGte)
+ExtractIsoYear.register_lookup(YearLt)
+ExtractIsoYear.register_lookup(YearLte)
 
 
 class Now(Func):

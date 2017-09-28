@@ -69,6 +69,8 @@ END;
             return "TO_CHAR(%s, 'IW')" % field_name
         elif lookup_type == 'quarter':
             return "TO_CHAR(%s, 'Q')" % field_name
+        elif lookup_type == 'iso_year':
+            return "TO_CHAR(%s, 'IYYY')" % field_name
         else:
             # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)

@@ -42,6 +42,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             # other database backends.
             # Mode 3: Monday, 1-53, with 4 or more days this year.
             return "WEEK(%s, 3)" % field_name
+        elif lookup_type == 'iso_year':
+            # Get the year part from the YEARWEEK function, which returns a
+            # number as year * 100 + week.
+            return "TRUNCATE(YEARWEEK(%s, 3), -2) / 100" % field_name
         else:
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)

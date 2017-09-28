@@ -338,6 +338,8 @@ def _sqlite_date_extract(lookup_type, dt):
         return dt.isocalendar()[1]
     elif lookup_type == 'quarter':
         return math.ceil(dt.month / 3)
+    elif lookup_type == 'iso_year':
+        return dt.isocalendar()[0]
     else:
         return getattr(dt, lookup_type)
 
@@ -410,6 +412,8 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return dt.isocalendar()[1]
     elif lookup_type == 'quarter':
         return math.ceil(dt.month / 3)
+    elif lookup_type == 'iso_year':
+        return dt.isocalendar()[0]
     else:
         return getattr(dt, lookup_type)
 

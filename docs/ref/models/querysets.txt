@@ -2927,6 +2927,26 @@ SQL equivalent::
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering.
 
+.. fieldlookup:: iso_year
+
+``iso_year``
+~~~~~~~~~~~~
+
+.. versionadded:: 2.2
+
+For date and datetime fields, an exact ISO 8601 week-numbering year match.
+Allows chaining additional field lookups. Takes an integer year.
+
+Example::
+
+    Entry.objects.filter(pub_date__iso_year=2005)
+    Entry.objects.filter(pub_date__iso_year__gte=2005)
+
+(The exact SQL syntax varies for each database engine.)
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering.
+
 .. fieldlookup:: month
 
 ``month``
