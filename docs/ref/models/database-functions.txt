@@ -439,6 +439,7 @@ return:
 * "year": 2015-01-01 00:00:00+00:00
 * "quarter": 2015-04-01 00:00:00+00:00
 * "month": 2015-06-01 00:00:00+00:00
+* "week": 2015-06-15 00:00:00+00:00
 * "day": 2015-06-15 00:00:00+00:00
 * "hour": 2015-06-15 14:00:00+00:00
 * "minute": 2015-06-15 14:30:00+00:00
@@ -452,6 +453,7 @@ values returned when this timezone is active will be:
 * "year": 2015-01-01 00:00:00+11:00
 * "quarter": 2015-04-01 00:00:00+10:00
 * "month": 2015-06-01 00:00:00+10:00
+* "week": 2015-06-16 00:00:00+10:00
 * "day": 2015-06-16 00:00:00+10:00
 * "hour": 2015-06-16 00:00:00+10:00
 * "minute": 2015-06-16 00:30:00+10:00
@@ -503,6 +505,14 @@ Usage example::
 .. class:: TruncMonth(expression, output_field=None, tzinfo=None, **extra)
 
     .. attribute:: kind = 'month'
+
+.. class:: TruncWeek(expression, output_field=None, tzinfo=None, **extra)
+
+    .. versionadded:: 2.1
+
+    Truncates to midnight on the Monday of the week.
+
+    .. attribute:: kind = 'week'
 
 .. class:: TruncQuarter(expression, output_field=None, tzinfo=None, **extra)
 

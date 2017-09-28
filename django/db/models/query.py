@@ -777,8 +777,8 @@ class QuerySet:
         Return a list of date objects representing all available dates for
         the given field_name, scoped to 'kind'.
         """
-        assert kind in ("year", "month", "day"), \
-            "'kind' must be one of 'year', 'month' or 'day'."
+        assert kind in ('year', 'month', 'week', 'day'), \
+            "'kind' must be one of 'year', 'month', 'week', or 'day'."
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
         return self.annotate(
@@ -793,8 +793,8 @@ class QuerySet:
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
         """
-        assert kind in ("year", "month", "day", "hour", "minute", "second"), \
-            "'kind' must be one of 'year', 'month', 'day', 'hour', 'minute' or 'second'."
+        assert kind in ('year', 'month', 'week', 'day', 'hour', 'minute', 'second'), \
+            "'kind' must be one of 'year', 'month', 'week', 'day', 'hour', 'minute', or 'second'."
         assert order in ('ASC', 'DESC'), \
             "'order' must be either 'ASC' or 'DESC'."
         if settings.USE_TZ:

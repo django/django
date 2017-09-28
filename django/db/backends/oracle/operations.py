@@ -78,6 +78,8 @@ END;
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
             return "TRUNC(%s, 'Q')" % field_name
+        elif lookup_type == 'week':
+            return "TRUNC(%s, 'IW')" % field_name
         else:
             return "TRUNC(%s)" % field_name
 
@@ -116,6 +118,8 @@ END;
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
         elif lookup_type == 'quarter':
             sql = "TRUNC(%s, 'Q')" % field_name
+        elif lookup_type == 'week':
+            sql = "TRUNC(%s, 'IW')" % field_name
         elif lookup_type == 'day':
             sql = "TRUNC(%s)" % field_name
         elif lookup_type == 'hour':

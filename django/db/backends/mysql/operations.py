@@ -53,6 +53,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "MAKEDATE(YEAR(%s), 1) + INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER" % (
                 field_name, field_name
             )
+        elif lookup_type == 'week':
+            return "DATE_SUB(%s, INTERVAL WEEKDAY(%s) DAY)" % (
+                field_name, field_name
+            )
         else:
             return "DATE(%s)" % (field_name)
 
@@ -83,6 +87,12 @@ class DatabaseOperations(BaseDatabaseOperations):
                 "CAST(DATE_FORMAT(MAKEDATE(YEAR({field_name}), 1) + "
                 "INTERVAL QUARTER({field_name}) QUARTER - " +
                 "INTERVAL 1 QUARTER, '%%Y-%%m-01 00:00:00') AS DATETIME)"
+            ).format(field_name=field_name)
+        if lookup_type == 'week':
+            return (
+                "CAST(DATE_FORMAT(DATE_SUB({field_name}, "
+                "INTERVAL WEEKDAY({field_name}) DAY), "
+                "'%%Y-%%m-%%d 00:00:00') AS DATETIME)"
             ).format(field_name=field_name)
         try:
             i = fields.index(lookup_type) + 1

@@ -694,13 +694,15 @@ objects representing all available dates of a particular kind within the
 contents of the ``QuerySet``.
 
 ``field`` should be the name of a ``DateField`` of your model.
-``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
-``datetime.date`` object in the result list is "truncated" to the given
-``type``.
+``kind`` should be either ``"year"``, ``"month"``, ``"week"``, or ``"day"``.
+Each :class:`datetime.date` object in the result list is "truncated" to the
+given ``type``.
 
 * ``"year"`` returns a list of all distinct year values for the field.
 * ``"month"`` returns a list of all distinct year/month values for the
   field.
+* ``"week"`` returns a list of all distinct year/week values for the field. All
+  dates will be a Monday.
 * ``"day"`` returns a list of all distinct year/month/day values for the
   field.
 
@@ -713,12 +715,18 @@ Examples::
     [datetime.date(2005, 1, 1)]
     >>> Entry.objects.dates('pub_date', 'month')
     [datetime.date(2005, 2, 1), datetime.date(2005, 3, 1)]
+    >>> Entry.objects.dates('pub_date', 'week')
+    [datetime.date(2005, 2, 14), datetime.date(2005, 3, 14)]
     >>> Entry.objects.dates('pub_date', 'day')
     [datetime.date(2005, 2, 20), datetime.date(2005, 3, 20)]
     >>> Entry.objects.dates('pub_date', 'day', order='DESC')
     [datetime.date(2005, 3, 20), datetime.date(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.date(2005, 3, 20)]
+
+.. versionchanged:: 2.1
+
+    "week" support was added.
 
 ``datetimes()``
 ~~~~~~~~~~~~~~~
@@ -731,9 +739,9 @@ contents of the ``QuerySet``.
 
 ``field_name`` should be the name of a ``DateTimeField`` of your model.
 
-``kind`` should be either ``"year"``, ``"month"``, ``"day"``, ``"hour"``,
-``"minute"`` or ``"second"``. Each ``datetime.datetime`` object in the result
-list is "truncated" to the given ``type``.
+``kind`` should be either ``"year"``, ``"month"``, ``"week"``, ``"day"``,
+``"hour"``, ``"minute"``, or ``"second"``. Each :class:`datetime.datetime`
+object in the result list is "truncated" to the given ``type``.
 
 ``order``, which defaults to ``'ASC'``, should be either ``'ASC'`` or
 ``'DESC'``. This specifies how to order the results.
@@ -744,6 +752,10 @@ on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
 object. If it's ``None``, Django uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
+
+.. versionchanged:: 2.1
+
+    "week" support was added.
 
 .. _database-time-zone-definitions:
 

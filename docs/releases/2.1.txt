@@ -173,6 +173,10 @@ Models
 * The new :class:`~django.db.models.functions.Replace` database function
   replaces strings in an expression.
 
+* The new :class:`~django.db.models.functions.TruncWeek` function truncates
+  :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField` to the Monday of a week.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

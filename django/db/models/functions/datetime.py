@@ -199,7 +199,8 @@ class TruncBase(TimezoneMixin, Transform):
                 field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
         elif isinstance(field, TimeField) and (
-                isinstance(output_field, DateTimeField) or copy.kind in ('year', 'quarter', 'month', 'day', 'date')):
+                isinstance(output_field, DateTimeField) or
+                copy.kind in ('year', 'quarter', 'month', 'week', 'day', 'date')):
             raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
                 field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
@@ -240,6 +241,11 @@ class TruncQuarter(TruncBase):
 
 class TruncMonth(TruncBase):
     kind = 'month'
+
+
+class TruncWeek(TruncBase):
+    """Truncate to midnight on the Monday of the week."""
+    kind = 'week'
 
 
 class TruncDay(TruncBase):

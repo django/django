@@ -3,7 +3,7 @@ from .datetime import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear,
     Now, Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
-    TruncQuarter, TruncSecond, TruncTime, TruncYear,
+    TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
 )
 from .text import (
     Concat, ConcatPair, Length, Lower, Replace, StrIndex, Substr, Upper,
@@ -21,7 +21,7 @@ __all__ = [
     'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay',
     'ExtractYear', 'Now', 'Trunc', 'TruncDate', 'TruncDay', 'TruncHour',
     'TruncMinute', 'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime',
-    'TruncYear',
+    'TruncWeek', 'TruncYear',
     # text
     'Concat', 'ConcatPair', 'Length', 'Lower', 'Replace', 'StrIndex', 'Substr',
     'Upper',

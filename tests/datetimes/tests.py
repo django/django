@@ -54,6 +54,12 @@ class DateTimesTests(TestCase):
             ],
         )
         self.assertSequenceEqual(
+            Comment.objects.datetimes("article__pub_date", "week"), [
+                datetime.datetime(2005, 7, 25),
+                datetime.datetime(2010, 7, 26),
+            ],
+        )
+        self.assertSequenceEqual(
             Comment.objects.datetimes("article__pub_date", "day"), [
                 datetime.datetime(2005, 7, 28),
                 datetime.datetime(2010, 7, 28),
@@ -98,6 +104,9 @@ class DateTimesTests(TestCase):
         self.assertQuerysetEqual(
             Article.objects.datetimes('pub_date', 'month'),
             ["datetime.datetime(2005, 7, 1, 0, 0)"])
+        self.assertQuerysetEqual(
+            Article.objects.datetimes('pub_date', 'week'),
+            ["datetime.datetime(2005, 7, 25, 0, 0)"])
         self.assertQuerysetEqual(
             Article.objects.datetimes('pub_date', 'day'),
             ["datetime.datetime(2005, 7, 28, 0, 0)",

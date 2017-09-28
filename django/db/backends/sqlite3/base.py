@@ -335,6 +335,9 @@ def _sqlite_date_trunc(lookup_type, dt):
         return '%i-%02i-01' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
         return "%i-%02i-01" % (dt.year, dt.month)
+    elif lookup_type == 'week':
+        dt = dt - datetime.timedelta(days=dt.weekday())
+        return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
     elif lookup_type == 'day':
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
@@ -403,6 +406,9 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return '%i-%02i-01 00:00:00' % (dt.year, month_in_quarter)
     elif lookup_type == 'month':
         return "%i-%02i-01 00:00:00" % (dt.year, dt.month)
+    elif lookup_type == 'week':
+        dt = dt - datetime.timedelta(days=dt.weekday())
+        return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
     elif lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
     elif lookup_type == 'hour':
