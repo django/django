@@ -431,6 +431,8 @@ class TestUtilsHashPass(SimpleTestCase):
 
 
 class BasePasswordHasherTests(SimpleTestCase):
+    not_implemented_msg = 'subclasses of BasePasswordHasher must provide %s() method'
+
     def setUp(self):
         self.hasher = BasePasswordHasher()
 
@@ -444,6 +446,33 @@ class BasePasswordHasherTests(SimpleTestCase):
         msg = "Couldn't load 'PlainHasher' algorithm library: No module named 'plain'"
         with self.assertRaisesMessage(ValueError, msg):
             PlainHasher()._load_library()
+
+    def test_attributes(self):
+        self.assertIsNone(self.hasher.algorithm)
+        self.assertIsNone(self.hasher.library)
+
+    def test_encode(self):
+        msg = self.not_implemented_msg % 'an encode'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.encode('password', 'salt')
+
+    def test_harden_runtime(self):
+        msg = 'subclasses of BasePasswordHasher should provide a harden_runtime() method'
+        with self.assertWarns(Warning, msg=msg):
+            self.hasher.harden_runtime('password', 'encoded')
+
+    def test_must_update(self):
+        self.assertIs(self.hasher.must_update('encoded'), False)
+
+    def test_safe_summary(self):
+        msg = self.not_implemented_msg % 'a safe_summary'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.safe_summary('encoded')
+
+    def test_verify(self):
+        msg = self.not_implemented_msg % 'a verify'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.verify('password', 'encoded')
 
 
 @skipUnless(argon2, "argon2-cffi not installed")
