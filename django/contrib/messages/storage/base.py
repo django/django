@@ -53,7 +53,6 @@ class BaseStorage:
         self._queued_messages = []
         self.used = False
         self.added_new = False
-        super().__init__(*args, **kwargs)
 
     def __len__(self):
         return len(self._loaded_messages) + len(self._queued_messages)
