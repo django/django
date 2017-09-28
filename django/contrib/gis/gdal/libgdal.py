@@ -84,7 +84,7 @@ def gdal_full_version():
     return _version_info('')
 
 
-version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
+version_regex = re.compile(r'^(?P<major>[0-9]+)\.(?P<minor>[0-9]+)(\.(?P<subminor>[0-9]+))?')
 
 
 def gdal_version_info():

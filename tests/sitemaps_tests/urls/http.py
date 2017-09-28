@@ -195,5 +195,5 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
-    url(r'^i18n/testmodel/(?P<id>\d+)/$', testmodelview, name='i18n_testmodel'),
+    url(r'^i18n/testmodel/(?P<id>[0-9]+)/$', testmodelview, name='i18n_testmodel'),
 )
