@@ -47,12 +47,12 @@ def redirect(to, *args, permanent=False, **kwargs):
         * A model: the model's `get_absolute_url()` function will be called.
 
         * A view name, possibly with arguments: `urls.reverse()` will be used
-          to reverse-resolve the name.
+          to reverse-resolve the name. The resulting URL is encoded.
 
         * A URL, which will be used as-is for the redirect location.
 
     By default issues a temporary redirect; pass permanent=True to issue a
-    permanent redirect
+    permanent redirect.
     """
     redirect_class = HttpResponsePermanentRedirect if permanent else HttpResponseRedirect
     return redirect_class(resolve_url(to, *args, **kwargs))
