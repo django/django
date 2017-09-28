@@ -429,10 +429,15 @@ class TestUtilsHashPass(SimpleTestCase):
             check_password('wrong_password', encoded)
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
+
+class BasePasswordHasherTests(SimpleTestCase):
+    def setUp(self):
+        self.hasher = BasePasswordHasher()
+
     def test_load_library_no_algorithm(self):
         msg = "Hasher 'BasePasswordHasher' doesn't specify a library attribute"
         with self.assertRaisesMessage(ValueError, msg):
-            BasePasswordHasher()._load_library()
+            self.hasher._load_library()
 
     def test_load_library_importerror(self):
         PlainHasher = type('PlainHasher', (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
