@@ -445,7 +445,7 @@ Now, of course, a WebSocket solution is somewhat limited in scope without the
 ability to live with the rest of your website - in particular, we want to make
 sure we know what user we're talking to, in case we have things like private
 chat channels (we don't want a solution where clients just ask for the right
-channels, as anyone could change the code and just put in private channel names)
+channels, as anyone could change the code and just put in private channel names).
 
 It can also save you having to manually make clients ask for what they want to
 see; if I see you open a WebSocket to my "updates" endpoint, and I know which
@@ -559,7 +559,7 @@ from hosts listed in the ``ALLOWED_HOSTS`` setting::
     from channels import Channel, Group
     from channels.sessions import channel_session
     from channels.auth import channel_session_user, channel_session_user_from_http
-    from channels.security.websockets import allowed_hosts_only.
+    from channels.security.websockets import allowed_hosts_only
 
     # Connected to websocket.connect
     @allowed_hosts_only
