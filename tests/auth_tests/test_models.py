@@ -5,12 +5,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import get_hasher
 from django.contrib.auth.models import (
-    AbstractUser, Group, Permission, User, UserManager,
+    AbstractUser, AnonymousUser, Group, Permission, User, UserManager,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models.with_custom_email_field import CustomEmailField
 
@@ -303,3 +303,21 @@ class TestCreateSuperUserSignals(TestCase):
     def test_create_superuser(self):
         User.objects.create_superuser("JohnDoe", "mail@example.com", "1")
         self.assertEqual(self.signals_count, 1)
+
+
+class AnonymousUserTests(SimpleTestCase):
+
+    def setUp(self):
+        self.user = AnonymousUser()
+
+    def test_properties(self):
+        self.assertIsNone(self.user.pk)
+        self.assertEqual(self.user.username, '')
+        self.assertEqual(self.user.get_username(), '')
+        self.assertIs(self.user.is_anonymous, True)
+        self.assertIs(self.user.is_authenticated, False)
+        self.assertIs(self.user.is_staff, False)
+        self.assertIs(self.user.is_active, False)
+        self.assertIs(self.user.is_superuser, False)
+        self.assertEqual(self.user.groups.all().count(), 0)
+        self.assertEqual(self.user.user_permissions.all().count(), 0)
