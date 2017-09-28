@@ -246,7 +246,7 @@ class JavaScriptCatalog(View):
         Return the number of plurals for this catalog language, or 2 if no
         plural string is available.
         """
-        match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
+        match = re.search(r'nplurals=\s*([0-9]+)', self._plural_string or '')
         if match:
             return int(match.groups()[0])
         return 2
