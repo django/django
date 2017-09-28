@@ -1416,7 +1416,7 @@ class Prefetch:
         return isinstance(other, Prefetch) and self.prefetch_to == other.prefetch_to
 
     def __hash__(self):
-        return hash(self.__class__) ^ hash(self.prefetch_to)
+        return hash((self.__class__, self.prefetch_to))
 
 
 def normalize_prefetch_lookups(lookups, prefix=None):
