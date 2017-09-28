@@ -70,6 +70,9 @@ class Node:
             return self.children == other.children
         return False
 
+    def __hash__(self):
+        return hash((self.__class__, self.connector, self.negated) + tuple(self.children))
+
     def add(self, data, conn_type, squash=True):
         """
         Combine this tree and the data represented by data using the
