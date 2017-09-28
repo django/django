@@ -57,7 +57,6 @@ class HashedFilesMixin:
     )
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self._patterns = OrderedDict()
         self.hashed_files = {}
         for extension, patterns in self.patterns:
