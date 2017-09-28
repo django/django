@@ -58,9 +58,11 @@ class Migration:
         self.replaces = list(self.__class__.replaces)
 
     def __eq__(self, other):
-        if not isinstance(other, Migration):
-            return False
-        return (self.name == other.name) and (self.app_label == other.app_label)
+        return (
+            isinstance(other, Migration) and
+            self.name == other.name and
+            self.app_label == other.app_label
+        )
 
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)

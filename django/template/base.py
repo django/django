@@ -126,10 +126,8 @@ class Origin:
         return self.name
 
     def __eq__(self, other):
-        if not isinstance(other, Origin):
-            return False
-
         return (
+            isinstance(other, Origin) and
             self.name == other.name and
             self.loader == other.loader
         )
