@@ -306,6 +306,7 @@ class TestCreateSuperUserSignals(TestCase):
 
 
 class AnonymousUserTests(SimpleTestCase):
+    no_repr_msg = "Django doesn't provide a DB representation for AnonymousUser."
 
     def setUp(self):
         self.user = AnonymousUser()
@@ -321,3 +322,30 @@ class AnonymousUserTests(SimpleTestCase):
         self.assertIs(self.user.is_superuser, False)
         self.assertEqual(self.user.groups.all().count(), 0)
         self.assertEqual(self.user.user_permissions.all().count(), 0)
+        self.assertEqual(self.user.get_group_permissions(), set())
+
+    def test_str(self):
+        self.assertEqual(str(self.user), 'AnonymousUser')
+
+    def test_eq(self):
+        self.assertEqual(self.user, AnonymousUser())
+        self.assertNotEqual(self.user, User('super', 'super@example.com', 'super'))
+
+    def test_hash(self):
+        self.assertEqual(hash(self.user), 1)
+
+    def test_delete(self):
+        with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
+            self.user.delete()
+
+    def test_save(self):
+        with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
+            self.user.save()
+
+    def test_set_password(self):
+        with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
+            self.user.set_password('password')
+
+    def test_check_password(self):
+        with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
+            self.user.check_password('password')
