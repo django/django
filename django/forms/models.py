@@ -979,6 +979,7 @@ class BaseInlineFormSet(BaseModelFormSet):
                 setattr(self.instance, to_field.attname, None)
 
         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
+        form.clear_cached_bound_field(name)
 
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]
