@@ -200,6 +200,11 @@ Database backend API
 
 * ...
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for SpatiaLite 4.0 is removed.
+
 Dropped support for MySQL 5.5
 -----------------------------
 
