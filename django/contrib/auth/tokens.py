@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
@@ -12,13 +12,14 @@ class PasswordResetTokenGenerator:
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
     secret = settings.SECRET_KEY
+    timeout_type = 'SECONDS' if hasattr(settings, 'PASSWORD_RESET_TIMEOUT') else 'DAYS'
 
     def make_token(self, user):
         """
         Return a token that can be used once to do a password reset
         for the given user.
         """
-        return self._make_token_with_timestamp(user, self._num_days(self._today()))
+        return self._make_token_with_timestamp(user, self._num_seconds(self._now()))
 
     def check_token(self, user, token):
         """
@@ -42,14 +43,23 @@ class PasswordResetTokenGenerator:
             return False
 
         # Check the timestamp is within limit
-        if (self._num_days(self._today()) - ts) > settings.PASSWORD_RESET_TIMEOUT_DAYS:
+        # Because settings may be changed between PASSWORD_RESET_TIMEOUT and PASSWORD_RESET_TIMEOUT_DAYS,
+        # convert both to seconds to compare
+        timeout = settings.PASSWORD_RESET_TIMEOUT if hasattr(settings, 'PASSWORD_RESET_TIMEOUT') \
+            else settings.PASSWORD_RESET_TIMEOUT_DAYS * 24 * 60 * 60
+
+        ts = ts * 24 * 60 * 60 if len(ts_b36) < 6 else ts
+
+        if (self._num_seconds(self._now()) - ts) > timeout:
             return False
 
         return True
 
     def _make_token_with_timestamp(self, user, timestamp):
-        # timestamp is number of days since 2001-1-1.  Converted to
+        # If using PASSWORD_RESET_TIMEOUT_DAYS, timestamp is number of days since 2001-1-1.  Converted to
         # base 36, this gives us a 3 digit string until about 2121
+        # If using PASSWORD_RESET_TIMEOUT, timestamp is number of seconds since 2001-1-1.  Converted to
+        # base 36, this gives us a 6 digit string for a long long time
         ts_b36 = int_to_base36(timestamp)
 
         # By hashing on the internal state of the user and using state
@@ -71,12 +81,11 @@ class PasswordResetTokenGenerator:
         login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
         return str(user.pk) + user.password + str(login_timestamp) + str(timestamp)
 
-    def _num_days(self, dt):
-        return (dt - date(2001, 1, 1)).days
+    def _num_seconds(self, dt):
+        return int((dt - datetime(2001, 1, 1)).total_seconds())
 
-    def _today(self):
-        # Used for mocking in tests
-        return date.today()
+    def _now(self):
+        return datetime.now()
 
 
 default_token_generator = PasswordResetTokenGenerator()

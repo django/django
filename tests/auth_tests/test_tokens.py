@@ -1,9 +1,9 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 
 class TokenGeneratorTest(TestCase):
@@ -27,25 +27,49 @@ class TokenGeneratorTest(TestCase):
         tk2 = p0.make_token(reload)
         self.assertEqual(tk1, tk2)
 
-    def test_timeout(self):
+    def test_timeout_days(self):
         """
         The token is valid after n days, but no greater.
         """
         # Uses a mocked version of PasswordResetTokenGenerator so we can change
         # the value of 'today'
         class Mocked(PasswordResetTokenGenerator):
-            def __init__(self, today):
-                self._today_val = today
+            def __init__(self, now):
+                self._now_val = now
 
-            def _today(self):
-                return self._today_val
+            def _now(self):
+                return self._now_val
 
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
-        p1 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
+        current_time = datetime.now()
+        p1 = Mocked(current_time + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
         self.assertTrue(p1.check_token(user, tk1))
-        p2 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
+        p2 = Mocked(current_time + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
+        self.assertFalse(p2.check_token(user, tk1))
+
+    @override_settings(PASSWORD_RESET_TIMEOUT=60 * 60)
+    def test_timeout(self):
+        """
+        The token is valid after n seconds, but no greater.
+        """
+        # Uses a mocked version of PasswordResetTokenGenerator so we can change
+        # the value of 'today'
+        class Mocked(PasswordResetTokenGenerator):
+            def __init__(self, now):
+                self._now_val = now
+
+            def _now(self):
+                return self._now_val
+
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        p0 = PasswordResetTokenGenerator()
+        tk1 = p0.make_token(user)
+        current_time = datetime.now()
+        p1 = Mocked(current_time + timedelta(seconds=60 * 30))
+        self.assertTrue(p1.check_token(user, tk1))
+        p2 = Mocked(current_time + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1)))
         self.assertFalse(p2.check_token(user, tk1))
 
     def test_check_token_with_nonexistent_token_and_user(self):
