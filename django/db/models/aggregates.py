@@ -110,6 +110,7 @@ class Count(Aggregate):
     function = 'COUNT'
     name = 'Count'
     template = '%(function)s(%(distinct)s%(expressions)s)'
+    output_field = IntegerField()
 
     def __init__(self, expression, distinct=False, filter=None, **extra):
         if expression == '*':
@@ -118,7 +119,7 @@ class Count(Aggregate):
             raise ValueError('Star cannot be used with filter. Please specify a field.')
         super().__init__(
             expression, distinct='DISTINCT ' if distinct else '',
-            output_field=IntegerField(), filter=filter, **extra
+            filter=filter, **extra
         )
 
     def _get_repr_options(self):
@@ -141,10 +142,11 @@ class Min(Aggregate):
 
 class StdDev(Aggregate):
     name = 'StdDev'
+    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
-        super().__init__(expression, output_field=FloatField(), **extra)
+        super().__init__(expression, **extra)
 
     def _get_repr_options(self):
         options = super()._get_repr_options()
@@ -167,10 +169,11 @@ class Sum(Aggregate):
 
 class Variance(Aggregate):
     name = 'Variance'
+    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'
-        super().__init__(expression, output_field=FloatField(), **extra)
+        super().__init__(expression, **extra)
 
     def _get_repr_options(self):
         options = super()._get_repr_options()
