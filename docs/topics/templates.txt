@@ -441,10 +441,6 @@ adds defaults that differ from Jinja2's for a few options:
     Unless all of these conditions are met, passing a function to the template is
     simpler and more in line with the design of Jinja2.
 
-.. versionadded:: 1.11
-
-    The ``'context_processors'`` option was added.
-
 The default configuration is purposefully kept to a minimum. If a template is
 rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
 the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and

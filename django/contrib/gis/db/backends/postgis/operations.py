@@ -7,7 +7,7 @@ from django.contrib.gis.db.backends.base.operations import (
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import GeometryField, RasterField
 from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
@@ -103,6 +103,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     Adapter = PostGISAdapter
 
+    collect = geom_func_prefix + 'Collect'
+    extent = geom_func_prefix + 'Extent'
+    extent3d = geom_func_prefix + '3DExtent'
+    length3d = geom_func_prefix + '3DLength'
+    makeline = geom_func_prefix + 'MakeLine'
+    perimeter3d = geom_func_prefix + '3DPerimeter'
+    unionagg = geom_func_prefix + 'Union'
+
     gis_operators = {
         'bbcontains': PostGISOperator(op='~', raster=True),
         'bboverlaps': PostGISOperator(op='&&', geography=True, raster=True),
@@ -134,24 +142,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     unsupported_functions = set()
 
-    @cached_property
-    def select(self):
-        return '%s::bytea'
-
+    select = '%s::bytea'
     select_extent = None
-
-    def __init__(self, connection):
-        super().__init__(connection)
-
-        prefix = self.geom_func_prefix
-
-        self.collect = prefix + 'Collect'
-        self.extent = prefix + 'Extent'
-        self.extent3d = prefix + '3DExtent'
-        self.length3d = prefix + '3DLength'
-        self.makeline = prefix + 'MakeLine'
-        self.perimeter3d = prefix + '3DPerimeter'
-        self.unionagg = prefix + 'Union'
 
     @cached_property
     def function_names(self):
@@ -392,4 +384,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geometry_converter(self, expression):
         read = wkb_r().read
-        return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))
+        geom_class = expression.output_field.geom_class
+
+        def converter(value, expression, connection):
+            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+        return converter
+
+    def get_area_att_for_field(self, field):
+        return 'sq_m'

@@ -14,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_of = True
-    has_bulk_insert = True
     uses_savepoints = True
     can_release_savepoints = True
     supports_tablespaces = True
@@ -49,10 +48,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     $$ LANGUAGE plpgsql;"""
-
-    @cached_property
-    def supports_aggregate_filter_clause(self):
-        return self.connection.pg_version >= 90400
+    supports_over_clause = True
+    supports_aggregate_filter_clause = True
 
     @cached_property
     def has_select_for_update_skip_locked(self):
@@ -61,10 +58,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def has_brin_index_support(self):
         return self.connection.pg_version >= 90500
-
-    @cached_property
-    def has_jsonb_datatype(self):
-        return self.connection.pg_version >= 90400
 
     @cached_property
     def has_jsonb_agg(self):

@@ -1,0 +1,275 @@
+============================================
+Django 2.1 release notes - UNDER DEVELOPMENT
+============================================
+
+Welcome to Django 2.1!
+
+These release notes cover the :ref:`new features <whats-new-2.1>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-2.1>` you'll
+want to be aware of when upgrading from Django 2.0 or earlier. We've
+:ref:`dropped some features<removed-features-2.1>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for some
+features <deprecated-features-2.1>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 2.1 supports Python 3.5, 3.6, and 3.7. Django 2.0 is the last version to
+support Python 3.4.  We **highly recommend** and only officially support the
+latest release of each series.
+
+.. _whats-new-2.1:
+
+What's new in Django 2.1
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-2.1:
+
+Backwards incompatible changes in 2.1
+=====================================
+
+Database backend API
+--------------------
+
+* ...
+
+Dropped support for MySQL 5.5
+-----------------------------
+
+The end of upstream support for MySQL 5.5 is December 2018. Django 2.1 supports
+MySQL 5.6 and higher.
+
+Dropped support for PostgreSQL 9.3
+----------------------------------
+
+The end of upstream support for PostgreSQL 9.3 is September 2018. Django 2.1
+supports PostgreSQL 9.4 and higher.
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-2.1:
+
+Features deprecated in 2.1
+==========================
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _removed-features-2.1:
+
+Features removed in 2.1
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 2.1. See :ref:`deprecated-features-1.11` for details, including how
+to remove usage of these features.
+in Django 2.1. See :ref:`deprecated-features-1.11` and for details, including
+how to remove usage of these features.
+
+* ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
+  ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()`` are removed.
+
+* The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
+  is removed.
+
+* ``django.test.runner.setup_databases()`` is removed.
+
+* ``django.utils.translation.string_concat()`` is removed.
+
+* ``django.core.cache.backends.memcached.PyLibMCCache`` no longer supports
+  passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
+
+* The ``host`` parameter of ``django.utils.http.is_safe_url()`` is removed.
+
+* Silencing of exceptions raised while rendering the ``{% include %}`` template
+  tag is removed.
+
+* ``DatabaseIntrospection.get_indexes()`` is removed.
+
+* The ``authenticate()`` method of authentication backends requires ``request``
+  as the first positional argument.
+
+* The ``django.db.models.permalink()`` decorator is removed.
+
+* The ``USE_ETAGS`` setting is removed. ``CommonMiddleware`` and
+  ``django.utils.cache.patch_response_headers()`` no longer set ETags.
+
+* The ``Model._meta.has_auto_field`` attribute is removed.
+
+* Support for regular expression groups with ``iLmsu#`` in ``url()`` is removed.
+
+* Support for ``Widget.render()`` methods without the ``renderer`` argument
+  is removed.

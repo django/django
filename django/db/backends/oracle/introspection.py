@@ -1,12 +1,11 @@
-import warnings
 from collections import namedtuple
 
 import cx_Oracle
 
+from django.db import models
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
-from django.utils.deprecation import RemovedInDjango21Warning
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield',))
 
@@ -98,6 +97,33 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Table name comparison is case insensitive under Oracle."""
         return name.lower()
 
+    def get_sequences(self, cursor, table_name, table_fields=()):
+        cursor.execute("""
+            SELECT
+                user_tab_identity_cols.sequence_name,
+                user_tab_identity_cols.column_name
+            FROM
+                user_tab_identity_cols,
+                user_constraints,
+                user_cons_columns cols
+            WHERE
+                user_constraints.constraint_name = cols.constraint_name
+                AND user_constraints.table_name = user_tab_identity_cols.table_name
+                AND cols.column_name = user_tab_identity_cols.column_name
+                AND user_constraints.constraint_type = 'P'
+                AND user_tab_identity_cols.table_name = UPPER(%s)
+        """, [table_name])
+        # Oracle allows only one identity column per table.
+        row = cursor.fetchone()
+        if row:
+            return [{'name': row[0].lower(), 'table': table_name, 'column': row[1].lower()}]
+        # To keep backward compatibility for AutoFields that aren't Oracle
+        # identity columns.
+        for f in table_fields:
+            if isinstance(f, models.AutoField):
+                return [{'table': table_name, 'column': f.column}]
+        return []
+
     def get_relations(self, cursor, table_name):
         """
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
@@ -128,40 +154,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE c.table_name = %s AND c.constraint_type = 'R'""", [table_name.upper()])
         return [tuple(cell.lower() for cell in row)
                 for row in cursor.fetchall()]
-
-    def get_indexes(self, cursor, table_name):
-        warnings.warn(
-            "get_indexes() is deprecated in favor of get_constraints().",
-            RemovedInDjango21Warning, stacklevel=2
-        )
-        sql = """
-    SELECT LOWER(uic1.column_name) AS column_name,
-           CASE user_constraints.constraint_type
-               WHEN 'P' THEN 1 ELSE 0
-           END AS is_primary_key,
-           CASE user_indexes.uniqueness
-               WHEN 'UNIQUE' THEN 1 ELSE 0
-           END AS is_unique
-    FROM   user_constraints, user_indexes, user_ind_columns uic1
-    WHERE  user_constraints.constraint_type (+) = 'P'
-      AND  user_constraints.index_name (+) = uic1.index_name
-      AND  user_indexes.uniqueness (+) = 'UNIQUE'
-      AND  user_indexes.index_name (+) = uic1.index_name
-      AND  uic1.table_name = UPPER(%s)
-      AND  uic1.column_position = 1
-      AND  NOT EXISTS (
-              SELECT 1
-              FROM   user_ind_columns uic2
-              WHERE  uic2.index_name = uic1.index_name
-                AND  uic2.column_position = 2
-           )
-        """
-        cursor.execute(sql, [table_name])
-        indexes = {}
-        for row in cursor.fetchall():
-            indexes[row[0]] = {'primary_key': bool(row[1]),
-                               'unique': bool(row[2])}
-        return indexes
 
     def get_constraints(self, cursor, table_name):
         """

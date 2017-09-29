@@ -1,7 +1,6 @@
 import ipaddress
 import os
 import re
-from contextlib import suppress
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
@@ -215,9 +214,11 @@ class EmailValidator:
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
             ip_address = literal_match.group(1)
-            with suppress(ValidationError):
+            try:
                 validate_ipv46_address(ip_address)
                 return True
+            except ValidationError:
+                pass
         return False
 
     def __eq__(self, other):
@@ -413,15 +414,21 @@ class DecimalValidator:
 
     def __call__(self, value):
         digit_tuple, exponent = value.as_tuple()[1:]
-        decimals = abs(exponent)
-        # digit_tuple doesn't include any leading zeros.
-        digits = len(digit_tuple)
-        if decimals > digits:
-            # We have leading zeros up to or past the decimal point. Count
-            # everything past the decimal point as a digit. We do not count
-            # 0 before the decimal point as a digit since that would mean
-            # we would not allow max_digits = decimal_places.
-            digits = decimals
+        if exponent >= 0:
+            # A positive exponent adds that many trailing zeros.
+            digits = len(digit_tuple) + exponent
+            decimals = 0
+        else:
+            # If the absolute value of the negative exponent is larger than the
+            # number of digits, then it's the same as the number of digits,
+            # because it'll consume all of the digits in digit_tuple and then
+            # add abs(exponent) - len(digit_tuple) leading zeros after the
+            # decimal point.
+            if abs(exponent) > len(digit_tuple):
+                digits = decimals = abs(exponent)
+            else:
+                digits = len(digit_tuple)
+                decimals = abs(exponent)
         whole_digits = digits - decimals
 
         if self.max_digits is not None and digits > self.max_digits:

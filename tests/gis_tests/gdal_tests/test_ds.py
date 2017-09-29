@@ -1,12 +1,11 @@
 import os
 import re
-import unittest
 
 from django.contrib.gis.gdal import (
     GDAL_VERSION, DataSource, Envelope, GDALException, OGRGeometry,
-    OGRIndexError,
 )
 from django.contrib.gis.gdal.field import OFTInteger, OFTReal, OFTString
+from django.test import SimpleTestCase
 
 from ..test_data import TEST_DATA, TestDS, get_ds_file
 
@@ -65,7 +64,7 @@ ds_list = (
 bad_ds = (TestDS('foo'),)
 
 
-class DataSourceTest(unittest.TestCase):
+class DataSourceTest(SimpleTestCase):
 
     def test01_valid_shp(self):
         "Testing valid SHP Data Source files."
@@ -84,8 +83,12 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(source.driver, str(ds.driver))
 
             # Making sure indexing works
-            with self.assertRaises(OGRIndexError):
-                ds[len(ds)]
+            msg = 'Index out of range when accessing layers in a datasource: %s.'
+            with self.assertRaisesMessage(IndexError, msg % len(ds)):
+                ds.__getitem__(len(ds))
+
+            with self.assertRaisesMessage(IndexError, 'Invalid OGR layer name given: invalid.'):
+                ds.__getitem__('invalid')
 
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
@@ -120,9 +123,9 @@ class DataSourceTest(unittest.TestCase):
                     self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaisesMessage(IndexError, 'Negative indices are not allowed on OGR Layers.'):
                     layer.__getitem__(-1)
-                with self.assertRaises(OGRIndexError):
+                with self.assertRaisesMessage(IndexError, 'Invalid feature id: 50000.'):
                     layer.__getitem__(50000)
 
                 if hasattr(source, 'field_values'):
@@ -138,6 +141,13 @@ class DataSourceTest(unittest.TestCase):
                         # the feature values here while in this loop.
                         for fld_name, fld_value in source.field_values.items():
                             self.assertEqual(fld_value[i], feat.get(fld_name))
+
+                        msg = 'Index out of range when accessing field in a feature: %s.'
+                        with self.assertRaisesMessage(IndexError, msg % len(feat)):
+                            feat.__getitem__(len(feat))
+
+                        with self.assertRaisesMessage(IndexError, 'Invalid OFT field name given: invalid.'):
+                            feat.__getitem__('invalid')
 
     def test03b_layer_slice(self):
         "Test indexing and slicing on Layers."

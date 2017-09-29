@@ -66,6 +66,7 @@ class BaseModelAdminChecks:
 
     def check(self, admin_obj, **kwargs):
         errors = []
+        errors.extend(self._check_autocomplete_fields(admin_obj))
         errors.extend(self._check_raw_id_fields(admin_obj))
         errors.extend(self._check_fields(admin_obj))
         errors.extend(self._check_fieldsets(admin_obj))
@@ -79,6 +80,61 @@ class BaseModelAdminChecks:
         errors.extend(self._check_ordering(admin_obj))
         errors.extend(self._check_readonly_fields(admin_obj))
         return errors
+
+    def _check_autocomplete_fields(self, obj):
+        """
+        Check that `autocomplete_fields` is a list or tuple of model fields.
+        """
+        if not isinstance(obj.autocomplete_fields, (list, tuple)):
+            return must_be('a list or tuple', option='autocomplete_fields', obj=obj, id='admin.E036')
+        else:
+            return list(chain.from_iterable([
+                self._check_autocomplete_fields_item(obj, obj.model, field_name, 'autocomplete_fields[%d]' % index)
+                for index, field_name in enumerate(obj.autocomplete_fields)
+            ]))
+
+    def _check_autocomplete_fields_item(self, obj, model, field_name, label):
+        """
+        Check that an item in `autocomplete_fields` is a ForeignKey or a
+        ManyToManyField and that the item has a related ModelAdmin with
+        search_fields defined.
+        """
+        try:
+            field = model._meta.get_field(field_name)
+        except FieldDoesNotExist:
+            return refer_to_missing_field(field=field_name, option=label, model=model, obj=obj, id='admin.E037')
+        else:
+            if not (field.many_to_many or field.many_to_one):
+                return must_be(
+                    'a foreign key or a many-to-many field',
+                    option=label, obj=obj, id='admin.E038'
+                )
+            related_admin = obj.admin_site._registry.get(field.remote_field.model)
+            if related_admin is None:
+                return [
+                    checks.Error(
+                        'An admin for model "%s" has to be registered '
+                        'to be referenced by %s.autocomplete_fields.' % (
+                            field.remote_field.model.__name__,
+                            type(obj).__name__,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E039',
+                    )
+                ]
+            elif not related_admin.search_fields:
+                return [
+                    checks.Error(
+                        '%s must define "search_fields", because it\'s '
+                        'referenced by %s.autocomplete_fields.' % (
+                            related_admin.__class__.__name__,
+                            type(obj).__name__,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E040',
+                    )
+                ]
+            return []
 
     def _check_raw_id_fields(self, obj):
         """ Check that `raw_id_fields` only contains field names that are listed

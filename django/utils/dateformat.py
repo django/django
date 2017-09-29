@@ -14,7 +14,6 @@ import calendar
 import datetime
 import re
 import time
-from contextlib import suppress
 
 from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
@@ -82,9 +81,11 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        with suppress(NotImplementedError):
+        try:
             if hasattr(self.data, 'tzinfo') and self.data.tzinfo:
                 return self.data.tzname() or ''
+        except NotImplementedError:
+            pass
         return ""
 
     def f(self):
@@ -165,11 +166,13 @@ class TimeFormat(Formatter):
             return ""
 
         name = None
-        with suppress(Exception):
+        try:
+            name = self.timezone.tzname(self.data)
+        except Exception:
             # pytz raises AmbiguousTimeError during the autumn DST change.
             # This happens mainly when __init__ receives a naive datetime
             # and sets self.timezone = get_default_timezone().
-            name = self.timezone.tzname(self.data)
+            pass
         if name is None:
             name = self.format('O')
         return str(name)

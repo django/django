@@ -9,7 +9,6 @@ import math
 import os
 import re
 import uuid
-from contextlib import suppress
 from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
@@ -221,11 +220,12 @@ class CharField(Field):
 
     def to_python(self, value):
         """Return a string."""
+        if value not in self.empty_values:
+            value = str(value)
+            if self.strip:
+                value = value.strip()
         if value in self.empty_values:
             return self.empty_value
-        value = str(value)
-        if self.strip:
-            value = value.strip()
         return value
 
     def widget_attrs(self, widget):
@@ -1092,7 +1092,7 @@ class FilePathField(ChoiceField):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
         else:
-            with suppress(OSError):
+            try:
                 for f in sorted(os.listdir(self.path)):
                     if f == '__pycache__':
                         continue
@@ -1101,6 +1101,8 @@ class FilePathField(ChoiceField):
                             (self.allow_folders and os.path.isdir(full_file))) and
                             (self.match is None or self.match_re.search(f))):
                         self.choices.append((full_file, f))
+            except OSError:
+                pass
 
         self.widget.choices = self.choices
 

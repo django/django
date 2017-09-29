@@ -220,10 +220,6 @@ subclass::
     e.g. if all the dates are in one month, it'll show the day-level
     drill-down only.
 
-    .. versionchanged:: 1.11
-
-        The ability to reference fields on related models was added.
-
     .. note::
 
         ``date_hierarchy`` uses :meth:`QuerySet.datetimes()
@@ -519,11 +515,13 @@ subclass::
         If you want to use a custom widget with a relation field (i.e.
         :class:`~django.db.models.ForeignKey` or
         :class:`~django.db.models.ManyToManyField`), make sure you haven't
-        included that field's name in ``raw_id_fields`` or ``radio_fields``.
+        included that field's name in ``raw_id_fields``, ``radio_fields``, or
+        ``autocomplete_fields``.
 
         ``formfield_overrides`` won't let you change the widget on relation
-        fields that have ``raw_id_fields`` or ``radio_fields`` set. That's
-        because ``raw_id_fields`` and ``radio_fields`` imply custom widgets of
+        fields that have ``raw_id_fields``, ``radio_fields``, or
+        ``autocomplete_fields`` set. That's because ``raw_id_fields``,
+        ``radio_fields``, and ``autocomplete_fields`` imply custom widgets of
         their own.
 
 .. attribute:: ModelAdmin.inlines
@@ -1071,6 +1069,58 @@ subclass::
     Don't include a field in ``radio_fields`` unless it's a ``ForeignKey`` or has
     ``choices`` set.
 
+.. attribute:: ModelAdmin.autocomplete_fields
+
+    .. versionadded:: 2.0
+
+    ``autocomplete_fields`` is a list of ``ForeignKey`` and/or
+    ``ManyToManyField`` fields you would like to change to `Select2
+    <https://select2.org/>`_ autocomplete inputs.
+
+    By default, the admin uses a select-box interface (``<select>``) for
+    those fields. Sometimes you don't want to incur the overhead of selecting
+    all the related instances to display in the dropdown.
+
+    The Select2 input looks similar to the default input but comes with a
+    search feature that loads the options asynchronously. This is faster and
+    more user-friendly if the related model has many instances.
+
+    You must define :attr:`~ModelAdmin.search_fields` on the related object's
+    ``ModelAdmin`` because the autocomplete search uses it.
+
+    Ordering and pagination of the results are controlled by the related
+    ``ModelAdmin``'s :meth:`~ModelAdmin.get_ordering` and
+    :meth:`~ModelAdmin.get_paginator` methods.
+
+    In the following example, ``ChoiceAdmin`` has an autocomplete field for the
+    ``ForeignKey`` to the ``Question``. The results are filtered by the
+    ``question_text`` field and ordered by the ``date_created`` field::
+
+        class QuestionAdmin(admin.ModelAdmin):
+            ordering = ['date_created']
+            search_fields = ['question_text']
+
+        class ChoiceAdmin(admin.ModelAdmin):
+            autocomplete_fields = ['question']
+
+    .. admonition:: Performance considerations for large datasets
+
+        Ordering using :attr:`ModelAdmin.ordering` may cause performance
+        problems as sorting on a large queryset will be slow.
+
+        Also, if your search fields include fields that aren't indexed by the
+        database, you might encounter poor performance on extremely large
+        tables.
+
+        For those cases, it's a good idea to write your own
+        :func:`ModelAdmin.get_search_results` implementation using a
+        full-text indexed search.
+
+        You may also want to change the ``Paginator`` on very large tables
+        as the default paginator always performs a ``count()`` query.
+        For example, you could override the default implementation of the
+        ``Paginator.count`` property.
+
 .. attribute:: ModelAdmin.raw_id_fields
 
     By default, Django's admin uses a select-box interface (<select>) for
@@ -1310,8 +1360,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. attribute:: ModelAdmin.popup_response_template
 
-    .. versionadded:: 1.11
-
     Path to a custom template, used by :meth:`response_add`,
     :meth:`response_change`, and :meth:`response_delete`.
 
@@ -1431,6 +1479,15 @@ templates used by the :class:`ModelAdmin` views:
     pre- or post-save operations for objects related to the parent. Note
     that at this point the parent object and its form have already been saved.
 
+.. method:: ModelAdmin.get_autocomplete_fields(request)
+
+    .. versionadded:: 2.0
+
+    The ``get_readonly_fields()`` method is given the ``HttpRequest`` and is
+    expected to return a ``list`` or ``tuple`` of field names that will be
+    displayed with an autocomplete widget as described above in the
+    :attr:`ModelAdmin.autocomplete_fields` section.
+
 .. method:: ModelAdmin.get_readonly_fields(request, obj=None)
 
     The ``get_readonly_fields`` method is given the ``HttpRequest`` and the
@@ -1461,8 +1518,6 @@ templates used by the :class:`ModelAdmin` views:
     in the :attr:`ModelAdmin.list_display_links` section.
 
 .. method:: ModelAdmin.get_exclude(request, obj=None)
-
-    .. versionadded:: 1.11
 
     The ``get_exclude`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
@@ -1524,11 +1579,15 @@ templates used by the :class:`ModelAdmin` views:
     that ModelAdmin in the same way as a URLconf.  Therefore you can extend
     them as documented in :doc:`/topics/http/urls`::
 
+        from django.contrib import admin
+        from django.template.response import TemplateResponse
+        from django.urls import path
+
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    url(r'^my_view/$', self.my_view),
+                    path('my_view/', self.my_view),
                 ]
                 return my_urls + urls
 
@@ -1580,13 +1639,13 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+                    path('my_view/', self.admin_site.admin_view(self.my_view))
                 ]
                 return my_urls + urls
 
     Notice the wrapped view in the fifth line above::
 
-        url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+        path('my_view/', self.admin_site.admin_view(self.my_view))
 
     This wrapping will protect ``self.my_view`` from unauthorized access and
     will apply the :func:`django.views.decorators.cache.never_cache` decorator to
@@ -1596,7 +1655,7 @@ templates used by the :class:`ModelAdmin` views:
     performed, you can pass a ``cacheable=True`` argument to
     ``AdminSite.admin_view()``::
 
-        url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
+        path('my_view/', self.admin_site.admin_view(self.my_view, cacheable=True))
 
     ``ModelAdmin`` views have ``model_admin`` attributes. Other
     ``AdminSite`` views have ``admin_site`` attributes.
@@ -2533,10 +2592,6 @@ app or per model. The following can:
 * ``object_history.html``
 * ``popup_response.html``
 
-.. versionchanged:: 1.11
-
-    The ability to override the ``popup_response.html`` template was added.
-
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your
 ``templates/admin`` directory. This is particularly useful to create custom 404
@@ -2704,17 +2759,17 @@ Hooking ``AdminSite`` instances into your URLconf
 The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
 ``AdminSite.urls`` method. It is not necessary to use
-:func:`~django.conf.urls.include()`.
+:func:`~django.urls.include()`.
 
 In this example, we register the default ``AdminSite`` instance
 ``django.contrib.admin.site`` at the URL ``/admin/`` ::
 
     # urls.py
-    from django.conf.urls import url
     from django.contrib import admin
+    from django.urls import path
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        path('admin/', admin.site.urls),
     ]
 
 .. _customizing-adminsite:
@@ -2746,12 +2801,12 @@ update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
 .. snippet::
     :filename: myproject/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from myapp.admin import admin_site
 
     urlpatterns = [
-        url(r'^myadmin/', admin_site.urls),
+        path('myadmin/', admin_site.urls),
     ]
 
 Note that you may not want autodiscovery of ``admin`` modules when using your
@@ -2775,12 +2830,12 @@ separate versions of the admin site -- using the ``AdminSite`` instances
 respectively::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.admin import basic_site, advanced_site
 
     urlpatterns = [
-        url(r'^basic-admin/', basic_site.urls),
-        url(r'^advanced-admin/', advanced_site.urls),
+        path('basic-admin/', basic_site.urls),
+        path('advanced-admin/', advanced_site.urls),
     ]
 
 ``AdminSite`` instances take a single argument to their constructor, their
@@ -2816,23 +2871,23 @@ your URLconf. Specifically, add these four patterns::
 
     from django.contrib.auth import views as auth_views
 
-    url(
-        r'^admin/password_reset/$',
+    path(
+        'admin/password_reset/',
         auth_views.PasswordResetView.as_view(),
         name='admin_password_reset',
     ),
-    url(
-        r'^admin/password_reset/done/$',
+    path(
+        'admin/password_reset/done/',
         auth_views.PasswordResetDoneView.as_view(),
         name='password_reset_done',
     ),
-    url(
-        r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+    path(
+        'reset/<uidb64>/<token>/',
         auth_views.PasswordResetConfirmView.as_view(),
         name='password_reset_confirm',
     ),
-    url(
-        r'^reset/done/$',
+    path(
+        'reset/done/',
         auth_views.PasswordResetCompleteView.as_view(),
         name='password_reset_complete',
     ),

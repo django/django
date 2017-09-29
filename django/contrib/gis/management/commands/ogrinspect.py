@@ -124,10 +124,10 @@ class Command(BaseCommand):
             # This extra legwork is so that the dictionary definition comes
             # out in the same order as the fields in the model definition.
             rev_mapping = {v: k for k, v in mapping_dict.items()}
-            output.extend(['', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name,
+            output.extend(['', '', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name,
                            '%s_mapping = {' % model_name.lower()])
-            output.extend("    '%s' : '%s'," % (
+            output.extend("    '%s': '%s'," % (
                 rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields
             )
-            output.extend(["    '%s' : '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}'])
+            output.extend(["    '%s': '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}'])
         return '\n'.join(output) + '\n'

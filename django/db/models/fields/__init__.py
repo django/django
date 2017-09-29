@@ -6,7 +6,7 @@ import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
-from functools import total_ordering
+from functools import partialmethod, total_ordering
 
 from django import forms
 from django.apps import apps
@@ -26,7 +26,7 @@ from django.utils.dateparse import (
 )
 from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.functional import Promise, cached_property, curry
+from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
@@ -158,7 +158,7 @@ class Field(RegisterLookupMixin):
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
-        self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
+        self._db_tablespace = db_tablespace
         self.auto_created = auto_created
 
         # Adjust the appropriate creation counter, and save our local copy.
@@ -423,7 +423,7 @@ class Field(RegisterLookupMixin):
             "choices": [],
             "help_text": '',
             "db_column": None,
-            "db_tablespace": settings.DEFAULT_INDEX_TABLESPACE,
+            "db_tablespace": None,
             "auto_created": False,
             "validators": [],
             "error_messages": None,
@@ -433,8 +433,9 @@ class Field(RegisterLookupMixin):
             "error_messages": "_error_messages",
             "validators": "_validators",
             "verbose_name": "_verbose_name",
+            "db_tablespace": "_db_tablespace",
         }
-        equals_comparison = {"choices", "validators", "db_tablespace"}
+        equals_comparison = {"choices", "validators"}
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
             # Unroll anything iterable for choices into a concrete list
@@ -688,6 +689,10 @@ class Field(RegisterLookupMixin):
     def unique(self):
         return self._unique or self.primary_key
 
+    @property
+    def db_tablespace(self):
+        return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
+
     def set_attributes_from_name(self, name):
         if not self.name:
             self.name = name
@@ -717,7 +722,7 @@ class Field(RegisterLookupMixin):
                 setattr(cls, self.attname, DeferredAttribute(self.attname, cls))
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
-                    curry(cls._get_FIELD_display, field=self))
+                    partialmethod(cls._get_FIELD_display, field=self))
 
     def get_filter_kwargs_for_object(self, obj):
         """
@@ -1254,11 +1259,11 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.null:
             setattr(
                 cls, 'get_next_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
+                partialmethod(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
             )
             setattr(
                 cls, 'get_previous_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
+                partialmethod(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
             )
 
     def get_prep_value(self, value):

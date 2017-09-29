@@ -104,11 +104,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
       See :ref:`template-loaders` for details.
 
-      .. versionchanged:: 1.11
-
-          Enabling of the cached template loader when ``debug`` is ``False``
-          was added.
-
     * ``string_if_invalid`` is the output, as a string, that the template
       system should use for invalid (e.g. misspelled) variables.
 
@@ -855,11 +850,6 @@ loaders that come with Django:
             },
         }]
 
-    .. versionchanged:: 1.11
-
-        The ability to specify directories for a particular filesystem loader
-        was added.
-
 ``django.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader
@@ -946,11 +936,6 @@ loaders that come with Django:
         that the ``Node`` implementation for each tag is thread-safe. For more
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
-
-    .. versionchanged:: 1.11
-
-        The automatic enabling of the cached template loader when ``debug`` is
-        ``False`` was added.
 
 ``django.template.loaders.locmem.Loader``
 

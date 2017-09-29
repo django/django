@@ -4,7 +4,7 @@ from django.contrib.gis.db.backends.base.operations import (
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.mysql.operations import DatabaseOperations
@@ -15,16 +15,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     mysql = True
     name = 'mysql'
+    geom_func_prefix = 'ST_'
 
     Adapter = WKTAdapter
-
-    @cached_property
-    def geom_func_prefix(self):
-        return '' if self.is_mysql_5_5 else 'ST_'
-
-    @cached_property
-    def is_mysql_5_5(self):
-        return self.connection.mysql_version < (5, 6, 1)
 
     @cached_property
     def is_mysql_5_6(self):
@@ -56,10 +49,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             'within': SpatialOperator(func='MBRWithin'),
         }
 
-    @cached_property
-    def function_names(self):
-        return {'Length': 'GLength'} if self.is_mysql_5_5 else {}
-
     disallowed_aggregates = (
         aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
         aggregates.MakeLine, aggregates.Union,
@@ -75,8 +64,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         }
         if self.connection.mysql_version < (5, 7, 5):
             unsupported.update({'AsGeoJSON', 'GeoHash', 'IsValid'})
-        if self.is_mysql_5_5:
-            unsupported.update({'Difference', 'Distance', 'Intersection', 'SymDifference', 'Union'})
         return unsupported
 
     def geo_db_type(self, f):
@@ -100,7 +87,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         srid = expression.output_field.srid
         if srid == -1:
             srid = None
+        geom_class = expression.output_field.geom_class
 
         def converter(value, expression, connection):
-            return None if value is None else GEOSGeometry(read(memoryview(value)), srid)
+            if value is not None:
+                geom = GEOSGeometryBase(read(memoryview(value)), geom_class)
+                if srid:
+                    geom.srid = srid
+                return geom
         return converter

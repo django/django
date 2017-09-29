@@ -2,13 +2,12 @@ import functools
 import re
 import sys
 import types
-from contextlib import suppress
 from pathlib import Path
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import force_escape, pprint
+from django.template.defaultfilters import pprint
 from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -271,7 +270,7 @@ class ExceptionReporter:
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
-                    frame_vars.append((k, force_escape(v)))
+                    frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame
 
@@ -348,14 +347,18 @@ class ExceptionReporter:
         """
         source = None
         if loader is not None and hasattr(loader, "get_source"):
-            with suppress(ImportError):
+            try:
                 source = loader.get_source(module_name)
+            except ImportError:
+                pass
             if source is not None:
                 source = source.splitlines()
         if source is None:
-            with suppress(OSError, IOError):
+            try:
                 with open(filename, 'rb') as fp:
                     source = fp.read().splitlines()
+            except (OSError, IOError):
+                pass
         if source is None:
             return None, [], None, []
 

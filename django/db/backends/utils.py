@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import functools
 import hashlib
 import logging
 import re
@@ -65,6 +66,18 @@ class CursorWrapper:
                 return self.cursor.callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
+        return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+
+    def executemany(self, sql, param_list):
+        return self._execute_with_wrappers(sql, param_list, many=True, executor=self._executemany)
+
+    def _execute_with_wrappers(self, sql, params, many, executor):
+        context = {'connection': self.db, 'cursor': self}
+        for wrapper in reversed(self.db.execute_wrappers):
+            executor = functools.partial(wrapper, executor)
+        return executor(sql, params, many, context)
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None:
@@ -72,7 +85,7 @@ class CursorWrapper:
             else:
                 return self.cursor.execute(sql, params)
 
-    def executemany(self, sql, param_list):
+    def _executemany(self, sql, param_list, *ignored_wrapper_args):
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             return self.cursor.executemany(sql, param_list)

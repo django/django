@@ -305,12 +305,6 @@ passes might be needed. Increase the maximum number of passes by subclassing
 ``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
 attribute. It defaults to 5.
 
-.. versionchanged:: 1.11
-
-    Previous versions didn't make multiple passes to ensure file hashes
-    converged, so often times file hashes weren't correct. The
-    ``max_post_process_passes`` attribute was added.
-
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
@@ -332,11 +326,6 @@ If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
 ``ValueError`` is raised. This behavior can be disabled by subclassing
 ``ManifestStaticFilesStorage`` and setting the ``manifest_strict`` attribute to
 ``False`` -- nonexistent paths will remain unchanged.
-
-.. versionchanged:: 1.11
-
-    The ``manifest_strict`` attribute was added. In older versions, the
-    behavior is the same as ``manifest_strict=False``.
 
 Due to the requirement of running :djadmin:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
@@ -462,10 +451,11 @@ primary URL configuration::
 
    from django.conf import settings
    from django.contrib.staticfiles import views
+   from django.urls import re_path
 
    if settings.DEBUG:
        urlpatterns += [
-           url(r'^static/(?P<path>.*)$', views.serve),
+           re_path(r'^static/(?P<path>.*)$', views.serve),
        ]
 
 Note, the beginning of the pattern (``r'^static/'``) should be your

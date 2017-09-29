@@ -49,7 +49,7 @@ class CustomPwdTemplateUserAdmin(UserAdmin):
 site = Admin2(name="admin2")
 
 site.register(models.Article, base_admin.ArticleAdmin)
-site.register(models.Section, inlines=[base_admin.ArticleInline])
+site.register(models.Section, inlines=[base_admin.ArticleInline], search_fields=['name'])
 site.register(models.Thing, base_admin.ThingAdmin)
 site.register(models.Fabric, base_admin.FabricAdmin)
 site.register(models.ChapterXtra1, base_admin.ChapterXtra1Admin)

@@ -4,7 +4,6 @@ and database field objects.
 """
 
 from collections import OrderedDict
-from contextlib import suppress
 from itertools import chain
 
 from django.core.exceptions import (
@@ -615,8 +614,10 @@ class BaseModelFormSet(BaseFormSet):
                 kwargs['instance'] = self.get_queryset()[i]
         elif self.initial_extra:
             # Set initial values for extra forms
-            with suppress(IndexError):
+            try:
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
+            except IndexError:
+                pass
         form = super()._construct_form(i, **kwargs)
         if pk_required:
             form.fields[self.model._meta.pk.name].required = True
@@ -836,7 +837,7 @@ class BaseModelFormSet(BaseFormSet):
                         pk_value = None
                 except IndexError:
                     pk_value = None
-            if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
+            if isinstance(pk, (ForeignKey, OneToOneField)):
                 qs = pk.remote_field.model._default_manager.get_queryset()
             else:
                 qs = self.model._default_manager.get_queryset()
@@ -1140,7 +1141,7 @@ class ModelChoiceIterator:
             yield self.choice(obj)
 
     def __len__(self):
-        return (len(self.queryset) + (1 if self.field.empty_label is not None else 0))
+        return len(self.queryset) + (1 if self.field.empty_label is not None else 0)
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))

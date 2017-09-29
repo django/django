@@ -44,6 +44,27 @@ GDAL_RESAMPLE_ALGORITHMS = {
     'Mode': 6,
 }
 
+# See http://www.gdal.org/gdal_8h.html#ace76452d94514561fffa8ea1d2a5968c
+GDAL_COLOR_TYPES = {
+    0: 'GCI_Undefined',  # Undefined, default value, i.e. not known
+    1: 'GCI_GrayIndex',  # Greyscale
+    2: 'GCI_PaletteIndex',  # Paletted
+    3: 'GCI_RedBand',  # Red band of RGBA image
+    4: 'GCI_GreenBand',  # Green band of RGBA image
+    5: 'GCI_BlueBand',  # Blue band of RGBA image
+    6: 'GCI_AlphaBand',  # Alpha (0=transparent, 255=opaque)
+    7: 'GCI_HueBand',  # Hue band of HLS image
+    8: 'GCI_SaturationBand',  # Saturation band of HLS image
+    9: 'GCI_LightnessBand',  # Lightness band of HLS image
+    10: 'GCI_CyanBand',  # Cyan band of CMYK image
+    11: 'GCI_MagentaBand',  # Magenta band of CMYK image
+    12: 'GCI_YellowBand',  # Yellow band of CMYK image
+    13: 'GCI_BlackBand',  # Black band of CMLY image
+    14: 'GCI_YCbCr_YBand',  # Y Luminance
+    15: 'GCI_YCbCr_CbBand',  # Cb Chroma
+    16: 'GCI_YCbCr_CrBand',  # Cr Chroma, also GCI_Max
+}
+
 # Fixed base path for buffer-based GDAL in-memory files.
 VSI_FILESYSTEM_BASE_PATH = '/vsimem/'
 

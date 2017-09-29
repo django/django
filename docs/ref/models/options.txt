@@ -131,17 +131,25 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.get_latest_by
 
-    The name of an orderable field in the model, typically a :class:`DateField`,
-    :class:`DateTimeField`, or :class:`IntegerField`. This specifies the default
-    field to use in your model :class:`Manager`’s
+    The name of a field or a list of field names in the model, typically
+    :class:`DateField`, :class:`DateTimeField`, or :class:`IntegerField`. This
+    specifies the default field(s) to use in your model :class:`Manager`’s
     :meth:`~django.db.models.query.QuerySet.latest` and
     :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
     Example::
 
+        # Latest by ascending order_date.
         get_latest_by = "order_date"
 
+        # Latest by priority descending, order_date ascending.
+        get_latest_by = ['-priority', 'order_date']
+
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
+
+    .. versionchanged:: 2.0
+
+        Support for a list of fields was added.
 
 ``managed``
 -----------
@@ -256,9 +264,10 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-order_date']
 
-    This is a tuple or list of strings. Each string is a field name with an optional
-    "-" prefix, which indicates descending order. Fields without a leading "-" will
-    be ordered ascending. Use the string "?" to order randomly.
+    This is a tuple or list of strings and/or query expressions. Each string is
+    a field name with an optional "-" prefix, which indicates descending order.
+    Fields without a leading "-" will be ordered ascending. Use the string "?"
+    to order randomly.
 
     For example, to order by a ``pub_date`` field ascending, use this::
 
@@ -272,8 +281,19 @@ Django quotes column and table names behind the scenes.
 
         ordering = ['-pub_date', 'author']
 
+    You can also use :doc:`query expressions </ref/models/expressions>`. To
+    order by ``author`` ascending and make null values sort last, use this::
+
+        from django.db.models import F
+
+        ordering = [F('author').asc(nulls_last=True)]
+
     Default ordering also affects :ref:`aggregation queries
     <aggregation-ordering-interaction>`.
+
+    .. versionchanged:: 2.0
+
+        Support for query expressions was added.
 
 .. warning::
 
@@ -366,8 +386,6 @@ Django quotes column and table names behind the scenes.
 -----------
 
 .. attribute:: Options.indexes
-
-    .. versionadded:: 1.11
 
     A list of :doc:`indexes </ref/models/indexes>` that you want to define on
     the model::

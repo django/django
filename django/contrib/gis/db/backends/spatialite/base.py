@@ -3,7 +3,7 @@ from ctypes.util import find_library
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.base import (
-    DatabaseWrapper as SQLiteDatabaseWrapper, SQLiteCursorWrapper,
+    DatabaseWrapper as SQLiteDatabaseWrapper,
 )
 
 from .client import SpatiaLiteClient
@@ -46,16 +46,13 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                 'SpatiaLite requires SQLite to be configured to allow '
                 'extension loading.'
             )
-        # Loading the SpatiaLite library extension on the connection, and returning
-        # the created cursor.
-        cur = conn.cursor(factory=SQLiteCursorWrapper)
+        # Load the SpatiaLite library extension on the connection.
         try:
-            cur.execute("SELECT load_extension(%s)", (self.spatialite_lib,))
+            conn.load_extension(self.spatialite_lib)
         except Exception as exc:
             raise ImproperlyConfigured(
                 'Unable to load the SpatiaLite library extension "%s"' % self.spatialite_lib
             ) from exc
-        cur.close()
         return conn
 
     def prepare_database(self):

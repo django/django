@@ -246,9 +246,9 @@ class SimpleTestCase(unittest.TestCase):
         Assert that a response redirected to a specific URL and that the
         redirect URL can be loaded.
 
-        Won't work for external links since it uses TestClient to do a request
-        (use fetch_redirect_response=False to check such links without fetching
-        them).
+        Won't work for external links since it uses the test client to do a
+        request (use fetch_redirect_response=False to check such links without
+        fetching them).
         """
         if msg_prefix:
             msg_prefix += ": "
@@ -712,7 +712,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         try:
             data = json.loads(raw)
-        except ValueError:
+        except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % raw)
         if isinstance(expected_data, str):
             try:
@@ -729,12 +729,12 @@ class SimpleTestCase(unittest.TestCase):
         """
         try:
             data = json.loads(raw)
-        except ValueError:
+        except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % raw)
         if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
-            except ValueError:
+            except json.JSONDecodeError:
                 self.fail("Second argument is not valid JSON: %r" % expected_data)
         self.assertNotEqual(data, expected_data, msg=msg)
 

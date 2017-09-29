@@ -42,10 +42,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
     return any results. Most Django projects won't encounter this exception,
     but it might be useful for implementing custom lookups and expressions.
 
-    .. versionchanged:: 1.11
-
-        In older versions, it's only importable from ``django.db.models.sql``.
-
 ``FieldDoesNotExist``
 ---------------------
 

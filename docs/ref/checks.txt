@@ -444,18 +444,18 @@ URLs
 The following checks are performed on your URL configuration:
 
 * **urls.W001**: Your URL pattern ``<pattern>`` uses
-  :func:`~django.conf.urls.include` with a ``regex`` ending with a
-  ``$``. Remove the dollar from the ``regex`` to avoid problems
-  including URLs.
-* **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
-  beginning with a ``/``. Remove this slash as it is unnecessary.
-  If this pattern is targeted in an :func:`~django.conf.urls.include`, ensure
-  the :func:`~django.conf.urls.include` pattern has a trailing ``/``.
+  :func:`~django.urls.include` with a ``route`` ending with a ``$``. Remove the
+  dollar from the ``route`` to avoid problems including URLs.
+* **urls.W002**: Your URL pattern ``<pattern>`` has a ``route`` beginning with
+  a ``/``. Remove this slash as it is unnecessary. If this pattern is targeted
+  in an :func:`~django.urls.include`, ensure the :func:`~django.urls.include`
+  pattern has a trailing ``/``.
 * **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
   including a ``:``. Remove the colon, to avoid ambiguous namespace
   references.
 * **urls.E004**: Your URL pattern ``<pattern>`` is invalid. Ensure that
-  ``urlpatterns`` is a list of :func:`~django.conf.urls.url()` instances.
+  ``urlpatterns`` is a list of :func:`~django.urls.path` and/or
+  :func:`~django.urls.re_path` instances.
 * **urls.W005**: URL namespace ``<namespace>`` isn't unique. You may not be
   able to reverse all URLs in this namespace.
 * **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must
@@ -527,6 +527,15 @@ with the admin site:
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
+* **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
+  ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E038**: The value of ``autocomplete_fields[n]`` must be a foreign
+  key or a many-to-many field.
+* **admin.E039**: An admin for model ``<model>`` has to be registered to be
+  referenced by ``<modeladmin>.autocomplete_fields``.
+* **admin.E040**: ``<modeladmin>`` must define ``search_fields``, because
+  it's referenced by ``<other_modeladmin>.autocomplete_fields``.
 
 ``ModelAdmin``
 ~~~~~~~~~~~~~~
@@ -669,6 +678,15 @@ The following checks are performed when a model contains a
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
 * **contenttypes.E005**: Model names must be at most 100 characters.
+
+``postgres``
+------------
+
+The following checks are performed on :mod:`django.contrib.postgres` model
+fields:
+
+* **postgres.E001**: Base field for array has errors: ...
+* **postgres.E002**: Base field for array cannot be a related field.
 
 ``sites``
 ---------

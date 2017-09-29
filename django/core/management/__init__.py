@@ -3,7 +3,6 @@ import os
 import pkgutil
 import sys
 from collections import OrderedDict, defaultdict
-from contextlib import suppress
 from importlib import import_module
 
 import django
@@ -262,12 +261,14 @@ class ManagementUtility:
             subcommand_cls = self.fetch_command(cwords[0])
             # special case: add the names of installed apps to options
             if cwords[0] in ('dumpdata', 'sqlmigrate', 'sqlsequencereset', 'test'):
-                # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
-                # user will find out once they execute the command.
-                with suppress(ImportError):
+                try:
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
                     options.extend((app_config.label, 0) for app_config in app_configs)
+                except ImportError:
+                    # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
+                    # user will find out once they execute the command.
+                    pass
             parser = subcommand_cls.create_parser('', cwords[0])
             options.extend(
                 (min(s_opt.option_strings), s_opt.nargs != 0)
@@ -306,9 +307,11 @@ class ManagementUtility:
         parser.add_argument('--settings')
         parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')  # catch-all
-        with suppress(CommandError):  # Ignore any option errors at this point.
+        try:
             options, args = parser.parse_known_args(self.argv[2:])
             handle_default_options(options)
+        except CommandError:
+            pass  # Ignore any option errors at this point.
 
         try:
             settings.INSTALLED_APPS

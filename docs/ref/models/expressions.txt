@@ -353,6 +353,13 @@ The ``Aggregate`` API is as follows:
         generated. Specifically, the ``function`` will be interpolated as the
         ``function`` placeholder within :attr:`template`. Defaults to ``None``.
 
+    .. attribute:: window_compatible
+
+        .. versionadded:: 2.0
+
+        Defaults to ``True`` since most aggregate functions can be used as the
+        source expression in :class:`~django.db.models.expressions.Window`.
+
 The ``expression`` argument can be the name of a field on the model, or another
 expression. It will be converted to a string and used as the ``expressions``
 placeholder within the ``template``.
@@ -456,8 +463,6 @@ expressions. For more details see :doc:`conditional-expressions`.
 
 .. class:: Subquery(queryset, output_field=None)
 
-.. versionadded:: 1.11
-
 You can add an explicit subquery to a ``QuerySet`` using the ``Subquery``
 expression.
 
@@ -490,8 +495,6 @@ Referencing columns from the outer queryset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: OuterRef(field)
-
-.. versionadded:: 1.11
 
 Use ``OuterRef`` when a queryset in a ``Subquery`` needs to refer to a field
 from the outer query. It acts like an :class:`F` expression except that the
@@ -541,8 +544,6 @@ row: the email address of the most recently created comment.
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: Exists(queryset)
-
-.. versionadded:: 1.11
 
 ``Exists`` is a ``Subquery`` subclass that uses an SQL ``EXISTS`` statement. In
 many cases it will perform better than a subquery since the database is able to
@@ -649,6 +650,184 @@ should avoid them if possible.
     force you to acknowledge that you're not interpolating your SQL with user
     provided data.
 
+Window functions
+----------------
+
+.. versionadded:: 2.0
+
+Window functions provide a way to apply functions on partitions. Unlike a
+normal aggregation function which computes a final result for each set defined
+by the group by, window functions operate on :ref:`frames <window-frames>` and
+partitions, and compute the result for each row.
+
+You can specify multiple windows in the same query which in Django ORM would be
+equivalent to including multiple expressions in a :doc:`QuerySet.annotate()
+</topics/db/aggregation>` call. The ORM doesn't make use of named windows,
+instead they are part of the selected columns.
+
+.. class:: Window(expression, partition_by=None, order_by=None, frame=None, output_field=None)
+
+    .. attribute:: filterable
+
+        Defaults to ``False``. The SQL standard disallows referencing window
+        functions in the ``WHERE`` clause and Django raises an exception when
+        constructing a ``QuerySet`` that would do that.
+
+    .. attribute:: template
+
+        Defaults to ``%(expression)s OVER (%(window)s)'``. If only the
+        ``expression`` argument is provided, the window clause will be blank.
+
+The ``Window`` class is the main expression for an ``OVER`` clause.
+
+The ``expression`` argument is either a :ref:`window function
+<window-functions>`, an :ref:`aggregate function <aggregation-functions>`, or
+an expression that's compatible in a window clause.
+
+The ``partition_by`` argument is a list of expressions (column names should be
+wrapped in an ``F``-object) that control the partitioning of the rows.
+Partitioning narrows which rows are used to compute the result set.
+
+The ``output_field`` is specified either as an argument or by the expression.
+
+The ``order_by`` argument accepts a sequence of expressions on which you can
+call :meth:`~django.db.models.Expression.asc` and
+:meth:`~django.db.models.Expression.desc`. The ordering controls the order in
+which the expression is applied. For example, if you sum over the rows in a
+partition, the first result is just the value of the first row, the second is
+the sum of first and second row.
+
+The ``frame`` parameter specifies which other rows that should be used in the
+computation. See :ref:`window-frames` for details.
+
+For example, to annotate each movie with the average rating for the movies by
+the same studio in the same genre and release year::
+
+    >>> from django.db.models import Avg, ExtractYear, F, Window
+    >>> Movie.objects.annotate(
+    >>>     avg_rating=Window(
+    >>>         expression=Avg('rating'),
+    >>>         partition_by=[F('studio'), F('genre')],
+    >>>         order_by=ExtractYear('released').asc(),
+    >>>     ),
+    >>> )
+
+This makes it easy to check if a movie is rated better or worse than its peers.
+
+You may want to apply multiple expressions over the same window, i.e., the
+same partition and frame. For example, you could modify the previous example
+to also include the best and worst rating in each movie's group (same studio,
+genre, and release year) by using three window functions in the same query. The
+partition and ordering from the previous example is extracted into a dictionary
+to reduce repetition::
+
+    >>> from django.db.models import Avg, ExtractYear, F, Max, Min, Window
+    >>> window = {
+    >>>    'partition': [F('studio'), F('genre')],
+    >>>    'order_by': ExtractYear('released').asc(),
+    >>> }
+    >>> Movie.objects.annotate(
+    >>>     avg_rating=Window(
+    >>>         expression=Avg('rating'), **window,
+    >>>     ),
+    >>>     best=Window(
+    >>>         expression=Max('rating'), **window,
+    >>>     ),
+    >>>     worst=Window(
+    >>>         expression=Min('rating'), **window,
+    >>>     ),
+    >>> )
+
+Among Django's built-in database backends, MySQL 8.0.2+, PostgreSQL, and Oracle
+support window expressions. Support for different window expression features
+varies among the different databases. For example, the options in
+:meth:`~django.db.models.Expression.asc` and
+:meth:`~django.db.models.Expression.desc` may not be supported. Consult the
+documentation for your database as needed.
+
+.. _window-frames:
+
+Frames
+~~~~~~
+
+For a window frame, you can choose either a range-based sequence of rows or an
+ordinary sequence of rows.
+
+.. class:: ValueRange(start=None, end=None)
+
+    .. attribute:: frame_type
+
+        This attribute is set to ``'RANGE'``.
+
+    PostgreSQL has limited support for ``ValueRange`` and only supports use of
+    the standard start and end points, such as ``CURRENT ROW`` and ``UNBOUNDED
+    FOLLOWING``.
+
+.. class:: RowRange(start=None, end=None)
+
+    .. attribute:: frame_type
+
+        This attribute is set to ``'ROWS'``.
+
+Both classes return SQL with the template::
+
+    %(frame_type)s BETWEEN %(start)s AND %(end)s
+
+Frames narrow the rows that are used for computing the result. They shift from
+some start point to some specified end point. Frames can be used with and
+without partitions, but it's often a good idea to specify an ordering of the
+window to ensure a deterministic result. In a frame, a peer in a frame is a row
+with an equivalent value, or all rows if an ordering clause isn't present.
+
+The default starting point for a frame is ``UNBOUNDED PRECEDING`` which is the
+first row of the partition. The end point is always explicitly included in the
+SQL generated by the ORM and is by default ``UNBOUNDED FOLLOWING``. The default
+frame includes all rows from the partition to the last row in the set.
+
+The accepted values for the ``start`` and ``end`` arguments are ``None``, an
+integer, or zero. A negative integer for ``start`` results in ``N preceding``,
+while ``None`` yields ``UNBOUNDED PRECEDING``. For both ``start`` and ``end``,
+zero will return ``CURRENT ROW``. Positive integers are accepted for ``end``.
+
+There's a difference in what ``CURRENT ROW`` includes. When specified in
+``ROWS`` mode, the frame starts or ends with the current row. When specified in
+``RANGE`` mode, the frame starts or ends at the first or last peer according to
+the ordering clause. Thus, ``RANGE CURRENT ROW`` evaluates the expression for
+rows which have the same value specified by the ordering. Because the template
+includes both the ``start`` and ``end`` points, this may be expressed with::
+
+    ValueRange(start=0, end=0)
+
+If a movie's "peers" are described as movies released by the same studio in the
+same genre in the same year, this ``RowRange`` example annotates each movie
+with the average rating of a movie's two prior and two following peers::
+
+    >>> from django.db.models import Avg, ExtractYear, F, RowRange, Window
+    >>> Movie.objects.annotate(
+    >>>     avg_rating=Window(
+    >>>         expression=Avg('rating'),
+    >>>         partition_by=[F('studio'), F('genre')],
+    >>>         order_by=ExtractYear('released').asc(),
+    >>>         frame=RowRange(start=-2, end=2),
+    >>>     ),
+    >>> )
+
+If the database supports it, you can specify the start and end points based on
+values of an expression in the partition. If the ``released`` field of the
+``Movie`` model stores the release month of each movies, this ``ValueRange``
+example annotates each movie with the average rating of a movie's peers
+released between twelve months before and twelve months after the each movie.
+
+    >>> from django.db.models import Avg, ExpressionList, F, ValueRange, Window
+    >>> Movie.objects.annotate(
+    >>>     avg_rating=Window(
+    >>>         expression=Avg('rating'),
+    >>>         partition_by=[F('studio'), F('genre')],
+    >>>         order_by=F('released').asc(),
+    >>>         frame=ValueRange(start=-12, end=12),
+    >>>     ),
+    >>> )
+
 .. currentmodule:: django.db.models
 
 Technical Information
@@ -676,6 +855,30 @@ calling the appropriate methods on the wrapped expression.
 
         Tells Django that this expression contains an aggregate and that a
         ``GROUP BY`` clause needs to be added to the query.
+
+    .. attribute:: contains_over_clause
+
+        .. versionadded:: 2.0
+
+        Tells Django that this expression contains a
+        :class:`~django.db.models.expressions.Window` expression. It's used,
+        for example, to disallow window function expressions in queries that
+        modify data. Defaults to ``True``.
+
+    .. attribute:: filterable
+
+        .. versionadded:: 2.0
+
+        Tells Django that this expression can be referenced in
+        :meth:`.QuerySet.filter`. Defaults to ``True``.
+
+    .. attribute:: window_compatible
+
+        .. versionadded:: 2.0
+
+        Tells Django that this expression can be used as the source expression
+        in :class:`~django.db.models.expressions.Window`. Defaults to
+        ``False``.
 
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
@@ -740,19 +943,11 @@ calling the appropriate methods on the wrapped expression.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
 
-        .. versionchanged:: 1.11
-
-            The ``nulls_last`` and ``nulls_first`` parameters were added.
-
     .. method:: desc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
-
-        .. versionchanged:: 1.11
-
-            The ``nulls_first`` and ``nulls_last`` parameters were added.
 
     .. method:: reverse_ordering()
 

@@ -158,14 +158,6 @@ Widget classes
     ``OpenLayers.js`` file `tailored to your needs`_ in the ``js`` property of
     the inner ``Media`` class (see :ref:`assets-as-a-static-definition`).
 
-    .. versionchanged:: 1.11
-
-        Older versions use ``OpenLayers.js`` from ``openlayers.org`` which
-        isn't suitable for production use since it offers no guaranteed uptime
-        and runs on a slow server.
-
-        Also, the widget nows uses OpenLayers 3 instead of OpenLayers 2.
-
     .. _tailored to your needs: http://openlayers.org/en/latest/doc/tutorials/custom-builds.html
 
 ``OSMWidget``
@@ -194,11 +186,5 @@ Widget classes
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map
     tiles.
-
-    .. versionchanged:: 1.11
-
-        OpenLayers 2.x has been dropped in favor of OpenLayers 3. If you extend
-        the ``gis/openlayers-osm.html`` template, please review your custom
-        template.
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site

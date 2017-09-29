@@ -127,13 +127,12 @@ class BaseContext:
         """
         Compare two contexts by comparing theirs 'dicts' attributes.
         """
-        if isinstance(other, BaseContext):
+        return (
+            isinstance(other, BaseContext) and
             # because dictionaries can be put in different order
             # we have to flatten them like in templates
-            return self.flatten() == other.flatten()
-
-        # if it's not comparable return false
-        return False
+            self.flatten() == other.flatten()
+        )
 
 
 class Context(BaseContext):

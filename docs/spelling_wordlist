@@ -27,6 +27,7 @@ attr
 auth
 autoclobber
 autocommit
+autocomplete
 autocompletion
 autodetect
 autodetectable
@@ -393,7 +394,6 @@ MBR
 memcache
 memcached
 mentorship
-mercator
 metaclass
 metaclasses
 metadata

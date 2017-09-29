@@ -56,7 +56,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     sys.exit(1)
         return test_database_name
 
-    def get_test_db_clone_settings(self, number):
+    def get_test_db_clone_settings(self, suffix):
         orig_settings_dict = self.connection.settings_dict
         source_database_name = orig_settings_dict['NAME']
         if self.is_in_memory_db(source_database_name):
@@ -64,12 +64,12 @@ class DatabaseCreation(BaseDatabaseCreation):
         else:
             new_settings_dict = orig_settings_dict.copy()
             root, ext = os.path.splitext(orig_settings_dict['NAME'])
-            new_settings_dict['NAME'] = '{}_{}.{}'.format(root, number, ext)
+            new_settings_dict['NAME'] = '{}_{}.{}'.format(root, suffix, ext)
             return new_settings_dict
 
-    def _clone_test_db(self, number, verbosity, keepdb=False):
+    def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
-        target_database_name = self.get_test_db_clone_settings(number)['NAME']
+        target_database_name = self.get_test_db_clone_settings(suffix)['NAME']
         # Forking automatically makes a copy of an in-memory database.
         if not self.is_in_memory_db(source_database_name):
             # Erase the old test database

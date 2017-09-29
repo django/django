@@ -374,9 +374,6 @@ class AnonymousUser:
     _groups = EmptyManager(Group)
     _user_permissions = EmptyManager(Permission)
 
-    def __init__(self):
-        pass
-
     def __str__(self):
         return 'AnonymousUser'
 

@@ -21,11 +21,6 @@ DEBUG = False
 # on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
-# Whether to use the "ETag" header. This saves bandwidth but slows down performance.
-# Deprecated (RemovedInDjango21Warning) in favor of ConditionalGetMiddleware
-# which sets the ETag regardless of this setting.
-USE_ETAGS = False
-
 # People who get code error notifications.
 # In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
 ADMINS = []

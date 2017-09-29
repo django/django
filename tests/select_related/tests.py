@@ -150,6 +150,15 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
 
+    def test_reverse_relation_caching(self):
+        species = Species.objects.select_related('genus').filter(name='melanogaster').first()
+        with self.assertNumQueries(0):
+            self.assertEqual(species.genus.name, 'Drosophila')
+        # The species_set reverse relation isn't cached.
+        self.assertEqual(species.genus._state.fields_cache, {})
+        with self.assertNumQueries(1):
+            self.assertEqual(species.genus.species_set.first().name, 'melanogaster')
+
     def test_select_related_after_values(self):
         """
         Running select_related() after calling values() raises a TypeError

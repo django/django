@@ -12,11 +12,11 @@ from django.db import connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import mysql, oracle, postgis, spatialite
+from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
-class GISFunctionsTests(TestCase):
+class GISFunctionsTests(FuncTestMixin, TestCase):
     """
     Testing functions from django/contrib/gis/db/models/functions.py.
     Area/Distance/Length/Perimeter are tested in distapp/tests.
@@ -127,11 +127,8 @@ class GISFunctionsTests(TestCase):
             City.objects.annotate(kml=functions.AsKML('name'))
 
         # Ensuring the KML is as expected.
-        qs = City.objects.annotate(kml=functions.AsKML('point', precision=9))
-        ptown = qs.get(name='Pueblo')
+        ptown = City.objects.annotate(kml=functions.AsKML('point', precision=9)).get(name='Pueblo')
         self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
-        # Same result if the queryset is evaluated again.
-        self.assertEqual(qs.get(name='Pueblo').kml, ptown.kml)
 
     @skipUnlessDBFeature("has_AsSVG_function")
     def test_assvg(self):
@@ -204,7 +201,7 @@ class GISFunctionsTests(TestCase):
     @skipUnlessDBFeature("has_Difference_function", "has_Transform_function")
     def test_difference_mixed_srid(self):
         """Testing with mixed SRID (Country has default 4326)."""
-        geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
+        geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical Mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
         # Oracle does something screwy with the Texas geometry.
         if oracle:

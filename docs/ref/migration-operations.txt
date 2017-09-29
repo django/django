@@ -197,8 +197,6 @@ is set, its column name).
 
 .. class:: AddIndex(model_name, index)
 
-.. versionadded:: 1.11
-
 Creates an index in the database table for the model with ``model_name``.
 ``index`` is an instance of the :class:`~django.db.models.Index` class.
 
@@ -206,8 +204,6 @@ Creates an index in the database table for the model with ``model_name``.
 ---------------
 
 .. class:: RemoveIndex(model_name, name)
-
-.. versionadded:: 1.11
 
 Removes the index named ``name`` from the model with ``model_name``.
 
@@ -476,10 +472,6 @@ Some things to note:
         # reloaded in case any are delayed.
         from_state.clear_delayed_apps_cache()
         ...
-
-  .. versionadded:: 1.11
-
-    This requirement and the ``clear_delayed_apps_cache()`` method is new.
 
 * ``to_state`` in the database_backwards method is the *older* state; that is,
   the one that will be the current state once the migration has finished reversing.

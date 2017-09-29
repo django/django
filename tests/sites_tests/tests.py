@@ -10,7 +10,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase, modify_settings, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, modify_settings, override_settings,
+)
 from django.test.utils import captured_stdout
 
 
@@ -203,27 +205,31 @@ class SitesFrameworkTests(TestCase):
         self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
 
-    @override_settings(ALLOWED_HOSTS=['example.com'])
-    def test_requestsite_save_notimplemented_msg(self):
-        # Test response msg for RequestSite.save NotImplementedError
+
+@override_settings(ALLOWED_HOSTS=['example.com'])
+class RequestSiteTests(SimpleTestCase):
+
+    def setUp(self):
         request = HttpRequest()
-        request.META = {
-            "HTTP_HOST": "example.com",
-        }
+        request.META = {'HTTP_HOST': 'example.com'}
+        self.site = RequestSite(request)
+
+    def test_init_attributes(self):
+        self.assertEqual(self.site.domain, 'example.com')
+        self.assertEqual(self.site.name, 'example.com')
+
+    def test_str(self):
+        self.assertEqual(str(self.site), 'example.com')
+
+    def test_save(self):
         msg = 'RequestSite cannot be saved.'
         with self.assertRaisesMessage(NotImplementedError, msg):
-            RequestSite(request).save()
+            self.site.save()
 
-    @override_settings(ALLOWED_HOSTS=['example.com'])
-    def test_requestsite_delete_notimplemented_msg(self):
-        # Test response msg for RequestSite.delete NotImplementedError
-        request = HttpRequest()
-        request.META = {
-            "HTTP_HOST": "example.com",
-        }
+    def test_delete(self):
         msg = 'RequestSite cannot be deleted.'
         with self.assertRaisesMessage(NotImplementedError, msg):
-            RequestSite(request).delete()
+            self.site.delete()
 
 
 class JustOtherRouter:

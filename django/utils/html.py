@@ -1,6 +1,7 @@
 """HTML utilities suitable for global use."""
 
 import re
+from html.parser import HTMLParser
 from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
@@ -10,8 +11,6 @@ from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils.text import normalize_newlines
-
-from .html_parser import HTMLParseError, HTMLParser
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION_RE = re.compile(
@@ -132,7 +131,7 @@ def linebreaks(value, autoescape=False):
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        HTMLParser.__init__(self)
+        HTMLParser.__init__(self, convert_charrefs=False)
         self.reset()
         self.fed = []
 
@@ -154,16 +153,9 @@ def _strip_once(value):
     Internal tag stripping utility used by strip_tags.
     """
     s = MLStripper()
-    try:
-        s.feed(value)
-    except HTMLParseError:
-        return value
-    try:
-        s.close()
-    except HTMLParseError:
-        return s.get_data() + s.rawdata
-    else:
-        return s.get_data()
+    s.feed(value)
+    s.close()
+    return s.get_data()
 
 
 @keep_lazy_text

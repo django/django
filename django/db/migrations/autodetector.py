@@ -1,6 +1,5 @@
 import functools
 import re
-from contextlib import suppress
 from itertools import chain
 
 from django.conf import settings
@@ -435,7 +434,7 @@ class MigrationAutodetector:
         Place potential swappable models first in lists of created models (only
         real way to solve #22783).
         """
-        with suppress(LookupError):
+        try:
             model = self.new_apps.get_model(item[0], item[1])
             base_names = [base.__name__ for base in model.__bases__]
             string_version = "%s.%s" % (item[0], item[1])
@@ -446,6 +445,8 @@ class MigrationAutodetector:
                 settings.AUTH_USER_MODEL.lower() == string_version.lower()
             ):
                 return ("___" + item[0], "___" + item[1])
+        except LookupError:
+            pass
         return item
 
     def generate_renamed_models(self):
@@ -468,12 +469,18 @@ class MigrationAutodetector:
                     rem_model_fields_def = self.only_relation_agnostic_fields(rem_model_state.fields)
                     if model_fields_def == rem_model_fields_def:
                         if self.questioner.ask_rename_model(rem_model_state, model_state):
+                            model_opts = self.new_apps.get_model(app_label, model_name)._meta
+                            dependencies = []
+                            for field in model_opts.get_fields():
+                                if field.is_relation:
+                                    dependencies.extend(self._get_dependencies_for_foreign_key(field))
                             self.add_operation(
                                 app_label,
                                 operations.RenameModel(
                                     old_name=rem_model_state.name,
                                     new_name=model_state.name,
-                                )
+                                ),
+                                dependencies=dependencies,
                             )
                             self.renamed_models[app_label, model_name] = rem_model_name
                             renamed_models_rel_key = '%s.%s' % (rem_model_state.app_label, rem_model_state.name)

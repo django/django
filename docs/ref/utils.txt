@@ -52,7 +52,6 @@ need to distinguish caches by the ``Accept-language`` header.
 
     Adds some useful headers to the given ``HttpResponse`` object:
 
-    * ``ETag``
     * ``Expires``
     * ``Cache-Control``
 
@@ -60,15 +59,6 @@ need to distinguish caches by the ``Accept-language`` header.
 
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
-
-    .. versionchanged:: 1.11
-
-        In older versions, the ``Last-Modified`` header was also set.
-
-    .. deprecated:: 1.11
-
-        Since the ``USE_ETAGS`` setting is deprecated, this function won't set
-        the ``ETag`` header when the deprecation ends in Django 2.1.
 
 .. function:: add_never_cache_headers(response)
 
@@ -396,11 +386,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         Returns the latest ``pubdate`` or ``updateddate`` for all items in the
         feed. If no items have either of these attributes this returns the
         current UTC date/time.
-
-        .. versionchanged:: 1.11
-
-            In older versions, it returned the current date/time without any
-            timezone information.
 
 ``Enclosure``
 -------------
@@ -801,10 +786,6 @@ appropriate entities.
         >>> type(mystr)
         <type 'str'>
 
-    .. versionchanged:: 1.11
-
-        Added support for decorator usage.
-
 ``django.utils.text``
 =====================
 
@@ -812,8 +793,6 @@ appropriate entities.
     :synopsis: Text manipulation.
 
 .. function:: format_lazy(format_string, *args, **kwargs)
-
-    .. versionadded:: 1.11
 
     A version of :meth:`str.format` for when ``format_string``, ``args``,
     and/or ``kwargs`` contain lazy objects. The first argument is the string to
@@ -823,8 +802,8 @@ appropriate entities.
         from django.utils.translation import pgettext_lazy
 
         urlpatterns = [
-            url(format_lazy(r'{person}/(?P<pk>\d+)/$', person=pgettext_lazy('URL', 'person')),
-                PersonDetailView.as_view()),
+            path(format_lazy('{person}/<int:pk>/', person=pgettext_lazy('URL', 'person')),
+                 PersonDetailView.as_view()),
         ]
 
     This example allows translators to translate part of the URL. If "person"
@@ -927,13 +906,7 @@ appropriate entities.
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
 
-    .. versionchanged:: 1.11
-
-        In older versions, ``value`` is a required argument.
-
 .. function:: localdate(value=None, timezone=None)
-
-    .. versionadded:: 1.11
 
     Uses :func:`localtime` to convert an aware :class:`~datetime.datetime` to a
     :meth:`~datetime.datetime.date` in a different time zone, by default the
@@ -1056,17 +1029,6 @@ functions without the ``u``.
     Same as the non-lazy versions above, but using lazy execution.
 
     See :ref:`lazy translations documentation <lazy-translations>`.
-
-.. function:: string_concat(*strings)
-
-    .. deprecated:: 1.11
-
-        Use :meth:`django.utils.text.format_lazy` instead.
-        ``string_concat(*strings)`` can be replaced by
-        ``format_lazy('{}' * len(strings), *strings)``.
-
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
 
 .. function:: activate(language)
 

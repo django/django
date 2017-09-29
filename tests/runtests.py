@@ -8,7 +8,6 @@ import subprocess
 import sys
 import tempfile
 import warnings
-from contextlib import suppress
 
 import django
 from django.apps import apps
@@ -18,14 +17,11 @@ from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
-from django.utils.deprecation import (
-    RemovedInDjango21Warning, RemovedInDjango30Warning,
-)
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.log import DEFAULT_LOGGING
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango30Warning)
-warnings.simplefilter("error", RemovedInDjango21Warning)
 # Make runtime warning errors to ensure no usage of error prone patterns.
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
@@ -316,8 +312,10 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
     # Make sure the bisection point isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [bisection_label, 'model_inheritance_same_model_name']:
-        with suppress(ValueError):
+        try:
             test_labels.remove(label)
+        except ValueError:
+            pass
 
     subprocess_args = get_subprocess_args(options)
 
@@ -365,8 +363,10 @@ def paired_tests(paired_test, options, test_labels, parallel):
     # Make sure the constant member of the pair isn't in the test list
     # Also remove tests that need to be run in specific combinations
     for label in [paired_test, 'model_inheritance_same_model_name']:
-        with suppress(ValueError):
+        try:
             test_labels.remove(label)
+        except ValueError:
+            pass
 
     subprocess_args = get_subprocess_args(options)
 

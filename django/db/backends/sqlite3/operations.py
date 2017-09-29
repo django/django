@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from contextlib import suppress
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -36,10 +35,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
         if isinstance(expression, bad_aggregates):
             for expr in expression.get_source_expressions():
-                # Not every subexpression has an output_field which is fine
-                # to ignore.
-                with suppress(FieldError):
+                try:
                     output_field = expr.output_field
+                except FieldError:
+                    # Not every subexpression has an output_field which is fine
+                    # to ignore.
+                    pass
+                else:
                     if isinstance(output_field, bad_fields):
                         raise NotImplementedError(
                             'You cannot use Sum, Avg, StdDev, and Variance '

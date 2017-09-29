@@ -14,6 +14,10 @@ class CheckUrlConfigTests(SimpleTestCase):
         result = check_url_config(None)
         self.assertEqual(result, [])
 
+    @override_settings(ROOT_URLCONF='check_framework.urls.no_warnings_i18n')
+    def test_no_warnings_i18n(self):
+        self.assertEqual(check_url_config(None), [])
+
     @override_settings(ROOT_URLCONF='check_framework.urls.warning_in_include')
     def test_check_resolver_recursive(self):
         # The resolver is checked recursively (examining url()s in include()).
@@ -28,8 +32,11 @@ class CheckUrlConfigTests(SimpleTestCase):
         self.assertEqual(len(result), 1)
         warning = result[0]
         self.assertEqual(warning.id, 'urls.W001')
-        expected_msg = "Your URL pattern '^include-with-dollar$' uses include with a regex ending with a '$'."
-        self.assertIn(expected_msg, warning.msg)
+        self.assertEqual(warning.msg, (
+            "Your URL pattern '^include-with-dollar$' uses include with a "
+            "route ending with a '$'. Remove the dollar from the route to "
+            "avoid problems including URLs."
+        ))
 
     @override_settings(ROOT_URLCONF='check_framework.urls.contains_tuple')
     def test_contains_tuple_not_url_instance(self):
@@ -38,23 +45,33 @@ class CheckUrlConfigTests(SimpleTestCase):
         self.assertEqual(warning.id, 'urls.E004')
         self.assertRegex(warning.msg, (
             r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) is "
-            r"invalid. Ensure that urlpatterns is a list of url\(\) instances.$"
+            r"invalid. Ensure that urlpatterns is a list of path\(\) and/or re_path\(\) "
+            r"instances\.$"
+        ))
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.include_contains_tuple')
+    def test_contains_included_tuple(self):
+        result = check_url_config(None)
+        warning = result[0]
+        self.assertEqual(warning.id, 'urls.E004')
+        self.assertRegex(warning.msg, (
+            r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) is "
+            r"invalid. Ensure that urlpatterns is a list of path\(\) and/or re_path\(\) "
+            r"instances\.$"
         ))
 
     @override_settings(ROOT_URLCONF='check_framework.urls.beginning_with_slash')
     def test_beginning_with_slash(self):
-        result = check_url_config(None)
-        self.assertEqual(len(result), 1)
-        warning = result[0]
-        self.assertEqual(warning.id, 'urls.W002')
-        expected_msg = (
-            "Your URL pattern '/starting-with-slash/$' has a regex beginning "
-            "with a '/'. Remove this slash as it is unnecessary. If this "
-            "pattern is targeted in an include(), ensure the include() pattern "
-            "has a trailing '/'."
+        msg = (
+            "Your URL pattern '%s' has a route beginning with a '/'. Remove "
+            "this slash as it is unnecessary. If this pattern is targeted in "
+            "an include(), ensure the include() pattern has a trailing '/'."
         )
-
-        self.assertIn(expected_msg, warning.msg)
+        warning1, warning2 = check_url_config(None)
+        self.assertEqual(warning1.id, 'urls.W002')
+        self.assertEqual(warning1.msg, msg % '/path-starting-with-slash/')
+        self.assertEqual(warning2.id, 'urls.W002')
+        self.assertEqual(warning2.msg, msg % '/url-starting-with-slash/$')
 
     @override_settings(
         ROOT_URLCONF='check_framework.urls.beginning_with_slash',
@@ -91,7 +108,7 @@ class CheckUrlConfigTests(SimpleTestCase):
 
     def test_get_warning_for_invalid_pattern_tuple(self):
         warning = get_warning_for_invalid_pattern((r'^$', lambda x: x))[0]
-        self.assertEqual(warning.hint, "Try using url() instead of a tuple.")
+        self.assertEqual(warning.hint, "Try using path() instead of a tuple.")
 
     def test_get_warning_for_invalid_pattern_other(self):
         warning = get_warning_for_invalid_pattern(object())[0]

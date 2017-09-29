@@ -9,8 +9,7 @@ from django.contrib.gis.db.backends.base.operations import (
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r, wkt_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
@@ -68,17 +67,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def select(self):
         return 'CAST (AsEWKB(%s) AS BLOB)' if self.spatial_version >= (4, 3, 0) else 'AsText(%s)'
 
-    @cached_property
-    def function_names(self):
-        return {
-            'Length': 'ST_Length',
-            'LineLocatePoint': 'ST_Line_Locate_Point',
-            'NumPoints': 'ST_NPoints',
-            'Reverse': 'ST_Reverse',
-            'Scale': 'ScaleCoords',
-            'Translate': 'ST_Translate',
-            'Union': 'ST_Union',
-        }
+    function_names = {
+        'Length': 'ST_Length',
+        'LineLocatePoint': 'ST_Line_Locate_Point',
+        'NumPoints': 'ST_NPoints',
+        'Reverse': 'ST_Reverse',
+        'Scale': 'ScaleCoords',
+        'Translate': 'ST_Translate',
+        'Union': 'ST_Union',
+    }
 
     @cached_property
     def unsupported_functions(self):
@@ -109,7 +106,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """
         if box is None:
             return None
-        shell = Geometry(box).shell
+        shell = GEOSGeometry(box).shell
         xmin, ymin = shell[0][:2]
         xmax, ymax = shell[2][:2]
         return (xmin, ymin, xmax, ymax)
@@ -199,12 +196,22 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return SpatialiteSpatialRefSys
 
     def get_geometry_converter(self, expression):
+        geom_class = expression.output_field.geom_class
         if self.spatial_version >= (4, 3, 0):
             read = wkb_r().read
-            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value))
+
+            def converter(value, expression, connection):
+                return None if value is None else GEOSGeometryBase(read(value), geom_class)
         else:
             read = wkt_r().read
             srid = expression.output_field.srid
             if srid == -1:
                 srid = None
-            return lambda value, expression, connection: None if value is None else GEOSGeometry(read(value), srid)
+
+            def converter(value, expression, connection):
+                if value is not None:
+                    geom = GEOSGeometryBase(read(value), geom_class)
+                    if srid:
+                        geom.srid = srid
+                    return geom
+        return converter

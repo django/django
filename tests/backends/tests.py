@@ -3,7 +3,6 @@ import datetime
 import threading
 import unittest
 import warnings
-from contextlib import suppress
 
 from django.core.management.color import no_style
 from django.db import (
@@ -390,8 +389,10 @@ class BackendTestCase(TransactionTestCase):
         finally:
             # Clean up the mess created by connection._close(). Since the
             # connection is already closed, this crashes on some backends.
-            with suppress(Exception):
+            try:
                 connection.close()
+            except Exception:
+                pass
 
     @override_settings(DEBUG=True)
     def test_queries(self):

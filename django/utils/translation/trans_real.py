@@ -6,7 +6,6 @@ import re
 import sys
 import warnings
 from collections import OrderedDict
-from contextlib import suppress
 from threading import local
 
 from django.apps import apps
@@ -57,22 +56,21 @@ def reset_cache(**kwargs):
         get_supported_language_variant.cache_clear()
 
 
-def to_locale(language, to_lower=False):
-    """
-    Turn a language name (en-us) into a locale name (en_US). If 'to_lower' is
-    True, the last component is lower-cased (en_us).
-    """
-    p = language.find('-')
-    if p >= 0:
-        if to_lower:
-            return language[:p].lower() + '_' + language[p + 1:].lower()
-        else:
-            # Get correct locale for sr-latn
-            if len(language[p + 1:]) > 2:
-                return language[:p].lower() + '_' + language[p + 1].upper() + language[p + 2:].lower()
-            return language[:p].lower() + '_' + language[p + 1:].upper()
+def to_locale(language):
+    """Turn a language name (en-us) into a locale name (en_US)."""
+    language = language.lower()
+    parts = language.split('-')
+    try:
+        country = parts[1]
+    except IndexError:
+        return language
     else:
-        return language.lower()
+        # A language with > 2 characters after the dash only has its first
+        # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
+        # A language with 2 characters after the dash has both characters
+        # capitalized; e.g. en-us becomes en_US.
+        parts[1] = country.title() if len(country) > 2 else country.upper()
+    return parts[0] + '_' + '-'.join(parts[1:])
 
 
 def to_language(locale):
@@ -257,8 +255,10 @@ def get_language():
     """Return the currently selected language."""
     t = getattr(_active, "value", None)
     if t is not None:
-        with suppress(AttributeError):
+        try:
             return t.to_language()
+        except AttributeError:
+            pass
     # If we don't have a real translation object, assume it's the default language.
     return settings.LANGUAGE_CODE
 
@@ -424,8 +424,10 @@ def get_supported_language_variant(lang_code, strict=False):
     if lang_code:
         # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
         possible_lang_codes = [lang_code]
-        with suppress(KeyError):
+        try:
             possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
+        except KeyError:
+            pass
         generic_lang_code = lang_code.split('-')[0]
         possible_lang_codes.append(generic_lang_code)
         supported_lang_codes = get_languages()
@@ -483,8 +485,10 @@ def get_language_from_request(request, check_path=False):
 
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
-    with suppress(LookupError):
+    try:
         return get_supported_language_variant(lang_code)
+    except LookupError:
+        pass
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
     for accept_lang, unused in parse_accept_lang_header(accept):

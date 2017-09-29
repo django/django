@@ -1,12 +1,9 @@
 import datetime
-import warnings
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
-from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -102,20 +99,11 @@ class BoundField:
         else:
             name = self.html_initial_name
 
-        kwargs = {}
-        if func_supports_parameter(widget.render, 'renderer') or func_accepts_kwargs(widget.render):
-            kwargs['renderer'] = self.form.renderer
-        else:
-            warnings.warn(
-                'Add the `renderer` argument to the render() method of %s. '
-                'It will be mandatory in Django 2.1.' % widget.__class__,
-                RemovedInDjango21Warning, stacklevel=2,
-            )
         return widget.render(
             name=name,
             value=self.value(),
             attrs=attrs,
-            **kwargs
+            renderer=self.form.renderer,
         )
 
     def as_text(self, attrs=None, **kwargs):

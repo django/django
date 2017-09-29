@@ -6,14 +6,16 @@ from django.core.checks import Error
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
 
-from .models import Band, ValidationTestInlineModel, ValidationTestModel
+from .models import Band, Song, ValidationTestInlineModel, ValidationTestModel
 
 
 class CheckTestCase(SimpleTestCase):
 
-    def assertIsInvalid(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None):
+    def assertIsInvalid(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None, admin_site=None):
+        if admin_site is None:
+            admin_site = AdminSite()
         invalid_obj = invalid_obj or model_admin
-        admin_obj = model_admin(model, AdminSite())
+        admin_obj = model_admin(model, admin_site)
         self.assertEqual(admin_obj.check(), [Error(msg, hint=hint, obj=invalid_obj, id=id)])
 
     def assertIsInvalidRegexp(self, model_admin, model, msg, id=None, hint=None, invalid_obj=None):
@@ -30,8 +32,10 @@ class CheckTestCase(SimpleTestCase):
         self.assertEqual(error.id, id)
         self.assertRegex(error.msg, msg)
 
-    def assertIsValid(self, model_admin, model):
-        admin_obj = model_admin(model, AdminSite())
+    def assertIsValid(self, model_admin, model, admin_site=None):
+        if admin_site is None:
+            admin_site = AdminSite()
+        admin_obj = model_admin(model, admin_site)
         self.assertEqual(admin_obj.check(), [])
 
 
@@ -1153,3 +1157,89 @@ class ListDisplayEditableTests(CheckTestCase):
             "'list_display_links'.",
             id='admin.E123',
         )
+
+
+class AutocompleteFieldsTests(CheckTestCase):
+    def test_autocomplete_e036(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = 'name'
+
+        self.assertIsInvalid(
+            Admin, Band,
+            msg="The value of 'autocomplete_fields' must be a list or tuple.",
+            id='admin.E036',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e037(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('nonexistent',)
+
+        self.assertIsInvalid(
+            Admin, ValidationTestModel,
+            msg=(
+                "The value of 'autocomplete_fields[0]' refers to 'nonexistent', "
+                "which is not an attribute of 'modeladmin.ValidationTestModel'."
+            ),
+            id='admin.E037',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e38(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('name',)
+
+        self.assertIsInvalid(
+            Admin, ValidationTestModel,
+            msg=(
+                "The value of 'autocomplete_fields[0]' must be a foreign "
+                "key or a many-to-many field."
+            ),
+            id='admin.E038',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e039(self):
+        class Admin(ModelAdmin):
+            autocomplete_fields = ('band',)
+
+        self.assertIsInvalid(
+            Admin, Song,
+            msg=(
+                'An admin for model "Band" has to be registered '
+                'to be referenced by Admin.autocomplete_fields.'
+            ),
+            id='admin.E039',
+            invalid_obj=Admin,
+        )
+
+    def test_autocomplete_e040(self):
+        class NoSearchFieldsAdmin(ModelAdmin):
+            pass
+
+        class AutocompleteAdmin(ModelAdmin):
+            autocomplete_fields = ('featuring',)
+
+        site = AdminSite()
+        site.register(Band, NoSearchFieldsAdmin)
+        self.assertIsInvalid(
+            AutocompleteAdmin, Song,
+            msg=(
+                'NoSearchFieldsAdmin must define "search_fields", because '
+                'it\'s referenced by AutocompleteAdmin.autocomplete_fields.'
+            ),
+            id='admin.E040',
+            invalid_obj=AutocompleteAdmin,
+            admin_site=site,
+        )
+
+    def test_autocomplete_is_valid(self):
+        class SearchFieldsAdmin(ModelAdmin):
+            search_fields = 'name'
+
+        class AutocompleteAdmin(ModelAdmin):
+            autocomplete_fields = ('featuring',)
+
+        site = AdminSite()
+        site.register(Band, SearchFieldsAdmin)
+        self.assertIsValid(AutocompleteAdmin, Song, admin_site=site)

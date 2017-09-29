@@ -11,6 +11,11 @@ want to be aware of when upgrading from Django 1.11 or earlier. We've
 their deprecation cycle, and we've :ref:`begun the deprecation process for some
 features <deprecated-features-2.0>`.
 
+This release starts Django's use of a :ref:`loose form of semantic versioning
+<internal-release-cadence>`, however, there aren't any major backwards
+incompatible changes that might be expected of a 2.0 release. Upgrading should
+be a similar amount of effort as past feature releases.
+
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
@@ -41,29 +46,62 @@ be compatible with Django 2.0.
 What's new in Django 2.0
 ========================
 
+Simplified URL routing syntax
+-----------------------------
+
+The new :func:`django.urls.path()` function allows a simpler, more readable URL
+routing syntax. For example, this example from previous Django releases::
+
+    url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+
+could be written as::
+
+    path('articles/<int:year>/', views.year_archive),
+
+The new syntax supports type coercion of URL parameters. In the example, the
+view will receive the ``year`` keyword argument as an integer rather than as
+a string.
+
+The ``django.conf.urls.url()`` function from previous versions is now available
+as :func:`django.urls.re_path`, however, the old location remains for backwards
+compatibility, without an imminent deprecation. The old
+``django.conf.urls.include()`` function is now importable from ``django.urls``
+so you can use ``from django.urls import include, path, re_path`` in your
+URLconfs.
+
+The :doc:`/topics/http/urls` document is rewritten to feature the new syntax
+and provide more details.
+
+Mobile-friendly ``contrib.admin``
+---------------------------------
+
+The admin is now responsive and supports all major mobile devices.
+Older browser may experience varying levels of graceful degradation.
+
+Window expressions
+------------------
+
+The new :class:`~django.db.models.expressions.Window` expression allows
+adding an ``OVER`` clause to querysets. You can use :ref:`window functions
+<window-functions>` and :ref:`aggregate functions <aggregation-functions>` in
+the expression.
+
 Minor features
 --------------
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
-
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
+  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using an
+  `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
+  ``ManyToManyField``.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   36,000 to 100,000.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,10 +134,9 @@ Minor features
   GDAL's internal virtual filesystem. Rasters can now be :ref:`created from and
   converted to binary data <gdal-raster-vsimem>` in-memory.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :meth:`GDALBand.color_interp()
+  <django.contrib.gis.gdal.GDALBand.color_interp>` method returns the color
+  interpretation for the band.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,15 +154,14 @@ Minor features
 * :class:`django.contrib.postgres.indexes.GinIndex` now supports the
   ``fastupdate`` and ``gin_pending_list_limit`` parameters.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* The new :class:`~django.contrib.postgres.indexes.GistIndex` class allows
+  creating ``GiST`` indexes in the database. The new
+  :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+  operation installs the ``btree_gist`` extension to add support for operator
+  classes that aren't built-in.
 
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* :djadmin:`inspectdb` can now introspect ``JSONField`` and various
+  ``RangeField``\s (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,51 +169,17 @@ Minor features
 * Added the ``protocol`` keyword argument to the
   :class:`~django.contrib.sitemaps.GenericSitemap` constructor.
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 Cache
 ~~~~~
 
-* ...
-
-CSRF
-~~~~
-
-* ...
-
-Database backends
-~~~~~~~~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
+* On memcached, ``cache.set_many()`` returns a list of keys that failed to be
+  inserted.
 
 File Storage
 ~~~~~~~~~~~~
 
 * :meth:`File.open() <django.core.files.File.open>` can be used as a context
   manager, e.g. ``with file.open() as f:``.
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -197,11 +199,6 @@ Generic Views
 
 * The new :attr:`.ContextMixin.extra_context` attribute allows adding context
   in ``View.as_view()``.
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -244,6 +241,10 @@ Models
   from the database. For databases that don't support server-side cursors, it
   controls the number of results Django fetches from the database adapter.
 
+* :meth:`.QuerySet.earliest`, :meth:`.QuerySet.latest`, and
+  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>`  now
+  allow ordering by several fields.
+
 * Added the :class:`~django.db.models.functions.datetime.ExtractQuarter`
   function to extract the quarter from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField`, and exposed it through the
@@ -273,24 +274,34 @@ Models
   parameters, if the backend supports this feature. Of Django's built-in
   backends, only Oracle supports it.
 
+* The new :meth:`connection.execute_wrapper()
+  <django.db.backends.base.DatabaseWrapper.execute_wrapper>` method allows
+  :doc:`installing wrappers around execution of database queries
+  </topics/db/instrumentation>`.
+
 * The new ``filter`` argument for built-in aggregates allows :ref:`adding
   different conditionals <conditional-aggregation>` to multiple aggregations
   over the same fields or relations.
+
+* Added support for expressions in :attr:`Meta.ordering
+  <django.db.models.Options.ordering>`.
+
+* The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
+  results as named tuples.
+
+* The new :class:`.FilteredRelation` class allows adding an ``ON`` clause to
+  querysets.
+
+Pagination
+~~~~~~~~~~
+
+* Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
+  to provide the documented pattern of handling invalid page numbers.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * The :djadmin:`runserver` Web server supports HTTP 1.1.
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
 
 Templates
 ~~~~~~~~~
@@ -309,11 +320,6 @@ Tests
 * Added settings that allow customizing the test tablespace parameters for
   Oracle: :setting:`DATAFILE_SIZE`, :setting:`DATAFILE_TMP_SIZE`,
   :setting:`DATAFILE_EXTSIZE`, and :setting:`DATAFILE_TMP_EXTSIZE`.
-
-URLs
-~~~~
-
-* ...
 
 Validators
 ~~~~~~~~~~
@@ -367,11 +373,26 @@ backends.
   requires that the arguments to ``OF`` be columns rather than tables, set
   ``DatabaseFeatures.select_for_update_of_column = True``.
 
+* To enable support for :class:`~django.db.models.expressions.Window`
+  expressions, set ``DatabaseFeatures.supports_over_clause`` to ``True``. You
+  may need to customize the ``DatabaseOperations.window_start_rows_start_end()``
+  and/or ``window_start_range_start_end()`` methods.
+
 * Third-party database backends should add a
   ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the
   database data type that will be used in the
   :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
   ``max_length`` argument isn't provided.
+
+* The first argument of ``DatabaseCreation._clone_test_db()`` and
+  ``get_test_db_clone_settings()`` is now ``suffix`` rather
+  than ``number`` (in case you want to rename the signatures in your backend
+  for consistency). ``django.test`` also now passes those values as strings
+  rather than as integers.
+
+* Third-party database backends should add a
+  ``DatabaseIntrospection.get_sequences()`` method based on the stub in
+  ``BaseDatabaseIntrospection``.
 
 Dropped support for Oracle 11.2
 -------------------------------
@@ -545,12 +566,6 @@ Miscellaneous
   connection, those queries could be included as part of the
   ``assertNumQueries()`` count.
 
-* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is more properly respected in
-  ``contrib.auth`` password reset. Previously, resets were allowed for one day
-  longer than expected. For example, with the default of
-  ``PASSWORD_RESET_TIMEOUT_DAYS = 3``, password reset tokens are now valid for
-  72 hours rather than 96 hours.
-
 * The default size of the Oracle test tablespace is increased from 20M to 50M
   and the default autoextend size is increased from 10M to 25M.
 
@@ -590,6 +605,8 @@ Miscellaneous
 
 * ``django.contrib.gis.gdal.OGRException`` is removed. It's been an alias for
   ``GDALException`` since Django 1.8.
+
+* Support for GEOS 3.3.x is dropped.
 
 .. _deprecated-features-2.0:
 
@@ -632,6 +649,11 @@ Miscellaneous
 
 * ``HttpRequest.xreadlines()`` is deprecated in favor of iterating over the
   request.
+
+* The ``field_name`` keyword argument to :meth:`.QuerySet.earliest` and
+  :meth:`.QuerySet.latest` is deprecated in favor of passing the field
+  names as arguments. Write ``.earliest('pub_date')`` instead of
+  ``.earliest(field_name='pub_date')``.
 
 .. _removed-features-2.0:
 

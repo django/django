@@ -29,7 +29,7 @@ class JSONField(forms.CharField):
             return value
         try:
             converted = json.loads(value)
-        except ValueError:
+        except json.JSONDecodeError:
             raise forms.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
@@ -45,7 +45,7 @@ class JSONField(forms.CharField):
             return initial
         try:
             return json.loads(data)
-        except ValueError:
+        except json.JSONDecodeError:
             return InvalidJSONInput(data)
 
     def prepare_value(self, value):
