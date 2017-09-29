@@ -185,11 +185,10 @@ available for :class:`~django.db.models.IntegerField`. For example::
 Index transforms
 ~~~~~~~~~~~~~~~~
 
-This class of transforms allows you to index into the array in queries. Any
-non-negative integer can be used. There are no errors if it exceeds the
-:attr:`size <ArrayField.size>` of the array. The lookups available after the
-transform are those from the :attr:`base_field <ArrayField.base_field>`. For
-example::
+Index transforms index into the array. Any non-negative integer can be used.
+There are no errors if it exceeds the :attr:`size <ArrayField.size>` of the
+array. The lookups available after the transform are those from the
+:attr:`base_field <ArrayField.base_field>`. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -214,9 +213,9 @@ example::
 Slice transforms
 ~~~~~~~~~~~~~~~~
 
-This class of transforms allow you to take a slice of the array. Any two
-non-negative integers can be used, separated by a single underscore. The
-lookups available after the transform do not change. For example::
+Slice transforms take a slice of the array. Any two non-negative integers can
+be used, separated by a single underscore. The lookups available after the
+transform do not change. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
