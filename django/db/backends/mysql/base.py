@@ -57,7 +57,10 @@ class CursorWrapper:
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
     to the particular underlying representation returned by Connection.cursor().
     """
-    codes_for_integrityerror = (1048,)
+    codes_for_integrityerror = (
+        1048,  # Column cannot be null
+        1690,  # BIGINT UNSIGNED value is out of range
+    )
 
     def __init__(self, cursor):
         self.cursor = cursor
