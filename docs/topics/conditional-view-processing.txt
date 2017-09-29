@@ -80,7 +80,7 @@ Suppose you have this pair of models, representing a simple blog system::
         ...
 
     class Entry(models.Model):
-        blog = models.ForeignKey(Blog)
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
         published = models.DateTimeField(default=datetime.datetime.now)
         ...
 
