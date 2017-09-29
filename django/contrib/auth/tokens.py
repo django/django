@@ -12,7 +12,6 @@ class PasswordResetTokenGenerator:
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
     secret = settings.SECRET_KEY
-    timeout_type = 'SECONDS' if hasattr(settings, 'PASSWORD_RESET_TIMEOUT') else 'DAYS'
 
     def make_token(self, user):
         """
