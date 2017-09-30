@@ -560,10 +560,14 @@ class LayerMapping(object):
                             # one from the kwargs WKT, adding in additional
                             # geometries, and update the attribute with the
                             # just-updated geometry WKT.
-                            geom = getattr(m, self.geom_field).ogr
-                            new = OGRGeometry(kwargs[self.geom_field])
-                            for g in new:
-                                geom.add(g)
+                            geom_value = getattr(m, self.geom_field)
+                            if geom_value is None:
+                                geom = OGRGeometry(kwargs[self.geom_field])
+                            else:
+                                geom = geom_value.ogr
+                                new = OGRGeometry(kwargs[self.geom_field])
+                                for g in new:
+                                    geom.add(g)
                             setattr(m, self.geom_field, geom.wkt)
                         except ObjectDoesNotExist:
                             # No unique model exists yet, create.

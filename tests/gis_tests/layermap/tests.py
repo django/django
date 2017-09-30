@@ -328,6 +328,9 @@ class LayerMapTest(TestCase):
         zh.save()
         lm = LayerMapping(Province, provinces_shp, province_mapping, unique='bag_id')
         lm.save(silent=True, strict=True)
+        zh.refresh_from_db()
+        self.assertIsNotNone(zh.border)
+        self.assertEqual(493, zh.border.ogr.num_coords)
 
 
 
