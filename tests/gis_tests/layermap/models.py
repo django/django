@@ -17,6 +17,12 @@ class State(NamedModel):
     pass
 
 
+class Province(NamedModel):
+    bag_id = models.CharField(max_length=16, primary_key=True)
+    center = models.PointField(null=True)
+    border = models.MultiPolygonField(null=True)
+
+
 class County(NamedModel):
     state = models.ForeignKey(State, models.CASCADE)
     mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
@@ -94,3 +100,8 @@ inter_mapping = {'name': 'Name',
                  'length': 'Length',
                  'path': 'LINESTRING',
                  }
+province_mapping = {'name': 'provincien',
+                    'bag_id': 'bag_id',
+                    'border': 'MULTIPOLYGON'
+                    }
+
