@@ -104,13 +104,16 @@ class BaseDatabaseOperations:
         truncates the given date field field_name to a date object with only
         the given specificity.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_trunc_sql() method.')
 
     def datetime_cast_date_sql(self, field_name, tzname):
         """
         Return the SQL to cast a datetime value to date value.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'datetime_cast_date_sql() method.'
+        )
 
     def datetime_cast_time_sql(self, field_name, tzname):
         """
