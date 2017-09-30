@@ -132,22 +132,6 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.CryptPasswordHasher'])
-    def test_crypt(self):
-        encoded = make_password('lètmei', 'ab', 'crypt')
-        self.assertEqual(encoded, 'crypt$$ab1Hv2Lg7ltQo')
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password('lètmei', encoded))
-        self.assertFalse(check_password('lètmeiz', encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "crypt")
-        # Blank passwords
-        blank_encoded = make_password('', 'ab', 'crypt')
-        self.assertTrue(blank_encoded.startswith('crypt$'))
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password('', blank_encoded))
-        self.assertFalse(check_password(' ', blank_encoded))
-
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
         encoded = make_password('lètmein', hasher='bcrypt_sha256')

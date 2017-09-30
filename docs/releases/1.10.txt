@@ -684,7 +684,6 @@ setting::
     'django.contrib.auth.hashers.MD5PasswordHasher'
     'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
-    'django.contrib.auth.hashers.CryptPasswordHasher'
 
 Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>` to
 strengthen the hashes in your database. If that's not feasible, add the
