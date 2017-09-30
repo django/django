@@ -21,7 +21,8 @@ if HAS_GEOS:
 
     from .models import (
         City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-        city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+        Province, city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+        province_mapping
     )
 
 
@@ -317,6 +318,20 @@ class LayerMapTest(TestCase):
         lm.save(silent=True, strict=True)
         self.assertEqual(City.objects.count(), 1)
         self.assertEqual(City.objects.all()[0].name, "Zürich")
+
+    def test_null_geom_with_unique(self):
+        """ Test a null geom field, with unique keyword argument """
+        provinces_shp = os.path.join(
+            shp_path, 'nl-provinces', 'nl-provinces.shp'
+        )
+        zh = Province(name='Zuid-Holland', bag_id='0028')
+        zh.save()
+        lm = LayerMapping(Province, provinces_shp, province_mapping, unique='bag_id')
+        lm.save(silent=True, strict=True)
+        zh.refresh_from_db()
+        self.assertIsNotNone(zh.border)
+        self.assertEqual(493, zh.border.ogr.num_coords)
+
 
 
 class OtherRouter(object):
