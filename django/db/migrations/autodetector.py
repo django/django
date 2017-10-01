@@ -1230,7 +1230,7 @@ class MigrationAutodetector:
         Given a migration name, try to extract a number from the beginning of
         it. If no number is found, return None.
         """
-        match = re.match(r'^\d+', name)
+        match = re.match(r'^[0-9]+', name)
         if match:
             return int(match.group())
         return None
