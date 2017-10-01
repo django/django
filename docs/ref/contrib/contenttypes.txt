@@ -349,6 +349,10 @@ normal field object, these examples will *not* work::
 Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
 does not appear in :class:`~django.forms.ModelForm`\s.
 
+Keep in mind that :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+will return *None* instead of throwing an error when referring to a non-existent
+primary key.
+
 Reverse generic relations
 -------------------------
 
