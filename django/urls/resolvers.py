@@ -25,7 +25,6 @@ from .converters import get_converter
 from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
-
 class ResolverMatch:
     def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
         self.func = func
@@ -59,14 +58,12 @@ class ResolverMatch:
             self.app_names, self.namespaces,
         )
 
-
 @functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return URLResolver(RegexPattern(r'^/'), urlconf)
-
 
 @functools.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
@@ -75,7 +72,6 @@ def get_ns_resolver(ns_pattern, resolver):
     # URLconf pattern.
     ns_resolver = URLResolver(RegexPattern(ns_pattern), resolver.url_patterns)
     return URLResolver(RegexPattern(r'^/'), [ns_resolver])
-
 
 class LocaleRegexDescriptor:
     def __init__(self, attr):
@@ -98,7 +94,6 @@ class LocaleRegexDescriptor:
         if language_code not in instance._regex_dict:
             instance._regex_dict[language_code] = instance._compile(str(pattern))
         return instance._regex_dict[language_code]
-
 
 class CheckURLMixin:
     def describe(self):
@@ -131,7 +126,6 @@ class CheckURLMixin:
             return [warning]
         else:
             return []
-
 
 class RegexPattern(CheckURLMixin):
     regex = LocaleRegexDescriptor('_regex')
@@ -185,11 +179,9 @@ class RegexPattern(CheckURLMixin):
     def __str__(self):
         return self._regex
 
-
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
     r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
 )
-
 
 def _route_to_regex(route, is_endpoint=False):
     """
@@ -230,7 +222,6 @@ def _route_to_regex(route, is_endpoint=False):
         parts.append('$')
     return ''.join(parts), converters
 
-
 class RoutePattern(CheckURLMixin):
     regex = LocaleRegexDescriptor('_route')
 
@@ -264,7 +255,6 @@ class RoutePattern(CheckURLMixin):
     def __str__(self):
         return self._route
 
-
 class LocalePrefixPattern:
     def __init__(self, prefix_default_language=True):
         self.prefix_default_language = prefix_default_language
@@ -297,7 +287,6 @@ class LocalePrefixPattern:
 
     def __str__(self):
         return self.language_prefix
-
 
 class URLPattern:
     def __init__(self, pattern, callback, default_args=None, name=None):
@@ -348,7 +337,6 @@ class URLPattern:
         if not hasattr(callback, '__name__'):
             return callback.__module__ + "." + callback.__class__.__name__
         return callback.__module__ + "." + callback.__qualname__
-
 
 class URLResolver:
     def __init__(self, pattern, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
