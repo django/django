@@ -43,7 +43,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     pass
                 else:
                     if isinstance(output_field, bad_fields):
-                        raise NotImplementedError(
+                        raise utils.NotSupportedError(
                             'You cannot use Sum, Avg, StdDev, and Variance '
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'

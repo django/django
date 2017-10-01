@@ -198,7 +198,9 @@ Backwards incompatible changes in 2.1
 Database backend API
 --------------------
 
-* ...
+* To adhere to :pep:`249`, exceptions where a database doesn't support a
+  feature are changed from :exc:`NotImplementedError` to
+  :exc:`django.db.NotSupportedError`.
 
 :mod:`django.contrib.gis`
 -------------------------

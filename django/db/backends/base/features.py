@@ -1,5 +1,5 @@
 from django.db.models.aggregates import StdDev
-from django.db.utils import ProgrammingError
+from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 
 
@@ -269,9 +269,9 @@ class BaseDatabaseFeatures:
         """Confirm support for STDDEV and related stats functions."""
         try:
             self.connection.ops.check_expression_support(StdDev(1))
-            return True
-        except NotImplementedError:
+        except NotSupportedError:
             return False
+        return True
 
     def introspected_boolean_field_type(self, field=None):
         """

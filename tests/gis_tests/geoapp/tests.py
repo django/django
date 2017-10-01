@@ -8,7 +8,7 @@ from django.contrib.gis.geos import (
     MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
@@ -516,7 +516,7 @@ class GeoQuerySetTest(TestCase):
         Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 City.objects.all().aggregate(MakeLine('point'))
             return
 

@@ -4,6 +4,7 @@ import unittest
 
 from django.db import connection
 from django.db.models import Avg, StdDev, Sum, Variance
+from django.db.utils import NotSupportedError
 from django.test import TestCase, TransactionTestCase, override_settings
 
 from ..models import Item, Object, Square
@@ -34,13 +35,13 @@ class Tests(TestCase):
         Raise NotImplementedError when aggregating on date/time fields (#19360).
         """
         for aggregate in (Sum, Avg, Variance, StdDev):
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('time'))
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('date'))
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('last_modified'))
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(
                     **{'complex': aggregate('last_modified') + aggregate('last_modified')}
                 )
