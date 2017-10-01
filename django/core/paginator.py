@@ -95,7 +95,7 @@ class Paginator:
         if self.count == 0 and not self.allow_empty_first_page:
             return 0
         hits = max(1, self.count - self.orphans)
-        return int(ceil(hits / float(self.per_page)))
+        return ceil(hits / self.per_page)
 
     @property
     def page_range(self):
