@@ -1052,8 +1052,7 @@ class SQLCompiler:
             raise
 
         if result_type == CURSOR:
-            # Caller didn't specify a result_type, so just give them back the
-            # cursor to process (and close).
+            # Give the caller the cursor to process and close.
             return cursor
         if result_type == SINGLE:
             try:

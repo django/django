@@ -256,7 +256,7 @@ class QuerySet:
         """
         The queryset iterator protocol uses three nested iterators in the
         default case:
-            1. sql.compiler:execute_sql()
+            1. sql.compiler.execute_sql()
                - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
                  using cursor.fetchmany(). This part is responsible for
                  doing some column masking, and returning the rows in chunks.
@@ -438,7 +438,7 @@ class QuerySet:
         #    insert into the childmost table.
         # We currently set the primary keys on the objects when using
         # PostgreSQL via the RETURNING ID clause. It should be possible for
-        # Oracle as well, but the semantics for  extracting the primary keys is
+        # Oracle as well, but the semantics for extracting the primary keys is
         # trickier so it's not done yet.
         assert batch_size is None or batch_size > 0
         # Check that the parents share the same concrete model with the our
