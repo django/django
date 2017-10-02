@@ -409,10 +409,11 @@ def get_languages():
 
 
 @functools.lru_cache(maxsize=1000)
-def get_supported_language_variant(lang_code, strict=False):
+def get_supported_language_variant(lang_code, strict=False, support_all_languages=False):
     """
-    Return the language-code that's listed in supported languages, possibly
-    selecting a more generic variant. Raise LookupError if nothing is found.
+    Return the language-code that's listed in supported languages (or `LANG_INFO`
+    if `support_all_languages` is set to True), possibly selecting a more
+    generic variant. Raise LookupError if nothing is found.
 
     If `strict` is False (the default), look for an alternative
     country-specific variant when the currently checked is not found.
@@ -430,7 +431,7 @@ def get_supported_language_variant(lang_code, strict=False):
             pass
         generic_lang_code = lang_code.split('-')[0]
         possible_lang_codes.append(generic_lang_code)
-        supported_lang_codes = get_languages()
+        supported_lang_codes = LANG_INFO if support_all_languages else get_languages()
 
         for code in possible_lang_codes:
             if code in supported_lang_codes and check_for_language(code):
@@ -443,28 +444,32 @@ def get_supported_language_variant(lang_code, strict=False):
     raise LookupError(lang_code)
 
 
-def get_language_from_path(path, strict=False):
+def get_language_from_path(path, strict=False, support_all_languages=False):
     """
     Return the language-code if there is a valid language-code
     found in the `path`.
 
     If `strict` is False (the default), the function will look for an alternative
     country-specific variant when the currently checked is not found.
+
+    If `support_all_languages` is False (default), the language-code will be
+    looked up in settings.LANGUAGES, otherwise in `LANG_INFO`.
     """
     regex_match = language_code_prefix_re.match(path)
     if not regex_match:
         return None
     lang_code = regex_match.group(1)
     try:
-        return get_supported_language_variant(lang_code, strict=strict)
+        return get_supported_language_variant(lang_code, strict=strict, support_all_languages=support_all_languages)
     except LookupError:
         return None
 
 
-def get_language_from_request(request, check_path=False):
+def get_language_from_request(request, check_path=False, support_all_languages=False):
     """
     Analyze the request to find what language the user wants the system to
-    show. Only languages listed in settings.LANGUAGES are taken into account.
+    show. Only languages listed in settings.LANGUAGES are taken into account
+    (with support_all_languages set to True, LANG_INFO will be looked up).
     If the user requests a sublanguage where we have a main language, we send
     out the main language.
 
@@ -476,7 +481,7 @@ def get_language_from_request(request, check_path=False):
         if lang_code is not None:
             return lang_code
 
-    supported_lang_codes = get_languages()
+    supported_lang_codes = LANG_INFO if support_all_languages else get_languages()
 
     if hasattr(request, 'session'):
         lang_code = request.session.get(LANGUAGE_SESSION_KEY)
@@ -486,7 +491,7 @@ def get_language_from_request(request, check_path=False):
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
 
     try:
-        return get_supported_language_variant(lang_code)
+        return get_supported_language_variant(lang_code, support_all_languages=support_all_languages)
     except LookupError:
         pass
 
@@ -499,12 +504,12 @@ def get_language_from_request(request, check_path=False):
             continue
 
         try:
-            return get_supported_language_variant(accept_lang)
+            return get_supported_language_variant(accept_lang, support_all_languages=support_all_languages)
         except LookupError:
             continue
 
     try:
-        return get_supported_language_variant(settings.LANGUAGE_CODE)
+        return get_supported_language_variant(settings.LANGUAGE_CODE, support_all_languages=support_all_languages)
     except LookupError:
         return settings.LANGUAGE_CODE
 

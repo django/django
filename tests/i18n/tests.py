@@ -1189,6 +1189,37 @@ class MiscTests(SimpleTestCase):
     @override_settings(
         LANGUAGES=[
             ('en', 'English'),
+            ('de', 'German'),
+        ]
+    )
+    def test_parse_literal_http_header_support_all(self):
+        """
+        Here we test that we parse a literal HTTP header correctly when
+        support_all_languages=True
+        """
+        g = get_language_from_request
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'en'}
+        self.assertEqual('en', g(r))
+        self.assertEqual('en', g(r, support_all_languages=True))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+        self.assertEqual('de', g(r))
+        self.assertEqual('de', g(r, support_all_languages=True))
+
+        # From here support_all_languages=True should lead to another output
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'es'}
+        self.assertEqual('en', g(r))
+        self.assertEqual('es', g(r, support_all_languages=True))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pl'}
+        self.assertEqual('en', g(r))
+        self.assertEqual('pl', g(r, support_all_languages=True))
+
+    @override_settings(
+        LANGUAGES=[
+            ('en', 'English'),
             ('zh-hans', 'Simplified Chinese'),
             ('zh-hant', 'Traditional Chinese'),
         ]

@@ -197,12 +197,12 @@ def to_locale(language):
     return _trans.to_locale(language)
 
 
-def get_language_from_request(request, check_path=False):
-    return _trans.get_language_from_request(request, check_path)
+def get_language_from_request(request, check_path=False, support_all_languages=False):
+    return _trans.get_language_from_request(request, check_path, support_all_languages)
 
 
-def get_language_from_path(path):
-    return _trans.get_language_from_path(path)
+def get_language_from_path(path, support_all_languages=False):
+    return _trans.get_language_from_path(path, support_all_languages)
 
 
 def templatize(src, **kwargs):
