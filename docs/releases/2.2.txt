@@ -185,6 +185,10 @@ Models
 
 * Added many :ref:`math database functions <math-functions>`.
 
+* Setting the new ``ignore_conflicts`` parameter of
+  :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
+  failure to insert rows that fail uniqueness constraints or other checks.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -236,6 +240,10 @@ Database backend API
 * Third-party database backends must implement support for table check
   constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
   ``False``.
+
+* Third party database backends must implement support for ignoring
+  constraints or uniqueness errors while inserting or set
+  ``DatabaseFeatures.supports_ignore_conflicts`` to ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------

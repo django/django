@@ -66,3 +66,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_jsonb_agg = is_postgresql_9_5
     has_brin_autosummarize = is_postgresql_10
     has_gin_pending_list_limit = is_postgresql_9_5
+    supports_ignore_conflicts = is_postgresql_9_5

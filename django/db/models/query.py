@@ -23,6 +23,7 @@ from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
 from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
+from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property, partition
@@ -418,7 +419,7 @@ class QuerySet:
             if obj.pk is None:
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
 
-    def bulk_create(self, objs, batch_size=None):
+    def bulk_create(self, objs, batch_size=None, ignore_conflicts=False):
         """
         Insert each of the instances into the database. Do *not* call
         save() on each of the instances, do not send any pre/post_save
@@ -456,14 +457,14 @@ class QuerySet:
         with transaction.atomic(using=self.db, savepoint=False):
             objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
             if objs_with_pk:
-                self._batched_insert(objs_with_pk, fields, batch_size)
+                self._batched_insert(objs_with_pk, fields, batch_size, ignore_conflicts=ignore_conflicts)
                 for obj_with_pk in objs_with_pk:
                     obj_with_pk._state.adding = False
                     obj_with_pk._state.db = self.db
             if objs_without_pk:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
-                ids = self._batched_insert(objs_without_pk, fields, batch_size)
-                if connection.features.can_return_ids_from_bulk_insert:
+                ids = self._batched_insert(objs_without_pk, fields, batch_size, ignore_conflicts=ignore_conflicts)
+                if connection.features.can_return_ids_from_bulk_insert and not ignore_conflicts:
                     assert len(ids) == len(objs_without_pk)
                 for obj_without_pk, pk in zip(objs_without_pk, ids):
                     obj_without_pk.pk = pk
@@ -1120,7 +1121,7 @@ class QuerySet:
     # PRIVATE METHODS #
     ###################
 
-    def _insert(self, objs, fields, return_id=False, raw=False, using=None):
+    def _insert(self, objs, fields, return_id=False, raw=False, using=None, ignore_conflicts=False):
         """
         Insert a new record for the given model. This provides an interface to
         the InsertQuery class and is how Model.save() is implemented.
@@ -1128,28 +1129,34 @@ class QuerySet:
         self._for_write = True
         if using is None:
             using = self.db
-        query = sql.InsertQuery(self.model)
+        query = sql.InsertQuery(self.model, ignore_conflicts=ignore_conflicts)
         query.insert_values(fields, objs, raw=raw)
         return query.get_compiler(using=using).execute_sql(return_id)
     _insert.alters_data = True
     _insert.queryset_only = False
 
-    def _batched_insert(self, objs, fields, batch_size):
+    def _batched_insert(self, objs, fields, batch_size, ignore_conflicts=False):
         """
         Helper method for bulk_create() to insert objs one batch at a time.
         """
+        if ignore_conflicts and not connections[self.db].features.supports_ignore_conflicts:
+            raise NotSupportedError('This database backend does not support ignoring conflicts.')
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
+        bulk_return = connections[self.db].features.can_return_ids_from_bulk_insert
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if connections[self.db].features.can_return_ids_from_bulk_insert:
-                inserted_id = self._insert(item, fields=fields, using=self.db, return_id=True)
+            if bulk_return and not ignore_conflicts:
+                inserted_id = self._insert(
+                    item, fields=fields, using=self.db, return_id=True,
+                    ignore_conflicts=ignore_conflicts,
+                )
                 if isinstance(inserted_id, list):
                     inserted_ids.extend(inserted_id)
                 else:
                     inserted_ids.append(inserted_id)
             else:
-                self._insert(item, fields=fields, using=self.db)
+                self._insert(item, fields=fields, using=self.db, ignore_conflicts=ignore_conflicts)
         return inserted_ids
 
     def _chain(self, **kwargs):
