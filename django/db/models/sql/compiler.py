@@ -1262,7 +1262,7 @@ class SQLInsertCompiler(SQLCompiler):
         with self.connection.cursor() as cursor:
             for sql, params in self.as_sql():
                 cursor.execute(sql, params)
-            if not (return_id and cursor):
+            if not return_id:
                 return
             if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
                 return self.connection.ops.fetch_returned_insert_ids(cursor)
