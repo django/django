@@ -349,9 +349,23 @@ normal field object, these examples will *not* work::
 Likewise, :class:`~django.contrib.contenttypes.fields.GenericForeignKey`\s
 does not appear in :class:`~django.forms.ModelForm`\s.
 
-Keep in mind that :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
-will return *None* instead of throwing an error when referring to a non-existent
-primary key.
+Also, :class:`~django.contrib.contenttypes.fields.GenericForeignKey` will return
+*None* instead of throwing an error when referring to a nonexistent primary key.
+For example::
+
+    >>> from django.contrib.auth.models import User
+    >>> guido = User.objects.get(username='Guido')
+    >>> t = TaggedItem(content_object=guido, tag='bdfl')
+    >>> t.save()
+    >>> t.content_object
+    <User: Guido>
+    # Deleting the guido user object
+    >>> User.objects.delete(username='Guido')
+    # Now, Primary key value exists in t object but that
+    # primary key does not point anywhere so the following
+    # should throw an error but instead it return None
+    >>> t.content_object
+    None
 
 Reverse generic relations
 -------------------------
