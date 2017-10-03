@@ -1127,12 +1127,8 @@ class QuerySet:
 
     def _batched_insert(self, objs, fields, batch_size):
         """
-        A helper method for bulk_create() to insert the bulk one batch at a
-        time. Insert recursively a batch from the front of the bulk and then
-        _batched_insert() the remaining objects again.
+        Helper method for bulk_create() to insert objs one batch at a time.
         """
-        if not objs:
-            return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
