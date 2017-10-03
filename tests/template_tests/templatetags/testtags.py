@@ -12,11 +12,9 @@ class EchoNode(Node):
 
 
 @register.tag
+@register.tag('other_echo')
 def echo(parser, token):
     return EchoNode(token.contents.split()[1:])
-
-
-register.tag('other_echo', echo)
 
 
 @register.filter
