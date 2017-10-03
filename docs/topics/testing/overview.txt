@@ -177,7 +177,7 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
-If using an SQLite in-memory database with SQLite 3.7.13+, `shared cache
+If using an SQLite in-memory database with SQLite, `shared cache
 <https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
 with ability to share the database between threads.
 

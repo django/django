@@ -40,12 +40,6 @@ For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
 
-.. admonition:: Support for column ordering on SQLite
-
-    Column ordering is supported on SQLite 3.3.0+ and only for some database
-    file formats. Refer to the `SQLite docs
-    <https://www.sqlite.org/lang_createindex.html>`_ for specifics.
-
 ``name``
 --------
 
