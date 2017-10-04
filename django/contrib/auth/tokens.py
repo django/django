@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
