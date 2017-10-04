@@ -30,7 +30,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_cast_with_precision = False
     uses_savepoints = True
     can_release_savepoints = True
-    can_share_in_memory_db = True
 
     @cached_property
     def supports_stddev(self):
