@@ -306,6 +306,11 @@ The ``Func`` API is as follows:
                         template="%(function)s('', %(expressions)s)",
                     )
 
+        To avoid a SQL injection vulnerability, ``extra_context`` :ref:`must
+        not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
+        as these values are interpolated into the SQL string rather than passed
+        as query parameters, where the database driver would escape them.
+
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
 joined together with ``arg_joiner``, and then interpolated into the ``template``
@@ -316,10 +321,15 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. The ``function``, ``template``, and
-``arg_joiner`` keywords can be used to replace the attributes of the same name
-without having to define your own class. ``output_field`` can be used to define
-the expected return type.
+into the ``template`` attribute. To avoid a SQL injection vulnerability,
+``extra`` :ref:`must not contain untrusted user input
+<avoiding-sql-injection-in-query-expressions>` as these values are interpolated
+into the SQL string rather than passed as query parameters, where the database
+driver would escape them.
+
+The ``function``, ``template``, and ``arg_joiner`` keywords can be used to
+replace the attributes of the same name without having to define your own
+class. ``output_field`` can be used to define the expected return type.
 
 ``Aggregate()`` expressions
 ---------------------------
@@ -1080,6 +1090,45 @@ Let's see how it works::
     Apple: AAPL
     Yahoo: Internet Company
     Django Software Foundation: No Tagline
+
+.. _avoiding-sql-injection-in-query-expressions:
+
+Avoiding SQL injection
+~~~~~~~~~~~~~~~~~~~~~~
+
+Since a ``Func``'s keyword arguments for ``__init__()``  (``**extra``) and
+``as_sql()`` (``**extra_context``) are interpolated into the SQL string rather
+than passed as query parameters (where the database driver would escape them),
+they must not contain untrusted user input.
+
+For example, if ``substring`` is user-provided, this function is vulnerable to
+SQL injection::
+
+    from django.db.models import Func
+
+    class Position(Func):
+        function = 'POSITION'
+        template = "%(function)s('%(substring)s' in %(expressions)s)"
+
+        def __init__(self, expression, substring):
+            # substring=substring is a SQL injection vulnerability!
+            super().__init__(expression, substring=substring)
+
+This function generates a SQL string without any parameters. Since ``substring``
+is passed to ``super().__init__()`` as a keyword argument, it's interpolated
+into the SQL string before the query is sent to the database.
+
+Here's a corrected rewrite::
+
+    class Position(Func):
+        function = 'POSITION'
+        arg_joiner = ' IN '
+
+        def __init__(self, expression, substring):
+            super().__init__(substring, expression)
+
+With ``substring`` instead passed as a positional argument, it'll be passed as
+a parameter in the database query.
 
 Adding support in third-party database backends
 -----------------------------------------------
