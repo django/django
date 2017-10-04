@@ -119,7 +119,7 @@ class FirstOfNode(Node):
 
     def render(self, context):
         for var in self.vars:
-            value = var.resolve(context, True)
+            value = var.resolve(context, ignore_failures=True)
             if value:
                 first = render_value_in_context(value, context)
                 if self.asvar:
@@ -157,10 +157,7 @@ class ForNode(Node):
         else:
             parentloop = {}
         with context.push():
-            try:
-                values = self.sequence.resolve(context, True)
-            except VariableDoesNotExist:
-                values = []
+            values = self.sequence.resolve(context, ignore_failures=True)
             if values is None:
                 values = []
             if not hasattr(values, '__len__'):
@@ -232,16 +229,14 @@ class IfChangedNode(Node):
             state_frame[self] = None
 
         nodelist_true_output = None
-        try:
-            if self._varlist:
-                # Consider multiple parameters.  This automatically behaves
-                # like an OR evaluation of the multiple variables.
-                compare_to = [var.resolve(context, True) for var in self._varlist]
-            else:
-                # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
-                compare_to = nodelist_true_output = self.nodelist_true.render(context)
-        except VariableDoesNotExist:
-            compare_to = None
+        if self._varlist:
+            # Consider multiple parameters. This behaves like an OR evaluation
+            # of the multiple variables.
+            compare_to = [var.resolve(context, ignore_failures=True) for var in self._varlist]
+        else:
+            # The "{% ifchanged %}" syntax (without any variables) compares
+            # the rendered output.
+            compare_to = nodelist_true_output = self.nodelist_true.render(context)
 
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
@@ -276,8 +271,8 @@ class IfEqualNode(Node):
         return '<%s>' % self.__class__.__name__
 
     def render(self, context):
-        val1 = self.var1.resolve(context, True)
-        val2 = self.var2.resolve(context, True)
+        val1 = self.var1.resolve(context, ignore_failures=True)
+        val2 = self.var2.resolve(context, ignore_failures=True)
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
@@ -346,10 +341,10 @@ class RegroupNode(Node):
         # This method is called for each object in self.target. See regroup()
         # for the reason why we temporarily put the object in the context.
         context[self.var_name] = obj
-        return self.expression.resolve(context, True)
+        return self.expression.resolve(context, ignore_failures=True)
 
     def render(self, context):
-        obj_list = self.target.resolve(context, True)
+        obj_list = self.target.resolve(context, ignore_failures=True)
         if obj_list is None:
             # target variable wasn't found in context; fail silently.
             context[self.var_name] = []
