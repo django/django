@@ -1080,6 +1080,8 @@ code would be required in the app's ``admin.py`` file::
         password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
         password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
+        """Right now, the 'fields' variable in the Meta class will not be used.
+        Instead, the 'add_fieldsets' in the UserAdmin class will be used."""
         class Meta:
             model = MyUser
             fields = ('email', 'date_of_birth')
