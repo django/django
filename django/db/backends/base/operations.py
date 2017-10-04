@@ -204,6 +204,22 @@ class BaseDatabaseOperations:
             ' SKIP LOCKED' if skip_locked else '',
         )
 
+    def _get_limit_offset_params(self, low_mark, high_mark):
+        offset = low_mark or 0
+        if high_mark is not None:
+            return (high_mark - offset), offset
+        elif offset:
+            return self.connection.ops.no_limit_value(), offset
+        return None, offset
+
+    def limit_offset_sql(self, low_mark, high_mark):
+        """Return LIMIT/OFFSET SQL clause."""
+        limit, offset = self._get_limit_offset_params(low_mark, high_mark)
+        return '%s%s' % (
+            (' LIMIT %d' % limit) if limit else '',
+            (' OFFSET %d' % offset) if offset else '',
+        )
+
     def last_executed_query(self, cursor, sql, params):
         """
         Return a string of the query last executed by the given cursor, with

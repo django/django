@@ -233,6 +233,9 @@ END;
         else:
             return "%s"
 
+    def limit_offset_sql(self, low_mark, high_mark):
+        return ''
+
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.

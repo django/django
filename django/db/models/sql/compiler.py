@@ -532,14 +532,9 @@ class SQLCompiler:
                 result.append('ORDER BY %s' % ', '.join(ordering))
 
             if with_limits:
-                if self.query.high_mark is not None:
-                    result.append('LIMIT %d' % (self.query.high_mark - self.query.low_mark))
-                if self.query.low_mark:
-                    if self.query.high_mark is None:
-                        val = self.connection.ops.no_limit_value()
-                        if val:
-                            result.append('LIMIT %d' % val)
-                    result.append('OFFSET %d' % self.query.low_mark)
+                limit_offset_sql = self.connection.ops.limit_offset_sql(self.query.low_mark, self.query.high_mark)
+                if limit_offset_sql:
+                    result.append(limit_offset_sql)
 
             if for_update_part and not self.connection.features.for_update_after_from:
                 result.append(for_update_part)
