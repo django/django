@@ -151,10 +151,6 @@ class ForNode(Node):
             reversed_text,
         )
 
-    def __iter__(self):
-        yield from self.nodelist_loop
-        yield from self.nodelist_empty
-
     def render(self, context):
         if 'forloop' in context:
             parentloop = context['forloop']
