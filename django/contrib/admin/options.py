@@ -1487,15 +1487,20 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
-                self.save_model(request, new_object, form, not add)
-                self.save_related(request, form, formsets, not add)
-                change_message = self.construct_change_message(request, form, formsets, add)
-                if add:
-                    self.log_addition(request, new_object, change_message)
-                    return self.response_add(request, new_object)
+                try:
+                    self.save_model(request, new_object, form, not add)
+                    self.save_related(request, form, formsets, not add)
+                except ValidationError as e:
+                    form.add_error(None, e)
+                    form_validated = False
                 else:
-                    self.log_change(request, new_object, change_message)
-                    return self.response_change(request, new_object)
+                    change_message = self.construct_change_message(request, form, formsets, add)
+                    if add:
+                        self.log_addition(request, new_object, change_message)
+                        return self.response_add(request, new_object)
+                    else:
+                        self.log_change(request, new_object, change_message)
+                        return self.response_change(request, new_object)
             else:
                 form_validated = False
         else:
