@@ -556,3 +556,9 @@ END;
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super().subtract_temporals(internal_type, lhs, rhs)
+
+    def bulk_batch_size(self, fields, objs):
+        """Oracle restricts the number of parameters in a query."""
+        if fields:
+            return self.connection.features.max_query_params // len(fields)
+        return len(objs)
