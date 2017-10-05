@@ -389,12 +389,14 @@ verbose names Django performs by looking at the model's class name::
             verbose_name = _('my thing')
             verbose_name_plural = _('my things')
 
-Model methods ``short_description`` attribute values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Model methods ``description`` argument to the ``@display`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For model methods, you can provide translations to Django and the admin site
-with the ``short_description`` attribute::
+with the ``description`` argument to the :func:`~django.contrib.admin.display`
+decorator::
 
+    from django.contrib import admin
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
@@ -406,9 +408,9 @@ with the ``short_description`` attribute::
             verbose_name=_('kind'),
         )
 
+        @admin.display(description=_('Is it a mouse?'))
         def is_mouse(self):
             return self.kind.type == MOUSE_TYPE
-        is_mouse.short_description = _('Is it a mouse?')
 
 Working with lazy translation objects
 -------------------------------------

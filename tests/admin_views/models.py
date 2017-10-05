@@ -3,6 +3,7 @@ import os
 import tempfile
 import uuid
 
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
@@ -45,20 +46,18 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    @admin.display(ordering='date', description='')
     def model_year(self):
         return self.date.year
-    model_year.admin_order_field = 'date'
-    model_year.short_description = ''
 
+    @admin.display(ordering='-date', description='')
     def model_year_reversed(self):
         return self.date.year
-    model_year_reversed.admin_order_field = '-date'
-    model_year_reversed.short_description = ''
 
-    def property_year(self):
+    @property
+    @admin.display(ordering='date')
+    def model_property_year(self):
         return self.date.year
-    property_year.admin_order_field = 'date'
-    model_property_year = property(property_year)
 
     @property
     def model_month(self):
@@ -746,9 +745,9 @@ class AdminOrderedModelMethod(models.Model):
     order = models.IntegerField()
     stuff = models.CharField(max_length=200)
 
+    @admin.display(ordering='order')
     def some_order(self):
         return self.order
-    some_order.admin_order_field = 'order'
 
 
 class AdminOrderedAdminMethod(models.Model):

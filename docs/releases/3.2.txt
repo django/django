@@ -141,6 +141,28 @@ Django </topics/cache>`.
 
 .. _pymemcache: https://pypi.org/project/pymemcache/
 
+New decorators for the admin site
+---------------------------------
+
+The new :func:`~django.contrib.admin.display` decorator allows for easily
+adding options to custom display functions that can be used with
+:attr:`~django.contrib.admin.ModelAdmin.list_display` or
+:attr:`~django.contrib.admin.ModelAdmin.readonly_fields`.
+
+Likewise, the new :func:`~django.contrib.admin.action` decorator allows for
+easily adding options to action functions that can be used with
+:attr:`~django.contrib.admin.ModelAdmin.actions`.
+
+Using the ``@display`` decorator has the advantage that it is now
+possible to use the ``@property`` decorator when needing to specify attributes
+on the custom method. Prior to this it was necessary to use the ``property()``
+function instead after assigning the required attributes to the method.
+
+Using decorators has the advantage that these options are more discoverable as
+they can be suggested by completion utilities in code editors. They are merely
+a convenience and still set the same attributes on the functions under the
+hood.
+
 Minor features
 --------------
 
