@@ -47,6 +47,10 @@ USE_TZ = False
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
+# Language code for translation fallback, which is LANGUAGE_CODE by default.
+# Set this as fallback for unsupported languages and missing translations.
+LANGUAGE_FALLBACK = LANGUAGE_CODE
+
 # Languages we provide translations for, out of the box.
 LANGUAGES = [
     ('af', gettext_noop('Afrikaans')),
