@@ -579,7 +579,7 @@ class BaseDatabaseOperations:
         This is used on specific backends to rule out known expressions
         that have problematic or nonexistent implementations. If the
         expression has a known problem, the backend should raise
-        NotImplementedError.
+        NotSupportedError.
         """
         pass
 

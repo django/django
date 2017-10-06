@@ -9,6 +9,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import Func, Value
 from django.db.models.functions import Cast
+from django.db.utils import NotSupportedError
 from django.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)
@@ -123,7 +124,7 @@ class Area(OracleToleranceMixin, GeoFunc):
 
     def as_sql(self, compiler, connection, **extra_context):
         if not connection.features.supports_area_geodetic and self.geo_field.geodetic(connection):
-            raise NotImplementedError('Area on geodetic coordinate systems not supported.')
+            raise NotSupportedError('Area on geodetic coordinate systems not supported.')
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
@@ -316,7 +317,7 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
 
     def as_sql(self, compiler, connection, **extra_context):
         if self.geo_field.geodetic(connection) and not connection.features.supports_length_geodetic:
-            raise NotImplementedError("This backend doesn't support Length on geodetic fields")
+            raise NotSupportedError("This backend doesn't support Length on geodetic fields")
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_postgresql(self, compiler, connection):
@@ -372,7 +373,7 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     def as_postgresql(self, compiler, connection):
         function = None
         if self.geo_field.geodetic(connection) and not self.source_is_geography():
-            raise NotImplementedError("ST_Perimeter cannot use a non-projected non-geography field.")
+            raise NotSupportedError("ST_Perimeter cannot use a non-projected non-geography field.")
         dim = min(f.dim for f in self.get_source_fields())
         if dim > 2:
             function = connection.ops.perimeter3d
@@ -380,7 +381,7 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
 
     def as_sqlite(self, compiler, connection):
         if self.geo_field.geodetic(connection):
-            raise NotImplementedError("Perimeter cannot use a non-projected field.")
+            raise NotSupportedError("Perimeter cannot use a non-projected field.")
         return super().as_sql(compiler, connection)
 
 
