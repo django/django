@@ -157,7 +157,7 @@ the respective field according to your needs.
 
     def gen_uuid(apps, schema_editor):
         MyModel = apps.get_model('myapp', 'MyModel')
-        for row in MyModel.objects.all():
+        for row in MyModel.objects.filter(uuid__isnull=True):
             row.uuid = uuid.uuid4()
             row.save(update_fields=['uuid'])
 
@@ -175,8 +175,11 @@ the respective field according to your needs.
 * Now you can apply the migrations as usual with the :djadmin:`migrate` command.
 
   Note there is a race condition if you allow objects to be created while this
-  migration is running. Objects created after the ``AddField`` and before
-  ``RunPython`` will have their original ``uuid``’s overwritten.
+  migration is running. The filter ``uuid__isnull=True`` helps to not overwrite
+  the original ``uuid`` of objects created after the ``AddField`` and before
+  ``RunPython``. If an object with a null field is created after ``RunPython``
+  before ``AlterField`` it can be fixed by reverting ``RunPython`` and running
+  it again that is fast and it only updates the new object.
 
 .. _non-atomic-migrations:
 
