@@ -179,11 +179,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def _add_fallback(self, localedirs=None):
         """Set the GNUTranslations() fallback with the default language."""
         fallback = get_fallback()
-        # Don't set a fallback for any default language variant or any English variant
-        # (as it's empty, so it'll ALWAYS fall back to the default language)
-        # If the language and fallback are the same, there's no need for adding a fallback.
-        if self.__language == fallback or self.__language.startswith(
-                settings.LANGUAGE_CODE[0:2]) or self.__language.startswith('en'):
+        # Don't set a fallback for the default language or any English variant
+        # (as it's empty, so it'll ALWAYS fall back to the fallback language).
+        # If the language is the same, there's no need for adding the fallback.
+        if self.__language == fallback or settings.LANGUAGE_CODE.startswith(
+                self.__language) or self.__language.startswith('en'):
             return
         if self.domain == 'django':
             # Get from cache
