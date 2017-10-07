@@ -57,8 +57,8 @@ class ChangeListTests(TestCase):
 
     def test_select_related_preserved(self):
         """
-        Regression test for #10348: ChangeList.get_queryset() shouldn't
-        overwrite a custom select_related provided by ModelAdmin.get_queryset().
+        ChangeList.get_queryset() shouldn't overwrite a custom select_related
+        provided by ModelAdmin.get_queryset() (#10348).
         """
         m = ChildAdmin(Child, custom_site)
         request = self.factory.get('/child/')
