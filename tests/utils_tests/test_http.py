@@ -268,6 +268,18 @@ class HttpDateProcessingTests(unittest.TestCase):
         parsed = parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
+    def test_parsing_rfc850_year_50(self):
+        year = datetime.now().year % 100
+        dates = (
+            ('Monday, 31-Dec-18 08:49:37 GMT', datetime(2018, 12, 31, 8, 49, 37)),
+            ('Tuesday, 31-Dec-%s 08:49:37 GMT' % (year + 50), datetime(2000 + year + 50, 12, 31, 8, 49, 37)),
+            ('Wednesday, 31-Dec-%s 18:49:37 GMT' % (year + 51), datetime(1900 + year + 51, 12, 31, 18, 49, 37)),
+        )
+        for rfc850str, rfc850date in dates:
+            with self.subTest(string=rfc850str, date=rfc850date):
+                parsed = parse_http_date(rfc850str)
+                self.assertEqual(datetime.utcfromtimestamp(parsed), rfc850date)
+
     def test_parsing_asctime(self):
         parsed = parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
