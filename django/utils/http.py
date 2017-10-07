@@ -144,7 +144,14 @@ def parse_http_date(date):
     try:
         year = int(m.group('year'))
         if year < 100:
-            if year < 70:
+            # RFC 850 does not mention this, but in RFC 7231 (and there's something similar in RFC 2822),
+            # there's the following quote:
+            # Recipients of a timestamp value in rfc850-date format, which uses a
+            # two-digit year, MUST interpret a timestamp that appears to be more
+            # than 50 years in the future as representing the most recent year in
+            # the past that had the same last two digits.
+            current_year = datetime.date.today().year - 2000  # 2017 -> 17
+            if year < current_year + 50:
                 year += 2000
             else:
                 year += 1900
