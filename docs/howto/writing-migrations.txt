@@ -86,16 +86,23 @@ the respective field according to your needs.
   arguments (choose an appropriate default for the type of the field you're
   adding).
 
-* Run the :djadmin:`makemigrations` command. This should generate a migration
-  with an ``AddField`` operation.
+* Change the parameter ``unique=True`` to ``null=True`` temporarily-
 
-* Generate two empty migration files for the same app by running
-  ``makemigrations myapp --empty`` twice. We've renamed the migration files to
+* Run the :djadmin:`makemigrations` command. This should generate a migration
+  with an ``AddField`` operation and will create the intermediary
+  null field and defer creating the unique constraint until we've populated
+  unique values on all the rows.
+
+* Generate an empty migration file for the same app by running
+  ``makemigrations myapp --empty``. We've renamed the migration files to
   give them meaningful names in the examples below.
 
-* Copy the ``AddField`` operation from the auto-generated migration (the first
-  of the three new files) to the last migration, change ``AddField`` to
-  ``AlterField``, and add imports of ``uuid`` and ``models``. For example:
+* Revert the added parameter ``null=True`` back to ``unique=True``.
+
+* Run the :djadmin:`makemigrations` command. This should generate a migration
+  with an ``AlterField`` operation.
+
+* The last migration file looks similar to this:
 
   .. snippet::
     :filename: 0006_remove_uuid_null.py
@@ -118,8 +125,7 @@ the respective field according to your needs.
             ),
         ]
 
-* Edit the first migration file. The generated migration class should look
-  similar to this:
+* The first migration file looks similar to this:
 
   .. snippet::
     :filename: 0004_add_uuid_field.py
@@ -134,15 +140,11 @@ the respective field according to your needs.
             migrations.AddField(
                 model_name='mymodel',
                 name='uuid',
-                field=models.UUIDField(default=uuid.uuid4, unique=True),
+                field=models.UUIDField(default=uuid.uuid4, null=True),
             ),
         ]
 
-  Change ``unique=True`` to ``null=True`` -- this will create the intermediary
-  null field and defer creating the unique constraint until we've populated
-  unique values on all the rows.
-
-* In the first empty migration file, add a
+* In the empty migration file, add a
   :class:`~django.db.migrations.operations.RunPython` or
   :class:`~django.db.migrations.operations.RunSQL` operation to generate a
   unique value (UUID in the example) for each existing row. Also add an import
