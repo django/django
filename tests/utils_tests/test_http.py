@@ -223,6 +223,26 @@ class HttpDateProcessingTests(unittest.TestCase):
         parsed = http.parse_http_date('Sunday, 06-Nov-94 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
+    def test_parsing_rfc850_year(self):
+        dates = (
+            ('Monday, 15-Aug-05 08:49:37 GMT', datetime(2005, 8, 15, 8, 49, 37)),
+            ('Monday, 15-Aug-17 08:49:37 GMT', datetime(2017, 8, 15, 8, 49, 37)),
+            ('Monday, 15-Aug-49 08:49:37 GMT', datetime(2049, 8, 15, 8, 49, 37)),
+            ('Monday, 15-Aug-51 08:49:37 GMT', datetime(2051, 8, 15, 8, 49, 37)),
+            # On Windows, test for 15-Aug-69 timestamp might fail because negative timestamps as not supported by
+            # utcfromtimestamp function
+            ('Monday, 15-Aug-69 08:00:00 GMT', datetime(1969, 8, 15, 8, 00, 00)),
+            # On Windows, test for 01-Jan-70 might fail because of a bug in Python 3.6
+            # https://bugs.python.org/issue29097
+            ('Monday, 01-Jan-70 00:00:00 GMT', datetime(1970, 1, 1, 0, 00, 00)),
+            ('Monday, 15-Aug-71 08:49:37 GMT', datetime(1971, 8, 15, 8, 49, 37)),
+            ('Monday, 15-Aug-95 08:49:37 GMT', datetime(1995, 8, 15, 8, 49, 37)),
+        )
+        for rfc850str, rfc850date in dates:
+            with self.subTest(string=rfc850str, date=rfc850date):
+                parsed = http.parse_http_date(rfc850str)
+                self.assertEqual(datetime.utcfromtimestamp(parsed), rfc850date)
+
     def test_parsing_asctime(self):
         parsed = http.parse_http_date('Sun Nov  6 08:49:37 1994')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
