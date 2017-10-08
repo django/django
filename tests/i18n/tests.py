@@ -1190,6 +1190,37 @@ class MiscTests(SimpleTestCase):
         self.assertEqual('zh-hant', g(r))
 
     @override_settings(
+        LANGUAGE_FALLBACK='es',
+        LANGUAGES=[
+            ('en', 'English'),
+            ('de', 'German'),
+            ('es', 'Spanish'),
+        ]
+    )
+    def test_parse_literal_http_header_with_fallback(self):
+        """
+        Now test that we parse a literal HTTP header correctly with a fallback.
+        """
+        g = get_language_from_request
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'es'}
+        self.assertEqual('es', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+        self.assertEqual('de', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'en,de'}
+        self.assertEqual('en', g(r))
+
+        # From here on the parsed language should be the fallback language.
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'pl'}
+        self.assertEqual(g(r), 'es')
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'tr'}
+        self.assertEqual(g(r), 'es')
+
+    @override_settings(
         LANGUAGES=[
             ('en', 'English'),
             ('zh-hans', 'Simplified Chinese'),
@@ -1258,6 +1289,41 @@ class MiscTests(SimpleTestCase):
         r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-hans'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-hans')
+
+    @override_settings(
+        LANGUAGE_FALLBACK='es',
+        LANGUAGES=[
+            ('en', 'English'),
+            ('de', 'German'),
+            ('es', 'Spanish'),
+        ]
+    )
+    def test_parse_language_cookie_with_fallback(self):
+        """
+        Now test that we parse preferences from cookies correctly with a fallback.
+        """
+        g = get_language_from_request
+        r = self.rf.get('/')
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'es'}
+        r.META = {}
+        self.assertEqual('es', g(r))
+
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'de'}
+        r.META = {}
+        self.assertEqual('de', g(r))
+
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'en'}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+        self.assertEqual('en', g(r))
+
+        # From here on the parsed language should be the fallback language.
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'tr'}
+        r.META = {}
+        self.assertEqual(g(r), 'es')
+
+        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'ja'}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
+        self.assertEqual(g(r), 'es')
 
     @override_settings(
         LANGUAGES=[
