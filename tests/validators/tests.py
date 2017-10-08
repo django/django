@@ -2,6 +2,7 @@ import os
 import re
 import types
 from datetime import datetime, timedelta
+from decimal import Decimal
 from unittest import TestCase, skipUnless
 
 from django.core.exceptions import ValidationError
@@ -9,11 +10,11 @@ from django.core.files.base import ContentFile
 from django.core.validators import (
     BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
-    MinValueValidator, RegexValidator, URLValidator, int_list_validator,
-    validate_comma_separated_integer_list, validate_email,
-    validate_image_file_extension, validate_integer, validate_ipv4_address,
-    validate_ipv6_address, validate_ipv46_address, validate_slug,
-    validate_unicode_slug,
+    MinValueValidator, ProhibitNullCharactersValidator, RegexValidator,
+    URLValidator, int_list_validator, validate_comma_separated_integer_list,
+    validate_email, validate_image_file_extension, validate_integer,
+    validate_ipv4_address, validate_ipv6_address, validate_ipv46_address,
+    validate_slug, validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 
@@ -259,11 +260,27 @@ TEST_DATA = [
     (FileExtensionValidator(['TXT']), ContentFile('contents', name='file.txt'), None),
     (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
 
+    (DecimalValidator(max_digits=2, decimal_places=2), Decimal('0.99'), None),
+    (DecimalValidator(max_digits=2, decimal_places=1), Decimal('0.99'), ValidationError),
+    (DecimalValidator(max_digits=3, decimal_places=1), Decimal('999'), ValidationError),
+    (DecimalValidator(max_digits=4, decimal_places=1), Decimal('999'), None),
+    (DecimalValidator(max_digits=20, decimal_places=2), Decimal('742403889818000000'), None),
+    (DecimalValidator(20, 2), Decimal('7.42403889818E+17'), None),
+    (DecimalValidator(max_digits=20, decimal_places=2), Decimal('7424742403889818000000'), ValidationError),
+    (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-1'), None),
+    (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-3'), ValidationError),
+    (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-5'), None),
+    (DecimalValidator(max_digits=5, decimal_places=5), Decimal('70E-6'), ValidationError),
+
     (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.PNG'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
     (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
+
+    (ProhibitNullCharactersValidator(), '\x00something', ValidationError),
+    (ProhibitNullCharactersValidator(), 'something', None),
+    (ProhibitNullCharactersValidator(), None, None),
 ]
 
 
@@ -334,7 +351,8 @@ class TestSimpleValidators(SimpleTestCase):
         self.assertEqual(repr(v), "ValidationError({'first': ['First Problem']})")
 
     def test_regex_validator_flags(self):
-        with self.assertRaises(TypeError):
+        msg = 'If the flags are set, regex must be a regular expression string.'
+        with self.assertRaisesMessage(TypeError, msg):
             RegexValidator(re.compile('a'), flags=re.IGNORECASE)
 
     def test_max_length_validator_message(self):
@@ -486,4 +504,22 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             FileExtensionValidator(['txt']),
             FileExtensionValidator(['txt'], message='custom error message')
+        )
+
+    def test_prohibit_null_characters_validator_equality(self):
+        self.assertEqual(
+            ProhibitNullCharactersValidator(message='message', code='code'),
+            ProhibitNullCharactersValidator(message='message', code='code')
+        )
+        self.assertEqual(
+            ProhibitNullCharactersValidator(),
+            ProhibitNullCharactersValidator()
+        )
+        self.assertNotEqual(
+            ProhibitNullCharactersValidator(message='message1', code='code'),
+            ProhibitNullCharactersValidator(message='message2', code='code')
+        )
+        self.assertNotEqual(
+            ProhibitNullCharactersValidator(message='message', code='code1'),
+            ProhibitNullCharactersValidator(message='message', code='code2')
         )

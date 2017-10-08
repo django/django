@@ -56,6 +56,10 @@ class PermWrapperTests(SimpleTestCase):
         with self.assertRaises(TypeError):
             self.EQLimiterObject() in pldict
 
+    def test_iter(self):
+        with self.assertRaisesMessage(TypeError, 'PermWrapper is not iterable.'):
+            iter(PermWrapper(MockUser()))
+
 
 @override_settings(ROOT_URLCONF='auth_tests.urls', TEMPLATES=AUTH_TEMPLATES)
 class AuthContextProcessorTests(TestCase):

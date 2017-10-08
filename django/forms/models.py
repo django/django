@@ -92,10 +92,18 @@ def model_to_dict(instance, fields=None, exclude=None):
     return data
 
 
+def apply_limit_choices_to_to_formfield(formfield):
+    """Apply limit_choices_to to the formfield's queryset if needed."""
+    if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
+        limit_choices_to = formfield.get_limit_choices_to()
+        if limit_choices_to is not None:
+            formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
+
+
 def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      formfield_callback=None, localized_fields=None,
                      labels=None, help_texts=None, error_messages=None,
-                     field_classes=None):
+                     field_classes=None, *, apply_limit_choices_to=True):
     """
     Return an ``OrderedDict`` containing form fields for the given model.
 
@@ -122,6 +130,9 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
 
     ``field_classes`` is a dictionary of model field names mapped to a form
     field class.
+
+    ``apply_limit_choices_to`` is a boolean indicating if limit_choices_to
+    should be applied to a field's queryset.
     """
     field_list = []
     ignored = []
@@ -165,11 +176,8 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
             formfield = formfield_callback(f, **kwargs)
 
         if formfield:
-            # Apply ``limit_choices_to``.
-            if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
-                limit_choices_to = formfield.get_limit_choices_to()
-                if limit_choices_to is not None:
-                    formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
+            if apply_limit_choices_to:
+                apply_limit_choices_to_to_formfield(formfield)
             field_list.append((f.name, formfield))
         else:
             ignored.append(f.name)
@@ -240,15 +248,17 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 # fields from the model"
                 opts.fields = None
 
-            fields = fields_for_model(opts.model, opts.fields, opts.exclude,
-                                      opts.widgets, formfield_callback,
-                                      opts.localized_fields, opts.labels,
-                                      opts.help_texts, opts.error_messages,
-                                      opts.field_classes)
+            fields = fields_for_model(
+                opts.model, opts.fields, opts.exclude, opts.widgets,
+                formfield_callback, opts.localized_fields, opts.labels,
+                opts.help_texts, opts.error_messages, opts.field_classes,
+                # limit_choices_to will be applied during ModelForm.__init__().
+                apply_limit_choices_to=False,
+            )
 
             # make sure opts.fields doesn't specify an invalid field
-            none_model_fields = [k for k, v in fields.items() if not v]
-            missing_fields = set(none_model_fields) - set(new_class.declared_fields)
+            none_model_fields = {k for k, v in fields.items() if not v}
+            missing_fields = none_model_fields.difference(new_class.declared_fields)
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
                 message = message % (', '.join(missing_fields),
@@ -290,6 +300,8 @@ class BaseModelForm(BaseForm):
             data, files, auto_id, prefix, object_data, error_class,
             label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
         )
+        for formfield in self.fields.values():
+            apply_limit_choices_to_to_formfield(formfield)
 
     def _get_validation_exclusions(self):
         """
@@ -577,22 +589,39 @@ class BaseModelFormSet(BaseFormSet):
         return field.to_python
 
     def _construct_form(self, i, **kwargs):
-        if self.is_bound and i < self.initial_form_count():
-            pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
-            pk = self.data[pk_key]
-            pk_field = self.model._meta.pk
-            to_python = self._get_to_python(pk_field)
-            pk = to_python(pk)
-            kwargs['instance'] = self._existing_object(pk)
-        if i < self.initial_form_count() and 'instance' not in kwargs:
-            kwargs['instance'] = self.get_queryset()[i]
-        if i >= self.initial_form_count() and self.initial_extra:
+        pk_required = False
+        if i < self.initial_form_count():
+            pk_required = True
+            if self.is_bound:
+                pk_key = '%s-%s' % (self.add_prefix(i), self.model._meta.pk.name)
+                try:
+                    pk = self.data[pk_key]
+                except KeyError:
+                    # The primary key is missing. The user may have tampered
+                    # with POST data.
+                    pass
+                else:
+                    to_python = self._get_to_python(self.model._meta.pk)
+                    try:
+                        pk = to_python(pk)
+                    except ValidationError:
+                        # The primary key exists but is an invalid value. The
+                        # user may have tampered with POST data.
+                        pass
+                    else:
+                        kwargs['instance'] = self._existing_object(pk)
+            else:
+                kwargs['instance'] = self.get_queryset()[i]
+        elif self.initial_extra:
             # Set initial values for extra forms
             try:
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
             except IndexError:
                 pass
-        return super()._construct_form(i, **kwargs)
+        form = super()._construct_form(i, **kwargs)
+        if pk_required:
+            form.fields[self.model._meta.pk.name].required = True
+        return form
 
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
@@ -654,8 +683,8 @@ class BaseModelFormSet(BaseFormSet):
         for form in valid_forms:
             exclude = form._get_validation_exclusions()
             unique_checks, date_checks = form.instance._get_unique_checks(exclude=exclude)
-            all_unique_checks = all_unique_checks.union(set(unique_checks))
-            all_date_checks = all_date_checks.union(set(date_checks))
+            all_unique_checks.update(unique_checks)
+            all_date_checks.update(date_checks)
 
         errors = []
         # Do each of the unique checks (unique and unique_together)
@@ -808,7 +837,7 @@ class BaseModelFormSet(BaseFormSet):
                         pk_value = None
                 except IndexError:
                     pk_value = None
-            if isinstance(pk, OneToOneField) or isinstance(pk, ForeignKey):
+            if isinstance(pk, (ForeignKey, OneToOneField)):
                 qs = pk.remote_field.model._default_manager.get_queryset()
             else:
                 qs = self.model._default_manager.get_queryset()
@@ -1112,7 +1141,7 @@ class ModelChoiceIterator:
             yield self.choice(obj)
 
     def __len__(self):
-        return (len(self.queryset) + (1 if self.field.empty_label is not None else 0))
+        return len(self.queryset) + (1 if self.field.empty_label is not None else 0)
 
     def choice(self, obj):
         return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
@@ -1222,6 +1251,8 @@ class ModelChoiceField(ChoiceField):
         return Field.validate(self, value)
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         initial_value = initial if initial is not None else ''
         data_value = data if data is not None else ''
         return str(self.prepare_value(initial_value)) != str(data_value)
@@ -1306,6 +1337,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
         return super().prepare_value(value)
 
     def has_changed(self, initial, data):
+        if self.disabled:
+            return False
         if initial is None:
             initial = []
         if data is None:

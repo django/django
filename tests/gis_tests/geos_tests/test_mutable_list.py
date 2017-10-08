@@ -419,13 +419,6 @@ class ListMixinTest(unittest.TestCase):
         self.assertLess(ul, pl + [2], 'cmp')
         self.assertLessEqual(ul, pl + [2], 'cmp')
 
-        # Also works with a custom IndexError
-        ul_longer = ul + [2]
-        ul_longer._IndexError = TypeError
-        ul._IndexError = TypeError
-        self.assertNotEqual(ul_longer, pl)
-        self.assertGreater(ul_longer, ul)
-
         pl[1] = 20
         self.assertGreater(pl, ul, 'cmp for gt self')
         self.assertLess(ul, pl, 'cmp for self lt')

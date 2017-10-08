@@ -158,7 +158,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         A CommandError should be thrown by handle() if the user enters in
         mismatched passwords three times.
         """
-        with self.assertRaises(CommandError):
+        msg = "Aborting password change for user 'joe' after 3 attempts"
+        with self.assertRaisesMessage(CommandError, msg):
             call_command('changepassword', username='joe', stdout=self.stdout, stderr=self.stderr)
 
     @mock.patch.object(changepassword.Command, '_get_pass', return_value='1234567890')
@@ -316,7 +317,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
         new_io = StringIO()
-        with self.assertRaises(CommandError):
+        with self.assertRaisesMessage(CommandError, 'You must use --email with --noinput.'):
             call_command(
                 "createsuperuser",
                 interactive=False,

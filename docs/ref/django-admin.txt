@@ -235,8 +235,6 @@ are prefixed by ``"###"``.
 
 .. django-admin-option:: --default MODULE
 
-.. versionadded:: 1.11
-
 The settings module to compare the current settings against. Leave empty to
 compare against Django's default settings.
 
@@ -366,7 +364,9 @@ output:
 * If ``inspectdb`` cannot map a column's type to a model field type, it'll
   use ``TextField`` and will insert the Python comment
   ``'This field type is a guess.'`` next to the field in the generated
-  model.
+  model. The recognized fields may depend on apps listed in
+  :setting:`INSTALLED_APPS`. For example, :mod:`django.contrib.postgres` adds
+  recognition for several PostgreSQL-specific field types.
 
 * If the database column name is a Python reserved word (such as
   ``'pass'``, ``'class'`` or ``'for'``), ``inspectdb`` will append
@@ -435,8 +435,6 @@ Specifies the :ref:`serialization format <serialization-formats>` (e.g.,
 <loading-fixtures-stdin>`.
 
 .. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
-
-.. versionadded:: 1.11
 
 Excludes loading the fixtures from the given applications and/or models (in the
 form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
@@ -876,9 +874,6 @@ If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overridden
 with its own :ref:`runserver<staticfiles-runserver>` command.
 
-If :djadmin:`migrate` was not previously executed, the table that stores the
-history of migrations is created at first run of ``runserver``.
-
 Logging of each request and response of the server is sent to the
 :ref:`django-server-logger` logger.
 
@@ -1020,10 +1015,6 @@ You can also pass code in on standard input to execute it. For example:
 On Windows, the REPL is output due to implementation limits of
 :func:`select.select` on that platform.
 
-.. versionchanged:: 1.11
-
-    In older versions, the REPL is also output on UNIX systems.
-
 ``showmigrations``
 ------------------
 
@@ -1050,10 +1041,6 @@ of 2 and above, all dependencies of a migration will also be shown.
 
 ``app_label``\s arguments limit the output, however, dependencies of provided
 apps may also be included.
-
-.. versionchanged:: 1.11
-
-    In older versions, ``showmigrations --plan`` ignores app labels.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1134,6 +1121,13 @@ behavior, as optimization is meant to be safe.
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts.
+
+.. django-admin-option:: --squashed-name SQUASHED_NAME
+
+.. versionadded:: 2.0
+
+Sets the name of the squashed migration. When omitted, the name is based on the
+first and last migration, with ``_squashed_`` in between.
 
 ``startapp``
 ------------
@@ -1318,8 +1312,6 @@ the side effects of tests that aren't properly isolated. :ref:`Grouping by test
 class <order-of-tests>` is preserved when using this option.
 
 .. django-admin-option:: --debug-mode
-
-.. versionadded:: 1.11
 
 Sets the :setting:`DEBUG` setting to ``True`` prior to running tests. This may
 help troubleshoot test failures.
@@ -1522,8 +1514,6 @@ instance.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. django-admin:: remove_stale_contenttypes
-
-.. versionadded:: 1.11
 
 This command is only available if Django's :doc:`contenttypes app
 </ref/contrib/contenttypes>` (:mod:`django.contrib.contenttypes`) is installed.

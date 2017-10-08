@@ -11,22 +11,33 @@ want to be aware of when upgrading from Django 1.11 or earlier. We've
 their deprecation cycle, and we've :ref:`begun the deprecation process for some
 features <deprecated-features-2.0>`.
 
+This release starts Django's use of a :ref:`loose form of semantic versioning
+<internal-release-cadence>`, however, there aren't any major backwards
+incompatible changes that might be expected of a 2.0 release. Upgrading should
+be a similar amount of effort as past feature releases.
+
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
 Python compatibility
 ====================
 
-Django 2.0 supports Python 3.5+. Since Django 1.11, support for Python 2.7 and
-3.4 is removed. We **highly recommend** and only officially support the latest
-release of each series.
+Django 2.0 supports Python 3.4, 3.5, and 3.6. We **highly recommend** and only
+officially support the latest release of each series.
+
+The Django 1.11.x series is the last to support Python 2.7.
+
+Django 2.0 will be the last release series to support Python 3.4. If you plan
+a deployment of Python 3.4 beyond the end-of-life for Django 2.0 (April 2019),
+stick with Django 1.11 LTS (supported until April 2020) instead. Note, however,
+that the end-of-life for Python 3.4 is March 2019.
 
 Third-party library support for older version of Django
 =======================================================
 
 Following the release of Django 2.0, we suggest that third-party app authors
 drop support for all versions of Django prior to 1.11. At that time, you should
-be able run your package's tests using ``python -Wd`` so that deprecation
+be able to run your package's tests using ``python -Wd`` so that deprecation
 warnings do appear. After making the deprecation warning fixes, your app should
 be compatible with Django 2.0.
 
@@ -35,18 +46,56 @@ be compatible with Django 2.0.
 What's new in Django 2.0
 ========================
 
+Simplified URL routing syntax
+-----------------------------
+
+The new :func:`django.urls.path()` function allows a simpler, more readable URL
+routing syntax. For example, this example from previous Django releases::
+
+    url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+
+could be written as::
+
+    path('articles/<int:year>/', views.year_archive),
+
+The new syntax supports type coercion of URL parameters. In the example, the
+view will receive the ``year`` keyword argument as an integer rather than as
+a string.
+
+The ``django.conf.urls.url()`` function from previous versions is now available
+as :func:`django.urls.re_path`, however, the old location remains for backwards
+compatibility, without an imminent deprecation. The old
+``django.conf.urls.include()`` function is now importable from ``django.urls``
+so you can use ``from django.urls import include, path, re_path`` in your
+URLconfs.
+
+The :doc:`/topics/http/urls` document is rewritten to feature the new syntax
+and provide more details.
+
+Mobile-friendly ``contrib.admin``
+---------------------------------
+
+The admin is now responsive and supports all major mobile devices.
+Older browser may experience varying levels of graceful degradation.
+
+Window expressions
+------------------
+
+The new :class:`~django.db.models.expressions.Window` expression allows
+adding an ``OVER`` clause to querysets. You can use :ref:`window functions
+<window-functions>` and :ref:`aggregate functions <aggregation-functions>` in
+the expression.
+
 Minor features
 --------------
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
-
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
+  :meth:`.ModelAdmin.get_autocomplete_fields` method allow using an
+  `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
+  ``ManyToManyField``.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,19 +103,14 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   36,000 to 100,000.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added MySQL support for the
   :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` function,
   :class:`~django.contrib.gis.db.models.functions.GeoHash` function,
-  :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
-  :lookup:`isvalid` lookup.
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function,
+  :lookup:`isvalid` lookup, and :ref:`distance lookups <distance-lookups>`.
 
 * Added the :class:`~django.contrib.gis.db.models.functions.Azimuth` and
   :class:`~django.contrib.gis.db.models.functions.LineLocatePoint` functions,
@@ -90,10 +134,9 @@ Minor features
   GDAL's internal virtual filesystem. Rasters can now be :ref:`created from and
   converted to binary data <gdal-raster-vsimem>` in-memory.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :meth:`GDALBand.color_interp()
+  <django.contrib.gis.gdal.GDALBand.color_interp>` method returns the color
+  interpretation for the band.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,15 +151,17 @@ Minor features
   :class:`~django.contrib.postgres.operations.CryptoExtension` migration
   operation.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :class:`django.contrib.postgres.indexes.GinIndex` now supports the
+  ``fastupdate`` and ``gin_pending_list_limit`` parameters.
 
-* ...
+* The new :class:`~django.contrib.postgres.indexes.GistIndex` class allows
+  creating ``GiST`` indexes in the database. The new
+  :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+  operation installs the ``btree_gist`` extension to add support for operator
+  classes that aren't built-in.
 
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* :djadmin:`inspectdb` can now introspect ``JSONField`` and various
+  ``RangeField``\s (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,51 +169,17 @@ Minor features
 * Added the ``protocol`` keyword argument to the
   :class:`~django.contrib.sitemaps.GenericSitemap` constructor.
 
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 Cache
 ~~~~~
 
-* ...
-
-CSRF
-~~~~
-
-* ...
-
-Database backends
-~~~~~~~~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
+* On memcached, ``cache.set_many()`` returns a list of keys that failed to be
+  inserted.
 
 File Storage
 ~~~~~~~~~~~~
 
 * :meth:`File.open() <django.core.files.File.open>` can be used as a context
   manager, e.g. ``with file.open() as f:``.
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -186,12 +197,8 @@ Forms
 Generic Views
 ~~~~~~~~~~~~~
 
-* ...
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
+* The new :attr:`.ContextMixin.extra_context` attribute allows adding context
+  in ``View.as_view()``.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -210,10 +217,13 @@ Management Commands
 * On Oracle, :djadmin:`inspectdb` can now introspect ``AutoField`` if the
   column is created as an identity column.
 
+* On MySQL, :djadmin:`dbshell` now supports client-side TLS certificates.
+
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :option:`squashmigrations --squashed-name`  option allows naming
+  the squashed migration.
 
 Models
 ~~~~~~
@@ -231,6 +241,10 @@ Models
   from the database. For databases that don't support server-side cursors, it
   controls the number of results Django fetches from the database adapter.
 
+* :meth:`.QuerySet.earliest`, :meth:`.QuerySet.latest`, and
+  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>`  now
+  allow ordering by several fields.
+
 * Added the :class:`~django.db.models.functions.datetime.ExtractQuarter`
   function to extract the quarter from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField`, and exposed it through the
@@ -240,20 +254,54 @@ Models
   function to truncate :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` to the first day of a quarter.
 
+* Added the :attr:`~django.db.models.Index.db_tablespace` parameter to
+  class-based indexes.
+
+* If the database supports a native duration field (Oracle and PostgreSQL),
+  :class:`~django.db.models.functions.datetime.Extract` now works with
+  :class:`~django.db.models.DurationField`.
+
+* Added the ``of`` argument to :meth:`.QuerySet.select_for_update()`, supported
+  on PostgreSQL and Oracle, to lock only rows from specific tables rather than
+  all selected tables. It may be helpful particularly when
+  :meth:`~.QuerySet.select_for_update()` is used in conjunction with
+  :meth:`~.QuerySet.select_related()`.
+
+* The new ``field_name`` parameter of :meth:`.QuerySet.in_bulk` allows fetching
+  results based on any unique model field.
+
+* :meth:`.CursorWrapper.callproc()` now takes an optional dictionary of keyword
+  parameters, if the backend supports this feature. Of Django's built-in
+  backends, only Oracle supports it.
+
+* The new :meth:`connection.execute_wrapper()
+  <django.db.backends.base.DatabaseWrapper.execute_wrapper>` method allows
+  :doc:`installing wrappers around execution of database queries
+  </topics/db/instrumentation>`.
+
+* The new ``filter`` argument for built-in aggregates allows :ref:`adding
+  different conditionals <conditional-aggregation>` to multiple aggregations
+  over the same fields or relations.
+
+* Added support for expressions in :attr:`Meta.ordering
+  <django.db.models.Options.ordering>`.
+
+* The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
+  results as named tuples.
+
+* The new :class:`.FilteredRelation` class allows adding an ``ON`` clause to
+  querysets.
+
+Pagination
+~~~~~~~~~~
+
+* Added :meth:`Paginator.get_page() <django.core.paginator.Paginator.get_page>`
+  to provide the documented pattern of handling invalid page numbers.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * The :djadmin:`runserver` Web server supports HTTP 1.1.
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
 
 Templates
 ~~~~~~~~~
@@ -273,15 +321,15 @@ Tests
   Oracle: :setting:`DATAFILE_SIZE`, :setting:`DATAFILE_TMP_SIZE`,
   :setting:`DATAFILE_EXTSIZE`, and :setting:`DATAFILE_TMP_EXTSIZE`.
 
-URLs
-~~~~
-
-* ...
-
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new :class:`.ProhibitNullCharactersValidator` disallows the null
+  character in the input of the :class:`~django.forms.CharField` form field
+  and its subclasses. Null character input was observed from vulnerability
+  scanning tools. Most databases silently discard null characters, but
+  psycopg2 2.7+ raises an exception when trying to save a null character to
+  a char/text field with PostgreSQL.
 
 .. _backwards-incompatible-2.0:
 
@@ -305,9 +353,10 @@ This section describes changes that may be needed in third-party database
 backends.
 
 * The ``DatabaseOperations.datetime_cast_date_sql()``,
-  ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``, and
-  ``datetime_extract_sql()`` methods now return only the SQL to perform the
-  operation instead of SQL and a list of parameters.
+  ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``,
+  ``datetime_extract_sql()``, and ``date_interval_sql()`` methods now return
+  only the SQL to perform the operation instead of SQL and a list of
+  parameters.
 
 * Third-party database backends should add a ``DatabaseWrapper.display_name``
   attribute with the name of the database that your backend works with. Django
@@ -315,6 +364,35 @@ backends.
 
 * The first argument of ``SchemaEditor._alter_column_type_sql()`` is now
   ``model`` rather than ``table``.
+
+* The first argument of ``SchemaEditor._create_index_name()`` is now
+  ``table_name`` rather than ``model``.
+
+* To enable ``FOR UPDATE OF`` support, set
+  ``DatabaseFeatures.has_select_for_update_of = True``. If the database
+  requires that the arguments to ``OF`` be columns rather than tables, set
+  ``DatabaseFeatures.select_for_update_of_column = True``.
+
+* To enable support for :class:`~django.db.models.expressions.Window`
+  expressions, set ``DatabaseFeatures.supports_over_clause`` to ``True``. You
+  may need to customize the ``DatabaseOperations.window_start_rows_start_end()``
+  and/or ``window_start_range_start_end()`` methods.
+
+* Third-party database backends should add a
+  ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the
+  database data type that will be used in the
+  :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
+  ``max_length`` argument isn't provided.
+
+* The first argument of ``DatabaseCreation._clone_test_db()`` and
+  ``get_test_db_clone_settings()`` is now ``suffix`` rather
+  than ``number`` (in case you want to rename the signatures in your backend
+  for consistency). ``django.test`` also now passes those values as strings
+  rather than as integers.
+
+* Third-party database backends should add a
+  ``DatabaseIntrospection.get_sequences()`` method based on the stub in
+  ``BaseDatabaseIntrospection``.
 
 Dropped support for Oracle 11.2
 -------------------------------
@@ -396,6 +474,57 @@ For custom management commands that use options not created using
     class MyCommand(BaseCommand):
         stealth_options = ('option_name', ...)
 
+Indexes no longer accept positional arguments
+---------------------------------------------
+
+For example::
+
+    models.Index(['headline', '-pub_date'], 'index_name')
+
+raises an exception and should be replaced with::
+
+    models.Index(fields=['headline', '-pub_date'], name='index_name')
+
+Foreign key constraints are now enabled on SQLite
+-------------------------------------------------
+
+This will appear as a backwards-incompatible change (``IntegrityError:
+FOREIGN KEY constraint failed``) if attempting to save an existing model
+instance that's violating a foreign key constraint.
+
+Foreign keys are now created with ``DEFERRABLE INITIALLY DEFERRED`` instead of
+``DEFERRABLE IMMEDIATE``. Thus, tables may need to be rebuilt to recreate
+foreign keys with the new definition, particularly if you're using a pattern
+like this::
+
+    from django.db import transaction
+
+    with transaction.atomic():
+        Book.objects.create(author_id=1)
+        Author.objects.create(id=1)
+
+If you don't recreate the foreign key as ``DEFERRED``, the first ``create()``
+would fail now that foreign key constraints are enforced.
+
+Backup your database first! After upgrading to Django 2.0, you can then
+rebuild tables using a script similar to this::
+
+    from django.apps import apps
+    from django.db import connection
+
+    for app in apps.get_app_configs():
+        for model in app.get_models(include_auto_created=True):
+            if model._meta.managed and not (model._meta.proxy or model._meta.swapped):
+                for base in model.__bases__:
+                    if hasattr(base, '_meta'):
+                        base._meta.local_many_to_many = []
+                model._meta.local_many_to_many = []
+                with connection.schema_editor() as editor:
+                    editor._remake_table(model)
+
+This script hasn't received extensive testing and needs adaption for various
+cases such as multiple databases. Feel free to contribute improvements.
+
 Miscellaneous
 -------------
 
@@ -437,12 +566,6 @@ Miscellaneous
   connection, those queries could be included as part of the
   ``assertNumQueries()`` count.
 
-* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is more properly respected in
-  ``contrib.auth`` password reset. Previously, resets were allowed for one day
-  longer than expected. For example, with the default of
-  ``PASSWORD_RESET_TIMEOUT_DAYS = 3``, password reset tokens are now valid for
-  72 hours rather than 96 hours.
-
 * The default size of the Oracle test tablespace is increased from 20M to 50M
   and the default autoextend size is increased from 10M to 25M.
 
@@ -464,10 +587,47 @@ Miscellaneous
   option. Add this to your existing migrations or accept an auto-generated
   migration for fields that use it.
 
+* Performing queries that require :ref:`automatic spatial transformations
+  <automatic-spatial-transformations>` now raises ``NotImplementedError``
+  on MySQL instead of silently using non-transformed geometries.
+
+* ``django.core.exceptions.DjangoRuntimeWarning`` is removed. It was only used
+  in the cache backend as an intermediate class in ``CacheKeyWarning``'s
+  inheritance of ``RuntimeWarning``.
+
+* Renamed ``BaseExpression._output_field`` to ``output_field``. You may need
+  to update custom expressions.
+
+* In older versions, forms and formsets combine their ``Media`` with widget
+  ``Media`` by concatenating the two. The combining now tries to :ref:`preserve
+  the relative order of elements in each list <form-media-asset-order>`.
+  ``MediaOrderConflictWarning`` is issued if the order can't be preserved.
+
+* ``django.contrib.gis.gdal.OGRException`` is removed. It's been an alias for
+  ``GDALException`` since Django 1.8.
+
+* Support for GEOS 3.3.x is dropped.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
 ==========================
+
+``context`` argument of ``Field.from_db_value()`` and ``Expression.convert_value()``
+------------------------------------------------------------------------------------
+
+The ``context`` argument of ``Field.from_db_value()`` and
+``Expression.convert_value()`` is unused as it's always an empty dictionary.
+The signature of both methods is now::
+
+    (self, value, expression, connection)
+
+instead of::
+
+    (self, value, expression, connection, context)
+
+Support for the old signature in custom fields and expressions remains until
+Django 3.0.
 
 Miscellaneous
 -------------
@@ -489,6 +649,11 @@ Miscellaneous
 
 * ``HttpRequest.xreadlines()`` is deprecated in favor of iterating over the
   request.
+
+* The ``field_name`` keyword argument to :meth:`.QuerySet.earliest` and
+  :meth:`.QuerySet.latest` is deprecated in favor of passing the field
+  names as arguments. Write ``.earliest('pub_date')`` instead of
+  ``.earliest(field_name='pub_date')``.
 
 .. _removed-features-2.0:
 
@@ -516,8 +681,9 @@ these features.
 
 * ``Field.rel`` and ``Field.remote_field.to`` are removed.
 
-* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` are now
-  required.
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
+  required in models and migrations. Consider squashing migrations so that you
+  have less of them to update.
 
 * ``django.db.models.fields.add_lazy_relation()`` is removed.
 

@@ -81,6 +81,23 @@ class PrefetchRelatedTests(TestCase):
             with self.assertRaises(BookWithYear.DoesNotExist):
                 book.bookwithyear
 
+    def test_onetoone_reverse_with_to_field_pk(self):
+        """
+        A model (Bio) with a OneToOneField primary key (author) that references
+        a non-pk field (name) on the related model (Author) is prefetchable.
+        """
+        Bio.objects.bulk_create([
+            Bio(author=self.author1),
+            Bio(author=self.author2),
+            Bio(author=self.author3),
+        ])
+        authors = Author.objects.filter(
+            name__in=[self.author1, self.author2, self.author3],
+        ).prefetch_related('bio')
+        with self.assertNumQueries(2):
+            for author in authors:
+                self.assertEqual(author.name, author.bio.author.name)
+
     def test_survives_clone(self):
         with self.assertNumQueries(2):
             [list(b.first_time_authors.all())
@@ -199,14 +216,22 @@ class PrefetchRelatedTests(TestCase):
 
     def test_attribute_error(self):
         qs = Reader.objects.all().prefetch_related('books_read__xyz')
-        with self.assertRaises(AttributeError) as cm:
+        msg = (
+            "Cannot find 'xyz' on Book object, 'books_read__xyz' "
+            "is an invalid parameter to prefetch_related()"
+        )
+        with self.assertRaisesMessage(AttributeError, msg) as cm:
             list(qs)
 
         self.assertIn('prefetch_related', str(cm.exception))
 
     def test_invalid_final_lookup(self):
         qs = Book.objects.prefetch_related('authors__name')
-        with self.assertRaises(ValueError) as cm:
+        msg = (
+            "'authors__name' does not resolve to an item that supports "
+            "prefetching - this is an invalid parameter to prefetch_related()."
+        )
+        with self.assertRaisesMessage(ValueError, msg) as cm:
             list(qs)
 
         self.assertIn('prefetch_related', str(cm.exception))
@@ -337,14 +362,22 @@ class CustomPrefetchTests(TestCase):
 
     def test_ambiguous(self):
         # Ambiguous: Lookup was already seen with a different queryset.
-        with self.assertRaises(ValueError):
+        msg = (
+            "'houses' lookup was already seen with a different queryset. You "
+            "may need to adjust the ordering of your lookups."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             self.traverse_qs(
                 Person.objects.prefetch_related('houses__rooms', Prefetch('houses', queryset=House.objects.all())),
                 [['houses', 'rooms']]
             )
 
         # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
-        with self.assertRaises(AttributeError):
+        msg = (
+            "Cannot find 'houses_lst' on Person object, 'houses_lst__rooms' is "
+            "an invalid parameter to prefetch_related()"
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
             self.traverse_qs(
                 Person.objects.prefetch_related(
                     'houses_lst__rooms',

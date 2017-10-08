@@ -19,7 +19,7 @@ class DeleteQuery(Query):
     compiler = 'SQLDeleteCompiler'
 
     def do_query(self, table, where, using):
-        self.tables = (table,)
+        self.alias_map = {table: self.alias_map[table]}
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
@@ -52,8 +52,8 @@ class DeleteQuery(Query):
         innerq.get_initial_alias()
         # The same for our new query.
         self.get_initial_alias()
-        innerq_used_tables = tuple([t for t in innerq.tables if innerq.alias_refcount[t]])
-        if not innerq_used_tables or innerq_used_tables == self.tables:
+        innerq_used_tables = tuple([t for t in innerq.alias_map if innerq.alias_refcount[t]])
+        if not innerq_used_tables or innerq_used_tables == tuple(self.alias_map):
             # There is only the base table in use in the query.
             self.where = innerq.where
         else:
@@ -87,17 +87,17 @@ class UpdateQuery(Query):
 
     def _setup_query(self):
         """
-        Run on initialization and after cloning. Any attributes that would
-        normally be set in __init__ should go in here, instead, so that they
-        are also set up after a clone() call.
+        Run on initialization and at the end of chaining. Any attributes that
+        would normally be set in __init__() should go here instead.
         """
         self.values = []
         self.related_ids = None
-        if not hasattr(self, 'related_updates'):
-            self.related_updates = {}
+        self.related_updates = {}
 
-    def clone(self, klass=None, **kwargs):
-        return super().clone(klass, related_updates=self.related_updates.copy(), **kwargs)
+    def clone(self):
+        obj = super().clone()
+        obj.related_updates = self.related_updates.copy()
+        return obj
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)

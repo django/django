@@ -92,8 +92,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     def __iter__(self):
         "Allow iteration over this LineString."
-        for i in range(len(self)):
-            yield self[i]
+        return iter(self._cs)
 
     def __len__(self):
         "Return the number of points in this LineString."
@@ -117,13 +116,12 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
-            self._post_init(self.srid)
+            self._post_init()
         else:
             # can this happen?
             raise GEOSException('Geometry resulting from slice deletion was invalid.')
 
     def _set_single(self, index, value):
-        self._checkindex(index)
         self._cs[index] = value
 
     def _checkdim(self, dim):

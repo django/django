@@ -15,6 +15,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         PositiveSmallIntegerField=(0, 65535),
         PositiveIntegerField=(0, 4294967295),
     )
+    cast_data_types = {
+        'CharField': 'char(%(max_length)s)',
+        'IntegerField': 'signed integer',
+        'BigIntegerField': 'signed integer',
+        'SmallIntegerField': 'signed integer',
+        'FloatField': 'signed',
+        'PositiveIntegerField': 'unsigned integer',
+        'PositiveSmallIntegerField': 'unsigned integer',
+    }
+    cast_char_field_without_max_length = 'char'
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
@@ -96,13 +106,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TIME(%s)" % (field_name)
 
     def date_interval_sql(self, timedelta):
-        return "INTERVAL '%06f' SECOND_MICROSECOND" % (timedelta.total_seconds()), []
+        return "INTERVAL '%06f' SECOND_MICROSECOND" % timedelta.total_seconds()
 
     def format_for_duration_arithmetic(self, sql):
-        if self.connection.features.supports_microsecond_precision:
-            return 'INTERVAL %s MICROSECOND' % sql
-        else:
-            return 'INTERVAL FLOOR(%s / 1000000) SECOND' % sql
+        return 'INTERVAL %s MICROSECOND' % sql
 
     def force_no_ordering(self):
         """
@@ -168,10 +175,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
-
-        if not self.connection.features.supports_microsecond_precision:
-            value = value.replace(microsecond=0)
-
         return str(value)
 
     def adapt_timefield_value(self, value):
@@ -221,23 +224,23 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_uuidfield_value)
         return converters
 
-    def convert_textfield_value(self, value, expression, connection, context):
+    def convert_textfield_value(self, value, expression, connection):
         if value is not None:
             value = force_text(value)
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
             value = bool(value)
         return value
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if settings.USE_TZ:
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
@@ -248,17 +251,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
-        if self.connection.features.supports_microsecond_precision:
-            if internal_type == 'TimeField':
-                return (
-                    "((TIME_TO_SEC(%(lhs)s) * POW(10, 6) + MICROSECOND(%(lhs)s)) -"
-                    " (TIME_TO_SEC(%(rhs)s) * POW(10, 6) + MICROSECOND(%(rhs)s)))"
-                ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
-            else:
-                return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params
-        elif internal_type == 'TimeField':
+        if internal_type == 'TimeField':
             return (
-                "(TIME_TO_SEC(%s) * POW(10, 6) - TIME_TO_SEC(%s) * POW(10, 6))"
-            ) % (lhs_sql, rhs_sql), lhs_params + rhs_params
+                "((TIME_TO_SEC(%(lhs)s) * POW(10, 6) + MICROSECOND(%(lhs)s)) -"
+                " (TIME_TO_SEC(%(rhs)s) * POW(10, 6) + MICROSECOND(%(rhs)s)))"
+            ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
         else:
-            return "(TIMESTAMPDIFF(SECOND, %s, %s) * POW(10, 6))" % (rhs_sql, lhs_sql), rhs_params + lhs_params
+            return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params

@@ -62,7 +62,8 @@ interface to working with templates in class-based views.
     any data they want to ensure is in there as keyword arguments.
     ``get_context_data()`` returns a dictionary; in ``ContextMixin`` it
     simply returns its keyword arguments, but it is common to override this to
-    add more members to the dictionary.
+    add more members to the dictionary. You can also use the
+    :attr:`~django.views.generic.base.ContextMixin.extra_context` attribute.
 
 Building up Django's generic class-based views
 ==============================================
@@ -257,12 +258,12 @@ We can hook this into our URLs easily enough:
 .. snippet::
     :filename: urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import RecordInterest
 
     urlpatterns = [
         #...
-        url(r'^author/(?P<pk>[0-9]+)/interest/$', RecordInterest.as_view(), name='author-interest'),
+        path('author/<int:pk>/interest/', RecordInterest.as_view(), name='author-interest'),
     ]
 
 Note the ``pk`` named group, which
@@ -603,7 +604,7 @@ For example, a simple JSON mixin might look something like this::
 
     from django.http import JsonResponse
 
-    class JSONResponseMixin(object):
+    class JSONResponseMixin:
         """
         A mixin that can be used to render a JSON response.
         """

@@ -97,16 +97,18 @@ class DistinctOnTests(TestCase):
 
     def test_distinct_not_implemented_checks(self):
         # distinct + annotate not allowed
-        with self.assertRaises(NotImplementedError):
+        msg = 'annotate() + distinct(fields) is not implemented.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
             Celebrity.objects.annotate(Max('id')).distinct('id')[0]
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesMessage(NotImplementedError, msg):
             Celebrity.objects.distinct('id').annotate(Max('id'))[0]
 
         # However this check is done only when the query executes, so you
         # can use distinct() to remove the fields before execution.
         Celebrity.objects.distinct('id').annotate(Max('id')).distinct()[0]
         # distinct + aggregate not allowed
-        with self.assertRaises(NotImplementedError):
+        msg = 'aggregate() + distinct(fields) not implemented.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
             Celebrity.objects.distinct('id').aggregate(Max('id'))
 
     def test_distinct_on_in_ordered_subquery(self):

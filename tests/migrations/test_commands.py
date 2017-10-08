@@ -11,9 +11,7 @@ from django.db import (
     ConnectionHandler, DatabaseError, connection, connections, models,
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.migrations.exceptions import (
-    InconsistentMigrationHistory, MigrationSchemaMissing,
-)
+from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import override_settings
 
@@ -697,35 +695,35 @@ class MakeMigrationsTests(MigrationTestBase):
         The history consistency checks in makemigrations respect
         settings.DATABASE_ROUTERS.
         """
-        def patched_ensure_schema(migration_recorder):
+        def patched_has_table(migration_recorder):
             if migration_recorder.connection is connections['other']:
-                raise MigrationSchemaMissing('Patched')
+                raise Exception('Other connection')
             else:
                 return mock.DEFAULT
 
         self.assertTableNotExists('migrations_unicodemodel')
         apps.register_model('migrations', UnicodeModel)
         with mock.patch.object(
-                MigrationRecorder, 'ensure_schema',
-                autospec=True, side_effect=patched_ensure_schema) as ensure_schema:
+                MigrationRecorder, 'has_table',
+                autospec=True, side_effect=patched_has_table) as has_table:
             with self.temporary_migration_module() as migration_dir:
                 call_command("makemigrations", "migrations", verbosity=0)
                 initial_file = os.path.join(migration_dir, "0001_initial.py")
                 self.assertTrue(os.path.exists(initial_file))
-                self.assertEqual(ensure_schema.call_count, 1)  # 'default' is checked
+                self.assertEqual(has_table.call_count, 1)  # 'default' is checked
 
                 # Router says not to migrate 'other' so consistency shouldn't
                 # be checked.
                 with self.settings(DATABASE_ROUTERS=['migrations.routers.TestRouter']):
                     call_command('makemigrations', 'migrations', verbosity=0)
-                self.assertEqual(ensure_schema.call_count, 2)  # 'default' again
+                self.assertEqual(has_table.call_count, 2)  # 'default' again
 
                 # With a router that doesn't prohibit migrating 'other',
                 # consistency is checked.
                 with self.settings(DATABASE_ROUTERS=['migrations.routers.EmptyRouter']):
-                    with self.assertRaisesMessage(MigrationSchemaMissing, 'Patched'):
+                    with self.assertRaisesMessage(Exception, 'Other connection'):
                         call_command('makemigrations', 'migrations', verbosity=0)
-                self.assertEqual(ensure_schema.call_count, 4)  # 'default' and 'other'
+                self.assertEqual(has_table.call_count, 4)  # 'default' and 'other'
 
                 # With a router that doesn't allow migrating on any database,
                 # no consistency checks are made.
@@ -741,7 +739,7 @@ class MakeMigrationsTests(MigrationTestBase):
                     self.assertIn(connection_alias, ['default', 'other'])
                     # Raises an error if invalid app_name/model_name occurs.
                     apps.get_app_config(app_name).get_model(call_kwargs['model_name'])
-                self.assertEqual(ensure_schema.call_count, 4)
+                self.assertEqual(has_table.call_count, 4)
 
     def test_failing_migration(self):
         # If a migration fails to serialize, it shouldn't generate an empty file. #21280
@@ -759,8 +757,18 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations exits if it detects a conflict.
         """
         with self.temporary_migration_module(module="migrations.test_migrations_conflict"):
-            with self.assertRaises(CommandError):
+            with self.assertRaises(CommandError) as context:
                 call_command("makemigrations")
+        exception_message = str(context.exception)
+        self.assertIn(
+            'Conflicting migrations detected; multiple leaf nodes '
+            'in the migration graph:',
+            exception_message
+        )
+        self.assertIn('0002_second', exception_message)
+        self.assertIn('0002_conflicting_second', exception_message)
+        self.assertIn('in migrations', exception_message)
+        self.assertIn("To fix them run 'python manage.py makemigrations --merge'", exception_message)
 
     def test_makemigrations_merge_no_conflict(self):
         """
@@ -782,7 +790,8 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations exits if no app is specified with 'empty' mode.
         """
-        with self.assertRaises(CommandError):
+        msg = 'You must supply at least one app label when using --empty.'
+        with self.assertRaisesMessage(CommandError, msg):
             call_command("makemigrations", empty=True)
 
     def test_makemigrations_empty_migration(self):
@@ -1358,3 +1367,25 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             with self.assertRaisesMessage(CommandError, msg):
                 call_command("squashmigrations", "migrations", "0003", "0002", interactive=False, verbosity=0)
+
+    def test_squashed_name_with_start_migration_name(self):
+        """--squashed-name specifies the new migration's name."""
+        squashed_name = 'squashed_name'
+        with self.temporary_migration_module(module='migrations.test_migrations') as migration_dir:
+            call_command(
+                'squashmigrations', 'migrations', '0001', '0002',
+                squashed_name=squashed_name, interactive=False, verbosity=0,
+            )
+            squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
+            self.assertTrue(os.path.exists(squashed_migration_file))
+
+    def test_squashed_name_without_start_migration_name(self):
+        """--squashed-name also works if a start migration is omitted."""
+        squashed_name = 'squashed_name'
+        with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:
+            call_command(
+                'squashmigrations', 'migrations', '0001',
+                squashed_name=squashed_name, interactive=False, verbosity=0,
+            )
+            squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
+            self.assertTrue(os.path.exists(squashed_migration_file))

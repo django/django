@@ -610,6 +610,8 @@ of a queryset::
 The ``contains`` and ``intersects`` lookups are just a subset of the
 available queries -- the :doc:`db-api` documentation has more.
 
+.. _automatic-spatial-transformations:
+
 Automatic Spatial Transformations
 ---------------------------------
 When doing spatial queries, GeoDjango automatically transforms
@@ -657,9 +659,10 @@ __ http://spatialreference.org/ref/epsg/32140/
 Lazy Geometries
 ---------------
 GeoDjango loads geometries in a standardized textual representation.  When the
-geometry field is first accessed, GeoDjango creates a `GEOS geometry object
-<ref-geos>`, exposing powerful functionality, such as serialization properties
-for popular geospatial formats::
+geometry field is first accessed, GeoDjango creates a
+:class:`~django.contrib.gis.geos.GEOSGeometry` object, exposing powerful
+functionality, such as serialization properties for popular geospatial
+formats::
 
     >>> sm = WorldBorder.objects.get(name='San Marino')
     >>> sm.mpoly
@@ -713,11 +716,11 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
-    from django.conf.urls import url, include
     from django.contrib.gis import admin
+    from django.urls import path, include
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        path('admin/', admin.site.urls),
     ]
 
 Create an admin user:

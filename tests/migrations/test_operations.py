@@ -1,5 +1,6 @@
 import unittest
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations import CreateModel
@@ -1368,6 +1369,12 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'old_name': "pink", 'new_name': "blue"})
 
+    def test_rename_missing_field(self):
+        state = ProjectState()
+        state.add_model(ModelState('app', 'model', []))
+        with self.assertRaisesMessage(FieldDoesNotExist, "app.model has no field named 'field'"):
+            migrations.RenameField('model', 'field', 'new_field').state_forwards('app', state)
+
     def test_alter_unique_together(self):
         """
         Tests the AlterUniqueTogether operation.
@@ -1938,7 +1945,7 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_runpython", editor, project_state, new_state)
         self.assertEqual(project_state.apps.get_model("test_runpython", "Pony").objects.count(), 0)
         # Now test we can't use a string
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'RunPython must be supplied with a callable'):
             migrations.RunPython("print 'ahahaha'")
         # And deconstruction
         definition = operation.deconstruct()
@@ -2002,10 +2009,11 @@ class OperationTests(OperationTestBase):
             Pony.objects.create(pink=1, weight=3.55)
             raise ValueError("Adrian hates ponies.")
 
+        # Verify atomicity when applying.
         atomic_migration = Migration("test", "test_runpythonatomic")
-        atomic_migration.operations = [migrations.RunPython(inner_method)]
+        atomic_migration.operations = [migrations.RunPython(inner_method, reverse_code=inner_method)]
         non_atomic_migration = Migration("test", "test_runpythonatomic")
-        non_atomic_migration.operations = [migrations.RunPython(inner_method, atomic=False)]
+        non_atomic_migration.operations = [migrations.RunPython(inner_method, reverse_code=inner_method, atomic=False)]
         # If we're a fully-transactional database, both versions should rollback
         if connection.features.can_rollback_ddl:
             self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
@@ -2028,11 +2036,35 @@ class OperationTests(OperationTestBase):
                 with connection.schema_editor() as editor:
                     non_atomic_migration.apply(project_state, editor)
             self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
-        # And deconstruction
+        # Reset object count to zero and verify atomicity when unapplying.
+        project_state.apps.get_model("test_runpythonatomic", "Pony").objects.all().delete()
+        # On a fully-transactional database, both versions rollback.
+        if connection.features.can_rollback_ddl:
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+            with self.assertRaises(ValueError):
+                with connection.schema_editor() as editor:
+                    atomic_migration.unapply(project_state, editor)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+            with self.assertRaises(ValueError):
+                with connection.schema_editor() as editor:
+                    non_atomic_migration.unapply(project_state, editor)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+        # Otherwise, the non-atomic operation leaves a row there.
+        else:
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+            with self.assertRaises(ValueError):
+                with connection.schema_editor() as editor:
+                    atomic_migration.unapply(project_state, editor)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+            with self.assertRaises(ValueError):
+                with connection.schema_editor() as editor:
+                    non_atomic_migration.unapply(project_state, editor)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
+        # Verify deconstruction.
         definition = non_atomic_migration.operations[0].deconstruct()
         self.assertEqual(definition[0], "RunPython")
         self.assertEqual(definition[1], [])
-        self.assertEqual(sorted(definition[2]), ["atomic", "code"])
+        self.assertEqual(sorted(definition[2]), ["atomic", "code", "reverse_code"])
 
     def test_run_python_related_assignment(self):
         """

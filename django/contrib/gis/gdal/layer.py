@@ -2,9 +2,7 @@ from ctypes import byref, c_double
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import (
-    GDALException, OGRIndexError, SRSException,
-)
+from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.field import OGRFieldTypes
 from django.contrib.gis.gdal.geometries import OGRGeometry
@@ -45,7 +43,7 @@ class Layer(GDALBase):
             # number of features because the beginning and ending feature IDs
             # are not guaranteed to be 0 and len(layer)-1, respectively.
             if index < 0:
-                raise OGRIndexError('Negative indices are not allowed on OGR Layers.')
+                raise IndexError('Negative indices are not allowed on OGR Layers.')
             return self._make_feature(index)
         elif isinstance(index, slice):
             # A slice was given
@@ -88,8 +86,8 @@ class Layer(GDALBase):
             for feat in self:
                 if feat.fid == feat_id:
                     return feat
-        # Should have returned a Feature, raise an OGRIndexError.
-        raise OGRIndexError('Invalid feature id: %s.' % feat_id)
+        # Should have returned a Feature, raise an IndexError.
+        raise IndexError('Invalid feature id: %s.' % feat_id)
 
     # #### Layer properties ####
     @property

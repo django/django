@@ -1,6 +1,7 @@
 import copy
 import inspect
 import warnings
+from functools import partialmethod
 from itertools import chain
 
 from django.apps import apps
@@ -27,7 +28,6 @@ from django.db.models.signals import (
 )
 from django.db.models.utils import make_model_tuple
 from django.utils.encoding import force_text
-from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -296,12 +296,6 @@ class ModelBase(type):
         # Copy indexes so that index names are unique when models extend an
         # abstract model.
         new_class._meta.indexes = [copy.deepcopy(idx) for idx in new_class._meta.indexes]
-        # Set the name of _meta.indexes. This can't be done in
-        # Options.contribute_to_class() because fields haven't been added to
-        # the model at that point.
-        for index in new_class._meta.indexes:
-            if not index.name:
-                index.set_name_with_model(new_class)
 
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
@@ -328,8 +322,8 @@ class ModelBase(type):
         opts._prepare(cls)
 
         if opts.order_with_respect_to:
-            cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
-            cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
+            cls.get_next_in_order = partialmethod(cls._get_next_or_previous_in_order, is_next=True)
+            cls.get_previous_in_order = partialmethod(cls._get_next_or_previous_in_order, is_next=False)
 
             # Defer creating accessors on the foreign class until it has been
             # created and registered. If remote_field is None, we're ordering
@@ -359,6 +353,13 @@ class ModelBase(type):
             manager.auto_created = True
             cls.add_to_class('objects', manager)
 
+        # Set the name of _meta.indexes. This can't be done in
+        # Options.contribute_to_class() because fields haven't been added to
+        # the model at that point.
+        for index in cls._meta.indexes:
+            if not index.name:
+                index.set_name_with_model(cls)
+
         class_prepared.send(sender=cls)
 
     @property
@@ -370,14 +371,23 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
+class ModelStateFieldsCacheDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            return self
+        res = instance.fields_cache = {}
+        return res
+
+
 class ModelState:
     """Store model instance state."""
-    def __init__(self, db=None):
-        self.db = db
-        # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
-        # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
-        # This impacts validation only; it has no effect on the actual save.
-        self.adding = True
+    db = None
+    # If true, uniqueness validation checks will consider this a new, unsaved
+    # object. Necessary for correct validation of new instances of objects with
+    # explicit (non-auto) PKs. This impacts validation only; it has no effect
+    # on the actual save.
+    adding = True
+    fields_cache = ModelStateFieldsCacheDescriptor()
 
 
 class Model(metaclass=ModelBase):
@@ -481,17 +491,19 @@ class Model(metaclass=ModelBase):
                         del kwargs[prop]
                 except (AttributeError, FieldDoesNotExist):
                     pass
-            if kwargs:
-                raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
+            for kwarg in kwargs:
+                raise TypeError("'%s' is an invalid keyword argument for this function" % kwarg)
         super().__init__()
         post_init.send(sender=cls, instance=self)
 
     @classmethod
     def from_db(cls, db, field_names, values):
         if len(values) != len(cls._meta.concrete_fields):
-            values = list(values)
-            values.reverse()
-            values = [values.pop() if f.attname in field_names else DEFERRED for f in cls._meta.concrete_fields]
+            values_iter = iter(values)
+            values = [
+                next(values_iter) if f.attname in field_names else DEFERRED
+                for f in cls._meta.concrete_fields
+            ]
         new = cls(*values)
         new._state.adding = False
         new._state.db = db
@@ -519,10 +531,14 @@ class Model(metaclass=ModelBase):
         return hash(self.pk)
 
     def __reduce__(self):
-        data = self.__dict__
+        data = self.__getstate__()
         data[DJANGO_VERSION_PICKLE_KEY] = get_version()
         class_id = self._meta.app_label, self._meta.object_name
         return model_unpickle, (class_id,), data
+
+    def __getstate__(self):
+        """Hook to allow choosing the attributes to pickle."""
+        return self.__dict__
 
     def __setstate__(self, state):
         msg = None
@@ -605,12 +621,12 @@ class Model(metaclass=ModelBase):
                 continue
             setattr(self, field.attname, getattr(db_instance, field.attname))
             # Throw away stale foreign key references.
-            if field.is_relation and field.get_cache_name() in self.__dict__:
-                rel_instance = getattr(self, field.get_cache_name())
+            if field.is_relation and field.is_cached(self):
+                rel_instance = field.get_cached_value(self)
                 local_val = getattr(db_instance, field.attname)
                 related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
                 if local_val != related_val or (local_val is None and related_val is None):
-                    del self.__dict__[field.get_cache_name()]
+                    field.delete_cached_value(self)
         self._state.db = db_instance._state.db
 
     def serializable_value(self, field_name):
@@ -644,13 +660,9 @@ class Model(metaclass=ModelBase):
         # a ForeignKey or OneToOneField on this model. If the field is
         # nullable, allowing the save() would result in silent data loss.
         for field in self._meta.concrete_fields:
-            if field.is_relation:
-                # If the related field isn't cached, then an instance hasn't
-                # been assigned and there's no need to worry about this check.
-                try:
-                    getattr(self, field.get_cache_name())
-                except AttributeError:
-                    continue
+            # If the related field isn't cached, then an instance hasn't
+            # been assigned and there's no need to worry about this check.
+            if field.is_relation and field.is_cached(self):
                 obj = getattr(self, field.name, None)
                 # A pk may have been assigned manually to a model instance not
                 # saved to the database (or auto-generated in a case like
@@ -661,7 +673,7 @@ class Model(metaclass=ModelBase):
                 if obj and obj.pk is None:
                     # Remove the object from a related instance cache.
                     if not field.remote_field.multiple:
-                        delattr(obj, field.remote_field.get_cache_name())
+                        field.remote_field.delete_cached_value(obj)
                     raise ValueError(
                         "save() prohibited to prevent data loss due to "
                         "unsaved related object '%s'." % field.name
@@ -771,9 +783,8 @@ class Model(metaclass=ModelBase):
                 # the related object cache, in case it's been accidentally
                 # populated. A fresh instance will be re-built from the
                 # database if necessary.
-                cache_name = field.get_cache_name()
-                if hasattr(self, cache_name):
-                    delattr(self, cache_name)
+                if field.is_cached(self):
+                    field.delete_cached_value(self)
 
     def _save_table(self, raw=False, cls=None, force_insert=False,
                     force_update=False, using=None, update_fields=None):
@@ -1543,8 +1554,8 @@ class Model(metaclass=ModelBase):
         errors = []
         fields = cls._meta.ordering
 
-        # Skip '?' fields.
-        fields = (f for f in fields if f != '?')
+        # Skip expressions and '?' fields.
+        fields = (f for f in fields if isinstance(f, str) and f != '?')
 
         # Convert "-field" to "field".
         fields = ((f[1:] if f.startswith('-') else f) for f in fields)
@@ -1660,7 +1671,7 @@ class Model(metaclass=ModelBase):
 
 # ORDERING METHODS #########################
 
-def method_set_order(ordered_obj, self, id_list, using=None):
+def method_set_order(self, ordered_obj, id_list, using=None):
     if using is None:
         using = DEFAULT_DB_ALIAS
     order_wrt = ordered_obj._meta.order_with_respect_to
@@ -1672,7 +1683,7 @@ def method_set_order(ordered_obj, self, id_list, using=None):
             ordered_obj.objects.filter(pk=j, **filter_args).update(_order=i)
 
 
-def method_get_order(ordered_obj, self):
+def method_get_order(self, ordered_obj):
     order_wrt = ordered_obj._meta.order_with_respect_to
     filter_args = order_wrt.get_forward_related_filter(self)
     pk_name = ordered_obj._meta.pk.name
@@ -1683,12 +1694,12 @@ def make_foreign_order_accessors(model, related_model):
     setattr(
         related_model,
         'get_%s_order' % model.__name__.lower(),
-        curry(method_get_order, model)
+        partialmethod(method_get_order, model)
     )
     setattr(
         related_model,
         'set_%s_order' % model.__name__.lower(),
-        curry(method_set_order, model)
+        partialmethod(method_set_order, model)
     )
 
 ########

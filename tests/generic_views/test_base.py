@@ -273,7 +273,11 @@ class TemplateViewTest(SimpleTestCase):
         """
         A template view must provide a template name.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "TemplateResponseMixin requires either a definition of "
+            "'template_name' or an implementation of 'get_template_names()'"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/template/no_template/')
 
     @require_jinja2
@@ -342,6 +346,10 @@ class TemplateViewTest(SimpleTestCase):
     def test_resolve_login_required_view(self):
         match = resolve('/template/login_required/')
         self.assertIs(match.func.view_class, TemplateView)
+
+    def test_extra_context(self):
+        response = self.client.get('/template/extra_context/')
+        self.assertEqual(response.context['title'], 'Title')
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')

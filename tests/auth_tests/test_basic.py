@@ -62,20 +62,6 @@ class BasicTestCase(TestCase):
         u3 = User.objects.create_user('testuser3', email=None)
         self.assertEqual(u3.email, '')
 
-    def test_anonymous_user(self):
-        "Check the properties of the anonymous user"
-        a = AnonymousUser()
-        self.assertIsNone(a.pk)
-        self.assertEqual(a.username, '')
-        self.assertEqual(a.get_username(), '')
-        self.assertTrue(a.is_anonymous)
-        self.assertFalse(a.is_authenticated)
-        self.assertFalse(a.is_staff)
-        self.assertFalse(a.is_active)
-        self.assertFalse(a.is_superuser)
-        self.assertEqual(a.groups.all().count(), 0)
-        self.assertEqual(a.user_permissions.all().count(), 0)
-
     def test_superuser(self):
         "Check the creation and properties of a superuser"
         super = User.objects.create_superuser('super', 'super@example.com', 'super')
@@ -97,13 +83,18 @@ class BasicTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='badsetting')
     def test_swappable_user_bad_setting(self):
         "The alternate user setting must point to something in the format app.model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = "AUTH_USER_MODEL must be of the form 'app_label.model_name'"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
     def test_swappable_user_nonexistent_model(self):
         "The current user model must point to an installed model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "AUTH_USER_MODEL refers to model 'thismodel.doesntexist' "
+            "that has not been installed"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     def test_user_verbose_names_translatable(self):

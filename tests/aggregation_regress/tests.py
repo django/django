@@ -431,13 +431,23 @@ class AggregationTests(TestCase):
 
     def test_field_error(self):
         # Bad field requests in aggregates are caught and reported
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'foo' into field. Choices are: authors, "
+            "contact, contact_id, hardbackbook, id, isbn, name, pages, price, "
+            "pubdate, publisher, publisher_id, rating, store, tags"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().aggregate(num_authors=Count('foo'))
 
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().annotate(num_authors=Count('foo'))
 
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'foo' into field. Choices are: authors, "
+            "contact, contact_id, hardbackbook, id, isbn, name, num_authors, "
+            "pages, price, pubdate, publisher, publisher_id, rating, store, tags"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().annotate(num_authors=Count('authors__id')).aggregate(Max('foo'))
 
     def test_more(self):
@@ -738,19 +748,25 @@ class AggregationTests(TestCase):
 
     def test_duplicate_alias(self):
         # Regression for #11256 - duplicating a default alias raises ValueError.
-        with self.assertRaises(ValueError):
+        msg = (
+            "The named annotation 'authors__age__avg' conflicts with "
+            "the default name for another annotation."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             Book.objects.all().annotate(Avg('authors__age'), authors__age__avg=Avg('authors__age'))
 
     def test_field_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
         # that conflicts with a field name on the model raises ValueError
-        with self.assertRaises(ValueError):
+        msg = "The annotation 'age' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(age=Avg('friends__age'))
 
     def test_m2m_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
         # that conflicts with an m2m name on the model raises ValueError
-        with self.assertRaises(ValueError):
+        msg = "The annotation 'friends' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(friends=Count('friends'))
 
     def test_values_queryset_non_conflict(self):
@@ -778,7 +794,8 @@ class AggregationTests(TestCase):
     def test_reverse_relation_name_conflict(self):
         # Regression for #11256 - providing an aggregate name
         # that conflicts with a reverse-related name on the model raises ValueError
-        with self.assertRaises(ValueError):
+        msg = "The annotation 'book_contact_set' conflicts with a field on the model."
+        with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(book_contact_set=Avg('friends__age'))
 
     def test_pickle(self):
@@ -937,7 +954,8 @@ class AggregationTests(TestCase):
 
         # Regression for #10766 - Shouldn't be able to reference an aggregate
         # fields in an aggregate() call.
-        with self.assertRaises(FieldError):
+        msg = "Cannot compute Avg('mean_age'): 'mean_age' is an aggregate"
+        with self.assertRaisesMessage(FieldError, msg):
             Book.objects.annotate(mean_age=Avg('authors__age')).annotate(Avg('mean_age'))
 
     def test_empty_filter_count(self):

@@ -16,6 +16,10 @@ from .models import TestModel
 
 
 class HTTPSitemapTests(SitemapTestsBase):
+    use_sitemap_err_msg = (
+        'To use sitemaps, either enable the sites framework or pass a '
+        'Site/RequestSite object in your view.'
+    )
 
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
@@ -25,6 +29,26 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
+        self.assertXMLEqual(response.content.decode(), expected_content)
+
+    def test_sitemap_not_callable(self):
+        """A sitemap may not be callable."""
+        response = self.client.get('/simple-not-callable/index.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
+</sitemapindex>
+""" % self.base_url
+        self.assertXMLEqual(response.content.decode(), expected_content)
+
+    def test_paged_sitemap(self):
+        """A sitemap may have multiple pages."""
+        response = self.client.get('/simple-paged/index.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<sitemap><loc>{0}/simple/sitemap-simple.xml</loc></sitemap><sitemap><loc>{0}/simple/sitemap-simple.xml?p=2</loc></sitemap>
+</sitemapindex>
+""".format(self.base_url)
         self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(TEMPLATES=[{
@@ -51,6 +75,21 @@ class HTTPSitemapTests(SitemapTestsBase):
 </urlset>
 """ % (self.base_url, date.today())
         self.assertXMLEqual(response.content.decode(), expected_content)
+
+    def test_no_section(self):
+        response = self.client.get('/simple/sitemap-simple2.xml')
+        self.assertEqual(str(response.context['exception']), "No sitemap available for section: 'simple2'")
+        self.assertEqual(response.status_code, 404)
+
+    def test_empty_page(self):
+        response = self.client.get('/simple/sitemap-simple.xml?p=0')
+        self.assertEqual(str(response.context['exception']), 'Page 0 empty')
+        self.assertEqual(response.status_code, 404)
+
+    def test_page_not_int(self):
+        response = self.client.get('/simple/sitemap-simple.xml?p=test')
+        self.assertEqual(str(response.context['exception']), "No page 'test'")
+        self.assertEqual(response.status_code, 404)
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -172,7 +211,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls and no Site objects exist
         """
         Site.objects.all().delete()
-        with self.assertRaises(ImproperlyConfigured):
+        with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
@@ -182,7 +221,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        with self.assertRaisesMessage(ImproperlyConfigured, self.use_sitemap_err_msg):
             Sitemap().get_urls()
 
     def test_sitemap_item(self):

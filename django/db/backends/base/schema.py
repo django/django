@@ -2,6 +2,9 @@ import hashlib
 import logging
 from datetime import datetime
 
+from django.db.backends.ddl_references import (
+    Columns, ForeignKeyName, IndexName, Statement, Table,
+)
 from django.db.backends.utils import strip_quotes
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
@@ -63,6 +66,8 @@ class BaseDatabaseSchemaEditor:
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
+    sql_delete_procedure = 'DROP PROCEDURE %(procedure)s'
+
     def __init__(self, connection, collect_sql=False, atomic=True):
         self.connection = connection
         self.collect_sql = collect_sql
@@ -97,6 +102,8 @@ class BaseDatabaseSchemaEditor:
                 "Executing DDL statements while in a transaction on databases "
                 "that can't perform a rollback is prohibited."
             )
+        # Account for non-string statement objects.
+        sql = str(sql)
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)", sql, params, extra={'params': params, 'sql': sql})
         if self.collect_sql:
@@ -255,13 +262,13 @@ class BaseDatabaseSchemaEditor:
             if field.remote_field and field.db_constraint:
                 to_table = field.remote_field.model._meta.db_table
                 to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
-                if self.connection.features.supports_foreign_keys:
-                    self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
-                elif self.sql_create_inline_fk:
+                if self.sql_create_inline_fk:
                     definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
                         "to_column": self.quote_name(to_column),
                     }
+                elif self.connection.features.supports_foreign_keys:
+                    self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
             # Add the SQL to our big list
             column_sqls.append("%s %s" % (
                 self.quote_name(field.column),
@@ -309,6 +316,10 @@ class BaseDatabaseSchemaEditor:
         self.execute(self.sql_delete_table % {
             "table": self.quote_name(model._meta.db_table),
         })
+        # Remove all deferred statements referencing the deleted table.
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_table(model._meta.db_table):
+                self.deferred_sql.remove(sql)
 
     def add_index(self, model, index):
         """Add an index on a model."""
@@ -371,6 +382,10 @@ class BaseDatabaseSchemaEditor:
             "old_table": self.quote_name(old_db_table),
             "new_table": self.quote_name(new_db_table),
         })
+        # Rename all references to the old table name.
+        for sql in self.deferred_sql:
+            if isinstance(sql, Statement):
+                sql.rename_table_references(old_db_table, new_db_table)
 
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
         """Move a model's table between tablespaces."""
@@ -447,6 +462,10 @@ class BaseDatabaseSchemaEditor:
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
+        # Remove all deferred statements referencing the deleted table.
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
+                self.deferred_sql.remove(sql)
 
     def alter_field(self, model, old_field, new_field, strict=False):
         """
@@ -565,6 +584,10 @@ class BaseDatabaseSchemaEditor:
         # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self._rename_field_sql(model._meta.db_table, old_field, new_field, new_type))
+            # Rename all references to the renamed column.
+            for sql in self.deferred_sql:
+                if isinstance(sql, Statement):
+                    sql.rename_column_references(model._meta.db_table, old_field.column, new_field.column)
         # Next, start accumulating actions to do
         actions = []
         null_actions = []
@@ -674,7 +697,9 @@ class BaseDatabaseSchemaEditor:
             self.execute(
                 self.sql_create_pk % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_pk")),
+                    "name": self.quote_name(
+                        self._create_index_name(model._meta.db_table, [new_field.column], suffix="_pk")
+                    ),
                     "columns": self.quote_name(new_field.column),
                 }
             )
@@ -704,14 +729,16 @@ class BaseDatabaseSchemaEditor:
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             for rel in new_field.model._meta.related_objects:
-                if not rel.many_to_many:
+                if not rel.many_to_many and rel.field.db_constraint:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
             self.execute(
                 self.sql_create_check % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_check")),
+                    "name": self.quote_name(
+                        self._create_index_name(model._meta.db_table, [new_field.column], suffix="_check")
+                    ),
                     "column": self.quote_name(new_field.column),
                     "check": new_db_params['check'],
                 }
@@ -824,14 +851,14 @@ class BaseDatabaseSchemaEditor:
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
 
-    def _create_index_name(self, model, column_names, suffix=""):
+    def _create_index_name(self, table_name, column_names, suffix=""):
         """
         Generate a unique name for an index/unique constraint.
 
         The name is divided into 3 parts: the table name, the column names,
         and a unique digest and suffix.
         """
-        table_name = strip_quotes(model._meta.db_table)
+        table_name = strip_quotes(table_name)
         hash_data = [table_name] + list(column_names)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
@@ -854,33 +881,42 @@ class BaseDatabaseSchemaEditor:
             index_name = "D%s" % index_name[:-1]
         return index_name
 
-    def _get_index_tablespace_sql(self, model, fields):
-        if len(fields) == 1 and fields[0].db_tablespace:
-            tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
-        elif model._meta.db_tablespace:
-            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
-        else:
-            tablespace_sql = ""
-        if tablespace_sql:
-            tablespace_sql = " " + tablespace_sql
-        return tablespace_sql
+    def _get_index_tablespace_sql(self, model, fields, db_tablespace=None):
+        if db_tablespace is None:
+            if len(fields) == 1 and fields[0].db_tablespace:
+                db_tablespace = fields[0].db_tablespace
+            elif model._meta.db_tablespace:
+                db_tablespace = model._meta.db_tablespace
+        if db_tablespace is not None:
+            return ' ' + self.connection.ops.tablespace_sql(db_tablespace)
+        return ''
 
-    def _create_index_sql(self, model, fields, suffix="", sql=None):
+    def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
+                          db_tablespace=None, col_suffixes=(), sql=None):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
         indexes, ...).
         """
-        tablespace_sql = self._get_index_tablespace_sql(model, fields)
+        tablespace_sql = self._get_index_tablespace_sql(model, fields, db_tablespace=db_tablespace)
         columns = [field.column for field in fields]
         sql_create_index = sql or self.sql_create_index
-        return sql_create_index % {
-            "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(self._create_index_name(model, columns, suffix=suffix)),
-            "using": "",
-            "columns": ", ".join(self.quote_name(column) for column in columns),
-            "extra": tablespace_sql,
-        }
+        table = model._meta.db_table
+
+        def create_index_name(*args, **kwargs):
+            nonlocal name
+            if name is None:
+                name = self._create_index_name(*args, **kwargs)
+            return self.quote_name(name)
+
+        return Statement(
+            sql_create_index,
+            table=Table(table, self.quote_name),
+            name=IndexName(table, columns, suffix, create_index_name),
+            using=using,
+            columns=Columns(table, columns, self.quote_name, col_suffixes=col_suffixes),
+            extra=tablespace_sql,
+        )
 
     def _model_indexes_sql(self, model):
         """
@@ -926,26 +962,28 @@ class BaseDatabaseSchemaEditor:
         from_column = field.column
         to_table = field.target_field.model._meta.db_table
         to_column = field.target_field.column
-        suffix = suffix % {
-            "to_table": to_table,
-            "to_column": to_column,
-        }
 
-        return self.sql_create_fk % {
-            "table": self.quote_name(from_table),
-            "name": self.quote_name(self._create_index_name(model, [from_column], suffix=suffix)),
-            "column": self.quote_name(from_column),
-            "to_table": self.quote_name(to_table),
-            "to_column": self.quote_name(to_column),
-            "deferrable": self.connection.ops.deferrable_sql(),
-        }
+        def create_fk_name(*args, **kwargs):
+            return self.quote_name(self._create_index_name(*args, **kwargs))
+
+        return Statement(
+            self.sql_create_fk,
+            table=Table(from_table, self.quote_name),
+            name=ForeignKeyName(from_table, [from_column], to_table, [to_column], suffix, create_fk_name),
+            column=Columns(from_table, [from_column], self.quote_name),
+            to_table=Table(to_table, self.quote_name),
+            to_column=Columns(to_table, [to_column], self.quote_name),
+            deferrable=self.connection.ops.deferrable_sql(),
+        )
 
     def _create_unique_sql(self, model, columns):
-        return self.sql_create_unique % {
-            "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(self._create_index_name(model, columns, suffix="_uniq")),
-            "columns": ", ".join(self.quote_name(column) for column in columns),
-        }
+        table = model._meta.db_table
+        return Statement(
+            self.sql_create_unique,
+            table=Table(table, self.quote_name),
+            name=IndexName(table, columns, '_uniq', self._create_index_name),
+            columns=Columns(table, columns, self.quote_name),
+        )
 
     def _delete_constraint_sql(self, template, model, name):
         return template % {
@@ -991,3 +1029,10 @@ class BaseDatabaseSchemaEditor:
             ))
         for constraint_name in constraint_names:
             self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))
+
+    def remove_procedure(self, procedure_name, param_types=()):
+        sql = self.sql_delete_procedure % {
+            'procedure': self.quote_name(procedure_name),
+            'param_types': ','.join(param_types),
+        }
+        self.execute(sql)

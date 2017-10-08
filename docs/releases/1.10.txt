@@ -55,11 +55,11 @@ Official support for Unicode usernames
 --------------------------------------
 
 The :class:`~django.contrib.auth.models.User` model in ``django.contrib.auth``
-originally only accepted ASCII letters in usernames. Although it wasn't a
-deliberate choice, Unicode characters have always been accepted when using
-Python 3.
+originally only accepted ASCII letters and numbers in usernames. Although it
+wasn't a deliberate choice, Unicode characters have always been accepted when
+using Python 3.
 
-The username validator now explicitly accepts Unicode letters by
+The username validator now explicitly accepts Unicode characters by
 default on Python 3 only. This default behavior can be overridden by changing
 the :attr:`~django.contrib.auth.models.User.username_validator` attribute of
 the ``User`` model, or to any proxy of that model, using either
@@ -118,19 +118,19 @@ Minor features
   subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value.
 
-* The :func:`~django.contrib.auth.views.logout` view sends "no-cache" headers
+* The ``django.contrib.auth.views.logout()`` view sends "no-cache" headers
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
 
-* Added the optional ``backend`` argument to :func:`~django.contrib.auth.login`
+* Added the optional ``backend`` argument to :func:`django.contrib.auth.login`
   to allow using it without credentials.
 
 * The new :setting:`LOGOUT_REDIRECT_URL` setting controls the redirect of the
-  :func:`~django.contrib.auth.views.logout` view, if the view doesn't get a
+  ``django.contrib.auth.views.logout()`` view, if the view doesn't get a
   ``next_page`` argument.
 
 * The new ``redirect_authenticated_user`` parameter for the
-  :func:`~django.contrib.auth.views.login` view allows redirecting
+  ``django.contrib.auth.views.login()`` view allows redirecting
   authenticated users visiting the login page.
 
 * The new :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` and
@@ -225,7 +225,7 @@ Minor features
   not worry about whether or not the ``staticfiles`` app is installed.
 
 * You can :ref:`more easily customize <customize-staticfiles-ignore-patterns>`
-  the ``collectstatic --ignore_patterns`` option with a custom ``AppConfig``.
+  the ``collectstatic --ignore`` option with a custom ``AppConfig``.
 
 Cache
 ~~~~~
@@ -450,7 +450,7 @@ Requests and Responses
   :meth:`~django.http.HttpResponse.seekable()` to make an instance a
   stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
 
-* Added the :attr:`HttpResponse.content_type
+* Added the :attr:`HttpRequest.content_type
   <django.http.HttpRequest.content_type>` and
   :attr:`~django.http.HttpRequest.content_params` attributes which are
   parsed from the ``CONTENT_TYPE`` header.
@@ -908,7 +908,7 @@ Miscellaneous
   a new :meth:`.AbstractBaseUser.clean` method.
 
 * Private API ``django.forms.models.model_to_dict()`` returns a queryset rather
-  than a list of primary keys for ``ManyToManyField``\s .
+  than a list of primary keys for ``ManyToManyField``\s.
 
 * If ``django.contrib.staticfiles`` is
   installed, the :ttag:`static`  template tag uses the ``staticfiles`` storage

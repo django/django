@@ -247,7 +247,11 @@ class RelatedModelFormTests(SimpleTestCase):
             model = A
             fields = '__all__'
 
-        with self.assertRaises(ValueError):
+        msg = (
+            "Cannot create form field for 'ref' yet, because "
+            "its related model 'B' has not been loaded yet"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):

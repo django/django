@@ -272,7 +272,7 @@ class Queries1Tests(TestCase):
         list(q2)
         combined_query = (q1 & q2).order_by('name').query
         self.assertEqual(len([
-            t for t in combined_query.tables if combined_query.alias_refcount[t]
+            t for t in combined_query.alias_map if combined_query.alias_refcount[t]
         ]), 1)
 
     def test_order_by_join_unref(self):
@@ -499,7 +499,7 @@ class Queries1Tests(TestCase):
             qs,
             ['<Item: four>', '<Item: one>', '<Item: three>', '<Item: two>']
         )
-        self.assertEqual(len(qs.query.tables), 1)
+        self.assertEqual(len(qs.query.alias_map), 1)
 
     def test_tickets_2874_3002(self):
         qs = Item.objects.select_related().order_by('note__note', 'name')
@@ -2248,6 +2248,44 @@ class ValuesQuerysetTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.values_list('name__foo')
 
+    def test_named_values_list_flat(self):
+        msg = "'flat' and 'named' can't be used together."
+        with self.assertRaisesMessage(TypeError, msg):
+            Number.objects.values_list('num', flat=True, named=True)
+
+    def test_named_values_list_bad_field_name(self):
+        msg = "Type names and field names must be valid identifiers: '1'"
+        with self.assertRaisesMessage(ValueError, msg):
+            Number.objects.extra(select={'1': 'num+1'}).values_list('1', named=True).first()
+
+    def test_named_values_list_with_fields(self):
+        qs = Number.objects.extra(select={'num2': 'num+1'}).annotate(Count('id'))
+        values = qs.values_list('num', 'num2', named=True).first()
+        self.assertEqual(type(values).__name__, 'Row')
+        self.assertEqual(values._fields, ('num', 'num2'))
+        self.assertEqual(values.num, 72)
+        self.assertEqual(values.num2, 73)
+
+    def test_named_values_list_without_fields(self):
+        qs = Number.objects.extra(select={'num2': 'num+1'}).annotate(Count('id'))
+        values = qs.values_list(named=True).first()
+        self.assertEqual(type(values).__name__, 'Row')
+        self.assertEqual(values._fields, ('num2', 'id', 'num', 'id__count'))
+        self.assertEqual(values.num, 72)
+        self.assertEqual(values.num2, 73)
+        self.assertEqual(values.id__count, 1)
+
+    def test_named_values_list_expression_with_default_alias(self):
+        expr = Count('id')
+        values = Number.objects.annotate(id__count1=expr).values_list(expr, 'id__count1', named=True).first()
+        self.assertEqual(values._fields, ('id__count2', 'id__count1'))
+
+    def test_named_values_list_expression(self):
+        expr = F('num') + 1
+        qs = Number.objects.annotate(combinedexpression1=expr).values_list(expr, 'combinedexpression1', named=True)
+        values = qs.first()
+        self.assertEqual(values._fields, ('combinedexpression2', 'combinedexpression1'))
+
 
 class QuerySetSupportsPythonIdioms(TestCase):
 
@@ -2365,7 +2403,7 @@ class WeirdQuerysetSlicingTests(TestCase):
         self.assertQuerysetEqual(Article.objects.all()[0:0], [])
         self.assertQuerysetEqual(Article.objects.all()[0:0][:10], [])
         self.assertEqual(Article.objects.all()[:0].count(), 0)
-        with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken.'):
+        with self.assertRaisesMessage(TypeError, 'Cannot reverse a query once a slice has been taken.'):
             Article.objects.all()[:0].latest('created')
 
     def test_empty_resultset_sql(self):
@@ -2957,7 +2995,8 @@ class WhereNodeTest(TestCase):
 class QuerySetExceptionTests(TestCase):
     def test_iter_exceptions(self):
         qs = ExtraInfo.objects.only('author')
-        with self.assertRaises(AttributeError):
+        msg = "'ManyToOneRel' object has no attribute 'attname'"
+        with self.assertRaisesMessage(AttributeError, msg):
             list(qs)
 
     def test_invalid_qs_list(self):
@@ -3735,9 +3774,10 @@ class TestTicket24279(TestCase):
 
 class TestInvalidValuesRelation(TestCase):
     def test_invalid_values(self):
-        with self.assertRaises(ValueError):
+        msg = "invalid literal for int() with base 10: 'abc'"
+        with self.assertRaisesMessage(ValueError, msg):
             Annotation.objects.filter(tag='abc')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             Annotation.objects.filter(tag__in=[123, 'abc'])
 
 

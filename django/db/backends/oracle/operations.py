@@ -23,6 +23,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
     }
+    set_operators = dict(BaseDatabaseOperations.set_operators, difference='MINUS')
 
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     _sequence_reset_sql = """
@@ -49,9 +50,8 @@ BEGIN
 END;
 /"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_operators['difference'] = 'MINUS'
+    # Oracle doesn't support string without precision; use the max string size.
+    cast_char_field_without_max_length = 'NVARCHAR2(2000)'
 
     def cache_key_culling_sql(self):
         return """
@@ -77,7 +77,7 @@ END;
         """
         NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
         """
-        return "NUMTODSINTERVAL(%06f, 'SECOND')" % (timedelta.total_seconds()), []
+        return "NUMTODSINTERVAL(%06f, 'SECOND')" % timedelta.total_seconds()
 
     def date_trunc_sql(self, lookup_type, field_name):
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
@@ -162,20 +162,28 @@ END;
             converters.append(self.convert_timefield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
-        converters.append(self.convert_empty_values)
+        # Oracle stores empty strings as null. If the field accepts the empty
+        # string, undo this to adhere to the Django convention of using
+        # the empty string instead of null.
+        if expression.field.empty_strings_allowed:
+            converters.append(
+                self.convert_empty_bytes
+                if internal_type == 'BinaryField' else
+                self.convert_empty_string
+            )
         return converters
 
-    def convert_textfield_value(self, value, expression, connection, context):
+    def convert_textfield_value(self, value, expression, connection):
         if isinstance(value, Database.LOB):
             value = value.read()
         return value
 
-    def convert_binaryfield_value(self, value, expression, connection, context):
+    def convert_binaryfield_value(self, value, expression, connection):
         if isinstance(value, Database.LOB):
             value = force_bytes(value.read())
         return value
 
-    def convert_booleanfield_value(self, value, expression, connection, context):
+    def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
             value = bool(value)
         return value
@@ -184,38 +192,34 @@ END;
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
 
-    def convert_datetimefield_value(self, value, expression, connection, context):
+    def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
             if settings.USE_TZ:
                 value = timezone.make_aware(value, self.connection.timezone)
         return value
 
-    def convert_datefield_value(self, value, expression, connection, context):
+    def convert_datefield_value(self, value, expression, connection):
         if isinstance(value, Database.Timestamp):
             value = value.date()
         return value
 
-    def convert_timefield_value(self, value, expression, connection, context):
+    def convert_timefield_value(self, value, expression, connection):
         if isinstance(value, Database.Timestamp):
             value = value.time()
         return value
 
-    def convert_uuidfield_value(self, value, expression, connection, context):
+    def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
             value = uuid.UUID(value)
         return value
 
-    def convert_empty_values(self, value, expression, connection, context):
-        # Oracle stores empty strings as null. We need to undo this in
-        # order to adhere to the Django convention of using the empty
-        # string instead of null, but only if the field accepts the
-        # empty string.
-        field = expression.output_field
-        if value is None and field.empty_strings_allowed:
-            value = ''
-            if field.get_internal_type() == 'BinaryField':
-                value = b''
-        return value
+    @staticmethod
+    def convert_empty_string(value, expression, connection):
+        return '' if value is None else value
+
+    @staticmethod
+    def convert_empty_bytes(value, expression, connection):
+        return b'' if value is None else value
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
@@ -228,6 +232,9 @@ END;
             return "DBMS_LOB.SUBSTR(%s)"
         else:
             return "%s"
+
+    def limit_offset_sql(self, low_mark, high_mark):
+        return ''
 
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
@@ -511,8 +518,7 @@ END;
         AutoFields that aren't Oracle identity columns.
         """
         name_length = self.max_name_length() - 3
-        sequence_name = '%s_SQ' % strip_quotes(table)
-        return truncate_name(sequence_name, name_length).upper()
+        return '%s_SQ' % truncate_name(strip_quotes(table), name_length).upper()
 
     def _get_sequence_name(self, cursor, table, pk_name):
         cursor.execute("""
@@ -550,3 +556,9 @@ END;
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super().subtract_temporals(internal_type, lhs, rhs)
+
+    def bulk_batch_size(self, fields, objs):
+        """Oracle restricts the number of parameters in a query."""
+        if fields:
+            return self.connection.features.max_query_params // len(fields)
+        return len(objs)

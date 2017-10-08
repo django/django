@@ -1,6 +1,7 @@
 import os
 import select
 import sys
+import traceback
 
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
@@ -68,11 +69,15 @@ class Command(BaseCommand):
                     continue
                 if not os.path.isfile(pythonrc):
                     continue
+                with open(pythonrc) as handle:
+                    pythonrc_code = handle.read()
+                # Match the behavior of the cpython shell where an error in
+                # PYTHONSTARTUP prints an exception and continues.
                 try:
-                    with open(pythonrc) as handle:
-                        exec(compile(handle.read(), pythonrc, 'exec'), imported_objects)
-                except NameError:
-                    pass
+                    exec(compile(pythonrc_code, pythonrc, 'exec'), imported_objects)
+                except Exception:
+                    traceback.print_exc()
+
         code.interact(local=imported_objects)
 
     def handle(self, **options):

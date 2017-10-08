@@ -102,7 +102,7 @@ class M2MRegressionTests(TestCase):
         c1 = TagCollection.objects.create(name='c1')
         c1.tags.set([t1, t2])
 
-        with self.assertRaises(TypeError):
+        with self.assertRaisesMessage(TypeError, "'int' object is not iterable"):
             c1.tags.set(7)
 
         c1.refresh_from_db()

@@ -100,14 +100,6 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
-.. versionchanged:: 1.11
-
-    In older versions, ``ALLOWED_HOSTS`` wasn't checked when running tests.
-
-    In older versions, ``ALLOWED_HOSTS`` wasn't checked if ``DEBUG=True``.
-    This was also changed in Django 1.10.3, 1.9.11, and 1.8.16 to prevent a
-    DNS rebinding attack.
-
 .. setting:: APPEND_SLASH
 
 ``APPEND_SLASH``
@@ -390,8 +382,6 @@ cookie is only sent with an HTTPS connection.
 ``CSRF_USE_SESSIONS``
 ---------------------
 
-.. versionadded:: 1.11
-
 Default: ``False``
 
 Whether to store the CSRF token in the user's session instead of in a cookie.
@@ -625,8 +615,9 @@ default port. Not used with SQLite.
 Default: ``None``
 
 A string representing the time zone for datetimes stored in this database
-(assuming that it doesn't support time zones) or ``None``. The same values are
-accepted as in the general :setting:`TIME_ZONE` setting.
+(assuming that it doesn't support time zones) or ``None``. This inner option of
+the :setting:`DATABASES` setting accepts the same values as the general
+:setting:`TIME_ZONE` setting.
 
 This allows interacting with third-party databases that store datetimes in
 local time rather than UTC. To avoid issues around DST changes, you shouldn't
@@ -645,8 +636,6 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
 
 ``DISABLE_SERVER_SIDE_CURSORS``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.11.1
 
 Default: ``False``
 
@@ -779,8 +768,6 @@ with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 ``TEMPLATE``
 ^^^^^^^^^^^^
 
-.. versionadded:: 1.11
-
 This is a PostgreSQL-specific setting.
 
 The name of a `template`_ (e.g. ``'template0'``) from which to create the test
@@ -835,11 +822,6 @@ This is an Oracle-specific setting.
 
 The password to use when connecting to the Oracle database that will be used
 when running tests. If not provided, Django will generate a random password.
-
-.. versionchanged:: 1.11
-
-    Older versions used a hardcoded default password. This was also changed
-    in 1.10.3, 1.9.11, and 1.8.16 to fix possible security implications.
 
 .. setting:: TEST_TBLSPACE
 
@@ -1362,8 +1344,6 @@ trailing space.
 ``EMAIL_USE_LOCALTIME``
 -----------------------
 
-.. versionadded:: 1.11
-
 Default: ``False``
 
 Whether to send the SMTP ``Date`` header of email messages in the local time
@@ -1585,8 +1565,6 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
 ``FORM_RENDERER``
 -----------------
-
-.. versionadded:: 1.11
 
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
@@ -1958,7 +1936,7 @@ Example: ``"http://media.example.com/"``
 ``MIDDLEWARE``
 --------------
 
-Default:: ``None``
+Default: ``None``
 
 A list of middleware to use. See :doc:`/topics/http/middleware`.
 
@@ -2044,10 +2022,6 @@ format has higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
-
-.. versionchanged:: 1.11
-
-    Support for non-uniform digit grouping was added.
 
 .. setting:: PREPEND_WWW
 
@@ -2166,19 +2140,12 @@ non-zero value.
 ``SECURE_HSTS_PRELOAD``
 -----------------------
 
-.. versionadded:: 1.11
-
 Default: ``False``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
 the ``preload`` directive to the :ref:`http-strict-transport-security`
 header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
 non-zero value.
-
-.. warning::
-    Setting this incorrectly can irreversibly (for at least several months,
-    depending on browser releases) break your site. Read the
-    :ref:`http-strict-transport-security` documentation first.
 
 .. setting:: SECURE_HSTS_SECONDS
 
@@ -2597,23 +2564,6 @@ the correct environment.
     match the system time zone.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-.. setting:: USE_ETAGS
-
-``USE_ETAGS``
--------------
-
-Default: ``False``
-
-A boolean that specifies whether to output the ``ETag`` header. This saves
-bandwidth but slows down performance. This is used by the
-:class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
-framework </topics/cache>`.
-
-.. deprecated:: 1.11
-
-    This setting is deprecated in favor of using ``ConditionalGetMiddleware``,
-    which sets an ETag regardless of this setting.
 
 .. setting:: USE_I18N
 
@@ -3443,7 +3393,6 @@ HTTP
   * :setting:`SECURE_SSL_HOST`
   * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`
-* :setting:`USE_ETAGS`
 * :setting:`USE_X_FORWARDED_HOST`
 * :setting:`USE_X_FORWARDED_PORT`
 * :setting:`WSGI_APPLICATION`

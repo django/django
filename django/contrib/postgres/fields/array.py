@@ -6,6 +6,7 @@ from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
 from django.db.models.lookups import Exact, In
+from django.utils.inspect import func_supports_parameter
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
@@ -82,7 +83,7 @@ class ArrayField(Field):
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if isinstance(value, list) or isinstance(value, tuple):
+        if isinstance(value, (list, tuple)):
             return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
         return value
 
@@ -103,11 +104,13 @@ class ArrayField(Field):
             value = [self.base_field.to_python(val) for val in vals]
         return value
 
-    def _from_db_value(self, value, expression, connection, context):
+    def _from_db_value(self, value, expression, connection):
         if value is None:
             return value
         return [
-            self.base_field.from_db_value(item, expression, connection, context)
+            self.base_field.from_db_value(item, expression, connection, {})
+            if func_supports_parameter(self.base_field.from_db_value, 'context')  # RemovedInDjango30Warning
+            else self.base_field.from_db_value(item, expression, connection)
             for item in value
         ]
 

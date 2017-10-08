@@ -277,14 +277,6 @@ class LazyObject:
             self._setup()
         return (unpickle_lazyobject, (self._wrapped,))
 
-    def __getstate__(self):
-        """
-        Prevent older versions of pickle from trying to pickle the __dict__
-        (which in the case of a SimpleLazyObject may contain a lambda). The
-        value will be ignored by __reduce__() and the custom unpickler.
-        """
-        return {}
-
     def __copy__(self):
         if self._wrapped is empty:
             # If uninitialized, copy the wrapper. Use type(self), not

@@ -30,35 +30,19 @@ class DateParseTests(unittest.TestCase):
             parse_time('09:15:90')
 
     def test_parse_datetime(self):
-        # Valid inputs
-        self.assertEqual(
-            parse_datetime('2012-04-23T09:15:00'),
-            datetime(2012, 4, 23, 9, 15)
+        valid_inputs = (
+            ('2012-04-23T09:15:00', datetime(2012, 4, 23, 9, 15)),
+            ('2012-4-9 4:8:16', datetime(2012, 4, 9, 4, 8, 16)),
+            ('2012-04-23T09:15:00Z', datetime(2012, 4, 23, 9, 15, 0, 0, get_fixed_timezone(0))),
+            ('2012-4-9 4:8:16-0320', datetime(2012, 4, 9, 4, 8, 16, 0, get_fixed_timezone(-200))),
+            ('2012-04-23T10:20:30.400+02:30', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150))),
+            ('2012-04-23T10:20:30.400+02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120))),
+            ('2012-04-23T10:20:30.400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
         )
-        self.assertEqual(
-            parse_datetime('2012-4-9 4:8:16'),
-            datetime(2012, 4, 9, 4, 8, 16)
-        )
-        self.assertEqual(
-            parse_datetime('2012-04-23T09:15:00Z'),
-            datetime(2012, 4, 23, 9, 15, 0, 0, get_fixed_timezone(0))
-        )
-        self.assertEqual(
-            parse_datetime('2012-4-9 4:8:16-0320'),
-            datetime(2012, 4, 9, 4, 8, 16, 0, get_fixed_timezone(-200))
-        )
-        self.assertEqual(
-            parse_datetime('2012-04-23T10:20:30.400+02:30'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150))
-        )
-        self.assertEqual(
-            parse_datetime('2012-04-23T10:20:30.400+02'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120))
-        )
-        self.assertEqual(
-            parse_datetime('2012-04-23T10:20:30.400-02'),
-            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))
-        )
+        for source, expected in valid_inputs:
+            with self.subTest(source=source):
+                self.assertEqual(parse_datetime(source), expected)
+
         # Invalid inputs
         self.assertIsNone(parse_datetime('20120423091500'))
         with self.assertRaises(ValueError):
@@ -78,7 +62,23 @@ class DurationParseTests(unittest.TestCase):
             timedelta(seconds=30),  # seconds
         ]
         for delta in timedeltas:
-            self.assertEqual(parse_duration(format(delta)), delta)
+            with self.subTest(delta=delta):
+                self.assertEqual(parse_duration(format(delta)), delta)
+
+    def test_parse_postgresql_format(self):
+        test_values = (
+            ('1 day', timedelta(1)),
+            ('1 day 0:00:01', timedelta(days=1, seconds=1)),
+            ('1 day -0:00:01', timedelta(days=1, seconds=-1)),
+            ('-1 day -0:00:01', timedelta(days=-1, seconds=-1)),
+            ('-1 day +0:00:01', timedelta(days=-1, seconds=1)),
+            ('4 days 0:15:30.1', timedelta(days=4, minutes=15, seconds=30, milliseconds=100)),
+            ('4 days 0:15:30.0001', timedelta(days=4, minutes=15, seconds=30, microseconds=100)),
+            ('-4 days -15:00:30', timedelta(days=-4, hours=-15, seconds=-30)),
+        )
+        for source, expected in test_values:
+            with self.subTest(source=source):
+                self.assertEqual(parse_duration(source), expected)
 
     def test_seconds(self):
         self.assertEqual(parse_duration('30'), timedelta(seconds=30))
@@ -97,27 +97,42 @@ class DurationParseTests(unittest.TestCase):
         self.assertEqual(parse_duration('4 10:15:30'), timedelta(days=4, hours=10, minutes=15, seconds=30))
 
     def test_fractions_of_seconds(self):
-        self.assertEqual(parse_duration('15:30.1'), timedelta(minutes=15, seconds=30, milliseconds=100))
-        self.assertEqual(parse_duration('15:30.01'), timedelta(minutes=15, seconds=30, milliseconds=10))
-        self.assertEqual(parse_duration('15:30.001'), timedelta(minutes=15, seconds=30, milliseconds=1))
-        self.assertEqual(parse_duration('15:30.0001'), timedelta(minutes=15, seconds=30, microseconds=100))
-        self.assertEqual(parse_duration('15:30.00001'), timedelta(minutes=15, seconds=30, microseconds=10))
-        self.assertEqual(parse_duration('15:30.000001'), timedelta(minutes=15, seconds=30, microseconds=1))
+        test_values = (
+            ('15:30.1', timedelta(minutes=15, seconds=30, milliseconds=100)),
+            ('15:30.01', timedelta(minutes=15, seconds=30, milliseconds=10)),
+            ('15:30.001', timedelta(minutes=15, seconds=30, milliseconds=1)),
+            ('15:30.0001', timedelta(minutes=15, seconds=30, microseconds=100)),
+            ('15:30.00001', timedelta(minutes=15, seconds=30, microseconds=10)),
+            ('15:30.000001', timedelta(minutes=15, seconds=30, microseconds=1)),
+        )
+        for source, expected in test_values:
+            with self.subTest(source=source):
+                self.assertEqual(parse_duration(source), expected)
 
     def test_negative(self):
-        self.assertEqual(parse_duration('-4 15:30'), timedelta(days=-4, minutes=15, seconds=30))
-        self.assertEqual(parse_duration('-172800'), timedelta(days=-2))
-        self.assertEqual(parse_duration('-15:30'), timedelta(minutes=-15, seconds=30))
-        self.assertEqual(parse_duration('-1:15:30'), timedelta(hours=-1, minutes=15, seconds=30))
-        self.assertEqual(parse_duration('-30.1'), timedelta(seconds=-30, milliseconds=-100))
+        test_values = (
+            ('-4 15:30', timedelta(days=-4, minutes=15, seconds=30)),
+            ('-172800', timedelta(days=-2)),
+            ('-15:30', timedelta(minutes=-15, seconds=30)),
+            ('-1:15:30', timedelta(hours=-1, minutes=15, seconds=30)),
+            ('-30.1', timedelta(seconds=-30, milliseconds=-100)),
+        )
+        for source, expected in test_values:
+            with self.subTest(source=source):
+                self.assertEqual(parse_duration(source), expected)
 
     def test_iso_8601(self):
-        self.assertIsNone(parse_duration('P4Y'))
-        self.assertIsNone(parse_duration('P4M'))
-        self.assertIsNone(parse_duration('P4W'))
-        self.assertEqual(parse_duration('P4D'), timedelta(days=4))
-        self.assertEqual(parse_duration('P0.5D'), timedelta(hours=12))
-        self.assertEqual(parse_duration('PT5H'), timedelta(hours=5))
-        self.assertEqual(parse_duration('PT5M'), timedelta(minutes=5))
-        self.assertEqual(parse_duration('PT5S'), timedelta(seconds=5))
-        self.assertEqual(parse_duration('PT0.000005S'), timedelta(microseconds=5))
+        test_values = (
+            ('P4Y', None),
+            ('P4M', None),
+            ('P4W', None),
+            ('P4D', timedelta(days=4)),
+            ('P0.5D', timedelta(hours=12)),
+            ('PT5H', timedelta(hours=5)),
+            ('PT5M', timedelta(minutes=5)),
+            ('PT5S', timedelta(seconds=5)),
+            ('PT0.000005S', timedelta(microseconds=5)),
+        )
+        for source, expected in test_values:
+            with self.subTest(source=source):
+                self.assertEqual(parse_duration(source), expected)

@@ -117,11 +117,6 @@ Disabling :setting:`ALLOWED_HOSTS` checking (``ALLOWED_HOSTS = ['*']``) when
 running tests prevents the test client from raising a helpful error message if
 you follow a redirect to an external URL.
 
-.. versionchanged:: 1.11
-
-    Older versions didn't validate ``ALLOWED_HOSTS`` while testing so these
-    techniques weren't necessary.
-
 .. _topics-testing-advanced-multidb:
 
 Tests and multiple databases
@@ -410,10 +405,6 @@ testing behavior. This behavior involves:
 
 #. Performing global post-test teardown.
 
-.. versionchanged:: 1.11
-
-    Running the system checks was added.
-
 If you define your own test runner class and point :setting:`TEST_RUNNER` at
 that class, Django will execute your test runner whenever you run
 ``./manage.py test``. In this way, it is possible to use any test framework
@@ -481,10 +472,6 @@ execute and tear down the test suite.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
-
-    .. versionadded:: 1.11
-
-        The ``debug_mode`` keyword argument was added.
 
 Attributes
 ~~~~~~~~~~
@@ -574,8 +561,6 @@ Methods
 
 .. method:: DiscoverRunner.run_checks()
 
-    .. versionadded:: 1.11
-
     Runs the :doc:`system checks </topics/checks>`.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
@@ -585,8 +570,6 @@ Methods
     Returns the result produced by the running the test suite.
 
 .. method:: DiscoverRunner.get_test_runner_kwargs()
-
-    .. versionadded:: 1.11
 
     Returns the keyword arguments to instantiate the
     ``DiscoverRunner.test_runner`` with.
@@ -626,18 +609,12 @@ utility methods in the ``django.test.utils`` module.
     If ``debug`` isn't ``None``, the :setting:`DEBUG` setting is updated to its
     value.
 
-    .. versionchanged:: 1.11
-
-        The ``debug`` argument was added.
-
 .. function:: teardown_test_environment()
 
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
 .. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs)
-
-    .. versionadded:: 1.11
 
     Creates the test databases.
 
@@ -646,8 +623,6 @@ utility methods in the ``django.test.utils`` module.
     :func:`teardown_databases` function at the conclusion of testing.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
-
-    .. versionadded:: 1.11
 
     Destroys the test databases, restoring pre-test conditions.
 

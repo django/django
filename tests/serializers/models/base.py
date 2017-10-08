@@ -124,7 +124,7 @@ class TeamField(models.CharField):
             return value
         return Team(value)
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection):
         return Team(value)
 
     def value_to_string(self, obj):

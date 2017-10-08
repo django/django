@@ -32,6 +32,10 @@ class Command(BaseCommand):
             '--noinput', '--no-input', action='store_false', dest='interactive',
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
+        parser.add_argument(
+            '--squashed-name', dest='squashed_name',
+            help='Sets the name of the new squashed migration.',
+        )
 
     def handle(self, **options):
 
@@ -41,6 +45,7 @@ class Command(BaseCommand):
         start_migration_name = options['start_migration_name']
         migration_name = options['migration_name']
         no_optimize = options['no_optimize']
+        squashed_name = options['squashed_name']
 
         # Load the current graph state, check the app and migration they asked for exists
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
@@ -154,9 +159,17 @@ class Command(BaseCommand):
             "replaces": replaces,
         })
         if start_migration_name:
-            new_migration = subclass("%s_squashed_%s" % (start_migration.name, migration.name), app_label)
+            if squashed_name:
+                # Use the name from --squashed-name.
+                prefix, _ = start_migration.name.split('_', 1)
+                name = '%s_%s' % (prefix, squashed_name)
+            else:
+                # Generate a name.
+                name = '%s_squashed_%s' % (start_migration.name, migration.name)
+            new_migration = subclass(name, app_label)
         else:
-            new_migration = subclass("0001_squashed_%s" % migration.name, app_label)
+            name = '0001_%s' % (squashed_name or 'squashed_%s' % migration.name)
+            new_migration = subclass(name, app_label)
             new_migration.initial = True
 
         # Write out the new migration file

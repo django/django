@@ -1,5 +1,5 @@
 from django.db.models.aggregates import StdDev
-from django.db.utils import ProgrammingError
+from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 
 
@@ -25,7 +25,7 @@ class BaseDatabaseFeatures:
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     can_return_ids_from_bulk_insert = False
-    has_bulk_insert = False
+    has_bulk_insert = True
     uses_savepoints = False
     can_release_savepoints = False
 
@@ -36,8 +36,10 @@ class BaseDatabaseFeatures:
     has_select_for_update = False
     has_select_for_update_nowait = False
     has_select_for_update_skip_locked = False
-
-    supports_select_related = True
+    has_select_for_update_of = False
+    # Does the database's SELECT FOR UPDATE OF syntax require a column rather
+    # than a table?
+    select_for_update_of_column = False
 
     # Does the default test database allow multiple connections?
     # Usually an indication that the test database is in-memory
@@ -67,9 +69,6 @@ class BaseDatabaseFeatures:
     # Does the database driver supports same type temporal data subtraction
     # by returning the type used to store duration field?
     supports_temporal_subtraction = False
-
-    # Do time/datetime fields have microsecond precision?
-    supports_microsecond_precision = True
 
     # Does the __regex lookup support backreferencing and grouping?
     supports_regex_backreferencing = True
@@ -227,8 +226,26 @@ class BaseDatabaseFeatures:
     supports_select_difference = True
     supports_slicing_ordering_in_compound = False
 
+    # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
+    # expressions?
+    supports_aggregate_filter_clause = False
+
     # Does the backend support indexing a TextField?
     supports_index_on_text_field = True
+
+    # Does the backed support window expressions (expression OVER (...))?
+    supports_over_clause = False
+
+    # Does the backend support CAST with precision?
+    supports_cast_with_precision = True
+
+    # SQL to create a procedure for use by the Django test suite. The
+    # functionality of the procedure isn't important.
+    create_test_procedure_without_params_sql = None
+    create_test_procedure_with_int_param_sql = None
+
+    # Does the backend support keyword parameters for cursor.callproc()?
+    supports_callproc_kwargs = False
 
     def __init__(self, connection):
         self.connection = connection
@@ -252,9 +269,9 @@ class BaseDatabaseFeatures:
         """Confirm support for STDDEV and related stats functions."""
         try:
             self.connection.ops.check_expression_support(StdDev(1))
-            return True
-        except NotImplementedError:
+        except NotSupportedError:
             return False
+        return True
 
     def introspected_boolean_field_type(self, field=None):
         """

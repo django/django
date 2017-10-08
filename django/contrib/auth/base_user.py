@@ -52,18 +52,16 @@ class AbstractBaseUser(models.Model):
 
     REQUIRED_FIELDS = []
 
+    # Stores the raw password if set_password() is called so that it can
+    # be passed to password_changed() after the model is saved.
+    _password = None
+
     class Meta:
         abstract = True
 
     def get_username(self):
         "Return the identifying username for this User"
         return getattr(self, self.USERNAME_FIELD)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Stores the raw password if set_password() is called so that it can
-        # be passed to password_changed() after the model is saved.
-        self._password = None
 
     def __str__(self):
         return self.get_username()

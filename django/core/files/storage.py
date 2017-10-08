@@ -300,7 +300,7 @@ class FileSystemStorage(Storage):
             else:
                 os.remove(name)
         except FileNotFoundError:
-            # If removal fails, the file or directory may have been removed
+            # FileNotFoundError is raised if the file or directory was removed
             # concurrently.
             pass
 

@@ -51,7 +51,7 @@ class SessionStore(SessionBase):
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
         # components.
-        if not set(session_key).issubset(set(VALID_KEY_CHARS)):
+        if not set(session_key).issubset(VALID_KEY_CHARS):
             raise InvalidSessionKey(
                 "Invalid characters in session key")
 
@@ -172,7 +172,6 @@ class SessionStore(SessionBase):
             finally:
                 if not renamed:
                     os.unlink(output_file_name)
-
         except (OSError, IOError, EOFError):
             pass
 

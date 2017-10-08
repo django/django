@@ -4,6 +4,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
 from django.utils.dateparse import parse_duration
@@ -31,6 +32,19 @@ class BaseDatabaseOperations:
         'intersection': 'INTERSECT',
         'difference': 'EXCEPT',
     }
+    # Mapping of Field.get_internal_type() (typically the model field's class
+    # name) to the data type to use for the Cast() function, if different from
+    # DatabaseWrapper.data_types.
+    cast_data_types = {}
+    # CharField data type if the max_length argument isn't provided.
+    cast_char_field_without_max_length = None
+
+    # Start and end points for window expressions.
+    PRECEDING = 'PRECEDING'
+    FOLLOWING = 'FOLLOWING'
+    UNBOUNDED_PRECEDING = 'UNBOUNDED ' + PRECEDING
+    UNBOUNDED_FOLLOWING = 'UNBOUNDED ' + FOLLOWING
+    CURRENT_ROW = 'CURRENT ROW'
 
     def __init__(self, connection):
         self.connection = connection
@@ -90,13 +104,16 @@ class BaseDatabaseOperations:
         truncates the given date field field_name to a date object with only
         the given specificity.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_trunc_sql() method.')
 
     def datetime_cast_date_sql(self, field_name, tzname):
         """
         Return the SQL to cast a datetime value to date value.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'datetime_cast_date_sql() method.'
+        )
 
     def datetime_cast_time_sql(self, field_name, tzname):
         """
@@ -149,7 +166,7 @@ class BaseDatabaseOperations:
         duplicates.
         """
         if fields:
-            raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
+            raise NotSupportedError('DISTINCT ON fields is not supported by this database backend')
         else:
             return 'DISTINCT'
 
@@ -177,16 +194,31 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def for_update_sql(self, nowait=False, skip_locked=False):
+    def for_update_sql(self, nowait=False, skip_locked=False, of=()):
         """
         Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """
-        if nowait:
-            return 'FOR UPDATE NOWAIT'
-        elif skip_locked:
-            return 'FOR UPDATE SKIP LOCKED'
-        else:
-            return 'FOR UPDATE'
+        return 'FOR UPDATE%s%s%s' % (
+            ' OF %s' % ', '.join(of) if of else '',
+            ' NOWAIT' if nowait else '',
+            ' SKIP LOCKED' if skip_locked else '',
+        )
+
+    def _get_limit_offset_params(self, low_mark, high_mark):
+        offset = low_mark or 0
+        if high_mark is not None:
+            return (high_mark - offset), offset
+        elif offset:
+            return self.connection.ops.no_limit_value(), offset
+        return None, offset
+
+    def limit_offset_sql(self, low_mark, high_mark):
+        """Return LIMIT/OFFSET SQL clause."""
+        limit, offset = self._get_limit_offset_params(low_mark, high_mark)
+        return '%s%s' % (
+            (' LIMIT %d' % limit) if limit else '',
+            (' OFFSET %d' % offset) if offset else '',
+        )
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -367,6 +399,13 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
 
+    def execute_sql_flush(self, using, sql_list):
+        """Execute a list of SQL statements to flush the database."""
+        with transaction.atomic(using=using, savepoint=self.connection.features.can_rollback_ddl):
+            with self.connection.cursor() as cursor:
+                for sql in sql_list:
+                    cursor.execute(sql)
+
     def sequence_reset_by_name_sql(self, style, sequences):
         """
         Return a list of the SQL statements required to reset sequences
@@ -527,7 +566,7 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def convert_durationfield_value(self, value, expression, connection, context):
+    def convert_durationfield_value(self, value, expression, connection):
         if value is not None:
             value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
             value = parse_duration(value)
@@ -540,7 +579,7 @@ class BaseDatabaseOperations:
         This is used on specific backends to rule out known expressions
         that have problematic or nonexistent implementations. If the
         expression has a known problem, the backend should raise
-        NotImplementedError.
+        NotSupportedError.
         """
         pass
 
@@ -584,4 +623,35 @@ class BaseDatabaseOperations:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        raise NotImplementedError("This backend does not support %s subtraction." % internal_type)
+        raise NotSupportedError("This backend does not support %s subtraction." % internal_type)
+
+    def window_frame_start(self, start):
+        if isinstance(start, int):
+            if start < 0:
+                return '%d %s' % (abs(start), self.PRECEDING)
+            elif start == 0:
+                return self.CURRENT_ROW
+        elif start is None:
+            return self.UNBOUNDED_PRECEDING
+        raise ValueError("start argument must be a negative integer, zero, or None, but got '%s'." % start)
+
+    def window_frame_end(self, end):
+        if isinstance(end, int):
+            if end == 0:
+                return self.CURRENT_ROW
+            elif end > 0:
+                return '%d %s' % (end, self.FOLLOWING)
+        elif end is None:
+            return self.UNBOUNDED_FOLLOWING
+        raise ValueError("end argument must be a positive integer, zero, or None, but got '%s'." % end)
+
+    def window_frame_rows_start_end(self, start=None, end=None):
+        """
+        Return SQL for start and end points in an OVER clause window frame.
+        """
+        if not self.connection.features.supports_over_clause:
+            raise NotSupportedError('This backend does not support window expressions.')
+        return self.window_frame_start(start), self.window_frame_end(end)
+
+    def window_frame_range_start_end(self, start=None, end=None):
+        return self.window_frame_rows_start_end(start, end)

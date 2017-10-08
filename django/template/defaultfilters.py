@@ -37,12 +37,11 @@ def stringfilter(func):
     passed as the first positional argument will be converted to a string.
     """
     def _dec(*args, **kwargs):
-        if args:
-            args = list(args)
-            args[0] = str(args[0])
-            if (isinstance(args[0], SafeData) and
-                    getattr(_dec._decorated_function, 'is_safe', False)):
-                return mark_safe(func(*args, **kwargs))
+        args = list(args)
+        args[0] = str(args[0])
+        if (isinstance(args[0], SafeData) and
+                getattr(_dec._decorated_function, 'is_safe', False)):
+            return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
@@ -222,6 +221,8 @@ def stringformat(value, arg):
     See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
     """
+    if isinstance(value, tuple):
+        value = str(value)
     try:
         return ("%" + str(arg)) % value
     except (ValueError, TypeError):

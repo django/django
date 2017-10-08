@@ -6,7 +6,7 @@ import itertools
 import uuid
 import warnings
 from base64 import b64decode, b64encode
-from functools import total_ordering
+from functools import partialmethod, total_ordering
 
 from django import forms
 from django.apps import apps
@@ -26,7 +26,7 @@ from django.utils.dateparse import (
 )
 from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.functional import Promise, cached_property, curry
+from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
@@ -158,7 +158,7 @@ class Field(RegisterLookupMixin):
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
-        self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
+        self._db_tablespace = db_tablespace
         self.auto_created = auto_created
 
         # Adjust the appropriate creation counter, and save our local copy.
@@ -423,7 +423,7 @@ class Field(RegisterLookupMixin):
             "choices": [],
             "help_text": '',
             "db_column": None,
-            "db_tablespace": settings.DEFAULT_INDEX_TABLESPACE,
+            "db_tablespace": None,
             "auto_created": False,
             "validators": [],
             "error_messages": None,
@@ -433,8 +433,9 @@ class Field(RegisterLookupMixin):
             "error_messages": "_error_messages",
             "validators": "_validators",
             "verbose_name": "_verbose_name",
+            "db_tablespace": "_db_tablespace",
         }
-        equals_comparison = {"choices", "validators", "db_tablespace"}
+        equals_comparison = {"choices", "validators"}
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
             # Unroll anything iterable for choices into a concrete list
@@ -607,13 +608,16 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def db_type_parameters(self, connection):
+        return DictWrapper(self.__dict__, connection.ops.quote_name, 'qn_')
+
     def db_check(self, connection):
         """
         Return the database column check constraint for this field, for the
         provided connection. Works the same way as db_type() for the case that
         get_internal_type() does not map to a preexisting model field.
         """
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        data = self.db_type_parameters(connection)
         try:
             return connection.data_type_check_constraints[self.get_internal_type()] % data
         except KeyError:
@@ -639,7 +643,7 @@ class Field(RegisterLookupMixin):
         # mapped to one of the built-in Django field types. In this case, you
         # can implement db_type() instead of get_internal_type() to specify
         # exactly which wacky database column type you want to use.
-        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        data = self.db_type_parameters(connection)
         try:
             return connection.data_types[self.get_internal_type()] % data
         except KeyError:
@@ -651,6 +655,13 @@ class Field(RegisterLookupMixin):
         use. For example, this method is called by ForeignKey and OneToOneField
         to determine its data type.
         """
+        return self.db_type(connection)
+
+    def cast_db_type(self, connection):
+        """Return the data type to use in the Cast() function."""
+        db_type = connection.ops.cast_data_types.get(self.get_internal_type())
+        if db_type:
+            return db_type % self.db_type_parameters(connection)
         return self.db_type(connection)
 
     def db_parameters(self, connection):
@@ -677,6 +688,10 @@ class Field(RegisterLookupMixin):
     @property
     def unique(self):
         return self._unique or self.primary_key
+
+    @property
+    def db_tablespace(self):
+        return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
 
     def set_attributes_from_name(self, name):
         if not self.name:
@@ -707,7 +722,7 @@ class Field(RegisterLookupMixin):
                 setattr(cls, self.attname, DeferredAttribute(self.attname, cls))
         if self.choices:
             setattr(cls, 'get_%s_display' % self.name,
-                    curry(cls._get_FIELD_display, field=self))
+                    partialmethod(cls._get_FIELD_display, field=self))
 
     def get_filter_kwargs_for_object(self, obj):
         """
@@ -723,9 +738,6 @@ class Field(RegisterLookupMixin):
         attname = self.get_attname()
         column = self.db_column or attname
         return attname, column
-
-    def get_cache_name(self):
-        return '_%s_cache' % self.name
 
     def get_internal_type(self):
         return self.__class__.__name__
@@ -1056,6 +1068,11 @@ class CharField(Field):
         else:
             return []
 
+    def cast_db_type(self, connection):
+        if self.max_length is None:
+            return connection.ops.cast_char_field_without_max_length
+        return super().cast_db_type(connection)
+
     def get_internal_type(self):
         return "CharField"
 
@@ -1242,11 +1259,11 @@ class DateField(DateTimeCheckMixin, Field):
         if not self.null:
             setattr(
                 cls, 'get_next_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
+                partialmethod(cls._get_next_or_previous_by_FIELD, field=self, is_next=True)
             )
             setattr(
                 cls, 'get_previous_by_%s' % self.name,
-                curry(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
+                partialmethod(cls._get_next_or_previous_by_FIELD, field=self, is_next=False)
             )
 
     def get_prep_value(self, value):
@@ -1541,12 +1558,6 @@ class DecimalField(Field):
                 params={'value': value},
             )
 
-    def _format(self, value):
-        if isinstance(value, str):
-            return value
-        else:
-            return self.format_number(value)
-
     def format_number(self, value):
         """
         Format a number into a string with the requisite number of digits and
@@ -1620,7 +1631,7 @@ class DurationField(Field):
         if value is None:
             return None
         # Discard any fractional microseconds due to floating point arithmetic.
-        return int(round(value.total_seconds() * 1000000))
+        return round(value.total_seconds() * 1000000)
 
     def get_db_converters(self, connection):
         converters = []

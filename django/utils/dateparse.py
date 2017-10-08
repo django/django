@@ -50,6 +50,20 @@ iso8601_duration_re = re.compile(
     r'$'
 )
 
+# Support PostgreSQL's day-time interval format, e.g. "3 days 04:05:06". The
+# year-month and mixed intervals cannot be converted to a timedelta and thus
+# aren't accepted.
+postgres_interval_re = re.compile(
+    r'^'
+    r'(?:(?P<days>-?\d+) (days? ?))?'
+    r'(?:(?P<sign>[-+])?'
+    r'(?P<hours>\d+):'
+    r'(?P<minutes>\d\d):'
+    r'(?P<seconds>\d\d)'
+    r'(?:\.(?P<microseconds>\d{1,6}))?'
+    r')?$'
+)
+
 
 def parse_date(value):
     """Parse a string and return a datetime.date.
@@ -114,17 +128,19 @@ def parse_duration(value):
 
     The preferred format for durations in Django is '%d %H:%M:%S.%f'.
 
-    Also supports ISO 8601 representation.
+    Also supports ISO 8601 representation and PostgreSQL's day-time interval
+    format.
     """
     match = standard_duration_re.match(value)
     if not match:
-        match = iso8601_duration_re.match(value)
+        match = iso8601_duration_re.match(value) or postgres_interval_re.match(value)
     if match:
         kw = match.groupdict()
+        days = datetime.timedelta(float(kw.pop('days', 0) or 0))
         sign = -1 if kw.pop('sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
         if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
             kw['microseconds'] = '-' + kw['microseconds']
         kw = {k: float(v) for k, v in kw.items() if v is not None}
-        return sign * datetime.timedelta(**kw)
+        return days + sign * datetime.timedelta(**kw)

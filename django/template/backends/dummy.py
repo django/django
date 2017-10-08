@@ -35,12 +35,9 @@ class TemplateStrings(BaseEngine):
                     Origin(template_file, template_name, self),
                     'Source does not exist',
                 ))
-                continue
-
-            return Template(template_code)
-
-        else:
-            raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
+            else:
+                return Template(template_code)
+        raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
 
 
 class Template(string.Template):

@@ -32,29 +32,20 @@ class GEOSFunc:
     variants when available.
     """
     def __init__(self, func_name):
-        try:
-            # GEOS thread-safe function signatures end with '_r', and
-            # take an additional context handle parameter.
-            self.cfunc = getattr(lgeos, func_name + '_r')
-            self.threaded = True
-            # Create a reference here to thread_context so it's not
-            # garbage-collected before an attempt to call this object.
-            self.thread_context = thread_context
-        except AttributeError:
-            # Otherwise, use usual function.
-            self.cfunc = getattr(lgeos, func_name)
-            self.threaded = False
+        # GEOS thread-safe function signatures end with '_r' and take an
+        # additional context handle parameter.
+        self.cfunc = getattr(lgeos, func_name + '_r')
+        # Create a reference to thread_context so it's not garbage-collected
+        # before an attempt to call this object.
+        self.thread_context = thread_context
 
     def __call__(self, *args):
-        if self.threaded:
-            # If a context handle does not exist for this thread, initialize one.
-            if not self.thread_context.handle:
-                self.thread_context.handle = GEOSContextHandle()
-            # Call the threaded GEOS routine with pointer of the context handle
-            # as the first argument.
-            return self.cfunc(self.thread_context.handle.ptr, *args)
-        else:
-            return self.cfunc(*args)
+        # Create a context handle if one doesn't exist for this thread.
+        if not self.thread_context.handle:
+            self.thread_context.handle = GEOSContextHandle()
+        # Call the threaded GEOS routine with the pointer of the context handle
+        # as the first argument.
+        return self.cfunc(self.thread_context.handle.ptr, *args)
 
     def __str__(self):
         return self.cfunc.__name__
@@ -64,12 +55,9 @@ class GEOSFunc:
         return self.cfunc.argtypes
 
     def _set_argtypes(self, argtypes):
-        if self.threaded:
-            new_argtypes = [CONTEXT_PTR]
-            new_argtypes.extend(argtypes)
-            self.cfunc.argtypes = new_argtypes
-        else:
-            self.cfunc.argtypes = argtypes
+        new_argtypes = [CONTEXT_PTR]
+        new_argtypes.extend(argtypes)
+        self.cfunc.argtypes = new_argtypes
 
     argtypes = property(_get_argtypes, _set_argtypes)
 

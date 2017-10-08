@@ -9,6 +9,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_skip_locked = True
+    has_select_for_update_of = True
+    select_for_update_of_column = True
     can_return_id_from_insert = True
     allow_sliced_subqueries = False
     can_introspect_autofield = True
@@ -19,7 +21,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
     truncates_names = True
-    has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_time_field = False
@@ -37,3 +38,21 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # does by uppercasing all identifiers.
     ignores_table_name_case = True
     supports_index_on_text_field = False
+    has_case_insensitive_like = False
+    create_test_procedure_without_params_sql = """
+        CREATE PROCEDURE "TEST_PROCEDURE" AS
+            V_I INTEGER;
+        BEGIN
+            V_I := 1;
+        END;
+    """
+    create_test_procedure_with_int_param_sql = """
+        CREATE PROCEDURE "TEST_PROCEDURE" (P_I INTEGER) AS
+            V_I INTEGER;
+        BEGIN
+            V_I := P_I;
+        END;
+    """
+    supports_callproc_kwargs = True
+    supports_over_clause = True
+    max_query_params = 2**16 - 1

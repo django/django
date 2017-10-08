@@ -88,8 +88,9 @@ Usage examples::
 Accepts a list of at least two text fields or expressions and returns the
 concatenated text. Each argument must be of a text or char type. If you want
 to concatenate a ``TextField()`` with a ``CharField()``, then be sure to tell
-Django that the ``output_field`` should be a ``TextField()``. This is also
-required when concatenating a ``Value`` as in the example below.
+Django that the ``output_field`` should be a ``TextField()``. Specifying an
+``output_field`` is also required when concatenating a ``Value`` as in the
+example below.
 
 This function will never have a null result. On backends where a null argument
 results in the entire expression being null, Django will ensure that each null
@@ -102,8 +103,11 @@ Usage example::
     >>> from django.db.models.functions import Concat
     >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
     >>> author = Author.objects.annotate(
-    ...    screen_name=Concat('name', V(' ('), 'goes_by', V(')'),
-    ...    output_field=CharField())).get()
+    ...     screen_name=Concat(
+    ...         'name', V(' ('), 'goes_by', V(')'),
+    ...         output_field=CharField()
+    ...     )
+    ... ).get()
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
 
@@ -255,10 +259,9 @@ Usage example::
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.create(name='Smith, Margaret')
     >>> Author.objects.create(name='Margaret Jackson')
-    >>> authors = Author.objects.annotate(
+    >>> Author.objects.filter(name='Margaret Jackson').annotate(
     ...     smith_index=StrIndex('name', V('Smith'))
-    ... ).order_by('smith_index')
-    >>> authors.first().smith_index
+    ... ).get().smith_index
     0
     >>> authors = Author.objects.annotate(
     ...    smith_index=StrIndex('name', V('Smith'))
@@ -331,12 +334,16 @@ We'll be using the following model in examples of each function::
 
 Extracts a component of a date as a number.
 
-Takes an ``expression`` representing a ``DateField`` or ``DateTimeField`` and a
-``lookup_name``, and returns the part of the date referenced by ``lookup_name``
-as an ``IntegerField``. Django usually uses the databases' extract function, so
-you may use any ``lookup_name`` that your database supports. A ``tzinfo``
-subclass, usually provided by ``pytz``, can be passed to extract a value in a
-specific timezone.
+Takes an ``expression`` representing a ``DateField``, ``DateTimeField``,
+``TimeField``, or ``DurationField`` and a ``lookup_name``, and returns the part
+of the date referenced by ``lookup_name`` as an ``IntegerField``.
+Django usually uses the databases' extract function, so you may use any
+``lookup_name`` that your database supports. A ``tzinfo`` subclass, usually
+provided by ``pytz``, can be passed to extract a value in a specific timezone.
+
+.. versionchanged:: 2.0
+
+    Support for ``DurationField`` was added.
 
 Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 ``lookup_name``\s return:
@@ -424,8 +431,6 @@ Usage example::
     .. attribute:: lookup_name = 'week_day'
 
 .. class:: ExtractWeek(expression, tzinfo=None, **extra)
-
-    .. versionadded:: 1.11
 
     .. attribute:: lookup_name = 'week'
 
@@ -524,8 +529,8 @@ the Melbourne timezone (UTC +10:00), which changes the day, weekday, and hour
 values that are returned::
 
     >>> import pytz
-    >>> tzinfo = pytz.timezone('Australia/Melbourne')  # UTC+10:00
-    >>> with timezone.override(tzinfo):
+    >>> melb = pytz.timezone('Australia/Melbourne')  # UTC+10:00
+    >>> with timezone.override(melb):
     ...    Experiment.objects.annotate(
     ...        day=ExtractDay('start_datetime'),
     ...        weekday=ExtractWeekDay('start_datetime'),
@@ -539,7 +544,7 @@ Explicitly passing the timezone to the ``Extract`` function behaves in the same
 way, and takes priority over an active timezone::
 
     >>> import pytz
-    >>> tzinfo = pytz.timezone('Australia/Melbourne')
+    >>> melb = pytz.timezone('Australia/Melbourne')
     >>> Experiment.objects.annotate(
     ...     day=ExtractDay('start_datetime', tzinfo=melb),
     ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
@@ -690,8 +695,6 @@ that deal with date-parts can be used with ``DateField``::
 ``TimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.11
-
 .. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
 
     .. attribute:: kind = 'hour'
@@ -756,8 +759,6 @@ truncate function. It's also registered as a transform on  ``DateTimeField`` as
 
 .. class:: TruncTime(expression, **extra)
 
-.. versionadded:: 1.11
-
     .. attribute:: lookup_name = 'time'
     .. attribute:: output_field = TimeField()
 
@@ -811,3 +812,132 @@ Usage example::
      'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=<UTC>),
      'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=<UTC>)
     }
+
+.. _window-functions:
+
+Window functions
+================
+
+.. versionadded:: 2.0
+
+There are a number of functions to use in a
+:class:`~django.db.models.expressions.Window` expression for computing the rank
+of elements or the :class:`Ntile` of some rows.
+
+``CumeDist``
+------------
+
+.. class:: CumeDist(*expressions, **extra)
+
+Calculates the cumulative distribution of a value within a window or partition.
+The cumulative distribution is defined as the number of rows preceding or
+peered with the current row divided by the total number of rows in the frame.
+
+``DenseRank``
+-------------
+
+.. class:: DenseRank(*expressions, **extra)
+
+Equivalent to :class:`Rank` but does not have gaps.
+
+``FirstValue``
+--------------
+
+.. class:: FirstValue(expression, **extra)
+
+Returns the value evaluated at the row that's the first row of the window
+frame, or ``None`` if no such value exists.
+
+``Lag``
+-------
+
+.. class:: Lag(expression, offset=1, default=None, **extra)
+
+Calculates the value offset by ``offset``, and if no row exists there, returns
+``default``.
+
+``default`` must have the same type as the ``expression``, however, this is
+only validated by the database and not in Python.
+
+``LastValue``
+-------------
+
+.. class:: LastValue(expression, **extra)
+
+Comparable to :class:`FirstValue`, it calculates the last value in a given
+frame clause.
+
+``Lead``
+--------
+
+.. class:: Lead(expression, offset=1, default=None, **extra)
+
+Calculates the leading value in a given :ref:`frame <window-frames>`. Both
+``offset`` and ``default`` are evaluated with respect to the current row.
+
+``default`` must have the same type as the ``expression``, however, this is
+only validated by the database and not in Python.
+
+``NthValue``
+------------
+
+.. class:: NthValue(expression, nth=1, **extra)
+
+Computes the row relative to the offset ``nth`` (must be a positive value)
+within the window. Returns ``None`` if no row exists.
+
+Some databases may handle a nonexistent nth-value differently. For example,
+Oracle returns an empty string rather than ``None`` for character-based
+expressions. Django doesn't do any conversions in these cases.
+
+``Ntile``
+---------
+
+.. class:: Ntile(num_buckets=1, **extra)
+
+Calculates a partition for each of the rows in the frame clause, distributing
+numbers as evenly as possible between 1 and ``num_buckets``. If the rows don't
+divide evenly into a number of buckets, one or more buckets will be represented
+more frequently.
+
+``PercentRank``
+---------------
+
+.. class:: PercentRank(*expressions, **extra)
+
+Computes the percentile rank of the rows in the frame clause. This
+computation is equivalent to evaluating::
+
+    (rank - 1) / (total rows - 1)
+
+The following table explains the calculation for the percentile rank of a row:
+
+===== ===== ==== ============ ============
+Row # Value Rank Calculation  Percent Rank
+===== ===== ==== ============ ============
+1     15    1    (1-1)/(7-1)  0.0000
+2     20    2    (2-1)/(7-1)  0.1666
+3     20    2    (2-1)/(7-1)  0.1666
+4     20    2    (2-1)/(7-1)  0.1666
+5     30    5    (5-1)/(7-1)  0.6666
+6     30    5    (5-1)/(7-1)  0.6666
+7     40    7    (7-1)/(7-1)  1.0000
+===== ===== ==== ============ ============
+
+``Rank``
+--------
+
+.. class:: Rank(*expressions, **extra)
+
+Comparable to ``RowNumber``, this function ranks rows in the window. The
+computed rank contains gaps. Use :class:`DenseRank` to compute rank without
+gaps.
+
+``RowNumber``
+-------------
+
+.. class:: RowNumber(*expressions, **extra)
+
+Computes the row number according to the ordering of either the frame clause
+or the ordering of the whole query if there is no partitioning of the
+:ref:`window frame <window-frames>`.

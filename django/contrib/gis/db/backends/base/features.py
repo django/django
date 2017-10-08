@@ -37,7 +37,6 @@ class BaseSpatialFeatures:
 
     # The following properties indicate if the database backend support
     # certain lookups (dwithin, left and right, relate, ...)
-    supports_distances_lookups = True
     supports_left_right_lookups = False
 
     # Does the database have raster support?
@@ -57,6 +56,10 @@ class BaseSpatialFeatures:
     @property
     def supports_crosses_lookup(self):
         return 'crosses' in self.connection.ops.gis_operators
+
+    @property
+    def supports_distances_lookups(self):
+        return self.has_Distance_function
 
     @property
     def supports_dwithin_lookup(self):

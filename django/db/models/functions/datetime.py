@@ -2,13 +2,13 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db.models import (
-    DateField, DateTimeField, IntegerField, TimeField, Transform,
+    DateField, DateTimeField, DurationField, Field, IntegerField, TimeField,
+    Transform,
 )
 from django.db.models.lookups import (
     YearExact, YearGt, YearGte, YearLt, YearLte,
 )
 from django.utils import timezone
-from django.utils.functional import cached_property
 
 
 class TimezoneMixin:
@@ -30,6 +30,7 @@ class TimezoneMixin:
 
 class Extract(TimezoneMixin, Transform):
     lookup_name = None
+    output_field = IntegerField()
 
     def __init__(self, expression, lookup_name=None, tzinfo=None, **extra):
         if self.lookup_name is None:
@@ -49,6 +50,10 @@ class Extract(TimezoneMixin, Transform):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
         elif isinstance(lhs_output_field, TimeField):
             sql = connection.ops.time_extract_sql(self.lookup_name, sql)
+        elif isinstance(lhs_output_field, DurationField):
+            if not connection.features.has_native_duration_field:
+                raise ValueError('Extract requires native DurationField database support.')
+            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
         else:
             # resolve_expression has already validated the output_field so this
             # assert should never be hit.
@@ -58,18 +63,17 @@ class Extract(TimezoneMixin, Transform):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         field = copy.lhs.output_field
-        if not isinstance(field, (DateField, DateTimeField, TimeField)):
-            raise ValueError('Extract input expression must be DateField, DateTimeField, or TimeField.')
+        if not isinstance(field, (DateField, DateTimeField, TimeField, DurationField)):
+            raise ValueError(
+                'Extract input expression must be DateField, DateTimeField, '
+                'TimeField, or DurationField.'
+            )
         # Passing dates to functions expecting datetimes is most likely a mistake.
         if type(field) == DateField and copy.lookup_name in ('hour', 'minute', 'second'):
             raise ValueError(
                 "Cannot extract time component '%s' from DateField '%s'. " % (copy.lookup_name, field.name)
             )
         return copy
-
-    @cached_property
-    def output_field(self):
-        return IntegerField()
 
 
 class ExtractYear(Extract):
@@ -140,7 +144,6 @@ ExtractYear.register_lookup(YearLte)
 
 
 class TruncBase(TimezoneMixin, Transform):
-    arity = 1
     kind = None
     tzinfo = None
 
@@ -176,21 +179,22 @@ class TruncBase(TimezoneMixin, Transform):
             raise ValueError('output_field must be either DateField, TimeField, or DateTimeField')
         # Passing dates or times to functions expecting datetimes is most
         # likely a mistake.
-        output_field = copy.output_field
-        explicit_output_field = field.__class__ != copy.output_field.__class__
+        class_output_field = self.__class__.output_field if isinstance(self.__class__.output_field, Field) else None
+        output_field = class_output_field or copy.output_field
+        has_explicit_output_field = class_output_field or field.__class__ is not copy.output_field.__class__
         if type(field) == DateField and (
                 isinstance(output_field, DateTimeField) or copy.kind in ('hour', 'minute', 'second', 'time')):
             raise ValueError("Cannot truncate DateField '%s' to %s. " % (
-                field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
+                field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
         elif isinstance(field, TimeField) and (
                 isinstance(output_field, DateTimeField) or copy.kind in ('year', 'quarter', 'month', 'day', 'date')):
             raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
-                field.name, output_field.__class__.__name__ if explicit_output_field else 'DateTimeField'
+                field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
         return copy
 
-    def convert_value(self, value, expression, connection, context):
+    def convert_value(self, value, expression, connection):
         if isinstance(self.output_field, DateTimeField):
             if settings.USE_TZ:
                 if value is None:
@@ -234,10 +238,7 @@ class TruncDay(TruncBase):
 class TruncDate(TruncBase):
     kind = 'date'
     lookup_name = 'date'
-
-    @cached_property
-    def output_field(self):
-        return DateField()
+    output_field = DateField()
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.
@@ -250,10 +251,7 @@ class TruncDate(TruncBase):
 class TruncTime(TruncBase):
     kind = 'time'
     lookup_name = 'time'
-
-    @cached_property
-    def output_field(self):
-        return TimeField()
+    output_field = TimeField()
 
     def as_sql(self, compiler, connection):
         # Cast to date rather than truncate to date.

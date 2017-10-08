@@ -244,9 +244,10 @@ class ProxyDeleteTest(TestCase):
         self.assertEqual(len(FooFileProxy.objects.all()), 0)
 
     def test_19187_values(self):
-        with self.assertRaises(TypeError):
+        msg = 'Cannot call delete() after .values() or .values_list()'
+        with self.assertRaisesMessage(TypeError, msg):
             Image.objects.values().delete()
-        with self.assertRaises(TypeError):
+        with self.assertRaisesMessage(TypeError, msg):
             Image.objects.values_list().delete()
 
 

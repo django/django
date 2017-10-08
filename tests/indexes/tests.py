@@ -19,7 +19,7 @@ class SchemaIndexesTests(TestCase):
         """
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
-                model=Article,
+                table_name=Article._meta.db_table,
                 column_names=("c1",),
                 suffix="123",
             )
@@ -35,7 +35,7 @@ class SchemaIndexesTests(TestCase):
         long_name = 'l%sng' % ('o' * 100)
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
-                model=Article,
+                table_name=Article._meta.db_table,
                 column_names=('c1', 'c2', long_name),
                 suffix='ix',
             )
@@ -51,12 +51,12 @@ class SchemaIndexesTests(TestCase):
 
     def test_index_together(self):
         editor = connection.schema_editor()
-        index_sql = editor._model_indexes_sql(Article)
+        index_sql = [str(statement) for statement in editor._model_indexes_sql(Article)]
         self.assertEqual(len(index_sql), 1)
         # Ensure the index name is properly quoted
         self.assertIn(
             connection.ops.quote_name(
-                editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
+                editor._create_index_name(Article._meta.db_table, ['headline', 'pub_date'], suffix='_idx')
             ),
             index_sql[0]
         )
@@ -70,7 +70,7 @@ class SchemaIndexesTests(TestCase):
     def test_postgresql_text_indexes(self):
         """Test creation of PostgreSQL-specific text indexes (#12234)"""
         from .models import IndexedArticle
-        index_sql = connection.schema_editor()._model_indexes_sql(IndexedArticle)
+        index_sql = [str(statement) for statement in connection.schema_editor()._model_indexes_sql(IndexedArticle)]
         self.assertEqual(len(index_sql), 5)
         self.assertIn('("headline" varchar_pattern_ops)', index_sql[1])
         self.assertIn('("body" text_pattern_ops)', index_sql[3])
@@ -99,7 +99,7 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
         )
         if storage != "InnoDB":
             self.skip("This test only applies to the InnoDB storage engine")
-        index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
+        index_sql = [str(statement) for statement in connection.schema_editor()._model_indexes_sql(ArticleTranslation)]
         self.assertEqual(index_sql, [
             'CREATE INDEX `indexes_articletranslation_article_no_constraint_id_d6c0806b` '
             'ON `indexes_articletranslation` (`article_no_constraint_id`)'
@@ -114,7 +114,7 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
                 new_field.set_attributes_from_name('new_foreign_key')
                 editor.add_field(ArticleTranslation, new_field)
                 field_created = True
-                self.assertEqual(editor.deferred_sql, [
+                self.assertEqual([str(statement) for statement in editor.deferred_sql], [
                     'ALTER TABLE `indexes_articletranslation` '
                     'ADD CONSTRAINT `indexes_articletrans_new_foreign_key_id_d27a9146_fk_indexes_a` '
                     'FOREIGN KEY (`new_foreign_key_id`) REFERENCES `indexes_article` (`id`)'

@@ -9,7 +9,7 @@ class Relation(models.Model):
     pass
 
 
-class InstanceOnlyDescriptor(object):
+class InstanceOnlyDescriptor:
     def __get__(self, instance, cls=None):
         if instance is None:
             raise AttributeError('Instance only')

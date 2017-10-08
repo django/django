@@ -36,7 +36,7 @@ class SearchQueryField(Field):
 class SearchVectorCombinable:
     ADD = '||'
 
-    def _combine(self, other, connector, reversed, node=None):
+    def _combine(self, other, connector, reversed):
         if not isinstance(other, SearchVectorCombinable) or not self.config == other.config:
             raise TypeError('SearchVector can only be combined with other SearchVectors')
         if reversed:
@@ -47,7 +47,7 @@ class SearchVectorCombinable:
 class SearchVector(SearchVectorCombinable, Func):
     function = 'to_tsvector'
     arg_joiner = " || ' ' || "
-    _output_field = SearchVectorField()
+    output_field = SearchVectorField()
     config = None
 
     def __init__(self, *expressions, **extra):
@@ -96,7 +96,7 @@ class SearchQueryCombinable:
     BITAND = '&&'
     BITOR = '||'
 
-    def _combine(self, other, connector, reversed, node=None):
+    def _combine(self, other, connector, reversed):
         if not isinstance(other, SearchQueryCombinable):
             raise TypeError(
                 'SearchQuery can only be combined with other SearchQuerys, '
@@ -125,7 +125,7 @@ class SearchQueryCombinable:
 
 
 class SearchQuery(SearchQueryCombinable, Value):
-    _output_field = SearchQueryField()
+    output_field = SearchQueryField()
 
     def __init__(self, value, output_field=None, *, config=None, invert=False):
         self.config = config
@@ -153,8 +153,8 @@ class SearchQuery(SearchQueryCombinable, Value):
             template = '!!({})'.format(template)
         return template, params
 
-    def _combine(self, other, connector, reversed, node=None):
-        combined = super()._combine(other, connector, reversed, node)
+    def _combine(self, other, connector, reversed):
+        combined = super()._combine(other, connector, reversed)
         combined.output_field = SearchQueryField()
         return combined
 
@@ -170,7 +170,7 @@ class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
 
 class SearchRank(Func):
     function = 'ts_rank'
-    _output_field = FloatField()
+    output_field = FloatField()
 
     def __init__(self, vector, query, **extra):
         if not hasattr(vector, 'resolve_expression'):
@@ -202,10 +202,12 @@ SearchVectorField.register_lookup(SearchVectorExact)
 
 
 class TrigramBase(Func):
+    output_field = FloatField()
+
     def __init__(self, expression, string, **extra):
         if not hasattr(string, 'resolve_expression'):
             string = Value(string)
-        super().__init__(expression, string, output_field=FloatField(), **extra)
+        super().__init__(expression, string, **extra)
 
 
 class TrigramSimilarity(TrigramBase):

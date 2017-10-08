@@ -1,11 +1,13 @@
 import datetime
 import decimal
+import functools
 import hashlib
 import logging
 import re
 from time import time
 
 from django.conf import settings
+from django.db.utils import NotSupportedError
 from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
@@ -45,15 +47,37 @@ class CursorWrapper:
     # The following methods cannot be implemented in __getattr__, because the
     # code must run when the method is invoked, not just when it is accessed.
 
-    def callproc(self, procname, params=None):
+    def callproc(self, procname, params=None, kparams=None):
+        # Keyword parameters for callproc aren't supported in PEP 249, but the
+        # database driver may support them (e.g. cx_Oracle).
+        if kparams is not None and not self.db.features.supports_callproc_kwargs:
+            raise NotSupportedError(
+                'Keyword parameters for callproc are not supported on this '
+                'database backend.'
+            )
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
-            if params is None:
+            if params is None and kparams is None:
                 return self.cursor.callproc(procname)
-            else:
+            elif kparams is None:
                 return self.cursor.callproc(procname, params)
+            else:
+                params = params or ()
+                return self.cursor.callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
+        return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+
+    def executemany(self, sql, param_list):
+        return self._execute_with_wrappers(sql, param_list, many=True, executor=self._executemany)
+
+    def _execute_with_wrappers(self, sql, params, many, executor):
+        context = {'connection': self.db, 'cursor': self}
+        for wrapper in reversed(self.db.execute_wrappers):
+            executor = functools.partial(wrapper, executor)
+        return executor(sql, params, many, context)
+
+    def _execute(self, sql, params, *ignored_wrapper_args):
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None:
@@ -61,7 +85,7 @@ class CursorWrapper:
             else:
                 return self.cursor.execute(sql, params)
 
-    def executemany(self, sql, param_list):
+    def _executemany(self, sql, param_list, *ignored_wrapper_args):
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             return self.cursor.executemany(sql, param_list)
@@ -158,12 +182,6 @@ def typecast_timestamp(s):  # does NOT store time zone information
         int(times[0]), int(times[1]), int(seconds),
         int((microseconds + '000000')[:6]), tzinfo
     )
-
-
-def typecast_decimal(s):
-    if s is None or s == '':
-        return None
-    return decimal.Decimal(s)
 
 
 ###############################################

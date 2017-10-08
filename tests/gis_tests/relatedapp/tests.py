@@ -1,7 +1,6 @@
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -132,7 +131,8 @@ class RelatedGeoModelTest(TestCase):
         # actually correspond to the centroid of the border.
         c1 = b1.centroid
         c2 = c1.transform(2276, clone=True)
-        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b1)
+        b2 = b1 if connection.features.supports_transform else b1.transform(2276, clone=True)
+        Parcel.objects.create(name='P2', city=pcity, center1=c1, center2=c2, border1=b1, border2=b2)
 
         # Should return the second Parcel, which has the center within the
         # border.
@@ -140,12 +140,15 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
 
+        # This time center2 is in a different coordinate system and needs to be
+        # wrapped in transformation SQL.
+        qs = Parcel.objects.filter(center2__within=F('border1'))
         if connection.features.supports_transform:
-            # This time center2 is in a different coordinate system and needs
-            # to be wrapped in transformation SQL.
-            qs = Parcel.objects.filter(center2__within=F('border1'))
-            self.assertEqual(1, len(qs))
-            self.assertEqual('P2', qs[0].name)
+            self.assertEqual('P2', qs.get().name)
+        else:
+            msg = "This backend doesn't support the Transform function."
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                list(qs)
 
         # Should return the first Parcel, which has the center point equal
         # to the point in the City ForeignKey.
@@ -153,11 +156,14 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P1', qs[0].name)
 
+        # This time the city column should be wrapped in transformation SQL.
+        qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
         if connection.features.supports_transform:
-            # This time the city column should be wrapped in transformation SQL.
-            qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
-            self.assertEqual(1, len(qs))
-            self.assertEqual('P1', qs[0].name)
+            self.assertEqual('P1', qs.get().name)
+        else:
+            msg = "This backend doesn't support the Transform function."
+            with self.assertRaisesMessage(NotSupportedError, msg):
+                list(qs)
 
     def test07_values(self):
         "Testing values() and values_list()."
@@ -170,8 +176,8 @@ class RelatedGeoModelTest(TestCase):
         for m, d, t in zip(gqs, gvqs, gvlqs):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
-            self.assertIsInstance(d['point'], Geometry)
-            self.assertIsInstance(t[1], Geometry)
+            self.assertIsInstance(d['point'], GEOSGeometry)
+            self.assertIsInstance(t[1], GEOSGeometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
 

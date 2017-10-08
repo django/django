@@ -1,5 +1,5 @@
 from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.error import GDALException, OGRIndexError
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
@@ -35,16 +35,11 @@ class Feature(GDALBase):
         """
         if isinstance(index, str):
             i = self.index(index)
-        else:
-            if index < 0 or index > self.num_fields:
-                raise OGRIndexError('index out of range')
+        elif 0 <= index < self.num_fields:
             i = index
+        else:
+            raise IndexError('Index out of range when accessing field in a feature: %s.' % index)
         return Field(self, i)
-
-    def __iter__(self):
-        "Iterate over each field in the Feature."
-        for i in range(self.num_fields):
-            yield self[i]
 
     def __len__(self):
         "Return the count of fields in this feature."
@@ -82,8 +77,13 @@ class Feature(GDALBase):
     @property
     def fields(self):
         "Return a list of fields in the Feature."
-        return [capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i))
-                for i in range(self.num_fields)]
+        return [
+            force_text(
+                capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i)),
+                self.encoding,
+                strings_only=True
+            ) for i in range(self.num_fields)
+        ]
 
     @property
     def geom(self):
@@ -111,5 +111,5 @@ class Feature(GDALBase):
         "Return the index of the given field name."
         i = capi.get_field_index(self.ptr, force_bytes(field_name))
         if i < 0:
-            raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
+            raise IndexError('Invalid OFT field name given: %s.' % field_name)
         return i

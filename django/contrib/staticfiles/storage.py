@@ -391,7 +391,7 @@ class ManifestFilesMixin(HashedFilesMixin):
             return OrderedDict()
         try:
             stored = json.loads(content, object_pairs_hook=OrderedDict)
-        except ValueError:
+        except json.JSONDecodeError:
             pass
         else:
             version = stored.get('version')

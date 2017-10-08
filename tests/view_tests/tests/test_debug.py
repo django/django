@@ -18,6 +18,7 @@ from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
+from django.utils.safestring import mark_safe
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
@@ -111,7 +112,14 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "Django tried these URL patterns", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+        # Pattern and view name of a RegexURLPattern appear.
+        self.assertContains(response, r"^regex-post/(?P&lt;pk&gt;[0-9]+)/$", status_code=404)
+        self.assertContains(response, "[name='regex-post']", status_code=404)
+        # Pattern and view name of a RoutePattern appear.
+        self.assertContains(response, r"path-post/&lt;int:pk&gt;/", status_code=404)
+        self.assertContains(response, "[name='path-post']", status_code=404)
 
     @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
     def test_404_empty_path_not_in_urls(self):
@@ -194,7 +202,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         response = self.client.get('/')
         self.assertContains(
             response,
-            "<h2>Congratulations on your first Django-powered page.</h2>"
+            "<h2>The install worked successfully! Congratulations!</h2>"
         )
 
     @override_settings(ROOT_URLCONF='view_tests.regression_21530_urls')
@@ -348,12 +356,12 @@ class ExceptionReporterTests(SimpleTestCase):
         request = self.rf.get('/test_view/')
         try:
             try:
-                raise AttributeError('Top level')
+                raise AttributeError(mark_safe('<p>Top level</p>'))
             except AttributeError as explicit:
                 try:
-                    raise ValueError('Second exception') from explicit
+                    raise ValueError(mark_safe('<p>Second exception</p>')) from explicit
                 except ValueError:
-                    raise IndexError('Final exception')
+                    raise IndexError(mark_safe('<p>Final exception</p>'))
         except Exception:
             # Custom exception handler, just pass it into ExceptionReporter
             exc_type, exc_value, tb = sys.exc_info()
@@ -365,12 +373,35 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         # Both messages are twice on page -- one rendered as html,
         # one as plain text (for pastebin)
-        self.assertEqual(2, html.count(explicit_exc.format("Top level")))
-        self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
+        self.assertEqual(2, html.count(explicit_exc.format('&lt;p&gt;Top level&lt;/p&gt;')))
+        self.assertEqual(2, html.count(implicit_exc.format('&lt;p&gt;Second exception&lt;/p&gt;')))
+        self.assertEqual(10, html.count('&lt;p&gt;Final exception&lt;/p&gt;'))
 
         text = reporter.get_traceback_text()
-        self.assertIn(explicit_exc.format("Top level"), text)
-        self.assertIn(implicit_exc.format("Second exception"), text)
+        self.assertIn(explicit_exc.format('<p>Top level</p>'), text)
+        self.assertIn(implicit_exc.format('<p>Second exception</p>'), text)
+        self.assertEqual(3, text.count('<p>Final exception</p>'))
+
+    def test_reporting_frames_without_source(self):
+        try:
+            source = "def funcName():\n    raise Error('Whoops')\nfuncName()"
+            namespace = {}
+            code = compile(source, 'generated', 'exec')
+            exec(code, namespace)
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        request = self.rf.get('/test_view/')
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        frames = reporter.get_traceback_frames()
+        last_frame = frames[-1]
+        self.assertEqual(last_frame['context_line'], '<source code not available>')
+        self.assertEqual(last_frame['filename'], 'generated')
+        self.assertEqual(last_frame['function'], 'funcName')
+        self.assertEqual(last_frame['lineno'], 2)
+        html = reporter.get_traceback_html()
+        self.assertIn('generated in funcName', html)
+        text = reporter.get_traceback_text()
+        self.assertIn('"generated" in funcName', text)
 
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
@@ -415,6 +446,16 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('VAL\\xe9VAL', html)
         self.assertIn('EXC\\xe9EXC', html)
 
+    def test_local_variable_escaping(self):
+        """Safe strings in local variables are escaped."""
+        try:
+            local = mark_safe('<p>Local variable</p>')
+            raise ValueError(local)
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        html = ExceptionReporter(None, exc_type, exc_value, tb).get_traceback_html()
+        self.assertIn('<td class="code"><pre>&#39;&lt;p&gt;Local variable&lt;/p&gt;&#39;</pre></td>', html)
+
     def test_unprintable_values_handling(self):
         "Unprintable values should not make the output generation choke."
         try:
@@ -445,6 +486,21 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
+
+    def test_encoding_error(self):
+        """
+        A UnicodeError displays a portion of the problematic string. HTML in
+        safe strings is escaped.
+        """
+        try:
+            mark_safe('abcdefghijkl<p>mnὀp</p>qrstuwxyz').encode('ascii')
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h2>Unicode error hint</h2>', html)
+        self.assertIn('The string that could not be encoded/decoded was: ', html)
+        self.assertIn('<strong>&lt;p&gt;mnὀp&lt;/p&gt;</strong>', html)
 
     def test_unfrozen_importlib(self):
         """

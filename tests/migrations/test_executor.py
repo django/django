@@ -126,6 +126,14 @@ class ExecutorTests(MigrationTestBase):
         migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).apps
         Editor = migrations_apps.get_model("migrations", "Editor")
         self.assertFalse(Editor.objects.exists())
+        # Record previous migration as successful.
+        executor.migrate([("migrations", "0001_initial")], fake=True)
+        # Rebuild the graph to reflect the new DB state.
+        executor.loader.build_graph()
+        # Migrating backwards is also atomic.
+        with self.assertRaisesMessage(RuntimeError, "Abort migration"):
+            executor.migrate([("migrations", None)])
+        self.assertFalse(Editor.objects.exists())
 
     @override_settings(MIGRATION_MODULES={
         "migrations": "migrations.test_migrations",

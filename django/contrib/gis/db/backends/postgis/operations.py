@@ -5,17 +5,21 @@ from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
+from django.contrib.gis.db.models import GeometryField, RasterField
 from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.geos.geometry import GEOSGeometryBase
+from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
-from django.db.utils import ProgrammingError
+from django.db.models import Func, Value
+from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
-from .pgraster import from_pgraster, get_pgraster_srid, to_pgraster
+from .pgraster import from_pgraster
 
 # Identifier to mark raster lookups as bilateral.
 BILATERAL = 'bilateral'
@@ -42,17 +46,11 @@ class PostGISOperator(SpatialOperator):
         return super().as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
-        # Get rhs value.
-        if isinstance(lookup.rhs, (tuple, list)):
-            rhs_val = lookup.rhs[0]
-            spheroid = lookup.rhs[-1] == 'spheroid'
-        else:
-            rhs_val = lookup.rhs
-            spheroid = False
+        spheroid = lookup.rhs_params and lookup.rhs_params[-1] == 'spheroid'
 
         # Check which input is a raster.
         lhs_is_raster = lookup.lhs.field.geom_type == 'RASTER'
-        rhs_is_raster = isinstance(rhs_val, GDALRaster)
+        rhs_is_raster = isinstance(lookup.rhs, GDALRaster)
 
         # Look for band indices and inject them if provided.
         if lookup.band_lhs is not None and lhs_is_raster:
@@ -83,26 +81,18 @@ class PostGISOperator(SpatialOperator):
         return template_params
 
 
-class PostGISDistanceOperator(PostGISOperator):
-    sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %(value)s'
+class ST_Polygon(Func):
+    function = 'ST_Polygon'
 
-    def as_sql(self, connection, lookup, template_params, sql_params):
-        if not lookup.lhs.output_field.geography and lookup.lhs.output_field.geodetic(connection):
-            template_params = self.check_raster(lookup, template_params)
-            sql_template = self.sql_template
-            if len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid':
-                template_params.update({
-                    'op': self.op,
-                    'func': connection.ops.spatial_function_name('DistanceSpheroid'),
-                })
-                sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s) %(op)s %(value)s'
-                # Using DistanceSpheroid requires the spheroid of the field as
-                # a parameter.
-                sql_params.insert(1, lookup.lhs.output_field.spheroid(connection))
-            else:
-                template_params.update({'op': self.op, 'func': connection.ops.spatial_function_name('DistanceSphere')})
-            return sql_template % template_params, sql_params
-        return super().as_sql(connection, lookup, template_params, sql_params)
+    def __init__(self, expr):
+        super().__init__(expr)
+        expr = self.source_expressions[0]
+        if isinstance(expr, Value) and not expr._output_field_or_none:
+            self.source_expressions[0] = Value(expr.value, output_field=RasterField(srid=expr.value.srid))
+
+    @cached_property
+    def output_field(self):
+        return GeometryField(srid=self.source_expressions[0].field.srid)
 
 
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
@@ -112,6 +102,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     geom_func_prefix = 'ST_'
 
     Adapter = PostGISAdapter
+
+    collect = geom_func_prefix + 'Collect'
+    extent = geom_func_prefix + 'Extent'
+    extent3d = geom_func_prefix + '3DExtent'
+    length3d = geom_func_prefix + '3DLength'
+    makeline = geom_func_prefix + 'MakeLine'
+    perimeter3d = geom_func_prefix + '3DPerimeter'
+    unionagg = geom_func_prefix + 'Union'
 
     gis_operators = {
         'bbcontains': PostGISOperator(op='~', raster=True),
@@ -140,26 +138,12 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         'touches': PostGISOperator(func='ST_Touches', raster=BILATERAL),
         'within': PostGISOperator(func='ST_Within', raster=BILATERAL),
         'dwithin': PostGISOperator(func='ST_DWithin', geography=True, raster=BILATERAL),
-        'distance_gt': PostGISDistanceOperator(func='ST_Distance', op='>', geography=True),
-        'distance_gte': PostGISDistanceOperator(func='ST_Distance', op='>=', geography=True),
-        'distance_lt': PostGISDistanceOperator(func='ST_Distance', op='<', geography=True),
-        'distance_lte': PostGISDistanceOperator(func='ST_Distance', op='<=', geography=True),
     }
 
     unsupported_functions = set()
 
-    def __init__(self, connection):
-        super().__init__(connection)
-
-        prefix = self.geom_func_prefix
-
-        self.collect = prefix + 'Collect'
-        self.extent = prefix + 'Extent'
-        self.extent3d = prefix + '3DExtent'
-        self.length3d = prefix + '3DLength'
-        self.makeline = prefix + 'MakeLine'
-        self.perimeter3d = prefix + '3DPerimeter'
-        self.unionagg = prefix + 'Union'
+    select = '%s::bytea'
+    select_extent = None
 
     @cached_property
     def function_names(self):
@@ -247,7 +231,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             geom_type = f.geom_type
         if f.geography:
             if f.srid != 4326:
-                raise NotImplementedError('PostGIS only supports geography columns with an SRID of 4326.')
+                raise NotSupportedError('PostGIS only supports geography columns with an SRID of 4326.')
 
             return 'geography(%s,%d)' % (geom_type, f.srid)
         else:
@@ -303,8 +287,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # Get the srid for this object
         if value is None:
             value_srid = None
-        elif f.geom_type == 'RASTER' and isinstance(value, str):
-            value_srid = get_pgraster_srid(value)
         else:
             value_srid = value.srid
 
@@ -312,8 +294,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # is not equal to the field srid.
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
-        elif f.geom_type == 'RASTER' and isinstance(value, str):
-            placeholder = '%s((%%s)::raster, %s)' % (tranform_func, f.srid)
         else:
             placeholder = '%s(%%s, %s)' % (tranform_func, f.srid)
 
@@ -382,10 +362,33 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     def spatial_ref_sys(self):
         return PostGISSpatialRefSys
 
-    # Methods to convert between PostGIS rasters and dicts that are
-    # readable by GDALRaster.
     def parse_raster(self, value):
+        """Convert a PostGIS HEX String into a dict readable by GDALRaster."""
         return from_pgraster(value)
 
-    def deconstruct_raster(self, value):
-        return to_pgraster(value)
+    def distance_expr_for_lookup(self, lhs, rhs, **kwargs):
+        return super().distance_expr_for_lookup(
+            self._normalize_distance_lookup_arg(lhs),
+            self._normalize_distance_lookup_arg(rhs),
+            **kwargs
+        )
+
+    @staticmethod
+    def _normalize_distance_lookup_arg(arg):
+        is_raster = (
+            arg.field.geom_type == 'RASTER'
+            if hasattr(arg, 'field') else
+            isinstance(arg, GDALRaster)
+        )
+        return ST_Polygon(arg) if is_raster else arg
+
+    def get_geometry_converter(self, expression):
+        read = wkb_r().read
+        geom_class = expression.output_field.geom_class
+
+        def converter(value, expression, connection):
+            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+        return converter
+
+    def get_area_att_for_field(self, field):
+        return 'sq_m'

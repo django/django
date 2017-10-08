@@ -61,22 +61,7 @@ Adds a few conveniences for perfectionists:
   indexer would treat them as separate URLs -- so it's best practice to
   normalize URLs.
 
-* Handles ETags based on the :setting:`USE_ETAGS` setting. If
-  :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
-  for each request by MD5-hashing the page content, and it'll take care of
-  sending ``Not Modified`` responses, if appropriate.
-
 * Sets the ``Content-Length`` header for non-streaming responses.
-
-.. versionchanged:: 1.11
-
-    Older versions didn't set the ``Content-Length`` header.
-
-.. deprecated:: 1.11
-
-    The :setting:`USE_ETAGS` setting is deprecated in favor of using
-    :class:`~django.middleware.http.ConditionalGetMiddleware` for ETag
-    processing.
 
 .. attribute:: CommonMiddleware.response_redirect_class
 
@@ -172,11 +157,6 @@ header, the middleware adds one if needed. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
-
-.. versionchanged:: 1.11
-
-    In older versions, the middleware set the ``Content-Length`` and ``Date``
-    headers and didn't set the ``ETag`` header.
 
 Locale middleware
 -----------------
@@ -471,11 +451,6 @@ Here are some hints about the ordering of various Django middleware classes:
    Before any middleware that may change or use the response body.
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
-
-#. :class:`~django.middleware.http.ConditionalGetMiddleware`
-
-   Before ``CommonMiddleware``: uses its ``ETag`` header when
-   :setting:`USE_ETAGS` = ``True``.
 
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
 

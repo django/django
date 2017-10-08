@@ -178,7 +178,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                 if parallel > 1:
                     for index in range(parallel):
                         connection.creation.clone_test_db(
-                            number=index + 1,
+                            suffix=str(index + 1),
                             verbosity=verbosity,
                             keepdb=keepdb,
                         )
@@ -292,7 +292,7 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
             if parallel > 1:
                 for index in range(parallel):
                     connection.creation.destroy_test_db(
-                        number=index + 1,
+                        suffix=str(index + 1),
                         verbosity=verbosity,
                         keepdb=keepdb,
                     )
@@ -499,10 +499,14 @@ class override_system_checks(TestContextDecorator):
 
     def enable(self):
         self.old_checks = self.registry.registered_checks
-        self.registry.registered_checks = self.new_checks
+        self.registry.registered_checks = set()
+        for check in self.new_checks:
+            self.registry.register(check, *getattr(check, 'tags', ()))
         self.old_deployment_checks = self.registry.deployment_checks
         if self.deployment_checks is not None:
-            self.registry.deployment_checks = self.deployment_checks
+            self.registry.deployment_checks = set()
+            for check in self.deployment_checks:
+                self.registry.register(check, *getattr(check, 'tags', ()), deploy=True)
 
     def disable(self):
         self.registry.registered_checks = self.old_checks

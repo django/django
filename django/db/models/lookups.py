@@ -1,13 +1,10 @@
 import itertools
 import math
 from copy import copy
-from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import (
-    DateTimeField, DecimalField, Field, IntegerField,
-)
+from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.functional import cached_property
 
@@ -28,7 +25,7 @@ class Lookup:
             # a bilateral transformation on a nested QuerySet: that won't work.
             from django.db.models.sql.query import Query  # avoid circular import
             if isinstance(rhs, Query):
-                raise NotImplementedError("Bilateral transformations on nested querysets are not supported.")
+                raise NotImplementedError("Bilateral transformations on nested querysets are not implemented.")
         self.bilateral_transforms = bilateral_transforms
 
     def apply_bilateral_transforms(self, value):
@@ -96,9 +93,7 @@ class Lookup:
             return self.get_db_prep_lookup(value, connection)
 
     def rhs_is_direct_value(self):
-        return not(
-            hasattr(self.rhs, 'as_sql') or
-            hasattr(self.rhs, 'get_compiler'))
+        return not hasattr(self.rhs, 'as_sql')
 
     def relabeled_clone(self, relabels):
         new = copy(self)
@@ -119,6 +114,10 @@ class Lookup:
     @cached_property
     def contains_aggregate(self):
         return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
+
+    @cached_property
+    def contains_over_clause(self):
+        return self.lhs.contains_over_clause or getattr(self.rhs, 'contains_over_clause', False)
 
     @property
     def is_summary(self):
@@ -300,40 +299,6 @@ class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
     pass
 
 
-class DecimalComparisonLookup:
-    def as_sqlite(self, compiler, connection):
-        lhs_sql, params = self.process_lhs(compiler, connection)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        params.extend(rhs_params)
-        # For comparisons whose lhs is a DecimalField, cast rhs AS NUMERIC
-        # because the rhs will have been converted to a string by the
-        # rev_typecast_decimal() adapter.
-        if isinstance(self.rhs, Decimal):
-            rhs_sql = 'CAST(%s AS NUMERIC)' % rhs_sql
-        rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        return '%s %s' % (lhs_sql, rhs_sql), params
-
-
-@DecimalField.register_lookup
-class DecimalGreaterThan(DecimalComparisonLookup, GreaterThan):
-    pass
-
-
-@DecimalField.register_lookup
-class DecimalGreaterThanOrEqual(DecimalComparisonLookup, GreaterThanOrEqual):
-    pass
-
-
-@DecimalField.register_lookup
-class DecimalLessThan(DecimalComparisonLookup, LessThan):
-    pass
-
-
-@DecimalField.register_lookup
-class DecimalLessThanOrEqual(DecimalComparisonLookup, LessThanOrEqual):
-    pass
-
-
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = 'in'
@@ -410,7 +375,7 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
+        if hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:
@@ -548,7 +513,7 @@ class YearComparisonLookup(YearLookup):
     def get_rhs_op(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
 
-    def get_bound(self):
+    def get_bound(self, start, finish):
         raise NotImplementedError(
             'subclasses of YearComparisonLookup must provide a get_bound() method'
         )

@@ -426,6 +426,9 @@ happens.
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
 objects, when you're confident you won't have primary-key collision.
 
+If you're using PostgreSQL, the sequence associated with the primary key might
+need to be updated; see :ref:`manually-specified-autoincrement-pk`.
+
 What happens when you save?
 ---------------------------
 

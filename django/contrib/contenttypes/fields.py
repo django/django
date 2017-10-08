@@ -6,6 +6,7 @@ from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
 from django.db.models import DO_NOTHING
 from django.db.models.base import ModelBase, make_foreign_order_accessors
+from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
     ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
     lazy_related_operation,
@@ -14,7 +15,7 @@ from django.db.models.query_utils import PathInfo
 from django.utils.functional import cached_property
 
 
-class GenericForeignKey:
+class GenericForeignKey(FieldCacheMixin):
     """
     Provide a generic many-to-one relation through the ``content_type`` and
     ``object_id`` fields.
@@ -48,7 +49,6 @@ class GenericForeignKey:
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
         self.model = cls
-        self.cache_attr = "_%s_cache" % name
         cls._meta.add_field(self, private=True)
         setattr(cls, name, self)
 
@@ -155,6 +155,9 @@ class GenericForeignKey:
             else:
                 return []
 
+    def get_cache_name(self):
+        return self.name
+
     def get_content_type(self, obj=None, id=None, using=None):
         if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(
@@ -202,14 +205,14 @@ class GenericForeignKey:
                 return (model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
                         model)
 
-        return (ret_val,
-                lambda obj: (obj.pk, obj.__class__),
-                gfk_key,
-                True,
-                self.name)
-
-    def is_cached(self, instance):
-        return hasattr(instance, self.cache_attr)
+        return (
+            ret_val,
+            lambda obj: (obj.pk, obj.__class__),
+            gfk_key,
+            True,
+            self.name,
+            True,
+        )
 
     def __get__(self, instance, cls=None):
         if instance is None:
@@ -223,25 +226,21 @@ class GenericForeignKey:
         ct_id = getattr(instance, f.get_attname(), None)
         pk_val = getattr(instance, self.fk_field)
 
-        try:
-            rel_obj = getattr(instance, self.cache_attr)
-        except AttributeError:
-            rel_obj = None
-        else:
-            if rel_obj and (ct_id != self.get_content_type(obj=rel_obj, using=instance._state.db).id or
-                            rel_obj._meta.pk.to_python(pk_val) != rel_obj.pk):
-                rel_obj = None
-
+        rel_obj = self.get_cached_value(instance, default=None)
         if rel_obj is not None:
-            return rel_obj
-
+            ct_match = ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
+            pk_match = rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
+            if ct_match and pk_match:
+                return rel_obj
+            else:
+                rel_obj = None
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
             try:
                 rel_obj = ct.get_object_for_this_type(pk=pk_val)
             except ObjectDoesNotExist:
                 pass
-        setattr(instance, self.cache_attr, rel_obj)
+        self.set_cached_value(instance, rel_obj)
         return rel_obj
 
     def __set__(self, instance, value):
@@ -253,7 +252,7 @@ class GenericForeignKey:
 
         setattr(instance, self.ct_field, ct)
         setattr(instance, self.fk_field, fk)
-        setattr(instance, self.cache_attr, value)
+        self.set_cached_value(instance, value)
 
 
 class GenericRel(ForeignObjectRel):
@@ -349,7 +348,7 @@ class GenericRelation(ForeignObject):
         self.to_fields = [self.model._meta.pk.name]
         return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
-    def _get_path_info_with_parent(self):
+    def _get_path_info_with_parent(self, filtered_relation):
         """
         Return the path that joins the current model through any parent models.
         The idea is that if you have a GFK defined on a parent model then we
@@ -363,10 +362,18 @@ class GenericRelation(ForeignObject):
         # generating a join to the parent model, then generating joins to the
         # child models.
         path = []
-        opts = self.remote_field.model._meta
+        opts = self.remote_field.model._meta.concrete_model._meta
         parent_opts = opts.get_field(self.object_id_field_name).model._meta
         target = parent_opts.pk
-        path.append(PathInfo(self.model._meta, parent_opts, (target,), self.remote_field, True, False))
+        path.append(PathInfo(
+            from_opts=self.model._meta,
+            to_opts=parent_opts,
+            target_fields=(target,),
+            join_field=self.remote_field,
+            m2m=True,
+            direct=False,
+            filtered_relation=filtered_relation,
+        ))
         # Collect joins needed for the parent -> child chain. This is easiest
         # to do if we collect joins for the child -> parent chain and then
         # reverse the direction (call to reverse() and use of
@@ -381,19 +388,35 @@ class GenericRelation(ForeignObject):
             path.extend(field.remote_field.get_path_info())
         return path
 
-    def get_path_info(self):
+    def get_path_info(self, filtered_relation=None):
         opts = self.remote_field.model._meta
         object_id_field = opts.get_field(self.object_id_field_name)
         if object_id_field.model != opts.model:
-            return self._get_path_info_with_parent()
+            return self._get_path_info_with_parent(filtered_relation)
         else:
             target = opts.pk
-            return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
+            return [PathInfo(
+                from_opts=self.model._meta,
+                to_opts=opts,
+                target_fields=(target,),
+                join_field=self.remote_field,
+                m2m=True,
+                direct=False,
+                filtered_relation=filtered_relation,
+            )]
 
-    def get_reverse_path_info(self):
+    def get_reverse_path_info(self, filtered_relation=None):
         opts = self.model._meta
         from_opts = self.remote_field.model._meta
-        return [PathInfo(from_opts, opts, (opts.pk,), self, not self.unique, False)]
+        return [PathInfo(
+            from_opts=from_opts,
+            to_opts=opts,
+            target_fields=(opts.pk,),
+            join_field=self,
+            m2m=not self.unique,
+            direct=False,
+            filtered_relation=filtered_relation,
+        )]
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
@@ -535,11 +558,14 @@ def create_generic_related_manager(superclass, rel):
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
-            return (queryset.filter(**query),
-                    lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
-                    lambda obj: obj.pk,
-                    False,
-                    self.prefetch_cache_name)
+            return (
+                queryset.filter(**query),
+                lambda relobj: object_id_converter(getattr(relobj, self.object_id_field_name)),
+                lambda obj: obj.pk,
+                False,
+                self.prefetch_cache_name,
+                False,
+            )
 
         def add(self, *objs, bulk=True):
             db = router.db_for_write(self.model, instance=self.instance)

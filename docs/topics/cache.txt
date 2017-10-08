@@ -168,11 +168,6 @@ permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
 
-.. versionchanged:: 1.11
-
-    The :setting:`LOCATION <CACHES-LOCATION>` setting now supports defining
-    multiple servers as a comma-delimited string.
-
 .. _database-caching:
 
 Database caching
@@ -238,7 +233,7 @@ operations to ``cache_replica``, and all write operations to
 ``cache_primary``. The cache table will only be synchronized onto
 ``cache_primary``::
 
-    class CacheRouter(object):
+    class CacheRouter:
         """A router to control all database cache operations"""
 
         def db_for_read(self, model, **hints):
@@ -479,14 +474,6 @@ the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
         }
     }
 
-.. versionchanged:: 1.11
-
-    Memcached backends can now be configured using ``OPTIONS``.
-
-    In older versions, you could pass ``pylibmc`` behavior settings directly
-    inside ``OPTIONS``. This is deprecated in favor of setting them under a
-    ``behaviors`` key within ``OPTIONS`` instead.
-
 .. _the-per-site-cache:
 
 The per-site cache
@@ -535,10 +522,6 @@ Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
 
 * Sets the ``Cache-Control`` header to give a max age for the page --
   again, from the :setting:`CACHE_MIDDLEWARE_SECONDS` setting.
-
-.. versionchanged:: 1.11
-
-    In older versions, the ``Last-Modified`` header was also set.
 
 See :doc:`/topics/http/middleware` for more on middleware.
 
@@ -591,7 +574,7 @@ multiple URLs point at the same view, each URL will be cached separately.
 Continuing the ``my_view`` example, if your URLconf looks like this::
 
     urlpatterns = [
-        url(r'^foo/([0-9]{1,2})/$', my_view),
+        path('foo/<int:code>/', my_view),
     ]
 
 then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
@@ -637,7 +620,7 @@ Doing so is easy: simply wrap the view function with ``cache_page`` when you
 refer to it in the URLconf. Here's the old URLconf from earlier::
 
     urlpatterns = [
-        url(r'^foo/([0-9]{1,2})/$', my_view),
+        path('foo/<int:code>/', my_view),
     ]
 
 Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
@@ -645,7 +628,7 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        url(r'^foo/([0-9]{1,2})/$', cache_page(60 * 15)(my_view)),
+        path('foo/<int:code>/', cache_page(60 * 15)(my_view)),
     ]
 
 .. templatetag:: cache
@@ -881,6 +864,13 @@ of key-value pairs::
 
 Like ``cache.set()``, ``set_many()`` takes an optional ``timeout`` parameter.
 
+On supported backends (memcached), ``set_many()`` returns a list of keys that
+failed to be inserted.
+
+.. versionchanged:: 2.0
+
+    The return value containing list of failing keys was added.
+
 You can delete keys explicitly with ``delete()``. This is an easy way of
 clearing the cache for a particular object::
 
@@ -899,7 +889,7 @@ from the cache, not just the keys set by your application. ::
 
 You can also increment or decrement a key that already exists using the
 ``incr()`` or ``decr()`` methods, respectively. By default, the existing cache
-value will incremented or decremented by 1. Other increment/decrement values
+value will be incremented or decremented by 1. Other increment/decrement values
 can be specified by providing an argument to the increment/decrement call. A
 ValueError will be raised if you attempt to increment or decrement a
 nonexistent cache key.::

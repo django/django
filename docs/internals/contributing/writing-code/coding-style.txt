@@ -151,7 +151,7 @@ Imports
       CONSTANT = 'foo'
 
 
-      class Example(object):
+      class Example:
           # ...
 
 * Use convenience imports whenever available. For example, do this::

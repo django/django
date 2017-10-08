@@ -92,7 +92,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.3 and higher. `psycopg2`_ 2.5.4 or higher is
+Django supports PostgreSQL 9.4 and higher. `psycopg2`_ 2.5.4 or higher is
 required, though the latest release is recommended.
 
 .. _psycopg2: http://initd.org/psycopg/
@@ -176,8 +176,6 @@ using a migration, use the
 Server-side cursors
 -------------------
 
-.. versionadded:: 1.11
-
 When using :meth:`QuerySet.iterator()
 <django.db.models.query.QuerySet.iterator>`, Django opens a :ref:`server-side
 cursor <psycopg2:server-side-cursors>`. By default, PostgreSQL assumes that
@@ -193,8 +191,6 @@ cursor query is controlled with the `cursor_tuple_fraction`_ option.
 
 Transaction pooling and server-side cursors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.11.1
 
 Using a connection pooler in transaction pooling mode (e.g. `pgBouncer`_)
 requires disabling server-side cursors for that connection.
@@ -224,10 +220,35 @@ live for the duration of the transaction.
 
 .. _pgBouncer: https://pgbouncer.github.io/
 
+.. _manually-specified-autoincrement-pk:
+
+Manually-specifying values of auto-incrementing primary keys
+------------------------------------------------------------
+
+Django uses PostgreSQL's `SERIAL data type`_ to store auto-incrementing primary
+keys. A ``SERIAL`` column is populated with values from a `sequence`_ that
+keeps track of the next available value. Manually assigning a value to an
+auto-incrementing field doesn't update the field's sequence, which might later
+cause a conflict. For example::
+
+    >>> from django.contrib.auth.models import User
+    >>> User.objects.create(username='alice', pk=1)
+    <User: alice>
+    >>> # The sequence hasn't been updated; its next value is 1.
+    >>> User.objects.create(username='bob')
+    ...
+    IntegrityError: duplicate key value violates unique constraint
+    "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
+
+If you need to specify such values, reset the sequence afterwards to avoid
+reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
+management command generates the SQL statements to do that.
+
+.. _SERIAL data type: https://www.postgresql.org/docs/current/static/datatype-numeric.html#DATATYPE-SERIAL
+.. _sequence: https://www.postgresql.org/docs/current/static/sql-createsequence.html
+
 Test database templates
 -----------------------
-
-.. versionadded:: 1.11
 
 You can use the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to specify
 a `template`_ (e.g. ``'template0'``) from which to create a test database.
@@ -255,7 +276,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.5 and higher.
+Django supports MySQL 5.6 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -273,35 +294,19 @@ Storage engines
 MySQL has several `storage engines`_. You can change the default storage engine
 in the server configuration.
 
-Until MySQL 5.5.4, the default engine was MyISAM_ [#]_. The main drawbacks of
-MyISAM are that it doesn't support transactions or enforce foreign-key
-constraints. On the plus side, it was the only engine that supported full-text
-indexing and searching until MySQL 5.6.4.
+MySQL's default storage engine is InnoDB_. This engine is fully transactional
+and supports foreign key references. It's the recommended choice. However, the
+InnoDB autoincrement counter is lost on a MySQL restart because it does not
+remember the ``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1".
+This may result in an inadvertent reuse of :class:`~django.db.models.AutoField`
+values.
 
-Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
-transactional and supports foreign key references. It's probably the best
-choice at this point. However, note that the InnoDB autoincrement counter
-is lost on a MySQL restart because it does not remember the
-``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
-result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
-
-If you upgrade an existing project to MySQL 5.5.5 and subsequently add some
-tables, ensure that your tables are using the same storage engine (i.e. MyISAM
-vs. InnoDB). Specifically, if tables that have a ``ForeignKey`` between them
-use different storage engines, you may see an error like the following when
-running ``migrate``::
-
-    _mysql_exceptions.OperationalError: (
-        1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
-    )
+The main drawbacks of MyISAM_ are that it doesn't support transactions or
+enforce foreign-key constraints.
 
 .. _storage engines: https://dev.mysql.com/doc/refman/en/storage-engines.html
 .. _MyISAM: https://dev.mysql.com/doc/refman/en/myisam-storage-engine.html
 .. _InnoDB: https://dev.mysql.com/doc/refman/en/innodb-storage-engine.html
-
-.. [#] Unless this was changed by the packager of your MySQL package. We've
-   had reports that the Windows Community Server installer sets up InnoDB as
-   the default storage engine, for example.
 
 .. _mysql-db-api-drivers:
 
@@ -468,8 +473,6 @@ like other MySQL options: either in a config file or with the entry
 Isolation level
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.11
-
 When running concurrent loads, database transactions from different sessions
 (say, separate threads handling different requests) may interact with each
 other. These interactions are affected by each session's `transaction isolation
@@ -602,9 +605,9 @@ both MySQL and Django will attempt to convert the values from UTC to local time.
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
-MySQL does not support the ``NOWAIT`` and ``SKIP LOCKED`` options to the
-``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used with
-``nowait=True`` or ``skip_locked=True``, then a
+MySQL does not support the ``NOWAIT``, ``SKIP LOCKED``, and ``OF`` options to
+the ``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used
+with ``nowait=True``, ``skip_locked=True``, or ``of`` then a
 :exc:`~django.db.NotSupportedError` is raised.
 
 Automatic typecasting can cause unexpected results

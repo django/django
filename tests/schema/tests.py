@@ -22,7 +22,7 @@ from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import timezone
 
 from .fields import (
@@ -195,14 +195,15 @@ class SchemaTests(TransactionTestCase):
         """
         Tries creating a model's table, and then deleting it.
         """
-        # Create the table
         with connection.schema_editor() as editor:
+            # Create the table
             editor.create_model(Author)
-        # The table is there
-        list(Author.objects.all())
-        # Clean up that table
-        with connection.schema_editor() as editor:
+            # The table is there
+            list(Author.objects.all())
+            # Clean up that table
             editor.delete_model(Author)
+            # No deferred SQL should be left over.
+            self.assertEqual(editor.deferred_sql, [])
         # The table is gone
         with self.assertRaises(DatabaseError):
             list(Author.objects.all())
@@ -318,6 +319,37 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Author, new_field2, new_field, strict=True)
         self.assertForeignKeyNotExists(Author, 'tag_id', 'schema_tag')
 
+    @isolate_apps('schema')
+    def test_no_db_constraint_added_during_primary_key_change(self):
+        """
+        When a primary key that's pointed to by a ForeignKey with
+        db_constraint=False is altered, a foreign key constraint isn't added.
+        """
+        class Author(Model):
+            class Meta:
+                app_label = 'schema'
+
+        class BookWeak(Model):
+            author = ForeignKey(Author, CASCADE, db_constraint=False)
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWeak)
+        self.assertForeignKeyNotExists(BookWeak, 'author_id', 'schema_author')
+        old_field = Author._meta.get_field('id')
+        new_field = BigAutoField(primary_key=True)
+        new_field.model = Author
+        new_field.set_attributes_from_name('id')
+        # @isolate_apps() and inner models are needed to have the model
+        # relations populated, otherwise this doesn't act as a regression test.
+        self.assertEqual(len(new_field.model._meta.related_objects), 1)
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertForeignKeyNotExists(BookWeak, 'author_id', 'schema_author')
+
     def _test_m2m_db_constraint(self, M2MFieldClass):
         class LocalAuthorWithM2M(Model):
             name = CharField(max_length=255)
@@ -378,6 +410,17 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
         self.assertEqual(columns['age'][1][6], True)
+
+    def test_add_field_remove_field(self):
+        """
+        Adding a field and removing it removes all deferred sql referring to it.
+        """
+        with connection.schema_editor() as editor:
+            # Create a table with a unique constraint on the slug field.
+            editor.create_model(Tag)
+            # Remove the slug column.
+            editor.remove_field(Tag, Tag._meta.get_field('slug'))
+        self.assertEqual(editor.deferred_sql, [])
 
     def test_add_field_temp_default(self):
         """
@@ -1640,7 +1683,7 @@ class SchemaTests(TransactionTestCase):
         author_index_name = index.name
         with connection.schema_editor() as editor:
             db_index_name = editor._create_index_name(
-                model=AuthorWithIndexedName,
+                table_name=AuthorWithIndexedName._meta.db_table,
                 column_names=('name',),
             )
         if connection.features.uppercases_column_names:
@@ -1910,7 +1953,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(model, get_field(unique=True), field, strict=True)
             self.assertNotIn(constraint_name, self.get_constraints(model._meta.db_table))
 
-            if connection.features.supports_foreign_keys:
+            if editor.sql_create_fk:
                 constraint_name = "CamelCaseFKConstraint"
                 editor.execute(
                     editor.sql_create_fk % {
@@ -2259,8 +2302,6 @@ class SchemaTests(TransactionTestCase):
         Changing the primary key field name of a model with a self-referential
         foreign key (#26384).
         """
-        if connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6):
-            self.skipTest('Skip known bug renaming primary keys on older MySQL versions (#24995).')
         with connection.schema_editor() as editor:
             editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')
@@ -2359,3 +2400,32 @@ class SchemaTests(TransactionTestCase):
         doc = Document.objects.create(name='Test Name')
         student = Student.objects.create(name='Some man')
         doc.students.add(student)
+
+    def test_rename_table_renames_deferred_sql_references(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+            editor.alter_db_table(Author, 'schema_author', 'schema_renamed_author')
+            editor.alter_db_table(Author, 'schema_book', 'schema_renamed_book')
+            self.assertGreater(len(editor.deferred_sql), 0)
+            for statement in editor.deferred_sql:
+                self.assertIs(statement.references_table('schema_author'), False)
+                self.assertIs(statement.references_table('schema_book'), False)
+
+    @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
+    def test_rename_column_renames_deferred_sql_references(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+            old_title = Book._meta.get_field('title')
+            new_title = CharField(max_length=100, db_index=True)
+            new_title.set_attributes_from_name('renamed_title')
+            editor.alter_field(Book, old_title, new_title)
+            old_author = Book._meta.get_field('author')
+            new_author = ForeignKey(Author, CASCADE)
+            new_author.set_attributes_from_name('renamed_author')
+            editor.alter_field(Book, old_author, new_author)
+            self.assertGreater(len(editor.deferred_sql), 0)
+            for statement in editor.deferred_sql:
+                self.assertIs(statement.references_column('book', 'title'), False)
+                self.assertIs(statement.references_column('book', 'author_id'), False)

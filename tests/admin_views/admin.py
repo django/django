@@ -97,6 +97,7 @@ class ArticleAdmin(admin.ModelAdmin):
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
+    autocomplete_fields = ('section',)
     view_on_site = False
     fieldsets = (
         ('Some fields', {
@@ -497,6 +498,10 @@ class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
 
 
+class StudentAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+
+
 class WorkHourAdmin(admin.ModelAdmin):
     list_display = ('datum', 'employee')
     list_filter = ('employee',)
@@ -603,6 +608,16 @@ class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
 
+class QuestionAdmin(admin.ModelAdmin):
+    ordering = ['-posted']
+    search_fields = ['question']
+    autocomplete_fields = ['related_questions']
+
+
+class AnswerAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['question']
+
+
 class PrePopulatedPostLargeSlugAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ('title',)
@@ -664,12 +679,17 @@ class CustomTemplateFilterColorAdmin(admin.ModelAdmin):
 class RelatedPrepopulatedInline1(admin.StackedInline):
     fieldsets = (
         (None, {
-            'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2',),)
+            'fields': (
+                ('fk', 'm2m'),
+                ('pubdate', 'status'),
+                ('name', 'slug1', 'slug2',),
+            ),
         }),
     )
     formfield_overrides = {models.CharField: {'strip': False}}
     model = RelatedPrepopulated
     extra = 1
+    autocomplete_fields = ['fk', 'm2m']
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
                            'slug2': ['status', 'name']}
 
@@ -677,12 +697,19 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
+    autocomplete_fields = ['fk', 'm2m']
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
                            'slug2': ['status', 'name']}
 
 
+class RelatedPrepopulatedInline3(admin.TabularInline):
+    model = RelatedPrepopulated
+    extra = 0
+    autocomplete_fields = ['fk', 'm2m']
+
+
 class MainPrepopulatedAdmin(admin.ModelAdmin):
-    inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2]
+    inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2, RelatedPrepopulatedInline3]
     fieldsets = (
         (None, {
             'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2', 'slug3'))
@@ -894,7 +921,10 @@ site = admin.AdminSite(name="admin")
 site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
-site.register(Section, save_as=True, inlines=[ArticleInline], readonly_fields=['name_property'])
+site.register(
+    Section, save_as=True, inlines=[ArticleInline],
+    readonly_fields=['name_property'], search_fields=['name'],
+)
 site.register(ModelWithStringPrimaryKey)
 site.register(Color)
 site.register(Thing, ThingAdmin)
@@ -956,6 +986,7 @@ site.register(InlineReferer, InlineRefererAdmin)
 site.register(ReferencedByGenRel)
 site.register(GenRelReference)
 site.register(ParentWithUUIDPK)
+site.register(RelatedPrepopulated, search_fields=['name'])
 site.register(RelatedWithUUIDPKModel)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
@@ -973,8 +1004,8 @@ site.register(Pizza, PizzaAdmin)
 site.register(ReadablePizza)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
-site.register(Question)
-site.register(Answer, date_hierarchy='question__posted')
+site.register(Question, QuestionAdmin)
+site.register(Answer, AnswerAdmin, date_hierarchy='question__posted')
 site.register(Answer2, date_hierarchy='question__expires')
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)

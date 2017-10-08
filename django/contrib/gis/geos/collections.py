@@ -2,13 +2,12 @@
  This module houses the Geometry Collection objects:
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
-import json
 from ctypes import byref, c_int, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
-from django.contrib.gis.geos.libgeos import geos_version_tuple, get_pointer_arr
+from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
 from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
@@ -35,7 +34,7 @@ class GeometryCollection(GEOSGeometry):
         self._check_allowed(init_geoms)
 
         # Creating the geometry pointer array.
-        collection = self._create_collection(len(init_geoms), iter(init_geoms))
+        collection = self._create_collection(len(init_geoms), init_geoms)
         super().__init__(collection, **kwargs)
 
     def __iter__(self):
@@ -50,12 +49,11 @@ class GeometryCollection(GEOSGeometry):
     # ### Methods for compatibility with ListMixin ###
     def _create_collection(self, length, items):
         # Creating the geometry pointer array.
-        geoms = get_pointer_arr(length)
-        for i, g in enumerate(items):
+        geoms = (GEOM_PTR * length)(*[
             # this is a little sloppy, but makes life easier
             # allow GEOSGeometry types (python wrappers) or pointer types
-            geoms[i] = capi.geom_clone(getattr(g, 'ptr', g))
-
+            capi.geom_clone(getattr(g, 'ptr', g)) for g in items
+        ])
         return capi.create_collection(c_int(self._typeid), byref(geoms), c_uint(length))
 
     def _get_single_internal(self, index):
@@ -77,19 +75,6 @@ class GeometryCollection(GEOSGeometry):
 
     _set_single = GEOSGeometry._set_single_rebuild
     _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
-
-    @property
-    def json(self):
-        if self.__class__.__name__ == 'GeometryCollection':
-            return json.dumps({
-                'type': self.__class__.__name__,
-                'geometries': [
-                    {'type': geom.__class__.__name__, 'coordinates': geom.coords}
-                    for geom in self
-                ],
-            })
-        return super().json
-    geojson = json
 
     @property
     def kml(self):

@@ -14,9 +14,9 @@ mod_wsgi.
 
 .. _WSGI: http://www.wsgi.org
 
-The `official mod_wsgi documentation`_ is fantastic; it's your source for all
-the details about how to use mod_wsgi. You'll probably want to start with the
-`installation and configuration documentation`_.
+The `official mod_wsgi documentation`_ is your source for all the details about
+how to use mod_wsgi. You'll probably want to start with the `installation and
+configuration documentation`_.
 
 .. _official mod_wsgi documentation: https://modwsgi.readthedocs.io/
 .. _installation and configuration documentation: https://modwsgi.readthedocs.io/en/develop/installation.html

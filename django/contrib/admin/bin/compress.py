@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 import argparse
-import os
 import subprocess
 import sys
+from pathlib import Path
 
 try:
     import closure
 except ImportError:
     closure_compiler = None
 else:
-    closure_compiler = os.path.join(os.path.dirname(closure.__file__), 'closure.jar')
+    closure_compiler = closure.get_jar_filename()
 
-js_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'admin', 'js')
+js_path = Path(__file__).parent.parent / 'static' / 'admin' / 'js'
 
 
 def main():
@@ -28,8 +28,8 @@ Compiler library and Java version 6 or later."""
     parser.add_argument("-q", "--quiet", action="store_false", dest="verbose")
     options = parser.parse_args()
 
-    compiler = closure_compiler if closure_compiler else os.path.expanduser(options.compiler)
-    if not os.path.exists(compiler):
+    compiler = Path(closure_compiler if closure_compiler else options.compiler).expanduser()
+    if not compiler.exists():
         sys.exit(
             "Google Closure compiler jar file %s not found. Please use the -c "
             "option to specify the path." % compiler
@@ -39,18 +39,16 @@ Compiler library and Java version 6 or later."""
         if options.verbose:
             sys.stdout.write("No filenames given; defaulting to admin scripts\n")
         files = [
-            os.path.join(js_path, f) for f in
-            ["actions.js", "collapse.js", "inlines.js", "prepopulate.js"]
+            js_path / f
+            for f in ["actions.js", "collapse.js", "inlines.js", "prepopulate.js"]
         ]
     else:
-        files = options.file
+        files = [Path(f) for f in options.file]
 
-    for file_name in files:
-        if not file_name.endswith(".js"):
-            file_name = file_name + ".js"
-        to_compress = os.path.expanduser(file_name)
-        if os.path.exists(to_compress):
-            to_compress_min = "%s.min.js" % "".join(file_name.rsplit(".js"))
+    for file_path in files:
+        to_compress = file_path.expanduser()
+        if to_compress.exists():
+            to_compress_min = to_compress.with_suffix('.min.js')
             cmd = "java -jar %s --js %s --js_output_file %s" % (compiler, to_compress, to_compress_min)
             if options.verbose:
                 sys.stdout.write("Running: %s\n" % cmd)

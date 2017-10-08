@@ -78,8 +78,9 @@ def call_command(command_name, *args, **options):
 
     This is the primary API you should use for calling specific commands.
 
-    `name` may be a string or a command object. Using a string is preferred
-    unless the command object is required for further processing or testing.
+    `command_name` may be a string or a command object. Using a string is
+    preferred unless the command object is required for further processing or
+    testing.
 
     Some examples:
         call_command('migrate')
@@ -121,7 +122,7 @@ def call_command(command_name, *args, **options):
     # Raise an error if any unknown options were passed.
     stealth_options = set(command.base_stealth_options + command.stealth_options)
     dest_parameters = {action.dest for action in parser._actions}
-    valid_options = dest_parameters | stealth_options | set(opt_mapping)
+    valid_options = (dest_parameters | stealth_options).union(opt_mapping)
     unknown_options = set(options) - valid_options
     if unknown_options:
         raise TypeError(
@@ -147,6 +148,8 @@ class ManagementUtility:
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
+        if self.prog_name == '__main__.py':
+            self.prog_name = 'python -m django'
         self.settings_exception = None
 
     def main_help_text(self, commands_only=False):

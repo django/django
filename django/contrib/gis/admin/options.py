@@ -2,6 +2,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
 from django.contrib.gis.db import models
 from django.contrib.gis.gdal import OGRGeomType
+from django.forms import Media
 
 spherical_mercator_srid = 3857
 
@@ -46,10 +47,7 @@ class GeoModelAdmin(ModelAdmin):
     @property
     def media(self):
         "Injects OpenLayers JavaScript into the admin."
-        media = super().media
-        media.add_js([self.openlayers_url])
-        media.add_js(self.extra_js)
-        return media
+        return super().media + Media(js=[self.openlayers_url] + self.extra_js)
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """

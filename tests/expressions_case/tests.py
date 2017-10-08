@@ -5,7 +5,7 @@ from operator import attrgetter, itemgetter
 from uuid import UUID
 
 from django.core.exceptions import FieldError
-from django.db import connection, models
+from django.db import models
 from django.db.models import F, Max, Min, Q, Sum, Value
 from django.db.models.expressions import Case, When
 from django.test import TestCase
@@ -295,12 +295,6 @@ class CaseExpressionTests(TestCase):
             [(1, 3), (2, 2), (3, 4), (2, 2), (3, 4), (3, 4), (4, 4)],
             transform=attrgetter('integer', 'test')
         )
-
-    if connection.vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 7, 0):
-        # There is a bug in sqlite < 3.7.0, where placeholder order is lost.
-        # Thus, the above query returns  <condition_value> + <result_value>
-        # for each matching case instead of <result_value> + 1 (#24148).
-        test_combined_expression = unittest.expectedFailure(test_combined_expression)
 
     def test_in_subquery(self):
         self.assertQuerysetEqual(
@@ -1253,6 +1247,15 @@ class CaseDocumentationExamples(TestCase):
             account_type=Client.PLATINUM,
             registered_on=date.today(),
         )
+        self.assertEqual(
+            Client.objects.aggregate(
+                regular=models.Count('pk', filter=Q(account_type=Client.REGULAR)),
+                gold=models.Count('pk', filter=Q(account_type=Client.GOLD)),
+                platinum=models.Count('pk', filter=Q(account_type=Client.PLATINUM)),
+            ),
+            {'regular': 2, 'gold': 1, 'platinum': 3}
+        )
+        # This was the example before the filter argument was added.
         self.assertEqual(
             Client.objects.aggregate(
                 regular=models.Sum(Case(

@@ -15,7 +15,7 @@ Multiple object mixins
     * Use the ``page`` parameter in the URLconf. For example, this is what
       your URLconf might look like::
 
-        url(r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view()),
+        path('objects/page<int:page>/', PaginatedView.as_view()),
 
     * Pass the page number via the ``page`` query-string parameter. For
       example, a URL would look like this::

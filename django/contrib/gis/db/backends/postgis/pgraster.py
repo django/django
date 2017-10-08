@@ -30,18 +30,6 @@ def chunk(data, index):
     return data[:index], data[index:]
 
 
-def get_pgraster_srid(data):
-    """
-    Extract the SRID from a PostGIS raster string.
-    """
-    if data is None:
-        return
-    # The positional arguments here extract the hex-encoded srid from the
-    # header of the PostGIS raster string. This can be understood through
-    # the POSTGIS_HEADER_STRUCTURE constant definition in the const module.
-    return unpack('i', data[106:114])[0]
-
-
 def from_pgraster(data):
     """
     Convert a PostGIS HEX String into a dictionary.
@@ -112,10 +100,6 @@ def to_pgraster(rast):
     """
     Convert a GDALRaster into PostGIS Raster format.
     """
-    # Return if the raster is null
-    if rast is None or rast == '':
-        return
-
     # Prepare the raster header data as a tuple. The first two numbers are
     # the endianness and the PostGIS Raster Version, both are fixed by
     # PostGIS at the moment.

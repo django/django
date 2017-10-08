@@ -96,10 +96,6 @@ Widgets of required form fields have the ``required`` HTML attribute. Set the
 ``required`` attribute isn't included on forms of formsets because the browser
 validation may not be correct when adding and deleting formsets.
 
-.. versionadded:: 1.10
-
-    Support for the ``required`` HTML attribute was added.
-
 ``label``
 ---------
 
@@ -389,8 +385,6 @@ For each field, we describe the default widget used if you don't specify
        trailing whitespace.
 
     .. attribute:: empty_value
-
-       .. versionadded:: 1.11
 
        The value to use to represent "empty". Defaults to an empty string.
 

@@ -139,10 +139,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features_class = DatabaseFeatures
     introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._named_cursor_idx = 0
+    # PostgreSQL backend-specific attributes.
+    _named_cursor_idx = 0
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -267,10 +265,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 alias=self.alias,
                 allow_thread_sharing=False)
         return nodb_connection
-
-    @cached_property
-    def psycopg2_version(self):
-        return PSYCOPG2_VERSION
 
     @cached_property
     def pg_version(self):

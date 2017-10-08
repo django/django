@@ -5,7 +5,7 @@ from django.db.models import F
 from django.db.models.functions import Upper
 from django.test import TestCase
 
-from .models import Article, Author, Reference
+from .models import Article, Author, OrderedByFArticle, Reference
 
 
 class OrderingTests(TestCase):
@@ -368,3 +368,13 @@ class OrderingTests(TestCase):
         r1 = Reference.objects.create(article_id=self.a1.pk)
         r2 = Reference.objects.create(article_id=self.a2.pk)
         self.assertSequenceEqual(Reference.objects.all(), [r2, r1])
+
+    def test_default_ordering_by_f_expression(self):
+        """F expressions can be used in Meta.ordering."""
+        articles = OrderedByFArticle.objects.all()
+        articles.filter(headline='Article 2').update(author=self.author_2)
+        articles.filter(headline='Article 3').update(author=self.author_1)
+        self.assertQuerysetEqual(
+            articles, ['Article 1', 'Article 4', 'Article 3', 'Article 2'],
+            attrgetter('headline')
+        )

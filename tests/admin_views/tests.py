@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import re
 import unittest
@@ -24,43 +23,37 @@ from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
 from django.forms.utils import ErrorList
-from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, modify_settings,
-    override_settings, skipUnlessDBFeature,
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
 
 from . import customadmin
 from .admin import CityAdmin, site, site2
-from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Answer, Answer2, Article, BarAccount, Book,
     Bookmark, Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child,
     Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
-    ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
-    FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gallery, Grommet,
-    Inquisition, Language, Link, MainPrepopulated, Media,
-    ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
-    ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
-    Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
+    Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
+    FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
+    MainPrepopulated, Media, ModelWithStringPrimaryKey, OtherStory, Paper,
+    Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
+    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, ReadablePizza, Recommendation,
     Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel, Report,
     Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
-    ShortMessage, Simple, State, Story, Subscriber, SuperSecretHideout,
-    SuperVillain, Telegram, TitleTranslation, Topping, UnchangeableObject,
-    UndeletableObject, UnorderedObject, Villain, Vodcast, Whatsit, Widget,
-    Worker, WorkHour,
+    ShortMessage, Simple, State, Story, SuperSecretHideout, SuperVillain,
+    Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
+    UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
 
 
@@ -3203,366 +3196,6 @@ class AdminInheritedInlinesTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
-class AdminActionsTest(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
-        cls.s1 = ExternalSubscriber.objects.create(name='John Doe', email='john@example.org')
-        cls.s2 = Subscriber.objects.create(name='Max Mustermann', email='max@example.org')
-
-    def setUp(self):
-        self.client.force_login(self.superuser)
-
-    def test_model_admin_custom_action(self):
-        "Tests a custom action defined in a ModelAdmin method"
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            'action': 'mail_admin',
-            'index': 0,
-        }
-        self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
-
-    def test_model_admin_default_delete_action(self):
-        "Tests the default delete action defined as a ModelAdmin method"
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
-            'action': 'delete_selected',
-            'index': 0,
-        }
-        delete_confirmation_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
-            'action': 'delete_selected',
-            'post': 'yes',
-        }
-        confirmation = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
-        self.assertIsInstance(confirmation, TemplateResponse)
-        self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers?")
-        self.assertContains(confirmation, "<h2>Summary</h2>")
-        self.assertContains(confirmation, "<li>Subscribers: 2</li>")
-        self.assertContains(confirmation, "<li>External subscribers: 1</li>")
-        self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
-        self.client.post(reverse('admin:admin_views_subscriber_changelist'), delete_confirmation_data)
-        self.assertEqual(Subscriber.objects.count(), 0)
-
-    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
-    def test_non_localized_pk(self):
-        """If USE_THOUSAND_SEPARATOR is set, make sure that the ids for
-        the objects selected for deletion are rendered without separators.
-        Refs #14895.
-        """
-        s = ExternalSubscriber.objects.create(id=9999)
-        action_data = {
-            ACTION_CHECKBOX_NAME: [s.pk, self.s2.pk],
-            'action': 'delete_selected',
-            'index': 0,
-        }
-        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
-        self.assertTemplateUsed(response, 'admin/delete_selected_confirmation.html')
-        self.assertContains(response, 'value="9999"')  # Instead of 9,999
-        self.assertContains(response, 'value="%s"' % self.s2.pk)
-
-    def test_model_admin_default_delete_action_protected(self):
-        """
-        Tests the default delete action defined as a ModelAdmin method in the
-        case where some related objects are protected from deletion.
-        """
-        q1 = Question.objects.create(question="Why?")
-        a1 = Answer.objects.create(question=q1, answer="Because.")
-        a2 = Answer.objects.create(question=q1, answer="Yes.")
-        q2 = Question.objects.create(question="Wherefore?")
-
-        action_data = {
-            ACTION_CHECKBOX_NAME: [q1.pk, q2.pk],
-            'action': 'delete_selected',
-            'index': 0,
-        }
-        delete_confirmation_data = action_data.copy()
-        delete_confirmation_data['post'] = 'yes'
-
-        response = self.client.post(reverse('admin:admin_views_question_changelist'), action_data)
-
-        self.assertContains(response, "would require deleting the following protected related objects")
-        self.assertContains(
-            response,
-            '<li>Answer: <a href="%s">Because.</a></li>' % reverse('admin:admin_views_answer_change', args=(a1.pk,)),
-            html=True
-        )
-        self.assertContains(
-            response,
-            '<li>Answer: <a href="%s">Yes.</a></li>' % reverse('admin:admin_views_answer_change', args=(a2.pk,)),
-            html=True
-        )
-
-        # A POST request to delete protected objects should display the page
-        # which says the deletion is prohibited.
-        response = self.client.post(reverse('admin:admin_views_question_changelist'), delete_confirmation_data)
-        self.assertContains(response, "would require deleting the following protected related objects")
-        self.assertEqual(Question.objects.count(), 2)
-
-    def test_model_admin_default_delete_action_no_change_url(self):
-        """
-        Default delete action shouldn't break if a user's ModelAdmin removes the url for change_view.
-
-        Regression test for #20640
-        """
-        obj = UnchangeableObject.objects.create()
-        action_data = {
-            ACTION_CHECKBOX_NAME: obj.pk,
-            "action": "delete_selected",
-            "index": "0",
-        }
-        response = self.client.post(reverse('admin:admin_views_unchangeableobject_changelist'), action_data)
-        # No 500 caused by NoReverseMatch
-        self.assertEqual(response.status_code, 200)
-        # The page shouldn't display a link to the nonexistent change page
-        self.assertContains(response, "<li>Unchangeable object: %s</li>" % obj, 1, html=True)
-
-    def test_custom_function_mail_action(self):
-        "Tests a custom action defined in a function"
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            'action': 'external_mail',
-            'index': 0,
-        }
-        self.client.post(reverse('admin:admin_views_externalsubscriber_changelist'), action_data)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
-
-    def test_custom_function_action_with_redirect(self):
-        "Tests a custom action defined in a function"
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            'action': 'redirect_to',
-            'index': 0,
-        }
-        response = self.client.post(reverse('admin:admin_views_externalsubscriber_changelist'), action_data)
-        self.assertEqual(response.status_code, 302)
-
-    def test_default_redirect(self):
-        """
-        Actions which don't return an HttpResponse are redirected to the same
-        page, retaining the querystring (which may contain changelist
-        information).
-        """
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            'action': 'external_mail',
-            'index': 0,
-        }
-        url = reverse('admin:admin_views_externalsubscriber_changelist') + '?o=1'
-        response = self.client.post(url, action_data)
-        self.assertRedirects(response, url)
-
-    def test_custom_function_action_streaming_response(self):
-        """Tests a custom action that returns a StreamingHttpResponse."""
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            'action': 'download',
-            'index': 0,
-        }
-        response = self.client.post(reverse('admin:admin_views_externalsubscriber_changelist'), action_data)
-        content = b''.join(response.streaming_content)
-        self.assertEqual(content, b'This is the content of the file')
-        self.assertEqual(response.status_code, 200)
-
-    def test_custom_function_action_no_perm_response(self):
-        """Tests a custom action that returns an HttpResponse with 403 code."""
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            'action': 'no_perm',
-            'index': 0,
-        }
-        response = self.client.post(reverse('admin:admin_views_externalsubscriber_changelist'), action_data)
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.content, b'No permission to perform this action')
-
-    def test_actions_ordering(self):
-        """
-        Actions are ordered as expected.
-        """
-        response = self.client.get(reverse('admin:admin_views_externalsubscriber_changelist'))
-        self.assertContains(response, '''<label>Action: <select name="action" required>
-<option value="" selected>---------</option>
-<option value="delete_selected">Delete selected external
-subscribers</option>
-<option value="redirect_to">Redirect to (Awesome action)</option>
-<option value="external_mail">External mail (Another awesome
-action)</option>
-<option value="download">Download subscription</option>
-<option value="no_perm">No permission to run</option>
-</select>''', html=True)
-
-    def test_model_without_action(self):
-        "Tests a ModelAdmin without any action"
-        response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
-        self.assertIsNone(response.context["action_form"])
-        self.assertNotContains(
-            response, '<input type="checkbox" class="action-select"',
-            msg_prefix="Found an unexpected action toggle checkboxbox in response"
-        )
-        self.assertNotContains(response, '<input type="checkbox" class="action-select"')
-
-    def test_model_without_action_still_has_jquery(self):
-        "A ModelAdmin without any actions still gets jQuery included in page"
-        response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
-        self.assertIsNone(response.context["action_form"])
-        self.assertContains(
-            response, 'jquery.min.js',
-            msg_prefix="jQuery missing from admin pages for model with no admin actions"
-        )
-
-    def test_action_column_class(self):
-        "The checkbox column class is present in the response"
-        response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
-        self.assertIsNotNone(response.context["action_form"])
-        self.assertContains(response, 'action-checkbox-column')
-
-    def test_multiple_actions_form(self):
-        """
-        Actions come from the form whose submit button was pressed (#10618).
-        """
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk],
-            # Two different actions selected on the two forms...
-            'action': ['external_mail', 'delete_selected'],
-            # ...but we clicked "go" on the top form.
-            'index': 0
-        }
-        self.client.post(reverse('admin:admin_views_externalsubscriber_changelist'), action_data)
-
-        # Send mail, don't delete.
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
-
-    def test_media_from_actions_form(self):
-        """
-        The action form's media is included in changelist view's media.
-        """
-        response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
-        media_path = MediaActionForm.Media.js[0]
-        self.assertIsInstance(response.context['action_form'], MediaActionForm)
-        self.assertIn('media', response.context)
-        self.assertIn(media_path, response.context['media']._js)
-        self.assertContains(response, media_path)
-
-    def test_user_message_on_none_selected(self):
-        """
-        User should see a warning when 'Go' is pressed and no items are selected.
-        """
-        action_data = {
-            ACTION_CHECKBOX_NAME: [],
-            'action': 'delete_selected',
-            'index': 0,
-        }
-        url = reverse('admin:admin_views_subscriber_changelist')
-        response = self.client.post(url, action_data)
-        self.assertRedirects(response, url, fetch_redirect_response=False)
-        response = self.client.get(response.url)
-        msg = """Items must be selected in order to perform actions on them. No items have been changed."""
-        self.assertContains(response, msg)
-        self.assertEqual(Subscriber.objects.count(), 2)
-
-    def test_user_message_on_no_action(self):
-        """
-        User should see a warning when 'Go' is pressed and no action is selected.
-        """
-        action_data = {
-            ACTION_CHECKBOX_NAME: [self.s1.pk, self.s2.pk],
-            'action': '',
-            'index': 0,
-        }
-        url = reverse('admin:admin_views_subscriber_changelist')
-        response = self.client.post(url, action_data)
-        self.assertRedirects(response, url, fetch_redirect_response=False)
-        response = self.client.get(response.url)
-        msg = """No action selected."""
-        self.assertContains(response, msg)
-        self.assertEqual(Subscriber.objects.count(), 2)
-
-    def test_selection_counter(self):
-        """
-        Check if the selection counter is there.
-        """
-        response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
-        self.assertContains(response, '0 of 2 selected')
-
-    def test_popup_actions(self):
-        """ Actions should not be shown in popups. """
-        response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
-        self.assertIsNotNone(response.context["action_form"])
-        response = self.client.get(
-            reverse('admin:admin_views_subscriber_changelist') + '?%s' % IS_POPUP_VAR)
-        self.assertIsNone(response.context["action_form"])
-
-    def test_popup_template_response_on_add(self):
-        """
-        Success on popups shall be rendered from template in order to allow
-        easy customization.
-        """
-        response = self.client.post(
-            reverse('admin:admin_views_actor_add') + '?%s=1' % IS_POPUP_VAR,
-            {'name': 'Troy McClure', 'age': '55', IS_POPUP_VAR: '1'})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, [
-            'admin/admin_views/actor/popup_response.html',
-            'admin/admin_views/popup_response.html',
-            'admin/popup_response.html',
-        ])
-        self.assertTemplateUsed(response, 'admin/popup_response.html')
-
-    def test_popup_template_response_on_change(self):
-        instance = Actor.objects.create(name='David Tennant', age=45)
-        response = self.client.post(
-            reverse('admin:admin_views_actor_change', args=(instance.pk,)) + '?%s=1' % IS_POPUP_VAR,
-            {'name': 'David Tennant', 'age': '46', IS_POPUP_VAR: '1'}
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, [
-            'admin/admin_views/actor/popup_response.html',
-            'admin/admin_views/popup_response.html',
-            'admin/popup_response.html',
-        ])
-        self.assertTemplateUsed(response, 'admin/popup_response.html')
-
-    def test_popup_template_response_on_delete(self):
-        instance = Actor.objects.create(name='David Tennant', age=45)
-        response = self.client.post(
-            reverse('admin:admin_views_actor_delete', args=(instance.pk,)) + '?%s=1' % IS_POPUP_VAR,
-            {IS_POPUP_VAR: '1'}
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, [
-            'admin/admin_views/actor/popup_response.html',
-            'admin/admin_views/popup_response.html',
-            'admin/popup_response.html',
-        ])
-        self.assertTemplateUsed(response, 'admin/popup_response.html')
-
-    def test_popup_template_escaping(self):
-        popup_response_data = json.dumps({
-            'new_value': 'new_value\\',
-            'obj': 'obj\\',
-            'value': 'value\\',
-        })
-        context = {
-            'popup_response_data': popup_response_data,
-        }
-        output = render_to_string('admin/popup_response.html', context)
-        self.assertIn(
-            r'&quot;value\\&quot;', output
-        )
-        self.assertIn(
-            r'&quot;new_value\\&quot;', output
-        )
-        self.assertIn(
-            r'&quot;obj\\&quot;', output
-        )
-
-
-@override_settings(ROOT_URLCONF='admin_views.urls')
 class TestCustomChangeList(TestCase):
 
     @classmethod
@@ -4361,6 +3994,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_mainprepopulated_add'))
+        self.wait_for('.select2')
 
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
@@ -4384,9 +4018,18 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
+        initial_select2_inputs = self.selenium.find_elements_by_class_name('select2-selection')
+        # Inline formsets have empty/invisible forms.
+        # 4 visible select2 inputs and 6 hidden inputs.
+        num_initial_select2_inputs = len(initial_select2_inputs)
+        self.assertEqual(num_initial_select2_inputs, 10)
 
         # Add an inline
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            num_initial_select2_inputs + 2
+        )
         self.selenium.find_element_by_id('id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-1-name').send_keys(
@@ -4414,6 +4057,10 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Add an inline
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            num_initial_select2_inputs + 4
+        )
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
@@ -4423,7 +4070,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
         self.assertEqual(slug2, 'option-one-tabular-inline-ignored-characters')
-
+        # Add an inline without an initial inline.
+        # The button is outside of the browser frame.
+        self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[2].click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            num_initial_select2_inputs + 6
+        )
         # Save and check that everything is properly stored in the database
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
@@ -4597,6 +4251,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, '<i>edited section</i>')
+        # Rendered select2 input.
+        select2_display = self.selenium.find_element_by_class_name('select2-selection__rendered')
+        # Clear button (×\n) is included in text.
+        self.assertEqual(select2_display.text, '×\n<i>edited section</i>')
 
         # Add popup
         self.selenium.find_element_by_id('add_id_form-0-section').click()
@@ -4608,6 +4266,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, 'new section')
+        select2_display = self.selenium.find_element_by_class_name('select2-selection__rendered')
+        # Clear button (×\n) is included in text.
+        self.assertEqual(select2_display.text, '×\nnew section')
 
     def test_inline_uuid_pk_edit_with_popup(self):
         from selenium.webdriver.support.ui import Select
@@ -6144,22 +5805,6 @@ class InlineAdminViewOnSiteTest(TestCase):
         "The right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         self.assertContains(response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name))
-
-
-@override_settings(ROOT_URLCONF='admin_views.urls')
-class TestETagWithAdminView(SimpleTestCase):
-    # The admin is compatible with ETags (#16003).
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get(reverse('admin:index'))
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True), ignore_warnings(category=RemovedInDjango21Warning):
-            response = self.client.get(reverse('admin:index'))
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

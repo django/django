@@ -1,7 +1,7 @@
 import datetime
 import os
 from decimal import Decimal
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django import forms
 from django.core.exceptions import (
@@ -180,7 +180,7 @@ class ModelFormBaseTest(TestCase):
     def test_no_model_class(self):
         class NoModelModelForm(forms.ModelForm):
             pass
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'ModelForm has no model class specified.'):
             NoModelModelForm()
 
     def test_empty_fields_to_fields_for_model(self):
@@ -326,7 +326,7 @@ class ModelFormBaseTest(TestCase):
                 fields = ('name', 'age')
 
     def test_extra_field_modelform_factory(self):
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, 'Unknown field(s) (no-field) specified for Person'):
             modelform_factory(Person, fields=['no-field', 'name'])
 
     def test_replace_field(self):
@@ -426,7 +426,8 @@ class ModelFormBaseTest(TestCase):
         form = PriceFormWithoutQuantity({'price': '6.00'})
         self.assertTrue(form.is_valid())
         price = form.save(commit=False)
-        with self.assertRaises(ValidationError):
+        msg = "{'quantity': ['This field cannot be null.']}"
+        with self.assertRaisesMessage(ValidationError, msg):
             price.full_clean()
 
         # The form should not validate fields that it doesn't contain even if they are
@@ -498,11 +499,12 @@ class ModelFormBaseTest(TestCase):
                 pass  # no model
 
         # Can't create new form
-        with self.assertRaises(ValueError):
+        msg = 'ModelForm has no model class specified.'
+        with self.assertRaisesMessage(ValueError, msg):
             InvalidModelForm()
 
         # Even if you provide a model instance
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             InvalidModelForm(instance=Category)
 
     def test_subcategory_form(self):
@@ -1301,10 +1303,11 @@ class ModelFormBasicTests(TestCase):
             ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
         )
         self.assertEqual(f.cleaned_data, {'url': 'foo'})
-        with self.assertRaises(ValueError):
+        msg = "The Category could not be created because the data didn't validate."
+        with self.assertRaisesMessage(ValueError, msg):
             f.save()
         f = BaseCategoryForm({'name': '', 'slug': '', 'url': 'foo'})
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg):
             f.save()
 
     def test_multi_fields(self):
@@ -1597,7 +1600,8 @@ class ModelChoiceFieldTests(TestCase):
         # instantiated. This proves clean() checks the database during clean() rather
         # than caching it at time of instantiation.
         Category.objects.get(url='4th').delete()
-        with self.assertRaises(ValidationError):
+        msg = "['Select a valid choice. That choice is not one of the available choices.']"
+        with self.assertRaisesMessage(ValidationError, msg):
             f.clean(c4.id)
 
     def test_modelchoicefield_choices(self):
@@ -1702,6 +1706,10 @@ class ModelChoiceFieldTests(TestCase):
             ['Select a valid choice. That choice is not one of the available choices.']
         )
 
+    def test_disabled_modelchoicefield_has_changed(self):
+        field = forms.ModelChoiceField(Author.objects.all(), disabled=True)
+        self.assertIs(field.has_changed('x', 'y'), False)
+
     def test_disabled_multiplemodelchoicefield(self):
         class ArticleForm(forms.ModelForm):
             categories = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
@@ -1726,6 +1734,10 @@ class ModelChoiceFieldTests(TestCase):
         form.fields['categories'].disabled = True
         self.assertEqual(form.errors, {})
         self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category1.pk])
+
+    def test_disabled_modelmultiplechoicefield_has_changed(self):
+        field = forms.ModelMultipleChoiceField(Author.objects.all(), disabled=True)
+        self.assertIs(field.has_changed('x', 'y'), False)
 
     def test_modelchoicefield_iterator(self):
         """
@@ -2906,6 +2918,16 @@ class LimitChoicesToTests(TestCase):
         fields = fields_for_model(StumpJoke, ['has_fooled_today'])
         self.assertSequenceEqual(fields['has_fooled_today'].queryset, [self.threepwood])
 
+    def test_callable_called_each_time_form_is_instantiated(self):
+        field = StumpJokeForm.base_fields['most_recently_fooled']
+        with mock.patch.object(field, 'limit_choices_to') as today_callable_dict:
+            StumpJokeForm()
+            self.assertEqual(today_callable_dict.call_count, 1)
+            StumpJokeForm()
+            self.assertEqual(today_callable_dict.call_count, 2)
+            StumpJokeForm()
+            self.assertEqual(today_callable_dict.call_count, 3)
+
 
 class FormFieldCallbackTests(SimpleTestCase):
 
@@ -3027,7 +3049,11 @@ class LocalizedModelFormTest(TestCase):
         self.assertTrue(f.fields['right'].localize)
 
     def test_model_form_refuses_arbitrary_string(self):
-        with self.assertRaises(TypeError):
+        msg = (
+            "BrokenLocalizedTripleForm.Meta.localized_fields "
+            "cannot be a string. Did you mean to type: ('foo',)?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
             class BrokenLocalizedTripleForm(forms.ModelForm):
                 class Meta:
                     model = Triple
@@ -3087,3 +3113,18 @@ class StrictAssignmentTests(TestCase):
             '__all__': ['Cannot set attribute'],
             'title': ['This field cannot be blank.']
         })
+
+
+class ModelToDictTests(TestCase):
+    def test_many_to_many(self):
+        """Data for a ManyToManyField is a list rather than a lazy QuerySet."""
+        blue = Colour.objects.create(name='blue')
+        red = Colour.objects.create(name='red')
+        item = ColourfulItem.objects.create()
+        item.colours.set([blue])
+        data = model_to_dict(item)['colours']
+        self.assertEqual(data, [blue])
+        item.colours.set([red])
+        # If data were a QuerySet, it would be reevaluated here and give "red"
+        # instead of the original value.
+        self.assertEqual(data, [blue])

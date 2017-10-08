@@ -5,6 +5,7 @@ HTML Widget classes
 import copy
 import datetime
 import re
+import warnings
 from itertools import chain
 
 from django.conf import settings
@@ -32,19 +33,26 @@ __all__ = (
 MEDIA_TYPES = ('css', 'js')
 
 
+class MediaOrderConflictWarning(RuntimeWarning):
+    pass
+
+
 @html_safe
 class Media:
-    def __init__(self, media=None, **kwargs):
-        if media:
-            media_attrs = media.__dict__
+    def __init__(self, media=None, css=None, js=None):
+        if media is not None:
+            css = getattr(media, 'css', {})
+            js = getattr(media, 'js', [])
         else:
-            media_attrs = kwargs
+            if css is None:
+                css = {}
+            if js is None:
+                js = []
+        self._css = css
+        self._js = js
 
-        self._css = {}
-        self._js = []
-
-        for name in MEDIA_TYPES:
-            getattr(self, 'add_' + name)(media_attrs.get(name))
+    def __repr__(self):
+        return 'Media(css=%r, js=%r)' % (self._css, self._js)
 
     def __str__(self):
         return self.render()
@@ -87,24 +95,48 @@ class Media:
             return Media(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
 
-    def add_js(self, data):
-        if data:
-            for path in data:
-                if path not in self._js:
-                    self._js.append(path)
+    @staticmethod
+    def merge(list_1, list_2):
+        """
+        Merge two lists while trying to keep the relative order of the elements.
+        Warn if the lists have the same two elements in a different relative
+        order.
 
-    def add_css(self, data):
-        if data:
-            for medium, paths in data.items():
-                for path in paths:
-                    if not self._css.get(medium) or path not in self._css[medium]:
-                        self._css.setdefault(medium, []).append(path)
+        For static assets it can be important to have them included in the DOM
+        in a certain order. In JavaScript you may not be able to reference a
+        global or in CSS you might want to override a style.
+        """
+        # Start with a copy of list_1.
+        combined_list = list(list_1)
+        last_insert_index = len(list_1)
+        # Walk list_2 in reverse, inserting each element into combined_list if
+        # it doesn't already exist.
+        for path in reversed(list_2):
+            try:
+                # Does path already exist in the list?
+                index = combined_list.index(path)
+            except ValueError:
+                # Add path to combined_list since it doesn't exist.
+                combined_list.insert(last_insert_index, path)
+            else:
+                if index > last_insert_index:
+                    warnings.warn(
+                        'Detected duplicate Media files in an opposite order:\n'
+                        '%s\n%s' % (combined_list[last_insert_index], combined_list[index]),
+                        MediaOrderConflictWarning,
+                    )
+                # path already exists in the list. Update last_insert_index so
+                # that the following elements are inserted in front of this one.
+                last_insert_index = index
+        return combined_list
 
     def __add__(self, other):
         combined = Media()
-        for name in MEDIA_TYPES:
-            getattr(combined, 'add_' + name)(getattr(self, '_' + name, None))
-            getattr(combined, 'add_' + name)(getattr(other, '_' + name, None))
+        combined._js = self.merge(self._js, other._js)
+        combined._css = {
+            medium: self.merge(self._css.get(medium, []), other._css.get(medium, []))
+            for medium in self._css.keys() | other._css.keys()
+        }
         return combined
 
 
@@ -391,7 +423,7 @@ class ClearableFileInput(FileInput):
         context = super().get_context(name, value, attrs)
         checkbox_name = self.clear_checkbox_name(name)
         checkbox_id = self.clear_checkbox_id(checkbox_name)
-        context.update({
+        context['widget'].update({
             'checkbox_name': checkbox_name,
             'checkbox_id': checkbox_id,
             'is_initial': self.is_initial(value),
@@ -550,7 +582,7 @@ class ChoiceWidget(Widget):
         groups = []
         has_selected = False
 
-        for index, (option_value, option_label) in enumerate(chain(self.choices)):
+        for index, (option_value, option_label) in enumerate(self.choices):
             if option_value is None:
                 option_value = ''
 
@@ -927,7 +959,7 @@ class SelectDateWidget(Widget):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         date_context = {}
-        year_choices = [(i, i) for i in self.years]
+        year_choices = [(i, str(i)) for i in self.years]
         if not self.is_required:
             year_choices.insert(0, self.year_none_value)
         year_attrs = context['widget']['attrs'].copy()
@@ -977,12 +1009,13 @@ class SelectDateWidget(Widget):
             year, month, day = value.year, value.month, value.day
         elif isinstance(value, str):
             if settings.USE_L10N:
+                input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
-                    input_format = get_format('DATE_INPUT_FORMATS')[0]
                     d = datetime.datetime.strptime(value, input_format)
-                    year, month, day = d.year, d.month, d.day
                 except ValueError:
                     pass
+                else:
+                    year, month, day = d.year, d.month, d.day
             match = self.date_re.match(value)
             if match:
                 year, month, day = [int(val) for val in match.groups()]
@@ -1007,8 +1040,7 @@ class SelectDateWidget(Widget):
     def id_for_label(self, id_):
         for first_select in self._parse_date_fmt():
             return '%s_%s' % (id_, first_select)
-        else:
-            return '%s_month' % id_
+        return '%s_month' % id_
 
     def value_from_datadict(self, data, files, name):
         y = data.get(self.year_field % name)

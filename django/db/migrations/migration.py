@@ -58,9 +58,11 @@ class Migration:
         self.replaces = list(self.__class__.replaces)
 
     def __eq__(self, other):
-        if not isinstance(other, Migration):
-            return False
-        return (self.name == other.name) and (self.app_label == other.app_label)
+        return (
+            isinstance(other, Migration) and
+            self.name == other.name and
+            self.app_label == other.app_label
+        )
 
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)
@@ -162,8 +164,10 @@ class Migration:
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
                     continue
-            if not schema_editor.connection.features.can_rollback_ddl and operation.atomic:
-                # We're forcing a transaction on a non-transactional-DDL backend
+            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            if not schema_editor.atomic_migration and atomic_operation:
+                # Force a transaction on a non-transactional-DDL backend or an
+                # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
                     operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
             else:

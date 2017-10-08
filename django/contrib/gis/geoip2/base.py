@@ -33,7 +33,7 @@ class GeoIP2:
     MODE_FILE = 4
     # Load database into memory. Pure Python.
     MODE_MEMORY = 8
-    cache_options = {opt: None for opt in (0, 1, 2, 4, 8)}
+    cache_options = frozenset((MODE_AUTO, MODE_MMAP_EXT, MODE_MMAP, MODE_FILE, MODE_MEMORY))
 
     # Paths to the city & country binary databases.
     _city_file = ''

@@ -1,7 +1,8 @@
 from django.conf.urls import url
 from django.contrib import admin
+from django.contrib.admin.actions import delete_selected
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 
@@ -73,3 +74,28 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(user['admin_url'], '/test_admin/admin/auth/user/')
         self.assertEqual(user['add_url'], '/test_admin/admin/auth/user/add/')
         self.assertEqual(user['name'], 'Users')
+
+
+class SiteActionsTests(SimpleTestCase):
+    def setUp(self):
+        self.site = admin.AdminSite()
+
+    def test_add_action(self):
+        def test_action():
+            pass
+        self.site.add_action(test_action)
+        self.assertEqual(self.site.get_action('test_action'), test_action)
+
+    def test_disable_action(self):
+        action_name = 'delete_selected'
+        self.assertEqual(self.site._actions[action_name], delete_selected)
+        self.site.disable_action(action_name)
+        with self.assertRaises(KeyError):
+            self.site._actions[action_name]
+
+    def test_get_action(self):
+        """AdminSite.get_action() returns an action even if it's disabled."""
+        action_name = 'delete_selected'
+        self.assertEqual(self.site.get_action(action_name), delete_selected)
+        self.site.disable_action(action_name)
+        self.assertEqual(self.site.get_action(action_name), delete_selected)

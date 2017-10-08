@@ -42,7 +42,7 @@ class PasswordResetTokenGenerator:
             return False
 
         # Check the timestamp is within limit
-        if (self._num_days(self._today()) - ts) >= settings.PASSWORD_RESET_TIMEOUT_DAYS:
+        if (self._num_days(self._today()) - ts) > settings.PASSWORD_RESET_TIMEOUT_DAYS:
             return False
 
         return True

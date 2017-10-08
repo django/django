@@ -53,7 +53,8 @@ class AppsTests(SimpleTestCase):
         """
         Tests when INSTALLED_APPS contains an incorrect app config.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = "'apps.apps.BadConfig' must supply a name attribute."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=['apps.apps.BadConfig']):
                 pass
 
@@ -61,7 +62,8 @@ class AppsTests(SimpleTestCase):
         """
         Tests when INSTALLED_APPS contains a class that isn't an app config.
         """
-        with self.assertRaises(ImproperlyConfigured):
+        msg = "'apps.apps.NotAConfig' isn't a subclass of AppConfig."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=['apps.apps.NotAConfig']):
                 pass
 

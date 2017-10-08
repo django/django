@@ -20,12 +20,10 @@ import hashlib
 import logging
 import re
 import time
-import warnings
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
@@ -153,7 +151,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         if_modified_since = parse_http_date_safe(if_modified_since)
 
     # Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
-    if (if_match_etags and not _if_match_passes(etag, if_match_etags)):
+    if if_match_etags and not _if_match_passes(etag, if_match_etags):
         return _precondition_failed(request)
 
     # Step 2: Test the If-Unmodified-Since precondition.
@@ -162,7 +160,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         return _precondition_failed(request)
 
     # Step 3: Test the If-None-Match precondition.
-    if (if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags)):
+    if if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags):
         if request.method in ('GET', 'HEAD'):
             return _not_modified(request, response)
         else:
@@ -248,18 +246,6 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
-    if settings.USE_ETAGS and not response.has_header('ETag'):
-        warnings.warn(
-            "The USE_ETAGS setting is deprecated in favor of "
-            "ConditionalGetMiddleware which sets the ETag regardless of the "
-            "setting. patch_response_headers() won't do ETag processing in "
-            "Django 2.1.",
-            RemovedInDjango21Warning
-        )
-        if hasattr(response, 'render') and callable(response.render):
-            response.add_post_render_callback(set_response_etag)
-        else:
-            response = set_response_etag(response)
     if not response.has_header('Expires'):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)

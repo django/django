@@ -46,7 +46,7 @@ class CommandTests(SimpleTestCase):
 
     def test_explode(self):
         """ An unknown command raises CommandError """
-        with self.assertRaises(CommandError):
+        with self.assertRaisesMessage(CommandError, "Unknown command: 'explode'"):
             management.call_command(('explode',))
 
     def test_system_exit(self):
@@ -215,5 +215,6 @@ class CommandRunTests(AdminScriptTestCase):
 class UtilsTests(SimpleTestCase):
 
     def test_no_existent_external_program(self):
-        with self.assertRaises(CommandError):
+        msg = 'Error executing a_42_command_that_doesnt_exist_42'
+        with self.assertRaisesMessage(CommandError, msg):
             popen_wrapper(['a_42_command_that_doesnt_exist_42'])

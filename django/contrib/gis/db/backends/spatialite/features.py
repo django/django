@@ -9,12 +9,5 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
     supports_3d_storage = True
 
     @cached_property
-    def supports_initspatialmetadata_in_one_transaction(self):
-        # SpatiaLite 4.1+ support initializing all metadata in one transaction
-        # which can result in a significant performance improvement when
-        # creating the database.
-        return self.connection.ops.spatial_version >= (4, 1, 0)
-
-    @cached_property
     def supports_area_geodetic(self):
         return bool(self.connection.ops.lwgeom_version())

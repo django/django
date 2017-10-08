@@ -853,13 +853,6 @@ The live server listens on ``localhost`` and binds to port 0 which uses a free
 port assigned by the operating system. The server's URL can be accessed with
 ``self.live_server_url`` during the tests.
 
-.. versionchanged:: 1.11
-
-    In older versions, Django tried a predefined port range which could be
-    customized in various ways including the ``DJANGO_LIVE_TEST_SERVER_ADDRESS``
-    environment variable. This is removed in favor of the simpler "bind to port
-    0" technique.
-
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:

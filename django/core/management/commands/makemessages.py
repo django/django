@@ -371,7 +371,7 @@ class Command(BaseCommand):
             locales = all_locales
         else:
             locales = locale or all_locales
-            locales = set(locales) - set(exclude)
+            locales = set(locales).difference(exclude)
 
         if locales:
             check_programs('msguniq', 'msgmerge', 'msgattrib')

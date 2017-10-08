@@ -157,7 +157,7 @@ class CookieStorage(BaseStorage):
                     # If we get here (and the JSON decode works), everything is
                     # good. In any other case, drop back and return None.
                     return json.loads(value, cls=MessageDecoder)
-                except ValueError:
+                except json.JSONDecodeError:
                     pass
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.

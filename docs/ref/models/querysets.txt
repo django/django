@@ -311,15 +311,6 @@ identical to::
 
     Entry.objects.order_by('blog__name')
 
-It is also possible to order a queryset by a related field, without incurring
-the cost of a JOIN, by referring to the ``_id`` of the related field::
-
-    # No Join
-    Entry.objects.order_by('blog_id')
-
-    # Join
-    Entry.objects.order_by('blog__id')
-
 You can also order by :doc:`query expressions </ref/models/expressions>` by
 calling ``asc()`` or ``desc()`` on the expression::
 
@@ -619,14 +610,10 @@ You can also refer to fields on related models with reverse relations through
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
 
-.. versionchanged:: 1.11
-
-    Support for ``**expressions`` was added.
-
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
-.. method:: values_list(*fields, flat=False)
+.. method:: values_list(*fields, flat=False, named=False)
 
 This is similar to ``values()`` except that instead of returning dictionaries,
 it returns tuples when iterated over. Each tuple contains the value from the
@@ -634,22 +621,31 @@ respective field or expression passed into the ``values_list()`` call — so the
 first item is the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
-    [(1, 'First entry'), ...]
+    <QuerySet [(1, 'First entry'), ...]>
     >>> from django.db.models.functions import Lower
     >>> Entry.objects.values_list('id', Lower('headline'))
-    [(1, 'first entry'), ...]
+    <QuerySet [(1, 'first entry'), ...]>
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
 rather than one-tuples. An example should make the difference clearer::
 
     >>> Entry.objects.values_list('id').order_by('id')
-    [(1,), (2,), (3,), ...]
+    <QuerySet[(1,), (2,), (3,), ...]>
 
     >>> Entry.objects.values_list('id', flat=True).order_by('id')
-    [1, 2, 3, ...]
+    <QuerySet [1, 2, 3, ...]>
 
 It is an error to pass in ``flat`` when there is more than one field.
+
+You can pass ``named=True`` to get results as a
+:func:`~python:collections.namedtuple`::
+
+    >>> Entry.objects.values_list('id', 'headline', named=True)
+    <QuerySet [Row(id=1, headline='First entry'), ...]>
+
+Using a named tuple may make use of the results more readable, at the expense
+of a small performance penalty for transforming the results into a named tuple.
 
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
@@ -670,10 +666,10 @@ For example, notice the behavior when querying across a
 :class:`~django.db.models.ManyToManyField`::
 
     >>> Author.objects.values_list('name', 'entry__headline')
-    [('Noam Chomsky', 'Impressions of Gaza'),
+    <QuerySet [('Noam Chomsky', 'Impressions of Gaza'),
      ('George Orwell', 'Why Socialists Do Not Believe in Fun'),
      ('George Orwell', 'In Defence of English Cooking'),
-     ('Don Quixote', None)]
+     ('Don Quixote', None)]>
 
 Authors with multiple entries appear multiple times and authors without any
 entries have ``None`` for the entry headline.
@@ -682,11 +678,11 @@ Similarly, when querying a reverse foreign key, ``None`` appears for entries
 not having any author::
 
     >>> Entry.objects.values_list('authors')
-    [('Noam Chomsky',), ('George Orwell',), (None,)]
+    <QuerySet [('Noam Chomsky',), ('George Orwell',), (None,)]>
 
-.. versionchanged:: 1.11
+.. versionchanged:: 2.0
 
-    Support for expressions in ``*fields`` was added.
+    The ``named`` parameter was added.
 
 ``dates()``
 ~~~~~~~~~~~
@@ -805,8 +801,6 @@ query by calling ``all()`` on a previously evaluated ``QuerySet``.
 
 .. method:: union(*other_qs, all=False)
 
-.. versionadded:: 1.11
-
 Uses SQL's ``UNION`` operator to combine the results of two or more
 ``QuerySet``\s. For example:
 
@@ -821,18 +815,16 @@ of other models. Passing different models works as long as the ``SELECT`` list
 is the same in all ``QuerySet``\s (at least the types, the names don't matter
 as long as the types in the same order).
 
-In addition, only ``LIMIT``, ``OFFSET``, and ``ORDER BY`` (i.e. slicing and
-:meth:`order_by`) are allowed on the resulting ``QuerySet``. Further, databases
-place restrictions on what operations are allowed in the combined queries. For
-example, most databases don't allow ``LIMIT`` or ``OFFSET`` in the combined
-queries.
+In addition, only ``LIMIT``, ``OFFSET``, ``COUNT(*)``, and ``ORDER BY`` (i.e.
+slicing, :meth:`count`, and :meth:`order_by`) are allowed on the resulting
+``QuerySet``. Further, databases place restrictions on what operations are
+allowed in the combined queries. For example, most databases don't allow
+``LIMIT`` or ``OFFSET`` in the combined queries.
 
 ``intersection()``
 ~~~~~~~~~~~~~~~~~~
 
 .. method:: intersection(*other_qs)
-
-.. versionadded:: 1.11
 
 Uses SQL's ``INTERSECT`` operator to return the shared elements of two or more
 ``QuerySet``\s. For example:
@@ -845,8 +837,6 @@ See :meth:`union` for some restrictions.
 ~~~~~~~~~~~~~~~~
 
 .. method:: difference(*other_qs)
-
-.. versionadded:: 1.11
 
 Uses SQL's ``EXCEPT`` operator to keep only elements present in the
 ``QuerySet`` but not in some other ``QuerySet``\s. For example::
@@ -1069,16 +1059,12 @@ database.
     :class:`related managers<django.db.models.fields.related.RelatedManager>`,
     any prefetched cache for the relation will be cleared.
 
-    .. versionchanged:: 1.11
-
-        The clearing of the prefetched cache described above was added.
-
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
 
     class Restaurant(models.Model):
         pizzas = models.ManyToManyField(Pizza, related_name='restaurants')
-        best_pizza = models.ForeignKey(Pizza, related_name='championed_by')
+        best_pizza = models.ForeignKey(Pizza, related_name='championed_by', on_delete=models.CASCADE)
 
 The following are all legal:
 
@@ -1611,7 +1597,7 @@ For example::
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: select_for_update(nowait=False, skip_locked=False)
+.. method:: select_for_update(nowait=False, skip_locked=False, of=())
 
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
@@ -1635,14 +1621,21 @@ queryset is evaluated. You can also ignore locked rows by using
 ``select_for_update()`` with both options enabled will result in a
 :exc:`ValueError`.
 
+By default, ``select_for_update()`` locks all rows that are selected by the
+query. For example, rows of related objects specified in :meth:`select_related`
+are locked in addition to rows of the queryset's model. If this isn't desired,
+specify the related objects you want to lock in ``select_for_update(of=(...))``
+using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
+to refer to the queryset's model.
+
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL doesn't support the
-``nowait`` and ``skip_locked`` arguments.
+``nowait``, ``skip_locked``, and ``of`` arguments.
 
-Passing ``nowait=True`` or ``skip_locked=True`` to ``select_for_update()``
-using database backends that do not support these options, such as MySQL,
-raises a :exc:`~django.db.NotSupportedError`. This prevents code from
-unexpectedly blocking.
+Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
+``select_for_update()`` using database backends that do not support these
+options, such as MySQL, raises a :exc:`~django.db.NotSupportedError`. This
+prevents code from unexpectedly blocking.
 
 Evaluating a queryset with ``select_for_update()`` in autocommit mode on
 backends which support ``SELECT ... FOR UPDATE`` is a
@@ -1666,9 +1659,14 @@ raised if ``select_for_update()`` is used in autocommit mode.
     ``select_for_update()`` you should use
     :class:`~django.test.TransactionTestCase`.
 
-.. versionchanged:: 1.11
+.. admonition:: Certain expressions may not be supported
 
-    The ``skip_locked`` argument was added.
+    PostgreSQL doesn't support ``select_for_update()`` with
+    :class:`~django.db.models.expressions.Window` expressions.
+
+.. versionchanged:: 2.0
+
+    The ``of`` argument was added.
 
 ``raw()``
 ~~~~~~~~~
@@ -1871,10 +1869,6 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
-.. versionchanged:: 1.11
-
-    Added support for callable values in ``defaults``.
-
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1920,10 +1914,6 @@ For detailed description how names passed in ``kwargs`` are resolved see
 As described above in :meth:`get_or_create`, this method is prone to a
 race-condition which can result in multiple rows being inserted simultaneously
 if uniqueness is not enforced at the database level.
-
-.. versionchanged:: 1.11
-
-    Added support for callable values in ``defaults``.
 
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
@@ -1982,11 +1972,13 @@ database query like ``count()`` would.
 ``in_bulk()``
 ~~~~~~~~~~~~~
 
-.. method:: in_bulk(id_list=None)
+.. method:: in_bulk(id_list=None, field_name='pk')
 
-Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID. If a list
-isn't provided, all objects in the queryset are returned.
+Takes a list of field values (``id_list``) and the ``field_name`` for those
+values, and returns a dictionary mapping each value to an instance of the
+object with the given field value. If ``id_list`` isn't provided, all objects
+in the queryset are returned. ``field_name`` must be a unique field, and it
+defaults to the primary key.
 
 Example::
 
@@ -1998,8 +1990,14 @@ Example::
     {}
     >>> Blog.objects.in_bulk()
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
+    >>> Blog.objects.in_bulk(['beatles_blog'], field_name='slug')
+    {'beatles_blog': <Blog: Beatles Blog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 2.0
+
+    The ``field_name`` parameter was added.
 
 ``iterator()``
 ~~~~~~~~~~~~~~
@@ -2065,10 +2063,6 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
     between the number of rows transferred and the data discarded if the loop
     is exited early.
 
-.. versionchanged:: 1.11
-
-    PostgreSQL support for server-side cursors was added.
-
 .. versionchanged:: 2.0
 
     The ``chunk_size`` parameter was added.
@@ -2076,20 +2070,29 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
 ``latest()``
 ~~~~~~~~~~~~
 
-.. method:: latest(field_name=None)
+.. method:: latest(*fields)
 
-Returns the latest object in the table, by date, using the ``field_name``
-provided as the date field.
+Returns the latest object in the table based on the given field(s).
 
 This example returns the latest ``Entry`` in the table, according to the
 ``pub_date`` field::
 
     Entry.objects.latest('pub_date')
 
+You can also choose the latest based on several fields. For example, to select
+the ``Entry`` with the earliest ``expire_date`` when two entries have the same
+``pub_date``::
+
+    Entry.objects.latest('pub_date', '-expire_date')
+
+The negative sign in ``'-expire_date'`` means to sort ``expire_date`` in
+*descending* order. Since ``latest()`` gets the last result, the ``Entry`` with
+the earliest ``expire_date`` is selected.
+
 If your model's :ref:`Meta <meta-options>` specifies
-:attr:`~django.db.models.Options.get_latest_by`, you can leave off the
-``field_name`` argument to ``earliest()`` or ``latest()``. Django will use the
-field specified in :attr:`~django.db.models.Options.get_latest_by` by default.
+:attr:`~django.db.models.Options.get_latest_by`, you can omit any arguments to
+``earliest()`` or ``latest()``. The fields specified in
+:attr:`~django.db.models.Options.get_latest_by` will be used by default.
 
 Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
 :exc:`~django.db.models.Model.DoesNotExist` if there is no object with the
@@ -2097,6 +2100,10 @@ given parameters.
 
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and
 readability.
+
+.. versionchanged:: 2.0
+
+    Support for several arguments was added.
 
 .. admonition:: ``earliest()`` and ``latest()`` may return instances with null dates.
 
@@ -2112,7 +2119,7 @@ readability.
 ``earliest()``
 ~~~~~~~~~~~~~~
 
-.. method:: earliest(field_name=None)
+.. method:: earliest(*fields)
 
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
@@ -2786,8 +2793,6 @@ in the database <database-time-zone-definitions>`.
 ``week``
 ~~~~~~~~
 
-.. versionadded:: 1.11
-
 For date and datetime fields, return the week number (1-52 or 53) according
 to `ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e., weeks start
 on a Monday and the first week starts on or before Thursday.
@@ -2856,8 +2861,6 @@ in the database <database-time-zone-definitions>`.
 
 ``time``
 ~~~~~~~~
-
-.. versionadded:: 1.11
 
 For datetime fields, casts the value as time. Allows chaining additional field
 lookups. Takes a :class:`datetime.time` value.
@@ -3062,6 +3065,17 @@ of the return value
     ``output_field`` if all fields are of the same type. Otherwise, you
     must provide the ``output_field`` yourself.
 
+``filter``
+~~~~~~~~~~
+
+.. versionadded:: 2.0
+
+An optional :class:`Q object <django.db.models.Q>` that's used to filter the
+rows that are aggregated.
+
+See :ref:`conditional-aggregation` and :ref:`filtering-on-annotations` for
+example usage.
+
 ``**extra``
 ~~~~~~~~~~~
 
@@ -3071,7 +3085,7 @@ by the aggregate.
 ``Avg``
 ~~~~~~~
 
-.. class:: Avg(expression, output_field=FloatField(), **extra)
+.. class:: Avg(expression, output_field=FloatField(), filter=None, **extra)
 
     Returns the mean value of the given expression, which must be numeric
     unless you specify a different ``output_field``.
@@ -3083,7 +3097,7 @@ by the aggregate.
 ``Count``
 ~~~~~~~~~
 
-.. class:: Count(expression, distinct=False, **extra)
+.. class:: Count(expression, distinct=False, filter=None, **extra)
 
     Returns the number of objects that are related through the provided
     expression.
@@ -3102,7 +3116,7 @@ by the aggregate.
 ``Max``
 ~~~~~~~
 
-.. class:: Max(expression, output_field=None, **extra)
+.. class:: Max(expression, output_field=None, filter=None, **extra)
 
     Returns the maximum value of the given expression.
 
@@ -3112,7 +3126,7 @@ by the aggregate.
 ``Min``
 ~~~~~~~
 
-.. class:: Min(expression, output_field=None, **extra)
+.. class:: Min(expression, output_field=None, filter=None, **extra)
 
     Returns the minimum value of the given expression.
 
@@ -3122,7 +3136,7 @@ by the aggregate.
 ``StdDev``
 ~~~~~~~~~~
 
-.. class:: StdDev(expression, sample=False, **extra)
+.. class:: StdDev(expression, sample=False, filter=None, **extra)
 
     Returns the standard deviation of the data in the provided expression.
 
@@ -3146,7 +3160,7 @@ by the aggregate.
 ``Sum``
 ~~~~~~~
 
-.. class:: Sum(expression, output_field=None, **extra)
+.. class:: Sum(expression, output_field=None, filter=None, **extra)
 
     Computes the sum of all values of the given expression.
 
@@ -3156,7 +3170,7 @@ by the aggregate.
 ``Variance``
 ~~~~~~~~~~~~
 
-.. class:: Variance(expression, sample=False, **extra)
+.. class:: Variance(expression, sample=False, filter=None, **extra)
 
     Returns the variance of the data in the provided expression.
 
@@ -3262,3 +3276,60 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example::
     >>> from django.db.models import prefetch_related_objects
     >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
     >>> prefetch_related_objects(restaurants, 'pizzas__toppings')
+
+``FilteredRelation()`` objects
+------------------------------
+
+.. versionadded:: 2.0
+
+.. class:: FilteredRelation(relation_name, *, condition=Q())
+
+    .. attribute:: FilteredRelation.relation_name
+
+        The name of the field on which you'd like to filter the relation.
+
+    .. attribute:: FilteredRelation.condition
+
+        A :class:`~django.db.models.Q` object to control the filtering.
+
+``FilteredRelation`` is used with :meth:`~.QuerySet.annotate()` to create an
+``ON`` clause when a ``JOIN`` is performed. It doesn't act on the default
+relationship but on the annotation name (``pizzas_vegetarian`` in example
+below).
+
+For example, to find restaurants that have vegetarian pizzas with
+``'mozzarella'`` in the name::
+
+    >>> from django.db.models import FilteredRelation, Q
+    >>> Restaurant.objects.annotate(
+    ...    pizzas_vegetarian=FilteredRelation(
+    ...        'pizzas', condition=Q(pizzas__vegetarian=True),
+    ...    ),
+    ... ).filter(pizzas_vegetarian__name__icontains='mozzarella')
+
+If there are a large number of pizzas, this queryset performs better than::
+
+    >>> Restaurant.objects.filter(
+    ...     pizzas__vegetarian=True,
+    ...     pizzas__name__icontains='mozzarella',
+    ... )
+
+because the filtering in the ``WHERE`` clause of the first queryset will only
+operate on vegetarian pizzas.
+
+``FilteredRelation`` doesn't support:
+
+* Conditions that span relational fields. For example::
+
+    >>> Restaurant.objects.annotate(
+    ...    pizzas_with_toppings_startswith_n=FilteredRelation(
+    ...        'pizzas__toppings',
+    ...        condition=Q(pizzas__toppings__name__startswith='n'),
+    ...    ),
+    ... )
+    Traceback (most recent call last):
+    ...
+    ValueError: FilteredRelation's condition doesn't support nested relations (got 'pizzas__toppings__name__startswith').
+* :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
+* A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
+  inherited from a parent model.

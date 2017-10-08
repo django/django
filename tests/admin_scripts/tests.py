@@ -22,7 +22,6 @@ from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
 from django.db import ConnectionHandler
-from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
@@ -1339,15 +1338,12 @@ class ManageRunserver(AdminScriptTestCase):
 
     def test_readonly_database(self):
         """
-        Ensure runserver.check_migrations doesn't choke when a database is read-only
-        (with possibly no django_migrations table).
+        runserver.check_migrations() doesn't choke when a database is read-only.
         """
-        with mock.patch.object(
-                MigrationRecorder, 'ensure_schema',
-                side_effect=MigrationSchemaMissing()):
+        with mock.patch.object(MigrationRecorder, 'has_table', return_value=False):
             self.cmd.check_migrations()
-        # Check a warning is emitted
-        self.assertIn("Not checking migrations", self.output.getvalue())
+        # You have # ...
+        self.assertIn('unapplied migration(s)', self.output.getvalue())
 
 
 class ManageRunserverMigrationWarning(TestCase):
@@ -2230,3 +2226,7 @@ class MainModule(AdminScriptTestCase):
         cmd_out, _ = self.run_django_admin(['--version'])
         mod_out, _ = self.run_test('-m', ['django', '--version'])
         self.assertEqual(mod_out, cmd_out)
+
+    def test_program_name_in_help(self):
+        out, err = self.run_test('-m', ['django', 'help'])
+        self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")

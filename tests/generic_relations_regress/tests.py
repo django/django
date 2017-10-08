@@ -246,3 +246,8 @@ class GenericRelationTests(TestCase):
     def test_ticket_22982(self):
         place = Place.objects.create(name='My Place')
         self.assertIn('GenericRelatedObjectManager', str(place.links))
+
+    def test_filter_on_related_proxy_model(self):
+        place = Place.objects.create()
+        Link.objects.create(content_object=place)
+        self.assertEqual(Place.objects.get(link_proxy__object_id=place.id), place)

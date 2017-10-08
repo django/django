@@ -66,8 +66,7 @@ class GEOSCoordSeq(GEOSBase):
     # #### Internal Routines ####
     def _checkindex(self, index):
         "Check the given index."
-        sz = self.size
-        if (sz < 1) or (index < 0) or (index >= sz):
+        if not (0 <= index < self.size):
             raise IndexError('invalid GEOS Geometry index: %s' % index)
 
     def _checkdim(self, dim):

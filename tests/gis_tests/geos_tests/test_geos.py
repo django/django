@@ -179,6 +179,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ls = fromstr('LINESTRING(0 0, 1 1, 5 5)')
         self.assertEqual(ls, ls.wkt)
         self.assertNotEqual(p, 'bar')
+        self.assertEqual(p, 'POINT(5.0 23.0)')
         # Error shouldn't be raise on equivalence testing with
         # an invalid type.
         for g in (p, ls):
@@ -327,6 +328,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with mock.patch('django.contrib.gis.geos.linestring.numpy', False):
             with self.assertRaisesMessage(TypeError, 'Invalid initialization input for LineStrings.'):
                 LineString('wrong input')
+
+        # Test __iter__().
+        self.assertEqual(list(LineString((0, 0), (1, 1), (2, 2))), [(0, 0), (1, 1), (2, 2)])
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
@@ -674,7 +678,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
             self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
 
-        with mock.patch('django.contrib.gis.geos.libgeos.geos_version_info', lambda: {'version': '3.4.9'}):
+        with mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: b'3.4.9'):
             with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
                 MultiLineString().closed
 
@@ -1292,22 +1296,18 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             '{"coordinates": [[[0, 0], [0, 1], [1, 1], [0, 0]]], "type": "Polygon"}',
         )
 
-    def test_geos_version(self):
-        """Testing the GEOS version regular expression."""
-        from django.contrib.gis.geos.libgeos import version_regex
-        versions = [('3.0.0rc4-CAPI-1.3.3', '3.0.0', '1.3.3'),
-                    ('3.0.0-CAPI-1.4.1', '3.0.0', '1.4.1'),
-                    ('3.4.0dev-CAPI-1.8.0', '3.4.0', '1.8.0'),
-                    ('3.4.0dev-CAPI-1.8.0 r0', '3.4.0', '1.8.0')]
-        for v_init, v_geos, v_capi in versions:
-            m = version_regex.match(v_init)
-            self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
-            self.assertEqual(m.group('version'), v_geos)
-            self.assertEqual(m.group('capi_version'), v_capi)
-
     def test_geos_version_tuple(self):
-        with mock.patch('django.contrib.gis.geos.libgeos.geos_version_info', lambda: {'version': '3.4.9'}):
-            self.assertEqual(geos_version_tuple(), (3, 4, 9))
+        versions = (
+            (b'3.0.0rc4-CAPI-1.3.3', (3, 0, 0)),
+            (b'3.0.0-CAPI-1.4.1', (3, 0, 0)),
+            (b'3.4.0dev-CAPI-1.8.0', (3, 4, 0)),
+            (b'3.4.0dev-CAPI-1.8.0 r0', (3, 4, 0)),
+            (b'3.6.2-CAPI-1.10.2 4d2925d6', (3, 6, 2)),
+        )
+        for version_string, version_tuple in versions:
+            with self.subTest(version_string=version_string):
+                with mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: version_string):
+                    self.assertEqual(geos_version_tuple(), version_tuple)
 
     def test_from_gml(self):
         self.assertEqual(
@@ -1318,6 +1318,27 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 '</gml:Point>'
             ),
         )
+
+    def test_from_ewkt(self):
+        self.assertEqual(GEOSGeometry.from_ewkt('SRID=1;POINT(1 1)'), Point(1, 1, srid=1))
+        self.assertEqual(GEOSGeometry.from_ewkt('POINT(1 1)'), Point(1, 1))
+
+    def test_from_ewkt_empty_string(self):
+        msg = 'Expected WKT but got an empty string.'
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('')
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('SRID=1;')
+
+    def test_from_ewkt_invalid_srid(self):
+        msg = 'EWKT has invalid SRID part.'
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('SRUD=1;POINT(1 1)')
+        with self.assertRaisesMessage(ValueError, msg):
+            GEOSGeometry.from_ewkt('SRID=WGS84;POINT(1 1)')
+
+    def test_fromstr_scientific_wkt(self):
+        self.assertEqual(GEOSGeometry('POINT(1.0e-1 1.0e+1)'), Point(.1, 10))
 
     def test_normalize(self):
         g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))

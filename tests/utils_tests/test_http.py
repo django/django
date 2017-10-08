@@ -1,10 +1,8 @@
 import unittest
 from datetime import datetime
 
-from django.test import ignore_warnings
 from django.utils import http
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango21Warning
 
 
 class TestUtilsHttp(unittest.TestCase):
@@ -61,6 +59,9 @@ class TestUtilsHttp(unittest.TestCase):
         for n in ['#', ' ']:
             with self.assertRaises(ValueError):
                 http.base36_to_int(n)
+        with self.assertRaises(ValueError) as cm:
+            http.base36_to_int('1' * 14)
+        self.assertEqual('Base36 input too large', str(cm.exception))
         for n in [123, {1: 2}, (1, 2, 3), 3.141]:
             with self.assertRaises(TypeError):
                 http.base36_to_int(n)
@@ -104,8 +105,6 @@ class TestUtilsHttp(unittest.TestCase):
             'http://2001:cdba:0000:0000:0000:0000:3257:9652]/',
         )
         for bad_url in bad_urls:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
             self.assertFalse(
                 http.is_safe_url(bad_url, allowed_hosts={'testserver', 'testserver2'}),
                 "%s should be blocked" % bad_url,
@@ -124,8 +123,6 @@ class TestUtilsHttp(unittest.TestCase):
             'path/http:2222222222',
         )
         for good_url in good_urls:
-            with ignore_warnings(category=RemovedInDjango21Warning):
-                self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
             self.assertTrue(
                 http.is_safe_url(good_url, allowed_hosts={'otherserver', 'testserver'}),
                 "%s should be allowed" % good_url,

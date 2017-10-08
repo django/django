@@ -1,3 +1,12 @@
+from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import (
+    Area as AreaMeasure, Distance as DistanceMeasure,
+)
+from django.db.utils import NotSupportedError
+from django.utils.functional import cached_property
+
+
 class BaseSpatialOperations:
     # Quick booleans for the type of this spatial backend, and
     # an attribute for the spatial database version tuple (if applicable)
@@ -9,6 +18,10 @@ class BaseSpatialOperations:
 
     # How the geometry column should be selected.
     select = None
+
+    @cached_property
+    def select_extent(self):
+        return self.select
 
     # Does the spatial database have a geometry or geography type?
     geography = False
@@ -35,7 +48,6 @@ class BaseSpatialOperations:
 
     # Constructors
     from_text = False
-    from_wkb = False
 
     # Default conversion functions for aggregates; will be overridden if implemented
     # for the spatial backend.
@@ -72,10 +84,7 @@ class BaseSpatialOperations:
         backend.
         """
         def transform_value(value, field):
-            return (
-                not (value is None or value.srid == field.srid) and
-                self.connection.features.supports_transform
-            )
+            return value is not None and value.srid != field.srid
 
         if hasattr(value, 'as_sql'):
             return (
@@ -97,7 +106,7 @@ class BaseSpatialOperations:
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):
-            raise NotImplementedError(
+            raise NotSupportedError(
                 "%s spatial aggregation is not supported by this database backend." % expression.name
             )
         super().check_expression_support(expression)
@@ -107,7 +116,7 @@ class BaseSpatialOperations:
 
     def spatial_function_name(self, func_name):
         if func_name in self.unsupported_functions:
-            raise NotImplementedError("This backend doesn't support the %s function." % func_name)
+            raise NotSupportedError("This backend doesn't support the %s function." % func_name)
         return self.function_names.get(func_name, self.geom_func_prefix + func_name)
 
     # Routines for getting the OGC-compliant models.
@@ -116,3 +125,38 @@ class BaseSpatialOperations:
 
     def spatial_ref_sys(self):
         raise NotImplementedError('subclasses of BaseSpatialOperations must a provide spatial_ref_sys() method')
+
+    distance_expr_for_lookup = staticmethod(Distance)
+
+    def get_db_converters(self, expression):
+        converters = super().get_db_converters(expression)
+        if isinstance(expression.output_field, GeometryField):
+            converters.append(self.get_geometry_converter(expression))
+        return converters
+
+    def get_geometry_converter(self, expression):
+        raise NotImplementedError(
+            'Subclasses of BaseSpatialOperations must provide a '
+            'get_geometry_converter() method.'
+        )
+
+    def get_area_att_for_field(self, field):
+        if field.geodetic(self.connection):
+            if self.connection.features.supports_area_geodetic:
+                return 'sq_m'
+            raise NotImplementedError('Area on geodetic coordinate systems not supported.')
+        else:
+            units_name = field.units_name(self.connection)
+            if units_name:
+                return AreaMeasure.unit_attname(units_name)
+
+    def get_distance_att_for_field(self, field):
+        dist_att = None
+        if field.geodetic(self.connection):
+            if self.connection.features.supports_distance_geodetic:
+                dist_att = 'm'
+        else:
+            units = field.units_name(self.connection)
+            if units:
+                dist_att = DistanceMeasure.unit_attname(units)
+        return dist_att

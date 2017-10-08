@@ -117,11 +117,11 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import PublisherList
 
     urlpatterns = [
-        url(r'^publishers/$', PublisherList.as_view()),
+        path('publishers/', PublisherList.as_view()),
     ]
 
 That's all the Python code we need to write. We still need to write a template,
@@ -332,11 +332,11 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import PublisherBookList
 
     urlpatterns = [
-        url(r'^books/([\w-]+)/$', PublisherBookList.as_view()),
+        path('books/<publisher>/', PublisherBookList.as_view()),
     ]
 
 Next, we'll write the ``PublisherBookList`` view itself::
@@ -351,7 +351,7 @@ Next, we'll write the ``PublisherBookList`` view itself::
         template_name = 'books/books_by_publisher.html'
 
         def get_queryset(self):
-            self.publisher = get_object_or_404(Publisher, name=self.args[0])
+            self.publisher = get_object_or_404(Publisher, name=self.kwargs['publisher'])
             return Book.objects.filter(publisher=self.publisher)
 
 As you can see, it's quite easy to add more logic to the queryset selection;
@@ -398,12 +398,12 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import AuthorDetailView
 
     urlpatterns = [
         #...
-        url(r'^authors/(?P<pk>[0-9]+)/$', AuthorDetailView.as_view(), name='author-detail'),
+        path('authors/<int:pk>/', AuthorDetailView.as_view(), name='author-detail'),
     ]
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the

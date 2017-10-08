@@ -15,7 +15,7 @@ def sql_for_table(model):
 
 
 def sql_for_index(model):
-    return '\n'.join(connection.schema_editor()._model_indexes_sql(model))
+    return '\n'.join(str(sql) for sql in connection.schema_editor()._model_indexes_sql(model))
 
 
 # We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings

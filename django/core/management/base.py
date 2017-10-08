@@ -12,7 +12,6 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.exceptions import MigrationSchemaMissing
 
 
 class CommandError(Exception):
@@ -428,11 +427,6 @@ class BaseCommand:
             executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
         except ImproperlyConfigured:
             # No databases are configured (or the dummy one)
-            return
-        except MigrationSchemaMissing:
-            self.stdout.write(self.style.NOTICE(
-                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
-            ))
             return
 
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())

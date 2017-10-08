@@ -200,10 +200,11 @@ class EmailValidator:
             # Try for possible IDN domain-part
             try:
                 domain_part = domain_part.encode('idna').decode('ascii')
-                if self.validate_domain_part(domain_part):
-                    return
             except UnicodeError:
                 pass
+            else:
+                if self.validate_domain_part(domain_part):
+                    return
             raise ValidationError(self.message, code=self.code)
 
     def validate_domain_part(self, domain_part):
@@ -413,15 +414,21 @@ class DecimalValidator:
 
     def __call__(self, value):
         digit_tuple, exponent = value.as_tuple()[1:]
-        decimals = abs(exponent)
-        # digit_tuple doesn't include any leading zeros.
-        digits = len(digit_tuple)
-        if decimals > digits:
-            # We have leading zeros up to or past the decimal point. Count
-            # everything past the decimal point as a digit. We do not count
-            # 0 before the decimal point as a digit since that would mean
-            # we would not allow max_digits = decimal_places.
-            digits = decimals
+        if exponent >= 0:
+            # A positive exponent adds that many trailing zeros.
+            digits = len(digit_tuple) + exponent
+            decimals = 0
+        else:
+            # If the absolute value of the negative exponent is larger than the
+            # number of digits, then it's the same as the number of digits,
+            # because it'll consume all of the digits in digit_tuple and then
+            # add abs(exponent) - len(digit_tuple) leading zeros after the
+            # decimal point.
+            if abs(exponent) > len(digit_tuple):
+                digits = decimals = abs(exponent)
+            else:
+                digits = len(digit_tuple)
+                decimals = abs(exponent)
         whole_digits = digits - decimals
 
         if self.max_digits is not None and digits > self.max_digits:
@@ -503,3 +510,27 @@ def get_available_image_extensions():
 validate_image_file_extension = FileExtensionValidator(
     allowed_extensions=get_available_image_extensions(),
 )
+
+
+@deconstructible
+class ProhibitNullCharactersValidator:
+    """Validate that the string doesn't contain the null character."""
+    message = _('Null characters are not allowed.')
+    code = 'null_characters_not_allowed'
+
+    def __init__(self, message=None, code=None):
+        if message is not None:
+            self.message = message
+        if code is not None:
+            self.code = code
+
+    def __call__(self, value):
+        if '\x00' in str(value):
+            raise ValidationError(self.message, code=self.code)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self.message == other.message and
+            self.code == other.code
+        )

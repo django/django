@@ -600,6 +600,10 @@ class Question(models.Model):
     question = models.CharField(max_length=20)
     posted = models.DateField(default=datetime.date.today)
     expires = models.DateTimeField(null=True, blank=True)
+    related_questions = models.ManyToManyField('self')
+
+    def __str__(self):
+        return self.question
 
 
 class Answer(models.Model):
@@ -746,6 +750,8 @@ class MainPrepopulated(models.Model):
 class RelatedPrepopulated(models.Model):
     parent = models.ForeignKey(MainPrepopulated, models.CASCADE)
     name = models.CharField(max_length=75)
+    fk = models.ForeignKey('self', models.CASCADE, blank=True, null=True)
+    m2m = models.ManyToManyField('self', blank=True)
     pubdate = models.DateField()
     status = models.CharField(
         max_length=20,
@@ -906,7 +912,6 @@ class InlineReference(models.Model):
     )
 
 
-# Models for #23604 and #23915
 class Recipe(models.Model):
     rname = models.CharField(max_length=20, unique=True)
 
@@ -957,3 +962,12 @@ class ParentWithUUIDPK(models.Model):
 
 class RelatedWithUUIDPKModel(models.Model):
     parent = models.ForeignKey(ParentWithUUIDPK, on_delete=models.SET_NULL, null=True, blank=True)
+
+
+class Author(models.Model):
+    pass
+
+
+class Authorship(models.Model):
+    book = models.ForeignKey(Book, models.CASCADE)
+    author = models.ForeignKey(Author, models.CASCADE)

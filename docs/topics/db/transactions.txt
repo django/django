@@ -176,6 +176,29 @@ Django provides a single API to control database transactions.
         If you catch exceptions raised by raw SQL queries, Django's behavior
         is unspecified and database-dependent.
 
+    .. admonition:: You may need to manually revert model state when rolling back a transaction.
+
+        The values of a model's fields won't be reverted when a transaction
+        rollback happens. This could lead to an inconsistent model state unless
+        you manually restore the original field values.
+
+        For example, given ``MyModel`` with an ``active`` field, this snippet
+        ensures that the ``if obj.active`` check at the end uses the correct
+        value if updating ``active`` to ``True`` fails in the transaction::
+
+            from django.db import DatabaseError, transaction
+
+            obj = MyModel(active=False)
+            obj.active = True
+            try:
+                with transaction.atomic():
+                    obj.save()
+            except DatabaseError:
+                obj.active = False
+
+            if obj.active:
+                ...
+
     In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
     to commit, roll back, or change the autocommit state of the database
     connection within an ``atomic`` block will raise an exception.
@@ -390,7 +413,7 @@ run.
 The solution is simple: instead of doing something during the atomic block
 (transaction) and then undoing it if the transaction fails, use
 :func:`on_commit` to delay doing it in the first place until after the
-transaction succeeds. It’s a lot easier to undo something you never did in the
+transaction succeeds. It's a lot easier to undo something you never did in the
 first place!
 
 Low-level APIs
@@ -464,9 +487,9 @@ Savepoints
 
 A savepoint is a marker within a transaction that enables you to roll back
 part of a transaction, rather than the full transaction. Savepoints are
-available with the SQLite (≥ 3.6.8), PostgreSQL, Oracle and MySQL (when using
-the InnoDB storage engine) backends. Other backends provide the savepoint
-functions, but they're empty operations -- they don't actually do anything.
+available with the SQLite, PostgreSQL, Oracle, and MySQL (when using the InnoDB
+storage engine) backends. Other backends provide the savepoint functions, but
+they're empty operations -- they don't actually do anything.
 
 Savepoints aren't especially useful if you are using autocommit, the default
 behavior of Django. However, once you open a transaction with :func:`atomic`,
@@ -559,8 +582,8 @@ Database-specific notes
 Savepoints in SQLite
 --------------------
 
-While SQLite ≥ 3.6.8 supports savepoints, a flaw in the design of the
-:mod:`sqlite3` module makes them hardly usable.
+While SQLite supports savepoints, a flaw in the design of the :mod:`sqlite3`
+module makes them hardly usable.
 
 When autocommit is enabled, savepoints don't make sense. When it's disabled,
 :mod:`sqlite3` commits implicitly before savepoint statements. (In fact, it

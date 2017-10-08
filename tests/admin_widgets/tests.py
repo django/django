@@ -681,7 +681,8 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def test_show_hide_date_time_picker_widgets(self):
         """
-        Pressing the ESC key closes the date and time picker widgets.
+        Pressing the ESC key or clicking on a widget value closes the date and
+        time picker widgets.
         """
         from selenium.webdriver.common.keys import Keys
 
@@ -690,22 +691,32 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
         # First, with the date picker widget ---------------------------------
+        cal_icon = self.selenium.find_element_by_id('calendarlink0')
         # The date picker is hidden
         self.assertEqual(self.get_css_value('#calendarbox0', 'display'), 'none')
         # Click the calendar icon
-        self.selenium.find_element_by_id('calendarlink0').click()
+        cal_icon.click()
         # The date picker is visible
         self.assertEqual(self.get_css_value('#calendarbox0', 'display'), 'block')
         # Press the ESC key
         self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
         # The date picker is hidden again
         self.assertEqual(self.get_css_value('#calendarbox0', 'display'), 'none')
+        # Click the calendar icon, then on the 15th of current month
+        cal_icon.click()
+        self.selenium.find_element_by_xpath("//a[contains(text(), '15')]").click()
+        self.assertEqual(self.get_css_value('#calendarbox0', 'display'), 'none')
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_birthdate_0').get_attribute('value'),
+            datetime.today().strftime('%Y-%m-') + '15',
+        )
 
         # Then, with the time picker widget ----------------------------------
+        time_icon = self.selenium.find_element_by_id('clocklink0')
         # The time picker is hidden
         self.assertEqual(self.get_css_value('#clockbox0', 'display'), 'none')
         # Click the time icon
-        self.selenium.find_element_by_id('clocklink0').click()
+        time_icon.click()
         # The time picker is visible
         self.assertEqual(self.get_css_value('#clockbox0', 'display'), 'block')
         self.assertEqual(
@@ -719,6 +730,14 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
         # The time picker is hidden again
         self.assertEqual(self.get_css_value('#clockbox0', 'display'), 'none')
+        # Click the time icon, then select the 'Noon' value
+        time_icon.click()
+        self.selenium.find_element_by_xpath("//a[contains(text(), 'Noon')]").click()
+        self.assertEqual(self.get_css_value('#clockbox0', 'display'), 'none')
+        self.assertEqual(
+            self.selenium.find_element_by_id('id_birthdate_1').get_attribute('value'),
+            '12:00:00',
+        )
 
     def test_calendar_nonday_class(self):
         """

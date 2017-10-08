@@ -33,13 +33,13 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode())
 
 
-Database.register_converter("bool", decoder(lambda s: s == '1'))
+Database.register_converter("bool", lambda s: s == b'1')
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("date", decoder(parse_date))
 Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
 Database.register_converter("TIMESTAMP", decoder(parse_datetime))
-Database.register_converter("decimal", decoder(backend_utils.typecast_decimal))
+Database.register_converter("decimal", decoder(decimal.Decimal))
 
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 
@@ -153,9 +153,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 'for controlling thread shareability.',
                 RuntimeWarning
             )
-        kwargs.update({'check_same_thread': False})
-        if self.features.can_share_in_memory_db:
-            kwargs.update({'uri': True})
+        kwargs.update({'check_same_thread': False, 'uri': True})
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -173,6 +171,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
+        conn.execute('PRAGMA foreign_keys = ON')
         return conn
 
     def init_connection_state(self):
@@ -212,6 +211,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # SQLite always runs at the SERIALIZABLE isolation level.
         with self.wrap_database_errors:
             self.connection.isolation_level = level
+
+    def disable_constraint_checking(self):
+        if self.in_atomic_block:
+            # sqlite3 cannot disable constraint checking inside a transaction.
+            return False
+        self.cursor().execute('PRAGMA foreign_keys = OFF')
+        return True
+
+    def enable_constraint_checking(self):
+        self.cursor().execute('PRAGMA foreign_keys = ON')
 
     def check_constraints(self, table_names=None):
         """

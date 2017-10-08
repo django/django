@@ -52,7 +52,6 @@ need to distinguish caches by the ``Accept-language`` header.
 
     Adds some useful headers to the given ``HttpResponse`` object:
 
-    * ``ETag``
     * ``Expires``
     * ``Cache-Control``
 
@@ -60,15 +59,6 @@ need to distinguish caches by the ``Accept-language`` header.
 
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
-
-    .. versionchanged:: 1.11
-
-        In older versions, the ``Last-Modified`` header was also set.
-
-    .. deprecated:: 1.11
-
-        Since the ``USE_ETAGS`` setting is deprecated, this function won't set
-        the ``ETag`` header when the deprecation ends in Django 2.1.
 
 .. function:: add_never_cache_headers(response)
 
@@ -143,7 +133,12 @@ The functions defined in this module share the following properties:
     Parses a string and returns a :class:`datetime.timedelta`.
 
     Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
-    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``).
+    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or
+    PostgreSQL's day-time interval format (e.g. ``3 days 04:05:06``).
+
+    .. versionchanged:: 2.0
+
+        Support for PostgreSQL's interval format was added.
 
 ``django.utils.decorators``
 ===========================
@@ -392,11 +387,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         feed. If no items have either of these attributes this returns the
         current UTC date/time.
 
-        .. versionchanged:: 1.11
-
-            In older versions, it returned the current date/time without any
-            timezone information.
-
 ``Enclosure``
 -------------
 
@@ -466,16 +456,16 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         {% for friend in person.friends %}
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
-    the view and the template are the same, ``@cached_property`` can avoid
-    that::
+    the view and the template are the same, decorating the ``friends()`` method
+    with ``@cached_property`` can avoid that::
 
         from django.utils.functional import cached_property
 
-        @cached_property
-        def friends(self):
-            # expensive computation
-            ...
-            return friends
+        class Person(models.Model):
+
+            @cached_property
+            def friends(self):
+                ...
 
     Note that as the method is now a property, in Python code it will need to
     be invoked appropriately::
@@ -719,8 +709,6 @@ escaping HTML.
 
     Converts a positive integer to a base 36 string.
 
-    .. _sys.maxint: https://docs.python.org/2/library/sys.html#sys.maxint
-
 .. function:: urlsafe_base64_encode(s)
 
     Encodes a bytestring in base64 for use in URLs, stripping any trailing
@@ -798,10 +786,6 @@ appropriate entities.
         >>> type(mystr)
         <type 'str'>
 
-    .. versionchanged:: 1.11
-
-        Added support for decorator usage.
-
 ``django.utils.text``
 =====================
 
@@ -809,8 +793,6 @@ appropriate entities.
     :synopsis: Text manipulation.
 
 .. function:: format_lazy(format_string, *args, **kwargs)
-
-    .. versionadded:: 1.11
 
     A version of :meth:`str.format` for when ``format_string``, ``args``,
     and/or ``kwargs`` contain lazy objects. The first argument is the string to
@@ -820,8 +802,8 @@ appropriate entities.
         from django.utils.translation import pgettext_lazy
 
         urlpatterns = [
-            url(format_lazy(r'{person}/(?P<pk>\d+)/$', person=pgettext_lazy('URL', 'person')),
-                PersonDetailView.as_view()),
+            path(format_lazy('{person}/<int:pk>/', person=pgettext_lazy('URL', 'person')),
+                 PersonDetailView.as_view()),
         ]
 
     This example allows translators to translate part of the URL. If "person"
@@ -924,13 +906,7 @@ appropriate entities.
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
 
-    .. versionchanged:: 1.11
-
-        In older versions, ``value`` is a required argument.
-
 .. function:: localdate(value=None, timezone=None)
-
-    .. versionadded:: 1.11
 
     Uses :func:`localtime` to convert an aware :class:`~datetime.datetime` to a
     :meth:`~datetime.datetime.date` in a different time zone, by default the
@@ -1053,17 +1029,6 @@ functions without the ``u``.
     Same as the non-lazy versions above, but using lazy execution.
 
     See :ref:`lazy translations documentation <lazy-translations>`.
-
-.. function:: string_concat(*strings)
-
-    .. deprecated:: 1.11
-
-        Use :meth:`django.utils.text.format_lazy` instead.
-        ``string_concat(*strings)`` can be replaced by
-        ``format_lazy('{}' * len(strings), *strings)``.
-
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
 
 .. function:: activate(language)
 

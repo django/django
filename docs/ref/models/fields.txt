@@ -315,10 +315,6 @@ This option is valid on all field types except :class:`ManyToManyField` and
 Note that when ``unique`` is ``True``, you don't need to specify
 :attr:`~Field.db_index`, because ``unique`` implies the creation of an index.
 
-.. versionchanged:: 1.11
-
-    In older versions, ``unique=True`` can't be used on :class:`FileField`.
-
 ``unique_for_date``
 -------------------
 
@@ -1137,10 +1133,10 @@ Django also defines a set of fields that represent relations.
 ``ForeignKey``
 --------------
 
-.. class:: ForeignKey(othermodel, on_delete, **options)
+.. class:: ForeignKey(to, on_delete, **options)
 
-A many-to-one relationship. Requires a positional argument: the class to which
-the model is related.
+A many-to-one relationship. Requires two positional arguments: the class to
+which the model is related and the :attr:`~ForeignKey.on_delete` option.
 
 .. _recursive-relationships:
 
@@ -1206,8 +1202,8 @@ need to use::
             on_delete=models.CASCADE,
         )
 
-This sort of reference can be useful when resolving circular import
-dependencies between two applications.
+This sort of reference, called a lazy relationship, can be useful when
+resolving circular import dependencies between two applications.
 
 A database index is automatically created on the ``ForeignKey``. You can
 disable this by setting :attr:`~Field.db_index` to ``False``.  You may want to
@@ -1430,7 +1426,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 ``ManyToManyField``
 -------------------
 
-.. class:: ManyToManyField(othermodel, **options)
+.. class:: ManyToManyField(to, **options)
 
 A many-to-many relationship. Requires a positional argument: the class to
 which the model is related, which works exactly the same as it does for
@@ -1633,7 +1629,7 @@ relationship at the database level.
 ``OneToOneField``
 -----------------
 
-.. class:: OneToOneField(othermodel, on_delete, parent_link=False, **options)
+.. class:: OneToOneField(to, on_delete, parent_link=False, **options)
 
 A one-to-one relationship. Conceptually, this is similar to a
 :class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the
@@ -1797,7 +1793,7 @@ Field API reference
 
     When loading data, :meth:`from_db_value` is used:
 
-    .. method:: from_db_value(value, expression, connection, context)
+    .. method:: from_db_value(value, expression, connection)
 
         Converts a value as returned by the database to a Python object. It is
         the reverse of :meth:`get_prep_value`.

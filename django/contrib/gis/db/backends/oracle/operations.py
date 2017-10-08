@@ -15,7 +15,8 @@ from django.contrib.gis.db.backends.base.operations import (
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
-from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
+from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
 
@@ -24,10 +25,6 @@ DEFAULT_TOLERANCE = '0.05'
 
 class SDOOperator(SpatialOperator):
     sql_template = "%(func)s(%(lhs)s, %(rhs)s) = 'TRUE'"
-
-
-class SDODistance(SpatialOperator):
-    sql_template = "SDO_GEOM.SDO_DISTANCE(%%(lhs)s, %%(rhs)s, %s) %%(op)s %%(value)s" % DEFAULT_TOLERANCE
 
 
 class SDODWithin(SpatialOperator):
@@ -89,7 +86,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     # However, this adversely affects performance (i.e., Java is called
     # to convert to WKT on every query).  If someone wishes to write a
     # SDO_GEOMETRY(...) parser in Python, let me know =)
-    select = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
+    select = 'SDO_UTIL.TO_WKBGEOMETRY(%s)'
 
     gis_operators = {
         'contains': SDOOperator(func='SDO_CONTAINS'),
@@ -104,10 +101,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'relate': SDORelate(),  # Oracle uses a different syntax, e.g., 'mask=inside+touch'
         'touches': SDOOperator(func='SDO_TOUCH'),
         'within': SDOOperator(func='SDO_INSIDE'),
-        'distance_gt': SDODistance(op='>'),
-        'distance_gte': SDODistance(op='>='),
-        'distance_lt': SDODistance(op='<'),
-        'distance_lte': SDODistance(op='<='),
         'dwithin': SDODWithin(),
     }
 
@@ -120,24 +113,12 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     def geo_quote_name(self, name):
         return super().geo_quote_name(name).upper()
 
-    def get_db_converters(self, expression):
-        converters = super().get_db_converters(expression)
-        internal_type = expression.output_field.get_internal_type()
-        geometry_fields = (
-            'PointField', 'GeometryField', 'LineStringField',
-            'PolygonField', 'MultiPointField', 'MultiLineStringField',
-            'MultiPolygonField', 'GeometryCollectionField',
-        )
-        if internal_type in geometry_fields:
-            converters.append(self.convert_textfield_value)
-        return converters
-
     def convert_extent(self, clob):
         if clob:
             # Generally, Oracle returns a polygon for the extent -- however,
             # it can return a single point if there's only one Point in the
             # table.
-            ext_geom = Geometry(clob.read())
+            ext_geom = GEOSGeometry(memoryview(clob.read()))
             gtype = str(ext_geom.geom_type)
             if gtype == 'Polygon':
                 # Construct the 4-tuple from the coordinates in the polygon.
@@ -215,3 +196,21 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         if placeholder == 'NULL':
             return []
         return super().modify_insert_params(placeholder, params)
+
+    def get_geometry_converter(self, expression):
+        read = wkb_r().read
+        srid = expression.output_field.srid
+        if srid == -1:
+            srid = None
+        geom_class = expression.output_field.geom_class
+
+        def converter(value, expression, connection):
+            if value is not None:
+                geom = GEOSGeometryBase(read(memoryview(value.read())), geom_class)
+                if srid:
+                    geom.srid = srid
+                return geom
+        return converter
+
+    def get_area_att_for_field(self, field):
+        return 'sq_m'
