@@ -322,8 +322,8 @@ class OrderingTests(TestCase):
 
     def test_order_by_f_expression_duplicates(self):
         """
-        A column may only be included once (the first occurrence) so we check
-        to ensure there are no duplicates by inspecting the SQL.
+        A column may only be included once (the first occurrence) so
+        there must be no duplicates when inspecting the SQL.
         """
         qs = Article.objects.order_by(F('headline').asc(), F('headline').desc())
         sql = str(qs.query).upper()

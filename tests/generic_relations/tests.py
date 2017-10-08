@@ -99,7 +99,7 @@ class GenericRelationsTests(TestCase):
 
     def test_access_content_object(self):
         """
-        Test accessing the content object like a foreign key.
+        Accessing the content object like a foreign key.
         """
         tagged_item = TaggedItem.objects.get(tag="salty")
         self.assertEqual(tagged_item.content_object, self.bacon)
@@ -120,7 +120,7 @@ class GenericRelationsTests(TestCase):
 
     def test_exclude_generic_relations(self):
         """
-        Test lookups over an object without GenericRelations.
+        Lookups over an object without GenericRelations.
         """
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
@@ -140,7 +140,7 @@ class GenericRelationsTests(TestCase):
 
     def test_access_via_content_type(self):
         """
-        Test lookups through content type.
+        Lookups through content type.
         """
         self.lion.delete()
         self.platypus.tags.create(tag="fatty")

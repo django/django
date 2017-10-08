@@ -1330,7 +1330,7 @@ class ManageRunserver(AdminScriptTestCase):
 
     def test_no_database(self):
         """
-        Ensure runserver.check_migrations doesn't choke on empty DATABASES.
+        runserver.check_migrations doesn't choke on empty DATABASES.
         """
         tested_connections = ConnectionHandler({})
         with mock.patch('django.core.management.base.connections', new=tested_connections):
@@ -1616,8 +1616,8 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_base_run_from_argv(self):
         """
-        Test run_from_argv properly terminates even with custom execute() (#19665)
-        Also test proper traceback display.
+        run_from_argv properly terminates even with custom execute() (#19665)
+        Also proper traceback display.
         """
         err = StringIO()
         command = BaseCommand(stderr=err)
@@ -1865,14 +1865,14 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
     ]
 
     def test_wrong_args(self):
-        "Make sure passing the wrong kinds of arguments outputs an error and prints usage"
+        "Passing the wrong kinds of arguments outputs an error and prints usage"
         out, err = self.run_django_admin(['startproject'])
         self.assertNoOutput(out)
         self.assertOutput(err, "usage:")
         self.assertOutput(err, "You must provide a project name.")
 
     def test_simple_project(self):
-        "Make sure the startproject management command creates a project"
+        "The startproject management command creates a project"
         args = ['startproject', 'testproject']
         testproject_dir = os.path.join(self.test_dir, 'testproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
@@ -1887,7 +1887,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "already exists")
 
     def test_invalid_project_name(self):
-        "Make sure the startproject management command validates a project name"
+        "The startproject management command validates a project name"
         for bad_name in ('7testproject', '../testproject'):
             args = ['startproject', bad_name]
             testproject_dir = os.path.join(self.test_dir, bad_name)
@@ -1921,7 +1921,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertFalse(os.path.exists(testproject_dir))
 
     def test_simple_project_different_directory(self):
-        "Make sure the startproject management command creates a project in a specific directory"
+        "The startproject management command creates a project in a specific directory"
         args = ['startproject', 'testproject', 'othertestproject']
         testproject_dir = os.path.join(self.test_dir, 'othertestproject')
         os.mkdir(testproject_dir)
@@ -1937,7 +1937,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertOutput(err, "already exists")
 
     def test_custom_project_template(self):
-        "Make sure the startproject management command is able to use a different project template"
+        "The startproject management command is able to use a different project template"
         template_path = os.path.join(custom_templates_dir, 'project_template')
         args = ['startproject', '--template', template_path, 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
@@ -1961,7 +1961,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
 
     def test_custom_project_template_from_tarball_by_path(self):
-        "Make sure the startproject management command is able to use a different project template from a tarball"
+        "The startproject management command is able to use a different project template from a tarball"
         template_path = os.path.join(custom_templates_dir, 'project_template.tgz')
         args = ['startproject', '--template', template_path, 'tarballtestproject']
         testproject_dir = os.path.join(self.test_dir, 'tarballtestproject')
@@ -2015,7 +2015,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
 
     def test_file_without_extension(self):
-        "Make sure the startproject management command is able to render custom files"
+        "The startproject management command is able to render custom files"
         template_path = os.path.join(custom_templates_dir, 'project_template')
         args = ['startproject', '--template', template_path, 'customtestproject', '-e', 'txt', '-n', 'Procfile']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
@@ -2032,7 +2032,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                 self.assertEqual(fh.read().strip(), '# some file for customtestproject test project')
 
     def test_custom_project_template_context_variables(self):
-        "Make sure template context variables are rendered with proper values"
+        "Template context variables are rendered with proper values"
         template_path = os.path.join(custom_templates_dir, 'project_template')
         args = ['startproject', '--template', template_path, 'another_project', 'project_dir']
         testproject_dir = os.path.join(self.test_dir, 'project_dir')
@@ -2047,7 +2047,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             self.assertIn("project_directory = '%s'" % testproject_dir, content)
 
     def test_no_escaping_of_project_variables(self):
-        "Make sure template context variables are not html escaped"
+        "Template context variables are not html escaped"
         # We're using a custom command so we need the alternate settings
         self.write_settings('alternate_settings.py')
         self.addCleanup(self.remove_settings, 'alternate_settings.py')
@@ -2069,7 +2069,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     def test_custom_project_destination_missing(self):
         """
-        Make sure an exception is raised when the provided
+        An exception is raised when the provided
         destination directory doesn't exist
         """
         template_path = os.path.join(custom_templates_dir, 'project_template')
@@ -2211,7 +2211,7 @@ class Dumpdata(AdminScriptTestCase):
     def test_pks_parsing(self):
         """Regression for #20509
 
-        Test would raise an exception rather than printing an error message.
+        Raise an exception rather than printing an error message.
         """
         args = ['dumpdata', '--pks=1']
         out, err = self.run_manage(args)

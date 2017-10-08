@@ -205,7 +205,7 @@ class ModelInheritanceTest(TestCase):
     def test_issue_7853(self):
         """
         Regression test for #7853
-        If the parent class has a self-referential link, make sure that any
+        If the parent class has a self-referential link, any
         updates to that link via the child update the right table.
         """
         obj = SelfRefChild.objects.create(child_data=37, parent_data=42)
@@ -244,7 +244,7 @@ class ModelInheritanceTest(TestCase):
     def test_inherited_fields(self):
         """
         Regression test for #8825 and #9390
-        Make sure all inherited fields (esp. m2m fields, in this case) appear
+        All inherited fields (esp. m2m fields, in this case) appear
         on the child class.
         """
         m2mchildren = list(M2MChild.objects.filter(articles__isnull=False))

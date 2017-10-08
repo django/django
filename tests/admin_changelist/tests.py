@@ -169,7 +169,7 @@ class ChangeListTests(TestCase):
         Regression tests for #11791: Inclusion tag result_list generates a
         table and this checks that the items are nested within the table
         element tags.
-        Also a regression test for #13599, verifies that hidden fields
+        Also a regression test for #13599: Hidden fields
         when list_editable is enabled are rendered in a div outside the
         table.
         """
@@ -760,7 +760,7 @@ class ChangeListTests(TestCase):
 
     def test_pagination_page_range(self):
         """
-        Regression tests for ticket #15653: ensure the number of pages
+        Regression tests for ticket #15653: The number of pages
         generated for changelist views are correct.
         """
         # instantiating and setting up ChangeList object

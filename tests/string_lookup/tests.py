@@ -42,7 +42,7 @@ class StringLookupTests(TestCase):
         """
         Regression tests for #3937
 
-        make sure we can use unicode characters in queries.
+        We can use unicode characters in queries.
         If these tests fail on MySQL, it's a problem with the test setup.
         A properly configured UTF-8 database can handle this.
         """
@@ -55,7 +55,7 @@ class StringLookupTests(TestCase):
         """
         Regression tests for #5087
 
-        make sure we can perform queries on TextFields.
+        We can perform queries on TextFields.
         """
 
         a = Article(name='Test', text='The quick brown fox jumps over the lazy dog.')

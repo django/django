@@ -168,7 +168,7 @@ class RawQueryTests(TestCase):
 
     def test_params(self):
         """
-        Test passing optional query parameters
+        Passing optional query parameters
         """
         query = "SELECT * FROM raw_query_author WHERE first_name = %s"
         author = Author.objects.all()[2]
@@ -183,7 +183,7 @@ class RawQueryTests(TestCase):
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_pyformat_params(self):
         """
-        Test passing optional query parameters
+        Passing optional query parameters
         """
         query = "SELECT * FROM raw_query_author WHERE first_name = %(first)s"
         author = Author.objects.all()[2]
@@ -197,7 +197,7 @@ class RawQueryTests(TestCase):
 
     def test_query_representation(self):
         """
-        Test representation of raw query with parameters
+        Representation of raw query with parameters
         """
         query = "SELECT * FROM raw_query_author WHERE last_name = %(last)s"
         qset = Author.objects.raw(query, {'last': 'foo'})
@@ -211,7 +211,7 @@ class RawQueryTests(TestCase):
 
     def test_many_to_many(self):
         """
-        Test of a simple raw query against a model containing a m2m field
+        A simple raw query against a model containing a m2m field
         """
         query = "SELECT * FROM raw_query_reviewer"
         reviewers = Reviewer.objects.all()
@@ -219,7 +219,7 @@ class RawQueryTests(TestCase):
 
     def test_extra_conversions(self):
         """
-        Test to insure that extra translations are ignored.
+        Extra translations are ignored.
         """
         query = "SELECT * FROM raw_query_author"
         translations = {'something': 'else'}
@@ -305,7 +305,7 @@ class RawQueryTests(TestCase):
 
     def test_db_column_name_is_used_in_raw_query(self):
         """
-        Regression test that ensures the `column` attribute on the field is
+        The `column` attribute on the field is
         used to generate the list of fields included in the query, as opposed
         to the `attname`. This is important when the primary key is a
         ForeignKey field because `attname` and `column` are not necessarily the

@@ -42,7 +42,7 @@ class AppsTests(SimpleTestCase):
 
     def test_ready(self):
         """
-        Tests the ready property of the master registry.
+        The ready property of the master registry.
         """
         # The master app registry is always ready when the tests run.
         self.assertTrue(apps.ready)
@@ -51,7 +51,7 @@ class AppsTests(SimpleTestCase):
 
     def test_bad_app_config(self):
         """
-        Tests when INSTALLED_APPS contains an incorrect app config.
+        INSTALLED_APPS contains correct app config.
         """
         msg = "'apps.apps.BadConfig' must supply a name attribute."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -60,7 +60,7 @@ class AppsTests(SimpleTestCase):
 
     def test_not_an_app_config(self):
         """
-        Tests when INSTALLED_APPS contains a class that isn't an app config.
+        INSTALLED_APPS contains a class that is an app config.
         """
         msg = "'apps.apps.NotAConfig' isn't a subclass of AppConfig."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
@@ -69,7 +69,7 @@ class AppsTests(SimpleTestCase):
 
     def test_no_such_app(self):
         """
-        Tests when INSTALLED_APPS contains an app that doesn't exist, either
+        INSTALLED_APPS contains no nonexistent app, either
         directly or via an app config.
         """
         with self.assertRaises(ImportError):
@@ -82,7 +82,7 @@ class AppsTests(SimpleTestCase):
 
     def test_no_such_app_config(self):
         """
-        Tests when INSTALLED_APPS contains an entry that doesn't exist.
+        INSTALLED_APPS contains no nonexistent entry.
         """
         with self.assertRaises(ImportError):
             with self.settings(INSTALLED_APPS=['apps.apps.NoSuchConfig']):
@@ -96,7 +96,7 @@ class AppsTests(SimpleTestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_configs(self):
         """
-        Tests apps.get_app_configs().
+        apps.get_app_configs().
         """
         app_configs = apps.get_app_configs()
         self.assertEqual([app_config.name for app_config in app_configs], SOME_INSTALLED_APPS_NAMES)
@@ -104,7 +104,7 @@ class AppsTests(SimpleTestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_app_config(self):
         """
-        Tests apps.get_app_config().
+        apps.get_app_config().
         """
         app_config = apps.get_app_config('admin')
         self.assertEqual(app_config.name, 'django.contrib.admin')
@@ -122,7 +122,7 @@ class AppsTests(SimpleTestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
         """
-        Tests apps.is_installed().
+        apps.is_installed().
         """
         self.assertTrue(apps.is_installed('django.contrib.admin'))
         self.assertTrue(apps.is_installed('django.contrib.auth'))
@@ -132,7 +132,7 @@ class AppsTests(SimpleTestCase):
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
         """
-        Tests apps.get_model().
+        apps.get_model().
         """
         self.assertEqual(apps.get_model('admin', 'LogEntry'), LogEntry)
         with self.assertRaises(LookupError):
@@ -208,7 +208,7 @@ class AppsTests(SimpleTestCase):
 
     def test_model_clash(self):
         """
-        Test for behavior when two models clash in the app registry.
+        Behavior when two models clash in the app registry.
         """
         new_apps = Apps(["apps"])
         meta_contents = {
@@ -258,7 +258,7 @@ class AppsTests(SimpleTestCase):
     @isolate_apps('apps', kwarg_name='apps')
     def test_lazy_model_operation(self, apps):
         """
-        Tests apps.lazy_model_operation().
+        apps.lazy_model_operation().
         """
         model_classes = []
         initial_pending = set(apps._pending_operations)

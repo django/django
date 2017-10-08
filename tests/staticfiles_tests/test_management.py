@@ -31,7 +31,7 @@ class TestNoFilesCreated:
 
     def test_no_files_created(self):
         """
-        Make sure no files were create in the destination directory.
+        No files were created in the destination directory.
         """
         self.assertEqual(os.listdir(settings.STATIC_ROOT), [])
 
@@ -47,7 +47,7 @@ class TestRunserver(StaticFilesTestCase):
 
 class TestFindStatic(TestDefaults, CollectionTestCase):
     """
-    Test ``findstatic`` management command.
+    ``findstatic`` management command.
     """
     def _get_file(self, filepath):
         path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
@@ -325,7 +325,7 @@ class TestCollectionFilesOverride(CollectionTestCase):
 
     def test_ordering_override(self):
         """
-        Test if collectstatic takes files in proper order
+        collectstatic takes files in proper order
         """
         self.assertFileContains('file2.txt', 'duplicate of file2.txt')
 
@@ -439,7 +439,7 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
 
     def test_broken_symlink(self):
         """
-        Test broken symlink gets deleted.
+        Broken symlink gets deleted.
         """
         path = os.path.join(settings.STATIC_ROOT, 'test.txt')
         os.unlink(path)

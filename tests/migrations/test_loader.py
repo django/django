@@ -15,7 +15,7 @@ class RecorderTests(TestCase):
 
     def test_apply(self):
         """
-        Tests marking migrations as applied/unapplied.
+        Marking migrations as applied/unapplied.
         """
         recorder = MigrationRecorder(connection)
         self.assertEqual(
@@ -50,7 +50,7 @@ class LoaderTests(TestCase):
     @modify_settings(INSTALLED_APPS={'append': 'basic'})
     def test_load(self):
         """
-        Makes sure the loader can load the migrations for the test apps,
+        The loader can load the migrations for the test apps,
         and then render them out to a new Apps.
         """
         # Load and test the plan
@@ -84,7 +84,7 @@ class LoaderTests(TestCase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
         """
-        Makes sure the loader can load migrations with a dependency on an unmigrated app.
+        The loader can load migrations with a dependency on an unmigrated app.
         """
         # Load and test the plan
         migration_loader = MigrationLoader(connection)
@@ -109,7 +109,7 @@ class LoaderTests(TestCase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
     def test_run_before(self):
         """
-        Makes sure the loader uses Migration.run_before.
+        The loader uses Migration.run_before.
         """
         # Load and test the plan
         migration_loader = MigrationLoader(connection)
@@ -129,7 +129,7 @@ class LoaderTests(TestCase):
     @modify_settings(INSTALLED_APPS={'append': 'migrations2'})
     def test_first(self):
         """
-        Makes sure the '__first__' migrations build correctly.
+        The '__first__' migrations build correctly.
         """
         migration_loader = MigrationLoader(connection)
         self.assertEqual(

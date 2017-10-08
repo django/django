@@ -149,7 +149,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_sitemaps_lastmod_mixed_ascending_last_modified_missing(self):
         """
         The Last-Modified header is omitted when lastmod isn't found in all
-        sitemaps. Test sitemaps are sorted by lastmod in ascending order.
+        sitemaps. Sitemaps are sorted by lastmod in ascending order.
         """
         response = self.client.get('/lastmod-sitemaps/mixed-ascending.xml')
         self.assertFalse(response.has_header('Last-Modified'))
@@ -157,7 +157,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_sitemaps_lastmod_mixed_descending_last_modified_missing(self):
         """
         The Last-Modified header is omitted when lastmod isn't found in all
-        sitemaps. Test sitemaps are sorted by lastmod in descending order.
+        sitemaps. Sitemaps are sorted by lastmod in descending order.
         """
         response = self.client.get('/lastmod-sitemaps/mixed-descending.xml')
         self.assertFalse(response.has_header('Last-Modified'))
@@ -165,7 +165,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_sitemaps_lastmod_ascending(self):
         """
         The Last-Modified header is set to the most recent sitemap lastmod.
-        Test sitemaps are sorted by lastmod in ascending order.
+        Sitemaps are sorted by lastmod in ascending order.
         """
         response = self.client.get('/lastmod-sitemaps/ascending.xml')
         self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
@@ -173,7 +173,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_sitemaps_lastmod_descending(self):
         """
         The Last-Modified header is set to the most recent sitemap lastmod.
-        Test sitemaps are sorted by lastmod in descending order.
+        Sitemaps are sorted by lastmod in descending order.
         """
         response = self.client.get('/lastmod-sitemaps/descending.xml')
         self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
@@ -207,7 +207,7 @@ class HTTPSitemapTests(SitemapTestsBase):
                 "django.contrib.sites app not installed.")
     def test_sitemap_get_urls_no_site_1(self):
         """
-        Check we get ImproperlyConfigured if we don't pass a site object to
+        We get ImproperlyConfigured if we don't pass a site object to
         Sitemap.get_urls and no Site objects exist
         """
         Site.objects.all().delete()
@@ -217,7 +217,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sitemap_get_urls_no_site_2(self):
         """
-        Check we get ImproperlyConfigured when we don't pass a site object to
+        We get ImproperlyConfigured when we don't pass a site object to
         Sitemap.get_urls if Site objects exists, but the sites framework is not
         actually installed.
         """
@@ -226,7 +226,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     def test_sitemap_item(self):
         """
-        Check to make sure that the raw item is included with each
+        The raw item is included with each
         Sitemap.get_url() url result.
         """
         test_sitemap = Sitemap()

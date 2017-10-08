@@ -265,7 +265,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_exclude_values(self):
         """
-        Tests for basic system checks of 'exclude' option values (#12689)
+        Basic system checks of 'exclude' option values (#12689)
         """
         class ExcludedFields1(admin.ModelAdmin):
             exclude = 'foo'
@@ -339,7 +339,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_valid_generic_inline_model_admin(self):
         """
-        Regression test for #22034 - check that generic inlines don't look for
+        Regression test for #22034 - generic inlines don't look for
         normal ForeignKey relations.
         """
         class InfluenceInline(GenericStackedInline):
@@ -480,7 +480,7 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_fk_exclusion(self):
         """
         Regression test for #11709 - when testing for fk excluding (when exclude is
-        given) make sure fk_name is honored or things blow up when there is more
+        given) fk_name must be honored or things blow up when there is more
         than one fk to the parent model.
         """
         class TwoAlbumFKAndAnEInline(admin.TabularInline):
@@ -767,7 +767,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_list_filter_works_on_through_field_even_when_apps_not_ready(self):
         """
-        Ensure list_filter can access reverse fields even when the app registry
+        list_filter can access reverse fields even when the app registry
         is not ready; refs #24146.
         """
         class BookAdminWithListFilter(admin.ModelAdmin):
