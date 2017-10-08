@@ -420,8 +420,6 @@ a subclass of dictionary. Exceptions are outlined here:
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
-    .. versionadded:: 1.11
-
     Creates a new ``QueryDict`` with keys from ``iterable`` and each value
     equal to ``value``. For example::
 

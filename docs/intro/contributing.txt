@@ -288,9 +288,9 @@ Once the tests complete, you should be greeted with a message informing you
 whether the test suite passed or failed. Since you haven't yet made any changes
 to Django's code, the entire test suite **should** pass. If you get failures or
 errors make sure you've followed all of the previous steps properly. See
-:ref:`running-unit-tests` for more information. If you're using Python 3.5+,
-there will be a couple failures related to deprecation warnings that you can
-ignore. These failures have since been fixed in Django.
+:ref:`running-unit-tests` for more information. There will be a couple failures
+related to deprecation warnings that you can ignore. These failures have since
+been fixed in Django.
 
 Note that the latest Django trunk may not always be stable. When developing
 against trunk, you can check `Django's continuous integration builds`__ to

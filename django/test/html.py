@@ -1,8 +1,7 @@
 """Compare two HTML documents."""
 
 import re
-
-from django.utils.html_parser import HTMLParseError, HTMLParser
+from html.parser import HTMLParser
 
 WHITESPACE = re.compile(r'\s+')
 
@@ -138,6 +137,10 @@ class RootElement(Element):
         return ''.join(str(c) for c in self.children)
 
 
+class HTMLParseError(Exception):
+    pass
+
+
 class Parser(HTMLParser):
     SELF_CLOSING_TAGS = (
         'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame', 'base',
@@ -145,7 +148,7 @@ class Parser(HTMLParser):
     )
 
     def __init__(self):
-        HTMLParser.__init__(self)
+        HTMLParser.__init__(self, convert_charrefs=False)
         self.root = RootElement()
         self.open_tags = []
         self.element_positions = {}

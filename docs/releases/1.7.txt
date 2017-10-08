@@ -421,7 +421,7 @@ Minor features
   <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
   to more easily customize the login policy.
 
-* :func:`django.contrib.auth.views.password_reset` takes an optional
+* ``django.contrib.auth.views.password_reset()`` takes an optional
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
@@ -1846,7 +1846,7 @@ remove usage of these features.
 * The ``check_for_test_cookie`` method in
   :class:`~django.contrib.auth.forms.AuthenticationForm` is removed.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) is removed.
 

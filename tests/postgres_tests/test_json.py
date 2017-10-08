@@ -5,7 +5,6 @@ from decimal import Decimal
 from django.core import exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import CharField, Form, widgets
-from django.test import skipUnlessDBFeature
 from django.utils.html import escape
 
 from . import PostgreSQLTestCase
@@ -18,7 +17,6 @@ except ImportError:
     pass
 
 
-@skipUnlessDBFeature('has_jsonb_datatype')
 class TestSaveLoad(PostgreSQLTestCase):
     def test_null(self):
         instance = JSONModel()
@@ -92,7 +90,6 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(loaded.field_custom, obj_after)
 
 
-@skipUnlessDBFeature('has_jsonb_datatype')
 class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -262,7 +259,6 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
 
 
-@skipUnlessDBFeature('has_jsonb_datatype')
 class TestSerialization(PostgreSQLTestCase):
     test_data = (
         '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '

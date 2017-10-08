@@ -51,8 +51,8 @@ def redirect(to, *args, permanent=False, **kwargs):
 
         * A URL, which will be used as-is for the redirect location.
 
-    By default issues a temporary redirect; pass permanent=True to issue a
-    permanent redirect
+    Issues a temporary redirect by default; pass permanent=True to issue a
+    permanent redirect.
     """
     redirect_class = HttpResponsePermanentRedirect if permanent else HttpResponseRedirect
     return redirect_class(resolve_url(to, *args, **kwargs))

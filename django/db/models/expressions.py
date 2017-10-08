@@ -150,12 +150,6 @@ class BaseExpression:
         if output_field is not None:
             self.output_field = output_field
 
-    def __getstate__(self):
-        # This method required only for Python 3.4.
-        state = self.__dict__.copy()
-        state.pop('convert_value', None)
-        return state
-
     def get_db_converters(self, connection):
         return (
             []
@@ -381,10 +375,7 @@ class BaseExpression:
 
     def __hash__(self):
         path, args, kwargs = self.deconstruct()
-        h = hash(path) ^ hash(args)
-        for kwarg in kwargs.items():
-            h ^= hash(kwarg)
-        return h
+        return hash((path,) + args + tuple(kwargs.items()))
 
 
 class Expression(BaseExpression, Combinable):
@@ -695,10 +686,7 @@ class RawSQL(Expression):
         return [self]
 
     def __hash__(self):
-        h = hash(self.sql) ^ hash(self.output_field)
-        for param in self.params:
-            h ^= hash(param)
-        return h
+        return hash((self.sql, self.output_field) + tuple(self.params))
 
 
 class Star(Expression):

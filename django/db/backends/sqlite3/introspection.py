@@ -1,11 +1,9 @@
 import re
-import warnings
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
 from django.db.models.indexes import Index
-from django.utils.deprecation import RemovedInDjango21Warning
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
@@ -88,21 +86,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_sequences(self, cursor, table_name, table_fields=()):
         pk_col = self.get_primary_key_column(cursor, table_name)
         return [{'table': table_name, 'column': pk_col}]
-
-    def column_name_converter(self, name):
-        """
-        SQLite will in some cases, e.g. when returning columns from views and
-        subselects, return column names in 'alias."column"' format instead of
-        simply 'column'.
-
-        Affects SQLite < 3.7.15, fixed by http://www.sqlite.org/src/info/5526e0aa3c
-        """
-        # TODO: remove when SQLite < 3.7.15 is sufficiently old.
-        # 3.7.13 ships in Debian stable as of 2014-03-21.
-        if self.connection.Database.sqlite_version_info < (3, 7, 15):
-            return name.split('.')[-1].strip('"')
-        else:
-            return name
 
     def get_relations(self, cursor, table_name):
         """
@@ -187,29 +170,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             key_columns.append(tuple(s.strip('"') for s in m.groups()))
 
         return key_columns
-
-    def get_indexes(self, cursor, table_name):
-        warnings.warn(
-            "get_indexes() is deprecated in favor of get_constraints().",
-            RemovedInDjango21Warning, stacklevel=2
-        )
-        indexes = {}
-        for info in self._table_info(cursor, table_name):
-            if info['pk'] != 0:
-                indexes[info['name']] = {'primary_key': True,
-                                         'unique': False}
-        cursor.execute('PRAGMA index_list(%s)' % self.connection.ops.quote_name(table_name))
-        # seq, name, unique
-        for index, unique in [(field[1], field[2]) for field in cursor.fetchall()]:
-            cursor.execute('PRAGMA index_info(%s)' % self.connection.ops.quote_name(index))
-            info = cursor.fetchall()
-            # Skip indexes across multiple fields
-            if len(info) != 1:
-                continue
-            name = info[0][2]  # seqno, cid, name
-            indexes[name] = {'primary_key': indexes.get(name, {}).get("primary_key", False),
-                             'unique': unique}
-        return indexes
 
     def get_primary_key_column(self, cursor, table_name):
         """Return the column name of the primary key for the given table."""

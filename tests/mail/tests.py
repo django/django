@@ -61,10 +61,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
         def iter_attachments():
             for i in email_message.walk():
-                # Once support for Python<3.5 has been dropped, we can use
-                # i.get_content_disposition() here instead.
-                content_disposition = i.get('content-disposition', '').split(';')[0].lower()
-                if content_disposition == 'attachment':
+                if i.get_content_disposition() == 'attachment':
                     filename = i.get_filename()
                     content = i.get_payload(decode=True)
                     mimetype = i.get_content_type()
@@ -1161,8 +1158,8 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
         # New kwarg added in Python 3.5; default switching to False in 3.6.
-        if sys.version_info >= (3, 5):
-            kwargs['decode_data'] = True
+        # Setting a value only silences a deprecation warning in Python 3.5.
+        kwargs['decode_data'] = True
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
         self._sink = []
         self.active = False

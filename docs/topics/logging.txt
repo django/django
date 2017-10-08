@@ -501,11 +501,6 @@ Log messages related to the rendering of templates.
 
 * Missing context variables are logged as ``DEBUG`` messages.
 
-* Uncaught exceptions raised during the rendering of an
-  :ttag:`{% include %} <include>` are logged as ``WARNING`` messages when
-  debug mode is off (helpful since ``{% include %}`` silences the exception and
-  returns an empty string in that case).
-
 .. _django-db-logger:
 
 ``django.db.backends``

@@ -20,6 +20,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import (
     Prefetch, Q, QuerySet, prefetch_related_objects,
 )
+from django.db.models.query_utils import FilteredRelation
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import DEFERRED, Model  # isort:skip
@@ -27,36 +28,6 @@ from django.db.models.fields.related import (  # isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
     ManyToOneRel, ManyToManyRel, OneToOneRel,
 )
-
-
-def permalink(func):
-    """
-    Decorator that calls urls.reverse() to return a URL using parameters
-    returned by the decorated function "func".
-
-    "func" should be a function that returns a tuple in one of the
-    following formats:
-        (viewname, viewargs)
-        (viewname, viewargs, viewkwargs)
-    """
-    import warnings
-    from functools import wraps
-
-    from django.urls import reverse
-    from django.utils.deprecation import RemovedInDjango21Warning
-
-    warnings.warn(
-        'permalink() is deprecated in favor of calling django.urls.reverse() '
-        'in the decorated method.',
-        RemovedInDjango21Warning,
-        stacklevel=2,
-    )
-
-    @wraps(func)
-    def inner(*args, **kwargs):
-        bits = func(*args, **kwargs)
-        return reverse(bits[0], None, *bits[1:3])
-    return inner
 
 
 __all__ = aggregates_all + fields_all + indexes_all
@@ -69,6 +40,7 @@ __all__ += [
     'Window', 'WindowFrame',
     'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
     'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
+    'FilteredRelation',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
-    'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel', 'permalink',
+    'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel',
 ]

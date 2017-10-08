@@ -711,21 +711,6 @@ available to the included template::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
-If the included template causes an exception while it's rendered (including
-if it's missing or has syntax errors), the behavior varies depending on the
-:class:`template engine's <django.template.Engine>` ``debug`` option (if not
-set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
-turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
-:exc:`~django.template.TemplateSyntaxError` will be raised. When debug mode
-is turned off, ``{% include %}`` logs a warning to the ``django.template``
-logger with the exception that happens while rendering the included template
-and returns an empty string.
-
-.. deprecated:: 1.11
-
-    Silencing exceptions raised while rendering the ``{% include %}`` template
-    tag is deprecated. In Django 2.1, the exception will be raised.
-
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
     "render this subtemplate and include the HTML", not as "parse this
@@ -902,11 +887,6 @@ attribute and calling the result ``country_list``.
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
 
-.. versionchanged:: 1.11
-
-    The group object was changed from a dictionary to a
-    :py:func:`~collections.namedtuple`.
-
 Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
 you can also write the previous example as::
 
@@ -996,8 +976,6 @@ attribute, allowing  you to group on the display string rather than the
 
 ``resetcycle``
 --------------
-
-.. versionadded:: 1.11
 
 Resets a previous `cycle`_ so that it restarts from its first item at its next
 encounter. Without arguments, ``{% resetcycle %}`` will reset the last

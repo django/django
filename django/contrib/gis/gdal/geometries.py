@@ -190,10 +190,7 @@ class OGRGeometry(GDALBase):
 
     def __eq__(self, other):
         "Is this Geometry equal to the other?"
-        if isinstance(other, OGRGeometry):
-            return self.equals(other)
-        else:
-            return False
+        return isinstance(other, OGRGeometry) and self.equals(other)
 
     def __str__(self):
         "WKT is used for the string representation."

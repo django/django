@@ -29,7 +29,7 @@ your operating system's package manager.
 You can verify that Python is installed by typing ``python`` from your shell;
 you should see something like::
 
-    Python 3.4.x
+    Python 3.x.y
     [GCC 4.x] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>>

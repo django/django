@@ -6,7 +6,6 @@ import os
 import pickle
 import textwrap
 import unittest
-import warnings
 from importlib import import_module
 from io import StringIO
 
@@ -18,7 +17,6 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango21Warning
 
 try:
     import tblib.pickling_support
@@ -681,16 +679,6 @@ def partition_suite_by_case(suite):
             for item in test_group:
                 groups.extend(partition_suite_by_case(item))
     return groups
-
-
-def setup_databases(*args, **kwargs):
-    warnings.warn(
-        '`django.test.runner.setup_databases()` has moved to '
-        '`django.test.utils.setup_databases()`.',
-        RemovedInDjango21Warning,
-        stacklevel=2,
-    )
-    return _setup_databases(*args, **kwargs)
 
 
 def filter_tests_by_tags(suite, tags, exclude_tags):

@@ -708,7 +708,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         try:
             data = json.loads(raw)
-        except ValueError:
+        except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % raw)
         if isinstance(expected_data, str):
             try:
@@ -725,12 +725,12 @@ class SimpleTestCase(unittest.TestCase):
         """
         try:
             data = json.loads(raw)
-        except ValueError:
+        except json.JSONDecodeError:
             self.fail("First argument is not valid JSON: %r" % raw)
         if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
-            except ValueError:
+            except json.JSONDecodeError:
                 self.fail("Second argument is not valid JSON: %r" % expected_data)
         self.assertNotEqual(data, expected_data, msg=msg)
 

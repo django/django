@@ -636,7 +636,7 @@ message as a nonexistent account.
 Password reset view now accepts ``from_email``
 ----------------------------------------------
 
-The :func:`django.contrib.auth.views.password_reset` view now accepts a
+The ``django.contrib.auth.views.password_reset()`` view now accepts a
 ``from_email`` parameter, which is passed to the ``password_reset_form``’s
 ``save()`` method as a keyword argument. If you are using this view with a
 custom password reset form, then you will need to ensure your form's ``save()``

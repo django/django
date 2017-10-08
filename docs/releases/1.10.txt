@@ -118,19 +118,19 @@ Minor features
   subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value.
 
-* The :func:`~django.contrib.auth.views.logout` view sends "no-cache" headers
+* The ``django.contrib.auth.views.logout()`` view sends "no-cache" headers
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
 
-* Added the optional ``backend`` argument to :func:`~django.contrib.auth.login`
+* Added the optional ``backend`` argument to :func:`django.contrib.auth.login`
   to allow using it without credentials.
 
 * The new :setting:`LOGOUT_REDIRECT_URL` setting controls the redirect of the
-  :func:`~django.contrib.auth.views.logout` view, if the view doesn't get a
+  ``django.contrib.auth.views.logout()`` view, if the view doesn't get a
   ``next_page`` argument.
 
 * The new ``redirect_authenticated_user`` parameter for the
-  :func:`~django.contrib.auth.views.login` view allows redirecting
+  ``django.contrib.auth.views.login()`` view allows redirecting
   authenticated users visiting the login page.
 
 * The new :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` and

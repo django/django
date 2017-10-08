@@ -386,8 +386,6 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: empty_value
 
-       .. versionadded:: 1.11
-
        The value to use to represent "empty". Defaults to an empty string.
 
 ``ChoiceField``

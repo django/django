@@ -238,8 +238,6 @@ foundation for custom widgets.
 
     .. method:: get_context(name, value, attrs)
 
-        .. versionadded:: 1.11
-
         Returns a dictionary of values to use when rendering the widget
         template. By default, the dictionary contains a single key,
         ``'widget'``, which is a dictionary representation of the widget
@@ -273,11 +271,6 @@ foundation for custom widgets.
         Renders a widget to HTML using the given renderer. If ``renderer`` is
         ``None``, the renderer from the :setting:`FORM_RENDERER` setting is
         used.
-
-        .. versionchanged:: 1.11
-
-            The ``renderer`` argument was added. Support for subclasses that
-            don't accept it will be removed in Django 2.1.
 
     .. method:: value_from_datadict(data, files, name)
 

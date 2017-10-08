@@ -61,10 +61,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property
-    def supports_microsecond_precision(self):
-        return self.connection.mysql_version >= (5, 6, 4)
-
-    @cached_property
     def has_zoneinfo_database(self):
         # Test if the time zone definitions are installed.
         with self.connection.cursor() as cursor:

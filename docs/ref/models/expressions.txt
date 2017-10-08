@@ -463,8 +463,6 @@ expressions. For more details see :doc:`conditional-expressions`.
 
 .. class:: Subquery(queryset, output_field=None)
 
-.. versionadded:: 1.11
-
 You can add an explicit subquery to a ``QuerySet`` using the ``Subquery``
 expression.
 
@@ -497,8 +495,6 @@ Referencing columns from the outer queryset
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: OuterRef(field)
-
-.. versionadded:: 1.11
 
 Use ``OuterRef`` when a queryset in a ``Subquery`` needs to refer to a field
 from the outer query. It acts like an :class:`F` expression except that the
@@ -548,8 +544,6 @@ row: the email address of the most recently created comment.
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: Exists(queryset)
-
-.. versionadded:: 1.11
 
 ``Exists`` is a ``Subquery`` subclass that uses an SQL ``EXISTS`` statement. In
 many cases it will perform better than a subquery since the database is able to
@@ -949,19 +943,11 @@ calling the appropriate methods on the wrapped expression.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
 
-        .. versionchanged:: 1.11
-
-            The ``nulls_last`` and ``nulls_first`` parameters were added.
-
     .. method:: desc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
-
-        .. versionchanged:: 1.11
-
-            The ``nulls_first`` and ``nulls_last`` parameters were added.
 
     .. method:: reverse_ordering()
 

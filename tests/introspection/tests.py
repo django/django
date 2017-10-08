@@ -4,8 +4,6 @@ from django.db import connection
 from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango21Warning
 
 from .models import Article, ArticleReporter, City, District, Reporter
 
@@ -46,9 +44,12 @@ class IntrospectionTests(TransactionTestCase):
                     self.fail("The test user has no CREATE VIEW privileges")
                 else:
                     raise
-
-        self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
-        self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+        try:
+            self.assertIn('introspection_article_view', connection.introspection.table_names(include_views=True))
+            self.assertNotIn('introspection_article_view', connection.introspection.table_names())
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP VIEW introspection_article_view')
 
     def test_unmanaged_through_model(self):
         tables = connection.introspection.django_table_names()
@@ -169,22 +170,6 @@ class IntrospectionTests(TransactionTestCase):
             pk_fk_column = connection.introspection.get_primary_key_column(cursor, District._meta.db_table)
         self.assertEqual(primary_key_column, 'id')
         self.assertEqual(pk_fk_column, 'city_id')
-
-    @ignore_warnings(category=RemovedInDjango21Warning)
-    def test_get_indexes(self):
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
-        self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
-
-    @ignore_warnings(category=RemovedInDjango21Warning)
-    def test_get_indexes_multicol(self):
-        """
-        Multicolumn indexes are not included in the introspection results.
-        """
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
-        self.assertNotIn('first_name', indexes)
-        self.assertIn('id', indexes)
 
     def test_get_constraints_index_types(self):
         with connection.cursor() as cursor:

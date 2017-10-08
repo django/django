@@ -60,10 +60,7 @@ def register_converter(converter, type_name):
 
 @lru_cache.lru_cache(maxsize=None)
 def get_converters():
-    converters = {}
-    converters.update(DEFAULT_CONVERTERS)
-    converters.update(REGISTERED_CONVERTERS)
-    return converters
+    return {**DEFAULT_CONVERTERS, **REGISTERED_CONVERTERS}
 
 
 def get_converter(raw_converter):

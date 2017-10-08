@@ -2,7 +2,6 @@ import base64
 import os
 import shutil
 import string
-import sys
 import tempfile
 import unittest
 from datetime import timedelta
@@ -733,10 +732,9 @@ class SessionMiddlewareTests(TestCase):
         # A deleted cookie header looks like:
         #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
         self.assertEqual(
-            'Set-Cookie: {}={}; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
+            'Set-Cookie: {}=""; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
             'Max-Age=0; Path=/'.format(
                 settings.SESSION_COOKIE_NAME,
-                '""' if sys.version_info >= (3, 5) else '',
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
@@ -763,10 +761,9 @@ class SessionMiddlewareTests(TestCase):
         #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0;
         #              Path=/example/
         self.assertEqual(
-            'Set-Cookie: {}={}; Domain=.example.local; expires=Thu, '
+            'Set-Cookie: {}=""; Domain=.example.local; expires=Thu, '
             '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/example/'.format(
                 settings.SESSION_COOKIE_NAME,
-                '""' if sys.version_info >= (3, 5) else '',
             ),
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )

@@ -55,3 +55,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     """
     supports_callproc_kwargs = True
     supports_over_clause = True
+    max_query_params = 2**16 - 1

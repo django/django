@@ -123,3 +123,15 @@ class AutoescapeTagTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('autoescape-lookup01', {'var': {'key': 'this & that'}})
         self.assertEqual(output, 'this &amp; that')
+
+    @setup({'autoescape-incorrect-arg': '{% autoescape true %}{{ var.key }}{% endautoescape %}'})
+    def test_invalid_arg(self):
+        msg = "'autoescape' argument should be 'on' or 'off'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('autoescape-incorrect-arg', {'var': {'key': 'this & that'}})
+
+    @setup({'autoescape-incorrect-arg': '{% autoescape %}{{ var.key }}{% endautoescape %}'})
+    def test_no_arg(self):
+        msg = "'autoescape' tag requires exactly one argument."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('autoescape-incorrect-arg', {'var': {'key': 'this & that'}})

@@ -259,10 +259,9 @@ Usage example::
     >>> Author.objects.create(name='Margaret Smith')
     >>> Author.objects.create(name='Smith, Margaret')
     >>> Author.objects.create(name='Margaret Jackson')
-    >>> authors = Author.objects.annotate(
+    >>> Author.objects.filter(name='Margaret Jackson').annotate(
     ...     smith_index=StrIndex('name', V('Smith'))
-    ... ).order_by('smith_index')
-    >>> authors.first().smith_index
+    ... ).get().smith_index
     0
     >>> authors = Author.objects.annotate(
     ...    smith_index=StrIndex('name', V('Smith'))
@@ -432,8 +431,6 @@ Usage example::
     .. attribute:: lookup_name = 'week_day'
 
 .. class:: ExtractWeek(expression, tzinfo=None, **extra)
-
-    .. versionadded:: 1.11
 
     .. attribute:: lookup_name = 'week'
 
@@ -698,8 +695,6 @@ that deal with date-parts can be used with ``DateField``::
 ``TimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.11
-
 .. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
 
     .. attribute:: kind = 'hour'
@@ -763,8 +758,6 @@ truncate function. It's also registered as a transform on  ``DateTimeField`` as
 ``__date``.
 
 .. class:: TruncTime(expression, **extra)
-
-.. versionadded:: 1.11
 
     .. attribute:: lookup_name = 'time'
     .. attribute:: output_field = TimeField()

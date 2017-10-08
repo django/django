@@ -265,6 +265,7 @@ TEST_DATA = [
     (DecimalValidator(max_digits=3, decimal_places=1), Decimal('999'), ValidationError),
     (DecimalValidator(max_digits=4, decimal_places=1), Decimal('999'), None),
     (DecimalValidator(max_digits=20, decimal_places=2), Decimal('742403889818000000'), None),
+    (DecimalValidator(20, 2), Decimal('7.42403889818E+17'), None),
     (DecimalValidator(max_digits=20, decimal_places=2), Decimal('7424742403889818000000'), ValidationError),
     (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-1'), None),
     (DecimalValidator(max_digits=5, decimal_places=2), Decimal('7304E-3'), ValidationError),

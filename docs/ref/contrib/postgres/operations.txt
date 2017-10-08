@@ -54,8 +54,6 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. class:: BtreeGinExtension()
 
-    .. versionadded:: 1.11
-
     Install the ``btree_gin`` extension.
 
 ``BtreeGistExtension``
@@ -71,8 +69,6 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 ===================
 
 .. class:: CITextExtension()
-
-    .. versionadded:: 1.11
 
     Installs the ``citext`` extension.
 

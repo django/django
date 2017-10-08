@@ -29,6 +29,9 @@ details on these changes.
 * The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
   ``latest()`` will be removed.
 
+See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
+details on these changes.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
@@ -714,7 +717,7 @@ details on these changes.
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
   removed. If your site has been running Django 1.6 for more than

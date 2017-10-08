@@ -16,7 +16,7 @@ from django.utils import tree
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
-PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct')
+PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
 
 
 class InvalidQuery(Exception):
@@ -291,3 +291,44 @@ def check_rel_lookup_compatibility(model, target_opts, field):
         check(target_opts) or
         (getattr(field, 'primary_key', False) and check(field.model._meta))
     )
+
+
+class FilteredRelation:
+    """Specify custom filtering in the ON clause of SQL joins."""
+
+    def __init__(self, relation_name, *, condition=Q()):
+        if not relation_name:
+            raise ValueError('relation_name cannot be empty.')
+        self.relation_name = relation_name
+        self.alias = None
+        if not isinstance(condition, Q):
+            raise ValueError('condition argument must be a Q() instance.')
+        self.condition = condition
+        self.path = []
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self.relation_name == other.relation_name and
+            self.alias == other.alias and
+            self.condition == other.condition
+        )
+
+    def clone(self):
+        clone = FilteredRelation(self.relation_name, condition=self.condition)
+        clone.alias = self.alias
+        clone.path = self.path[:]
+        return clone
+
+    def resolve_expression(self, *args, **kwargs):
+        """
+        QuerySet.annotate() only accepts expression-like arguments
+        (with a resolve_expression() method).
+        """
+        raise NotImplementedError('FilteredRelation.resolve_expression() is unused.')
+
+    def as_sql(self, compiler, connection):
+        # Resolve the condition in Join.filtered_relation.
+        query = compiler.query
+        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
+        return compiler.compile(where)

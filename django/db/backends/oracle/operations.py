@@ -233,6 +233,9 @@ END;
         else:
             return "%s"
 
+    def limit_offset_sql(self, low_mark, high_mark):
+        return ''
+
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
@@ -553,3 +556,9 @@ END;
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super().subtract_temporals(internal_type, lhs, rhs)
+
+    def bulk_batch_size(self, fields, objs):
+        """Oracle restricts the number of parameters in a query."""
+        if fields:
+            return self.connection.features.max_query_params // len(fields)
+        return len(objs)

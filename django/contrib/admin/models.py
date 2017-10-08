@@ -95,7 +95,7 @@ class LogEntry(models.Model):
         if self.change_message and self.change_message[0] == '[':
             try:
                 change_message = json.loads(self.change_message)
-            except ValueError:
+            except json.JSONDecodeError:
                 return self.change_message
             messages = []
             for sub_message in change_message:

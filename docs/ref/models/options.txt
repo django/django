@@ -387,8 +387,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.indexes
 
-    .. versionadded:: 1.11
-
     A list of :doc:`indexes </ref/models/indexes>` that you want to define on
     the model::
 

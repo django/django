@@ -235,8 +235,6 @@ are prefixed by ``"###"``.
 
 .. django-admin-option:: --default MODULE
 
-.. versionadded:: 1.11
-
 The settings module to compare the current settings against. Leave empty to
 compare against Django's default settings.
 
@@ -437,8 +435,6 @@ Specifies the :ref:`serialization format <serialization-formats>` (e.g.,
 <loading-fixtures-stdin>`.
 
 .. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
-
-.. versionadded:: 1.11
 
 Excludes loading the fixtures from the given applications and/or models (in the
 form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
@@ -1019,10 +1015,6 @@ You can also pass code in on standard input to execute it. For example:
 On Windows, the REPL is output due to implementation limits of
 :func:`select.select` on that platform.
 
-.. versionchanged:: 1.11
-
-    In older versions, the REPL is also output on UNIX systems.
-
 ``showmigrations``
 ------------------
 
@@ -1049,10 +1041,6 @@ of 2 and above, all dependencies of a migration will also be shown.
 
 ``app_label``\s arguments limit the output, however, dependencies of provided
 apps may also be included.
-
-.. versionchanged:: 1.11
-
-    In older versions, ``showmigrations --plan`` ignores app labels.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1325,8 +1313,6 @@ class <order-of-tests>` is preserved when using this option.
 
 .. django-admin-option:: --debug-mode
 
-.. versionadded:: 1.11
-
 Sets the :setting:`DEBUG` setting to ``True`` prior to running tests. This may
 help troubleshoot test failures.
 
@@ -1528,8 +1514,6 @@ instance.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. django-admin:: remove_stale_contenttypes
-
-.. versionadded:: 1.11
 
 This command is only available if Django's :doc:`contenttypes app
 </ref/contrib/contenttypes>` (:mod:`django.contrib.contenttypes`) is installed.

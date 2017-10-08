@@ -643,54 +643,32 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif hasattr(obj, item):
             return []
         elif hasattr(model, item):
-            # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
                 field = model._meta.get_field(item)
             except FieldDoesNotExist:
-                try:
-                    field = getattr(model, item)
-                except AttributeError:
-                    field = None
-
-            if field is None:
-                return [
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a "
-                        "callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                            label, item, obj.__class__.__name__, model._meta.app_label, model._meta.object_name
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E108',
-                    )
-                ]
-            elif isinstance(field, models.ManyToManyField):
-                return [
-                    checks.Error(
-                        "The value of '%s' must not be a ManyToManyField." % label,
-                        obj=obj.__class__,
-                        id='admin.E109',
-                    )
-                ]
+                return []
             else:
+                if isinstance(field, models.ManyToManyField):
+                    return [
+                        checks.Error(
+                            "The value of '%s' must not be a ManyToManyField." % label,
+                            obj=obj.__class__,
+                            id='admin.E109',
+                        )
+                    ]
                 return []
         else:
-            try:
-                model._meta.get_field(item)
-            except FieldDoesNotExist:
-                return [
-                    # This is a deliberate repeat of E108; there's more than one path
-                    # required to test this condition.
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, "
-                        "an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                            label, item, obj.__class__.__name__, model._meta.app_label, model._meta.object_name
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E108',
-                    )
-                ]
-            else:
-                return []
+            return [
+                checks.Error(
+                    "The value of '%s' refers to '%s', which is not a callable, "
+                    "an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        label, item, obj.__class__.__name__,
+                        model._meta.app_label, model._meta.object_name,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E108',
+                )
+            ]
 
     def _check_list_display_links(self, obj):
         """ Check that list_display_links is a unique subset of list_display.

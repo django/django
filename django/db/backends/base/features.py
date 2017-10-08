@@ -1,5 +1,5 @@
 from django.db.models.aggregates import StdDev
-from django.db.utils import ProgrammingError
+from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 
 
@@ -69,9 +69,6 @@ class BaseDatabaseFeatures:
     # Does the database driver supports same type temporal data subtraction
     # by returning the type used to store duration field?
     supports_temporal_subtraction = False
-
-    # Do time/datetime fields have microsecond precision?
-    supports_microsecond_precision = True
 
     # Does the __regex lookup support backreferencing and grouping?
     supports_regex_backreferencing = True
@@ -272,9 +269,9 @@ class BaseDatabaseFeatures:
         """Confirm support for STDDEV and related stats functions."""
         try:
             self.connection.ops.check_expression_support(StdDev(1))
-            return True
-        except NotImplementedError:
+        except NotSupportedError:
             return False
+        return True
 
     def introspected_boolean_field_type(self, field=None):
         """

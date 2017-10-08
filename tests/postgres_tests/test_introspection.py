@@ -1,7 +1,6 @@
 from io import StringIO
 
 from django.core.management import call_command
-from django.test import skipUnlessDBFeature
 from django.test.utils import modify_settings
 
 from . import PostgreSQLTestCase
@@ -20,7 +19,6 @@ class InspectDBTests(PostgreSQLTestCase):
         for field_output in field_outputs:
             self.assertIn(field_output, output)
 
-    @skipUnlessDBFeature('has_jsonb_datatype')
     def test_json_field(self):
         self.assertFieldsInModel(
             'postgres_tests_jsonmodel',

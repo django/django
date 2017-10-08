@@ -49,10 +49,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     $$ LANGUAGE plpgsql;"""
     supports_over_clause = True
-
-    @cached_property
-    def supports_aggregate_filter_clause(self):
-        return self.connection.pg_version >= 90400
+    supports_aggregate_filter_clause = True
 
     @cached_property
     def has_select_for_update_skip_locked(self):
@@ -61,10 +58,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def has_brin_index_support(self):
         return self.connection.pg_version >= 90500
-
-    @cached_property
-    def has_jsonb_datatype(self):
-        return self.connection.pg_version >= 90400
 
     @cached_property
     def has_jsonb_agg(self):

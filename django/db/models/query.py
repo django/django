@@ -22,7 +22,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import F
 from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
-from django.db.models.query_utils import InvalidQuery, Q
+from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango30Warning
@@ -256,7 +256,7 @@ class QuerySet:
         """
         The queryset iterator protocol uses three nested iterators in the
         default case:
-            1. sql.compiler:execute_sql()
+            1. sql.compiler.execute_sql()
                - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
                  using cursor.fetchmany(). This part is responsible for
                  doing some column masking, and returning the rows in chunks.
@@ -438,7 +438,7 @@ class QuerySet:
         #    insert into the childmost table.
         # We currently set the primary keys on the objects when using
         # PostgreSQL via the RETURNING ID clause. It should be possible for
-        # Oracle as well, but the semantics for  extracting the primary keys is
+        # Oracle as well, but the semantics for extracting the primary keys is
         # trickier so it's not done yet.
         assert batch_size is None or batch_size > 0
         # Check that the parents share the same concrete model with the our
@@ -953,6 +953,12 @@ class QuerySet:
         if lookups == (None,):
             clone._prefetch_related_lookups = ()
         else:
+            for lookup in lookups:
+                if isinstance(lookup, Prefetch):
+                    lookup = lookup.prefetch_to
+                lookup = lookup.split(LOOKUP_SEP, 1)[0]
+                if lookup in self.query._filtered_relations:
+                    raise ValueError('prefetch_related() is not supported with FilteredRelation.')
             clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
         return clone
 
@@ -984,7 +990,10 @@ class QuerySet:
             if alias in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
                                  "the model." % alias)
-            clone.query.add_annotation(annotation, alias, is_summary=False)
+            if isinstance(annotation, FilteredRelation):
+                clone.query.add_filtered_relation(annotation, alias)
+            else:
+                clone.query.add_annotation(annotation, alias, is_summary=False)
 
         for alias, annotation in clone.query.annotations.items():
             if alias in annotations and annotation.contains_aggregate:
@@ -1060,6 +1069,10 @@ class QuerySet:
             # Can only pass None to defer(), not only(), as the rest option.
             # That won't stop people trying to do this, so let's be explicit.
             raise TypeError("Cannot pass None as an argument to only().")
+        for field in fields:
+            field = field.split(LOOKUP_SEP, 1)[0]
+            if field in self.query._filtered_relations:
+                raise ValueError('only() is not supported with FilteredRelation.')
         clone = self._chain()
         clone.query.add_immediate_loading(fields)
         return clone
@@ -1114,12 +1127,8 @@ class QuerySet:
 
     def _batched_insert(self, objs, fields, batch_size):
         """
-        A helper method for bulk_create() to insert the bulk one batch at a
-        time. Insert recursively a batch from the front of the bulk and then
-        _batched_insert() the remaining objects again.
+        Helper method for bulk_create() to insert objs one batch at a time.
         """
-        if not objs:
-            return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
@@ -1400,12 +1409,10 @@ class Prefetch:
         return None
 
     def __eq__(self, other):
-        if isinstance(other, Prefetch):
-            return self.prefetch_to == other.prefetch_to
-        return False
+        return isinstance(other, Prefetch) and self.prefetch_to == other.prefetch_to
 
     def __hash__(self):
-        return hash(self.__class__) ^ hash(self.prefetch_to)
+        return hash((self.__class__, self.prefetch_to))
 
 
 def normalize_prefetch_lookups(lookups, prefix=None):
@@ -1730,9 +1737,9 @@ class RelatedPopulator:
         #    model's fields.
         #  - related_populators: a list of RelatedPopulator instances if
         #    select_related() descends to related models from this model.
-        #  - field, remote_field: the fields to use for populating the
-        #    internal fields cache. If remote_field is set then we also
-        #    set the reverse link.
+        #  - local_setter, remote_setter: Methods to set cached values on
+        #    the object being populated and on the remote object. Usually
+        #    these are Field.set_cached_value() methods.
         select_fields = klass_info['select_fields']
         from_parent = klass_info['from_parent']
         if not from_parent:
@@ -1751,16 +1758,8 @@ class RelatedPopulator:
         self.model_cls = klass_info['model']
         self.pk_idx = self.init_list.index(self.model_cls._meta.pk.attname)
         self.related_populators = get_related_populators(klass_info, select, self.db)
-        reverse = klass_info['reverse']
-        field = klass_info['field']
-        self.remote_field = None
-        if reverse:
-            self.field = field.remote_field
-            self.remote_field = field
-        else:
-            self.field = field
-            if field.unique:
-                self.remote_field = field.remote_field
+        self.local_setter = klass_info['local_setter']
+        self.remote_setter = klass_info['remote_setter']
 
     def populate(self, row, from_obj):
         if self.reorder_for_init:
@@ -1774,9 +1773,9 @@ class RelatedPopulator:
             if self.related_populators:
                 for rel_iter in self.related_populators:
                     rel_iter.populate(row, obj)
-            if self.remote_field:
-                self.remote_field.set_cached_value(obj, from_obj)
-        self.field.set_cached_value(from_obj, obj)
+        self.local_setter(from_obj, obj)
+        if obj is not None:
+            self.remote_setter(obj, from_obj)
 
 
 def get_related_populators(klass_info, select, db):

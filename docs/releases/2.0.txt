@@ -97,21 +97,11 @@ Minor features
   `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
   ``ManyToManyField``.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher is increased from
   36,000 to 100,000.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,11 +138,6 @@ Minor features
   <django.contrib.gis.gdal.GDALBand.color_interp>` method returns the color
   interpretation for the band.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -178,36 +163,11 @@ Minor features
 * :djadmin:`inspectdb` can now introspect ``JSONField`` and various
   ``RangeField``\s (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added the ``protocol`` keyword argument to the
   :class:`~django.contrib.sitemaps.GenericSitemap` constructor.
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -215,31 +175,11 @@ Cache
 * On memcached, ``cache.set_many()`` returns a list of keys that failed to be
   inserted.
 
-CSRF
-~~~~
-
-* ...
-
-Database backends
-~~~~~~~~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
 File Storage
 ~~~~~~~~~~~~
 
 * :meth:`File.open() <django.core.files.File.open>` can be used as a context
   manager, e.g. ``with file.open() as f:``.
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -259,11 +199,6 @@ Generic Views
 
 * The new :attr:`.ContextMixin.extra_context` attribute allows adding context
   in ``View.as_view()``.
-
-Internationalization
-~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -354,6 +289,9 @@ Models
 * The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
   results as named tuples.
 
+* The new :class:`.FilteredRelation` class allows adding an ``ON`` clause to
+  querysets.
+
 Pagination
 ~~~~~~~~~~
 
@@ -364,16 +302,6 @@ Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * The :djadmin:`runserver` Web server supports HTTP 1.1.
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
 
 Templates
 ~~~~~~~~~
@@ -392,11 +320,6 @@ Tests
 * Added settings that allow customizing the test tablespace parameters for
   Oracle: :setting:`DATAFILE_SIZE`, :setting:`DATAFILE_TMP_SIZE`,
   :setting:`DATAFILE_EXTSIZE`, and :setting:`DATAFILE_TMP_EXTSIZE`.
-
-URLs
-~~~~
-
-* ...
 
 Validators
 ~~~~~~~~~~
@@ -643,12 +566,6 @@ Miscellaneous
   connection, those queries could be included as part of the
   ``assertNumQueries()`` count.
 
-* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is more properly respected in
-  ``contrib.auth`` password reset. Previously, resets were allowed for one day
-  longer than expected. For example, with the default of
-  ``PASSWORD_RESET_TIMEOUT_DAYS = 3``, password reset tokens are now valid for
-  72 hours rather than 96 hours.
-
 * The default size of the Oracle test tablespace is increased from 20M to 50M
   and the default autoextend size is increased from 10M to 25M.
 
@@ -764,8 +681,9 @@ these features.
 
 * ``Field.rel`` and ``Field.remote_field.to`` are removed.
 
-* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` are now
-  required.
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
+  required in models and migrations. Consider squashing migrations so that you
+  have less of them to update.
 
 * ``django.db.models.fields.add_lazy_relation()`` is removed.
 

@@ -220,10 +220,6 @@ subclass::
     e.g. if all the dates are in one month, it'll show the day-level
     drill-down only.
 
-    .. versionchanged:: 1.11
-
-        The ability to reference fields on related models was added.
-
     .. note::
 
         ``date_hierarchy`` uses :meth:`QuerySet.datetimes()
@@ -1364,8 +1360,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. attribute:: ModelAdmin.popup_response_template
 
-    .. versionadded:: 1.11
-
     Path to a custom template, used by :meth:`response_add`,
     :meth:`response_change`, and :meth:`response_delete`.
 
@@ -1524,8 +1518,6 @@ templates used by the :class:`ModelAdmin` views:
     in the :attr:`ModelAdmin.list_display_links` section.
 
 .. method:: ModelAdmin.get_exclude(request, obj=None)
-
-    .. versionadded:: 1.11
 
     The ``get_exclude`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
@@ -2599,10 +2591,6 @@ app or per model. The following can:
 * ``delete_confirmation.html``
 * ``object_history.html``
 * ``popup_response.html``
-
-.. versionchanged:: 1.11
-
-    The ability to override the ``popup_response.html`` template was added.
 
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your

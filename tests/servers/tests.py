@@ -5,7 +5,7 @@ import errno
 import os
 import socket
 import sys
-from http.client import HTTPConnection
+from http.client import HTTPConnection, RemoteDisconnected
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -13,11 +13,6 @@ from urllib.request import urlopen
 from django.test import LiveServerTestCase, override_settings
 
 from .models import Person
-
-try:
-    from http.client import RemoteDisconnected
-except ImportError:  # Python 3.4
-    from http.client import BadStatusLine as RemoteDisconnected
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {

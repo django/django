@@ -487,9 +487,9 @@ Savepoints
 
 A savepoint is a marker within a transaction that enables you to roll back
 part of a transaction, rather than the full transaction. Savepoints are
-available with the SQLite (≥ 3.6.8), PostgreSQL, Oracle and MySQL (when using
-the InnoDB storage engine) backends. Other backends provide the savepoint
-functions, but they're empty operations -- they don't actually do anything.
+available with the SQLite, PostgreSQL, Oracle, and MySQL (when using the InnoDB
+storage engine) backends. Other backends provide the savepoint functions, but
+they're empty operations -- they don't actually do anything.
 
 Savepoints aren't especially useful if you are using autocommit, the default
 behavior of Django. However, once you open a transaction with :func:`atomic`,
@@ -582,8 +582,8 @@ Database-specific notes
 Savepoints in SQLite
 --------------------
 
-While SQLite ≥ 3.6.8 supports savepoints, a flaw in the design of the
-:mod:`sqlite3` module makes them hardly usable.
+While SQLite supports savepoints, a flaw in the design of the :mod:`sqlite3`
+module makes them hardly usable.
 
 When autocommit is enabled, savepoints don't make sense. When it's disabled,
 :mod:`sqlite3` commits implicitly before savepoint statements. (In fact, it

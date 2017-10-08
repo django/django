@@ -216,7 +216,7 @@ Minor features
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
-* The :func:`~django.contrib.auth.views.password_reset` view accepts an
+* The ``django.contrib.auth.views.password_reset()`` view accepts an
   ``extra_email_context`` parameter.
 
 :mod:`django.contrib.contenttypes`

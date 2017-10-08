@@ -1,4 +1,4 @@
-/*global Calendar, findPosX, findPosY, getStyle, get_format, gettext, interpolate, ngettext, quickElement*/
+/*global Calendar, findPosX, findPosY, getStyle, get_format, gettext, gettext_noop, interpolate, ngettext, quickElement*/
 // Inserts shortcut buttons after all of the following:
 //     <input type="text" class="vDateField">
 //     <input type="text" class="vTimeField">
@@ -10,11 +10,11 @@
         clockInputs: [],
         clockHours: {
             default_: [
-                ['Now', -1],
-                ['Midnight', 0],
-                ['6 a.m.', 6],
-                ['Noon', 12],
-                ['6 p.m.', 18]
+                [gettext_noop('Now'), -1],
+                [gettext_noop('Midnight'), 0],
+                [gettext_noop('6 a.m.'), 6],
+                [gettext_noop('Noon'), 12],
+                [gettext_noop('6 p.m.'), 18]
             ]
         },
         dismissClockFunc: [],

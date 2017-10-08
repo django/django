@@ -460,10 +460,6 @@ can be used for notification when a user logs in or out.
         The :class:`~django.http.HttpRequest` object, if one was provided to
         :func:`~django.contrib.auth.authenticate`.
 
-    .. versionchanged:: 1.11
-
-        The ``request`` argument was added.
-
 .. _authentication-backends-reference:
 
 Authentication backends
@@ -516,10 +512,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
-
-        .. versionchanged:: 1.11
-
-            The ``request`` argument was added.
 
     .. method:: get_user_permissions(user_obj, obj=None)
 
