@@ -661,9 +661,10 @@ Features removed in 2.0
 =======================
 
 These features have reached the end of their deprecation cycle and are removed
-in Django 2.0. See :ref:`deprecated-features-1.9` and
-:ref:`deprecated-features-1.10` for details, including how to remove usage of
-these features.
+in Django 2.0.
+
+See :ref:`deprecated-features-1.9` for details on these changes, including how
+to remove usage of these features.
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` is
   removed.
@@ -751,6 +752,8 @@ these features.
 * The ``django.template.loader.LoaderOrigin`` and
   ``django.template.base.StringOrigin`` aliases for
   ``django.template.base.Origin`` are removed.
+
+See :ref:`deprecated-features-1.10` for details on these changes.
 
 * The ``makemigrations --exit`` option is removed.
 
