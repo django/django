@@ -47,6 +47,23 @@ class URLEncodeTests(unittest.TestCase):
             'position=Developer&name=Adrian&name=Simon',
         ])
 
+    def test_dict_with_bytes_values(self):
+        self.assertEqual(urlencode({'a': b'abc'}, doseq=True), 'a=abc')
+
+    def test_dict_with_sequence_of_bytes(self):
+        self.assertEqual(urlencode({'a': [b'spam', b'eggs', b'bacon']}, doseq=True), 'a=spam&a=eggs&a=bacon')
+
+    def test_dict_with_bytearray(self):
+        self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=True), 'a=0&a=1')
+        self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+
+    def test_generator(self):
+        def gen():
+            yield from range(2)
+
+        self.assertEqual(urlencode({'a': gen()}, doseq=True), 'a=0&a=1')
+        self.assertEqual(urlencode({'a': gen()}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+
 
 class Base36IntTests(SimpleTestCase):
     def test_roundtrip(self):
