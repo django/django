@@ -10,8 +10,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Exists, ExpressionList, ExpressionWrapper, F, Func, OrderBy,
-    OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
+    Case, Col, Combinable, Exists, ExpressionList, ExpressionWrapper, F, Func,
+    OrderBy, OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -1387,3 +1387,23 @@ class ReprTests(TestCase):
             repr(Variance('a', sample=True, filter=filter)),
             "Variance(F(a), filter=(AND: ('a', 1)), sample=True)"
         )
+
+
+class CombinableTests(SimpleTestCase):
+    bitwise_msg = 'Use .bitand() and .bitor() for bitwise logical operations.'
+
+    def test_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() & Combinable()
+
+    def test_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() | Combinable()
+
+    def test_reversed_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() & Combinable()
+
+    def test_reversed_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() | Combinable()
