@@ -675,7 +675,7 @@ escaping HTML.
 .. module:: django.utils.http
    :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
 
-.. function:: urlencode(query, doseq=0)
+.. function:: urlencode(query, doseq=False)
 
     A version of Python's :func:`urllib.parse.urlencode` function that can
     operate on ``MultiValueDict`` and non-string values.
