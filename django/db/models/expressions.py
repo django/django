@@ -371,8 +371,7 @@ class BaseExpression:
         """
         yield self
         for expr in self.get_source_expressions():
-            if expr:
-                yield from expr.flatten()
+            yield from expr.flatten()
 
     def select_format(self, compiler, sql, params):
         """
