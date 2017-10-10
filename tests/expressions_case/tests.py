@@ -8,7 +8,7 @@ from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models import F, Max, Min, Q, Sum, Value
 from django.db.models.expressions import Case, When
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import CaseTestModel, Client, FKCaseTestModel, O2OCaseTestModel
 
@@ -1287,3 +1287,17 @@ class CaseDocumentationExamples(TestCase):
             [('Jack Black', 'P')],
             transform=attrgetter('name', 'account_type')
         )
+
+
+class CaseWhenTests(SimpleTestCase):
+    def test_only_when_arguments(self):
+        msg = 'Positional arguments must all be When objects.'
+        with self.assertRaisesMessage(TypeError, msg):
+            Case(When(Q(pk__in=[])), object())
+
+    def test_invalid_when_constructor_args(self):
+        msg = '__init__() takes either a Q object or lookups as keyword arguments'
+        with self.assertRaisesMessage(TypeError, msg):
+            When(condition=object())
+        with self.assertRaisesMessage(TypeError, msg):
+            When()
