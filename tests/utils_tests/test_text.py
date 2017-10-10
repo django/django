@@ -164,8 +164,9 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(lazy_numeric, '0800 3569377')
 
     def test_slugify(self):
-        items = [
+        items = (
             # given - expected - unicode?
+            ('Hello, World!', 'hello-world', False),
             ('Hello, World!', 'hello-world', False),
             ('spam & eggs', 'spam-eggs', False),
             ('spam & ıçüş', 'spam-ıçüş', True),
@@ -175,7 +176,7 @@ class TestUtilsText(SimpleTestCase):
             ('    foo ıç bar', 'foo-ıç-bar', True),
             ('___this-is-a-test___', 'this-is-a-test', True),
             ('你好', '你好', True),
-        ]
+        )
         for value, output, is_unicode in items:
             self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
 
