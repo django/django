@@ -3863,3 +3863,11 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+class Ticket28373Tests(TestCase):
+    def test_ticket_28373(self):
+        created = datetime.datetime.now()
+        Article.objects.create(name='one', created=created)
+        self.assertTrue(Article.objects.filter(created=created).exists())
+        self.assertTrue(Article.objects.filter(created__date=created.date()).exists())
+        
