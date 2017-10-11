@@ -11,9 +11,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s"
-    sql_create_varchar_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s varchar_pattern_ops)%(extra)s"
-    sql_create_text_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s text_pattern_ops)%(extra)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s%(opclass)s)%(extra)s"
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
 
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
@@ -49,9 +47,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if '[' in db_type:
                 return None
             if db_type.startswith('varchar'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_varchar_index)
+                return self._create_index_sql(model, [field], suffix='_like', operator_class='varchar_pattern_ops')
             elif db_type.startswith('text'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
+                return self._create_index_sql(model, [field], suffix='_like', operator_class='text_pattern_ops')
         return None
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
