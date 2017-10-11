@@ -3866,7 +3866,7 @@ class Ticket23622Tests(TestCase):
 
 class Ticket28373Tests(TestCase):
     def test_ticket_28373(self):
-        created = datetime.datetime.now()
+        created = datetime.datetime(2007, 12, 19, 22, 25, 0)
         Article.objects.create(name='one', created=created)
         self.assertTrue(Article.objects.filter(created=created).exists())
         self.assertTrue(Article.objects.filter(created__date=created.date()).exists())
