@@ -11,7 +11,7 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=[], name=None, db_tablespace=None):
+    def __init__(self, *, fields=[], name=None, operator_class='', db_tablespace=None):
         if not isinstance(fields, list):
             raise ValueError('Index.fields must be a list.')
         if not fields:
@@ -29,6 +29,9 @@ class Index:
                 errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
             if errors:
                 raise ValueError(errors)
+        self.operator_class = operator_class
+        if self.operator_class:
+            self.operator_class = ' {}'.format(self.operator_class)
         self.db_tablespace = db_tablespace
 
     def check_name(self):
@@ -48,7 +51,7 @@ class Index:
         col_suffixes = [order[1] for order in self.fields_orders]
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
-            col_suffixes=col_suffixes,
+            col_suffixes=col_suffixes, operator_class=self.operator_class
         )
 
     def remove_sql(self, model, schema_editor):
@@ -64,6 +67,8 @@ class Index:
         kwargs = {'fields': self.fields, 'name': self.name}
         if self.db_tablespace is not None:
             kwargs['db_tablespace'] = self.db_tablespace
+        if self.operator_class:
+            kwargs['operator_class'] = self.operator_class
         return (path, (), kwargs)
 
     def clone(self):

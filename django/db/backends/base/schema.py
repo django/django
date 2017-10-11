@@ -851,7 +851,7 @@ class BaseDatabaseSchemaEditor:
             new_field.remote_field.through._meta.get_field(new_field.m2m_field_name()),
         )
 
-    def _create_index_name(self, table_name, column_names, suffix=""):
+    def _create_index_name(self, table_name, column_names, suffix="", operator_class=''):
         """
         Generate a unique name for an index/unique constraint.
 
@@ -860,6 +860,8 @@ class BaseDatabaseSchemaEditor:
         """
         _, table_name = split_identifier(table_name)
         hash_data = [table_name] + list(column_names)
+        if operator_class:
+            hash_data.append(operator_class)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
@@ -892,7 +894,7 @@ class BaseDatabaseSchemaEditor:
         return ''
 
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
-                          db_tablespace=None, col_suffixes=(), sql=None):
+                          db_tablespace=None, col_suffixes=(), sql=None, operator_class=''):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -912,9 +914,10 @@ class BaseDatabaseSchemaEditor:
         return Statement(
             sql_create_index,
             table=Table(table, self.quote_name),
-            name=IndexName(table, columns, suffix, create_index_name),
+            name=IndexName(table, columns, suffix, operator_class, create_index_name),
             using=using,
             columns=Columns(table, columns, self.quote_name, col_suffixes=col_suffixes),
+            opclass=operator_class,
             extra=tablespace_sql,
         )
 
@@ -981,7 +984,7 @@ class BaseDatabaseSchemaEditor:
         return Statement(
             self.sql_create_unique,
             table=Table(table, self.quote_name),
-            name=IndexName(table, columns, '_uniq', self._create_index_name),
+            name=IndexName(table, columns, '_uniq', '', self._create_index_name),
             columns=Columns(table, columns, self.quote_name),
         )
 
