@@ -164,7 +164,7 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Added support for PostgreSQL operator classes (:attr:`.Index.opclasses`).
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

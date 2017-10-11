@@ -12,9 +12,15 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=(), name=None, db_tablespace=None):
+    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=()):
+        if opclasses and not name:
+            raise ValueError('An index must be named to use opclasses.')
         if not isinstance(fields, (list, tuple)):
             raise ValueError('Index.fields must be a list or tuple.')
+        if not isinstance(opclasses, (list, tuple)):
+            raise ValueError('Index.opclasses must be a list or tuple.')
+        if opclasses and len(fields) != len(opclasses):
+            raise ValueError('Index.fields and Index.opclasses must have the same number of elements.')
         if not fields:
             raise ValueError('At least one field is required to define an index.')
         self.fields = list(fields)
@@ -31,6 +37,7 @@ class Index:
             if errors:
                 raise ValueError(errors)
         self.db_tablespace = db_tablespace
+        self.opclasses = opclasses
 
     def check_name(self):
         errors = []
@@ -49,7 +56,7 @@ class Index:
         col_suffixes = [order[1] for order in self.fields_orders]
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
-            col_suffixes=col_suffixes,
+            col_suffixes=col_suffixes, opclasses=self.opclasses,
         )
 
     def remove_sql(self, model, schema_editor):
@@ -65,6 +72,8 @@ class Index:
         kwargs = {'fields': self.fields, 'name': self.name}
         if self.db_tablespace is not None:
             kwargs['db_tablespace'] = self.db_tablespace
+        if self.opclasses:
+            kwargs['opclasses'] = self.opclasses
         return (path, (), kwargs)
 
     def clone(self):
