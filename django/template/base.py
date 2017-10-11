@@ -515,7 +515,14 @@ class Parser:
         e.g. a compile error within the body of an if statement.
         """
         if not isinstance(e, Exception):
-            e = TemplateSyntaxError(e)
+            if self.origin is not None:
+                if self.origin.template_name is not None:
+                    origin = self.origin.template_name
+                else:
+                    origin = self.origin.name
+                e = TemplateSyntaxError('%s: %s' % (origin, e))
+            else:
+                e = TemplateSyntaxError(e)
         if not hasattr(e, 'token'):
             e.token = token
         return e
