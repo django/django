@@ -65,3 +65,11 @@ class FunctionTests(SimpleTestCase):
             join(['<a>', '<img>', '</a>'], '<br>', autoescape=False),
             '<a>&lt;br&gt;<img>&lt;br&gt;</a>',
         )
+
+    def test_noniterable_arg(self):
+        obj = object()
+        self.assertEqual(join(obj, '<br>'), obj)
+
+    def test_noniterable_arg_autoescape_off(self):
+        obj = object()
+        self.assertEqual(join(obj, '<br>', autoescape=False), obj)
