@@ -148,7 +148,7 @@ The ``Storage`` class
         Validates the ``filename`` by calling :attr:`get_valid_name()` and
         returns a filename to be passed to the :meth:`save` method.
 
-        The ``filename`` argument may include a path as returned by
+        The ``filename`` parameter may include a path as returned by
         :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`.
         In that case, the path won't be passed to :attr:`get_valid_name()` but
         will be prepended back to the resulting name.
@@ -183,10 +183,10 @@ The ``Storage`` class
         storage system may modify the filename as necessary to get a unique
         name. The actual name of the stored file will be returned.
 
-        The ``max_length`` argument is passed along to
+        The ``max_length`` parameter is passed along to
         :meth:`get_available_name`.
 
-        The ``content`` argument must be an instance of
+        The ``content`` parameter must be an instance of
         :class:`django.core.files.File` or a file-like object that can be
         wrapped in ``File``.
 

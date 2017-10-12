@@ -1958,7 +1958,7 @@ Example::
 In this case, migrations pertaining to the ``blog`` app will be contained in
 the ``blog.db_migrations`` package.
 
-If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
+If you provide the ``app_label`` parameter, :djadmin:`makemigrations` will
 automatically create the package if it doesn't already exist.
 
 When you supply ``None`` as a value for an app, Django will consider the app as
@@ -2791,7 +2791,7 @@ Default: ``None``
 
 The URL where requests are redirected after a user logs out using
 :class:`~django.contrib.auth.views.LogoutView` (if the view doesn't get a
-``next_page`` argument).
+``next_page`` parameter).
 
 If ``None``, no redirect will be performed and the logout view will be
 rendered.

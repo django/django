@@ -182,12 +182,12 @@ This method allows adding errors to specific fields from within the
 ``Form.clean()`` method, or from outside the form altogether; for instance
 from a view.
 
-The ``field`` argument is the name of the field to which the errors
+The ``field`` parameter is the name of the field to which the errors
 should be added. If its value is ``None`` the error will be treated as
 a non-field error as returned by :meth:`Form.non_field_errors()
 <django.forms.Form.non_field_errors>`.
 
-The ``error`` argument can be a simple string, or preferably an instance of
+The ``error`` parameter can be a simple string, or preferably an instance of
 ``ValidationError``. See :ref:`raising-validation-error` for best practices
 when defining form errors.
 
@@ -610,7 +610,7 @@ field names.  This behavior is configurable, though, if you want to change the
 ``id`` convention or remove HTML ``id`` attributes and ``<label>`` tags
 entirely.
 
-Use the ``auto_id`` argument to the ``Form`` constructor to control the ``id``
+Use the ``auto_id`` parameter to the ``Form`` constructor to control the ``id``
 and label behavior. This argument must be ``True``, ``False`` or a string.
 
 If ``auto_id`` is ``False``, then the form output will not include ``<label>``
@@ -732,7 +732,7 @@ Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
 :setting:`FORM_RENDERER` setting.
 
 You can set this as a class attribute when declaring your form or use the
-``renderer`` argument to ``Form.__init__()``. For example::
+``renderer`` parameter to ``Form.__init__()``. For example::
 
     from django import forms
 
@@ -763,7 +763,7 @@ appended according to the default order. Unknown field names in the list are
 ignored. This makes it possible to disable a field in a subclass by setting it
 to ``None`` without having to redefine ordering.
 
-You can also use the ``Form.field_order`` argument to a :class:`Form` to
+You can also use the ``Form.field_order`` parameter to a :class:`Form` to
 override the field order. If a :class:`~django.forms.Form` defines
 :attr:`~Form.field_order` *and* you include ``field_order`` when instantiating
 the ``Form``, then the latter ``field_order`` will have precedence.

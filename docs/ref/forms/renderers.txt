@@ -27,7 +27,7 @@ setting. It defaults to
 ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``.
 
 You can also provide a custom renderer by setting the
-:attr:`.Form.default_renderer` attribute or by using the ``renderer`` argument
+:attr:`.Form.default_renderer` attribute or by using the ``renderer`` parameter
 of :meth:`.Widget.render`.
 
 Use one of the :ref:`built-in template form renderers

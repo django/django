@@ -115,7 +115,7 @@ A simple example::
 ``Case()`` accepts any number of ``When()`` objects as individual arguments.
 Other options are provided using keyword arguments. If none of the conditions
 evaluate to ``TRUE``, then the expression given with the ``default`` keyword
-argument is returned. If a ``default`` argument isn't provided, ``None`` is
+argument is returned. If a ``default`` parameter isn't provided, ``None`` is
 used.
 
 If we wanted to change our previous query to get the discount based on how long
@@ -190,7 +190,7 @@ Conditional aggregation
 -----------------------
 
 What if we want to find out how many clients there are for each
-``account_type``? We can use the ``filter`` argument of :ref:`aggregate
+``account_type``? We can use the ``filter`` parameter of :ref:`aggregate
 functions <aggregation-functions>` to achieve this::
 
     >>> # Create some more Clients first so we can have something to count

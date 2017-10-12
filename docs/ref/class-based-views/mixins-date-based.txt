@@ -41,7 +41,7 @@ Date-based mixins
         Tries the following sources, in order:
 
         * The value of the :attr:`YearMixin.year` attribute.
-        * The value of the ``year`` argument captured in the URL pattern.
+        * The value of the ``year`` parameter captured in the URL pattern.
         * The value of the ``year`` ``GET`` query argument.
 
         Raises a 404 if no valid year specification can be found.
@@ -93,7 +93,7 @@ Date-based mixins
         Tries the following sources, in order:
 
         * The value of the :attr:`MonthMixin.month` attribute.
-        * The value of the ``month`` argument captured in the URL pattern.
+        * The value of the ``month`` parameter captured in the URL pattern.
         * The value of the ``month`` ``GET`` query argument.
 
         Raises a 404 if no valid month specification can be found.
@@ -145,7 +145,7 @@ Date-based mixins
         Tries the following sources, in order:
 
         * The value of the :attr:`DayMixin.day` attribute.
-        * The value of the ``day`` argument captured in the URL pattern.
+        * The value of the ``day`` parameter captured in the URL pattern.
         * The value of the ``day`` ``GET`` query argument.
 
         Raises a 404 if no valid day specification can be found.
@@ -198,7 +198,7 @@ Date-based mixins
         Tries the following sources, in order:
 
         * The value of the :attr:`WeekMixin.week` attribute.
-        * The value of the ``week`` argument captured in the URL pattern
+        * The value of the ``week`` parameter captured in the URL pattern
         * The value of the ``week`` ``GET`` query argument.
 
         Raises a 404 if no valid week specification can be found.

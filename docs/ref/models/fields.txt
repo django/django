@@ -246,7 +246,7 @@ validation <validating-objects>`. Default is ``True``.
 
 .. attribute:: Field.error_messages
 
-The ``error_messages`` argument lets you override the default messages that the
+The ``error_messages`` parameter lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override.
 
@@ -607,7 +607,7 @@ uses :class:`~django.core.validators.EmailValidator` to validate the input.
 A file-upload field.
 
 .. note::
-    The ``primary_key`` argument isn't supported and will raise a an error if
+    The ``primary_key`` parameter isn't supported and will raise a an error if
     used.
 
 Has two optional arguments:
@@ -808,11 +808,11 @@ method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
 ``content`` which is an object containing the file's contents.  The
-optional ``save`` argument controls whether or not the model instance is
+optional ``save`` parameter controls whether or not the model instance is
 saved after the file associated with this field has been altered. Defaults to
 ``True``.
 
-Note that the ``content`` argument should be an instance of
+Note that the ``content`` parameter should be an instance of
 :class:`django.core.files.File`, not Python's built-in file object.
 You can construct a :class:`~django.core.files.File` from an existing
 Python file object like this::
@@ -835,7 +835,7 @@ Deletes the file associated with this instance and clears all attributes on
 the field. Note: This method will close the file if it happens to be open when
 ``delete()`` is called.
 
-The optional ``save`` argument controls whether or not the model instance is
+The optional ``save`` parameter controls whether or not the model instance is
 saved after the file associated with this field has been deleted. Defaults to
 ``True``.
 

@@ -89,7 +89,7 @@ instead).
 .. method:: get_valid_name(name)
 
 Returns a filename suitable for use with the underlying storage system. The
-``name`` argument passed to this method is either the original filename sent to
+``name`` parameter passed to this method is either the original filename sent to
 the server or, if ``upload_to`` is a callable, the filename returned by that
 method after any path information is removed. Override this to customize how
 non-standard characters are converted to safe filenames.
@@ -100,7 +100,7 @@ and underscores from the original filename, removing everything else.
 .. method:: get_available_name(name, max_length=None)
 
 Returns a filename that is available in the storage mechanism, possibly taking
-the provided filename into account. The ``name`` argument passed to this method
+the provided filename into account. The ``name`` parameter passed to this method
 will have already cleaned to a filename valid for the storage system, according
 to the ``get_valid_name()`` method described above.
 

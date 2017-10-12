@@ -151,7 +151,7 @@ You can use the :func:`redirect` function in a number of ways.
             return redirect('https://example.com/')
 
 By default, :func:`redirect` returns a temporary redirect. All of the above
-forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
+forms accept a ``permanent`` parameter; if set to ``True`` a permanent redirect
 will be returned::
 
     def my_view(request):

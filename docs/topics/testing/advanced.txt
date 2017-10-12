@@ -682,10 +682,10 @@ can be useful during testing.
     :setting:`DATABASES`, and sets :setting:`NAME` to the value of
     ``old_database_name``.
 
-    The ``verbosity`` argument has the same behavior as for
+    The ``verbosity`` parameter has the same behavior as for
     :class:`~django.test.runner.DiscoverRunner`.
 
-    If the ``keepdb`` argument is ``True``, then the connection to the
+    If the ``keepdb`` parameter is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
 
 .. _topics-testing-code-coverage:

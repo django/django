@@ -46,9 +46,9 @@ check function::
             )
         return errors
 
-The check function *must* accept an ``app_configs`` argument; this argument is
+The check function *must* accept an ``app_configs`` parameter; this argument is
 the list of applications that should be inspected. If None, the check must be
-run on *all* installed apps in the project. The ``**kwargs`` argument is required
+run on *all* installed apps in the project. The ``**kwargs`` parameter is required
 for future expansion.
 
 Messages
@@ -68,7 +68,7 @@ The concept is very similar to messages from the :doc:`message framework
 Messages are tagged with a ``level`` indicating the severity of the message.
 
 There are also shortcuts to make creating messages with common levels easier.
-When using these classes you can omit the ``level`` argument because it is
+When using these classes you can omit the ``level`` parameter because it is
 implied by the class name.
 
 * :class:`Debug`
@@ -134,7 +134,7 @@ by the base class. It's recommended that you delegate each check to separate
 methods.
 
 Consider an example where you are implementing a custom field named
-``RangedIntegerField``. This field adds ``min`` and ``max`` arguments to the
+``RangedIntegerField``. This field adds ``min`` and ``max`` parameters to the
 constructor of ``IntegerField``. You may want to add a check to ensure that users
 provide a min value that is less than or equal to the max value. The following
 code snippet shows how you can implement this check::

@@ -241,7 +241,7 @@ __ http://www.gdal.org/ogr_formats.html
     .. method:: get_geoms(geos=False)
 
     A method that returns a list containing the geometry of each feature in the
-    layer. If the optional argument ``geos`` is set to ``True`` then the
+    layer. If the optional parameter ``geos`` is set to ``True`` then the
     geometries are converted to :class:`~django.contrib.gis.geos.GEOSGeometry`
     objects. Otherwise, they are returned as :class:`OGRGeometry` objects::
 
@@ -1348,11 +1348,11 @@ blue.
         rasters it is recommended to provide the file path of the target raster.
 
         The resampling algorithm used for warping can be specified with the
-        ``resampling`` argument. The default is ``NearestNeighbor``, and the
+        ``resampling`` parameter. The default is ``NearestNeighbor``, and the
         other allowed values are ``Bilinear``, ``Cubic``, ``CubicSpline``,
         ``Lanczos``, ``Average``, and ``Mode``.
 
-        The ``max_error`` argument can be used to specify the maximum error
+        The ``max_error`` parameter can be used to specify the maximum error
         measured in input pixels that is allowed in approximating the
         transformation. The default is 0.0 for exact calculations.
 
@@ -1386,10 +1386,10 @@ blue.
         By default, the driver of the source raster is used and the name of the
         raster is the original name appended with
         ``'_copy' + source_driver_name``. A different driver or name can be
-        specified with the ``driver`` and ``name`` arguments.
+        specified with the ``driver`` and ``name`` parameters.
 
         The default resampling algorithm is ``NearestNeighbour`` but can be
-        changed using the ``resampling`` argument. The default maximum allowed
+        changed using the ``resampling`` parameter. The default maximum allowed
         error for resampling is 0.0 and can be changed using the ``max_error``
         argument. Consult the :attr:`~GDALRaster.warp` documentation for detail
         on those arguments.
@@ -1483,10 +1483,10 @@ blue.
         is a tuple with the following structure:
         ``(minimum, maximum, mean, standard deviation)``.
 
-        If the ``approximate`` argument is set to ``True``, the statistics may
+        If the ``approximate`` parameter is set to ``True``, the statistics may
         be computed based on overviews or a subset of image tiles.
 
-        If the ``refresh`` argument is set to ``True``, the statistics will be
+        If the ``refresh`` parameter is set to ``True``, the statistics will be
         computed from the data directly, and the cache will be updated with the
         result.
 
@@ -1495,7 +1495,7 @@ blue.
         statistics might be cached in an auxiliary file. In some cases this
         metadata might be out of sync with the pixel values or cause values
         from a previous call to be returned which don't reflect the value of
-        the ``approximate`` argument. In such cases, use the ``refresh``
+        the ``approximate`` parameter. In such cases, use the ``refresh``
         argument to get updated values and store them in the cache.
 
         For empty bands (where all pixel values are "no data"), all statistics
@@ -1806,7 +1806,7 @@ For instance::
     '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
 
 To create a new virtual file-based raster from scratch, use the ``ds_input``
-dictionary representation and provide a ``name`` argument that starts with
+dictionary representation and provide a ``name`` parameter that starts with
 ``/vsimem/`` (for detail of the dictionary representation, see
 :ref:`gdal-raster-ds-input`). For virtual file-based rasters, the
 :attr:`~GDALRaster.vsi_buffer` attribute returns the ``bytes`` representation

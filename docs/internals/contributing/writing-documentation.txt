@@ -308,7 +308,7 @@ something like this::
 
         .. versionchanged:: A.B
 
-            The ``middle_name`` argument was added.
+            The ``middle_name`` parameter was added.
 
 Put the changed annotation notes at the bottom of a section, not the top.
 

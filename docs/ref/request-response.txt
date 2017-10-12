@@ -307,12 +307,12 @@ Methods
 
     Returns a cookie value for a signed cookie, or raises a
     ``django.core.signing.BadSignature`` exception if the signature is
-    no longer valid. If you provide the ``default`` argument the exception
+    no longer valid. If you provide the ``default`` parameter the exception
     will be suppressed and that default value will be returned instead.
 
-    The optional ``salt`` argument can be used to provide extra protection
+    The optional ``salt`` parameter can be used to provide extra protection
     against brute force attacks on your secret key. If supplied, the
-    ``max_age`` argument will be checked against the signed timestamp
+    ``max_age`` parameter will be checked against the signed timestamp
     attached to the cookie value to ensure the cookie is not older than
     ``max_age`` seconds.
 
@@ -638,7 +638,7 @@ Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To tell the browser to treat the response as a file attachment, use the
-``content_type`` argument and set the ``Content-Disposition`` header. For example,
+``content_type`` parameter and set the ``Content-Disposition`` header. For example,
 this is how you might return a Microsoft Excel spreadsheet::
 
     >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
@@ -781,7 +781,7 @@ Methods
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
     it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
-    You can use the optional ``salt`` argument for added key strength, but
+    You can use the optional ``salt`` parameter for added key strength, but
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
 

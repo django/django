@@ -49,7 +49,7 @@ The ``File`` class
     .. method:: open(mode=None)
 
         Open or reopen the file (which also does ``File.seek(0)``).
-        The ``mode`` argument allows the same values
+        The ``mode`` parameter allows the same values
         as Python's built-in :func:`python:open()`.
 
         When reopening a file, ``mode`` will override whatever mode the file
@@ -148,7 +148,7 @@ below) will also have a couple of extra methods:
 
         >>> car.photo.save('myphoto.jpg', content, save=True)
 
-    Note that the ``content`` argument must be an instance of either
+    Note that the ``content`` parameter must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
     :class:`~django.core.files.base.ContentFile`.
 

@@ -211,7 +211,7 @@ Custom default settings
 
 If you'd like default values to come from somewhere other than
 ``django.conf.global_settings``, you can pass in a module or class that
-provides the default settings as the ``default_settings`` argument (or as the
+provides the default settings as the ``default_settings`` parameter (or as the
 first positional argument) in the call to ``configure()``.
 
 In this example, default settings are taken from ``myapp_defaults``, and the

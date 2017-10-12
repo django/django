@@ -122,7 +122,7 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances::
 As long as the names match, the model instances will be created correctly.
 
 Alternatively, you can map fields in the query to model fields using the
-``translations`` argument to ``raw()``. This is a dictionary mapping names of
+``translations`` parameter to ``raw()``. This is a dictionary mapping names of
 fields in the query to names of fields on the model. For example, the above
 query could also be written::
 
@@ -219,11 +219,11 @@ argument.
 
     **Don't.**
 
-    Using the ``params`` argument completely protects you from `SQL injection
+    Using the ``params`` parameter completely protects you from `SQL injection
     attacks`__, a common exploit where attackers inject arbitrary SQL into
     your database. If you use string interpolation, sooner or later you'll
     fall victim to SQL injection. As long as you remember to always use the
-    ``params`` argument you'll be protected.
+    ``params`` parameter you'll be protected.
 
 __ https://en.wikipedia.org/wiki/SQL_injection
 
@@ -377,4 +377,4 @@ Calling stored procedures
 
     .. versionchanged:: 2.0
 
-        The ``kparams`` argument was added.
+        The ``kparams`` parameter was added.

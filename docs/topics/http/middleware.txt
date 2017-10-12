@@ -76,11 +76,11 @@ Middleware can live anywhere on your Python path.
 ``__init__(get_response)``
 --------------------------
 
-Middleware factories must accept a ``get_response`` argument. You can also
+Middleware factories must accept a ``get_response`` parameter. You can also
 initialize some global state for the middleware. Keep in mind a couple of
 caveats:
 
-* Django initializes your middleware with only the ``get_response`` argument,
+* Django initializes your middleware with only the ``get_response`` parameter,
   so you can't define ``__init__()`` as requiring any other arguments.
 
 * Unlike the ``__call__()`` method which is called once per request,
@@ -296,7 +296,7 @@ old ``MIDDLEWARE_CLASSES``. All middleware classes included with Django
 are compatible with both settings.
 
 The mixin provides an ``__init__()`` method that accepts an optional
-``get_response`` argument and stores it in ``self.get_response``.
+``get_response`` parameter and stores it in ``self.get_response``.
 
 The ``__call__()`` method:
 

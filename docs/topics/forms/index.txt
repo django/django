@@ -749,7 +749,7 @@ using the :ttag:`include` tag to reuse it in other templates:
     {% endfor %}
 
 If the form object passed to a template has a different name within the
-context, you can alias it using the ``with`` argument of the :ttag:`include`
+context, you can alias it using the ``with`` parameter of the :ttag:`include`
 tag:
 
 .. code-block:: html+django

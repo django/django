@@ -278,5 +278,5 @@ how to remove usage of these features.
 
 * Support for regular expression groups with ``iLmsu#`` in ``url()`` is removed.
 
-* Support for ``Widget.render()`` methods without the ``renderer`` argument
+* Support for ``Widget.render()`` methods without the ``renderer`` parameter
   is removed.

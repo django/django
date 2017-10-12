@@ -80,7 +80,7 @@ should be aware too. In this mode, the example above becomes::
 .. warning::
 
     Dealing with aware datetime objects isn't always intuitive. For instance,
-    the ``tzinfo`` argument of the standard datetime constructor doesn't work
+    the ``tzinfo`` parameter of the standard datetime constructor doesn't work
     reliably for time zones with DST. Using UTC is generally safe; if you're
     using other time zones, you should review the `pytz`_ documentation
     carefully.

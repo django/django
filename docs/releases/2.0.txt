@@ -280,7 +280,7 @@ Models
   :doc:`installing wrappers around execution of database queries
   </topics/db/instrumentation>`.
 
-* The new ``filter`` argument for built-in aggregates allows :ref:`adding
+* The new ``filter`` parameter for built-in aggregates allows :ref:`adding
   different conditionals <conditional-aggregation>` to multiple aggregations
   over the same fields or relations.
 
@@ -685,7 +685,7 @@ to remove usage of these features.
 
 * The ``on_delete`` parameter for ``ForeignKey`` and ``OneToOneField`` are now
   required.
-* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
+* The ``on_delete`` parameter for ``ForeignKey`` and ``OneToOneField`` is now
   required in models and migrations. Consider squashing migrations so that you
   have less of them to update.
 

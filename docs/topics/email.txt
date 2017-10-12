@@ -449,9 +449,9 @@ instance of the email backend that you can use.
 
 By default, a call to ``get_connection()`` will return an instance of the
 email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
-``backend`` argument, an instance of that backend will be instantiated.
+``backend`` parameter, an instance of that backend will be instantiated.
 
-The ``fail_silently`` argument controls how the backend should handle errors.
+The ``fail_silently`` parameter controls how the backend should handle errors.
 If ``fail_silently`` is True, exceptions during the email sending process
 will be silently ignored.
 

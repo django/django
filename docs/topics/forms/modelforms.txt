@@ -787,7 +787,7 @@ Changing the queryset
 By default, when you create a formset from a model, the formset will use a
 queryset that includes all objects in the model (e.g.,
 ``Author.objects.all()``). You can override this behavior by using the
-``queryset`` argument::
+``queryset`` parameter::
 
     >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
 
@@ -1052,7 +1052,7 @@ formset::
             formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
         return render(request, 'manage_authors.html', {'formset': formset})
 
-Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
+Note that we pass the ``queryset`` parameter in both the ``POST`` and ``GET``
 cases in this example.
 
 Using the formset in the template

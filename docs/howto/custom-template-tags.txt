@@ -151,7 +151,7 @@ You can use ``register.filter()`` as a decorator instead::
     def lower(value):
         return value.lower()
 
-If you leave off the ``name`` argument, as in the second example above, Django
+If you leave off the ``name`` parameter, as in the second example above, Django
 will use the function's name as the filter name.
 
 Finally, ``register.filter()`` also accepts three keyword arguments,
@@ -444,7 +444,7 @@ use of :func:`~django.utils.html.format_html` instead of ``mark_safe()`` is
 strongly recommended.
 
 If your template tag needs to access the current context, you can use the
-``takes_context`` argument when registering your tag::
+``takes_context`` parameter when registering your tag::
 
     @register.simple_tag(takes_context=True)
     def current_time(context, format_string):
@@ -484,7 +484,7 @@ positional arguments. For example:
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
 It's possible to store the tag results in a template variable rather than
-directly outputting it. This is done by using the ``as`` argument followed by
+directly outputting it. This is done by using the ``as`` parameter followed by
 the variable name. Doing so enables you to output the content yourself where
 you see fit:
 
@@ -874,7 +874,7 @@ Let's refactor our ``CycleNode`` implementation to use the ``render_context``::
 
 Note that it's perfectly safe to store global information that will not change
 throughout the life of the ``Node`` as an attribute. In the case of
-``CycleNode``, the ``cyclevars`` argument doesn't change after the ``Node`` is
+``CycleNode``, the ``cyclevars`` parameter doesn't change after the ``Node`` is
 instantiated, so we don't need to put it in the ``render_context``. But state
 information that is specific to the template that is currently being rendered,
 like the current iteration of the ``CycleNode``, should be stored in the
@@ -914,7 +914,7 @@ As with filter registration, it is also possible to use this as a decorator::
     def shout(parser, token):
         ...
 
-If you leave off the ``name`` argument, as in the second example above, Django
+If you leave off the ``name`` parameter, as in the second example above, Django
 will use the function's name as the tag name.
 
 Passing template variables to the tag

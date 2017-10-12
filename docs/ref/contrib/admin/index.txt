@@ -2189,7 +2189,7 @@ The ``InlineModelAdmin`` class adds:
 
     For users with JavaScript-enabled browsers, an "Add another" link is
     provided to enable any number of additional inlines to be added in addition
-    to those provided as a result of the ``extra`` argument.
+    to those provided as a result of the ``extra`` parameter.
 
     The dynamic link will not appear if the number of currently displayed forms
     exceeds ``max_num``, or if the user does not have JavaScript enabled.
@@ -2399,7 +2399,7 @@ other. You can customize the appearance using any of the normal
 Working with many-to-many intermediary models
 ---------------------------------------------
 
-When you specify an intermediary model using the ``through`` argument to a
+When you specify an intermediary model using the ``through`` parameter to a
 :class:`~django.db.models.ManyToManyField`, the admin will not display a
 widget by default. This is because each instance of that intermediary model
 requires more information than could be displayed in a single widget, and the
@@ -2624,7 +2624,7 @@ creating your own ``AdminSite`` instance (see below), and changing the
     register your models and ``ModelAdmin`` instances with it.
 
     When constructing an instance of an ``AdminSite``, you can provide
-    a unique instance name using the ``name`` argument to the constructor. This
+    a unique instance name using the ``name`` parameter to the constructor. This
     instance name is used to identify the instance, especially when
     :ref:`reversing admin URLs <admin-reverse-urls>`. If no instance name is
     provided, a default instance name of ``admin`` will be used.

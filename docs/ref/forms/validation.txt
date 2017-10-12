@@ -222,7 +222,7 @@ Django's form (and model) fields support use of simple utility functions and
 classes known as validators. A validator is merely a callable object or
 function that takes a value and simply returns nothing if the value is valid or
 raises a :exc:`~django.core.exceptions.ValidationError` if not. These can be
-passed to a field's constructor, via the field's ``validators`` argument, or
+passed to a field's constructor, via the field's ``validators`` parameter, or
 defined on the :class:`~django.forms.Field` class itself with the
 ``default_validators`` attribute.
 

@@ -370,7 +370,7 @@ authentication are saved in the user's session. This allows the same
 details on a future request. The authentication backend to save in the session
 is selected as follows:
 
-#. Use the value of the optional ``backend`` argument, if provided.
+#. Use the value of the optional ``backend`` parameter, if provided.
 #. Use the value of the ``user.backend`` attribute, if present. This allows
    pairing :func:`~django.contrib.auth.authenticate()` and
    :func:`~django.contrib.auth.login()`:
@@ -380,7 +380,7 @@ is selected as follows:
    one.
 #. Otherwise, raise an exception.
 
-In cases 1 and 2, the value of the ``backend`` argument or the ``user.backend``
+In cases 1 and 2, the value of the ``backend`` parameter or the ``user.backend``
 attribute should be a dotted import path string (like that found in
 :setting:`AUTHENTICATION_BACKENDS`), not the actual backend class.
 
@@ -916,7 +916,7 @@ your URLconf::
 
 The views have optional arguments you can use to alter the behavior of the
 view. For example, if you want to change the template name a view uses, you can
-provide the ``template_name`` argument. A way to do this is to provide keyword
+provide the ``template_name`` parameter. A way to do this is to provide keyword
 arguments in the URLconf, these will be passed on to the view. For example::
 
     urlpatterns = [

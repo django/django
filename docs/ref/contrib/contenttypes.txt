@@ -287,7 +287,7 @@ model:
     .. attribute:: GenericForeignKey.for_concrete_model
 
        If ``False``, the field will be able to reference proxy models. Default
-       is ``True``. This mirrors the ``for_concrete_model`` argument to
+       is ``True``. This mirrors the ``for_concrete_model`` parameter to
        :meth:`~django.contrib.contenttypes.models.ContentTypeManager.get_for_model`.
 
 .. admonition:: Primary key type compatibility
@@ -469,7 +469,7 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     :func:`~django.forms.models.modelformset_factory` and
     :func:`~django.forms.models.inlineformset_factory`.
 
-    The ``for_concrete_model`` argument corresponds to the
+    The ``for_concrete_model`` parameter corresponds to the
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model`
     argument on ``GenericForeignKey``.
 

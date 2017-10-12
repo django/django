@@ -115,7 +115,7 @@ The ``django.template.loader`` module defines two functions to load templates.
     configuration.
 
     If you want to restrict the search to a particular template engine, pass
-    the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
+    the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` parameter.
 
 .. function:: select_template(template_name_list, using=None)
 
@@ -565,7 +565,7 @@ the postmortem will appear like:
 .. image:: _images/postmortem.png
 
 Custom engines can populate the postmortem by passing the ``backend`` and
-``tried`` arguments when raising :exc:`~django.template.TemplateDoesNotExist`.
+``tried`` parameters when raising :exc:`~django.template.TemplateDoesNotExist`.
 Backends that use the postmortem :ref:`should specify an origin
 <template-origin-api>` on the template object.
 
