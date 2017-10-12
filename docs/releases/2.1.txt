@@ -205,7 +205,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The new :tfilter:`json_script` filter safely outputs a Python object as JSON,
+  wrapped in a ``<script>`` tag, ready for use with JavaScript.
 
 Tests
 ~~~~~

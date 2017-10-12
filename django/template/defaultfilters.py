@@ -12,8 +12,8 @@ from django.utils import formats
 from django.utils.dateformat import format, time_format
 from django.utils.encoding import iri_to_uri
 from django.utils.html import (
-    avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
-    strip_tags, urlize as _urlize,
+    avoid_wrapping, conditional_escape, escape, escapejs,
+    json_script as _json_script, linebreaks, strip_tags, urlize as _urlize,
 )
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
@@ -80,6 +80,15 @@ def capfirst(value):
 def escapejs_filter(value):
     """Hex encode characters for use in JavaScript strings."""
     return escapejs(value)
+
+
+@register.filter(is_safe=True)
+def json_script(value, element_id):
+    """
+    Output value JSON-encoded, wrapped in a <script type="application/json">
+    tag.
+    """
+    return _json_script(value, element_id)
 
 
 @register.filter(is_safe=True)

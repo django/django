@@ -1,5 +1,6 @@
 """HTML utilities suitable for global use."""
 
+import json
 import re
 from html.parser import HTMLParser
 from urllib.parse import (
@@ -75,6 +76,27 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
     return mark_safe(str(value).translate(_js_escapes))
+
+
+_json_script_escapes = {
+    ord('>'): '\\u003E',
+    ord('<'): '\\u003C',
+    ord('&'): '\\u0026',
+}
+
+
+def json_script(value, element_id):
+    """
+    Escape all the HTML/XML special characters with their unicode escapes, so
+    value is safe to be output anywhere except for inside a tag attribute. Wrap
+    the escaped JSON in a script tag.
+    """
+    from django.core.serializers.json import DjangoJSONEncoder
+    json_str = json.dumps(value, cls=DjangoJSONEncoder).translate(_json_script_escapes)
+    return format_html(
+        '<script id="{}" type="application/json">{}</script>',
+        element_id, mark_safe(json_str)
+    )
 
 
 def conditional_escape(text):
