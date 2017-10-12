@@ -192,11 +192,7 @@ class AuthenticationForm(forms.Form):
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
-                raise forms.ValidationError(
-                    self.error_messages['invalid_login'],
-                    code='invalid_login',
-                    params={'username': self.username_field.verbose_name},
-                )
+                raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
 
@@ -226,6 +222,13 @@ class AuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+    def get_invalid_login_error(self):
+        return forms.ValidationError(
+            self.error_messages['invalid_login'],
+            code='invalid_login',
+            params={'username': self.username_field.verbose_name},
+        )
 
 
 class PasswordResetForm(forms.Form):
