@@ -337,6 +337,21 @@ class AdminDocViewFunctionsTests(SimpleTestCase):
             (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
             (r'^a/?$', '/a/'),
+            (r'^(?P<a>\w+)\.b', '/<a>.b'),
+            (r'^(?P<a>(?:\w+|\d+))', '/<a>'),
+            (r'^(?P<a>\w+(?#comment))', '/<a>'),
+            (r'^(?i)(?P<a>\w+)', '/<a>'),
+            (r'^(?P<a>\w+)(?P=a)', '/<a>'),
+            (r'^(?P<a>\w+)b{1,2}', '/<a>b'),
+            (r'^(?P<a>\w+)b+', '/<a>b'),
+            (r'^(?P<a>\w+)b*', '/<a>b'),
+            (r'^(?P<a>\w+)\b', '/<a>'),
+            (r'^(\w+)\1', '/<var>'),
+            (r'^(\w+)\12', '/<var>'),
+            (r'^(\w+)\123', '/<var>3'),
+            (r'^(\w+)\0', '/<var>\\0'),
+            (r'^(\w+)\012', '/<var>\\012'),
+            (r'^(\w+)\0123', '/<var>\\0123'),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):
