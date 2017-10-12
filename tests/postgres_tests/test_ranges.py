@@ -1,6 +1,5 @@
 import datetime
 import json
-from contextlib import suppress
 
 from django import forms
 from django.core import exceptions, serializers
@@ -11,12 +10,14 @@ from django.utils import timezone
 from . import PostgreSQLTestCase
 from .models import RangeLookupsModel, RangesModel
 
-with suppress(ImportError):
+try:
     from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
     from django.contrib.postgres import fields as pg_fields, forms as pg_forms
     from django.contrib.postgres.validators import (
         RangeMaxValueValidator, RangeMinValueValidator,
     )
+except ImportError:
+    pass
 
 
 class TestSaveLoad(PostgreSQLTestCase):

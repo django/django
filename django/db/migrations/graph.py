@@ -1,5 +1,4 @@
 import warnings
-from collections import deque
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
@@ -56,9 +55,10 @@ class Node:
         # Use self.key instead of self to speed up the frequent hashing
         # when constructing an OrderedSet.
         if '_ancestors' not in self.__dict__:
-            ancestors = deque([self.key])
-            for parent in sorted(self.parents):
-                ancestors.extendleft(reversed(parent.ancestors()))
+            ancestors = []
+            for parent in sorted(self.parents, reverse=True):
+                ancestors += parent.ancestors()
+            ancestors.append(self.key)
             self.__dict__['_ancestors'] = list(OrderedSet(ancestors))
         return self.__dict__['_ancestors']
 
@@ -68,9 +68,10 @@ class Node:
         # Use self.key instead of self to speed up the frequent hashing
         # when constructing an OrderedSet.
         if '_descendants' not in self.__dict__:
-            descendants = deque([self.key])
-            for child in sorted(self.children):
-                descendants.extendleft(reversed(child.descendants()))
+            descendants = []
+            for child in sorted(self.children, reverse=True):
+                descendants += child.descendants()
+            descendants.append(self.key)
             self.__dict__['_descendants'] = list(OrderedSet(descendants))
         return self.__dict__['_descendants']
 
@@ -288,24 +289,13 @@ class MigrationGraph:
 
     def iterative_dfs(self, start, forwards=True):
         """Iterative depth-first search for finding dependencies."""
-        visited = deque()
-        visited.append(start)
-        if forwards:
-            stack = deque(sorted(start.parents))
-        else:
-            stack = deque(sorted(start.children))
+        visited = []
+        stack = [start]
         while stack:
-            node = stack.popleft()
-            visited.appendleft(node)
-            if forwards:
-                children = sorted(node.parents, reverse=True)
-            else:
-                children = sorted(node.children, reverse=True)
-            # reverse sorting is needed because prepending using deque.extendleft
-            # also effectively reverses values
-            stack.extendleft(children)
-
-        return list(OrderedSet(visited))
+            node = stack.pop()
+            visited.append(node)
+            stack += sorted(node.parents if forwards else node.children)
+        return list(OrderedSet(reversed(visited)))
 
     def root_nodes(self, app=None):
         """

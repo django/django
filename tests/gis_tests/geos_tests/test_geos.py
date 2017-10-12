@@ -1337,6 +1337,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaisesMessage(ValueError, msg):
             GEOSGeometry.from_ewkt('SRID=WGS84;POINT(1 1)')
 
+    def test_fromstr_scientific_wkt(self):
+        self.assertEqual(GEOSGeometry('POINT(1.0e-1 1.0e+1)'), Point(.1, 10))
+
     def test_normalize(self):
         g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
         self.assertIsNone(g.normalize())

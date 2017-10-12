@@ -4,6 +4,7 @@ import os
 import re
 import sys
 from copy import copy
+from functools import partial
 from importlib import import_module
 from io import BytesIO
 from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
@@ -21,7 +22,7 @@ from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
 from django.utils.encoding import force_bytes
-from django.utils.functional import SimpleLazyObject, curry
+from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 
@@ -455,7 +456,7 @@ class Client(RequestFactory):
         # Curry a data dictionary into an instance of the template renderer
         # callback function.
         data = {}
-        on_template_render = curry(store_rendered_templates, data)
+        on_template_render = partial(store_rendered_templates, data)
         signal_uid = "template-render-%s" % id(request)
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
@@ -491,7 +492,7 @@ class Client(RequestFactory):
             response.templates = data.get("templates", [])
             response.context = data.get("context")
 
-            response.json = curry(self._parse_json, response)
+            response.json = partial(self._parse_json, response)
 
             # Attach the ResolverMatch instance to the response
             response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))

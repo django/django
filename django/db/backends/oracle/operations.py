@@ -13,8 +13,6 @@ from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    compiler_module = "django.db.backends.oracle.compiler"
-
     # Oracle uses NUMBER(11) and NUMBER(19) for integer fields.
     integer_field_ranges = {
         'SmallIntegerField': (-99999999999, 99999999999),
@@ -23,6 +21,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
     }
+    set_operators = dict(BaseDatabaseOperations.set_operators, difference='MINUS')
 
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     _sequence_reset_sql = """
@@ -51,10 +50,6 @@ END;
 
     # Oracle doesn't support string without precision; use the max string size.
     cast_char_field_without_max_length = 'NVARCHAR2(2000)'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_operators['difference'] = 'MINUS'
 
     def cache_key_culling_sql(self):
         return """
@@ -235,6 +230,16 @@ END;
             return "DBMS_LOB.SUBSTR(%s)"
         else:
             return "%s"
+
+    def no_limit_value(self):
+        return None
+
+    def limit_offset_sql(self, low_mark, high_mark):
+        fetch, offset = self._get_limit_offset_params(low_mark, high_mark)
+        return '%s%s' % (
+            (' OFFSET %d ROWS' % offset) if offset else '',
+            (' FETCH FIRST %d ROWS ONLY' % fetch) if fetch else '',
+        )
 
     def last_executed_query(self, cursor, sql, params):
         # https://cx-oracle.readthedocs.io/en/latest/cursor.html#Cursor.statement
@@ -518,8 +523,7 @@ END;
         AutoFields that aren't Oracle identity columns.
         """
         name_length = self.max_name_length() - 3
-        sequence_name = '%s_SQ' % strip_quotes(table)
-        return truncate_name(sequence_name, name_length).upper()
+        return '%s_SQ' % truncate_name(strip_quotes(table), name_length).upper()
 
     def _get_sequence_name(self, cursor, table, pk_name):
         cursor.execute("""
@@ -557,3 +561,9 @@ END;
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super().subtract_temporals(internal_type, lhs, rhs)
+
+    def bulk_batch_size(self, fields, objs):
+        """Oracle restricts the number of parameters in a query."""
+        if fields:
+            return self.connection.features.max_query_params // len(fields)
+        return len(objs)

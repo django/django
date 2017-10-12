@@ -7,6 +7,18 @@ module.
 
 .. currentmodule:: django.contrib.postgres.fields
 
+Indexing these fields
+=====================
+
+:class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+B-tree index, which isn't particularly helpful when querying complex data types.
+Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
+:class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
+the index choice is dependent on the queries that you're using. Generally, GiST
+may be a good choice for the :ref:`range fields <range-fields>` and
+:class:`HStoreField`, and GIN may be helpful for :class:`ArrayField` and
+:class:`JSONField`.
+
 ``ArrayField``
 ==============
 
@@ -185,11 +197,10 @@ available for :class:`~django.db.models.IntegerField`. For example::
 Index transforms
 ~~~~~~~~~~~~~~~~
 
-This class of transforms allows you to index into the array in queries. Any
-non-negative integer can be used. There are no errors if it exceeds the
-:attr:`size <ArrayField.size>` of the array. The lookups available after the
-transform are those from the :attr:`base_field <ArrayField.base_field>`. For
-example::
+Index transforms index into the array. Any non-negative integer can be used.
+There are no errors if it exceeds the :attr:`size <ArrayField.size>` of the
+array. The lookups available after the transform are those from the
+:attr:`base_field <ArrayField.base_field>`. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -214,9 +225,9 @@ example::
 Slice transforms
 ~~~~~~~~~~~~~~~~
 
-This class of transforms allow you to take a slice of the array. Any two
-non-negative integers can be used, separated by a single underscore. The
-lookups available after the transform do not change. For example::
+Slice transforms take a slice of the array. Any two non-negative integers can
+be used, separated by a single underscore. The lookups available after the
+transform do not change. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -242,20 +253,10 @@ lookups available after the transform do not change. For example::
     at the database level and cannot be supported in a logical, consistent
     fashion by Django.
 
-Indexing ``ArrayField``
------------------------
-
-At present using :attr:`~django.db.models.Field.db_index` will create a
-``btree`` index. This does not offer particularly significant help to querying.
-A more useful index is a ``GIN`` index, which you should create using a
-:class:`~django.db.migrations.operations.RunSQL` operation.
-
 ``CIText`` fields
 =================
 
 .. class:: CIText(**options)
-
-    .. versionadded:: 1.11
 
     A mixin to create case-insensitive text fields backed by the citext_ type.
     Read about `the performance considerations`_ prior to using it.
@@ -297,10 +298,6 @@ A more useful index is a ``GIN`` index, which you should create using a
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
     step, or ``type "hstore" does not exist`` if you skip the second.
-
-    .. versionchanged:: 1.11
-
-        Added the ability to store nulls. Previously, they were cast to strings.
 
 .. note::
 
@@ -482,8 +479,6 @@ using in conjunction with lookups on
 
     .. attribute:: encoder
 
-        .. versionadded:: 1.11
-
         An optional JSON-encoding class to serialize data types not supported
         by the standard JSON serializer (``datetime``, ``uuid``, etc.). For
         example, you can use the
@@ -516,8 +511,6 @@ using in conjunction with lookups on
     based on keys. The ``jsonb`` field is stored based on the actual structure
     of the JSON which allows indexing. The trade-off is a small additional cost
     on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
-
-    **As a result, this field requires PostgreSQL ≥ 9.4**.
 
 Querying ``JSONField``
 ----------------------
@@ -658,7 +651,7 @@ excluded; that is, ``[)``.
 .. class:: DateTimeRangeField(**options)
 
     Stores a range of timestamps. Based on a
-    :class:`~django.db.models.DateTimeField`. Represented by a ``tztsrange`` in
+    :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
     Python.
 

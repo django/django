@@ -271,10 +271,6 @@ function::
 
     serialize('json', SomeModel.objects.all(), cls=LazyEncoder)
 
-.. versionchanged:: 1.11
-
-    The ability to use a custom encoder using ``cls=...`` was added.
-
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
@@ -303,10 +299,6 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 
 :class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
-
-.. versionchanged:: 1.11
-
-    Support for :class:`~datetime.timedelta` was added.
 
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 

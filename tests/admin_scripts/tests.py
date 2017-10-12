@@ -12,7 +12,6 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import suppress
 from io import StringIO
 from unittest import mock
 
@@ -96,10 +95,12 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Also try to remove the compiled file; if it exists, it could
         # mess up later tests that depend upon the .py file not existing
-        with suppress(OSError):
+        try:
             if sys.platform.startswith('java'):
                 # Jython produces module$py.class files
                 os.remove(re.sub(r'\.py$', '$py.class', full_name))
+        except OSError:
+            pass
         # Also remove a __pycache__ directory, if it exists
         cache_name = os.path.join(self.test_dir, '__pycache__')
         if os.path.isdir(cache_name):
@@ -165,8 +166,10 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def run_manage(self, args, settings_file=None):
         def safe_remove(path):
-            with suppress(OSError):
+            try:
                 os.remove(path)
+            except OSError:
+                pass
 
         conf_dir = os.path.dirname(conf.__file__)
         template_manage_py = os.path.join(conf_dir, 'project_template', 'manage.py-tpl')
@@ -2223,3 +2226,7 @@ class MainModule(AdminScriptTestCase):
         cmd_out, _ = self.run_django_admin(['--version'])
         mod_out, _ = self.run_test('-m', ['django', '--version'])
         self.assertEqual(mod_out, cmd_out)
+
+    def test_program_name_in_help(self):
+        out, err = self.run_test('-m', ['django', 'help'])
+        self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")

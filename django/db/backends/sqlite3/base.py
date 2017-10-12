@@ -153,9 +153,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 'for controlling thread shareability.',
                 RuntimeWarning
             )
-        kwargs.update({'check_same_thread': False})
-        if self.features.can_share_in_memory_db:
-            kwargs.update({'uri': True})
+        kwargs.update({'check_same_thread': False, 'uri': True})
         return kwargs
 
     def get_new_connection(self, conn_params):

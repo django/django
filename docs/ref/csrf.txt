@@ -232,11 +232,6 @@ own view for handling this condition.  To do this, simply set the
 CSRF failures are logged as warnings to the :ref:`django.security.csrf
 <django-security-logger>` logger.
 
-.. versionchanged:: 1.11
-
-    In older versions, CSRF failures are logged to the ``django.request``
-    logger.
-
 .. _how-csrf-works:
 
 How it works

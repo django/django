@@ -34,29 +34,26 @@ class CsOperation(GEOSFuncFactory):
     "For coordinate sequence operations."
     restype = c_int
 
-    def get_func(self, ordinate=False, get=False):
+    def __init__(self, *args, ordinate=False, get=False, **kwargs):
         if get:
             # Get routines have double parameter passed-in by reference.
-            self.errcheck = check_cs_get
+            errcheck = check_cs_get
             dbl_param = POINTER(c_double)
         else:
-            self.errcheck = check_cs_op
+            errcheck = check_cs_op
             dbl_param = c_double
 
         if ordinate:
             # Get/Set ordinate routines have an extra uint parameter.
-            self.argtypes = [CS_PTR, c_uint, c_uint, dbl_param]
+            argtypes = [CS_PTR, c_uint, c_uint, dbl_param]
         else:
-            self.argtypes = [CS_PTR, c_uint, dbl_param]
-        return super().get_func()
+            argtypes = [CS_PTR, c_uint, dbl_param]
+
+        super().__init__(*args, **dict(kwargs, errcheck=errcheck, argtypes=argtypes))
 
 
 class CsOutput(GEOSFuncFactory):
     restype = CS_PTR
-
-    def get_func(self, argtypes):
-        self.argtypes = argtypes
-        return super().get_func()
 
     @staticmethod
     def errcheck(result, func, cargs):
@@ -71,9 +68,9 @@ class CsOutput(GEOSFuncFactory):
 # ## Coordinate Sequence ctypes prototypes ##
 
 # Coordinate Sequence constructors & cloning.
-cs_clone = CsOutput('GEOSCoordSeq_clone', [CS_PTR])
-create_cs = CsOutput('GEOSCoordSeq_create', [c_uint, c_uint])
-get_cs = CsOutput('GEOSGeom_getCoordSeq', [GEOM_PTR])
+cs_clone = CsOutput('GEOSCoordSeq_clone', argtypes=[CS_PTR])
+create_cs = CsOutput('GEOSCoordSeq_create', argtypes=[c_uint, c_uint])
+get_cs = CsOutput('GEOSGeom_getCoordSeq', argtypes=[GEOM_PTR])
 
 # Getting, setting ordinate
 cs_getordinate = CsOperation('GEOSCoordSeq_getOrdinate', ordinate=True, get=True)

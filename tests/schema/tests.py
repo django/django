@@ -2302,8 +2302,6 @@ class SchemaTests(TransactionTestCase):
         Changing the primary key field name of a model with a self-referential
         foreign key (#26384).
         """
-        if connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6):
-            self.skipTest('Skip known bug renaming primary keys on older MySQL versions (#24995).')
         with connection.schema_editor() as editor:
             editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')

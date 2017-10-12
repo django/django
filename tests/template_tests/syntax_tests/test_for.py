@@ -1,4 +1,5 @@
 from django.template import TemplateSyntaxError
+from django.template.defaulttags import ForNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -197,3 +198,21 @@ class ForTagTests(SimpleTestCase):
             },
         })
         self.assertEqual(output, 'two:2,four:4,_six:6,eight:8,')
+
+    @setup({'invalid_for_loop': '{% for x items %}{{ x }}{% endfor %}'})
+    def test_invalid_arg(self):
+        msg = "'for' statements should have at least four words: for x items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('invalid_for_loop', {'items': (1, 2)})
+
+    @setup({'invalid_for_loop': '{% for x from items %}{{ x }}{% endfor %}'})
+    def test_invalid_in_keyword(self):
+        msg = "'for' statements should use the format 'for x in y': for x from items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('invalid_for_loop', {'items': (1, 2)})
+
+
+class ForNodeTests(SimpleTestCase):
+    def test_repr(self):
+        node = ForNode('x', 'sequence', is_reversed=True, nodelist_loop=['val'], nodelist_empty=['val2'])
+        self.assertEqual(repr(node), '<ForNode: for x in sequence, tail_len: 1 reversed>')

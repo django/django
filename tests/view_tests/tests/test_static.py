@@ -141,7 +141,7 @@ class StaticHelperTest(StaticTests):
         urls.urlpatterns = self._old_views_urlpatterns
 
     def test_prefix(self):
-        self.assertEqual(static('test')[0].regex.pattern, '^test(?P<path>.*)$')
+        self.assertEqual(static('test')[0].pattern.regex.pattern, '^test(?P<path>.*)$')
 
     @override_settings(DEBUG=False)
     def test_debug_off(self):

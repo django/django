@@ -116,7 +116,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
-            self._post_init(self.srid)
+            self._post_init()
         else:
             # can this happen?
             raise GEOSException('Geometry resulting from slice deletion was invalid.')

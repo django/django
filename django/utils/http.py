@@ -3,9 +3,7 @@ import calendar
 import datetime
 import re
 import unicodedata
-import warnings
 from binascii import Error as BinasciiError
-from contextlib import suppress
 from email.utils import formatdate
 from urllib.parse import (
     ParseResult, SplitResult, _coerce_args, _splitnetloc, _splitparams, quote,
@@ -15,7 +13,6 @@ from urllib.parse import (
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes
 from django.utils.functional import keep_lazy_text
 
@@ -91,11 +88,24 @@ def urlencode(query, doseq=False):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
-    return original_urlencode(
-        [(k, [str(i) for i in v] if isinstance(v, (list, tuple)) else str(v))
-         for k, v in query],
-        doseq
-    )
+    query_params = []
+    for key, value in query:
+        if isinstance(value, (str, bytes)):
+            query_val = value
+        else:
+            try:
+                iter(value)
+            except TypeError:
+                query_val = value
+            else:
+                # Consume generators and iterators, even when doseq=True, to
+                # work around https://bugs.python.org/issue31706.
+                query_val = [
+                    item if isinstance(item, bytes) else str(item)
+                    for item in value
+                ]
+        query_params.append((key, query_val))
+    return original_urlencode(query_params, doseq)
 
 
 def cookie_date(epoch_seconds=None):
@@ -166,8 +176,10 @@ def parse_http_date_safe(date):
     """
     Same as parse_http_date, but return None if the input is invalid.
     """
-    with suppress(Exception):
+    try:
         return parse_http_date(date)
+    except Exception:
+        pass
 
 
 # Base 36 functions: useful for generating compact URLs
@@ -263,7 +275,7 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
+def is_safe_url(url, allowed_hosts=None, require_https=False):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).
@@ -279,14 +291,6 @@ def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
         return False
     if allowed_hosts is None:
         allowed_hosts = set()
-    if host:
-        warnings.warn(
-            "The host argument is deprecated, use allowed_hosts instead.",
-            RemovedInDjango21Warning,
-            stacklevel=2,
-        )
-        # Avoid mutating the passed in allowed_hosts.
-        allowed_hosts = allowed_hosts | {host}
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
     return (_is_safe_url(url, allowed_hosts, require_https=require_https) and

@@ -57,7 +57,10 @@ class CursorWrapper:
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
     to the particular underlying representation returned by Connection.cursor().
     """
-    codes_for_integrityerror = (1048,)
+    codes_for_integrityerror = (
+        1048,  # Column cannot be null
+        1690,  # BIGINT UNSIGNED value is out of range
+    )
 
     def __init__(self, cursor):
         self.cursor = cursor
@@ -97,14 +100,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
-    _data_types = {
+    data_types = {
         'AutoField': 'integer AUTO_INCREMENT',
         'BigAutoField': 'bigint AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
         'DateField': 'date',
-        'DateTimeField': 'datetime',
+        'DateTimeField': 'datetime(6)',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
         'DurationField': 'bigint',
         'FileField': 'varchar(%(max_length)s)',
@@ -121,16 +124,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'SlugField': 'varchar(%(max_length)s)',
         'SmallIntegerField': 'smallint',
         'TextField': 'longtext',
-        'TimeField': 'time',
+        'TimeField': 'time(6)',
         'UUIDField': 'char(32)',
     }
-
-    @cached_property
-    def data_types(self):
-        if self.features.supports_microsecond_precision:
-            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
-        else:
-            return self._data_types
 
     # For these columns, MySQL doesn't:
     # - accept default values and implicitly treats these columns as nullable

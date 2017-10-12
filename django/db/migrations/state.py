@@ -1,6 +1,6 @@
 import copy
 from collections import OrderedDict
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
@@ -20,7 +20,7 @@ from .exceptions import InvalidBasesError
 def _get_app_label_and_model_name(model, app_label=''):
     if isinstance(model, str):
         split = model.split('.', 1)
-        return (tuple(split) if len(split) == 2 else (app_label, split[0]))
+        return tuple(split) if len(split) == 2 else (app_label, split[0])
     else:
         return model._meta.app_label, model._meta.model_name
 
@@ -224,11 +224,7 @@ class ProjectState:
         return cls(app_models)
 
     def __eq__(self, other):
-        if set(self.models) != set(other.models):
-            return False
-        if set(self.real_apps) != set(other.real_apps):
-            return False
-        return all(model == other.models[key] for key, model in self.models.items())
+        return self.models == other.models and set(self.real_apps) == set(other.real_apps)
 
 
 class AppConfigStub(AppConfig):
@@ -342,9 +338,11 @@ class StateApps(Apps):
         self.clear_cache()
 
     def unregister_model(self, app_label, model_name):
-        with suppress(KeyError):
+        try:
             del self.all_models[app_label][model_name]
             del self.app_configs[app_label].models[model_name]
+        except KeyError:
+            pass
 
 
 class ModelState:

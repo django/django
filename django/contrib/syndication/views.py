@@ -1,5 +1,4 @@
 from calendar import timegm
-from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
@@ -153,13 +152,17 @@ class Feed:
 
         title_tmp = None
         if self.title_template is not None:
-            with suppress(TemplateDoesNotExist):
+            try:
                 title_tmp = loader.get_template(self.title_template)
+            except TemplateDoesNotExist:
+                pass
 
         description_tmp = None
         if self.description_template is not None:
-            with suppress(TemplateDoesNotExist):
+            try:
                 description_tmp = loader.get_template(self.description_template)
+            except TemplateDoesNotExist:
+                pass
 
         for item in self._get_dynamic_attr('items', obj):
             context = self.get_context_data(item=item, site=current_site,

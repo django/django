@@ -25,14 +25,12 @@ from django.core.files import temp as tempfile
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, modify_settings,
-    override_settings, skipUnlessDBFeature,
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -3996,6 +3994,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         """
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_mainprepopulated_add'))
+        self.wait_for('.select2')
 
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
@@ -4019,9 +4018,18 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-0-slug2').get_attribute('value')
         self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
+        initial_select2_inputs = self.selenium.find_elements_by_class_name('select2-selection')
+        # Inline formsets have empty/invisible forms.
+        # 4 visible select2 inputs and 6 hidden inputs.
+        num_initial_select2_inputs = len(initial_select2_inputs)
+        self.assertEqual(num_initial_select2_inputs, 10)
 
         # Add an inline
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            num_initial_select2_inputs + 2
+        )
         self.selenium.find_element_by_id('id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-1-name').send_keys(
@@ -4049,6 +4057,10 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Add an inline
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            num_initial_select2_inputs + 4
+        )
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
@@ -4058,7 +4070,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
         self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
         self.assertEqual(slug2, 'option-one-tabular-inline-ignored-characters')
-
+        # Add an inline without an initial inline.
+        # The button is outside of the browser frame.
+        self.selenium.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[2].click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_class_name('select2-selection')),
+            num_initial_select2_inputs + 6
+        )
         # Save and check that everything is properly stored in the database
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
@@ -4232,6 +4251,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, '<i>edited section</i>')
+        # Rendered select2 input.
+        select2_display = self.selenium.find_element_by_class_name('select2-selection__rendered')
+        # Clear button (×\n) is included in text.
+        self.assertEqual(select2_display.text, '×\n<i>edited section</i>')
 
         # Add popup
         self.selenium.find_element_by_id('add_id_form-0-section').click()
@@ -4243,6 +4266,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_form-0-section'))
         self.assertEqual(select.first_selected_option.text, 'new section')
+        select2_display = self.selenium.find_element_by_class_name('select2-selection__rendered')
+        # Clear button (×\n) is included in text.
+        self.assertEqual(select2_display.text, '×\nnew section')
 
     def test_inline_uuid_pk_edit_with_popup(self):
         from selenium.webdriver.support.ui import Select
@@ -5779,22 +5805,6 @@ class InlineAdminViewOnSiteTest(TestCase):
         "The right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         self.assertContains(response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name))
-
-
-@override_settings(ROOT_URLCONF='admin_views.urls')
-class TestETagWithAdminView(SimpleTestCase):
-    # The admin is compatible with ETags (#16003).
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get(reverse('admin:index'))
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True), ignore_warnings(category=RemovedInDjango21Warning):
-            response = self.client.get(reverse('admin:index'))
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

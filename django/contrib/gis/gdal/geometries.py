@@ -44,14 +44,12 @@ from ctypes import byref, c_char_p, c_double, c_ubyte, c_void_p, string_at
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import (
-    GDALException, OGRIndexError, SRSException,
-)
+from django.contrib.gis.gdal.error import GDALException, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
-from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
 from django.utils.encoding import force_bytes
 
 
@@ -192,10 +190,7 @@ class OGRGeometry(GDALBase):
 
     def __eq__(self, other):
         "Is this Geometry equal to the other?"
-        if isinstance(other, OGRGeometry):
-            return self.equals(other)
-        else:
-            return False
+        return isinstance(other, OGRGeometry) and self.equals(other)
 
     def __str__(self):
         "WKT is used for the string representation."
@@ -555,7 +550,7 @@ class LineString(OGRGeometry):
 
     def __getitem__(self, index):
         "Return the Point at the given index."
-        if index >= 0 and index < self.point_count:
+        if 0 <= index < self.point_count:
             x, y, z = c_double(), c_double(), c_double()
             capi.get_point(self.ptr, index, byref(x), byref(y), byref(z))
             dim = self.coord_dim
@@ -566,12 +561,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError('index out of range: %s' % index)
-
-    def __iter__(self):
-        "Iterate over each point in the LineString."
-        for i in range(self.point_count):
-            yield self[i]
+            raise IndexError('Index out of range when accessing points of a line string: %s.' % index)
 
     def __len__(self):
         "Return the number of points in the LineString."
@@ -618,17 +608,12 @@ class Polygon(OGRGeometry):
         "Return the number of interior rings in this Polygon."
         return self.geom_count
 
-    def __iter__(self):
-        "Iterate through each ring in the Polygon."
-        for i in range(self.geom_count):
-            yield self[i]
-
     def __getitem__(self, index):
         "Get the ring at the specified index."
-        if index < 0 or index >= self.geom_count:
-            raise OGRIndexError('index out of range: %s' % index)
-        else:
+        if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
+        else:
+            raise IndexError('Index out of range when accessing rings of a polygon: %s.' % index)
 
     # Polygon Properties
     @property
@@ -664,15 +649,10 @@ class GeometryCollection(OGRGeometry):
 
     def __getitem__(self, index):
         "Get the Geometry at the specified index."
-        if index < 0 or index >= self.geom_count:
-            raise OGRIndexError('index out of range: %s' % index)
-        else:
+        if 0 <= index < self.geom_count:
             return OGRGeometry(capi.clone_geom(capi.get_geom_ref(self.ptr, index)), self.srs)
-
-    def __iter__(self):
-        "Iterate over each Geometry."
-        for i in range(self.geom_count):
-            yield self[i]
+        else:
+            raise IndexError('Index out of range when accessing geometry in a collection: %s.' % index)
 
     def __len__(self):
         "Return the number of geometries in this Geometry Collection."

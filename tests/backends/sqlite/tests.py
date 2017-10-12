@@ -2,12 +2,10 @@ import re
 import threading
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.db.models import Avg, StdDev, Sum, Variance
-from django.test import (
-    TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature,
-)
+from django.db.utils import NotSupportedError
+from django.test import TestCase, TransactionTestCase, override_settings
 
 from ..models import Item, Object, Square
 
@@ -37,13 +35,13 @@ class Tests(TestCase):
         Raise NotImplementedError when aggregating on date/time fields (#19360).
         """
         for aggregate in (Sum, Avg, Variance, StdDev):
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('time'))
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('date'))
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(aggregate('last_modified'))
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 Item.objects.all().aggregate(
                     **{'complex': aggregate('last_modified') + aggregate('last_modified')}
                 )
@@ -56,19 +54,8 @@ class Tests(TestCase):
                 'NAME': 'file:memorydb_test?mode=memory&cache=shared',
             }
         }
-        wrapper = DatabaseWrapper(settings_dict)
-        creation = wrapper.creation
-        if creation.connection.features.can_share_in_memory_db:
-            expected = creation.connection.settings_dict['TEST']['NAME']
-            self.assertEqual(creation._get_test_db_name(), expected)
-        else:
-            msg = (
-                "Using a shared memory database with `mode=memory` in the "
-                "database name is not supported in your environment, "
-                "use `:memory:` instead."
-            )
-            with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                creation._get_test_db_name()
+        creation = DatabaseWrapper(settings_dict).creation
+        self.assertEqual(creation._get_test_db_name(), creation.connection.settings_dict['TEST']['NAME'])
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'Test only for SQLite')
@@ -124,7 +111,6 @@ class EscapingChecksDebug(EscapingChecks):
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
-@skipUnlessDBFeature('can_share_in_memory_db')
 class ThreadSharing(TransactionTestCase):
     available_apps = ['backends']
 

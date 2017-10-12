@@ -1,19 +1,23 @@
 from datetime import date
 
 from django import forms
-from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
+    get_content_type_for_model,
 )
 from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.admin.widgets import (
+    AdminDateWidget, AdminRadioSelect, AutocompleteSelect,
+    AutocompleteSelectMultiple,
+)
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
 
-from .models import Band, Concert
+from .models import Band, Concert, Song
 
 
 class MockRequest:
@@ -615,9 +619,52 @@ class ModelAdminTests(TestCase):
         ma = ModelAdmin(Band, self.site)
         mock_request = MockRequest()
         mock_request.user = User.objects.create(username='bill')
-        self.assertEqual(ma.log_addition(mock_request, self.band, 'added'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('id'))
-        self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
+        content_type = get_content_type_for_model(self.band)
+        tests = (
+            (ma.log_addition, ADDITION, {'added': {}}),
+            (ma.log_change, CHANGE, {'changed': {'fields': ['name', 'bio']}}),
+            (ma.log_deletion, DELETION, str(self.band)),
+        )
+        for method, flag, message in tests:
+            with self.subTest(name=method.__name__):
+                created = method(mock_request, self.band, message)
+                fetched = LogEntry.objects.filter(action_flag=flag).latest('id')
+                self.assertEqual(created, fetched)
+                self.assertEqual(fetched.action_flag, flag)
+                self.assertEqual(fetched.content_type, content_type)
+                self.assertEqual(fetched.object_id, str(self.band.pk))
+                self.assertEqual(fetched.user, mock_request.user)
+                if flag == DELETION:
+                    self.assertEqual(fetched.change_message, '')
+                    self.assertEqual(fetched.object_repr, message)
+                else:
+                    self.assertEqual(fetched.change_message, str(message))
+                    self.assertEqual(fetched.object_repr, str(self.band))
+
+    def test_get_autocomplete_fields(self):
+        class NameAdmin(ModelAdmin):
+            search_fields = ['name']
+
+        class SongAdmin(ModelAdmin):
+            autocomplete_fields = ['featuring']
+            fields = ['featuring', 'band']
+
+        class OtherSongAdmin(SongAdmin):
+            def get_autocomplete_fields(self, request):
+                return ['band']
+
+        self.site.register(Band, NameAdmin)
+        try:
+            # Uses autocomplete_fields if not overridden.
+            model_admin = SongAdmin(Song, self.site)
+            form = model_admin.get_form(request)()
+            self.assertIsInstance(form.fields['featuring'].widget.widget, AutocompleteSelectMultiple)
+            # Uses overridden get_autocomplete_fields
+            model_admin = OtherSongAdmin(Song, self.site)
+            form = model_admin.get_form(request)()
+            self.assertIsInstance(form.fields['band'].widget.widget, AutocompleteSelect)
+        finally:
+            self.site.unregister(Band)
 
 
 class ModelAdminPermissionTests(SimpleTestCase):

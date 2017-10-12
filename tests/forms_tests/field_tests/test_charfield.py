@@ -120,6 +120,29 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean(' 1'), ' 1')
         self.assertEqual(f.clean('1 '), '1 ')
 
+    def test_strip_before_checking_empty(self):
+        """
+        A whitespace-only value, ' ', is stripped to an empty string and then
+        converted to the empty value, None.
+        """
+        f = CharField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(' '))
+
+    def test_clean_non_string(self):
+        """CharField.clean() calls str(value) before stripping it."""
+        class StringWrapper:
+            def __init__(self, v):
+                self.v = v
+
+            def __str__(self):
+                return self.v
+
+        value = StringWrapper(' ')
+        f1 = CharField(required=False, empty_value=None)
+        self.assertIsNone(f1.clean(value))
+        f2 = CharField(strip=False)
+        self.assertEqual(f2.clean(value), ' ')
+
     def test_charfield_disabled(self):
         f = CharField(disabled=True)
         self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled required />')

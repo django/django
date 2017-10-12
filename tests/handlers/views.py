@@ -1,12 +1,9 @@
-from contextlib import suppress
+from http import HTTPStatus
 
 from django.core.exceptions import SuspiciousOperation
 from django.db import connection, transaction
 from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
-with suppress(ImportError):  # Python < 3.5
-    from http import HTTPStatus
 
 
 def regular(request):

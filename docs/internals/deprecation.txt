@@ -26,6 +26,12 @@ details on these changes.
 * Support for the ``context`` argument of ``Field.from_db_value()`` and
   ``Expression.convert_value()`` will be removed.
 
+* The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
+  ``latest()`` will be removed.
+
+See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
+details on these changes.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
@@ -144,7 +150,7 @@ details on these changes.
   ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
   ``content_type``.
 
-* The ``app_name`` argument to :func:`~django.conf.urls.include()` will be
+* The ``app_name`` argument to ``django.conf.urls.include()`` will be
   removed.
 
 * Support for passing a 3-tuple as the first argument to ``include()`` will
@@ -711,7 +717,7 @@ details on these changes.
   remove calls to this method, and instead ensure that their auth related views
   are CSRF protected, which ensures that cookies are enabled.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
   removed. If your site has been running Django 1.6 for more than
@@ -783,10 +789,9 @@ details on these changes.
   ``django.contrib.gis.utils`` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
-  :func:`~django.conf.urls.include`, ``patterns()`` and
-  :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
-  :data:`~django.conf.urls.handler500`, are now available through
-  :mod:`django.conf.urls` .
+  ``include()``, ``patterns()``, and ``url()``, plus
+  :data:`~django.conf.urls.handler404` and :data:`~django.conf.urls.handler500`
+  are now available through ``django.conf.urls``.
 
 * The functions ``setup_environ()`` and ``execute_manager()`` will be removed
   from :mod:`django.core.management`. This also means that the old (pre-1.4)

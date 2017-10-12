@@ -322,10 +322,6 @@ MySQL, PostGIS, SpatiaLite  ``ST_IsValid(poly)``
 Oracle                      ``SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(poly, 0.05) = 'TRUE'``
 ==========================  ================================================================
 
-.. versionchanged:: 1.11
-
-    Oracle and SpatiaLite support was added.
-
 .. versionchanged:: 2.0
 
     MySQL support was added.
@@ -635,10 +631,6 @@ simpler `ST_Distance <https://postgis.net/docs/ST_Distance.html>`__ function is
 used with projected coordinate systems. Rasters are converted to geometries for
 spheroid based lookups.
 
-.. versionadded:: 1.11
-
-    Support for the ``'spheroid'`` option on SQLite was added.
-
 .. versionadded:: 2.0
 
     MySQL support was added.
@@ -745,10 +737,6 @@ PostGIS     ``ST_DWithin(poly, geom, 5)``
 Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
 SpatiaLite  ``PtDistWithin(poly, geom, 5)``
 ==========  ======================================
-
-.. versionchanged:: 1.11
-
-    SpatiaLite support was added.
 
 Aggregate Functions
 -------------------

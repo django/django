@@ -1,5 +1,4 @@
 import re
-import warnings
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -7,10 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
-from django.utils.cache import (
-    cc_delim_re, get_conditional_response, set_response_etag,
-)
-from django.utils.deprecation import MiddlewareMixin, RemovedInDjango21Warning
+from django.utils.deprecation import MiddlewareMixin
 
 
 class CommonMiddleware(MiddlewareMixin):
@@ -30,11 +26,6 @@ class CommonMiddleware(MiddlewareMixin):
 
           This behavior can be customized by subclassing CommonMiddleware and
           overriding the response_redirect_class attribute.
-
-        - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
-          the entire page content and Not Modified responses will be returned
-          appropriately. USE_ETAGS is deprecated in favor of
-          ConditionalGetMiddleware.
     """
 
     response_redirect_class = HttpResponsePermanentRedirect
@@ -114,34 +105,12 @@ class CommonMiddleware(MiddlewareMixin):
             if self.should_redirect_with_slash(request):
                 return self.response_redirect_class(self.get_full_path_with_slash(request))
 
-        if settings.USE_ETAGS and self.needs_etag(response):
-            warnings.warn(
-                "The USE_ETAGS setting is deprecated in favor of "
-                "ConditionalGetMiddleware which sets the ETag regardless of "
-                "the setting. CommonMiddleware won't do ETag processing in "
-                "Django 2.1.",
-                RemovedInDjango21Warning
-            )
-            if not response.has_header('ETag'):
-                set_response_etag(response)
-
-            if response.has_header('ETag'):
-                return get_conditional_response(
-                    request,
-                    etag=response['ETag'],
-                    response=response,
-                )
         # Add the Content-Length header to non-streaming responses if not
         # already set.
         if not response.streaming and not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 
         return response
-
-    def needs_etag(self, response):
-        """Return True if an ETag header should be added to response."""
-        cache_control_headers = cc_delim_re.split(response.get('Cache-Control', ''))
-        return all(header.lower() != 'no-store' for header in cache_control_headers)
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):

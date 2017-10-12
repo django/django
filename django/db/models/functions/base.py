@@ -52,9 +52,6 @@ class ConcatPair(Func):
     """
     function = 'CONCAT'
 
-    def __init__(self, left, right, **extra):
-        super().__init__(left, right, **extra)
-
     def as_sqlite(self, compiler, connection):
         coalesced = self.coalesce()
         return super(ConcatPair, coalesced).as_sql(
@@ -145,9 +142,7 @@ class Length(Transform):
     """Return the number of characters in the expression."""
     function = 'LENGTH'
     lookup_name = 'length'
-
-    def __init__(self, expression, *, output_field=None, **extra):
-        super().__init__(expression, output_field=output_field or fields.IntegerField(), **extra)
+    output_field = fields.IntegerField()
 
     def as_mysql(self, compiler, connection):
         return super().as_sql(compiler, connection, function='CHAR_LENGTH')
@@ -160,11 +155,7 @@ class Lower(Transform):
 
 class Now(Func):
     template = 'CURRENT_TIMESTAMP'
-
-    def __init__(self, output_field=None, **extra):
-        if output_field is None:
-            output_field = fields.DateTimeField()
-        super().__init__(output_field=output_field, **extra)
+    output_field = fields.DateTimeField()
 
     def as_postgresql(self, compiler, connection):
         # Postgres' CURRENT_TIMESTAMP means "the time at the start of the
@@ -181,13 +172,7 @@ class StrIndex(Func):
     """
     function = 'INSTR'
     arity = 2
-
-    def __init__(self, string, substring, **extra):
-        """
-        string: the name of a field, or an expression returning a string
-        substring: the name of a field, or an expression returning a string
-        """
-        super().__init__(string, substring, output_field=fields.IntegerField(), **extra)
+    output_field = fields.IntegerField()
 
     def as_postgresql(self, compiler, connection):
         return super().as_sql(compiler, connection, function='STRPOS')

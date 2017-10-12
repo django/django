@@ -65,7 +65,12 @@ class BookWithYear(Book):
 
 
 class Bio(models.Model):
-    author = models.OneToOneField(Author, models.CASCADE)
+    author = models.OneToOneField(
+        Author,
+        models.CASCADE,
+        primary_key=True,
+        to_field='name',
+    )
     books = models.ManyToManyField(Book, blank=True)
 
 

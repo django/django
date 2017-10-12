@@ -357,8 +357,8 @@ class SQLCompiler:
 
     def get_extra_select(self, order_by, select):
         extra_select = []
-        select_sql = [t[1] for t in select]
         if self.query.distinct and not self.query.distinct_fields:
+            select_sql = [t[1] for t in select]
             for expr, (sql, params, is_ref) in order_by:
                 without_ordering = self.ordering_parts.search(sql).group(1)
                 if not is_ref and (without_ordering, params) not in select_sql:
@@ -439,6 +439,8 @@ class SQLCompiler:
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
             for_update_part = None
+            # Is a LIMIT/OFFSET clause needed?
+            with_limit_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
@@ -479,7 +481,7 @@ class SQLCompiler:
                     if self.connection.get_autocommit():
                         raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
 
-                    if with_limits and not self.connection.features.supports_select_for_update_with_limit:
+                    if with_limit_offset and not self.connection.features.supports_select_for_update_with_limit:
                         raise NotSupportedError(
                             'LIMIT/OFFSET is not supported with '
                             'select_for_update on this database backend.'
@@ -531,15 +533,8 @@ class SQLCompiler:
                     params.extend(o_params)
                 result.append('ORDER BY %s' % ', '.join(ordering))
 
-            if with_limits:
-                if self.query.high_mark is not None:
-                    result.append('LIMIT %d' % (self.query.high_mark - self.query.low_mark))
-                if self.query.low_mark:
-                    if self.query.high_mark is None:
-                        val = self.connection.ops.no_limit_value()
-                        if val:
-                            result.append('LIMIT %d' % val)
-                    result.append('OFFSET %d' % self.query.low_mark)
+            if with_limit_offset:
+                result.append(self.connection.ops.limit_offset_sql(self.query.low_mark, self.query.high_mark))
 
             if for_update_part and not self.connection.features.for_update_after_from:
                 result.append(for_update_part)
@@ -564,7 +559,7 @@ class SQLCompiler:
                         subselect, subparams = select_clone.as_sql(self, self.connection)
                         sub_selects.append(subselect)
                         sub_params.extend(subparams)
-                return 'SELECT %s FROM (%s) AS subquery' % (
+                return 'SELECT %s FROM (%s) subquery' % (
                     ', '.join(sub_selects),
                     ' '.join(result),
                 ), sub_params + params
@@ -702,7 +697,7 @@ class SQLCompiler:
         """
         result = []
         params = []
-        for alias in self.query.alias_map:
+        for alias in tuple(self.query.alias_map):
             if not self.query.alias_refcount[alias]:
                 continue
             try:
@@ -737,10 +732,10 @@ class SQLCompiler:
                 f.field.related_query_name()
                 for f in opts.related_objects if f.field.unique
             )
-            return chain(direct_choices, reverse_choices)
+            return chain(direct_choices, reverse_choices, self.query._filtered_relations)
 
         related_klass_infos = []
-        if not restricted and self.query.max_depth and cur_depth > self.query.max_depth:
+        if not restricted and cur_depth > self.query.max_depth:
             # We've recursed far enough; bail out.
             return related_klass_infos
 
@@ -788,7 +783,8 @@ class SQLCompiler:
             klass_info = {
                 'model': f.remote_field.model,
                 'field': f,
-                'reverse': False,
+                'local_setter': f.set_cached_value,
+                'remote_setter': f.remote_field.set_cached_value if f.unique else lambda x, y: None,
                 'from_parent': False,
             }
             related_klass_infos.append(klass_info)
@@ -825,7 +821,8 @@ class SQLCompiler:
                 klass_info = {
                     'model': model,
                     'field': f,
-                    'reverse': True,
+                    'local_setter': f.remote_field.set_cached_value,
+                    'remote_setter': f.set_cached_value,
                     'from_parent': from_parent,
                 }
                 related_klass_infos.append(klass_info)
@@ -841,6 +838,47 @@ class SQLCompiler:
                     select, model._meta, alias, cur_depth + 1,
                     next, restricted)
                 get_related_klass_infos(klass_info, next_klass_infos)
+            fields_not_found = set(requested).difference(fields_found)
+            for name in list(requested):
+                # Filtered relations work only on the topmost level.
+                if cur_depth > 1:
+                    break
+                if name in self.query._filtered_relations:
+                    fields_found.add(name)
+                    f, _, join_opts, joins, _ = self.query.setup_joins([name], opts, root_alias)
+                    model = join_opts.model
+                    alias = joins[-1]
+                    from_parent = issubclass(model, opts.model) and model is not opts.model
+
+                    def local_setter(obj, from_obj):
+                        f.remote_field.set_cached_value(from_obj, obj)
+
+                    def remote_setter(obj, from_obj):
+                        setattr(from_obj, name, obj)
+                    klass_info = {
+                        'model': model,
+                        'field': f,
+                        'local_setter': local_setter,
+                        'remote_setter': remote_setter,
+                        'from_parent': from_parent,
+                    }
+                    related_klass_infos.append(klass_info)
+                    select_fields = []
+                    columns = self.get_default_columns(
+                        start_alias=alias, opts=model._meta,
+                        from_parent=opts.model,
+                    )
+                    for col in columns:
+                        select_fields.append(len(select))
+                        select.append((col, None))
+                    klass_info['select_fields'] = select_fields
+                    next_requested = requested.get(name, {})
+                    next_klass_infos = self.get_related_selections(
+                        select, opts=model._meta, root_alias=alias,
+                        cur_depth=cur_depth + 1, requested=next_requested,
+                        restricted=restricted,
+                    )
+                    get_related_klass_infos(klass_info, next_klass_infos)
             fields_not_found = set(requested).difference(fields_found)
             if fields_not_found:
                 invalid_fields = ("'%s'" % s for s in fields_not_found)
@@ -942,16 +980,15 @@ class SQLCompiler:
     def apply_converters(self, rows, converters):
         connection = self.connection
         converters = list(converters.items())
-        for row in rows:
-            row = list(row)
+        for row in map(list, rows):
             for pos, (convs, expression) in converters:
                 value = row[pos]
                 for converter in convs:
                     value = converter(value, expression, connection)
                 row[pos] = value
-            yield tuple(row)
+            yield row
 
-    def results_iter(self, results=None):
+    def results_iter(self, results=None, tuple_expected=False):
         """Return an iterator over the results from executing this query."""
         if results is None:
             results = self.execute_sql(MULTI)
@@ -960,6 +997,8 @@ class SQLCompiler:
         rows = chain.from_iterable(results)
         if converters:
             rows = self.apply_converters(rows, converters)
+            if tuple_expected:
+                rows = map(tuple, rows)
         return rows
 
     def has_results(self):
@@ -1008,8 +1047,7 @@ class SQLCompiler:
             raise
 
         if result_type == CURSOR:
-            # Caller didn't specify a result_type, so just give them back the
-            # cursor to process (and close).
+            # Give the caller the cursor to process and close.
             return cursor
         if result_type == SINGLE:
             try:
@@ -1055,10 +1093,7 @@ class SQLCompiler:
 
 
 class SQLInsertCompiler(SQLCompiler):
-
-    def __init__(self, *args, **kwargs):
-        self.return_id = False
-        super().__init__(*args, **kwargs)
+    return_id = False
 
     def field_as_sql(self, field, val):
         """
@@ -1109,6 +1144,8 @@ class SQLInsertCompiler(SQLCompiler):
                 )
             if value.contains_aggregate:
                 raise FieldError("Aggregate functions are not allowed in this query")
+            if value.contains_over_clause:
+                raise FieldError('Window expressions are not allowed in this query.')
         else:
             value = field.get_db_prep_save(value, connection=self.connection)
         return value
@@ -1220,7 +1257,7 @@ class SQLInsertCompiler(SQLCompiler):
         with self.connection.cursor() as cursor:
             for sql, params in self.as_sql():
                 cursor.execute(sql, params)
-            if not (return_id and cursor):
+            if not return_id:
                 return
             if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
                 return self.connection.ops.fetch_returned_insert_ids(cursor)
@@ -1264,6 +1301,8 @@ class SQLUpdateCompiler(SQLCompiler):
                 val = val.resolve_expression(self.query, allow_joins=False, for_save=True)
                 if val.contains_aggregate:
                     raise FieldError("Aggregate functions are not allowed in this query")
+                if val.contains_over_clause:
+                    raise FieldError('Window expressions are not allowed in this query.')
             elif hasattr(val, 'prepare_database_save'):
                 if field.remote_field:
                     val = field.get_db_prep_save(

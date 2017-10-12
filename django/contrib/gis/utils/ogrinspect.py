@@ -169,6 +169,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
         yield '# This is an auto-generated Django model module created by ogrinspect.'
         yield 'from django.contrib.gis.db import models'
         yield ''
+        yield ''
 
     yield 'class %s(models.Model):' % model_name
 

@@ -93,15 +93,7 @@ The view function looks like this::
         paginator = Paginator(contact_list, 25) # Show 25 contacts per page
 
         page = request.GET.get('page')
-        try:
-            contacts = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            contacts = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            contacts = paginator.page(paginator.num_pages)
-
+        contacts = paginator.get_page(page)
         return render(request, 'list.html', {'contacts': contacts})
 
 In the template :file:`list.html`, you'll want to include navigation between
@@ -176,6 +168,20 @@ Optional arguments
 
 Methods
 -------
+
+.. method:: Paginator.get_page(number)
+
+    .. versionadded:: 2.0
+
+    Returns a :class:`Page` object with the given 1-based index, while also
+    handling out of range and invalid page numbers.
+
+    If the page isn't a number, it returns the first page. If the page number
+    is negative or greater than the number of pages, it returns the last page.
+
+    It raises an exception (:exc:`EmptyPage`) only if you specify
+    ``Paginator(..., allow_empty_first_page=False)`` and the ``object_list`` is
+    empty.
 
 .. method:: Paginator.page(number)
 

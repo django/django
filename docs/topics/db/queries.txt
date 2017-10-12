@@ -34,7 +34,7 @@ models, which comprise a Weblog application:
             return self.name
 
     class Entry(models.Model):
-        blog = models.ForeignKey(Blog)
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateField()
@@ -228,7 +228,7 @@ refinements together. For example::
     ... ).exclude(
     ...     pub_date__gte=datetime.date.today()
     ... ).filter(
-    ...     pub_date__gte=datetime(2005, 1, 30)
+    ...     pub_date__gte=datetime.date(2005, 1, 30)
     ... )
 
 This takes the initial :class:`~django.db.models.query.QuerySet` of all entries
@@ -659,10 +659,6 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 ``.bitrightshift()``, and ``.bitleftshift()``. For example::
 
     >>> F('somefield').bitand(16)
-
-.. versionchanged:: 1.11
-
-    Support for ``.bitrightshift()`` and ``.bitleftshift()`` was added.
 
 The ``pk`` lookup shortcut
 --------------------------

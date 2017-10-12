@@ -1,0 +1,13 @@
+===========================
+Django 1.11.7 release notes
+===========================
+
+*Expected November 1, 2017*
+
+Django 1.11.7 fixes several bugs in 1.11.6.
+
+Bugfixes
+========
+
+* Prevented ``cache.get_or_set()`` from caching ``None`` if the ``default``
+  argument is a callable that returns ``None`` (:ticket:`28601`).

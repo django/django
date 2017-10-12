@@ -345,7 +345,7 @@ class HttpRequest:
         yield from self
 
     def readlines(self):
-        return list(iter(self))
+        return list(self)
 
 
 class QueryDict(MultiValueDict):

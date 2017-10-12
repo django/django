@@ -6,7 +6,9 @@ from django.contrib.gis.gdal.raster.base import GDALRasterBase
 from django.contrib.gis.shortcuts import numpy
 from django.utils.encoding import force_text
 
-from .const import GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
+from .const import (
+    GDAL_COLOR_TYPES, GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES,
+)
 
 
 class GDALBand(GDALRasterBase):
@@ -167,6 +169,13 @@ class GDALBand(GDALRasterBase):
         if as_string:
             dtype = GDAL_PIXEL_TYPES[dtype]
         return dtype
+
+    def color_interp(self, as_string=False):
+        """Return the GDAL color interpretation for this band."""
+        color = capi.get_band_color_interp(self._ptr)
+        if as_string:
+            color = GDAL_COLOR_TYPES[color]
+        return color
 
     def data(self, data=None, offset=None, size=None, shape=None, as_memoryview=False):
         """

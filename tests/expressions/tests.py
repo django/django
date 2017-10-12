@@ -10,8 +10,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Exists, ExpressionWrapper, F, Func, OrderBy, OuterRef, Random,
-    RawSQL, Ref, Subquery, Value, When,
+    Case, Col, Combinable, Exists, ExpressionList, ExpressionWrapper, F, Func,
+    OrderBy, OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -1028,19 +1028,16 @@ class FTimeDeltaTests(TestCase):
 
         # e1: started one day after assigned, tiny duration, data
         # set so that end time has no fractional seconds, which
-        # tests an edge case on sqlite. This Experiment is only
-        # included in the test data when the DB supports microsecond
-        # precision.
-        if connection.features.supports_microsecond_precision:
-            delay = datetime.timedelta(1)
-            end = stime + delay + delta1
-            e1 = Experiment.objects.create(
-                name='e1', assigned=sday, start=stime + delay, end=end,
-                completed=end.date(), estimated_time=delta1,
-            )
-            cls.deltas.append(delta1)
-            cls.delays.append(e1.start - datetime.datetime.combine(e1.assigned, midnight))
-            cls.days_long.append(e1.completed - e1.assigned)
+        # tests an edge case on sqlite.
+        delay = datetime.timedelta(1)
+        end = stime + delay + delta1
+        e1 = Experiment.objects.create(
+            name='e1', assigned=sday, start=stime + delay, end=end,
+            completed=end.date(), estimated_time=delta1,
+        )
+        cls.deltas.append(delta1)
+        cls.delays.append(e1.start - datetime.datetime.combine(e1.assigned, midnight))
+        cls.days_long.append(e1.completed - e1.assigned)
 
         # e2: started three days after assigned, small duration
         end = stime + delta2
@@ -1144,8 +1141,6 @@ class FTimeDeltaTests(TestCase):
     def test_mixed_comparisons1(self):
         for i in range(len(self.delays)):
             delay = self.delays[i]
-            if not connection.features.supports_microsecond_precision:
-                delay = datetime.timedelta(delay.days, delay.seconds)
             test_set = [e.name for e in Experiment.objects.filter(assigned__gt=F('start') - delay)]
             self.assertEqual(test_set, self.expnames[:i])
 
@@ -1213,27 +1208,21 @@ class FTimeDeltaTests(TestCase):
         self.assertEqual(at_least_120_days, {'e5'})
 
         less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
-        expected = {'e0', 'e2'}
-        if connection.features.supports_microsecond_precision:
-            expected.add('e1')
-        self.assertEqual(less_than_5_days, expected)
+        self.assertEqual(less_than_5_days, {'e0', 'e1', 'e2'})
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_time_subtraction(self):
-        if connection.features.supports_microsecond_precision:
-            time = datetime.time(12, 30, 15, 2345)
-            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
-        else:
-            time = datetime.time(12, 30, 15)
-            timedelta = datetime.timedelta(hours=1, minutes=15, seconds=15)
-        Time.objects.create(time=time)
+        Time.objects.create(time=datetime.time(12, 30, 15, 2345))
         queryset = Time.objects.annotate(
             difference=ExpressionWrapper(
                 F('time') - Value(datetime.time(11, 15, 0), output_field=models.TimeField()),
                 output_field=models.DurationField(),
             )
         )
-        self.assertEqual(queryset.get().difference, timedelta)
+        self.assertEqual(
+            queryset.get().difference,
+            datetime.timedelta(hours=1, minutes=15, seconds=15, microseconds=2345)
+        )
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_datetime_subtraction(self):
@@ -1274,10 +1263,9 @@ class FTimeDeltaTests(TestCase):
             new_start=F('start_sub_hours') + datetime.timedelta(days=-2),
         )
         expected_start = datetime.datetime(2010, 6, 23, 9, 45, 0)
-        if connection.features.supports_microsecond_precision:
-            # subtract 30 microseconds
-            experiments = experiments.annotate(new_start=F('new_start') + datetime.timedelta(microseconds=-30))
-            expected_start += datetime.timedelta(microseconds=+746970)
+        # subtract 30 microseconds
+        experiments = experiments.annotate(new_start=F('new_start') + datetime.timedelta(microseconds=-30))
+        expected_start += datetime.timedelta(microseconds=+746970)
         experiments.update(start=F('new_start'))
         e0 = Experiment.objects.get(name='e0')
         self.assertEqual(e0.start, expected_start)
@@ -1330,6 +1318,11 @@ class ValueTests(TestCase):
         self.assertNotEqual(value, other_value)
         self.assertNotEqual(value, no_output_field)
 
+    def test_raise_empty_expressionlist(self):
+        msg = 'ExpressionList requires at least one expression'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExpressionList()
+
 
 class ReprTests(TestCase):
 
@@ -1337,6 +1330,10 @@ class ReprTests(TestCase):
         self.assertEqual(
             repr(Case(When(a=1))),
             "<Case: CASE WHEN <Q: (AND: ('a', 1))> THEN Value(None), ELSE Value(None)>"
+        )
+        self.assertEqual(
+            repr(When(Q(age__gte=18), then=Value('legal'))),
+            "<When: WHEN <Q: (AND: ('age__gte', 18))> THEN Value(legal)>"
         )
         self.assertEqual(repr(Col('alias', 'field')), "Col(alias, field)")
         self.assertEqual(repr(F('published')), "F(published)")
@@ -1351,6 +1348,14 @@ class ReprTests(TestCase):
         self.assertEqual(repr(RawSQL('table.col', [])), "RawSQL(table.col, [])")
         self.assertEqual(repr(Ref('sum_cost', Sum('cost'))), "Ref(sum_cost, Sum(F(cost)))")
         self.assertEqual(repr(Value(1)), "Value(1)")
+        self.assertEqual(
+            repr(ExpressionList(F('col'), F('anothercol'))),
+            'ExpressionList(F(col), F(anothercol))'
+        )
+        self.assertEqual(
+            repr(ExpressionList(OrderBy(F('col'), descending=False))),
+            'ExpressionList(OrderBy(F(col), descending=False))'
+        )
 
     def test_functions(self):
         self.assertEqual(repr(Coalesce('a', 'b')), "Coalesce(F(a), F(b))")
@@ -1382,3 +1387,23 @@ class ReprTests(TestCase):
             repr(Variance('a', sample=True, filter=filter)),
             "Variance(F(a), filter=(AND: ('a', 1)), sample=True)"
         )
+
+
+class CombinableTests(SimpleTestCase):
+    bitwise_msg = 'Use .bitand() and .bitor() for bitwise logical operations.'
+
+    def test_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() & Combinable()
+
+    def test_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() | Combinable()
+
+    def test_reversed_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() & Combinable()
+
+    def test_reversed_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() | Combinable()

@@ -68,6 +68,7 @@ class Command(BaseCommand):
         # Same as user_data but with foreign keys as fake model instances
         # instead of raw IDs.
         fake_user_data = {}
+        verbose_field_name = self.username_field.verbose_name
 
         # Do quick and dirty validation if --noinput
         if not options['interactive']:
@@ -96,7 +97,6 @@ class Command(BaseCommand):
                     raise NotRunningInTTYException("Not running in a TTY")
 
                 # Get a username
-                verbose_field_name = self.username_field.verbose_name
                 while username is None:
                     input_msg = capfirst(verbose_field_name)
                     if default_username:
@@ -120,6 +120,9 @@ class Command(BaseCommand):
                         else:
                             self.stderr.write("Error: That %s is already taken." % verbose_field_name)
                             username = None
+
+                if not username:
+                    raise CommandError('%s cannot be blank.' % capfirst(verbose_field_name))
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)

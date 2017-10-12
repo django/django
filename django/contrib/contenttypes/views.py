@@ -1,5 +1,3 @@
-from contextlib import suppress
-
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.requests import RequestSite
@@ -55,10 +53,12 @@ def shortcut(request, content_type_id, object_id):
         # First, look for an many-to-many relationship to Site.
         for field in opts.many_to_many:
             if field.remote_field.model is Site:
-                with suppress(IndexError):
+                try:
                     # Caveat: In the case of multiple related Sites, this just
                     # selects the *first* one, which is arbitrary.
                     object_domain = getattr(obj, field.name).all()[0].domain
+                except IndexError:
+                    pass
                 if object_domain is not None:
                     break
 
@@ -77,8 +77,10 @@ def shortcut(request, content_type_id, object_id):
 
         # Fall back to the current site (if possible).
         if object_domain is None:
-            with suppress(Site.DoesNotExist):
+            try:
                 object_domain = Site.objects.get_current(request).domain
+            except Site.DoesNotExist:
+                pass
 
     else:
         # Fall back to the current request's site.

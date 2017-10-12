@@ -2,8 +2,6 @@ from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
 
-from .base import Database
-
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set
@@ -16,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
-    has_bulk_insert = True
     supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
     can_introspect_decimal_field = False
@@ -31,25 +28,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_temporal_subtraction = True
     ignores_table_name_case = True
     supports_cast_with_precision = False
-
-    @cached_property
-    def uses_savepoints(self):
-        return Database.sqlite_version_info >= (3, 6, 8)
-
-    @cached_property
-    def supports_index_column_ordering(self):
-        return Database.sqlite_version_info >= (3, 3, 0)
-
-    @cached_property
-    def can_release_savepoints(self):
-        return self.uses_savepoints
-
-    @cached_property
-    def can_share_in_memory_db(self):
-        return (
-            Database.__name__ == 'sqlite3.dbapi2' and
-            Database.sqlite_version_info >= (3, 7, 13)
-        )
+    uses_savepoints = True
+    can_release_savepoints = True
 
     @cached_property
     def supports_stddev(self):

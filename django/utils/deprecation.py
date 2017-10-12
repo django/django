@@ -6,11 +6,8 @@ class RemovedInDjango30Warning(PendingDeprecationWarning):
     pass
 
 
-class RemovedInDjango21Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
-
-
-RemovedInNextVersionWarning = RemovedInDjango21Warning
 
 
 class warn_about_renamed_method:

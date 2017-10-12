@@ -4,44 +4,6 @@
 var isOpera = (navigator.userAgent.indexOf("Opera") >= 0) && parseFloat(navigator.appVersion);
 var isIE = ((document.all) && (!isOpera)) && parseFloat(navigator.appVersion.split("MSIE ")[1].split(";")[0]);
 
-// Cross-browser event handlers.
-function addEvent(obj, evType, fn) {
-    'use strict';
-    if (obj.addEventListener) {
-        obj.addEventListener(evType, fn, false);
-        return true;
-    } else if (obj.attachEvent) {
-        var r = obj.attachEvent("on" + evType, fn);
-        return r;
-    } else {
-        return false;
-    }
-}
-
-function removeEvent(obj, evType, fn) {
-    'use strict';
-    if (obj.removeEventListener) {
-        obj.removeEventListener(evType, fn, false);
-        return true;
-    } else if (obj.detachEvent) {
-        obj.detachEvent("on" + evType, fn);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function cancelEventPropagation(e) {
-    'use strict';
-    if (!e) {
-        e = window.event;
-    }
-    e.cancelBubble = true;
-    if (e.stopPropagation) {
-        e.stopPropagation();
-    }
-}
-
 // quickElement(tagType, parentReference [, textInChildNode, attribute, attributeValue ...]);
 function quickElement() {
     'use strict';

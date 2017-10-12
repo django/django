@@ -72,7 +72,7 @@ class Point(GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self._ptr = ptr
-            self._set_cs()
+            self._post_init()
         else:
             # can this happen?
             raise GEOSException('Geometry resulting from slice deletion was invalid.')

@@ -562,6 +562,8 @@ class GDALBandTests(SimpleTestCase):
         self.assertEqual(self.band.description, '')
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
+        self.assertEqual(self.band.color_interp(), 1)
+        self.assertEqual(self.band.color_interp(as_string=True), 'GCI_GrayIndex')
         self.assertEqual(self.band.nodata_value, 15)
         if numpy:
             data = self.band.data()

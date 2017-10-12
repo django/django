@@ -1,10 +1,12 @@
 from collections import defaultdict, namedtuple
-from contextlib import suppress
 
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.proxy import SpatialProxy
 from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.geometry.backend import Geometry, GeometryException
+from django.contrib.gis.geos import (
+    GeometryCollection, GEOSException, GEOSGeometry, LineString,
+    MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.fields import Field
 from django.utils.translation import gettext_lazy as _
@@ -49,23 +51,6 @@ def get_srid_info(srid, connection):
         )
 
     return _srid_cache[alias][srid]
-
-
-class GeoSelectFormatMixin:
-    def select_format(self, compiler, sql, params):
-        """
-        Return the selection format string, depending on the requirements
-        of the spatial backend.  For example, Oracle and MySQL require custom
-        selection formats in order to retrieve geometries in OGC WKT. For all
-        other fields, return a simple '%s' format string.
-        """
-        connection = compiler.connection
-        if connection.ops.select:
-            # This allows operations to be done on fields in the SELECT,
-            # overriding their values -- used by the Oracle and MySQL
-            # spatial backends to get database values as WKT.
-            sql = connection.ops.select % sql
-        return sql, params
 
 
 class BaseSpatialField(Field):
@@ -170,8 +155,10 @@ class BaseSpatialField(Field):
         if isinstance(value, gdal.GDALRaster):
             return value
         elif is_candidate:
-            with suppress(GDALException):
+            try:
                 return gdal.GDALRaster(value)
+            except GDALException:
+                pass
         elif isinstance(value, dict):
             try:
                 return gdal.GDALRaster(value)
@@ -182,7 +169,7 @@ class BaseSpatialField(Field):
         obj = super().get_prep_value(value)
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
-        if isinstance(obj, Geometry):
+        if isinstance(obj, GEOSGeometry):
             pass
         else:
             # Check if input is a candidate for conversion to raster or geometry.
@@ -194,8 +181,8 @@ class BaseSpatialField(Field):
                 obj = raster
             elif is_candidate:
                 try:
-                    obj = Geometry(obj)
-                except (GeometryException, GDALException):
+                    obj = GEOSGeometry(obj)
+                except (GEOSException, GDALException):
                     raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
             else:
                 raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
@@ -205,7 +192,7 @@ class BaseSpatialField(Field):
         return obj
 
 
-class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
+class GeometryField(BaseSpatialField):
     """
     The base Geometry field -- maps to the OpenGIS Specification Geometry type.
     """
@@ -213,6 +200,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
     form_class = forms.GeometryField
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
+    geom_class = None
 
     def __init__(self, verbose_name=None, dim=2, geography=False, *, extent=(-180.0, -90.0, 180.0, 90.0),
                  tolerance=0.05, **kwargs):
@@ -255,19 +243,11 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             kwargs['geography'] = self.geography
         return name, path, args, kwargs
 
-    def from_db_value(self, value, expression, connection):
-        if value:
-            value = Geometry(value)
-            srid = value.srid
-            if not srid and self.srid != -1:
-                value.srid = self.srid
-        return value
-
     def contribute_to_class(self, cls, name, **kwargs):
         super().contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
-        setattr(cls, self.attname, SpatialProxy(Geometry, self))
+        setattr(cls, self.attname, SpatialProxy(GEOSGeometry, self))
 
     def formfield(self, **kwargs):
         defaults = {'form_class': self.form_class,
@@ -280,57 +260,77 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             defaults['widget'] = forms.Textarea
         return super().formfield(**defaults)
 
+    def select_format(self, compiler, sql, params):
+        """
+        Return the selection format string, depending on the requirements
+        of the spatial backend. For example, Oracle and MySQL require custom
+        selection formats in order to retrieve geometries in OGC WKB.
+        """
+        select = compiler.connection.ops.select
+        return select % sql if select else sql, params
+
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     geom_type = 'POINT'
+    geom_class = Point
     form_class = forms.PointField
     description = _("Point")
 
 
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
+    geom_class = LineString
     form_class = forms.LineStringField
     description = _("Line string")
 
 
 class PolygonField(GeometryField):
     geom_type = 'POLYGON'
+    geom_class = Polygon
     form_class = forms.PolygonField
     description = _("Polygon")
 
 
 class MultiPointField(GeometryField):
     geom_type = 'MULTIPOINT'
+    geom_class = MultiPoint
     form_class = forms.MultiPointField
     description = _("Multi-point")
 
 
 class MultiLineStringField(GeometryField):
     geom_type = 'MULTILINESTRING'
+    geom_class = MultiLineString
     form_class = forms.MultiLineStringField
     description = _("Multi-line string")
 
 
 class MultiPolygonField(GeometryField):
     geom_type = 'MULTIPOLYGON'
+    geom_class = MultiPolygon
     form_class = forms.MultiPolygonField
     description = _("Multi polygon")
 
 
 class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'
+    geom_class = GeometryCollection
     form_class = forms.GeometryCollectionField
     description = _("Geometry collection")
 
 
-class ExtentField(GeoSelectFormatMixin, Field):
+class ExtentField(Field):
     "Used as a return value from an extent aggregate"
 
     description = _("Extent Aggregate Field")
 
     def get_internal_type(self):
         return "ExtentField"
+
+    def select_format(self, compiler, sql, params):
+        select = compiler.connection.ops.select_extent
+        return select % sql if select else sql, params
 
 
 class RasterField(BaseSpatialField):

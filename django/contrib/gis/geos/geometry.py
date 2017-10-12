@@ -6,7 +6,7 @@ import re
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
-from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geometry import hex_regex, json_regex, wkt_regex
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
@@ -21,9 +21,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_bytes, force_text
 
 
-@deconstructible
-class GEOSGeometry(GEOSBase, ListMixin):
-    "A class that, generally, encapsulates a GEOS geometry."
+class GEOSGeometryBase(GEOSBase):
 
     _GEOS_CLASSES = None
 
@@ -31,96 +29,39 @@ class GEOSGeometry(GEOSBase, ListMixin):
     destructor = capi.destroy_geom
     has_cs = False  # Only Point, LineString, LinearRing have coordinate sequences
 
-    def __init__(self, geo_input, srid=None):
-        """
-        The base constructor for GEOS geometry objects, and may take the
-        following inputs:
-
-         * strings:
-            - WKT
-            - HEXEWKB (a PostGIS-specific canonical form)
-            - GeoJSON (requires GDAL)
-         * buffer:
-            - WKB
-
-        The `srid` keyword is used to specify the Source Reference Identifier
-        (SRID) number for this Geometry.  If not set, the SRID will be None.
-        """
-        input_srid = None
-        if isinstance(geo_input, bytes):
-            geo_input = force_text(geo_input)
-        if isinstance(geo_input, str):
-            wkt_m = wkt_regex.match(geo_input)
-            if wkt_m:
-                # Handling WKT input.
-                if wkt_m.group('srid'):
-                    input_srid = int(wkt_m.group('srid'))
-                g = self._from_wkt(force_bytes(wkt_m.group('wkt')))
-            elif hex_regex.match(geo_input):
-                # Handling HEXEWKB input.
-                g = wkb_r().read(force_bytes(geo_input))
-            elif json_regex.match(geo_input):
-                # Handling GeoJSON input.
-                ogr = gdal.OGRGeometry.from_json(geo_input)
-                g = ogr._geos_ptr()
-                input_srid = ogr.srid
-            else:
-                raise ValueError('String input unrecognized as WKT EWKT, and HEXEWKB.')
-        elif isinstance(geo_input, GEOM_PTR):
-            # When the input is a pointer to a geometry (GEOM_PTR).
-            g = geo_input
-        elif isinstance(geo_input, memoryview):
-            # When the input is a buffer (WKB).
-            g = wkb_r().read(geo_input)
-        elif isinstance(geo_input, GEOSGeometry):
-            g = capi.geom_clone(geo_input.ptr)
-        else:
-            # Invalid geometry type.
-            raise TypeError('Improper geometry input type: %s' % type(geo_input))
-
-        if not g:
-            raise GEOSException('Could not initialize GEOS Geometry with given input.')
-
-        input_srid = input_srid or capi.geos_get_srid(g) or None
-        if input_srid and srid and input_srid != srid:
-            raise ValueError('Input geometry already has SRID: %d.' % input_srid)
-
-        # Setting the pointer object with a valid pointer.
-        self.ptr = g
-        # Post-initialization setup.
-        self._post_init(input_srid or srid)
-
-    def _post_init(self, srid):
-        "Perform post-initialization setup."
-        # Setting the SRID, if given.
-        if srid and isinstance(srid, int):
-            self.srid = srid
+    def __init__(self, ptr, cls):
+        self._ptr = ptr
 
         # Setting the class type (e.g., Point, Polygon, etc.)
-        if type(self) == GEOSGeometry:
-            if GEOSGeometry._GEOS_CLASSES is None:
-                # Lazy-loaded variable to avoid import conflicts with GEOSGeometry.
-                from .linestring import LineString, LinearRing
-                from .point import Point
-                from .polygon import Polygon
-                from .collections import (
-                    GeometryCollection, MultiPoint, MultiLineString, MultiPolygon,
-                )
-                GEOSGeometry._GEOS_CLASSES = {
-                    0: Point,
-                    1: LineString,
-                    2: LinearRing,
-                    3: Polygon,
-                    4: MultiPoint,
-                    5: MultiLineString,
-                    6: MultiPolygon,
-                    7: GeometryCollection,
-                }
-            self.__class__ = GEOSGeometry._GEOS_CLASSES[self.geom_typeid]
+        if type(self) in (GEOSGeometryBase, GEOSGeometry):
+            if cls is None:
+                if GEOSGeometryBase._GEOS_CLASSES is None:
+                    # Inner imports avoid import conflicts with GEOSGeometry.
+                    from .linestring import LineString, LinearRing
+                    from .point import Point
+                    from .polygon import Polygon
+                    from .collections import (
+                        GeometryCollection, MultiPoint, MultiLineString, MultiPolygon,
+                    )
+                    GEOSGeometryBase._GEOS_CLASSES = {
+                        0: Point,
+                        1: LineString,
+                        2: LinearRing,
+                        3: Polygon,
+                        4: MultiPoint,
+                        5: MultiLineString,
+                        6: MultiPolygon,
+                        7: GeometryCollection,
+                    }
+                cls = GEOSGeometryBase._GEOS_CLASSES[self.geom_typeid]
+            self.__class__ = cls
+        self._post_init()
 
+    def _post_init(self):
+        "Perform post-initialization setup."
         # Setting the coordinate sequence for the geometry (will be None on
         # geometries that do not have coordinate sequences)
-        self._set_cs()
+        self._cs = GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz) if self.has_cs else None
 
     def __copy__(self):
         """
@@ -158,7 +99,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if not ptr:
             raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
-        self._post_init(srid)
+        self._post_init()
+        self.srid = srid
 
     @classmethod
     def _from_wkb(cls, wkb):
@@ -226,13 +168,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return self.sym_difference(other)
 
     # #### Coordinate Sequence Routines ####
-    def _set_cs(self):
-        "Set the coordinate sequence for this Geometry."
-        if self.has_cs:
-            self._cs = GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz)
-        else:
-            self._cs = None
-
     @property
     def coord_seq(self):
         "Return a clone of the coordinate sequence for this Geometry."
@@ -536,7 +471,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
             # again due to the reassignment.
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
-            self._post_init(g.srid)
+            self._post_init()
+            self.srid = g.srid
         else:
             raise GEOSException('Transformed WKB was invalid.')
 
@@ -677,7 +613,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     def clone(self):
         "Clone this Geometry."
-        return GEOSGeometry(capi.geom_clone(self.ptr), srid=self.srid)
+        return GEOSGeometry(capi.geom_clone(self.ptr))
 
 
 class LinearGeometryMixin:
@@ -715,3 +651,67 @@ class LinearGeometryMixin:
         Return whether or not this Geometry is closed.
         """
         return capi.geos_isclosed(self.ptr)
+
+
+@deconstructible
+class GEOSGeometry(GEOSGeometryBase, ListMixin):
+    "A class that, generally, encapsulates a GEOS geometry."
+
+    def __init__(self, geo_input, srid=None):
+        """
+        The base constructor for GEOS geometry objects. It may take the
+        following inputs:
+
+         * strings:
+            - WKT
+            - HEXEWKB (a PostGIS-specific canonical form)
+            - GeoJSON (requires GDAL)
+         * buffer:
+            - WKB
+
+        The `srid` keyword specifies the Source Reference Identifier (SRID)
+        number for this Geometry. If not provided, it defaults to None.
+        """
+        input_srid = None
+        if isinstance(geo_input, bytes):
+            geo_input = force_text(geo_input)
+        if isinstance(geo_input, str):
+            wkt_m = wkt_regex.match(geo_input)
+            if wkt_m:
+                # Handle WKT input.
+                if wkt_m.group('srid'):
+                    input_srid = int(wkt_m.group('srid'))
+                g = self._from_wkt(force_bytes(wkt_m.group('wkt')))
+            elif hex_regex.match(geo_input):
+                # Handle HEXEWKB input.
+                g = wkb_r().read(force_bytes(geo_input))
+            elif json_regex.match(geo_input):
+                # Handle GeoJSON input.
+                ogr = gdal.OGRGeometry.from_json(geo_input)
+                g = ogr._geos_ptr()
+                input_srid = ogr.srid
+            else:
+                raise ValueError('String input unrecognized as WKT EWKT, and HEXEWKB.')
+        elif isinstance(geo_input, GEOM_PTR):
+            # When the input is a pointer to a geometry (GEOM_PTR).
+            g = geo_input
+        elif isinstance(geo_input, memoryview):
+            # When the input is a buffer (WKB).
+            g = wkb_r().read(geo_input)
+        elif isinstance(geo_input, GEOSGeometry):
+            g = capi.geom_clone(geo_input.ptr)
+        else:
+            raise TypeError('Improper geometry input type: %s' % type(geo_input))
+
+        if not g:
+            raise GEOSException('Could not initialize GEOS Geometry with given input.')
+
+        input_srid = input_srid or capi.geos_get_srid(g) or None
+        if input_srid and srid and input_srid != srid:
+            raise ValueError('Input geometry already has SRID: %d.' % input_srid)
+
+        super().__init__(g, None)
+        # Set the SRID, if given.
+        srid = input_srid or srid
+        if srid and isinstance(srid, int):
+            self.srid = srid

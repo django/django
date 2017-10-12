@@ -8,7 +8,7 @@ from django.contrib.gis.geos import (
     MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
@@ -403,6 +403,27 @@ class GeoLookupTest(TestCase):
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
         self.assertIsNone(State.objects.get(name='Northern Mariana Islands').poly)
 
+    @skipUnlessDBFeature('supports_null_geometries', 'supports_crosses_lookup', 'supports_relate_lookup')
+    def test_null_geometries_excluded_in_lookups(self):
+        """NULL features are excluded in spatial lookup functions."""
+        null = State.objects.create(name='NULL', poly=None)
+        queries = [
+            ('equals', Point(1, 1)),
+            ('disjoint', Point(1, 1)),
+            ('touches', Point(1, 1)),
+            ('crosses', LineString((0, 0), (1, 1), (5, 5))),
+            ('within', Point(1, 1)),
+            ('overlaps', LineString((0, 0), (1, 1), (5, 5))),
+            ('contains', LineString((0, 0), (1, 1), (5, 5))),
+            ('intersects', LineString((0, 0), (1, 1), (5, 5))),
+            ('relate', (Point(1, 1), 'T*T***FF*')),
+            ('same_as', Point(1, 1)),
+            ('exact', Point(1, 1)),
+        ]
+        for lookup, geom in queries:
+            with self.subTest(lookup=lookup):
+                self.assertNotIn(null, State.objects.filter(**{'poly__%s' % lookup: geom}))
+
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
@@ -495,7 +516,7 @@ class GeoQuerySetTest(TestCase):
         Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            with self.assertRaises(NotImplementedError):
+            with self.assertRaises(NotSupportedError):
                 City.objects.all().aggregate(MakeLine('point'))
             return
 

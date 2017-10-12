@@ -8,6 +8,10 @@ from .datetime import (
     Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
     TruncQuarter, TruncSecond, TruncTime, TruncYear,
 )
+from .window import (
+    CumeDist, DenseRank, FirstValue, Lag, LastValue, Lead, NthValue, Ntile,
+    PercentRank, Rank, RowNumber,
+)
 
 __all__ = [
     # base
@@ -18,4 +22,7 @@ __all__ = [
     'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay',
     'ExtractYear', 'Trunc', 'TruncDate', 'TruncDay', 'TruncHour', 'TruncMinute',
     'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime', 'TruncYear',
+    # window
+    'CumeDist', 'DenseRank', 'FirstValue', 'Lag', 'LastValue', 'Lead',
+    'NthValue', 'Ntile', 'PercentRank', 'Rank', 'RowNumber',
 ]

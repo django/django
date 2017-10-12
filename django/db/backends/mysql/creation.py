@@ -38,9 +38,9 @@ class DatabaseCreation(BaseDatabaseCreation):
             else:
                 raise e
 
-    def _clone_test_db(self, number, verbosity, keepdb=False):
+    def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
-        target_database_name = self.get_test_db_clone_settings(number)['NAME']
+        target_database_name = self.get_test_db_clone_settings(suffix)['NAME']
         test_db_params = {
             'dbname': self.connection.ops.quote_name(target_database_name),
             'suffix': self.sql_table_creation_suffix(),

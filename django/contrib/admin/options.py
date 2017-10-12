@@ -19,6 +19,10 @@ from django.contrib.admin.utils import (
     get_deleted_objects, lookup_needs_distinct, model_format_dict,
     model_ngettext, quote, unquote,
 )
+from django.contrib.admin.views.autocomplete import AutocompleteJsonView
+from django.contrib.admin.widgets import (
+    AutocompleteSelect, AutocompleteSelectMultiple,
+)
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
     FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
@@ -94,6 +98,7 @@ csrf_protect_m = method_decorator(csrf_protect)
 class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
+    autocomplete_fields = ()
     raw_id_fields = ()
     fields = None
     exclude = None
@@ -134,7 +139,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return self.formfield_for_choice_field(db_field, request, **kwargs)
 
         # ForeignKey or ManyToManyFields
-        if isinstance(db_field, models.ManyToManyField) or isinstance(db_field, models.ForeignKey):
+        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             # Combine the field kwargs with any options for formfield_overrides.
             # Make sure the passed in **kwargs override anything in
             # formfield_overrides because **kwargs is more specific, and should
@@ -213,7 +218,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         Get a form Field for a ForeignKey.
         """
         db = kwargs.get('using')
-        if db_field.name in self.raw_id_fields:
+
+        if db_field.name in self.get_autocomplete_fields(request):
+            kwargs['widget'] = AutocompleteSelect(db_field.remote_field, using=db)
+        elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in self.radio_fields:
             kwargs['widget'] = widgets.AdminRadioSelect(attrs={
@@ -238,9 +246,12 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return None
         db = kwargs.get('using')
 
-        if db_field.name in self.raw_id_fields:
+        autocomplete_fields = self.get_autocomplete_fields(request)
+        if db_field.name in autocomplete_fields:
+            kwargs['widget'] = AutocompleteSelectMultiple(db_field.remote_field, using=db)
+        elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
-        elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
+        elif db_field.name in list(self.filter_vertical) + list(self.filter_horizontal):
             kwargs['widget'] = widgets.FilteredSelectMultiple(
                 db_field.verbose_name,
                 db_field.name in self.filter_vertical
@@ -252,11 +263,19 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 kwargs['queryset'] = queryset
 
         form_field = db_field.formfield(**kwargs)
-        if isinstance(form_field.widget, SelectMultiple) and not isinstance(form_field.widget, CheckboxSelectMultiple):
+        if (isinstance(form_field.widget, SelectMultiple) and
+                not isinstance(form_field.widget, (CheckboxSelectMultiple, AutocompleteSelectMultiple))):
             msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
             help_text = form_field.help_text
             form_field.help_text = format_lazy('{} {}', help_text, msg) if help_text else msg
         return form_field
+
+    def get_autocomplete_fields(self, request):
+        """
+        Return a list of ForeignKey and/or ManyToMany fields which should use
+        an autocomplete widget.
+        """
+        return self.autocomplete_fields
 
     def get_view_on_site_url(self, obj=None):
         if obj is None or not self.view_on_site:
@@ -548,7 +567,7 @@ class ModelAdmin(BaseModelAdmin):
         return inline_instances
 
     def get_urls(self):
-        from django.conf.urls import url
+        from django.urls import path
 
         def wrap(view):
             def wrapper(*args, **kwargs):
@@ -559,13 +578,14 @@ class ModelAdmin(BaseModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
 
         urlpatterns = [
-            url(r'^$', wrap(self.changelist_view), name='%s_%s_changelist' % info),
-            url(r'^add/$', wrap(self.add_view), name='%s_%s_add' % info),
-            url(r'^(.+)/history/$', wrap(self.history_view), name='%s_%s_history' % info),
-            url(r'^(.+)/delete/$', wrap(self.delete_view), name='%s_%s_delete' % info),
-            url(r'^(.+)/change/$', wrap(self.change_view), name='%s_%s_change' % info),
+            path('', wrap(self.changelist_view), name='%s_%s_changelist' % info),
+            path('add/', wrap(self.add_view), name='%s_%s_add' % info),
+            path('autocomplete/', wrap(self.autocomplete_view), name='%s_%s_autocomplete' % info),
+            path('<path:object_id>/history/', wrap(self.history_view), name='%s_%s_history' % info),
+            path('<path:object_id>/delete/', wrap(self.delete_view), name='%s_%s_delete' % info),
+            path('<path:object_id>/change/', wrap(self.change_view), name='%s_%s_change' % info),
             # For backwards compatibility (was the change url before 1.9)
-            url(r'^(.+)/$', wrap(RedirectView.as_view(
+            path('<path:object_id>/', wrap(RedirectView.as_view(
                 pattern_name='%s:%s_%s_change' % ((self.admin_site.name,) + info)
             ))),
         ]
@@ -627,8 +647,8 @@ class ModelAdmin(BaseModelAdmin):
         exclude = exclude or None
 
         # Remove declared form fields which are in readonly_fields.
-        new_attrs = OrderedDict(
-            (f, None) for f in readonly_fields
+        new_attrs = OrderedDict.fromkeys(
+            f for f in readonly_fields
             if f in self.form.declared_fields
         )
         form = type(self.form.__name__, (self.form,), new_attrs)
@@ -658,6 +678,32 @@ class ModelAdmin(BaseModelAdmin):
         """
         from django.contrib.admin.views.main import ChangeList
         return ChangeList
+
+    def get_changelist_instance(self, request):
+        """
+        Return a `ChangeList` instance based on `request`. May raise
+        `IncorrectLookupParameters`.
+        """
+        list_display = self.get_list_display(request)
+        list_display_links = self.get_list_display_links(request, list_display)
+        # Add the action checkboxes if any actions are available.
+        if self.get_actions(request):
+            list_display = ['action_checkbox'] + list(list_display)
+        ChangeList = self.get_changelist(request)
+        return ChangeList(
+            request,
+            self.model,
+            list_display,
+            list_display_links,
+            self.get_list_filter(request),
+            self.date_hierarchy,
+            self.get_search_fields(request),
+            self.get_list_select_related(request),
+            self.list_per_page,
+            self.list_max_show_all,
+            self.list_editable,
+            self,
+        )
 
     def get_object(self, request, object_id, from_field=None):
         """
@@ -1127,8 +1173,7 @@ class ModelAdmin(BaseModelAdmin):
             opts = obj._meta
             to_field = request.POST.get(TO_FIELD_VAR)
             attr = str(to_field) if to_field else opts.pk.attname
-            # Retrieve the `object_id` from the resolved pattern arguments.
-            value = request.resolver_match.args[0]
+            value = request.resolver_match.kwargs['object_id']
             new_value = obj.serializable_value(attr)
             popup_response_data = json.dumps({
                 'action': 'change',
@@ -1442,10 +1487,6 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = form.instance
             formsets, inline_instances = self._create_formsets(request, new_object, change=not add)
             if all_valid(formsets) and form_validated:
-                if not add:
-                    # Evalute querysets in form.initial so that changes to
-                    # ManyToManyFields are reflected in this change's LogEntry.
-                    form.has_changed()
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
                 change_message = self.construct_change_message(request, form, formsets, add)
@@ -1505,6 +1546,9 @@ class ModelAdmin(BaseModelAdmin):
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
 
+    def autocomplete_view(self, request):
+        return AutocompleteJsonView.as_view(model_admin=self)(request)
+
     def add_view(self, request, form_url='', extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)
 
@@ -1522,26 +1566,8 @@ class ModelAdmin(BaseModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
 
-        list_display = self.get_list_display(request)
-        list_display_links = self.get_list_display_links(request, list_display)
-        list_filter = self.get_list_filter(request)
-        search_fields = self.get_search_fields(request)
-        list_select_related = self.get_list_select_related(request)
-
-        # Check actions to see if any are available on this changelist
-        actions = self.get_actions(request)
-        if actions:
-            # Add the action checkboxes if there are any actions available.
-            list_display = ['action_checkbox'] + list(list_display)
-
-        ChangeList = self.get_changelist(request)
         try:
-            cl = ChangeList(
-                request, self.model, list_display,
-                list_display_links, list_filter, self.date_hierarchy,
-                search_fields, list_select_related, self.list_per_page,
-                self.list_max_show_all, self.list_editable, self,
-            )
+            cl = self.get_changelist_instance(request)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
@@ -1562,6 +1588,7 @@ class ModelAdmin(BaseModelAdmin):
         action_failed = False
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
 
+        actions = self.get_actions(request)
         # Actions with no confirmation
         if (actions and request.method == 'POST' and
                 'index' in request.POST and '_save' not in request.POST):

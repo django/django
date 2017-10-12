@@ -15,6 +15,7 @@ class Aggregate(Func):
     contains_aggregate = True
     name = None
     filter_template = '%s FILTER (WHERE %%(filter)s)'
+    window_compatible = True
 
     def __init__(self, *args, filter=None, **kwargs):
         self.filter = filter
@@ -109,6 +110,7 @@ class Count(Aggregate):
     function = 'COUNT'
     name = 'Count'
     template = '%(function)s(%(distinct)s%(expressions)s)'
+    output_field = IntegerField()
 
     def __init__(self, expression, distinct=False, filter=None, **extra):
         if expression == '*':
@@ -117,7 +119,7 @@ class Count(Aggregate):
             raise ValueError('Star cannot be used with filter. Please specify a field.')
         super().__init__(
             expression, distinct='DISTINCT ' if distinct else '',
-            output_field=IntegerField(), filter=filter, **extra
+            filter=filter, **extra
         )
 
     def _get_repr_options(self):
@@ -125,9 +127,7 @@ class Count(Aggregate):
         return dict(options, distinct=self.extra['distinct'] != '')
 
     def convert_value(self, value, expression, connection):
-        if value is None:
-            return 0
-        return int(value)
+        return 0 if value is None else value
 
 
 class Max(Aggregate):
@@ -142,19 +142,15 @@ class Min(Aggregate):
 
 class StdDev(Aggregate):
     name = 'StdDev'
+    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
-        super().__init__(expression, output_field=FloatField(), **extra)
+        super().__init__(expression, **extra)
 
     def _get_repr_options(self):
         options = super()._get_repr_options()
         return dict(options, sample=self.function == 'STDDEV_SAMP')
-
-    def convert_value(self, value, expression, connection):
-        if value is None:
-            return value
-        return float(value)
 
 
 class Sum(Aggregate):
@@ -173,16 +169,12 @@ class Sum(Aggregate):
 
 class Variance(Aggregate):
     name = 'Variance'
+    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'
-        super().__init__(expression, output_field=FloatField(), **extra)
+        super().__init__(expression, **extra)
 
     def _get_repr_options(self):
         options = super()._get_repr_options()
         return dict(options, sample=self.function == 'VAR_SAMP')
-
-    def convert_value(self, value, expression, connection):
-        if value is None:
-            return value
-        return float(value)

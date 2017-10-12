@@ -155,13 +155,15 @@ class BaseCache:
         Return the value of the key stored or retrieved.
         """
         val = self.get(key, version=version)
-        if val is None and default is not None:
+        if val is None:
             if callable(default):
                 default = default()
-            self.add(key, default, timeout=timeout, version=version)
-            # Fetch the value again to avoid a race condition if another caller
-            # added a value between the first get() and the add() above.
-            return self.get(key, default, version=version)
+            if default is not None:
+                self.add(key, default, timeout=timeout, version=version)
+                # Fetch the value again to avoid a race condition if another
+                # caller added a value between the first get() and the add()
+                # above.
+                return self.get(key, default, version=version)
         return val
 
     def has_key(self, key, version=None):
@@ -206,9 +208,13 @@ class BaseCache:
 
         If timeout is given, use that timeout for the key; otherwise use the
         default cache timeout.
+
+        On backends that support it, return a list of keys that failed
+        insertion, or an empty list if all keys were inserted successfully.
         """
         for key, value in data.items():
             self.set(key, value, timeout=timeout, version=version)
+        return []
 
     def delete_many(self, keys, version=None):
         """

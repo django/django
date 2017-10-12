@@ -8,16 +8,6 @@ try:
     HAS_POSTGRES = True
 except ImportError:
     HAS_POSTGRES = False
-except ImproperlyConfigured as e:
-    # If psycopg is installed but not geos, the import path hits
-    # django.contrib.gis.geometry.backend which will "helpfully" convert
-    # an ImportError into an ImproperlyConfigured.
-    # Here, we make sure we're only catching this specific case and not another
-    # ImproperlyConfigured one.
-    if e.args and e.args[0].startswith('Could not import user-defined GEOMETRY_BACKEND'):
-        HAS_POSTGRES = False
-    else:
-        raise
 
 
 if HAS_POSTGRES:

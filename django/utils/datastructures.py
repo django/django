@@ -1,6 +1,5 @@
 import copy
 from collections import OrderedDict
-from contextlib import suppress
 
 
 class OrderedSet:
@@ -10,7 +9,7 @@ class OrderedSet:
     """
 
     def __init__(self, iterable=None):
-        self.dict = OrderedDict(((x, None) for x in iterable) if iterable else [])
+        self.dict = OrderedDict.fromkeys(iterable or ())
 
     def add(self, item):
         self.dict[item] = None
@@ -19,8 +18,10 @@ class OrderedSet:
         del self.dict[item]
 
     def discard(self, item):
-        with suppress(KeyError):
+        try:
             self.remove(item)
+        except KeyError:
+            pass
 
     def __iter__(self):
         return iter(self.dict)

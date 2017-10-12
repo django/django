@@ -523,6 +523,22 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_blank_username(self):
+        """Creation fails if --username is blank."""
+        new_io = StringIO()
+
+        def test(self):
+            with self.assertRaisesMessage(CommandError, 'Username cannot be blank.'):
+                call_command(
+                    'createsuperuser',
+                    username='',
+                    stdin=MockTTY(),
+                    stdout=new_io,
+                    stderr=new_io,
+                )
+
+        test(self)
+
     def test_invalid_username(self):
         """Creation fails if the username fails validation."""
         user_field = User._meta.get_field(User.USERNAME_FIELD)

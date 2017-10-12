@@ -261,8 +261,6 @@ precedence::
 
 .. method:: Form.get_initial_for_field(field, field_name)
 
-.. versionadded:: 1.11
-
 Use :meth:`~Form.get_initial_for_field()` to retrieve initial data for a form
 field. It retrieves data from :attr:`Form.initial` and :attr:`Field.initial`,
 in that order, and evaluates any callable initial values.
@@ -461,11 +459,6 @@ include ``checked`` if appropriate::
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" value="Hi there" required /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" value="foo@example.com" required /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked /></td></tr>
-
-.. versionchanged:: 1.11
-
-    The ``checked`` attribute was changed to use HTML5 boolean syntax rather
-    than ``checked="checked"``.
 
 This default output is a two-column HTML table, with a ``<tr>`` for each field.
 Notice the following:
@@ -733,8 +726,6 @@ Configuring the rendering of a form's widgets
 ---------------------------------------------
 
 .. attribute:: Form.default_renderer
-
-.. versionadded:: 1.11
 
 Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
 ``None`` which means to use the default renderer specified by the

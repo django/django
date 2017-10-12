@@ -25,7 +25,7 @@ class Lookup:
             # a bilateral transformation on a nested QuerySet: that won't work.
             from django.db.models.sql.query import Query  # avoid circular import
             if isinstance(rhs, Query):
-                raise NotImplementedError("Bilateral transformations on nested querysets are not supported.")
+                raise NotImplementedError("Bilateral transformations on nested querysets are not implemented.")
         self.bilateral_transforms = bilateral_transforms
 
     def apply_bilateral_transforms(self, value):
@@ -114,6 +114,10 @@ class Lookup:
     @cached_property
     def contains_aggregate(self):
         return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
+
+    @cached_property
+    def contains_over_clause(self):
+        return self.lhs.contains_over_clause or getattr(self.rhs, 'contains_over_clause', False)
 
     @property
     def is_summary(self):
@@ -509,7 +513,7 @@ class YearComparisonLookup(YearLookup):
     def get_rhs_op(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
 
-    def get_bound(self):
+    def get_bound(self, start, finish):
         raise NotImplementedError(
             'subclasses of YearComparisonLookup must provide a get_bound() method'
         )
