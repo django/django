@@ -5,7 +5,6 @@ import functools
 import math
 import os
 import re
-import sys
 import uuid
 from unittest import mock
 
@@ -25,10 +24,9 @@ from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY36
 
 from .models import FoodManager, FoodQuerySet
-
-PY36 = sys.version_info >= (3, 6)
 
 
 class Money(decimal.Decimal):
