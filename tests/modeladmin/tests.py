@@ -43,6 +43,32 @@ class ModelAdminTests(TestCase):
         )
         self.site = AdminSite()
 
+    def test_model_pattern_sorted(self):
+        class Agent(models.Model):
+            class Meta:
+                app_label = 'agent'
+
+        class Booking(models.Model):
+            class Meta:
+                app_label = 'booking'
+
+        class CoverBand(models.Model):
+            class Meta:
+                app_label = 'coverband'
+
+        def find_app_label():
+            urls = self.site.get_urls()
+            for url in urls:
+                if '<app_label>' in str(url.pattern):
+                    return str(url.pattern)
+
+        self.site.register(Booking)
+        self.assertIn('booking', find_app_label())
+        self.site.register(CoverBand)
+        self.assertIn('booking|coverband', find_app_label())
+        self.site.register(Agent)
+        self.assertIn('agent|booking|coverband', find_app_label())
+
     def test_modeladmin_str(self):
         ma = ModelAdmin(Band, self.site)
         self.assertEqual(str(ma), 'modeladmin.ModelAdmin')
