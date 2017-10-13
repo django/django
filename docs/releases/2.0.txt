@@ -245,20 +245,20 @@ Models
   :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>`  now
   allow ordering by several fields.
 
-* Added the :class:`~django.db.models.functions.datetime.ExtractQuarter`
-  function to extract the quarter from :class:`~django.db.models.DateField` and
+* Added the :class:`~django.db.models.functions.ExtractQuarter` function to
+  extract the quarter from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField`, and exposed it through the
   :lookup:`quarter` lookup.
 
-* Added the :class:`~django.db.models.functions.datetime.TruncQuarter`
-  function to truncate :class:`~django.db.models.DateField` and
+* Added the :class:`~django.db.models.functions.TruncQuarter` function to
+  truncate :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` to the first day of a quarter.
 
 * Added the :attr:`~django.db.models.Index.db_tablespace` parameter to
   class-based indexes.
 
 * If the database supports a native duration field (Oracle and PostgreSQL),
-  :class:`~django.db.models.functions.datetime.Extract` now works with
+  :class:`~django.db.models.functions.Extract` now works with
   :class:`~django.db.models.DurationField`.
 
 * Added the ``of`` parameter to :meth:`.QuerySet.select_for_update()`, supported

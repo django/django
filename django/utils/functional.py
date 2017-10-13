@@ -1,4 +1,5 @@
 import copy
+import itertools
 import operator
 from functools import total_ordering, wraps
 
@@ -189,7 +190,7 @@ def keep_lazy(*resultclasses):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            for arg in list(args) + list(kwargs.values()):
+            for arg in itertools.chain(args, kwargs.values()):
                 if isinstance(arg, Promise):
                     break
             else:

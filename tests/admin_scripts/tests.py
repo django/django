@@ -26,10 +26,10 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
+from django.utils.version import PY36
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
-PY36 = sys.version_info >= (3, 6)
 SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 

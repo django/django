@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
+from django.utils.version import PY36
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
     cleanse_setting, technical_500_response,
@@ -30,8 +31,6 @@ from ..views import (
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     sensitive_method_view, sensitive_view,
 )
-
-PY36 = sys.version_info >= (3, 6)
 
 
 class User:

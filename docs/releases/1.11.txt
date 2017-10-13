@@ -330,16 +330,16 @@ Models
   (This validator moved to the form field in :doc:`Django 1.11.2 <1.11.2>`.)
 
 * Added support for time truncation to
-  :class:`~django.db.models.functions.datetime.Trunc` functions.
+  :class:`~django.db.models.functions.Trunc` functions.
 
-* Added the :class:`~django.db.models.functions.datetime.ExtractWeek` function
-  to extract the week from :class:`~django.db.models.DateField` and
+* Added the :class:`~django.db.models.functions.ExtractWeek` function to
+  extract the week from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` and exposed it through the
   :lookup:`week` lookup.
 
-* Added the :class:`~django.db.models.functions.datetime.TruncTime` function
-  to truncate :class:`~django.db.models.DateTimeField` to its time component
-  and exposed it through the :lookup:`time` lookup.
+* Added the :class:`~django.db.models.functions.TruncTime` function to truncate
+  :class:`~django.db.models.DateTimeField` to its time component and exposed it
+  through the :lookup:`time` lookup.
 
 * Added support for expressions in :meth:`.QuerySet.values` and
   :meth:`~.QuerySet.values_list`.
