@@ -30,6 +30,14 @@ simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 
+_html_escapes = {
+    ord('&'): '&amp;',
+    ord('<'): '&lt;',
+    ord('>'): '&gt;',
+    ord('"'): '&quot;',
+    ord("'"): '&#39;',
+}
+
 
 @keep_lazy(str, SafeText)
 def escape(text):
@@ -41,10 +49,7 @@ def escape(text):
     This may result in double-escaping. If this is a concern, use
     conditional_escape() instead.
     """
-    return mark_safe(
-        str(text).replace('&', '&amp;').replace('<', '&lt;')
-        .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-    )
+    return mark_safe(str(text).translate(_html_escapes))
 
 
 _js_escapes = {
