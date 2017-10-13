@@ -2,8 +2,8 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db.models import (
-    DateField, DateTimeField, DurationField, Field, IntegerField, TimeField,
-    Transform,
+    DateField, DateTimeField, DurationField, Field, Func, IntegerField,
+    TimeField, Transform, fields,
 )
 from django.db.models.lookups import (
     YearExact, YearGt, YearGte, YearLt, YearLte,
@@ -141,6 +141,17 @@ ExtractYear.register_lookup(YearGt)
 ExtractYear.register_lookup(YearGte)
 ExtractYear.register_lookup(YearLt)
 ExtractYear.register_lookup(YearLte)
+
+
+class Now(Func):
+    template = 'CURRENT_TIMESTAMP'
+    output_field = fields.DateTimeField()
+
+    def as_postgresql(self, compiler, connection):
+        # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the
+        # transaction". Use STATEMENT_TIMESTAMP to be cross-compatible with
+        # other databases.
+        return self.as_sql(compiler, connection, template='STATEMENT_TIMESTAMP()')
 
 
 class TruncBase(TimezoneMixin, Transform):
