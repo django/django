@@ -64,6 +64,8 @@ def subclass_exception(name, parents, module, attached_to=None):
 
         class_dict['__reduce__'] = __reduce__
         class_dict['__setstate__'] = __setstate__
+        if attached_to:
+            class_dict['__qualname__'] = '%s.%s' % (attached_to.__qualname__, name)
 
     return type(name, parents, class_dict)
 
