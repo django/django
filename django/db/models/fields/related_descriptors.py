@@ -79,7 +79,7 @@ class ForwardManyToOneDescriptor:
         class Child(Model):
             parent = ForeignKey(Parent, related_name='children')
 
-    ``child.parent`` is a ``ForwardManyToOneDescriptor`` instance.
+    ``Child.parent`` is a ``ForwardManyToOneDescriptor`` instance.
     """
 
     def __init__(self, field_with_rel):
@@ -254,7 +254,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
         class Restaurant(Model):
             place = OneToOneField(Place, related_name='restaurant')
 
-    ``restaurant.place`` is a ``ForwardOneToOneDescriptor`` instance.
+    ``Restaurant.place`` is a ``ForwardOneToOneDescriptor`` instance.
     """
 
     def get_object(self, instance):
@@ -303,7 +303,7 @@ class ReverseOneToOneDescriptor:
         class Restaurant(Model):
             place = OneToOneField(Place, related_name='restaurant')
 
-    ``place.restaurant`` is a ``ReverseOneToOneDescriptor`` instance.
+    ``Place.restaurant`` is a ``ReverseOneToOneDescriptor`` instance.
     """
 
     def __init__(self, related):
@@ -466,7 +466,7 @@ class ReverseManyToOneDescriptor:
         class Child(Model):
             parent = ForeignKey(Parent, related_name='children')
 
-    ``parent.children`` is a ``ReverseManyToOneDescriptor`` instance.
+    ``Parent.children`` is a ``ReverseManyToOneDescriptor`` instance.
 
     Most of the implementation is delegated to a dynamically defined manager
     class built by ``create_forward_many_to_many_manager()`` defined below.
@@ -713,7 +713,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
         class Pizza(Model):
             toppings = ManyToManyField(Topping, related_name='pizzas')
 
-    ``pizza.toppings`` and ``topping.pizzas`` are ``ManyToManyDescriptor``
+    ``Pizza.toppings`` and ``Topping.pizzas`` are ``ManyToManyDescriptor``
     instances.
 
     Most of the implementation is delegated to a dynamically defined manager
