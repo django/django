@@ -23,8 +23,13 @@ We don't usually recommend allowing ``null=True`` for ``CharField`` since this
 allows the field to have two "empty values", but it's important for the
 ``Coalesce`` example below.
 
+.. _comparison-functions:
+
+Comparison and conversion functions
+===================================
+
 ``Cast``
-========
+--------
 
 .. class:: Cast(expression, output_field)
 
@@ -40,7 +45,7 @@ Usage example::
     4.0
 
 ``Coalesce``
-============
+------------
 
 .. class:: Coalesce(*expressions, **extra)
 
@@ -80,39 +85,8 @@ Usage examples::
     >>> now = timezone.now()
     >>> Coalesce('updated', Cast(now, DateTimeField()))
 
-``Concat``
-==========
-
-.. class:: Concat(*expressions, **extra)
-
-Accepts a list of at least two text fields or expressions and returns the
-concatenated text. Each argument must be of a text or char type. If you want
-to concatenate a ``TextField()`` with a ``CharField()``, then be sure to tell
-Django that the ``output_field`` should be a ``TextField()``. Specifying an
-``output_field`` is also required when concatenating a ``Value`` as in the
-example below.
-
-This function will never have a null result. On backends where a null argument
-results in the entire expression being null, Django will ensure that each null
-part is converted to an empty string first.
-
-Usage example::
-
-    >>> # Get the display name as "name (goes_by)"
-    >>> from django.db.models import CharField, Value as V
-    >>> from django.db.models.functions import Concat
-    >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
-    >>> author = Author.objects.annotate(
-    ...     screen_name=Concat(
-    ...         'name', V(' ('), 'goes_by', V(')'),
-    ...         output_field=CharField()
-    ...     )
-    ... ).get()
-    >>> print(author.screen_name)
-    Margaret Smith (Maggie)
-
 ``Greatest``
-============
+------------
 
 .. class:: Greatest(*expressions, **extra)
 
@@ -154,7 +128,7 @@ and ``comment.modified``.
     a sensible minimum value to provide as a default.
 
 ``Least``
-=========
+---------
 
 .. class:: Least(*expressions, **extra)
 
@@ -175,147 +149,10 @@ will result in a database error.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible maximum value to provide as a default.
 
-``Length``
-==========
+.. _date-functions:
 
-.. class:: Length(expression, **extra)
-
-Accepts a single text field or expression and returns the number of characters
-the value has. If the expression is null, then the length will also be null.
-
-Usage example::
-
-    >>> # Get the length of the name and goes_by fields
-    >>> from django.db.models.functions import Length
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(
-    ...    name_length=Length('name'),
-    ...    goes_by_length=Length('goes_by')).get()
-    >>> print(author.name_length, author.goes_by_length)
-    (14, None)
-
-It can also be registered as a transform. For example::
-
-    >>> from django.db.models import CharField
-    >>> from django.db.models.functions import Length
-    >>> CharField.register_lookup(Length, 'length')
-    >>> # Get authors whose name is longer than 7 characters
-    >>> authors = Author.objects.filter(name__length__gt=7)
-
-``Lower``
-=========
-
-.. class:: Lower(expression, **extra)
-
-Accepts a single text field or expression and returns the lowercase
-representation.
-
-It can also be registered as a transform as described in :class:`Length`.
-
-Usage example::
-
-    >>> from django.db.models.functions import Lower
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
-    >>> print(author.name_lower)
-    margaret smith
-
-``Now``
-=======
-
-.. class:: Now()
-
-Returns the database server's current date and time when the query is executed,
-typically using the SQL ``CURRENT_TIMESTAMP``.
-
-Usage example::
-
-    >>> from django.db.models.functions import Now
-    >>> Article.objects.filter(published__lte=Now())
-    <QuerySet [<Article: How to Django>]>
-
-.. admonition:: PostgreSQL considerations
-
-    On PostgreSQL, the SQL ``CURRENT_TIMESTAMP`` returns the time that the
-    current transaction started. Therefore for cross-database compatibility,
-    ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
-    timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
-
-``StrIndex``
-============
-
-.. class:: StrIndex(string, substring, **extra)
-
-.. versionadded:: 2.0
-
-Returns a positive integer corresponding to the 1-indexed position of the first
-occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
-found.
-
-Usage example::
-
-    >>> from django.db.models import Value as V
-    >>> from django.db.models.functions import StrIndex
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> Author.objects.create(name='Smith, Margaret')
-    >>> Author.objects.create(name='Margaret Jackson')
-    >>> Author.objects.filter(name='Margaret Jackson').annotate(
-    ...     smith_index=StrIndex('name', V('Smith'))
-    ... ).get().smith_index
-    0
-    >>> authors = Author.objects.annotate(
-    ...    smith_index=StrIndex('name', V('Smith'))
-    ... ).filter(smith_index__gt=0)
-    <QuerySet [<Author: Margaret Smith>, <Author: Smith, Margaret>]>
-
-.. warning::
-
-    In MySQL, a database table's :ref:`collation<mysql-collation>` determines
-    whether string comparisons (such as the ``expression`` and ``substring`` of
-    this function) are case-sensitive. Comparisons are case-insensitive by
-    default.
-
-``Substr``
-==========
-
-.. class:: Substr(expression, pos, length=None, **extra)
-
-Returns a substring of length ``length`` from the field or expression starting
-at position ``pos``. The position is 1-indexed, so the position must be greater
-than 0. If ``length`` is ``None``, then the rest of the string will be returned.
-
-Usage example::
-
-    >>> # Set the alias to the first 5 characters of the name as lowercase
-    >>> from django.db.models.functions import Substr, Lower
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
-    1
-    >>> print(Author.objects.get(name='Margaret Smith').alias)
-    marga
-
-``Upper``
-=========
-
-.. class:: Upper(expression, **extra)
-
-Accepts a single text field or expression and returns the uppercase
-representation.
-
-It can also be registered as a transform as described in :class:`Length`.
-
-Usage example::
-
-    >>> from django.db.models.functions import Upper
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
-    >>> print(author.name_upper)
-    MARGARET SMITH
-
-Date Functions
+Date functions
 ==============
-
-.. module:: django.db.models.functions.datetime
 
 We'll be using the following model in examples of each function::
 
@@ -554,6 +391,26 @@ way, and takes priority over an active timezone::
     ... )
     {'day': 16, 'weekday': 3, 'hour': 9}
 
+``Now``
+-------
+
+.. class:: Now()
+
+Returns the database server's current date and time when the query is executed,
+typically using the SQL ``CURRENT_TIMESTAMP``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Now
+    >>> Article.objects.filter(published__lte=Now())
+    <QuerySet [<Article: How to Django>]>
+
+.. admonition:: PostgreSQL considerations
+
+    On PostgreSQL, the SQL ``CURRENT_TIMESTAMP`` returns the time that the
+    current transaction started. Therefore for cross-database compatibility,
+    ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
+    timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
 ``Trunc``
 ---------
@@ -692,59 +549,6 @@ that deal with date-parts can be used with ``DateField``::
     2016-01-01 00:00:00+11:00 1
     2014-06-01 00:00:00+10:00 1
 
-``TimeField`` truncation
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
-
-    .. attribute:: kind = 'hour'
-
-.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
-
-    .. attribute:: kind = 'minute'
-
-.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
-
-    .. attribute:: kind = 'second'
-
-These are logically equivalent to ``Trunc('time_field', kind)``. They truncate
-all parts of the time up to ``kind`` which allows grouping or filtering times
-with less precision. ``expression`` can have an ``output_field`` of either
-``TimeField`` or ``DateTimeField``.
-
-Since ``TimeField``\s don't have a date component, only ``Trunc`` subclasses
-that deal with time-parts can be used with ``TimeField``::
-
-    >>> from datetime import datetime
-    >>> from django.db.models import Count, TimeField
-    >>> from django.db.models.functions import TruncHour
-    >>> from django.utils import timezone
-    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
-    >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
-    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
-    >>> Experiment.objects.create(start_datetime=start1, start_time=start1.time())
-    >>> Experiment.objects.create(start_datetime=start2, start_time=start2.time())
-    >>> Experiment.objects.create(start_datetime=start3, start_time=start3.time())
-    >>> experiments_per_hour = Experiment.objects.annotate(
-    ...    hour=TruncHour('start_datetime', output_field=TimeField()),
-    ... ).values('hour').annotate(experiments=Count('id'))
-    >>> for exp in experiments_per_hour:
-    ...     print(exp['hour'], exp['experiments'])
-    ...
-    14:00:00 2
-    17:00:00 1
-
-    >>> import pytz
-    >>> melb = pytz.timezone('Australia/Melbourne')
-    >>> experiments_per_hour = Experiment.objects.annotate(
-    ...    hour=TruncHour('start_datetime', tzinfo=melb),
-    ... ).values('hour').annotate(experiments=Count('id'))
-    >>> for exp in experiments_per_hour:
-    ...     print(exp['hour'], exp['experiments'])
-    ...
-    2014-06-16 00:00:00+10:00 2
-    2016-01-01 04:00:00+11:00 1
-
 ``DateTimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -812,6 +616,211 @@ Usage example::
      'minute': 'minute': datetime.datetime(2014, 6, 15, 14, 30, tzinfo=<UTC>),
      'second': datetime.datetime(2014, 6, 15, 14, 30, 50, tzinfo=<UTC>)
     }
+
+``TimeField`` truncation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+
+    .. attribute:: kind = 'hour'
+
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+
+    .. attribute:: kind = 'minute'
+
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+
+    .. attribute:: kind = 'second'
+
+These are logically equivalent to ``Trunc('time_field', kind)``. They truncate
+all parts of the time up to ``kind`` which allows grouping or filtering times
+with less precision. ``expression`` can have an ``output_field`` of either
+``TimeField`` or ``DateTimeField``.
+
+Since ``TimeField``\s don't have a date component, only ``Trunc`` subclasses
+that deal with time-parts can be used with ``TimeField``::
+
+    >>> from datetime import datetime
+    >>> from django.db.models import Count, TimeField
+    >>> from django.db.models.functions import TruncHour
+    >>> from django.utils import timezone
+    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
+    >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
+    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
+    >>> Experiment.objects.create(start_datetime=start1, start_time=start1.time())
+    >>> Experiment.objects.create(start_datetime=start2, start_time=start2.time())
+    >>> Experiment.objects.create(start_datetime=start3, start_time=start3.time())
+    >>> experiments_per_hour = Experiment.objects.annotate(
+    ...    hour=TruncHour('start_datetime', output_field=TimeField()),
+    ... ).values('hour').annotate(experiments=Count('id'))
+    >>> for exp in experiments_per_hour:
+    ...     print(exp['hour'], exp['experiments'])
+    ...
+    14:00:00 2
+    17:00:00 1
+
+    >>> import pytz
+    >>> melb = pytz.timezone('Australia/Melbourne')
+    >>> experiments_per_hour = Experiment.objects.annotate(
+    ...    hour=TruncHour('start_datetime', tzinfo=melb),
+    ... ).values('hour').annotate(experiments=Count('id'))
+    >>> for exp in experiments_per_hour:
+    ...     print(exp['hour'], exp['experiments'])
+    ...
+    2014-06-16 00:00:00+10:00 2
+    2016-01-01 04:00:00+11:00 1
+
+.. _text-functions:
+
+Text functions
+==============
+
+``Concat``
+----------
+
+.. class:: Concat(*expressions, **extra)
+
+Accepts a list of at least two text fields or expressions and returns the
+concatenated text. Each argument must be of a text or char type. If you want
+to concatenate a ``TextField()`` with a ``CharField()``, then be sure to tell
+Django that the ``output_field`` should be a ``TextField()``. Specifying an
+``output_field`` is also required when concatenating a ``Value`` as in the
+example below.
+
+This function will never have a null result. On backends where a null argument
+results in the entire expression being null, Django will ensure that each null
+part is converted to an empty string first.
+
+Usage example::
+
+    >>> # Get the display name as "name (goes_by)"
+    >>> from django.db.models import CharField, Value as V
+    >>> from django.db.models.functions import Concat
+    >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
+    >>> author = Author.objects.annotate(
+    ...     screen_name=Concat(
+    ...         'name', V(' ('), 'goes_by', V(')'),
+    ...         output_field=CharField()
+    ...     )
+    ... ).get()
+    >>> print(author.screen_name)
+    Margaret Smith (Maggie)
+
+``Length``
+----------
+
+.. class:: Length(expression, **extra)
+
+Accepts a single text field or expression and returns the number of characters
+the value has. If the expression is null, then the length will also be null.
+
+Usage example::
+
+    >>> # Get the length of the name and goes_by fields
+    >>> from django.db.models.functions import Length
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(
+    ...    name_length=Length('name'),
+    ...    goes_by_length=Length('goes_by')).get()
+    >>> print(author.name_length, author.goes_by_length)
+    (14, None)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Length
+    >>> CharField.register_lookup(Length, 'length')
+    >>> # Get authors whose name is longer than 7 characters
+    >>> authors = Author.objects.filter(name__length__gt=7)
+
+``Lower``
+---------
+
+.. class:: Lower(expression, **extra)
+
+Accepts a single text field or expression and returns the lowercase
+representation.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import Lower
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
+    >>> print(author.name_lower)
+    margaret smith
+
+``StrIndex``
+------------
+
+.. class:: StrIndex(string, substring, **extra)
+
+.. versionadded:: 2.0
+
+Returns a positive integer corresponding to the 1-indexed position of the first
+occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
+found.
+
+Usage example::
+
+    >>> from django.db.models import Value as V
+    >>> from django.db.models.functions import StrIndex
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> Author.objects.create(name='Smith, Margaret')
+    >>> Author.objects.create(name='Margaret Jackson')
+    >>> Author.objects.filter(name='Margaret Jackson').annotate(
+    ...     smith_index=StrIndex('name', V('Smith'))
+    ... ).get().smith_index
+    0
+    >>> authors = Author.objects.annotate(
+    ...    smith_index=StrIndex('name', V('Smith'))
+    ... ).filter(smith_index__gt=0)
+    <QuerySet [<Author: Margaret Smith>, <Author: Smith, Margaret>]>
+
+.. warning::
+
+    In MySQL, a database table's :ref:`collation<mysql-collation>` determines
+    whether string comparisons (such as the ``expression`` and ``substring`` of
+    this function) are case-sensitive. Comparisons are case-insensitive by
+    default.
+
+``Substr``
+----------
+
+.. class:: Substr(expression, pos, length=None, **extra)
+
+Returns a substring of length ``length`` from the field or expression starting
+at position ``pos``. The position is 1-indexed, so the position must be greater
+than 0. If ``length`` is ``None``, then the rest of the string will be returned.
+
+Usage example::
+
+    >>> # Set the alias to the first 5 characters of the name as lowercase
+    >>> from django.db.models.functions import Substr, Lower
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
+    1
+    >>> print(Author.objects.get(name='Margaret Smith').alias)
+    marga
+
+``Upper``
+---------
+
+.. class:: Upper(expression, **extra)
+
+Accepts a single text field or expression and returns the uppercase
+representation.
+
+It can also be registered as a transform as described in :class:`Length`.
+
+Usage example::
+
+    >>> from django.db.models.functions import Upper
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
+    >>> print(author.name_upper)
+    MARGARET SMITH
 
 .. _window-functions:
 
