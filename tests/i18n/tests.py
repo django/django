@@ -9,6 +9,7 @@ from threading import local
 
 from django import forms
 from django.conf import settings
+from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template
 from django.test import (
@@ -334,6 +335,23 @@ class FormattingTests(SimpleTestCase):
             'f': self.f,
             'l': self.long,
         })
+
+    def test_all_format_strings(self):
+        all_locales = LANG_INFO.keys()
+        today = datetime.date.today()
+        now = datetime.datetime.now()
+        current_year = str(today.year)
+        current_day = str(today.day)
+        current_minute = str(now.minute)
+        for locale in all_locales:
+            with self.subTest(locale=locale), translation.override(locale):
+                self.assertIn(current_year, date_format(today))  # Uses DATE_FORMAT by default
+                self.assertIn(current_minute, time_format(now))  # Uses TIME_FORMAT by default
+                self.assertIn(current_year, date_format(now, format=get_format('DATETIME_FORMAT')))
+                self.assertIn(current_year, date_format(today, format=get_format('YEAR_MONTH_FORMAT')))
+                self.assertIn(current_day, date_format(today, format=get_format('MONTH_DAY_FORMAT')))
+                self.assertIn(current_year, date_format(today, format=get_format('SHORT_DATE_FORMAT')))
+                self.assertIn(current_year, date_format(now, format=get_format('SHORT_DATETIME_FORMAT')))
 
     def test_locale_independent(self):
         """
