@@ -38,7 +38,7 @@ def rfc2822_date(date):
     days = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
-    # We do this ourselves to be timezone aware, email.Utils is not tz aware.
+    # Timezone aware formatting. email.utils.formatdate() isn't tz aware.
     dow = days[date.weekday()]
     month = months[date.month - 1]
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))

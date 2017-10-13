@@ -145,7 +145,7 @@ def parse_http_date(date):
 
     Return an integer expressed in seconds since the epoch, in UTC.
     """
-    # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
+    # email.utils.parsedate() does the job for RFC1123 dates; unfortunately
     # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
