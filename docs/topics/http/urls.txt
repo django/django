@@ -286,7 +286,7 @@ function for the same URL.
 Specifying defaults for view arguments
 ======================================
 
-A convenient trick is to specify default parameters for your views' arguments.
+A convenient trick is to specify default arguments for your views' parameters.
 Here's an example URLconf and view::
 
     # URLconf
