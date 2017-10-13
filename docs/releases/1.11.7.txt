@@ -11,3 +11,5 @@ Bugfixes
 
 * Prevented ``cache.get_or_set()`` from caching ``None`` if the ``default``
   argument is a callable that returns ``None`` (:ticket:`28601`).
+
+* Fixed the Basque ``DATE_FORMAT`` string (:ticket:`28710`).
