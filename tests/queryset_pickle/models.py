@@ -45,6 +45,7 @@ class Happening(models.Model):
     name = models.CharField(blank=True, max_length=100, default="test")
     number1 = models.IntegerField(blank=True, default=standalone_number)
     number2 = models.IntegerField(blank=True, default=Numbers.get_static_number)
+    event = models.OneToOneField(Event, models.CASCADE, null=True)
 
 
 class Container:
