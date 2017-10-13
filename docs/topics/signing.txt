@@ -80,7 +80,7 @@ generate signatures. You can use a different secret by passing it to the
     alphanumeric characters, hyphens, and underscores.
 
 Using the ``salt`` parameter
----------------------------
+----------------------------
 
 If you do not wish for every occurrence of a particular string to have the same
 signature hash, you can use the optional ``salt`` parameter to the ``Signer``

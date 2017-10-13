@@ -274,7 +274,6 @@ Models
   parameters, if the backend supports this feature. Of Django's built-in
   backends, only Oracle supports it.
 
-* The new ``filter`` parameter for built-in aggregates allows :ref:`adding
 * The new :meth:`connection.execute_wrapper()
   <django.db.backends.base.DatabaseWrapper.execute_wrapper>` method allows
   :doc:`installing wrappers around execution of database queries
@@ -684,8 +683,6 @@ to remove usage of these features.
 * ``Field.rel`` and ``Field.remote_field.to`` are removed.
 
 * The ``on_delete`` parameter for ``ForeignKey`` and ``OneToOneField`` are now
-  required.
-* The ``on_delete`` parameter for ``ForeignKey`` and ``OneToOneField`` is now
   required in models and migrations. Consider squashing migrations so that you
   have less of them to update.
 
