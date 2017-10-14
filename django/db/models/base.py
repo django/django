@@ -60,7 +60,7 @@ def subclass_exception(name, bases, module, attached_to):
 
 class ModelBase(type):
     """Metaclass for all models."""
-    def __new__(cls, name, bases, attrs):
+    def __new__(cls, name, bases, attrs, **kwargs):
         super_new = super().__new__
 
         # Also ensure initialization is only performed for subclasses of Model
@@ -75,7 +75,7 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
-        new_class = super_new(cls, name, bases, new_attrs)
+        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
         if not attr_meta:

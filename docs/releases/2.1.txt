@@ -153,7 +153,7 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Models can now use ``__init_subclass__()`` from :pep:`487`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
