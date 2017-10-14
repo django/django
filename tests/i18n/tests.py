@@ -332,20 +332,17 @@ class FormattingTests(SimpleTestCase):
 
     def test_all_format_strings(self):
         all_locales = LANG_INFO.keys()
-        today = datetime.date.today()
-        now = datetime.datetime.now()
-        current_year = str(today.year)
-        current_day = str(today.day)
-        current_minute = str(now.minute)
+        some_date = datetime.date(2017, 10, 14)
+        some_datetime = datetime.datetime(2017, 10, 14, 10, 23)
         for locale in all_locales:
             with self.subTest(locale=locale), translation.override(locale):
-                self.assertIn(current_year, date_format(today))  # Uses DATE_FORMAT by default
-                self.assertIn(current_minute, time_format(now))  # Uses TIME_FORMAT by default
-                self.assertIn(current_year, date_format(now, format=get_format('DATETIME_FORMAT')))
-                self.assertIn(current_year, date_format(today, format=get_format('YEAR_MONTH_FORMAT')))
-                self.assertIn(current_day, date_format(today, format=get_format('MONTH_DAY_FORMAT')))
-                self.assertIn(current_year, date_format(today, format=get_format('SHORT_DATE_FORMAT')))
-                self.assertIn(current_year, date_format(now, format=get_format('SHORT_DATETIME_FORMAT')))
+                self.assertIn('2017', date_format(some_date))  # Uses DATE_FORMAT by default
+                self.assertIn('23', time_format(some_datetime))  # Uses TIME_FORMAT by default
+                self.assertIn('2017', date_format(some_datetime, format=get_format('DATETIME_FORMAT')))
+                self.assertIn('2017', date_format(some_date, format=get_format('YEAR_MONTH_FORMAT')))
+                self.assertIn('14', date_format(some_date, format=get_format('MONTH_DAY_FORMAT')))
+                self.assertIn('2017', date_format(some_date, format=get_format('SHORT_DATE_FORMAT')))
+                self.assertIn('2017', date_format(some_datetime, format=get_format('SHORT_DATETIME_FORMAT')))
 
     def test_locale_independent(self):
         """
