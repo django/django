@@ -17,7 +17,7 @@ def gettext_noop(s):
 DEBUG = False
 
 # Whether the framework should propagate raw exceptions rather than catching
-# them. This is useful under some testing situations and should never be used
+# them. This is useful under some testing scenarios and should never be used
 # on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
