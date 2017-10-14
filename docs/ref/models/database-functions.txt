@@ -800,6 +800,16 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
+``LTrim``
+---------
+
+.. class:: LTrim(expression, **extra)
+
+.. versionadded:: 2.1
+
+Similar to :class:`~django.db.models.functions.Trim`, but removes only leading
+spaces.
+
 ``Ord``
 -------
 
@@ -862,6 +872,16 @@ Usage example::
     >>> print(author.last_letter)
     h
 
+``RTrim``
+---------
+
+.. class:: RTrim(expression, **extra)
+
+.. versionadded:: 2.1
+
+Similar to :class:`~django.db.models.functions.Trim`, but removes only trailing
+spaces.
+
 ``StrIndex``
 ------------
 
@@ -914,6 +934,25 @@ Usage example::
     1
     >>> print(Author.objects.get(name='Margaret Smith').alias)
     marga
+
+``Trim``
+--------
+
+.. class:: Trim(expression, **extra)
+
+.. versionadded:: 2.1
+
+Returns the value of the given text field or expression with leading and
+trailing spaces removed.
+
+Usage example::
+
+    >>> from django.db.models.functions import Trim
+    >>> Author.objects.create(name='  John  ', alias='j')
+    >>> Author.objects.update(name=Trim('name'))
+    1
+    >>> print(Author.objects.get(alias='j').name)
+    John
 
 ``Upper``
 ---------

@@ -110,6 +110,11 @@ class Lower(Transform):
     lookup_name = 'lower'
 
 
+class LTrim(Transform):
+    function = 'LTRIM'
+    lookup_name = 'ltrim'
+
+
 class Ord(Transform):
     function = 'ASCII'
     lookup_name = 'ord'
@@ -134,6 +139,11 @@ class Right(Left):
 
     def get_substr(self):
         return Substr(self.source_expressions[0], self.source_expressions[1] * Value(-1))
+
+
+class RTrim(Transform):
+    function = 'RTRIM'
+    lookup_name = 'rtrim'
 
 
 class StrIndex(Func):
@@ -172,6 +182,11 @@ class Substr(Func):
 
     def as_oracle(self, compiler, connection):
         return super().as_sql(compiler, connection, function='SUBSTR')
+
+
+class Trim(Transform):
+    function = 'TRIM'
+    lookup_name = 'trim'
 
 
 class Upper(Transform):
