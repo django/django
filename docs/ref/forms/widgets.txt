@@ -157,6 +157,25 @@ this, you use the :attr:`Widget.attrs` argument when creating the widget::
         url = forms.URLField()
         comment = forms.CharField(widget=forms.TextInput(attrs={'size': '40'}))
 
+You can also modify a widget in the form definition::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+        name.widget.attrs.update({'class': 'special'})
+        comment.widget.attrs.update(size='40')
+
+Or if the field isn't declared directly on the form (such as model form fields),
+you can use the :attr:`Form.fields` attribute::
+
+    class CommentForm(forms.ModelForm):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['name'].widget.attrs.update({'class': 'special'})
+            self.fields['comment'].widget.attrs.update(size='40')
+
 Django will then include the extra attributes in the rendered output:
 
     >>> f = CommentForm(auto_id=False)
