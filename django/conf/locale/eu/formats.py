@@ -4,12 +4,12 @@
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = r'Y\k\o N j\a'
 TIME_FORMAT = 'H:i'
-# DATETIME_FORMAT =
-# YEAR_MONTH_FORMAT =
-# MONTH_DAY_FORMAT =
-SHORT_DATE_FORMAT = 'Y M j'
-# SHORT_DATETIME_FORMAT =
-# FIRST_DAY_OF_WEEK =
+DATETIME_FORMAT = r'Y\k\o N j\a, H:i'
+YEAR_MONTH_FORMAT = r'Y\k\o F'
+MONTH_DAY_FORMAT = r'F\r\e\n j\a'
+SHORT_DATE_FORMAT = 'Y-m-d'
+SHORT_DATETIME_FORMAT = 'Y-m-d H:i'
+FIRST_DAY_OF_WEEK = 1  # Astelehena
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
@@ -18,4 +18,4 @@ SHORT_DATE_FORMAT = 'Y M j'
 # DATETIME_INPUT_FORMATS =
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '.'
-# NUMBER_GROUPING =
+NUMBER_GROUPING = 3
