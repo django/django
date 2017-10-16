@@ -1627,6 +1627,9 @@ class Query:
         """Clear any existing limits."""
         self.low_mark, self.high_mark = 0, None
 
+    def has_limit_one(self):
+        return self.high_mark is not None and (self.high_mark - self.low_mark) == 1
+
     def can_filter(self):
         """
         Return True if adding filters to this instance is still possible.
