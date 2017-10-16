@@ -47,7 +47,7 @@ USE_TZ = False
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-# Translation fallback for any language except LANGUAGE_CODE.
+# Translation fallback for any language except LANGUAGE_CODE and English.
 # Set this as fallback for unsupported languages and missing translations.
 LANGUAGE_FALLBACK = LANGUAGE_CODE
 
