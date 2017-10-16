@@ -245,6 +245,20 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
 
+    def process_rhs(self, compiler, connection):
+        from django.db.models.sql.query import Query
+        if isinstance(self.rhs, Query):
+            if self.rhs.has_limit_one():
+                # The subquery must select only the pk.
+                self.rhs.clear_select_clause()
+                self.rhs.add_fields(['pk'])
+            else:
+                raise ValueError(
+                    'The QuerySet value for an exact lookup must be limited to '
+                    'one result using slicing.'
+                )
+        return super().process_rhs(compiler, connection)
+
 
 @Field.register_lookup
 class IExact(BuiltinLookup):
