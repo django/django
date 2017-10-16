@@ -1925,9 +1925,7 @@ Behind the scenes, Django has a very flexible model of deciding which language
 should be used -- installation-wide, for a particular user, or both.
 
 To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
-Django uses this language as the default translation -- the final attempt if no
-better matching translation is found through one of the methods employed by the
-locale middleware (see below).
+Django uses this language as the default translation.
 
 If all you want is to run Django with your native language all you need to do
 is set :setting:`LANGUAGE_CODE` and make sure the corresponding :term:`message
@@ -1937,6 +1935,12 @@ If you want to let each individual user specify which language they
 prefer, then you also need to use the ``LocaleMiddleware``.
 ``LocaleMiddleware`` enables language selection based on data from the request.
 It customizes content for each user.
+
+If additionally you want to have a translation fallback for foreign languages
+in case of unsupported languages or missing translations, set
+:setting:`LANGUAGE_FALLBACK`. This is the final attempt if no better matching
+translation is found through one of the methods employed by the locale
+middleware.
 
 To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE` setting. Because middleware order matters, follow
@@ -1981,7 +1985,7 @@ following this algorithm:
   prefer, in order by priority. Django tries each language in the header
   until it finds one with available translations.
 
-* Failing that, it uses the global :setting:`LANGUAGE_CODE` setting.
+* Failing that, it uses the global :setting:`LANGUAGE_FALLBACK` setting.
 
 .. _locale-middleware-notes:
 
@@ -2096,6 +2100,8 @@ You can also run :djadmin:`django-admin compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
 the directories in your :setting:`LOCALE_PATHS` setting.
 
+.. _using-a-non-english-base-language:
+
 Using a non-English base language
 ---------------------------------
 
@@ -2109,7 +2115,14 @@ aware of certain limitations:
   English.
 
 * When an English variant is activated and English strings are missing, the
-  fallback language will not be the :setting:`LANGUAGE_CODE` of the project,
+  fallback language will not be the :setting:`LANGUAGE_FALLBACK` of the project,
   but the original strings. For example, an English user visiting a site with
-  Spanish as the default language and original strings written in Russian will
+  Spanish as the fallback language and original strings written in Russian will
   fallback to Russian, not to Spanish.
+
+If your project has a non-English base language, then consider using it for
+:setting:`LANGUAGE_CODE` unless there are good reasons not to do so. This will
+avoid possible confusion regarding the aforementioned point, because if
+:setting:`LANGUAGE_CODE` is determined as the user’s preferred language, then
+:setting:`LANGUAGE_FALLBACK` will not be active. This results in having your
+base language as fallback for your language code.

@@ -1706,12 +1706,9 @@ It serves two purposes:
 
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
-* If the locale middleware is active, it provides a fallback language in case the
-  user's preferred language can't be determined or is not supported by the
-  website. It also provides the fallback translation when a translation for a
-  given literal doesn't exist for the user's preferred language.
-
-See :ref:`how-django-discovers-language-preference` for more details.
+* If the locale middleware is active, it provides the default fallback language
+  for unsupported languages and missing literal translations, in case
+  :setting:`LANGUAGE_FALLBACK` has not been changed.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
@@ -1778,6 +1775,43 @@ and reliable option to perform the switch is to change the language cookie name
 permanently (via the :setting:`LANGUAGE_COOKIE_NAME` setting), and to add
 a middleware that copies the value from the old cookie to a new one and then
 deletes the one.
+
+.. setting:: LANGUAGE_FALLBACK
+
+``LANGUAGE_FALLBACK``
+---------------------
+
+Default: ``LANGUAGE_CODE``
+
+A string determing the fallback language in case the user’s preferred language
+can’t be determined or is not supported by the website. It also provides the
+fallback translation when a translation for a given literal doesn’t exist for
+the user’s preferred language.
+
+Just like with :setting:`LANGUAGE_CODE` the string should be in standard
+:term:`language ID format <language code>`. The ``LocaleMiddleware`` must be
+active for the setting to have any effect.
+
+Note that :setting:`LANGUAGE_FALLBACK` has no effect on translation, when
+either :setting:`LANGUAGE_CODE` or an English variant is determined as the
+user’s preferred language. This has following reasons:
+
+* Django's built-in translations do not define values for English variants,
+  because the original strings are already written in English. Adding a
+  fallback for English would therefore result in a lot of unintended
+  fallback cases.
+* For similar reasons adding a fallback language could also result in
+  unintended fallbacks in case the language of original strings is the same
+  as your language code. Without restriction on :setting:`LANGUAGE_CODE`, a
+  user with this as preferred language would receive texts in the defined
+  fallback language, except redundant translations for the base language are
+  maintained (which is not recommended). For example, a German user would
+  get English texts for a site with German as the language code and original
+  strings written in German, if :setting:`LANGUAGE_FALLBACK` is set to
+  English.
+
+See :ref:`how-django-discovers-language-preference` and
+:ref:`using-a-non-english-base-language` for more details.
 
 .. setting:: LANGUAGES
 
@@ -3354,6 +3388,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
 * :setting:`LANGUAGE_COOKIE_NAME`
 * :setting:`LANGUAGE_COOKIE_PATH`
+* :setting:`LANGUAGE_FALLBACK`
 * :setting:`LANGUAGES`
 * :setting:`LOCALE_PATHS`
 * :setting:`MONTH_DAY_FORMAT`
