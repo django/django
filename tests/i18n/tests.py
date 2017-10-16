@@ -1316,14 +1316,14 @@ class MiscTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual('en', g(r))
 
-        # From here on the parsed language should be the fallback language.
+        # From here on the parsed language should differ from the cookie value.
         r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'tr'}
         r.META = {}
         self.assertEqual(g(r), 'es')
 
         r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'ja'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
-        self.assertEqual(g(r), 'es')
+        self.assertEqual(g(r), 'de')
 
     @override_settings(
         LANGUAGES=[
