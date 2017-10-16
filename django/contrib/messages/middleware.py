@@ -15,8 +15,7 @@ class MessageMiddleware(MiddlewareMixin):
         """
         Update the storage backend (i.e., save the messages).
 
-        If not all messages could not be stored and ``DEBUG`` is ``True``,
-        raise ValueError.
+        Raise ValueError if not all messages could be stored and DEBUG is True.
         """
         # A higher middleware layer may return a request which does not contain
         # messages storage, so make no assumption that it will be there.
