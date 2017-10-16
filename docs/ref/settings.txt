@@ -1783,9 +1783,9 @@ deletes the one.
 
 Default: ``LANGUAGE_CODE``
 
-A string determing the fallback language in case the user’s preferred language
+A string specifying the fallback language in case the user’s preferred language
 can’t be determined or is not supported by the website. It also provides the
-fallback translation when a translation for a given literal doesn’t exist for
+fallback translation when a translation for a given literal does not exist for
 the user’s preferred language.
 
 Just like with :setting:`LANGUAGE_CODE` the string should be in standard
