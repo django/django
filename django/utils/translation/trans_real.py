@@ -182,8 +182,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         # Don't set a fallback for the default language or any English variant
         # (as it's empty, so it'll ALWAYS fall back to the fallback language).
         # If the language is the same, there's no need for adding the fallback.
-        if self.__language == fallback or self.__language.startswith('en') or (
-                self.__language and settings.LANGUAGE_CODE.startswith(self.__language)):
+        if self.__language == fallback or self.__language.startswith('en'):
             return
         if self.domain == 'django':
             # Get from cache
