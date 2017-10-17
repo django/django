@@ -16,6 +16,7 @@ from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
+from asgiref.applications import sync_to_async, async_to_sync
 from channels.exceptions import RequestAborted, RequestTimeout, ResponseLater as ResponseLaterOuter
 
 try:
@@ -167,16 +168,31 @@ class AsgiHandler(base.BaseHandler):
     # Size to chunk response bodies into for multiple response messages
     chunk_size = 512 * 1024
 
-    def __init__(self, type, reply):
-        if type != "http":
-            raise ValueError("The AsgiHandler can only handle HTTP requests")
-        self.reply = reply
+    def __init__(self, conntype):
+        if conntype != "http":
+            raise ValueError("The AsgiHandler can only handle HTTP requests, not %s" % conntype)
         super(AsgiHandler, self).__init__()
         self.load_middleware()
 
-    def __call__(self, message):
-        if message["type"] != "http.request":
-            return
+    async def __call__(self, receive, send):
+        """
+        Async entrypoint - uses the SyncToAsync wrapper to run things in a
+        threadpool.
+        """
+        self.send = async_to_sync(send)
+        while True:
+            message = await receive()
+            if message["type"] == "http.disconnect":
+                # Once they disconnect, that's it. GOOD DAY SIR. I SAID GOOD. DAY.
+                break
+            else:
+                await self.handle(message)
+
+    @sync_to_async
+    def handle(self, message):
+        """
+        Synchronous message processing.
+        """
         # Set script prefix from message root_path, turning None into empty string
         set_script_prefix(message.get('root_path', '') or '')
         signals.request_started.send(sender=self.__class__, message=message)
@@ -210,7 +226,7 @@ class AsgiHandler(base.BaseHandler):
                 return
         # Transform response into messages, which we yield back to caller
         for message in self.encode_response(response):
-            self.reply(message)
+            self.send(message)
         # Close the response now we're done with it
         response.close()
 

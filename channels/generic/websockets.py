@@ -1,66 +1,41 @@
 from django.core.serializers.json import DjangoJSONEncoder, json
 
-from ..auth import channel_and_http_session_user_from_http, channel_session_user_from_http
-from ..channel import Group
-from ..exceptions import SendNotAvailableOnDemultiplexer
-from ..sessions import enforce_ordering
-from .base import BaseConsumer
+from channels.consumer import SyncConsumer
 
 
-class WebsocketConsumer(BaseConsumer):
+class WebsocketConsumer(SyncConsumer):
     """
     Base WebSocket consumer. Provides a general encapsulation for the
     WebSocket handling model that other applications can build on.
     """
 
-    # You shouldn't need to override this
-    method_mapping = {
-        "websocket.connect": "raw_connect",
-        "websocket.receive": "raw_receive",
-        "websocket.disconnect": "raw_disconnect",
-    }
-
-    groups = None
-
-    def connection_groups(self, **kwargs):
-        """
-        Group(s) to make people join when they connect and leave when they
-        disconnect. Make sure to return a list/tuple, not a string!
-        """
-        return self.groups or []
-
-    def raw_connect(self, message, **kwargs):
-        """
-        Called when a WebSocket connection is opened. Base level so you don't
-        need to call super() all the time.
-        """
-        for group in self.connection_groups(**kwargs):
-            Group(group, channel_layer=self.channel_layer).add(self.consumer_channel)
-        self.connect(message, **kwargs)
-
-    def connect(self, message, **kwargs):
+    def websocket_connect(self, message):
         """
         Called when a WebSocket connection is opened.
         """
+        # TODO: group joining
+        self.connect(message)
+
+    def connect(self, message):
         self.accept()
 
     def accept(self):
         """
         Accepts an incoming socket
         """
-        self.reply({"type": "websocket.accept"})
+        super(WebsocketConsumer, self).send({"type": "websocket.accept"})
 
-    def raw_receive(self, message, **kwargs):
+    def websocket_receive(self, message):
         """
         Called when a WebSocket frame is received. Decodes it and passes it
         to receive().
         """
         if "text" in message:
-            self.receive(text=message['text'], **kwargs)
+            self.receive(text=message['text'])
         else:
-            self.receive(bytes=message['bytes'], **kwargs)
+            self.receive(bytes=message['bytes'])
 
-    def receive(self, text=None, bytes=None, **kwargs):
+    def receive(self, text=None, bytes=None):
         """
         Called with a decoded WebSocket frame.
         """
@@ -71,45 +46,38 @@ class WebsocketConsumer(BaseConsumer):
         Sends a reply back down the WebSocket
         """
         if text is not None:
-            self.reply({"type": "websocket.send", "text": text})
+            super(WebsocketConsumer, self).send(
+                {"type": "websocket.send", "text": text},
+            )
         elif bytes is not None:
-            self.reply({"type": "websocket.send", "bytes": bytes})
+            super(WebsocketConsumer, self).send(
+                {"type": "websocket.send", "bytes": bytes},
+            )
         if close:
             self.close(close)
-
-    @classmethod
-    def group_send(cls, name, text=None, bytes=None, close=False):
-        if text is not None:
-            Group(name).send({"type": "websocket.send", "text": text})
-        elif bytes is not None:
-            Group(name).send({"type": "websocket.send", "bytes": bytes})
-        else:
-            raise ValueError("You must pass text or bytes")
-        if close:
-            if close is True:
-                Group(name).send({"type": "websocket.close"})
-            else:
-                Group(name).send({"type": "websocket.close", "code": close})
 
     def close(self, code=None):
         """
         Closes the WebSocket from the server end
         """
         if code is not None and code is not True:
-            self.reply({"type": "websocket.close", "code": code})
+            super(WebsocketConsumer, self).send(
+                {"type": "websocket.close", "code": code}
+            )
         else:
-            self.reply({"type": "websocket.close"})
+            super(WebsocketConsumer, self).send(
+                {"type": "websocket.close"}
+            )
 
-    def raw_disconnect(self, message, **kwargs):
+    def websocket_disconnect(self, message):
         """
         Called when a WebSocket connection is closed. Base level so you don't
         need to call super() all the time.
         """
-        for group in self.connection_groups(**kwargs):
-            Group(group, channel_layer=self.channel_layer).discard(self.consumer_channel)
-        self.disconnect(message, **kwargs)
+        # TODO: group leaving
+        self.disconnect(message)
 
-    def disconnect(self, message, **kwargs):
+    def disconnect(self, message):
         """
         Called when a WebSocket connection is closed.
         """
