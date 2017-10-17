@@ -1806,8 +1806,8 @@ user’s preferred language. This has following reasons:
   user with this as preferred language would receive texts in the defined
   fallback language, except redundant translations for the base language are
   maintained (which is not recommended). For example, a German user would
-  get English texts for a site with German as the language code and original
-  strings written in German, if the fallback is English.
+  get Spanish texts for a site with German as the language code and original
+  strings written in German, if the fallback is Spanish.
 
 See :ref:`how-django-discovers-language-preference` and
 :ref:`using-a-non-english-base-language` for more details.
