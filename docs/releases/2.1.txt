@@ -159,7 +159,7 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added :meth:`.HttpRequest.get_full_path_info`.
 
 Serialization
 ~~~~~~~~~~~~~
