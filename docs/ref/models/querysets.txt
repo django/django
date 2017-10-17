@@ -1078,7 +1078,7 @@ one for the restaurants, one for the pizzas, and one for the toppings.
 
 This will fetch the best pizza and all the toppings for the best pizza for each
 restaurant. This will be done in 3 database queries - one for the restaurants,
-one for the 'best pizzas', and one for one for the toppings.
+one for the 'best pizzas', and one for the toppings.
 
 Of course, the ``best_pizza`` relationship could also be fetched using
 ``select_related`` to reduce the query count to 2:
