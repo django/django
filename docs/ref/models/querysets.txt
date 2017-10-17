@@ -1628,6 +1628,19 @@ specify the related objects you want to lock in ``select_for_update(of=(...))``
 using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
 to refer to the queryset's model.
 
+You can't use ``select_for_update()`` on nullable relations::
+
+    >>> Person.objects.select_related('hometown').select_for_update()
+    Traceback (most recent call last):
+    ...
+    django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+To avoid that restriction, you can exclude null objects if you don't care about
+them::
+
+    >>> Person.objects.select_related('hometown').select_for_update().exclude(hometown=None)
+    <QuerySet [<Person: ...)>, ...]>
+
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL doesn't support the
 ``nowait``, ``skip_locked``, and ``of`` arguments.

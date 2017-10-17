@@ -783,6 +783,7 @@ class SQLCompiler:
             klass_info = {
                 'model': f.remote_field.model,
                 'field': f,
+                'reverse': False,
                 'local_setter': f.set_cached_value,
                 'remote_setter': f.remote_field.set_cached_value if f.unique else lambda x, y: None,
                 'from_parent': False,
@@ -821,6 +822,7 @@ class SQLCompiler:
                 klass_info = {
                     'model': model,
                     'field': f,
+                    'reverse': True,
                     'local_setter': f.remote_field.set_cached_value,
                     'remote_setter': f.set_cached_value,
                     'from_parent': from_parent,
@@ -858,6 +860,7 @@ class SQLCompiler:
                     klass_info = {
                         'model': model,
                         'field': f,
+                        'reverse': True,
                         'local_setter': local_setter,
                         'remote_setter': remote_setter,
                         'from_parent': from_parent,
@@ -905,7 +908,10 @@ class SQLCompiler:
                     path = []
                     yield 'self'
                 else:
-                    path = parent_path + [klass_info['field'].name]
+                    field = klass_info['field']
+                    if klass_info['reverse']:
+                        field = field.remote_field
+                    path = parent_path + [field.name]
                     yield LOOKUP_SEP.join(path)
                 queue.extend(
                     (path, klass_info)
@@ -918,7 +924,10 @@ class SQLCompiler:
             klass_info = self.klass_info
             for part in parts:
                 for related_klass_info in klass_info.get('related_klass_infos', []):
-                    if related_klass_info['field'].name == part:
+                    field = related_klass_info['field']
+                    if related_klass_info['reverse']:
+                        field = field.remote_field
+                    if field.name == part:
                         klass_info = related_klass_info
                         break
                 else:
