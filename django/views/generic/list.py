@@ -181,7 +181,13 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         if hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
             names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
-
+        elif not names:
+            raise ImproperlyConfigured(
+                "%(cls)s requires either a 'template_name' attribute "
+                "or a get_queryset() method that returns a QuerySet." % {
+                    'cls': self.__class__.__name__,
+                }
+            )
         return names
 
 
