@@ -25,8 +25,8 @@ class AsyncConsumer:
     on their type.
     """
 
-    def __init__(self, conntype):
-        self.conntype = conntype
+    def __init__(self, scope):
+        self.scope = scope
 
     async def __call__(self, receive, send):
         """
@@ -62,8 +62,8 @@ class SyncConsumer:
     for user-called methods very confusing as there'd be two types of each.
     """
 
-    def __init__(self, conntype):
-        self.conntype = conntype
+    def __init__(self, scope):
+        self.scope = scope
 
     async def __call__(self, receive, send):
         # Store send function as a sync version
@@ -89,4 +89,3 @@ class SyncConsumer:
         Overrideable/callable-by-subclasses send method.
         """
         self.base_send(message)
-

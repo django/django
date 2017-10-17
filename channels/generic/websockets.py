@@ -107,7 +107,10 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         """
         Encode the given content as JSON and send it to the client.
         """
-        super(JsonWebsocketConsumer, self).send(text=self.encode_json(content), close=close)
+        super(JsonWebsocketConsumer, self).send(
+            text=self.encode_json(content),
+            close=close,
+        )
 
     @classmethod
     def decode_json(cls, text):
@@ -116,10 +119,6 @@ class JsonWebsocketConsumer(WebsocketConsumer):
     @classmethod
     def encode_json(cls, content):
         return json.dumps(content)
-
-    @classmethod
-    def group_send(cls, name, content, close=False):
-        WebsocketConsumer.group_send(name, cls.encode_json(content), close=close)
 
 
 class WebsocketMultiplexer(object):

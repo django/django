@@ -40,24 +40,25 @@ class AsgiRequest(http.HttpRequest):
     # body and aborts.
     body_receive_timeout = 60
 
-    def __init__(self, message):
+    def __init__(self, scope, message):
+        self.scope = scope
         self.message = message
         self._content_length = 0
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
         # Path info
-        self.path = self.message['path']
-        self.script_name = self.message.get('root_path', '')
+        self.path = self.scope['path']
+        self.script_name = self.scope.get('root_path', '')
         if self.script_name and self.path.startswith(self.script_name):
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = self.path[len(self.script_name):]
         else:
             self.path_info = self.path
         # HTTP basics
-        self.method = self.message['method'].upper()
+        self.method = self.scope['method'].upper()
         # fix https://github.com/django/channels/issues/622
-        query_string = self.message.get('query_string', '')
+        query_string = self.scope.get('query_string', '')
         if isinstance(query_string, bytes):
             query_string = query_string.decode('utf-8')
         self.META = {
@@ -69,24 +70,24 @@ class AsgiRequest(http.HttpRequest):
             "wsgi.multithread": True,
             "wsgi.multiprocess": True,
         }
-        if self.message.get('client', None):
-            self.META['REMOTE_ADDR'] = self.message['client'][0]
+        if self.scope.get('client', None):
+            self.META['REMOTE_ADDR'] = self.scope['client'][0]
             self.META['REMOTE_HOST'] = self.META['REMOTE_ADDR']
-            self.META['REMOTE_PORT'] = self.message['client'][1]
-        if self.message.get('server', None):
-            self.META['SERVER_NAME'] = self.message['server'][0]
-            self.META['SERVER_PORT'] = six.text_type(self.message['server'][1])
+            self.META['REMOTE_PORT'] = self.scope['client'][1]
+        if self.scope.get('server', None):
+            self.META['SERVER_NAME'] = self.scope['server'][0]
+            self.META['SERVER_PORT'] = six.text_type(self.scope['server'][1])
         else:
             self.META['SERVER_NAME'] = "unknown"
             self.META['SERVER_PORT'] = "0"
         # Handle old style-headers for a transition period
-        if "headers" in self.message and isinstance(self.message['headers'], dict):
-            self.message['headers'] = [
+        if "headers" in self.scope and isinstance(self.scope['headers'], dict):
+            self.scope['headers'] = [
                 (x.encode("latin1"), y) for x, y in
-                self.message['headers'].items()
+                self.scope['headers'].items()
             ]
         # Headers go into META
-        for name, value in self.message.get('headers', []):
+        for name, value in self.scope.get('headers', []):
             name = name.decode("latin1")
             if name == "content-length":
                 corrected_name = "CONTENT_LENGTH"
@@ -119,7 +120,7 @@ class AsgiRequest(http.HttpRequest):
                 pass
         # Body handling
         # TODO: chunked bodies
-        self._body = message.get("body", b"")
+        self._body = self.message.get("body", b"")
         assert isinstance(self._body, six.binary_type), "Body is not bytes"
         # Add a stream-a-like for the body
         self._stream = BytesIO(self._body)
@@ -128,10 +129,10 @@ class AsgiRequest(http.HttpRequest):
 
     @cached_property
     def GET(self):
-        return http.QueryDict(self.message.get('query_string', ''))
+        return http.QueryDict(self.scope.get('query_string', ''))
 
     def _get_scheme(self):
-        return self.message.get("scheme", "http")
+        return self.scope.get("scheme", "http")
 
     def _get_post(self):
         if not hasattr(self, '_post'):
@@ -168,10 +169,11 @@ class AsgiHandler(base.BaseHandler):
     # Size to chunk response bodies into for multiple response messages
     chunk_size = 512 * 1024
 
-    def __init__(self, conntype):
-        if conntype != "http":
-            raise ValueError("The AsgiHandler can only handle HTTP requests, not %s" % conntype)
+    def __init__(self, scope):
+        if scope["type"] != "http":
+            raise ValueError("The AsgiHandler can only handle HTTP connections, not %s" % scope["type"])
         super(AsgiHandler, self).__init__()
+        self.scope = scope
         self.load_middleware()
 
     async def __call__(self, receive, send):
@@ -198,7 +200,7 @@ class AsgiHandler(base.BaseHandler):
         signals.request_started.send(sender=self.__class__, message=message)
         # Run request through view system
         try:
-            request = self.request_class(message)
+            request = self.request_class(self.scope, message)
         except UnicodeDecodeError:
             logger.warning(
                 'Bad Request (UnicodeDecodeError)',
@@ -225,8 +227,8 @@ class AsgiHandler(base.BaseHandler):
                 # will send a response at a later time
                 return
         # Transform response into messages, which we yield back to caller
-        for message in self.encode_response(response):
-            self.send(message)
+        for response_message in self.encode_response(response):
+            self.send(response_message)
         # Close the response now we're done with it
         response.close()
 
