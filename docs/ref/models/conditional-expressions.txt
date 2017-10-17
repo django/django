@@ -213,7 +213,7 @@ functions <aggregation-functions>` to achieve this::
     ...     gold=Count('pk', filter=Q(account_type=Client.GOLD)),
     ...     platinum=Count('pk', filter=Q(account_type=Client.PLATINUM)),
     ... )
-    {'regular': 2, 'gold': 1, 'platinum': 3}
+    {'regular': 2, 'gold': 0, 'platinum': 3}
 
 This aggregate produces a query with the SQL 2003 ``FILTER WHERE`` syntax
 on databases that support it:
