@@ -1985,7 +1985,8 @@ following this algorithm:
   prefer, in order by priority. Django tries each language in the header
   until it finds one with available translations.
 
-* Failing that, it uses the global :setting:`LANGUAGE_FALLBACK` setting.
+* Failing that, it uses the global :setting:`LANGUAGE_FALLBACK` setting if
+  set.
 
 .. _locale-middleware-notes:
 

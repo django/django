@@ -1781,7 +1781,7 @@ deletes the one.
 ``LANGUAGE_FALLBACK``
 ---------------------
 
-Default: ``LANGUAGE_CODE``
+Default: ``None``
 
 A string specifying the fallback language in case the user’s preferred language
 can’t be determined or is not supported by the website. It also provides the

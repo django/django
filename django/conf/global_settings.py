@@ -49,7 +49,7 @@ LANGUAGE_CODE = 'en-us'
 
 # Translation fallback for any language except LANGUAGE_CODE and English.
 # Set this as fallback for unsupported languages and missing translations.
-LANGUAGE_FALLBACK = LANGUAGE_CODE
+LANGUAGE_FALLBACK = None
 
 # Languages we provide translations for, out of the box.
 LANGUAGES = [
