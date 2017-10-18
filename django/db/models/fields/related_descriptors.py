@@ -581,7 +581,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         def get_queryset(self):
             try:
-                return self.instance._prefetched_objects_cache[self.field.related_query_name()]
+                return self.instance._prefetched_objects_cache[self.field.remote_field.get_cache_name()]
             except (AttributeError, KeyError):
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
@@ -604,7 +604,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             for rel_obj in queryset:
                 instance = instances_dict[rel_obj_attr(rel_obj)]
                 setattr(rel_obj, self.field.name, instance)
-            cache_name = self.field.related_query_name()
+            cache_name = self.field.remote_field.get_cache_name()
             return queryset, rel_obj_attr, instance_attr, False, cache_name, False
 
         def add(self, *objs, bulk=True):
