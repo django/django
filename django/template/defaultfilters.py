@@ -1,6 +1,7 @@
 """Default variable filters."""
 import random as random_module
 import re
+import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
@@ -616,7 +617,7 @@ def unordered_list(value, autoescape=True):
                 except StopIteration:
                     yield item, None
                     break
-                if not isinstance(next_item, str):
+                if isinstance(next_item, (list, tuple, types.GeneratorType)):
                     try:
                         iter(next_item)
                     except TypeError:
