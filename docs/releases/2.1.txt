@@ -128,7 +128,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The :class:`~django.forms.Select` widgets and its subclasses optionally accept
+  a keyword argument `opt_attrs` which adds HTML attributes to options rendered
+  by the widget.
 
 Generic Views
 ~~~~~~~~~~~~~

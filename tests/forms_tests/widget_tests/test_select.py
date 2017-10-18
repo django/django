@@ -161,6 +161,19 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
+    def test_choices_option_attributes(self):
+        widget = Select(
+            choices=[(1, 1), (2, 2), (3, 3)],
+            opt_attrs={'class': 'super', 'my_attr': 'my_value'}
+        )
+        self.check_html(widget, 'num', None, html=(
+            """<select name="num">
+            <option value="1" class="super" my_attr="my_value">1</option>
+            <option value="2" class="super" my_attr="my_value">2</option>
+            <option value="3" class="super" my_attr="my_value">3</option>
+            </select>"""
+        ))
+
     def test_choices_escaping(self):
         choices = (('bad', 'you & me'), ('good', mark_safe('you &gt; me')))
         self.check_html(self.widget(choices=choices), 'escape', None, html=(
