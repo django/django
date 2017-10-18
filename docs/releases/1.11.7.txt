@@ -13,3 +13,6 @@ Bugfixes
   argument is a callable that returns ``None`` (:ticket:`28601`).
 
 * Fixed the Basque ``DATE_FORMAT`` string (:ticket:`28710`).
+
+* Made ``QuerySet.reverse()`` affect ``nulls_first`` and ``nulls_last``
+  (:ticket:`28722`).
