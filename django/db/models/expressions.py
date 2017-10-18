@@ -1132,6 +1132,9 @@ class OrderBy(BaseExpression):
 
     def reverse_ordering(self):
         self.descending = not self.descending
+        if self.nulls_first or self.nulls_last:
+            self.nulls_first = not self.nulls_first
+            self.nulls_last = not self.nulls_last
         return self
 
     def asc(self):
