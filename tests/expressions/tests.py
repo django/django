@@ -7,7 +7,7 @@ from copy import deepcopy
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, models, transaction
-from django.db.models import TimeField, UUIDField
+from django.db.models import TimeField, UUIDField, IntegerField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
@@ -145,7 +145,7 @@ class BasicExpressionsTests(TestCase):
 
     def test_order_of_operations(self):
         # Law of order of operations is followed
-        self. company_query.update(
+        self.company_query.update(
             num_chairs=F('num_employees') + 2 * F('num_employees')
         )
         self.assertSequenceEqual(
@@ -296,6 +296,7 @@ class BasicExpressionsTests(TestCase):
 
         def test():
             test_gmbh.point_of_contact = F("ceo")
+
         with self.assertRaises(ValueError):
             test()
 
@@ -791,7 +792,7 @@ class ExpressionsNumericTests(TestCase):
         """
         self.assertEqual(
             Number.objects.filter(integer__gt=0)
-                  .update(integer=F('integer') + 1),
+                .update(integer=F('integer') + 1),
             2)
 
         self.assertQuerysetEqual(
@@ -811,7 +812,7 @@ class ExpressionsNumericTests(TestCase):
         """
         self.assertEqual(
             Number.objects.filter(integer__gt=0)
-                  .update(integer=F('integer') + 1),
+                .update(integer=F('integer') + 1),
             2)
         self.assertQuerysetEqual(
             Number.objects.exclude(float=F('integer')),
@@ -1296,3 +1297,52 @@ class ReprTests(TestCase):
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")
         self.assertEqual(repr(Sum('a')), "Sum(F(a))")
         self.assertEqual(repr(Variance('a', sample=True)), "Variance(F(a), sample=True)")
+
+
+class CaseThenSubqueryTests(TestCase):
+
+    def test_subquery(self):
+        employee1 = Employee.objects.create(firstname='First1', lastname='Last1', salary=1)
+        employee2 = Employee.objects.create(firstname='First2', lastname='Last2', salary=2)
+        Company.objects.create(name='C1', point_of_contact=employee1, ceo=employee2, num_employees=2, num_chairs=2)
+        Company.objects.create(name='C2', point_of_contact=employee2, ceo=employee1, num_employees=2, num_chairs=2)
+        Company.objects.create(name='C3', point_of_contact=employee1, ceo=employee1, num_employees=2, num_chairs=2)
+
+        qs = Employee.objects.annotate(magic_number=Case(
+            When(salary=1, then=Subquery(Company.objects.filter(point_of_contact_id=OuterRef('id'))
+                                         .values('point_of_contact_id').annotate(count=Count('*')).values('count'))),
+            When(salary=2, then=Subquery(Company.objects.filter(ceo_id=OuterRef('id'))
+                                         .values('ceo_id').annotate(count=Count('*')).values('count'))),
+            output_field=IntegerField()
+        )).order_by('salary')
+        e1, e2 = qs
+
+        # Employee 1 should have magic_number=2, since it has a salary of 1, and thus falls into the count
+        # point_of_contact Case
+        self.assertEqual(e1.magic_number, 2)
+
+        # Employee 2 should have magic_number=1, since it has a salary of 2, and this falls into the count
+        # ceo Case
+        self.assertEqual(e2.magic_number, 1)
+
+    def test_exists(self):
+        employee1 = Employee.objects.create(firstname='First1', lastname='Last1', salary=1)
+        employee2 = Employee.objects.create(firstname='First2', lastname='Last2', salary=2)
+        Company.objects.create(name='C1', point_of_contact=employee1, ceo=employee1, num_employees=2, num_chairs=2)
+        Company.objects.create(name='C2', point_of_contact=employee2, ceo=employee1, num_employees=2, num_chairs=2)
+        Company.objects.create(name='C3', point_of_contact=employee1, ceo=employee1, num_employees=2, num_chairs=2)
+
+        qs = Employee.objects.annotate(is_magic=Case(
+            When(salary=1, then=Exists(Company.objects.filter(point_of_contact_id=OuterRef('id')))),
+            When(salary=2, then=Exists(Company.objects.filter(ceo_id=OuterRef('id')))),
+            output_field=IntegerField()
+        )).order_by('salary')
+        e1, e2 = qs
+
+        # Employee 1 should have is_magic=True, since it has a salary of 1, and this falls into the exists
+        # point_of_contact Case
+        self.assertEqual(e1.is_magic, True)
+
+        # Employee 2 should have is_magic=False, since it has a salary of 2, and this falls into the exists
+        # ceo Case
+        self.assertEqual(e2.is_magic, False)

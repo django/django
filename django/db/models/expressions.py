@@ -386,11 +386,11 @@ class CombinedExpression(Expression):
             rhs_output = None
         if (not connection.features.has_native_duration_field and
                 ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
-                 (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+                     (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
         if (lhs_output and rhs_output and self.connector == self.SUB and
-            lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
-                lhs_output.get_internal_type() == rhs_output.get_internal_type()):
+                    lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
+                    lhs_output.get_internal_type() == rhs_output.get_internal_type()):
             return TemporalSubtraction(self.lhs, self.rhs).as_sql(compiler, connection)
         expressions = []
         expression_params = []
@@ -457,6 +457,7 @@ class F(Combinable):
     """
     An object capable of resolving references to existing query objects.
     """
+
     def __init__(self, name):
         """
         Arguments:
@@ -484,6 +485,7 @@ class ResolvedOuterRef(F):
     In this case, the reference to the outer query has been resolved because
     the inner query has been used as a subquery.
     """
+
     def as_sql(self, *args, **kwargs):
         raise ValueError(
             'This queryset contains a reference to an outer query and may '
@@ -590,6 +592,7 @@ class Value(Expression):
     """
     Represents a wrapped value as a node within an expression
     """
+
     def __init__(self, value, output_field=None):
         """
         Arguments:
@@ -677,7 +680,6 @@ class Random(Expression):
 
 
 class Col(Expression):
-
     contains_column_references = True
 
     def __init__(self, alias, target, output_field=None):
@@ -712,6 +714,7 @@ class Ref(Expression):
     Reference to column alias of the query. For example, Ref('sum_cost') in
     qs.annotate(sum_cost=Sum('cost')) query.
     """
+
     def __init__(self, refs, source):
         super(Ref, self).__init__()
         self.refs, self.source = refs, source
@@ -1005,11 +1008,12 @@ class Exists(Subquery):
     def output_field(self):
         return fields.BooleanField()
 
-    def resolve_expression(self, query=None, **kwargs):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # As a performance optimization, remove ordering since EXISTS doesn't
         # care about it, just whether or not a row matches.
         self.queryset = self.queryset.order_by()
-        return super(Exists, self).resolve_expression(query, **kwargs)
+        return super(Exists, self).resolve_expression(query, allow_joins=allow_joins, reuse=reuse,
+                                                      summarize=summarize, for_save=for_save)
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         sql, params = super(Exists, self).as_sql(compiler, connection, template, **extra_context)
