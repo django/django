@@ -46,7 +46,7 @@ django_conversions.update({
 
 # This should match the numerical portion of the version numbers (we can treat
 # versions like 5.0.24 and 5.0.24a as the same).
-server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
+server_version_re = re.compile(r'([0-9]{1,2})\.([0-9]{1,2})\.([0-9]{1,2})')
 
 
 class CursorWrapper:

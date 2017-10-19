@@ -45,7 +45,7 @@ def intcomma(value, use_l10n=True):
         else:
             return number_format(value, force_grouping=True)
     orig = str(value)
-    new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>,\g<2>', orig)
+    new = re.sub(r"^(-?[0-9]+)([0-9]{3})", r'\g<1>,\g<2>', orig)
     if orig == new:
         return new
     else:

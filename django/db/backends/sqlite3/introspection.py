@@ -5,7 +5,7 @@ from django.db.backends.base.introspection import (
 )
 from django.db.models.indexes import Index
 
-field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
+field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*([0-9]+)\s*\)\s*$')
 
 
 def get_field_size(name):

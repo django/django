@@ -341,7 +341,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         Return the version of PROJ.4 used by PostGIS as a tuple of the
         major, minor, and subminor release numbers.
         """
-        proj_regex = re.compile(r'(\d+)\.(\d+)\.(\d+)')
+        proj_regex = re.compile(r'([0-9]+)\.([0-9]+)\.([0-9]+)')
         proj_ver_str = self.postgis_proj_version()
         m = proj_regex.search(proj_ver_str)
         if m:
