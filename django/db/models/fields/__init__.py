@@ -138,7 +138,7 @@ class Field(RegisterLookupMixin):
                  serialize=True, unique_for_date=None, unique_for_month=None,
                  unique_for_year=None, choices=None, help_text='', db_column=None,
                  db_tablespace=None, auto_created=False, validators=(),
-                 error_messages=None, defer=False):
+                 error_messages=None, defer=False, ):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -252,9 +252,9 @@ class Field(RegisterLookupMixin):
                         id='fields.E004',
                     )
                 ]
-            elif any(isinstance(choice, str) or
-                         not is_iterable(choice) or len(choice) != 2
-                     for choice in self.choices):
+            elif any(
+                    isinstance(choice, str) or not is_iterable(choice) or len(choice) != 2 for choice in
+                    self.choices):
                 return [
                     checks.Error(
                         "'choices' must be an iterable containing "
@@ -801,21 +801,16 @@ class Field(RegisterLookupMixin):
                     blank_defined = True
                     break
 
-        first_choice = (blank_choice if include_blank and
-                                        not blank_defined else [])
+        first_choice = (blank_choice if include_blank and not blank_defined else [])
         if self.choices:
             return first_choice + choices
         rel_model = self.remote_field.model
         limit_choices_to = limit_choices_to or self.get_limit_choices_to()
         if hasattr(self.remote_field, 'get_related_field'):
-            lst = [(getattr(x, self.remote_field.get_related_field().attname),
-                    smart_text(x))
-                   for x in rel_model._default_manager.complex_filter(
-                    limit_choices_to)]
+            lst = [(getattr(x, self.remote_field.get_related_field().attname), smart_text(x)) for x in
+                   rel_model._default_manager.complex_filter(limit_choices_to)]
         else:
-            lst = [(x.pk, smart_text(x))
-                   for x in rel_model._default_manager.complex_filter(
-                    limit_choices_to)]
+            lst = [(x.pk, smart_text(x)) for x in rel_model._default_manager.complex_filter(limit_choices_to)]
         return first_choice + lst
 
     def value_to_string(self, obj):
@@ -1059,8 +1054,7 @@ class CharField(Field):
                     id='fields.E120',
                 )
             ]
-        elif (not isinstance(self.max_length, int) or isinstance(self.max_length, bool) or
-                      self.max_length <= 0):
+        elif (not isinstance(self.max_length, int) or isinstance(self.max_length, bool) or self.max_length <= 0):
             return [
                 checks.Error(
                     "'max_length' must be a positive integer.",

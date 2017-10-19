@@ -1192,9 +1192,10 @@ class QuerySet:
     def _merge_sanity_check(self, other):
         """Check that two QuerySet classes may be merged."""
         if self._fields is not None and (
-                        set(self.query.values_select) != set(other.query.values_select) or
-                        set(self.query.extra_select) != set(other.query.extra_select) or
-                    set(self.query.annotation_select) != set(other.query.annotation_select)):
+            set(self.query.values_select) != set(other.query.values_select) or
+            set(self.query.extra_select) != set(other.query.extra_select) or
+            set(self.query.annotation_select) != set(other.query.annotation_select)
+        ):
             raise TypeError(
                 "Merging '%s' classes must involve the same values in each case."
                 % self.__class__.__name__
@@ -1301,9 +1302,11 @@ class RawQuerySet:
                 raise InvalidQuery('Raw query must include the primary key')
             model_cls = self.model
             fields = [self.model_fields.get(c) for c in self.columns]
-            converters = compiler.get_converters([
-                                                     f.get_col(f.model._meta.db_table) if f else None for f in fields
-                                                     ])
+            converters = compiler.get_converters(
+                [
+                    f.get_col(f.model._meta.db_table) if f else None for f in fields
+                ]
+            )
             if converters:
                 query = compiler.apply_converters(query, converters)
             for values in query:
@@ -1638,7 +1641,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     additional_lookups = [
         copy.copy(additional_lookup) for additional_lookup
         in getattr(rel_qs, '_prefetch_related_lookups', ())
-        ]
+    ]
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh
         # instance, so we access an internal instead of using public interface
@@ -1752,7 +1755,7 @@ class RelatedPopulator:
             self.cols_end = select_fields[-1] + 1
             self.init_list = [
                 f[0].target.attname for f in select[self.cols_start:self.cols_end]
-                ]
+            ]
             self.reorder_for_init = None
         else:
             attname_indexes = {select[idx][0].target.attname: idx for idx in select_fields}
