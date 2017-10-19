@@ -2131,7 +2131,8 @@ the direction is changed.
 
 Returns the first object matched by the queryset, or ``None`` if there
 is no matching object. If the ``QuerySet`` has no ordering defined, then the
-queryset is automatically ordered by the primary key.
+queryset is automatically ordered by the primary key. This can affect
+aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
 
