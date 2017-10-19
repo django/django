@@ -130,7 +130,9 @@ Forms
 
 * The :class:`~django.forms.Select` widgets and its subclasses optionally accept
   a keyword argument `opt_attrs` which adds HTML attributes to options rendered
-  by the widget.
+  by the widget. Values in this argument dictionary may be constants or
+  callables. The latter will be called with the properties of each option to
+  allow for dynamic option attributes.
 
 Generic Views
 ~~~~~~~~~~~~~

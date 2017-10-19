@@ -174,6 +174,45 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
+    def test_choices_option_attributes_callable(self):
+        def example_option_formatter(value, **kwargs):
+            return ['one', 'two', 'three'][value - 1]
+
+        def beatle_to_css_class(value, **kwargs):
+            return "beatle {name}".format(name=value)
+
+        widget_1 = Select(
+            choices=[(1, 1), (2, 2), (3, 3)],
+            opt_attrs={
+                'val_str': example_option_formatter,
+                'index_times_7': lambda **kwargs: int(kwargs['index']) * 7,
+                'my_attr': 'val'
+            }
+        )
+        self.check_html(widget_1, 'num', None, html=(
+            """<select name="num">
+            <option value="1" val_str="one" index_times_7="0"my_attr="val">1</option>
+            <option value="2" val_str="two" index_times_7="7" my_attr="val">2</option>
+            <option value="3" val_str="three" index_times_7="14" my_attr="val">3</option>
+            </select>"""
+        ))
+        widget_2 = Select(
+            choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')],
+            opt_attrs={
+                'class': beatle_to_css_class
+            }
+        )
+        self.check_html(widget_2, 'num', None, html=(
+            """<select name="num">
+            <option value="john" class="beatle john">John</option>
+            <option value="paul" class="beatle paul">Paul</option>
+            <option value="george" class="beatle george">George</option>
+            <option value="ringo" class="beatle ringo">Ringo</option>
+            </select>"""
+        ))
+
+
+
     def test_choices_escaping(self):
         choices = (('bad', 'you & me'), ('good', mark_safe('you &gt; me')))
         self.check_html(self.widget(choices=choices), 'escape', None, html=(
