@@ -2,8 +2,9 @@ from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
 from .models import (
-    BigChild, Child, ChildProxy, Primary, RefreshPrimaryProxy, Secondary,
-    User, Publication)
+    BigChild, Child, ChildProxy, Primary, Publication, RefreshPrimaryProxy,
+    Secondary, User,
+)
 
 
 class AssertionMixin:
