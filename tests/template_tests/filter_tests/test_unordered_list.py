@@ -1,7 +1,7 @@
 from django.template.defaultfilters import unordered_list
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from ..utils import setup
 
@@ -41,7 +41,7 @@ class FunctionTests(SimpleTestCase):
 
     def test_list_gettext(self):
         self.assertEqual(
-            unordered_list(['item 1', ugettext_lazy('item 2')]),
+            unordered_list(['item 1', gettext_lazy('item 2')]),
             '\t<li>item 1</li>\n\t<li>item 2</li>'
         )
 
