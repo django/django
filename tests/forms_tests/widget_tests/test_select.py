@@ -211,8 +211,6 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
-
-
     def test_choices_escaping(self):
         choices = (('bad', 'you & me'), ('good', mark_safe('you &gt; me')))
         self.check_html(self.widget(choices=choices), 'escape', None, html=(
