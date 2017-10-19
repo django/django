@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from .models import (
     BigChild, Child, ChildProxy, Primary, RefreshPrimaryProxy, Secondary,
-)
+    User, Publication)
 
 
 class AssertionMixin:
@@ -271,3 +271,16 @@ class TestDefer2(AssertionMixin, TestCase):
             # access of any of them.
             self.assertEqual(rf2.name, 'new foo')
             self.assertEqual(rf2.value, 'new bar')
+
+    def test_defaul_defer_fields(self):
+        u = User.objects.create()
+        p = Publication()
+        p.user = u
+        p.save()
+        p = Publication.objects.get()
+        publication = Publication.objects.defer('text').get()
+        self.assertEqual(len(p.get_deferred_fields()), 2)
+        self.assertEqual(len(publication.get_deferred_fields()), 3)
+        self.assertEqual(p.user, u)
+        self.assertEqual(publication.text, "Test text")
+        self.assertEqual(p.title, "Test Title")

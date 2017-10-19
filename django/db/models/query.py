@@ -189,6 +189,9 @@ class QuerySet:
         self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = ()
+        self._prefetch_deferred_fields = ()
+        if model is not None:
+            self._prefetch_deferred_fields = [x.attname for x in model._meta.fields if x.defer]
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
@@ -200,6 +203,7 @@ class QuerySet:
         manager = Manager.from_queryset(cls)()
         manager._built_with_as_manager = True
         return manager
+
     as_manager.queryset_only = True
     as_manager = classmethod(as_manager)
 
@@ -673,6 +677,7 @@ class QuerySet:
         query. No signals are sent and there is no protection for cascades.
         """
         return sql.DeleteQuery(self.model).delete_qs(self, using)
+
     _raw_delete.alters_data = True
 
     def update(self, **kwargs):
@@ -691,6 +696,7 @@ class QuerySet:
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
         return rows
+
     update.alters_data = True
 
     def _update(self, values):
@@ -706,6 +712,7 @@ class QuerySet:
         query.add_update_fields(values)
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
+
     _update.alters_data = True
     _update.queryset_only = False
 
@@ -1109,6 +1116,7 @@ class QuerySet:
         query = sql.InsertQuery(self.model)
         query.insert_values(fields, objs, raw=raw)
         return query.get_compiler(using=using).execute_sql(return_id)
+
     _insert.alters_data = True
     _insert.queryset_only = False
 
@@ -1158,6 +1166,7 @@ class QuerySet:
         c._known_related_objects = self._known_related_objects
         c._iterable_class = self._iterable_class
         c._fields = self._fields
+        c.query.add_deferred_loading(self._prefetch_deferred_fields)
         return c
 
     def _fetch_all(self):
@@ -1183,9 +1192,9 @@ class QuerySet:
     def _merge_sanity_check(self, other):
         """Check that two QuerySet classes may be merged."""
         if self._fields is not None and (
-                set(self.query.values_select) != set(other.query.values_select) or
-                set(self.query.extra_select) != set(other.query.extra_select) or
-                set(self.query.annotation_select) != set(other.query.annotation_select)):
+                        set(self.query.values_select) != set(other.query.values_select) or
+                        set(self.query.extra_select) != set(other.query.extra_select) or
+                    set(self.query.annotation_select) != set(other.query.annotation_select)):
             raise TypeError(
                 "Merging '%s' classes must involve the same values in each case."
                 % self.__class__.__name__
@@ -1206,6 +1215,7 @@ class QuerySet:
         query = self.query.resolve_expression(*args, **kwargs)
         query._db = self._db
         return query
+
     resolve_expression.queryset_only = True
 
     def _add_hints(self, **hints):
@@ -1255,6 +1265,7 @@ class RawQuerySet:
     Provide an iterator which converts the results of raw SQL queries into
     annotated model instances.
     """
+
     def __init__(self, raw_query, model=None, query=None, params=None,
                  translations=None, using=None, hints=None):
         self.raw_query = raw_query
@@ -1291,8 +1302,8 @@ class RawQuerySet:
             model_cls = self.model
             fields = [self.model_fields.get(c) for c in self.columns]
             converters = compiler.get_converters([
-                f.get_col(f.model._meta.db_table) if f else None for f in fields
-            ])
+                                                     f.get_col(f.model._meta.db_table) if f else None for f in fields
+                                                     ])
             if converters:
                 query = compiler.apply_converters(query, converters)
             for values in query:
@@ -1431,7 +1442,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     # We need to be able to dynamically add to the list of prefetch_related
     # lookups that we look up (see below).  So we need some book keeping to
     # ensure we don't do duplicate work.
-    done_queries = {}    # dictionary of things like 'foo__bar': [results]
+    done_queries = {}  # dictionary of things like 'foo__bar': [results]
 
     auto_lookups = set()  # we add to this as we go through.
     followed_descriptors = set()  # recursion protection
@@ -1627,7 +1638,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     additional_lookups = [
         copy.copy(additional_lookup) for additional_lookup
         in getattr(rel_qs, '_prefetch_related_lookups', ())
-    ]
+        ]
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh
         # instance, so we access an internal instead of using public interface
@@ -1708,6 +1719,7 @@ class RelatedPopulator:
     method gets row and from_obj as input and populates the select_related()
     model instance.
     """
+
     def __init__(self, klass_info, select, db):
         self.db = db
         # Pre-compute needed attributes. The attributes are:
@@ -1740,7 +1752,7 @@ class RelatedPopulator:
             self.cols_end = select_fields[-1] + 1
             self.init_list = [
                 f[0].target.attname for f in select[self.cols_start:self.cols_end]
-            ]
+                ]
             self.reorder_for_init = None
         else:
             attname_indexes = {select[idx][0].target.attname: idx for idx in select_fields}
