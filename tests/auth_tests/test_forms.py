@@ -377,6 +377,18 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
 
+    @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
+    def test_username_field_max_length_defaults_to_254(self):
+        self.assertIsNone(IntegerUsernameUser._meta.get_field('username').max_length)
+        data = {
+            'username': '0123456',
+            'password': 'password',
+        }
+        IntegerUsernameUser.objects.create_user(**data)
+        form = AuthenticationForm(None, data)
+        self.assertEqual(form.fields['username'].max_length, 254)
+        self.assertEqual(form.errors, {})
+
     def test_username_field_label(self):
 
         class CustomAuthenticationForm(AuthenticationForm):
