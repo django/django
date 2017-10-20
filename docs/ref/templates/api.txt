@@ -229,6 +229,12 @@ different contexts.
         >>> context = Context({"my_name": "Dolores"})
         >>> template.render(context)
         "My name is Dolores."
+        
+.. admonition:: ``Template`` and ``loader.get_template``
+    
+    ``loader.get_template`` returns a ``django.template.backends.<*>.Template``,
+    not ``django.template.Template``. So, the result's ``render()`` method can 
+    accept ``request``.
 
 Variables and lookups
 ---------------------
