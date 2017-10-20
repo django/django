@@ -63,7 +63,6 @@ class ResolverMatch:
 @functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
-        from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return URLResolver(RegexPattern(r'^/'), urlconf)
 
