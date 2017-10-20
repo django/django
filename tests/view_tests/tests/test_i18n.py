@@ -184,7 +184,7 @@ class SetLanguageTests(TestCase):
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class I18NViewTests(SimpleTestCase):
-    """Test django.views.i18n views other than set_language."""
+    """django.views.i18n views other than set_language."""
     @override_settings(LANGUAGE_CODE='de')
     def test_get_formats(self):
         formats = get_formats()
@@ -262,7 +262,7 @@ class I18NViewTests(SimpleTestCase):
 
     def test_jsi18n_fallback_language(self):
         """
-        Let's make sure that the fallback language is still working properly
+        The fallback language is still working properly
         in cases where the selected language cannot be found.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('fi'):
@@ -306,7 +306,7 @@ class I18NViewTests(SimpleTestCase):
 
     def test_i18n_language_non_english_default(self):
         """
-        Check if the Javascript i18n view returns an empty language catalog
+        The Javascript i18n view returns an empty language catalog
         if the default language is non-English, the selected language
         is English and there is not 'en' translation available. See #13388,
         #3594 and #13726 for more details.
@@ -328,7 +328,7 @@ class I18NViewTests(SimpleTestCase):
 
     def test_i18n_language_non_english_fallback(self):
         """
-        Makes sure that the fallback language is still working properly
+        The fallback language is still working properly
         in cases where the selected language cannot be found.
         """
         with self.settings(LANGUAGE_CODE='fr'), override('none'):
@@ -353,7 +353,7 @@ class I18NViewTests(SimpleTestCase):
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
     def test_i18n_language_english_default(self):
         """
-        Check if the JavaScript i18n view returns a complete language catalog
+        The JavaScript i18n view returns a complete language catalog
         if the default language is en-us, the selected language has a
         translation available and a catalog composed by djangojs domain
         translations of multiple Python packages is requested. See #13388,

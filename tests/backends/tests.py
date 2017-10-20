@@ -29,7 +29,7 @@ class DateQuotingTest(TestCase):
 
     def test_django_date_trunc(self):
         """
-        Test the custom ``django_date_trunc method``, in particular against
+        The custom ``django_date_trunc method``, in particular against
         fields which clash with strings passed to it (e.g. 'year') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
@@ -39,7 +39,7 @@ class DateQuotingTest(TestCase):
 
     def test_django_date_extract(self):
         """
-        Test the custom ``django_date_extract method``, in particular against fields
+        The custom ``django_date_extract method``, in particular against fields
         which clash with strings passed to it (e.g. 'day') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
@@ -94,13 +94,12 @@ class LongNameTest(TransactionTestCase):
     """Long primary keys and model names can result in a sequence name
     that exceeds the database limits, which will result in truncation
     on certain databases (e.g., Postgres). The backend needs to use
-    the correct sequence name in last_insert_id and other places, so
-    check it is. Refs #8901.
+    the correct sequence name in last_insert_id and other places. Refs #8901.
     """
     available_apps = ['backends']
 
     def test_sequence_name_length_limits_create(self):
-        """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
+        """Creation of model with long name and long pk name doesn't error. Ref #8901"""
         VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
     def test_sequence_name_length_limits_m2m(self):
@@ -397,7 +396,7 @@ class BackendTestCase(TransactionTestCase):
     @override_settings(DEBUG=True)
     def test_queries(self):
         """
-        Test the documented API of connection.queries.
+        The documented API of connection.queries.
         """
         with connection.cursor() as cursor:
             reset_queries()

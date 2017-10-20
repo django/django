@@ -186,7 +186,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_no_template_source_loaders(self):
         """
-        Make sure if you don't specify a template, the debug view doesn't blow up.
+        If you don't specify a template, the debug view doesn't blow up.
         """
         with self.assertRaises(TemplateDoesNotExist):
             self.client.get('/render_no_template/')
@@ -194,7 +194,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):
         """
-        Make sure that the default URLconf template is shown shown instead
+        The default URLconf template is shown shown instead
         of the technical 404 page, if the user has not altered their
         URLconf yet.
         """
@@ -228,7 +228,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 
     def test_handle_db_exception(self):
         """
-        Ensure the debug view works when a database exception is raised by
+        The debug view works when a database exception is raised by
         performing an invalid query and passing the exception to the debug view.
         """
         with connection.cursor() as cursor:
@@ -738,7 +738,7 @@ class ExceptionReportTestMixin:
     def verify_unsafe_response(self, view, check_for_vars=True,
                                check_for_POST_params=True):
         """
-        Asserts that potentially sensitive info are displayed in the response.
+        Potentially sensitive info are displayed in the response.
         """
         request = self.rf.post('/some_url/', self.breakfast_data)
         response = view(request)
@@ -757,7 +757,7 @@ class ExceptionReportTestMixin:
     def verify_safe_response(self, view, check_for_vars=True,
                              check_for_POST_params=True):
         """
-        Asserts that certain sensitive info are not displayed in the response.
+        Certain sensitive info are not displayed in the response.
         """
         request = self.rf.post('/some_url/', self.breakfast_data)
         response = view(request)
@@ -782,7 +782,7 @@ class ExceptionReportTestMixin:
     def verify_paranoid_response(self, view, check_for_vars=True,
                                  check_for_POST_params=True):
         """
-        Asserts that no variables or POST parameters are displayed in the response.
+        No variables or POST parameters are displayed in the response.
         """
         request = self.rf.post('/some_url/', self.breakfast_data)
         response = view(request)
@@ -801,7 +801,7 @@ class ExceptionReportTestMixin:
 
     def verify_unsafe_email(self, view, check_for_POST_params=True):
         """
-        Asserts that potentially sensitive info are displayed in the email report.
+        Potentially sensitive info are displayed in the email report.
         """
         with self.settings(ADMINS=[('Admin', 'admin@fattie-breakie.com')]):
             mail.outbox = []  # Empty outbox
@@ -834,7 +834,7 @@ class ExceptionReportTestMixin:
 
     def verify_safe_email(self, view, check_for_POST_params=True):
         """
-        Asserts that certain sensitive info are not displayed in the email report.
+        Certain sensitive info are not displayed in the email report.
         """
         with self.settings(ADMINS=[('Admin', 'admin@fattie-breakie.com')]):
             mail.outbox = []  # Empty outbox
@@ -874,7 +874,7 @@ class ExceptionReportTestMixin:
 
     def verify_paranoid_email(self, view):
         """
-        Asserts that no variables or POST parameters are displayed in the email report.
+        No variables or POST parameters are displayed in the email report.
         """
         with self.settings(ADMINS=[('Admin', 'admin@fattie-breakie.com')]):
             mail.outbox = []  # Empty outbox

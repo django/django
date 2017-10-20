@@ -44,7 +44,7 @@ class PaginationTests(unittest.TestCase):
 
     def test_paginator(self):
         """
-        Tests the paginator attributes using varying inputs.
+        The paginator attributes using varying inputs.
         """
         nine = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         ten = nine + [10]
@@ -277,7 +277,7 @@ class PaginationTests(unittest.TestCase):
 
 class ModelPaginationTests(TestCase):
     """
-    Test pagination with Django model instances
+    Pagination with Django model instances
     """
     def setUp(self):
         # Prepare a list of objects for pagination.
@@ -326,7 +326,7 @@ class ModelPaginationTests(TestCase):
 
     def test_page_getitem(self):
         """
-        Tests proper behavior of a paginator page __getitem__ (queryset
+        Proper behavior of a paginator page __getitem__ (queryset
         evaluation, slicing, exception raised).
         """
         paginator = Paginator(Article.objects.order_by('id'), 5)

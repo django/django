@@ -178,7 +178,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_model(self):
         """
-        Tests the CreateModel operation.
+        The CreateModel operation.
         Most other tests use this operation as part of setup, so check failures here first.
         """
         operation = migrations.CreateModel(
@@ -286,7 +286,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_model_with_unique_after(self):
         """
-        Tests the CreateModel operation directly followed by an
+        The CreateModel operation directly followed by an
         AlterUniqueTogether (bug #22844 - sqlite remake issues)
         """
         operation1 = migrations.CreateModel(
@@ -329,7 +329,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_model_m2m(self):
         """
-        Test the creation of a model with a ManyToMany field and the
+        The creation of a model with a ManyToMany field and the
         auto-created "through" model.
         """
         project_state = self.set_up_test_model("test_crmomm")
@@ -368,7 +368,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_model_inheritance(self):
         """
-        Tests the CreateModel operation on a multi-table inheritance setup.
+        The CreateModel operation on a multi-table inheritance setup.
         """
         project_state = self.set_up_test_model("test_crmoih")
         # Test the state alteration
@@ -495,7 +495,7 @@ class OperationTests(OperationTestBase):
 
     def test_delete_model(self):
         """
-        Tests the DeleteModel operation.
+        The DeleteModel operation.
         """
         project_state = self.set_up_test_model("test_dlmo")
         # Test the state alteration
@@ -521,7 +521,7 @@ class OperationTests(OperationTestBase):
 
     def test_delete_proxy_model(self):
         """
-        Tests the DeleteModel operation ignores proxy models.
+        The DeleteModel operation ignores proxy models.
         """
         project_state = self.set_up_test_model("test_dlprmo", proxy_model=True)
         # Test the state alteration
@@ -545,7 +545,7 @@ class OperationTests(OperationTestBase):
 
     def test_rename_model(self):
         """
-        Tests the RenameModel operation.
+        The RenameModel operation.
         """
         project_state = self.set_up_test_model("test_rnmo", related_model=True)
         # Test the state alteration
@@ -611,7 +611,7 @@ class OperationTests(OperationTestBase):
 
     def test_rename_model_with_self_referential_fk(self):
         """
-        Tests the RenameModel operation on model with self referential FK.
+        The RenameModel operation on model with self referential FK.
         """
         project_state = self.set_up_test_model("test_rmwsrf", related_model=True)
         # Test the state alteration
@@ -652,7 +652,7 @@ class OperationTests(OperationTestBase):
 
     def test_rename_model_with_superclass_fk(self):
         """
-        Tests the RenameModel operation on a model which has a superclass that
+        The RenameModel operation on a model which has a superclass that
         has a foreign key.
         """
         project_state = self.set_up_test_model("test_rmwsc", related_model=True, mti_model=True)
@@ -802,7 +802,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_field(self):
         """
-        Tests the AddField operation.
+        The AddField operation.
         """
         # Test the state alteration
         operation = migrations.AddField(
@@ -835,7 +835,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_charfield(self):
         """
-        Tests the AddField operation on TextField.
+        The AddField operation on TextField.
         """
         project_state = self.set_up_test_model("test_adchfl")
 
@@ -876,7 +876,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_textfield(self):
         """
-        Tests the AddField operation on TextField.
+        The AddField operation on TextField.
         """
         project_state = self.set_up_test_model("test_adtxtfl")
 
@@ -917,7 +917,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_binaryfield(self):
         """
-        Tests the AddField operation on TextField/BinaryField.
+        The AddField operation on TextField/BinaryField.
         """
         project_state = self.set_up_test_model("test_adbinfl")
 
@@ -976,7 +976,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_field_preserve_default(self):
         """
-        Tests the AddField operation's state alteration
+        The AddField operation's state alteration
         when preserve_default = False.
         """
         project_state = self.set_up_test_model("test_adflpd")
@@ -1011,7 +1011,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_field_m2m(self):
         """
-        Tests the AddField operation with a ManyToManyField.
+        The AddField operation with a ManyToManyField.
         """
         project_state = self.set_up_test_model("test_adflmm", second_model=True)
         # Test the state alteration
@@ -1111,7 +1111,7 @@ class OperationTests(OperationTestBase):
 
     def test_remove_field(self):
         """
-        Tests the RemoveField operation.
+        The RemoveField operation.
         """
         project_state = self.set_up_test_model("test_rmfl")
         # Test the state alteration
@@ -1137,7 +1137,7 @@ class OperationTests(OperationTestBase):
 
     def test_remove_fk(self):
         """
-        Tests the RemoveField operation on a foreign key.
+        The RemoveField operation on a foreign key.
         """
         project_state = self.set_up_test_model("test_rfk", related_model=True)
         self.assertColumnExists("test_rfk_rider", "pony_id")
@@ -1154,7 +1154,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_model_table(self):
         """
-        Tests the AlterModelTable operation.
+        The AlterModelTable operation.
         """
         project_state = self.set_up_test_model("test_almota")
         # Test the state alteration
@@ -1183,14 +1183,14 @@ class OperationTests(OperationTestBase):
 
     def test_alter_model_table_none(self):
         """
-        Tests the AlterModelTable operation if the table name is set to None.
+        The AlterModelTable operation if the table name is set to None.
         """
         operation = migrations.AlterModelTable("Pony", None)
         self.assertEqual(operation.describe(), "Rename table for Pony to (default)")
 
     def test_alter_model_table_noop(self):
         """
-        Tests the AlterModelTable operation if the table name is not changed.
+        The AlterModelTable operation if the table name is not changed.
         """
         project_state = self.set_up_test_model("test_almota")
         # Test the state alteration
@@ -1241,7 +1241,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_field(self):
         """
-        Tests the AlterField operation.
+        The AlterField operation.
         """
         project_state = self.set_up_test_model("test_alfl")
         # Test the state alteration
@@ -1268,7 +1268,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_field_pk(self):
         """
-        Tests the AlterField operation on primary keys (for things like PostgreSQL's SERIAL weirdness)
+        The AlterField operation on primary keys (for things like PostgreSQL's SERIAL weirdness)
         """
         project_state = self.set_up_test_model("test_alflpk")
         # Test the state alteration
@@ -1287,7 +1287,7 @@ class OperationTests(OperationTestBase):
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_field_pk_fk(self):
         """
-        Tests the AlterField operation on primary keys changes any FKs pointing to it.
+        The AlterField operation on primary keys changes any FKs pointing to it.
         """
         project_state = self.set_up_test_model("test_alflpkfk", related_model=True)
         # Test the state alteration
@@ -1324,7 +1324,7 @@ class OperationTests(OperationTestBase):
 
     def test_rename_field(self):
         """
-        Tests the RenameField operation.
+        The RenameField operation.
         """
         project_state = self.set_up_test_model("test_rnfl", unique_together=True, index_together=True)
         # Test the state alteration
@@ -1377,7 +1377,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_unique_together(self):
         """
-        Tests the AlterUniqueTogether operation.
+        The AlterUniqueTogether operation.
         """
         project_state = self.set_up_test_model("test_alunto")
         # Test the state alteration
@@ -1422,7 +1422,7 @@ class OperationTests(OperationTestBase):
 
     def test_add_index(self):
         """
-        Test the AddIndex operation.
+        The AddIndex operation.
         """
         project_state = self.set_up_test_model("test_adin")
         msg = (
@@ -1454,7 +1454,7 @@ class OperationTests(OperationTestBase):
 
     def test_remove_index(self):
         """
-        Test the RemoveIndex operation.
+        The RemoveIndex operation.
         """
         project_state = self.set_up_test_model("test_rmin", multicol_index=True)
         self.assertTableExists("test_rmin_pony")
@@ -1521,7 +1521,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_field_with_index(self):
         """
-        Test AlterField operation with an index to ensure indexes created via
+        AlterField operation with an index to ensure indexes created via
         Meta.indexes don't get dropped with sqlite3 remake.
         """
         project_state = self.set_up_test_model("test_alflin", index=True)
@@ -1542,7 +1542,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_index_together(self):
         """
-        Tests the AlterIndexTogether operation.
+        The AlterIndexTogether operation.
         """
         project_state = self.set_up_test_model("test_alinto")
         # Test the state alteration
@@ -1574,7 +1574,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_model_options(self):
         """
-        Tests the AlterModelOptions operation.
+        The AlterModelOptions operation.
         """
         project_state = self.set_up_test_model("test_almoop")
         # Test the state alteration (no DB alteration to test)
@@ -1611,7 +1611,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_order_with_respect_to(self):
         """
-        Tests the AlterOrderWithRespectTo operation.
+        The AlterOrderWithRespectTo operation.
         """
         project_state = self.set_up_test_model("test_alorwrtto", related_model=True)
         # Test the state alteration
@@ -1765,7 +1765,7 @@ class OperationTests(OperationTestBase):
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
-        Tests the RunSQL operation.
+        The RunSQL operation.
         """
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
@@ -1904,7 +1904,7 @@ class OperationTests(OperationTestBase):
 
     def test_run_sql_noop(self):
         """
-        #24098 - Tests no-op RunSQL operations.
+        #24098 - No-op RunSQL operations.
         """
         operation = migrations.RunSQL(migrations.RunSQL.noop, migrations.RunSQL.noop)
         with connection.schema_editor() as editor:
@@ -1913,7 +1913,7 @@ class OperationTests(OperationTestBase):
 
     def test_run_python(self):
         """
-        Tests the RunPython operation
+        The RunPython operation
         """
 
         project_state = self.set_up_test_model("test_runpython", mti_model=True)
@@ -2000,7 +2000,7 @@ class OperationTests(OperationTestBase):
 
     def test_run_python_atomic(self):
         """
-        Tests the RunPython operation correctly handles the "atomic" keyword
+        The RunPython operation correctly handles the "atomic" keyword
         """
         project_state = self.set_up_test_model("test_runpythonatomic", mti_model=True)
 
@@ -2263,7 +2263,7 @@ class OperationTests(OperationTestBase):
 
     def test_run_python_noop(self):
         """
-        #24098 - Tests no-op RunPython operations.
+        #24098 - No-op RunPython operations.
         """
         project_state = ProjectState()
         new_state = project_state.clone()
@@ -2275,7 +2275,7 @@ class OperationTests(OperationTestBase):
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_separate_database_and_state(self):
         """
-        Tests the SeparateDatabaseAndState operation.
+        The SeparateDatabaseAndState operation.
         """
         project_state = self.set_up_test_model("test_separatedatabaseandstate")
         # Create the operation
@@ -2433,7 +2433,7 @@ class SwappableOperationTests(OperationTestBase):
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
     def test_delete_ignore_swapped(self):
         """
-        Tests the DeleteModel operation ignores swapped models.
+        The DeleteModel operation ignores swapped models.
         """
         operation = migrations.DeleteModel("Pony")
         project_state, new_state = self.make_test_state("test_dligsw", operation)
@@ -2450,7 +2450,7 @@ class SwappableOperationTests(OperationTestBase):
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
     def test_add_field_ignore_swapped(self):
         """
-        Tests the AddField operation.
+        The AddField operation.
         """
         # Test the state alteration
         operation = migrations.AddField(

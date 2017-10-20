@@ -17,7 +17,7 @@ class BackendSpecificChecksTests(SimpleTestCase):
 
     @mock.patch('django.db.models.fields.router.allow_migrate', new=dummy_allow_migrate)
     def test_check_field(self):
-        """ Test if backend specific checks are performed. """
+        """ Backend specific checks are performed. """
         error = Error('an error')
 
         class Model(models.Model):

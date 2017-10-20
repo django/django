@@ -181,7 +181,7 @@ class TestFixtures(TestCase):
     def test_unknown_format(self):
         """
         Test for ticket #4371 -- Loading data of an unknown format should fail
-        Validate that error conditions are caught correctly
+        Error conditions are caught correctly
         """
         msg = "Problem installing fixture 'bad_fixture1': unkn is not a known serialization format."
         with self.assertRaisesMessage(management.CommandError, msg):
@@ -436,7 +436,7 @@ class TestFixtures(TestCase):
 
     def test_loaddata_raises_error_when_fixture_has_invalid_foreign_key(self):
         """
-        Regression for #3615 - Ensure data with nonexistent child key references raises error
+        Regression for #3615 - Data with nonexistent child key references raises error
         """
         with self.assertRaisesMessage(IntegrityError, "Problem installing fixture"):
             management.call_command(
@@ -836,7 +836,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
     def test_dump_and_load_m2m_simple(self):
         """
-        Test serializing and deserializing back models with simple M2M relations
+        Serializing and deserializing back models with simple M2M relations
         """
         a = M2MSimpleA.objects.create(data="a")
         b1 = M2MSimpleB.objects.create(data="b1")

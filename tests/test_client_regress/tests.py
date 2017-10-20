@@ -1407,7 +1407,7 @@ class RequestFactoryStateTest(SimpleTestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class RequestFactoryEnvironmentTests(SimpleTestCase):
     """
-    Regression tests for #8551 and #17067: ensure that environment variables
+    Regression tests for #8551 and #17067: environment variables
     are set correctly in RequestFactory.
     """
 

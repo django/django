@@ -70,7 +70,7 @@ class TranslationTests(SimpleTestCase):
     @translation.override('fr')
     def test_plural(self):
         """
-        Test plurals with ngettext. French differs from English in that 0 is singular.
+        Plurals with ngettext. French differs from English in that 0 is singular.
         """
         self.assertEqual(ngettext("%d year", "%d years", 0) % 0, "0 année")
         self.assertEqual(ngettext("%d year", "%d years", 2) % 2, "2 années")
@@ -885,7 +885,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_sub_locales(self):
         """
-        Check if sublocales fall back to the main locale
+        Sublocales fall back to the main locale
         """
         with self.settings(USE_THOUSAND_SEPARATOR=True):
             with translation.override('de-at', deactivate=True):
@@ -895,7 +895,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_input(self):
         """
-        Tests if form input is correctly localized
+        Form input is correctly localized
         """
         self.maxDiff = 1200
         with translation.override('de-at', deactivate=True):
@@ -934,7 +934,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_sanitize_separators(self):
         """
-        Tests django.utils.formats.sanitize_separators.
+        django.utils.formats.sanitize_separators.
         """
         # Non-strings are untouched
         self.assertEqual(sanitize_separators(123), 123)
@@ -971,7 +971,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_iter_format_modules(self):
         """
-        Tests the iter_format_modules function.
+        The iter_format_modules function.
         """
         # Importing some format modules so that we can compare the returned
         # modules with these expected modules
@@ -997,7 +997,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_iter_format_modules_stability(self):
         """
-        Tests the iter_format_modules function always yields format modules in
+        The iter_format_modules function always yields format modules in
         a stable and correct order in presence of both base ll and ll_CC formats.
         """
         en_format_mod = import_module('django.conf.locale.en.formats')
@@ -1017,7 +1017,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localize_templatetag_and_filter(self):
         """
-        Tests the {% localize %} templatetag
+        The {% localize %} templatetag
         """
         context = Context({'value': 3.14})
         template1 = Template(
@@ -1042,7 +1042,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_as_text_as_hidden_input(self):
         """
-        Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
+        Form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
         """
         self.maxDiff = 1200
 
@@ -1109,7 +1109,7 @@ class MiscTests(SimpleTestCase):
 
     def test_parse_spec_http_header(self):
         """
-        Testing HTTP header parsing. First, we test that we can parse the
+        HTTP header parsing. We can parse the
         values according to the spec (and that we extract all the pieces in
         the right order).
         """
@@ -1152,7 +1152,7 @@ class MiscTests(SimpleTestCase):
 
     def test_parse_literal_http_header(self):
         """
-        Now test that we parse a literal HTTP header correctly.
+        We parse a literal HTTP header correctly.
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1239,7 +1239,7 @@ class MiscTests(SimpleTestCase):
 
     def test_parse_language_cookie(self):
         """
-        Now test that we parse language preferences stored in a cookie correctly.
+        We parse language preferences stored in a cookie correctly.
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1591,7 +1591,7 @@ class TranslationFilesMissing(SimpleTestCase):
 
     def test_failure_finding_default_mo_files(self):
         '''
-        Ensure IOError is raised if the default language is unparseable.
+        IOError is raised if the default language is unparseable.
         Refs: #18192
         '''
         self.patchGettextFind()

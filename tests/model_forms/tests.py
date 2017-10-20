@@ -859,7 +859,7 @@ class UniqueTest(TestCase):
     def test_multiple_field_unique_together(self):
         """
         When the same field is involved in multiple unique_together
-        constraints, we need to make sure we don't remove the data for it
+        constraints, the data for it must not be removed
         before doing all the validation checking (not just failing after
         the first one).
         """
@@ -939,12 +939,12 @@ class UniqueTest(TestCase):
                          ['Derived book with this Suffix1 and Suffix2 already exists.'])
 
     def test_explicitpk_unspecified(self):
-        """Test for primary_key being in the form and failing validation."""
+        """primary_key is in the form and fails validation."""
         form = ExplicitPKForm({'key': '', 'desc': ''})
         self.assertFalse(form.is_valid())
 
     def test_explicitpk_unique(self):
-        """Ensure keys and blank character strings are tested for uniqueness."""
+        """Keys and blank character strings are tested for uniqueness."""
         form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertTrue(form.is_valid())
         form.save()
@@ -1678,7 +1678,7 @@ class ModelChoiceFieldTests(TestCase):
 
     def test_modelchoicefield_22745(self):
         """
-        #22745 -- Make sure that ModelChoiceField with RadioSelect widget
+        #22745 -- ModelChoiceField with RadioSelect widget
         doesn't produce unnecessary db queries when accessing its BoundField's
         attrs.
         """
@@ -1933,7 +1933,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_show_hidden_initial(self):
         """
-        Test support of show_hidden_initial by ModelMultipleChoiceField.
+        Support of show_hidden_initial by ModelMultipleChoiceField.
         """
         class WriterForm(forms.Form):
             persons = forms.ModelMultipleChoiceField(show_hidden_initial=True,
@@ -1956,7 +1956,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_field_22745(self):
         """
-        #22745 -- Make sure that ModelMultipleChoiceField with
+        #22745 -- ModelMultipleChoiceField with
         CheckboxSelectMultiple widget doesn't produce unnecessary db queries
         when accessing its BoundField's attrs.
         """
@@ -2785,7 +2785,7 @@ class CustomCleanTests(TestCase):
 
     def test_model_form_clean_applies_to_model(self):
         """
-        Regression test for #12960. Make sure the cleaned_data returned from
+        Regression test for #12960. The cleaned_data returned from
         ModelForm.clean() is applied to the model instance.
         """
         class CategoryForm(forms.ModelForm):
@@ -2879,7 +2879,7 @@ class StumpJokeWithCustomFieldForm(forms.ModelForm):
 
 class LimitChoicesToTests(TestCase):
     """
-    Tests the functionality of ``limit_choices_to``.
+    The functionality of ``limit_choices_to``.
     """
     @classmethod
     def setUpTestData(cls):

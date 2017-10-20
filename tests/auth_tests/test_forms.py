@@ -714,7 +714,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_nonexistent_email(self):
         """
-        Test nonexistent email address. This should not fail because it would
+        Email address should exist. This should not fail because it would
         expose information about registered users.
         """
         data = {'email': 'foo@bar.com'}
@@ -808,9 +808,9 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_save_plaintext_email(self):
         """
-        Test the PasswordResetForm.save() method with no html_email_template_name
+        The PasswordResetForm.save() method with no html_email_template_name
         parameter passed in.
-        Test to ensure original behavior is unchanged after the parameter was added.
+        Original behavior is unchanged after the parameter was added.
         """
         (user, username, email) = self.create_dummy_user()
         form = PasswordResetForm({"email": email})
@@ -827,9 +827,9 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_save_html_email_template_name(self):
         """
-        Test the PasswordResetFOrm.save() method with html_email_template_name
+        PasswordResetFOrm.save() method with html_email_template_name
         parameter specified.
-        Test to ensure that a multipart email is sent with both text/plain
+        A multipart email is sent with both text/plain
         and text/html parts.
         """
         (user, username, email) = self.create_dummy_user()

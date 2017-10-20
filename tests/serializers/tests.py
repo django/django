@@ -234,7 +234,7 @@ class SerializersTestBase:
         )
 
     def test_serialize_superfluous_queries(self):
-        """Ensure no superfluous queries are made when serializing ForeignKeys
+        """No superfluous queries are made when serializing ForeignKeys
 
         #17602
         """

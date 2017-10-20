@@ -24,7 +24,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):
         """
-        Tests running a simple set of migrations.
+        Running a simple set of migrations.
         """
         executor = MigrationExecutor(connection)
         # Let's look at the plan first and make sure it's up to scratch
@@ -63,7 +63,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_run_with_squashed(self):
         """
-        Tests running a squashed migration from zero (should ignore what it replaces)
+        Running a squashed migration from zero (should ignore what it replaces)
         """
         executor = MigrationExecutor(connection)
         # Check our leaf node is the squashed one
@@ -250,7 +250,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_soft_apply(self):
         """
-        Tests detection of initial migrations already having been applied.
+        Detection of initial migrations already having been applied.
         """
         state = {"faked": None}
 

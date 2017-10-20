@@ -29,7 +29,7 @@ class MigrateTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
         """
-        Tests basic usage of the migrate command.
+        Basic usage of the migrate command.
         """
         # No tables are created
         self.assertTableNotExists("migrations_author")
@@ -226,7 +226,7 @@ class MigrateTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
     def test_showmigrations_plan(self):
         """
-        Tests --plan output of showmigrations command
+        --plan output of showmigrations command
         """
         out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
@@ -271,7 +271,7 @@ class MigrateTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_empty"})
     def test_showmigrations_plan_no_migrations(self):
         """
-        Tests --plan output of showmigrations command without migrations
+        --plan output of showmigrations command without migrations
         """
         out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
@@ -284,7 +284,7 @@ class MigrateTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_complex"})
     def test_showmigrations_plan_squashed(self):
         """
-        Tests --plan output of showmigrations command with squashed migrations.
+        --plan output of showmigrations command with squashed migrations.
         """
         out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)

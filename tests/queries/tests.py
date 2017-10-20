@@ -3431,7 +3431,7 @@ class RelabelCloneTest(TestCase):
 class Ticket20101Tests(TestCase):
     def test_ticket_20101(self):
         """
-        Tests QuerySet ORed combining in exclude subquery case.
+        QuerySet ORed combining in exclude subquery case.
         """
         t = Tag.objects.create(name='foo')
         a1 = Annotation.objects.create(tag=t, name='a1')
@@ -3607,7 +3607,7 @@ class RelatedLookupTypeTests(TestCase):
 
     def test_values_queryset_lookup(self):
         """
-        #23396 - Ensure ValueQuerySets are not checked for compatibility with the lookup field
+        #23396 - ValueQuerySets are not checked for compatibility with the lookup field
         """
         # Make sure the num and objecta field values match.
         ob = ObjectB.objects.get(name='ob')
@@ -3804,7 +3804,7 @@ class Ticket23622Tests(TestCase):
     @skipUnlessDBFeature('can_distinct_on_fields')
     def test_ticket_23622(self):
         """
-        Make sure __pk__in and __in work the same for related fields when
+        __pk__in and __in work the same for related fields when
         using a distinct on subquery.
         """
         a1 = Ticket23605A.objects.create()

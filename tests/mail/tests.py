@@ -33,7 +33,7 @@ class HeadersCheckMixin:
 
     def assertMessageHasHeaders(self, message, headers):
         """
-        Asserts that the `message` has all `headers`.
+        The `message` has all `headers`.
 
         message: can be an instance of an email.Message subclass or a string
                  with the contents of an email message.
@@ -181,7 +181,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_space_continuation(self):
         """
-        Test for space continuation character in long (ASCII) subject headers (#7747)
+        Space continuation character in long (ASCII) subject headers (#7747)
         """
         email = EmailMessage(
             'Long subject lines that get wrapped should contain a space '
@@ -216,7 +216,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_from_header(self):
         """
-        Make sure we can manually set the From header (#9214)
+        We can manually set the From header (#9214)
         """
         email = EmailMessage(
             'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
@@ -227,7 +227,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_to_header(self):
         """
-        Make sure we can manually set the To header (#17444)
+        We can manually set the To header (#17444)
         """
         email = EmailMessage('Subject', 'Content', 'bounce@example.com',
                              ['list-subscriber@example.com', 'list-subscriber2@example.com'],
@@ -256,7 +256,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_multiple_message_call(self):
         """
-        Regression for #13259 - Make sure that headers are not changed when
+        Regression for #13259 - Headers are not changed when
         calling EmailMessage.message()
         """
         email = EmailMessage(
@@ -271,7 +271,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_unicode_address_header(self):
         """
         Regression for #11144 - When a to/from/cc header contains unicode,
-        make sure the email addresses are parsed correctly (especially with
+        the email addresses are parsed correctly (especially with
         regards to commas)
         """
         email = EmailMessage(
@@ -302,7 +302,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_safe_mime_multipart(self):
         """
-        Make sure headers can be set with a different encoding than utf-8 in
+        Headers can be set with a different encoding than utf-8 in
         SafeMIMEMultipart as well
         """
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
@@ -410,8 +410,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_attach_file(self):
         """
-        Test attaching a file against different mimetypes and make sure that
-        a file will be attached and sent properly even if an invalid mimetype
+        Attaching a file against different mimetypes.
+        A file will be attached and sent properly even if an invalid mimetype
         is specified.
         """
         files = (
@@ -475,7 +475,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_dummy_backend(self):
         """
-        Make sure that dummy backends returns correct number of sent messages
+        Dummy backends returns correct number of sent messages
         """
         connection = dummy.EmailBackend()
         email = EmailMessage(
@@ -486,14 +486,14 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_arbitrary_keyword(self):
         """
-        Make sure that get_connection() accepts arbitrary keyword that might be
+        get_connection() accepts arbitrary keyword that might be
         used with custom backends.
         """
         c = mail.get_connection(fail_silently=True, foo='bar')
         self.assertTrue(c.fail_silently)
 
     def test_custom_backend(self):
-        """Test custom backend defined in this suite."""
+        """Custom backend defined in this suite."""
         conn = mail.get_connection('mail.custombackend.EmailBackend')
         self.assertTrue(hasattr(conn, 'test_outbox'))
         email = EmailMessage(
@@ -504,7 +504,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(len(conn.test_outbox), 1)
 
     def test_backend_arg(self):
-        """Test backend argument of mail.get_connection()"""
+        """Backend argument of mail.get_connection()"""
         self.assertIsInstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
         self.assertIsInstance(
             mail.get_connection('django.core.mail.backends.locmem.EmailBackend'),
@@ -527,7 +527,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         ADMINS=[('nobody', 'nobody@example.com')],
         MANAGERS=[('nobody', 'nobody@example.com')])
     def test_connection_arg(self):
-        """Test connection argument to send_mail(), et. al."""
+        """Connection argument to send_mail(), et. al."""
         mail.outbox = []
 
         # Send using non-default connection
@@ -812,7 +812,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     def test_plaintext_send_mail(self):
         """
-        Test send_mail without the html_message
+        send_mail without the html_message
         regression test for adding html_message parameter to send_mail()
         """
         send_mail('Subject', 'Content', 'sender@example.com', ['nobody@example.com'])
@@ -825,7 +825,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         self.assertEqual(message.get_content_type(), 'text/plain')
 
     def test_html_send_mail(self):
-        """Test html_message argument to send_mail"""
+        """html_message argument to send_mail"""
         send_mail('Subject', 'Content', 'sender@example.com', ['nobody@example.com'], html_message='HTML Content')
         message = self.get_the_message()
 
@@ -840,7 +840,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     @override_settings(MANAGERS=[('nobody', 'nobody@example.com')])
     def test_html_mail_managers(self):
-        """Test html_message argument to mail_managers"""
+        """html_message argument to mail_managers"""
         mail_managers('Subject', 'Content', html_message='HTML Content')
         message = self.get_the_message()
 
@@ -855,7 +855,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
 
     @override_settings(ADMINS=[('nobody', 'nobody@example.com')])
     def test_html_mail_admins(self):
-        """Test html_message argument to mail_admins """
+        """html_message argument to mail_admins """
         mail_admins('Subject', 'Content', html_message='HTML Content')
         message = self.get_the_message()
 
@@ -1011,7 +1011,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def test_locmem_shared_messages(self):
         """
-        Make sure that the locmen backend populates the outbox.
+        The locmen backend populates the outbox.
         """
         connection = locmem.EmailBackend()
         connection2 = locmem.EmailBackend()
@@ -1056,7 +1056,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         return messages
 
     def test_file_sessions(self):
-        """Make sure opening a connection creates a new file"""
+        """Opening a connection creates a new file"""
         msg = EmailMessage(
             'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
             headers={'From': 'from@example.com'},

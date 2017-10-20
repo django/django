@@ -24,7 +24,7 @@ class StateTests(SimpleTestCase):
 
     def test_create(self):
         """
-        Tests making a ProjectState from an Apps
+        Making a ProjectState from an Apps
         """
 
         new_apps = Apps(["migrations"])
@@ -317,7 +317,7 @@ class StateTests(SimpleTestCase):
 
     def test_render(self):
         """
-        Tests rendering a ProjectState into an Apps.
+        Rendering a ProjectState into an Apps.
         """
         project_state = ProjectState()
         project_state.add_model(ModelState(
@@ -834,7 +834,7 @@ class StateTests(SimpleTestCase):
 
     def test_ignore_order_wrt(self):
         """
-        Makes sure ProjectState doesn't include OrderWrt fields when
+        ProjectState doesn't include OrderWrt fields when
         making from existing models.
         """
         new_apps = Apps()
@@ -981,7 +981,7 @@ class ModelStateTests(SimpleTestCase):
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
     def test_create_swappable(self):
         """
-        Tests making a ProjectState from an Apps with a swappable model
+        Making a ProjectState from an Apps with a swappable model
         """
         new_apps = Apps(['migrations'])
 
@@ -1055,7 +1055,7 @@ class ModelStateTests(SimpleTestCase):
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
     def test_custom_manager_swappable(self):
         """
-        Tests making a ProjectState from unused models with custom managers
+        Making a ProjectState from unused models with custom managers
         """
         new_apps = Apps(['migrations'])
 
