@@ -6,7 +6,7 @@ import unicodedata
 
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
-    check_password, is_password_usable, make_password,
+    check_password, is_password_disabled, is_password_usable, make_password,
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
@@ -116,6 +116,9 @@ class AbstractBaseUser(models.Model):
 
     def has_usable_password(self):
         return is_password_usable(self.password)
+
+    def has_disabled_password(self):
+        return is_password_disabled(self.password)
 
     def get_session_auth_hash(self):
         """

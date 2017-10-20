@@ -817,6 +817,19 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         form.save()
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_disabled_password(self):
+        user = User.objects.create_user('testuser', 'test@example.com', 'test')
+        data = {"email": "test@example.com"}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        user.password = 'unknown hasher'
+        user.save()
+        form = PasswordResetForm(data)
+        # The form itself is valid, but no email is sent
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(len(mail.outbox), 1)
+
     def test_save_plaintext_email(self):
         """
         Test the PasswordResetForm.save() method with no html_email_template_name

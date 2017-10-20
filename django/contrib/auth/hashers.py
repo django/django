@@ -21,8 +21,12 @@ UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
 UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
 
 
+def is_password_disabled(password):
+    return password.startswith(UNUSABLE_PASSWORD_PREFIX)
+
+
 def is_password_usable(encoded):
-    if encoded is None or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
+    if encoded is None or is_password_disabled(encoded):
         return False
     try:
         identify_hasher(encoded)

@@ -14,6 +14,7 @@ class BasicTestCase(TestCase):
         "Users can be created and can set their password"
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
+        self.assertIs(u.has_disabled_password(), False)
         self.assertFalse(u.check_password('bad'))
         self.assertTrue(u.check_password('testpw'))
 
@@ -22,10 +23,12 @@ class BasicTestCase(TestCase):
         u.save()
         self.assertFalse(u.check_password('testpw'))
         self.assertFalse(u.has_usable_password())
+        self.assertIs(u.has_disabled_password(), True)
         u.set_password('testpw')
         self.assertTrue(u.check_password('testpw'))
         u.set_password(None)
         self.assertFalse(u.has_usable_password())
+        self.assertIs(u.has_disabled_password(), True)
 
         # Check username getter
         self.assertEqual(u.get_username(), 'testuser')
@@ -40,6 +43,7 @@ class BasicTestCase(TestCase):
         # Check API-based user creation with no password
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u2.has_usable_password())
+        self.assertIs(u.has_disabled_password(), True)
 
     def test_unicode_username(self):
         User.objects.create_user('jörg')

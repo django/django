@@ -255,14 +255,14 @@ class PasswordResetForm(forms.Form):
         """Given an email, return matching user(s) who should receive a reset.
 
         This allows subclasses to more easily customize the default policies
-        that prevent inactive users and users with unusable passwords from
+        that prevent inactive users and users with disabled passwords from
         resetting their password.
         """
         active_users = UserModel._default_manager.filter(**{
             '%s__iexact' % UserModel.get_email_field_name(): email,
             'is_active': True,
         })
-        return (u for u in active_users if u.has_usable_password())
+        return (u for u in active_users if not u.has_disabled_password())
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
