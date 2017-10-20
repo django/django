@@ -335,6 +335,13 @@ creating a ``TaggedItem``::
     >>> t.content_object
     <User: Guido>
 
+If the related object is deleted, the ``content_type`` and ``object_id`` fields
+remain set to their original values and the ``GenericForeignKey`` returns
+``None``::
+
+    >>> guido.delete()
+    >>> t.content_object  # returns None
+
 Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
