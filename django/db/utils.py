@@ -81,7 +81,7 @@ class DatabaseErrorWrapper:
         ):
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
-                try exc_value.diag.table_name:
+                try:
                     argument, tb_name = exc_value.args + ("In the table '%s'" % exc_value.diag.table_name,)
                     dj_exc_value = dj_exc_type(argument + tb_name)
                 except ProgrammingError:
