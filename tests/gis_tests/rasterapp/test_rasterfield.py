@@ -127,11 +127,11 @@ class RasterFieldTest(TransactionTestCase):
         stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
         stx_pnt.transform(3086)
 
-        lookups = list(
+        lookups = [
             (name, lookup)
             for name, lookup in BaseSpatialField.get_lookups().items()
             if issubclass(lookup, GISLookup)
-        )
+        ]
         self.assertNotEqual(lookups, [], 'No lookups found')
         # Loop through all the GIS lookups.
         for name, lookup in lookups:
@@ -185,7 +185,7 @@ class RasterFieldTest(TransactionTestCase):
                 len(combo_values),
                 'Number of lookup names and values should be the same',
             )
-            combos = list(x for x in zip(combo_keys, combo_values) if x[1])
+            combos = [x for x in zip(combo_keys, combo_values) if x[1]]
             self.assertEqual(
                 [(n, x) for n, x in enumerate(combos) if x in combos[:n]],
                 [],
