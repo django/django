@@ -64,7 +64,7 @@ class DatabaseErrorWrapper:
 
     def __enter__(self):
         pass
-
+    
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             return
@@ -82,11 +82,11 @@ class DatabaseErrorWrapper:
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
                 if exc_value.diag.table_name:
-					a = exc_value.args
-					a = a + ("In the table '%s'" % exc_value.diag.table_name,)
-					a = a[0] + a[1]
-					dj_exc_value = dj_exc_type(a)
-				else:
+                    a = exc_value.args
+                    a = a + ("In the table '%s'" % exc_value.diag.table_name,)
+                    a = a[0] + a[1]
+                    dj_exc_value = dj_exc_type(a)
+                else:
                     dj_exc_value = dj_exc_type(*exc_value.args)
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
