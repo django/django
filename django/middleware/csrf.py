@@ -10,7 +10,7 @@ import string
 from urllib.parse import urlparse
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
@@ -262,14 +262,17 @@ class CsrfViewMiddleware(MiddlewareMixin):
                     if server_port not in ('443', '80'):
                         good_referer = '%s:%s' % (good_referer, server_port)
                 else:
-                    # request.get_host() includes the port.
-                    good_referer = request.get_host()
+                    try:
+                        # request.get_host() includes the port.
+                        good_referer = request.get_host()
+                    except DisallowedHost:
+                        pass
 
-                # Here we generate a list of all acceptable HTTP referers,
-                # including the current host since that has been validated
-                # upstream.
+                # Create a list of all acceptable HTTP referers, including the
+                # current host if it's permitted by ALLOWED_HOSTS.
                 good_hosts = list(settings.CSRF_TRUSTED_ORIGINS)
-                good_hosts.append(good_referer)
+                if good_referer is not None:
+                    good_hosts.append(good_referer)
 
                 if not any(is_same_domain(referer.netloc, host) for host in good_hosts):
                     reason = REASON_BAD_REFERER % referer.geturl()

@@ -294,6 +294,19 @@ class CsrfViewMiddlewareTestMixin:
             status_code=403,
         )
 
+    def test_https_malformed_host(self):
+        """
+        CsrfViewMiddleware generates a 403 response if it receives an HTTPS
+        request with a bad host.
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = '@malformed'
+        req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
+        req.META['SERVER_PORT'] = '443'
+        response = self.mw.process_view(req, token_view, (), {})
+        self.assertEqual(response.status_code, 403)
+
     @override_settings(DEBUG=True)
     def test_https_malformed_referer(self):
         """
