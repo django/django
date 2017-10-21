@@ -43,6 +43,7 @@ class InternalError(DatabaseError):
 class ProgrammingError(DatabaseError):
     pass
 
+
 class NotSupportedError(DatabaseError):
     pass
 
