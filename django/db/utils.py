@@ -81,10 +81,10 @@ class DatabaseErrorWrapper:
         ):
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
-                try:
+                if exec_value.diag.table_name:
                     argument, tb_name = exc_value.args + ("In the table '%s'" % exc_value.diag.table_name,)
                     dj_exc_value = dj_exc_type(argument + tb_name)
-                except ProgrammingError:
+                else:
                     dj_exc_value = dj_exc_type(*exc_value.args)
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
