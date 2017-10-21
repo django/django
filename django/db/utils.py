@@ -43,7 +43,6 @@ class InternalError(DatabaseError):
 class ProgrammingError(DatabaseError):
     pass
 
-
 class NotSupportedError(DatabaseError):
     pass
 
@@ -64,7 +63,7 @@ class DatabaseErrorWrapper:
 
     def __enter__(self):
         pass
-    
+
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             return
