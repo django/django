@@ -902,9 +902,7 @@ class MigrationAutodetector:
                 )
                 if rename_key in self.renamed_models:
                     new_field.remote_field.through = old_field.remote_field.through
-            old_field_dec = self.deep_deconstruct(old_field)
-            new_field_dec = self.deep_deconstruct(new_field)
-            if old_field_dec != new_field_dec:
+            if self._field_effectively_altered(old_field, new_field):
                 both_m2m = old_field.many_to_many and new_field.many_to_many
                 neither_m2m = not old_field.many_to_many and not new_field.many_to_many
                 if both_m2m or neither_m2m:
@@ -932,6 +930,28 @@ class MigrationAutodetector:
                     # We cannot alter between m2m and concrete fields
                     self._generate_removed_field(app_label, model_name, field_name)
                     self._generate_added_field(app_label, model_name, field_name)
+
+    def _field_effectively_altered(self, old_field, new_field):
+        old_path, old_args, old_kwargs = self.deep_deconstruct(old_field)
+        new_path, new_args, new_kwargs = self.deep_deconstruct(new_field)
+        if old_path != new_path or old_args != new_args:
+            return True
+        # old_field and new_field are the same class
+        non_migration_fields = old_field.get_non_migration_fields()
+        for k, v in old_kwargs.items():
+            if k in new_kwargs and v == new_kwargs[k]:
+                continue
+            if k in non_migration_fields:
+                continue
+            return True
+        for k, v in new_kwargs.items():
+            if k in old_kwargs:
+                # already compared in the previous loop
+                continue
+            if k in non_migration_fields:
+                continue
+            return True
+        return False
 
     def create_altered_indexes(self):
         option_name = operations.AddIndex.option_name
