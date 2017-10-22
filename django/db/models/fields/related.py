@@ -599,6 +599,12 @@ class ForeignObject(RelatedField):
             )
         return name, path, args, kwargs
 
+    @staticmethod
+    def get_non_migration_fields():
+        fields = super(ForeignObject, ForeignObject).get_non_migration_fields()
+        fields.add("on_delete")
+        return fields
+
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')

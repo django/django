@@ -256,6 +256,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
     ])
+    author_with_m2m_null = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher", null=True)),
+    ])
     author_with_m2m_through = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract")),
@@ -1690,12 +1694,20 @@ class AutodetectorTests(TestCase):
 
     def test_alter_many_to_many(self):
         changes = self.get_changes(
-            [self.author_with_m2m, self.publisher], [self.author_with_m2m_blank, self.publisher]
+            [self.author_with_m2m, self.publisher], [self.author_with_m2m_null, self.publisher]
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publishers")
+
+    def test_alter_non_migration_fields(self):
+        changes = self.get_changes(
+            [self.author_with_m2m, self.publisher], [self.author_with_m2m_blank, self.publisher]
+        )
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 0)
+
 
     def test_create_with_through_model(self):
         """

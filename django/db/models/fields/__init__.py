@@ -461,6 +461,16 @@ class Field(RegisterLookupMixin):
         # Return basic info - other fields should override this.
         return (self.name, path, [], keywords)
 
+    @staticmethod
+    def get_non_migration_fields():
+        return {
+            "verbose_name",
+            "blank",
+            "editable",
+            "help_text",
+            "error_messages"
+        }
+
     def clone(self):
         """
         Uses deconstruct() to clone a new copy of this Field.
