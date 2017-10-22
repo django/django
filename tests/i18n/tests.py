@@ -1017,20 +1017,30 @@ class FormattingTests(SimpleTestCase):
 
     def test_localize_templatetag_and_filter(self):
         """
-        Tests the {% localize %} templatetag
+        Test the {% localize %} templatetag and the localize/unlocalize filters.
         """
-        context = Context({'value': 3.14})
+        context = Context({'float': 3.14, 'date': datetime.date(2016, 12, 31)})
         template1 = Template(
-            '{% load l10n %}{% localize %}{{ value }}{% endlocalize %};'
-            '{% localize on %}{{ value }}{% endlocalize %}'
+            '{% load l10n %}{% localize %}{{ float }}/{{ date }}{% endlocalize %}; '
+            '{% localize on %}{{ float }}/{{ date }}{% endlocalize %}'
         )
-        template2 = Template("{% load l10n %}{{ value }};{% localize off %}{{ value }};{% endlocalize %}{{ value }}")
-        template3 = Template('{% load l10n %}{{ value }};{{ value|unlocalize }}')
-        template4 = Template('{% load l10n %}{{ value }};{{ value|localize }}')
-        output1 = '3,14;3,14'
-        output2 = '3,14;3.14;3,14'
-        output3 = '3,14;3.14'
-        output4 = '3.14;3,14'
+        template2 = Template(
+            '{% load l10n %}{{ float }}/{{ date }}; '
+            '{% localize off %}{{ float }}/{{ date }};{% endlocalize %} '
+            '{{ float }}/{{ date }}'
+        )
+        template3 = Template(
+            '{% load l10n %}{{ float }}/{{ date }}; {{ float|unlocalize }}/{{ date|unlocalize }}'
+        )
+        template4 = Template(
+            '{% load l10n %}{{ float }}/{{ date }}; {{ float|localize }}/{{ date|localize }}'
+        )
+        expected_localized = '3,14/31. Dezember 2016'
+        expected_unlocalized = '3.14/Dez. 31, 2016'
+        output1 = '; '.join([expected_localized, expected_localized])
+        output2 = '; '.join([expected_localized, expected_unlocalized, expected_localized])
+        output3 = '; '.join([expected_localized, expected_unlocalized])
+        output4 = '; '.join([expected_unlocalized, expected_localized])
         with translation.override('de', deactivate=True):
             with self.settings(USE_L10N=False):
                 self.assertEqual(template1.render(context), output1)
