@@ -3,10 +3,9 @@ import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
-from django.db.utils import (
-    ConnectionDoesNotExist, ConnectionHandler, load_backend,
-)
+from django.db.utils import ConnectionHandler, load_backend
 from django.test import SimpleTestCase, TestCase
+from django.utils.connection import ConnectionDoesNotExist
 
 
 class ConnectionHandlerTests(SimpleTestCase):
@@ -41,7 +40,7 @@ class ConnectionHandlerTests(SimpleTestCase):
             conns['other'].ensure_connection()
 
     def test_nonexistent_alias(self):
-        msg = "The connection nonexistent doesn't exist"
+        msg = "The connection 'nonexistent' doesn't exist."
         conns = ConnectionHandler({
             DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
         })
@@ -49,7 +48,7 @@ class ConnectionHandlerTests(SimpleTestCase):
             conns['nonexistent']
 
     def test_ensure_defaults_nonexistent_alias(self):
-        msg = "The connection nonexistent doesn't exist"
+        msg = "The connection 'nonexistent' doesn't exist."
         conns = ConnectionHandler({
             DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
         })
@@ -57,7 +56,7 @@ class ConnectionHandlerTests(SimpleTestCase):
             conns.ensure_defaults('nonexistent')
 
     def test_prepare_test_settings_nonexistent_alias(self):
-        msg = "The connection nonexistent doesn't exist"
+        msg = "The connection 'nonexistent' doesn't exist."
         conns = ConnectionHandler({
             DEFAULT_DB_ALIAS: {'ENGINE': 'django.db.backends.dummy'},
         })

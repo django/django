@@ -2,10 +2,11 @@ import pkgutil
 from importlib import import_module
 from pathlib import Path
 
-from asgiref.local import Local
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+# For backwards compatibility with Django < 3.2
+from django.utils.connection import ConnectionDoesNotExist  # NOQA: F401
+from django.utils.connection import BaseConnectionHandler
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -131,39 +132,30 @@ def load_backend(backend_name):
             raise
 
 
-class ConnectionDoesNotExist(Exception):
-    pass
+class ConnectionHandler(BaseConnectionHandler):
+    settings_name = 'DATABASES'
+    # Connections needs to still be an actual thread local, as it's truly
+    # thread-critical. Database backends should use @async_unsafe to protect
+    # their code from async contexts, but this will give those contexts
+    # separate connections in case it's needed as well. There's no cleanup
+    # after async contexts, though, so we don't allow that if we can help it.
+    thread_critical = True
 
+    def configure_settings(self, databases):
+        databases = super().configure_settings(databases)
+        if databases == {}:
+            databases[DEFAULT_DB_ALIAS] = {'ENGINE': 'django.db.backends.dummy'}
+        elif DEFAULT_DB_ALIAS not in databases:
+            raise ImproperlyConfigured(
+                f"You must define a '{DEFAULT_DB_ALIAS}' database."
+            )
+        elif databases[DEFAULT_DB_ALIAS] == {}:
+            databases[DEFAULT_DB_ALIAS]['ENGINE'] = 'django.db.backends.dummy'
+        return databases
 
-class ConnectionHandler:
-    def __init__(self, databases=None):
-        """
-        databases is an optional dictionary of database definitions (structured
-        like settings.DATABASES).
-        """
-        self._databases = databases
-        # Connections needs to still be an actual thread local, as it's truly
-        # thread-critical. Database backends should use @async_unsafe to protect
-        # their code from async contexts, but this will give those contexts
-        # separate connections in case it's needed as well. There's no cleanup
-        # after async contexts, though, so we don't allow that if we can help it.
-        self._connections = Local(thread_critical=True)
-
-    @cached_property
+    @property
     def databases(self):
-        if self._databases is None:
-            self._databases = settings.DATABASES
-        if self._databases == {}:
-            self._databases = {
-                DEFAULT_DB_ALIAS: {
-                    'ENGINE': 'django.db.backends.dummy',
-                },
-            }
-        if DEFAULT_DB_ALIAS not in self._databases:
-            raise ImproperlyConfigured("You must define a '%s' database." % DEFAULT_DB_ALIAS)
-        if self._databases[DEFAULT_DB_ALIAS] == {}:
-            self._databases[DEFAULT_DB_ALIAS]['ENGINE'] = 'django.db.backends.dummy'
-        return self._databases
+        return self.settings
 
     def ensure_defaults(self, alias):
         """
@@ -173,7 +165,7 @@ class ConnectionHandler:
         try:
             conn = self.databases[alias]
         except KeyError:
-            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+            raise self.exception_class(f"The connection '{alias}' doesn't exist.")
 
         conn.setdefault('ATOMIC_REQUESTS', False)
         conn.setdefault('AUTOCOMMIT', True)
@@ -193,7 +185,7 @@ class ConnectionHandler:
         try:
             conn = self.databases[alias]
         except KeyError:
-            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+            raise self.exception_class(f"The connection '{alias}' doesn't exist.")
 
         test_settings = conn.setdefault('TEST', {})
         default_test_settings = [
@@ -206,29 +198,12 @@ class ConnectionHandler:
         for key, value in default_test_settings:
             test_settings.setdefault(key, value)
 
-    def __getitem__(self, alias):
-        if hasattr(self._connections, alias):
-            return getattr(self._connections, alias)
-
+    def create_connection(self, alias):
         self.ensure_defaults(alias)
         self.prepare_test_settings(alias)
         db = self.databases[alias]
         backend = load_backend(db['ENGINE'])
-        conn = backend.DatabaseWrapper(db, alias)
-        setattr(self._connections, alias, conn)
-        return conn
-
-    def __setitem__(self, key, value):
-        setattr(self._connections, key, value)
-
-    def __delitem__(self, key):
-        delattr(self._connections, key)
-
-    def __iter__(self):
-        return iter(self.databases)
-
-    def all(self):
-        return [self[alias] for alias in self]
+        return backend.DatabaseWrapper(db, alias)
 
     def close_all(self):
         for alias in self:

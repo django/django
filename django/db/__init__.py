@@ -5,6 +5,7 @@ from django.db.utils import (
     InterfaceError, InternalError, NotSupportedError, OperationalError,
     ProgrammingError,
 )
+from django.utils.connection import ConnectionProxy
 
 __all__ = [
     'connection', 'connections', 'router', 'DatabaseError', 'IntegrityError',
@@ -17,28 +18,8 @@ connections = ConnectionHandler()
 
 router = ConnectionRouter()
 
-
-class DefaultConnectionProxy:
-    """
-    Proxy for accessing the default DatabaseWrapper object's attributes. If you
-    need to access the DatabaseWrapper object itself, use
-    connections[DEFAULT_DB_ALIAS] instead.
-    """
-    def __getattr__(self, item):
-        return getattr(connections[DEFAULT_DB_ALIAS], item)
-
-    def __setattr__(self, name, value):
-        return setattr(connections[DEFAULT_DB_ALIAS], name, value)
-
-    def __delattr__(self, name):
-        return delattr(connections[DEFAULT_DB_ALIAS], name)
-
-    def __eq__(self, other):
-        return connections[DEFAULT_DB_ALIAS] == other
-
-
 # For backwards compatibility. Prefer connections['default'] instead.
-connection = DefaultConnectionProxy()
+connection = ConnectionProxy(connections, DEFAULT_DB_ALIAS)
 
 
 # Register an event to reset saved queries when a Django request is started.
