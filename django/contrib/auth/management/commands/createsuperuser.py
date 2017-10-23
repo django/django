@@ -53,6 +53,10 @@ class Command(BaseCommand):
                 '--%s' % field, dest=field, default=None,
                 help='Specifies the %s for the superuser.' % field,
             )
+        parser.add_argument(
+            '--password', dest='password', default=None,
+            help='Specifies the password for the superuser.',
+        )
 
     def execute(self, *args, **options):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
@@ -63,7 +67,7 @@ class Command(BaseCommand):
         database = options['database']
 
         # If not provided, create the user with an unusable password
-        password = None
+        password = options.get('password', None)
         user_data = {}
         # Same as user_data but with foreign keys as fake model instances
         # instead of raw IDs.
@@ -83,6 +87,13 @@ class Command(BaseCommand):
                         user_data[field_name] = field.clean(options[field_name], None)
                     else:
                         raise CommandError("You must use --%s with --noinput." % field_name)
+
+                if password:
+                    try:
+                        validate_password(password, self.UserModel(**fake_user_data))
+                    except exceptions.ValidationError as err:
+                        raise CommandError('\n'.join(err.messages))
+
             except exceptions.ValidationError as e:
                 raise CommandError('; '.join(e.messages))
 
@@ -123,6 +134,12 @@ class Command(BaseCommand):
 
                 if not username:
                     raise CommandError('%s cannot be blank.' % capfirst(verbose_field_name))
+
+                if password:
+                    try:
+                        validate_password(password, self.UserModel(**fake_user_data))
+                    except exceptions.ValidationError as err:
+                        raise CommandError('\n'.join(err.messages))
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
