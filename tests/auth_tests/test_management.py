@@ -602,6 +602,93 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_password_argument(self):
+
+        """createsuperuser --password."""
+        new_io = StringIO()
+
+        def test(self):
+            call_command(
+                'createsuperuser',
+                username='joe1234567890',
+                password='joe1234',
+                email='joe@somewhere.org',
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            u = User._default_manager.get(username='joe1234567890')
+            self.assertEqual(u.email, 'joe@somewhere.org')
+            self.assertTrue(u.has_usable_password())
+            self.assertTrue(u.check_password('joe1234'))
+
+        test(self)
+
+    def test_invalid_password_argument(self):
+
+        """createsuperuser --password with invalid password."""
+        new_io = StringIO()
+
+        def test(self):
+            with self.assertRaisesMessage(CommandError, 'This password is entirely numeric.'):
+                call_command(
+                    'createsuperuser',
+                    username='joe1234567890',
+                    password='1234',
+                    stdin=MockTTY(),
+                    stdout=new_io,
+                    stderr=new_io,
+                )
+
+        test(self)
+
+    def test_non_intractive_password_argument(self):
+
+        """createsuperuser --password --noinput."""
+        new_io = StringIO()
+
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username='joe1234567890',
+                email='joe@somewhere.org',
+                password='joe1234',
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            u = User._default_manager.get(username='joe1234567890')
+            self.assertEqual(u.email, 'joe@somewhere.org')
+            self.assertTrue(u.has_usable_password())
+            self.assertTrue(u.check_password('joe1234'))
+
+        test(self)
+
+    def test_non_intractive_invalid_password_argument(self):
+
+        """createsuperuser --password --noinput with invalid password."""
+        new_io = StringIO()
+
+        def test(self):
+            with self.assertRaisesMessage(CommandError, 'This password is entirely numeric.'):
+                call_command(
+                    'createsuperuser',
+                    interactive=False,
+                    username='joe1234567890',
+                    email='joe@somewhere.org',
+                    password='1234',
+                    stdin=MockTTY(),
+                    stdout=new_io,
+                    stderr=new_io,
+                )
+
+        test(self)
+
     def test_validation_mismatched_passwords(self):
         """
         Creation should fail if the user enters mismatched passwords.
