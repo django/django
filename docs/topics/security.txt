@@ -90,14 +90,17 @@ SQL injection is a type of attack where a malicious user is able to execute
 arbitrary SQL code on a database. This can result in records
 being deleted or data leakage.
 
-By using Django's querysets, the resulting SQL will be properly escaped by
-the underlying database driver. However, Django also gives developers power to
-write :ref:`raw queries <executing-raw-queries>` or execute
-:ref:`custom sql <executing-custom-sql>`. These capabilities should be used
-sparingly and you should always be careful to properly escape any parameters
-that the user can control. In addition, you should exercise caution when using
-:meth:`~django.db.models.query.QuerySet.extra` and
-:class:`~django.db.models.expressions.RawSQL`.
+Django's querysets are protected from SQL injection since their queries are
+constructed using query parameterization. A query's SQL code is defined
+separately from the query's parameters. Since parameters may be user-provided
+and therefore unsafe, they are escaped by the underlying database driver.
+
+Django also gives developers power to write :ref:`raw queries
+<executing-raw-queries>` or execute :ref:`custom sql <executing-custom-sql>`.
+These capabilities should be used sparingly and you should always be careful to
+properly escape any parameters that the user can control. In addition, you
+should exercise caution when using :meth:`~django.db.models.query.QuerySet.extra`
+and :class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
