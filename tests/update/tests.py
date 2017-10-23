@@ -118,14 +118,12 @@ class AdvancedTests(TestCase):
         resp = DataPoint.objects.values('value').distinct()
         self.assertEqual(list(resp), [{'value': 'thing'}])
 
-    def test_update_slice_fail(self):
+    def test_update_slice(self):
         """
-        We do not support update on already sliced query sets.
+        Ensure that updates on slices return the correct result count
         """
         method = DataPoint.objects.all()[:2].update
-        msg = 'Cannot update a query once a slice has been taken.'
-        with self.assertRaisesMessage(AssertionError, msg):
-            method(another_value='another thing')
+        self.assertEqual(2, method(another_value='another thing'))
 
     def test_update_respects_to_field(self):
         """
