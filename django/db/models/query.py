@@ -680,8 +680,11 @@ class QuerySet:
         Update all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
         """
-        assert self.query.can_filter(), \
-            "Cannot update a query once a slice has been taken."
+
+        if not self.query.can_filter():
+            return self.query.model.objects.filter(
+                pk__in=list(self.values_list('pk', flat=True))).update(**kwargs)
+        
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
