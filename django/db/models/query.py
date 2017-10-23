@@ -684,7 +684,7 @@ class QuerySet:
         if not self.query.can_filter():
             return self.query.model.objects.filter(
                 pk__in=list(self.values_list('pk', flat=True))).update(**kwargs)
-        
+
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
