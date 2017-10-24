@@ -245,13 +245,13 @@ template, but you can override it to send more::
 Viewing subsets of objects
 --------------------------
 
-Now let's take a closer look at the ``model`` argument we've been
-using all along. The ``model`` argument, which specifies the database
+Now let's take a closer look at the ``model`` parameter we've been
+using all along. The ``model`` parameter, which specifies the database
 model that the view will operate upon, is available on all the
 generic views that operate on a single object or a collection of
-objects. However, the ``model`` argument is not the only way to
+objects. However, the ``model`` parameter is not the only way to
 specify the objects that the view will operate upon -- you can also
-specify the list of objects using the ``queryset`` argument::
+specify the list of objects using the ``queryset`` parameter::
 
     from django.views.generic import DetailView
     from books.models import Publisher

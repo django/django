@@ -294,7 +294,7 @@ object. In order to do this, we need to have two different querysets:
 ``Publisher`` queryset for use in :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
     We'll rely on the default implementation of ``get_object()`` to fetch the
     correct ``Publisher`` object.
-    However, we need to explicitly pass a ``queryset`` argument because
+    However, we need to explicitly pass a ``queryset`` parameter because
     otherwise the default implementation of ``get_object()`` would call
     ``get_queryset()`` which we have overridden to return ``Book`` objects
     instead of ``Publisher`` ones.

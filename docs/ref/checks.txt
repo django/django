@@ -57,7 +57,7 @@ Constructor arguments are:
     be unique within that application.
 
 There are subclasses to make creating messages with common levels easier. When
-using them you can omit the ``level`` argument because it is implied by the
+using them you can omit the ``level`` parameter because it is implied by the
 class name.
 
 .. class:: Debug(msg, hint=None, obj=None, id=None)
@@ -191,7 +191,7 @@ File fields
 * **fields.E200**: ``unique`` is not a valid argument for a ``FileField``.
   *This check is removed in Django 1.11*.
 * **fields.E201**: ``primary_key`` is not a valid argument for a ``FileField``.
-* **fields.E202**: ``FileField``’s ``upload_to`` argument must be a relative
+* **fields.E202**: ``FileField``’s ``upload_to`` parameter must be a relative
   path, not an absolute path.
 * **fields.E210**: Cannot use ``ImageField`` because Pillow is not installed.
 

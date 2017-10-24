@@ -70,7 +70,7 @@ Customizing model loading
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
 
-The ``db`` argument contains the database alias for the database the model
+The ``db`` parameter contains the database alias for the database the model
 is loaded from, ``field_names`` contains the names of all loaded fields, and
 ``values`` contains the loaded values for each field in ``field_names``. The
 ``field_names`` are in the same order as the ``values``. If all of the model's
@@ -151,7 +151,7 @@ aren't cleared either.
 
 The reloading happens from the database the instance was loaded from, or from
 the default database if the instance wasn't loaded from the database. The
-``using`` argument can be used to force the database used for reloading.
+``using`` parameter can be used to force the database used for reloading.
 
 It is possible to force the set of fields to be loaded by using the ``fields``
 argument.
@@ -220,7 +220,7 @@ This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
 order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
 ``message_dict`` attribute containing errors from all three stages.
 
-The optional ``exclude`` argument can be used to provide a list of field names
+The optional ``exclude`` parameter can be used to provide a list of field names
 that can be excluded from validation and cleaning.
 :class:`~django.forms.ModelForm` uses this argument to exclude fields that
 aren't present on your form from being validated since any errors raised could
@@ -344,11 +344,11 @@ Finally, ``full_clean()`` will check any unique constraints on your model.
 
 This method is similar to :meth:`~Model.clean_fields`, but validates all
 uniqueness constraints on your model instead of individual field values. The
-optional ``exclude`` argument allows you to provide a list of field names to
+optional ``exclude`` parameter allows you to provide a list of field names to
 exclude from validation. It will raise a
 :exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
 
-Note that if you provide an ``exclude`` argument to ``validate_unique()``, any
+Note that if you provide an ``exclude`` parameter to ``validate_unique()``, any
 :attr:`~django.db.models.Options.unique_together` constraint involving one of
 the fields you provided will not be checked.
 
@@ -559,7 +559,7 @@ all of the model fields from being updated in the database. For example::
     product.name = 'Name changed again'
     product.save(update_fields=['name'])
 
-The ``update_fields`` argument can be any iterable containing strings. An
+The ``update_fields`` parameter can be any iterable containing strings. An
 empty ``update_fields`` iterable will skip the save. A value of None will
 perform an update on all fields.
 

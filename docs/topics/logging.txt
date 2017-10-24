@@ -596,7 +596,7 @@ Python logging module.
     If the log record contains stack trace information, that stack
     trace will be included in the email.
 
-    The ``include_html`` argument of ``AdminEmailHandler`` is used to
+    The ``include_html`` parameter of ``AdminEmailHandler`` is used to
     control whether the traceback email includes an HTML attachment
     containing the full content of the debug Web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
@@ -623,7 +623,7 @@ Python logging module.
     sensitive information to be filtered out of error reports -- learn more on
     :ref:`Filtering error reports<filtering-error-reports>`.
 
-    By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
+    By setting the ``email_backend`` parameter of ``AdminEmailHandler``, the
     :ref:`email backend <topic-email-backends>` that is being used by the
     handler can be overridden, like this:
 

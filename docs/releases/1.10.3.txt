@@ -54,7 +54,7 @@ Bugfixes
 * Added ``model_name`` to the ``allow_migrate()`` calls in ``makemigrations``
   (:ticket:`27200`).
 
-* Made the ``JavaScriptCatalog`` view respect the ``packages`` argument;
+* Made the ``JavaScriptCatalog`` view respect the ``packages`` parameter;
   previously it was ignored (:ticket:`27374`).
 
 * Fixed ``QuerySet.bulk_create()`` on PostgreSQL when the number of objects is

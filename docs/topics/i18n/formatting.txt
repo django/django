@@ -46,7 +46,7 @@ locales when guessing the format used by the user when inputting data on forms.
     or ``%p`` (AM/PM).
 
 To enable a form field to localize input and output data simply use its
-``localize`` argument::
+``localize`` parameter::
 
     class CashRegisterForm(forms.Form):
        product = forms.CharField()

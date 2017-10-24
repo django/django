@@ -572,7 +572,7 @@ A few subtleties that are worth mentioning:
   details.
 
 * If you use a ``values()`` clause after an :meth:`extra()` call,
-  any fields defined by a ``select`` argument in the :meth:`extra()` must
+  any fields defined by a ``select`` parameter in the :meth:`extra()` must
   be explicitly included in the ``values()`` call. Any :meth:`extra()` call
   made after a ``values()`` call will have its extra selected fields
   ignored.
@@ -1127,7 +1127,7 @@ lookups:
     >>> from django.db.models import Prefetch
     >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
 
-You can provide a custom queryset with the optional ``queryset`` argument.
+You can provide a custom queryset with the optional ``queryset`` parameter.
 This can be used to change the default ordering of the queryset:
 
     >>> Restaurant.objects.prefetch_related(
@@ -1140,7 +1140,7 @@ applicable to reduce the number of queries even further:
     ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
 
 You can also assign the prefetched result to a custom attribute with the optional
-``to_attr`` argument. The result will be stored directly in a list.
+``to_attr`` parameter. The result will be stored directly in a list.
 
 This allows prefetching the same relation multiple times with a different
 ``QuerySet``; for instance:
@@ -1218,7 +1218,7 @@ where prefetching with a custom ``QuerySet`` is useful:
     This consideration is not limited to the use of ``Prefetch`` objects. Some
     advanced techniques may require that the lookups be performed in a
     specific order to avoid creating extra queries; therefore it's recommended
-    to always carefully order ``prefetch_related`` arguments.
+    to always carefully order ``prefetch_related`` parameters.
 
 ``extra()``
 ~~~~~~~~~~~
@@ -1274,7 +1274,7 @@ of the arguments is required, but you should use at least one of them.
 
 * ``select``
 
-  The ``select`` argument lets you put extra fields in the ``SELECT``
+  The ``select`` parameter lets you put extra fields in the ``SELECT``
   clause.  It should be a dictionary mapping attribute names to SQL
   clauses to use to calculate that attribute.
 
@@ -1398,7 +1398,7 @@ of the arguments is required, but you should use at least one of them.
 
   The ``where`` parameter described above may use standard Python
   database string placeholders — ``'%s'`` to indicate parameters the
-  database engine should automatically quote. The ``params`` argument is
+  database engine should automatically quote. The ``params`` parameter is
   a list of any extra parameters to be substituted.
 
   Example::
@@ -1630,7 +1630,7 @@ to refer to the queryset's model.
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL doesn't support the
-``nowait``, ``skip_locked``, and ``of`` arguments.
+``nowait``, ``skip_locked``, and ``of`` parameters.
 
 Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -1666,7 +1666,7 @@ raised if ``select_for_update()`` is used in autocommit mode.
 
 .. versionchanged:: 2.0
 
-    The ``of`` argument was added.
+    The ``of`` parameter was added.
 
 ``raw()``
 ~~~~~~~~~
@@ -3221,7 +3221,7 @@ in particular, it is not otherwise possible to use ``OR`` in ``QuerySets``.
 The ``Prefetch()`` object can be used to control the operation of
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`.
 
-The ``lookup`` argument describes the relations to follow and works the same
+The ``lookup`` parameter describes the relations to follow and works the same
 as the string based lookups passed to
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
 
@@ -3233,7 +3233,7 @@ as the string based lookups passed to
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
     <QuerySet [<Question: What's up?>]>
 
-The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
+The ``queryset`` parameter supplies a base ``QuerySet`` for the given lookup.
 This is useful to further filter down the prefetch operation, or to call
 :meth:`~django.db.models.query.QuerySet.select_related()` from the prefetched
 relation, hence reducing the number of queries even further:
@@ -3245,7 +3245,7 @@ relation, hence reducing the number of queries even further:
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: The sky>]>
 
-The ``to_attr`` argument sets the result of the prefetch operation to a custom
+The ``to_attr`` parameter sets the result of the prefetch operation to a custom
 attribute:
 
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')

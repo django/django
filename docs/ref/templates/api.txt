@@ -762,7 +762,7 @@ processor *must* return a dictionary.
 Custom context processors can live anywhere in your code base. All Django
 cares about is that your custom context processors are pointed to by the
 ``'context_processors'`` option in your :setting:`TEMPLATES` setting — or the
-``context_processors`` argument of :class:`~django.template.Engine` if you're
+``context_processors`` parameter of :class:`~django.template.Engine` if you're
 using it directly.
 
 Loading templates
@@ -782,7 +782,7 @@ The :setting:`DIRS <TEMPLATES-DIRS>` option
 
 Tell Django what your template directories are by using the :setting:`DIRS
 <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
-file — or the ``dirs`` argument of :class:`~django.template.Engine`. This
+file — or the ``dirs`` parameter of :class:`~django.template.Engine`. This
 should be set to a list of strings that contain full paths to your template
 directories::
 
@@ -813,7 +813,7 @@ sources.
 
 Some of these other loaders are disabled by default, but you can activate them
 by adding a ``'loaders'`` option to your ``DjangoTemplates`` backend in the
-:setting:`TEMPLATES` setting or passing a ``loaders`` argument to
+:setting:`TEMPLATES` setting or passing a ``loaders`` parameter to
 :class:`~django.template.Engine`. ``loaders`` should be a list of strings or
 tuples, where each represents a template loader class. Here are the template
 loaders that come with Django:
@@ -987,7 +987,7 @@ Loader methods
         source.
 
         For example, the filesystem loader may receive ``'index.html'`` as a
-        ``template_name`` argument.  This method would yield origins for the
+        ``template_name`` parameter.  This method would yield origins for the
         full path of ``index.html`` as it appears in each template directory
         the loader looks at.
 
@@ -1014,7 +1014,7 @@ Loader methods
         template is found, :exc:`~django.template.TemplateDoesNotExist` is
         raised.
 
-        The optional ``skip`` argument is a list of origins to ignore when
+        The optional ``skip`` parameter is a list of origins to ignore when
         extending templates. This allow templates to extend other templates of
         the same name. It also used to avoid recursion errors.
 

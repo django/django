@@ -124,7 +124,7 @@ Bugfixes
 * Fixed ``SimpleTestCase.assertRaisesMessage()`` on Python 2.7.10
   (:ticket:`24903`).
 
-* Provided better backwards compatibility for the ``verbosity`` argument in
+* Provided better backwards compatibility for the ``verbosity`` parameter in
   ``optparse`` management commands by casting it to an integer
   (:ticket:`24769`).
 

@@ -23,7 +23,7 @@ details on these changes.
 
 * ``HttpRequest.xreadlines()`` will be removed.
 
-* Support for the ``context`` argument of ``Field.from_db_value()`` and
+* Support for the ``context`` parameter of ``Field.from_db_value()`` and
   ``Expression.convert_value()`` will be removed.
 
 * The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
@@ -76,7 +76,7 @@ details on these changes.
 * Support for regular expression groups with ``iLmsu#`` in ``url()`` will be
   removed.
 
-* Support for ``Widget.render()`` methods without the ``renderer`` argument
+* Support for ``Widget.render()`` methods without the ``renderer`` parameter
   will be removed.
 
 .. _deprecation-removed-in-2.0:
@@ -87,7 +87,7 @@ details on these changes.
 See the :ref:`Django 1.9 release notes<deprecated-features-1.9>` for more
 details on these changes.
 
-* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
+* The ``weak`` parameter to ``django.dispatch.signals.Signal.disconnect()`` will
   be removed.
 
 * ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
@@ -97,7 +97,7 @@ details on these changes.
 
 * The ``assignment_tag`` helper will be removed.
 
-* The ``host`` argument to ``assertsRedirects`` will be removed. The
+* The ``host`` parameter to ``assertsRedirects`` will be removed. The
   compatibility layer which allows absolute URLs to be considered equal to
   relative ones when the path is identical will also be removed.
 
@@ -105,7 +105,7 @@ details on these changes.
 
 * ``Field.remote_field.to`` attribute will be removed.
 
-* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField``  will be
+* The ``on_delete`` parameter for ``ForeignKey`` and ``OneToOneField``  will be
   required.
 
 * ``django.db.models.fields.add_lazy_relation()`` will be removed.
@@ -132,7 +132,7 @@ details on these changes.
 * The ``load_template()`` and ``load_template_sources()`` template loader
   methods will be removed.
 
-* The ``template_dirs`` argument for template loaders will be removed:
+* The ``template_dirs`` parameter for template loaders will be removed:
 
   * ``django.template.loaders.base.Loader.get_template()``
   * ``django.template.loaders.cached.Loader.cache_key()``
@@ -150,7 +150,7 @@ details on these changes.
   ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
   ``content_type``.
 
-* The ``app_name`` argument to ``django.conf.urls.include()`` will be
+* The ``app_name`` parameter to ``django.conf.urls.include()`` will be
   removed.
 
 * Support for passing a 3-tuple as the first argument to ``include()`` will
@@ -275,7 +275,7 @@ details on these changes.
 
 * ``django.conf.urls.patterns()`` will be removed.
 
-* Support for the ``prefix`` argument to
+* Support for the ``prefix`` parameter to
   ``django.conf.urls.i18n.i18n_patterns()`` will be removed.
 
 * ``SimpleTestCase.urls`` will be removed.
@@ -323,11 +323,11 @@ details on these changes.
   * ``get_all_related_many_to_many_objects()``
   * ``get_all_related_m2m_objects_with_model()``
 
-* The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
+* The ``error_message`` parameter of ``django.forms.RegexField`` will be removed.
 
 * The ``unordered_list`` filter will no longer support old style lists.
 
-* Support for string ``view`` arguments to ``url()`` will be removed.
+* Support for string ``view`` parameters to ``url()`` will be removed.
 
 * The backward compatible shim  to rename ``django.forms.Form._has_changed()``
   to ``has_changed()`` will be removed.
@@ -337,7 +337,7 @@ details on these changes.
 * The ``remove_tags()`` and ``strip_entities()`` functions in
   ``django.utils.html`` will be removed.
 
-* The ``is_admin_site`` argument to
+* The ``is_admin_site`` parameter to
   ``django.contrib.auth.views.password_reset()`` will be removed.
 
 * ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
@@ -349,7 +349,7 @@ details on these changes.
   ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
 
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
-  defined with no default value for its ``form_class`` argument will be removed.
+  defined with no default value for its ``form_class`` parameter will be removed.
 
 * The following settings will be removed:
 
@@ -410,7 +410,7 @@ details on these changes.
   removed.
 
 * The backwards compatibility shims to allow ``Storage.get_available_name()``
-  and ``Storage.save()`` to be defined without a ``max_length`` argument will
+  and ``Storage.save()`` to be defined without a ``max_length`` parameter will
   be removed.
 
 * Support for the legacy ``%(<foo>)s`` syntax in ``ModelFormMixin.success_url``
@@ -505,7 +505,7 @@ details on these changes.
 
 * The ``--natural`` and ``-n`` options for :djadmin:`dumpdata` will be removed.
 
-* The ``use_natural_keys`` argument for ``serializers.serialize()`` will be
+* The ``use_natural_keys`` parameter for ``serializers.serialize()`` will be
   removed.
 
 * Private API ``django.forms.forms.get_declared_fields()`` will be removed.
@@ -680,7 +680,7 @@ details on these changes.
   specified as a plain string instead of a tuple will be removed and raise an
   exception.
 
-* The ``mimetype`` argument to the ``__init__`` methods of
+* The ``mimetype`` parameter to the ``__init__`` methods of
   :class:`~django.http.HttpResponse`,
   :class:`~django.template.response.SimpleTemplateResponse`, and
   :class:`~django.template.response.TemplateResponse`, will be removed.

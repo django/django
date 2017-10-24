@@ -610,7 +610,7 @@ To customize the form field used by :class:`~django.forms.ModelForm`, you can
 override :meth:`~Field.formfield`.
 
 The form field class can be specified via the ``form_class`` and
-``choices_form_class`` arguments; the latter is used if the field has choices
+``choices_form_class`` parameters; the latter is used if the field has choices
 specified, the former otherwise. If these arguments are not provided,
 :class:`~django.forms.CharField` or :class:`~django.forms.TypedChoiceField`
 will be used.

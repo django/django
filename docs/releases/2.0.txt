@@ -141,7 +141,7 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The new ``distinct`` argument for
+* The new ``distinct`` parameter for
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
   concatenated values will be distinct.
 
@@ -184,7 +184,7 @@ File Storage
 Forms
 ~~~~~
 
-* The new ``date_attrs`` and ``time_attrs`` arguments for
+* The new ``date_attrs`` and ``time_attrs`` parameters for
   :class:`~django.forms.SplitDateTimeWidget` and
   :class:`~django.forms.SplitHiddenDateTimeWidget` allow specifying different
   HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
@@ -261,7 +261,7 @@ Models
   :class:`~django.db.models.functions.Extract` now works with
   :class:`~django.db.models.DurationField`.
 
-* Added the ``of`` argument to :meth:`.QuerySet.select_for_update()`, supported
+* Added the ``of`` parameter to :meth:`.QuerySet.select_for_update()`, supported
   on PostgreSQL and Oracle, to lock only rows from specific tables rather than
   all selected tables. It may be helpful particularly when
   :meth:`~.QuerySet.select_for_update()` is used in conjunction with
@@ -279,7 +279,7 @@ Models
   :doc:`installing wrappers around execution of database queries
   </topics/db/instrumentation>`.
 
-* The new ``filter`` argument for built-in aggregates allows :ref:`adding
+* The new ``filter`` parameter for built-in aggregates allows :ref:`adding
   different conditionals <conditional-aggregation>` to multiple aggregations
   over the same fields or relations.
 
@@ -382,7 +382,7 @@ backends.
   ``DatabaseOperations.cast_char_field_without_max_length`` attribute with the
   database data type that will be used in the
   :class:`~django.db.models.functions.Cast` function for a ``CharField`` if the
-  ``max_length`` argument isn't provided.
+  ``max_length`` parameter isn't provided.
 
 * The first argument of ``DatabaseCreation._clone_test_db()`` and
   ``get_test_db_clone_settings()`` is now ``suffix`` rather
@@ -576,7 +576,7 @@ Miscellaneous
 
       Book.objects.iterator(chunk_size=100)
 
-* Providing unknown package names in the ``packages`` argument of the
+* Providing unknown package names in the ``packages`` parameter of the
   :class:`~django.views.i18n.JavaScriptCatalog` view now raises ``ValueError``
   instead of passing silently.
 
@@ -613,10 +613,10 @@ Miscellaneous
 Features deprecated in 2.0
 ==========================
 
-``context`` argument of ``Field.from_db_value()`` and ``Expression.convert_value()``
-------------------------------------------------------------------------------------
+``context`` parameter of ``Field.from_db_value()`` and ``Expression.convert_value()``
+-------------------------------------------------------------------------------------
 
-The ``context`` argument of ``Field.from_db_value()`` and
+The ``context`` parameter of ``Field.from_db_value()`` and
 ``Expression.convert_value()`` is unused as it's always an empty dictionary.
 The signature of both methods is now::
 
@@ -666,7 +666,7 @@ in Django 2.0.
 See :ref:`deprecated-features-1.9` for details on these changes, including how
 to remove usage of these features.
 
-* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` is
+* The ``weak`` parameter to ``django.dispatch.signals.Signal.disconnect()`` is
   removed.
 
 * ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
@@ -676,13 +676,13 @@ to remove usage of these features.
 
 * The ``assignment_tag`` helper is removed.
 
-* The ``host`` argument to ``SimpleTestCase.assertsRedirects()`` is removed.
+* The ``host`` parameter to ``SimpleTestCase.assertsRedirects()`` is removed.
   The compatibility layer which allows absolute URLs to be considered equal to
   relative ones when the path is identical is also removed.
 
 * ``Field.rel`` and ``Field.remote_field.to`` are removed.
 
-* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
+* The ``on_delete`` parameter for ``ForeignKey`` and ``OneToOneField`` are now
   required in models and migrations. Consider squashing migrations so that you
   have less of them to update.
 
@@ -709,7 +709,7 @@ to remove usage of these features.
 * The ``load_template`` and ``load_template_sources`` template loader methods
   are removed.
 
-* The ``template_dirs`` argument for template loaders is removed:
+* The ``template_dirs`` parameter for template loaders is removed:
 
   * ``django.template.loaders.base.Loader.get_template()``
   * ``django.template.loaders.cached.Loader.cache_key()``
@@ -725,7 +725,7 @@ to remove usage of these features.
 * The ``mime_type`` attribute of ``django.utils.feedgenerator.Atom1Feed`` and
   ``django.utils.feedgenerator.RssFeed`` is removed.
 
-* The ``app_name`` argument to ``include()`` is removed.
+* The ``app_name`` parameter to ``include()`` is removed.
 
 * Support for passing a 3-tuple (including ``admin.site.urls``) as the first
   argument to ``include()`` is removed.

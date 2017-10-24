@@ -203,7 +203,7 @@ Django provides a single API to control database transactions.
     to commit, roll back, or change the autocommit state of the database
     connection within an ``atomic`` block will raise an exception.
 
-    ``atomic`` takes a ``using`` argument which should be the name of a
+    ``atomic`` takes a ``using`` parameter which should be the name of a
     database. If this argument isn't provided, Django uses the ``"default"``
     database.
 
@@ -215,7 +215,7 @@ Django provides a single API to control database transactions.
     - commits or rolls back the transaction when exiting the outermost block.
 
     You can disable the creation of savepoints for inner blocks by setting the
-    ``savepoint`` argument to ``False``. If an exception occurs, Django will
+    ``savepoint`` parameter to ``False``. If an exception occurs, Django will
     perform the rollback when exiting the first parent block with a savepoint
     if there is one, and the outermost block otherwise. Atomicity is still
     guaranteed by the outer transaction. This option should only be used if
@@ -439,7 +439,7 @@ module to manage the autocommit state of each database connection.
 
 .. function:: set_autocommit(autocommit, using=None)
 
-These functions take a ``using`` argument which should be the name of a
+These functions take a ``using`` parameter which should be the name of a
 database. If it isn't provided, Django uses the ``"default"`` database.
 
 Autocommit is initially turned on. If you turn it off, it's your
@@ -474,7 +474,7 @@ you've performed until this point with :func:`commit`, or to cancel them with
 
 .. function:: rollback(using=None)
 
-These functions take a ``using`` argument which should be the name of a
+These functions take a ``using`` parameter which should be the name of a
 database. If it isn't provided, Django uses the ``"default"`` database.
 
 Django will refuse to commit or to rollback when an :func:`atomic` block is
@@ -503,8 +503,8 @@ partial commit or rollback. You're strongly encouraged to use :func:`atomic`
 rather than the functions described below, but they're still part of the
 public API, and there's no plan to deprecate them.
 
-Each of these functions takes a ``using`` argument which should be the name of
-a database for which the behavior applies.  If no ``using`` argument is
+Each of these functions takes a ``using`` parameter which should be the name of
+a database for which the behavior applies.  If no ``using`` parameter is
 provided then the ``"default"`` database is used.
 
 Savepoints are controlled by three functions in :mod:`django.db.transaction`:

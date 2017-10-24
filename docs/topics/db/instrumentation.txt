@@ -108,7 +108,7 @@ database query executions, and when exited, removes the wrapper. The wrapper is
 installed on the thread-local connection object.
 
 ``wrapper`` is a callable taking five arguments.  It is called for every query
-execution in the scope of the context manager, with arguments ``execute``,
+execution in the scope of the context manager, with parameters ``execute``,
 ``sql``, ``params``, ``many``, and ``context`` as described above. It's
 expected to call ``execute(sql, params, many, context)`` and return the return
 value of that call.

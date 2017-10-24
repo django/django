@@ -179,5 +179,5 @@ For example, the following code will store uploaded files under
         photo = models.ImageField(storage=fs)
 
 :doc:`Custom storage systems </howto/custom-file-storage>` work the same way:
-you can pass them in as the ``storage`` argument to a
+you can pass them in as the ``storage`` parameter to a
 :class:`~django.db.models.FileField`.

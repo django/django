@@ -15,7 +15,7 @@ available from the ``django.contrib.postgres.indexes`` module.
     Creates a `BRIN index
     <https://www.postgresql.org/docs/current/static/brin-intro.html>`_.
 
-    The ``pages_per_range`` argument takes a positive integer.
+    The ``pages_per_range`` parameter takes a positive integer.
 
 ``GinIndex``
 ============

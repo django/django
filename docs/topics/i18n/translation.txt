@@ -454,9 +454,9 @@ Lazy translations and plural
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using lazy translation for a plural string (``[u]n[p]gettext_lazy``), you
-generally don't know the ``number`` argument at the time of the string
+generally don't know the ``number`` parameter at the time of the string
 definition. Therefore, you are authorized to pass a key name instead of an
-integer as the ``number`` argument. Then ``number`` will be looked up in the
+integer as the ``number`` parameter. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
     from django import forms
@@ -472,7 +472,7 @@ dictionary under that key during string interpolation. Here's example::
                 raise forms.ValidationError(self.error_message % {'num': number})
 
 If the string contains exactly one unnamed placeholder, you can interpolate
-directly with the ``number`` argument::
+directly with the ``number`` parameter::
 
     class MyForm(forms.Form):
         error_message = ngettext_lazy(
@@ -1016,7 +1016,7 @@ The ``JavaScriptCatalog`` view
         )
 
 The precedence of translations is such that the packages appearing later in the
-``packages`` argument have higher precedence than the ones appearing at the
+``packages`` parameter have higher precedence than the ones appearing at the
 beginning. This is important in the case of clashing translations for the same
 literal.
 

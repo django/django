@@ -600,8 +600,8 @@ setting for the middleware.  It can be used like this::
     def my_view(request):
         ...
 
-The ``key_prefix`` and ``cache`` arguments may be specified together. The
-``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
+The ``key_prefix`` and ``cache`` parameters may be specified together. The
+``key_prefix`` parameter and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
 
 Specifying per-view cache in the URLconf
@@ -795,7 +795,7 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
 
 ``key`` should be a ``str``, and ``value`` can be any picklable Python object.
 
-The ``timeout`` argument is optional and defaults to the ``timeout`` argument
+The ``timeout`` parameter is optional and defaults to the ``timeout`` argument
 of the appropriate backend in the :setting:`CACHES` setting (explained above).
 It's the number of seconds the value should be stored in the cache. Passing in
 ``None`` for ``timeout`` will cache the value forever. A ``timeout`` of ``0``
@@ -811,7 +811,7 @@ We advise against storing the literal value ``None`` in the cache, because you
 won't be able to distinguish between your stored ``None`` value and a cache
 miss signified by a return value of ``None``.
 
-``cache.get()`` can take a ``default`` argument. This specifies which value to
+``cache.get()`` can take a ``default`` parameter. This specifies which value to
 return if the object doesn't exist in the cache::
 
     >>> cache.get('my_key', 'has expired')
@@ -960,7 +960,7 @@ prefix and the user-provided cache key to obtain the final cache key.
 
 By default, any key request will automatically include the site
 default cache key version. However, the primitive cache functions all
-include a ``version`` argument, so you can specify a particular cache
+include a ``version`` parameter, so you can specify a particular cache
 key version to set or get. For example::
 
     >>> # Set version 2 of a cache key

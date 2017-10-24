@@ -186,7 +186,7 @@ Geometry Objects
     :type srid: int
 
 This is the base class for all GEOS geometry objects.  It initializes on the
-given ``geo_input`` argument, and then assumes the proper geometry subclass
+given ``geo_input`` parameter, and then assumes the proper geometry subclass
 (e.g., ``GEOSGeometry('POINT(1 1)')`` will create a :class:`Point` object).
 
 The ``srid`` parameter, if given, is set as the SRID of the created geometry if
@@ -857,7 +857,7 @@ For example::
 
 .. class:: PreparedGeometry
 
-    All methods on ``PreparedGeometry`` take an ``other`` argument, which
+    All methods on ``PreparedGeometry`` take an ``other`` parameter, which
     must be a :class:`GEOSGeometry` instance.
 
     .. method:: contains(other)

@@ -129,7 +129,7 @@ Multiple object mixins
         ``is_paginated``).
 
         Constructed by paginating ``queryset`` into pages of size ``page_size``.
-        If the request contains a ``page`` argument, either as a captured URL
+        If the request contains a ``page`` parameter, either as a captured URL
         argument or as a GET argument, ``object_list`` will correspond to the
         objects from that page.
 

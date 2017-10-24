@@ -13,7 +13,7 @@ Bugfixes
   missing or invalid option" error when the password starts with a number or
   special character (:ticket:`27420`).
 
-* Fixed incorrect ``app_label`` / ``model_name`` arguments for
+* Fixed incorrect ``app_label`` / ``model_name`` parameters for
   ``allow_migrate()`` in ``makemigrations`` migration consistency checks
   (:ticket:`27461`).
 

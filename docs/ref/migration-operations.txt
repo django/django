@@ -142,7 +142,7 @@ the field's name, and ``field`` is an unbound Field instance (the thing
 you would put in the field declaration in ``models.py`` - for example,
 ``models.IntegerField(null=True)``.
 
-The ``preserve_default`` argument indicates whether the field's default
+The ``preserve_default`` parameter indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
@@ -172,7 +172,7 @@ Alters a field's definition, including changes to its type,
 :attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
 :attr:`~django.db.models.Field.db_column` and other field attributes.
 
-The ``preserve_default`` argument indicates whether the field's default
+The ``preserve_default`` parameter indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is altering a nullable field to a non-nullable one and
@@ -243,7 +243,7 @@ you can reverse the changes done in the forwards queries::
         [("DELETE FROM musician where name=%s;", ['Reinhardt'])],
     )
 
-The ``state_operations`` argument is so you can supply operations that are
+The ``state_operations`` parameter is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
@@ -261,12 +261,12 @@ operation that adds that field and so will try to run it again). For example::
         ],
     )
 
-The optional ``hints`` argument will be passed as ``**hints`` to the
+The optional ``hints`` parameter will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making
 routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
 
-The optional ``elidable`` argument determines whether or not the operation will
+The optional ``elidable`` parameter determines whether or not the operation will
 be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 .. attribute:: RunSQL.noop
@@ -289,16 +289,16 @@ match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
 <django.db.backends.base.schema.BaseDatabaseSchemaEditor>`.
 
-The ``reverse_code`` argument is called when unapplying migrations. This
+The ``reverse_code`` parameter is called when unapplying migrations. This
 callable should undo what is done in the ``code`` callable so that the
 migration is reversible.
 
-The optional ``hints`` argument will be passed as ``**hints`` to the
+The optional ``hints`` parameter will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
 routing decision. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
 
-The optional ``elidable`` argument determines whether or not the operation will
+The optional ``elidable`` parameter determines whether or not the operation will
 be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 You are advised to write the code as a separate function above the ``Migration``
@@ -463,7 +463,7 @@ Some things to note:
   would have applied, but are given to you for convenience and speed reasons.
 
 * If you want to work with model classes or model instances from the
-  ``from_state`` argument in ``database_forwards()`` or
+  ``from_state`` parameter in ``database_forwards()`` or
   ``database_backwards()``, you must render model states using the
   ``clear_delayed_apps_cache()`` method to make related models available::
 

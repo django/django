@@ -122,12 +122,12 @@ Minor features
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
 
-* Added the optional ``backend`` argument to :func:`django.contrib.auth.login`
+* Added the optional ``backend`` parameter to :func:`~django.contrib.auth.login`
   to allow using it without credentials.
 
 * The new :setting:`LOGOUT_REDIRECT_URL` setting controls the redirect of the
   ``django.contrib.auth.views.logout()`` view, if the view doesn't get a
-  ``next_page`` argument.
+  ``next_page`` parameter.
 
 * The new ``redirect_authenticated_user`` parameter for the
   ``django.contrib.auth.views.login()`` view allows redirecting
@@ -365,7 +365,7 @@ Migrations
 
 * Added support for serialization of ``enum.Enum`` objects.
 
-* Added the ``elidable`` argument to the
+* Added the ``elidable`` parameter to the
   :class:`~django.db.migrations.operations.RunSQL` and
   :class:`~django.db.migrations.operations.RunPython` operations to allow them
   to be removed when squashing migrations.
@@ -540,7 +540,7 @@ Database backend API
   ``supports_temporal_subtraction`` database feature flag to ``True`` and
   implement the ``DatabaseOperations.subtract_temporals()`` method. This
   method should return the SQL and parameters required to compute the
-  difference in microseconds between the ``lhs`` and ``rhs`` arguments in the
+  difference in microseconds between the ``lhs`` and ``rhs`` parameters in the
   datatype used to store :class:`~django.db.models.DurationField`.
 
 ``select_related()`` prohibits non-relational fields for nested relations
@@ -1201,7 +1201,7 @@ to remove usage of these features.
 
 * ``django.conf.urls.patterns()`` is removed.
 
-* Support for the ``prefix`` argument to
+* Support for the ``prefix`` parameter to
   ``django.conf.urls.i18n.i18n_patterns()`` is removed.
 
 * ``SimpleTestCase.urls`` is removed.
@@ -1247,11 +1247,11 @@ to remove usage of these features.
   * ``get_all_related_many_to_many_objects()``
   * ``get_all_related_m2m_objects_with_model()``
 
-* The ``error_message`` argument of ``django.forms.RegexField`` is removed.
+* The ``error_message`` parameter of ``django.forms.RegexField`` is removed.
 
 * The ``unordered_list`` filter no longer supports old style lists.
 
-* Support for string ``view`` arguments to ``url()`` is removed.
+* Support for string ``view`` parameters to ``url()`` is removed.
 
 * The backward compatible shim  to rename ``django.forms.Form._has_changed()``
   to ``has_changed()`` is removed.
@@ -1261,7 +1261,7 @@ to remove usage of these features.
 * The ``remove_tags()`` and ``strip_entities()`` functions in
   ``django.utils.html`` is removed.
 
-* The ``is_admin_site`` argument to
+* The ``is_admin_site`` parameter to
   ``django.contrib.auth.views.password_reset()`` is removed.
 
 * ``django.db.models.field.subclassing.SubfieldBase`` is removed.
@@ -1272,7 +1272,7 @@ to remove usage of these features.
   ``django.contrib.admin.helpers.InlineAdminForm`` is removed.
 
 * The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
-  defined with no default value for its ``form_class`` argument is removed.
+  defined with no default value for its ``form_class`` parameter is removed.
 
 * The following settings are removed, and you must upgrade to the
   :setting:`TEMPLATES` setting:
@@ -1336,7 +1336,7 @@ to remove usage of these features.
   removed.
 
 * The backwards compatibility shims to allow ``Storage.get_available_name()``
-  and ``Storage.save()`` to be defined without a ``max_length`` argument are
+  and ``Storage.save()`` to be defined without a ``max_length`` parameter are
   removed.
 
 * Support for the legacy ``%(<foo>)s`` syntax in ``ModelFormMixin.success_url``

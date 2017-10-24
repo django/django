@@ -251,7 +251,7 @@ illustrates that they can be either strings *or* methods. For each of
 ``title``, ``link`` and ``description``, Django follows this
 algorithm:
 
-* First, it tries to call a method, passing the ``obj`` argument, where
+* First, it tries to call a method, passing the ``obj`` parameter, where
   ``obj`` is the object returned by ``get_object()``.
 
 * Failing that, it tries to call a method with no arguments.

@@ -53,13 +53,13 @@ vertical bar (``"|"``) character. You can quite happily use such patterns for
 matching against incoming URLs and sending them off to views, but you cannot
 reverse such patterns.
 
-The ``current_app`` argument allows you to provide a hint to the resolver
+The ``current_app`` parameter allows you to provide a hint to the resolver
 indicating the application to which the currently executing view belongs.
-This ``current_app`` argument is used as a hint to resolve application
+This ``current_app`` parameter is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
-The ``urlconf`` argument is the URLconf module containing the URL patterns to
+The ``urlconf`` parameter is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
 .. note::
@@ -86,7 +86,7 @@ URLConf is loaded. Some common cases where this function is necessary are:
 * providing a reversed URL as the ``url`` attribute of a generic class-based
   view.
 
-* providing a reversed URL to a decorator (such as the ``login_url`` argument
+* providing a reversed URL to a decorator (such as the ``login_url`` parameter
   for the :func:`django.contrib.auth.decorators.permission_required`
   decorator).
 

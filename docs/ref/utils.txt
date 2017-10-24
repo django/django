@@ -429,7 +429,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 .. class:: cached_property(object, name)
 
     The ``@cached_property`` decorator caches the result of a method with a
-    single ``self`` argument as a property. The cached result will persist
+    single ``self`` parameter as a property. The cached result will persist
     as long as the instance does, so if the instance is passed around and the
     function subsequently invoked, the cached result will be returned.
 
@@ -489,7 +489,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
 
-    You can use the ``name`` argument to make cached properties of other
+    You can use the ``name`` parameter to make cached properties of other
     methods. For example, if you had an expensive ``get_friends()`` method and
     wanted to allow calling it without retrieving the cached value, you could
     write::
@@ -879,7 +879,7 @@ appropriate entities.
 .. function:: activate(timezone)
 
     Sets the :ref:`current time zone <default-current-time-zone>`. The
-    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
+    ``timezone`` parameter must be an instance of a :class:`~datetime.tzinfo`
     subclass or a time zone name.
 
 .. function:: deactivate()
@@ -890,7 +890,7 @@ appropriate entities.
 
     This is a Python context manager that sets the :ref:`current time zone
     <default-current-time-zone>` on entry with :func:`activate()`, and restores
-    the previously active time zone on exit. If the ``timezone`` argument is
+    the previously active time zone on exit. If the ``timezone`` parameter is
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
@@ -1053,7 +1053,7 @@ functions without the ``u``.
     for a given language, activates it as the translation object for the
     current thread and reactivates the previous active language on exit.
     Optionally, it can simply deactivate the temporary translation on exit with
-    :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
+    :func:`django.utils.translation.deactivate` if the ``deactivate`` parameter
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
 

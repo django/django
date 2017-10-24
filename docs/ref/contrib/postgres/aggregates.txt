@@ -95,7 +95,7 @@ Aggregate functions for statistics
 ``y`` and ``x``
 ---------------
 
-The arguments ``y`` and ``x`` for all these functions can be the name of a
+The parameters ``y`` and ``x`` for all these functions can be the name of a
 field or an expression returning a numeric data. Both are required.
 
 ``Corr``

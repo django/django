@@ -508,7 +508,7 @@ views for displaying drilldown pages for date-based data.
 
     A day archive page showing all objects for *today*. This is exactly the
     same as :class:`django.views.generic.dates.DayArchiveView`, except today's
-    date is used instead of the ``year``/``month``/``day`` arguments.
+    date is used instead of the ``year``/``month``/``day`` parameters.
 
     **Ancestors (MRO)**
 

@@ -60,7 +60,7 @@ algorithm the system follows to determine which Python code to execute:
      matches from the regular expression are provided as positional arguments.
    * The keyword arguments are made up of any named parts matched by the
      path expression, overridden by any arguments specified in the optional
-     ``kwargs`` argument to :func:`django.urls.path` or
+     ``kwargs`` parameter to :func:`django.urls.path` or
      :func:`django.urls.re_path`.
 
 5. If no URL pattern matches, or if an exception is raised during any
@@ -286,7 +286,7 @@ function for the same URL.
 Specifying defaults for view arguments
 ======================================
 
-A convenient trick is to specify default parameters for your views' arguments.
+A convenient trick is to specify default arguments for your views' parameters.
 Here's an example URLconf and view::
 
     # URLconf
@@ -726,7 +726,7 @@ the fully qualified name into parts and then tries the following lookup:
 
 2. If there is a current application defined, Django finds and returns the URL
    resolver for that instance. The current application can be specified with
-   the ``current_app`` argument to the :func:`~django.urls.reverse()`
+   the ``current_app`` parameter to the :func:`~django.urls.reverse()`
    function.
 
    The :ttag:`url` template tag uses the namespace of the currently resolved
@@ -880,7 +880,7 @@ For example::
 This will include the nominated URL patterns into the given application
 namespace.
 
-The instance namespace can be specified using the ``namespace`` argument to
+The instance namespace can be specified using the ``namespace`` parameter to
 :func:`~django.urls.include`. If the instance namespace is not specified,
 it will default to the included URLconf's application namespace. This means
 it will also be the default instance for that namespace.

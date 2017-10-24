@@ -598,7 +598,7 @@ Django 1.4 also includes several smaller improvements worth noting:
 
 .. _JsLex: https://bitbucket.org/ned/jslex
 
-* The :ttag:`trans` template tag now takes an optional ``as`` argument to
+* The :ttag:`trans` template tag now takes an optional ``as`` parameter to
   be able to retrieve a translation string without displaying it but setting
   a template context variable instead.
 

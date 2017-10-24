@@ -98,7 +98,7 @@ Note a few important things about how the test client works:
   If, for some reason, you *want* the test client to perform CSRF
   checks, you can create an instance of the test client that
   enforces CSRF checks. To do this, pass in the
-  ``enforce_csrf_checks`` argument when you construct your
+  ``enforce_csrf_checks`` parameter when you construct your
   client::
 
       >>> from django.test import Client
@@ -122,7 +122,7 @@ Use the ``django.test.Client`` class to make requests.
     :meth:`~django.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
 
-    The ``enforce_csrf_checks`` argument can be used to test CSRF
+    The ``enforce_csrf_checks`` parameter can be used to test CSRF
     protection (see above).
 
     Once you have a ``Client`` instance, you can call any of the following
@@ -256,7 +256,7 @@ Use the ``django.test.Client`` class to make requests.
         such as an image, this means you will need to open the file in
         ``rb`` (read binary) mode.
 
-        The ``extra`` argument acts the same as for :meth:`Client.get`.
+        The ``extra`` parameter acts the same as for :meth:`Client.get`.
 
         If the URL you request with a POST contains encoded parameters, these
         parameters will be made available in the request.GET data. For example,
@@ -279,7 +279,7 @@ Use the ``django.test.Client`` class to make requests.
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
-        including the ``follow``, ``secure`` and ``extra`` arguments, except
+        including the ``follow``, ``secure`` and ``extra`` parameters, except
         it does not return a message body.
 
     .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
@@ -290,7 +290,7 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` parameters act the same as for
         :meth:`Client.get`.
 
     .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
@@ -301,7 +301,7 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` parameters act the same as for
         :meth:`Client.get`.
 
     .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
@@ -309,7 +309,7 @@ Use the ``django.test.Client`` class to make requests.
         Makes a PATCH request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` parameters act the same as for
         :meth:`Client.get`.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, **extra)
@@ -320,7 +320,7 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow``, ``secure`` and ``extra`` arguments act the same as for
+        The ``follow``, ``secure`` and ``extra`` parameters act the same as for
         :meth:`Client.get`.
 
     .. method:: Client.trace(path, follow=False, secure=False, **extra)
@@ -332,7 +332,7 @@ Use the ``django.test.Client`` class to make requests.
         parameter in order to comply with :rfc:`7231#section-4.3.8`, which
         mandates that TRACE requests must not have a body.
 
-        The ``follow``, ``secure``, and ``extra`` arguments act the same as for
+        The ``follow``, ``secure``, and ``extra`` parameters act the same as for
         :meth:`Client.get`.
 
     .. method:: Client.login(**credentials)
@@ -346,7 +346,7 @@ Use the ``django.test.Client`` class to make requests.
         and session data required to pass any login-based tests that may form
         part of a view.
 
-        The format of the ``credentials`` argument depends on which
+        The format of the ``credentials`` parameter depends on which
         :ref:`authentication backend <authentication-backends>` you're using
         (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
         setting). If you're using the standard authentication backend provided
@@ -393,7 +393,7 @@ Use the ``django.test.Client`` class to make requests.
         and the user's credentials don't need to be provided.
 
         The user will have its ``backend`` attribute set to the value of the
-        ``backend`` argument (which should be a dotted Python path string), or
+        ``backend`` parameter (which should be a dotted Python path string), or
         to ``settings.AUTHENTICATION_BACKENDS[0]`` if a value isn't provided.
         The :func:`~django.contrib.auth.authenticate` function called by
         :meth:`login` normally annotates the user like this.
@@ -1320,7 +1320,7 @@ provides a number of custom assertion methods that are useful for testing Web
 applications:
 
 The failure messages given by most of these assertion methods can be customized
-with the ``msg_prefix`` argument. This string will be prefixed to any failure
+with the ``msg_prefix`` parameter. This string will be prefixed to any failure
 message generated by the assertion. This allows you to provide additional
 details that may help you to identify the location and cause of a failure in
 your test suite.
@@ -1451,7 +1451,7 @@ your test suite.
     redirected to ``expected_url`` (including any ``GET`` data), and that the
     final page was received with ``target_status_code``.
 
-    If your request used the ``follow`` argument, the ``expected_url`` and
+    If your request used the ``follow`` parameter, the ``expected_url`` and
     ``target_status_code`` will be the url and status code for the final
     point of the redirect chain.
 
@@ -1496,7 +1496,7 @@ your test suite.
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: SimpleTestCase.assertHTMLNotEqual(html1, html2, msg=None)
 
@@ -1507,7 +1507,7 @@ your test suite.
     ``html1`` and ``html2`` must be valid HTML. An ``AssertionError`` will be
     raised if one of them cannot be parsed.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: SimpleTestCase.assertXMLEqual(xml1, xml2, msg=None)
 
@@ -1518,7 +1518,7 @@ your test suite.
     syntax differences. When invalid XML is passed in any parameter, an
     ``AssertionError`` is always raised, even if both string are identical.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: SimpleTestCase.assertXMLNotEqual(xml1, xml2, msg=None)
 
@@ -1526,7 +1526,7 @@ your test suite.
     comparison is based on XML semantics. See
     :meth:`~SimpleTestCase.assertXMLEqual` for details.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: SimpleTestCase.assertInHTML(needle, haystack, count=None, msg_prefix='')
 
@@ -1544,14 +1544,14 @@ your test suite.
     Usual JSON non-significant whitespace rules apply as the heavyweight is
     delegated to the :mod:`json` library.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: SimpleTestCase.assertJSONNotEqual(raw, expected_data, msg=None)
 
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not* equal.
     See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
 
@@ -1569,7 +1569,7 @@ your test suite.
     comparison is against more than one ordered values), a ``ValueError`` is
     raised.
 
-    Output in case of error can be customized with the ``msg`` argument.
+    Output in case of error can be customized with the ``msg`` parameter.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 

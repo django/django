@@ -237,7 +237,7 @@ Methods
     Raises :exc:`LookupError` if no such model exists in this application.
 
     Requires the app registry to be fully populated unless the
-    ``require_ready`` argument is set to ``False``. ``require_ready`` behaves
+    ``require_ready`` parameter is set to ``False``. ``require_ready`` behaves
     exactly as in :meth:`apps.get_model()`.
 
 .. method:: AppConfig.ready()
@@ -354,7 +354,7 @@ Application registry
     exactly one dot.
 
     Requires the app registry to be fully populated unless the
-    ``require_ready`` argument is set to ``False``.
+    ``require_ready`` parameter is set to ``False``.
 
     Setting ``require_ready`` to ``False`` allows looking up models
     :ref:`while the app registry is being populated <app-loading-process>`,

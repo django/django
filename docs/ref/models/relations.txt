@@ -117,7 +117,7 @@ Related objects reference
         ``null=True``, this is invalid.
 
         For :class:`~django.db.models.ForeignKey` objects, this method accepts
-        a ``bulk`` argument to control how to perform the operation.
+        a ``bulk`` parameter to control how to perform the operation.
         If ``True`` (the default), ``QuerySet.update()`` is used.
         If ``bulk=False``, the ``save()`` method of each individual model
         instance is called instead. This triggers the
@@ -146,13 +146,13 @@ Related objects reference
             >>> new_list = [obj1, obj2, obj3]
             >>> e.related_set.set(new_list)
 
-        This method accepts a ``clear`` argument to control how to perform the
+        This method accepts a ``clear`` parameter to control how to perform the
         operation. If ``False`` (the default), the elements missing from the
         new set are removed using ``remove()`` and only the new ones are added.
         If ``clear=True``, the ``clear()`` method is called instead and the
         whole set is added at once.
 
-        The ``bulk`` argument is passed on to :meth:`add`.
+        The ``bulk`` parameter is passed on to :meth:`add`.
 
         Note that since ``set()`` is a compound operation, it is subject to
         race conditions. For instance, new objects may be added to the database

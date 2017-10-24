@@ -79,11 +79,11 @@ generate signatures. You can use a different secret by passing it to the
     <https://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
     alphanumeric characters, hyphens, and underscores.
 
-Using the ``salt`` argument
----------------------------
+Using the ``salt`` parameter
+----------------------------
 
 If you do not wish for every occurrence of a particular string to have the same
-signature hash, you can use the optional ``salt`` argument to the ``Signer``
+signature hash, you can use the optional ``salt`` parameter to the ``Signer``
 class. Using a salt will seed the signing hash function with both the salt and
 your :setting:`SECRET_KEY`::
 

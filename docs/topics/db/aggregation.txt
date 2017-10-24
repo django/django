@@ -352,7 +352,7 @@ This query generates an annotated result set, and then generates a filter
 based upon that annotation.
 
 If you need two annotations with two separate filters you can use the
-``filter`` argument with any aggregate. For example, to generate a list of
+``filter`` parameter with any aggregate. For example, to generate a list of
 authors with a count of highly rated books::
 
     >>> highly_rated = Count('books', filter=Q(books__rating__gte=7))
@@ -363,14 +363,14 @@ Each ``Author`` in the result set will have the ``num_books`` and
 
 .. admonition:: Choosing between ``filter`` and ``QuerySet.filter()``
 
-    Avoid using the ``filter`` argument with a single annotation or
+    Avoid using the ``filter`` parameter with a single annotation or
     aggregation. It's more efficient to use ``QuerySet.filter()`` to exclude
-    rows. The aggregation ``filter`` argument is only useful when using two or
+    rows. The aggregation ``filter`` parameter is only useful when using two or
     more aggregations over the same relations with different conditionals.
 
 .. versionchanged:: 2.0
 
-    The ``filter`` argument was added to aggregates.
+    The ``filter`` parameter was added to aggregates.
 
 Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

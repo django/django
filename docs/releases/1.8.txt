@@ -318,7 +318,7 @@ File Storage
 * :meth:`Storage.get_available_name()
   <django.core.files.storage.Storage.get_available_name>` and
   :meth:`Storage.save() <django.core.files.storage.Storage.save>`
-  now take a ``max_length`` argument to implement storage-level maximum
+  now take a ``max_length`` parameter to implement storage-level maximum
   filename length constraints. Filenames exceeding this argument will get
   truncated. This prevents a database error when appending a unique suffix to a
   long filename that already exists on the storage. See the :ref:`deprecation
@@ -485,7 +485,7 @@ Migrations
 * The migration operations :class:`~django.db.migrations.operations.RunPython`
   and :class:`~django.db.migrations.operations.RunSQL` now call the
   :meth:`allow_migrate` method of database routers. The router can use the
-  newly introduced ``app_label`` and ``hints`` arguments to make a routing
+  newly introduced ``app_label`` and ``hints`` parameters to make a routing
   decision. To take advantage of this feature you need to update the router to
   the new ``allow_migrate`` signature, see the :ref:`deprecation section
   <deprecated-signature-of-allow-migrate>` for more details.
@@ -544,7 +544,7 @@ Signals
   :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
   their traceback attached as a ``__traceback__`` attribute.
 
-* The ``environ`` argument, which contains the WSGI environment structure from
+* The ``environ`` parameter, which contains the WSGI environment structure from
   the request, was added to the :data:`~django.core.signals.request_started`
   signal.
 
@@ -587,7 +587,7 @@ Requests and Responses
   :exc:`~django.core.exceptions.SuspiciousOperation`, the response will be
   rendered with a detailed error page.
 
-* The ``query_string`` argument of :class:`~django.http.QueryDict` is now
+* The ``query_string`` parameter of :class:`~django.http.QueryDict` is now
   optional, defaulting to ``None``, so a blank ``QueryDict`` can now be
   instantiated with ``QueryDict()`` instead of ``QueryDict(None)`` or
   ``QueryDict('')``.
@@ -628,7 +628,7 @@ Tests
   and :class:`Client.trace() <django.test.Client.trace>` methods were
   implemented, allowing you to create ``TRACE`` requests in your tests.
 
-* The ``count`` argument was added to
+* The ``count`` parameter was added to
   :meth:`~django.test.SimpleTestCase.assertTemplateUsed`. This allows you to
   assert that a template was rendered a specific number of times.
 
@@ -1026,7 +1026,7 @@ those writing third-party backends in updating their code:
 :mod:`django.contrib.admin`
 ---------------------------
 
-* ``AdminSite`` no longer takes an ``app_name`` argument and its ``app_name``
+* ``AdminSite`` no longer takes an ``app_name`` parameter and its ``app_name``
   attribute has been removed. The application name is always ``admin`` (as
   opposed to the instance name which you can still customize using
   ``AdminSite(name="...")``.
@@ -1247,7 +1247,7 @@ in ``urlpatterns``::
 and Django would magically import ``myapp.views.myview`` internally and turn
 the string into a real function reference. In order to reduce repetition when
 referencing many views from the same module, the ``patterns()`` function takes
-a required initial ``prefix`` argument which is prepended to all
+a required initial ``prefix`` parameter which is prepended to all
 views-as-strings in that set of ``urlpatterns``::
 
     urlpatterns = patterns('myapp.views',
@@ -1320,10 +1320,10 @@ tests has been deprecated and will be removed in Django 1.10. Use
 :func:`@override_settings(ROOT_URLCONF=...) <django.test.override_settings>`
 instead.
 
-``prefix`` argument to :func:`~django.conf.urls.i18n.i18n_patterns`
--------------------------------------------------------------------
+``prefix`` parameter to :func:`~django.conf.urls.i18n.i18n_patterns`
+--------------------------------------------------------------------
 
-Related to the previous item, the ``prefix`` argument to
+Related to the previous item, the ``prefix`` parameter to
 :func:`django.conf.urls.i18n.i18n_patterns` has been deprecated. Simply pass a
 list of :func:`django.conf.urls.url` instances instead.
 
@@ -1341,7 +1341,7 @@ path being reversed to be imported. This behavior has also resulted in a
 `security issue`_. Use :ref:`named URL patterns <naming-url-patterns>`
 for reversing instead.
 
-If you are using :mod:`django.contrib.sitemaps`, add the ``name`` argument to
+If you are using :mod:`django.contrib.sitemaps`, add the ``name`` parameter to
 the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
     from django.contrib.sitemaps.views import sitemap
@@ -1430,8 +1430,8 @@ It provided the :ttag:`lorem` template tag which is now included in the
 built-in tags. Simply remove ``'django.contrib.webdesign'`` from
 :setting:`INSTALLED_APPS` and ``{% load webdesign %}`` from your templates.
 
-``error_message`` argument to ``django.forms.RegexField``
----------------------------------------------------------
+``error_message`` parameter to ``django.forms.RegexField``
+----------------------------------------------------------
 
 It provided backwards compatibility for pre-1.0 code, but its functionality is
 redundant. Use ``Field.error_messages['invalid']`` instead.
@@ -1465,8 +1465,8 @@ they are not actually safe.
 The unused and undocumented ``django.utils.html.strip_entities()`` function has
 also been deprecated.
 
-``is_admin_site`` argument to ``django.contrib.auth.views.password_reset()``
-----------------------------------------------------------------------------
+``is_admin_site`` parameter to ``django.contrib.auth.views.password_reset()``
+-----------------------------------------------------------------------------
 
 It's a legacy option that should no longer be necessary.
 
@@ -1503,11 +1503,11 @@ deprecated and will be removed in Django 1.10. Historically, it was used
 to construct the "view on site" URL. This URL is now accessible using the
 ``absolute_url`` attribute of the form.
 
-``django.views.generic.edit.FormMixin.get_form()``’s ``form_class`` argument
-----------------------------------------------------------------------------
+``django.views.generic.edit.FormMixin.get_form()``’s ``form_class`` parameter
+-----------------------------------------------------------------------------
 
 ``FormMixin`` subclasses that override the ``get_form()`` method should make
-sure to provide a default value for the ``form_class`` argument since it's
+sure to provide a default value for the ``form_class`` parameter since it's
 now optional.
 
 Rendering templates loaded by :func:`~django.template.loader.get_template()` with a :class:`~django.template.Context`
@@ -1539,8 +1539,8 @@ response class.
 Check the :doc:`template response API documentation </ref/template-response>`
 for details.
 
-``current_app`` argument of template-related APIs
--------------------------------------------------
+``current_app`` parameter of template-related APIs
+--------------------------------------------------
 
 The following functions and classes will no longer accept a ``current_app``
 parameter to set an URL namespace in Django 1.10:
@@ -1554,8 +1554,8 @@ Set ``request.current_app`` instead, where ``request`` is the first argument
 to these functions or classes. If you're using a plain ``Context``, use a
 ``RequestContext`` instead.
 
-``dictionary`` and ``context_instance`` arguments of rendering functions
-------------------------------------------------------------------------
+``dictionary`` and ``context_instance`` parameters of rendering functions
+-------------------------------------------------------------------------
 
 The following functions will no longer accept the ``dictionary`` and
 ``context_instance`` parameters in Django 1.10:
@@ -1572,8 +1572,8 @@ pass a :class:`dict` in the ``context`` parameter instead. If you're passing a
 :class:`~django.template.RequestContext`, pass the request separately in the
 ``request`` parameter.
 
-``dirs`` argument of template-finding functions
------------------------------------------------
+``dirs`` parameter of template-finding functions
+------------------------------------------------
 
 The following functions will no longer accept a ``dirs`` parameter to override
 ``TEMPLATE_DIRS`` in Django 1.10:
@@ -1601,8 +1601,8 @@ Private API ``django.test.utils.TestTemplateLoader`` is deprecated in favor of
 
 .. _storage-max-length-update:
 
-Support for the ``max_length`` argument on custom ``Storage`` classes
----------------------------------------------------------------------
+Support for the ``max_length`` parameter on custom ``Storage`` classes
+----------------------------------------------------------------------
 
 ``Storage`` subclasses should add ``max_length=None`` as a parameter to
 :meth:`~django.core.files.storage.Storage.get_available_name` and/or
@@ -1620,7 +1620,7 @@ to a function that quoted identifiers for sending to the database. In Django
 ``SQLCompiler`` instance. For backwards-compatibility, calling a
 ``SQLCompiler`` instance performs the same name-quoting that the ``qn``
 function used to. However, this backwards-compatibility shim is immediately
-deprecated: you should rename your ``qn`` arguments to ``compiler``, and call
+deprecated: you should rename your ``qn`` parameters to ``compiler``, and call
 ``compiler.quote_name_unless_alias(...)`` where you previously called
 ``qn(...)``.
 
