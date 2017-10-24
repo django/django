@@ -1,8 +1,8 @@
 import os
 import select
+import shlex
 import sys
 import traceback
-import shlex
 
 from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
