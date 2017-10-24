@@ -1,5 +1,6 @@
 import os
 import select
+import shlex
 import sys
 import traceback
 
@@ -30,14 +31,26 @@ class Command(BaseCommand):
             '-c', '--command', dest='command',
             help='Instead of opening an interactive shell, run a command as Django and exit.',
         )
+        parser.add_argument(
+            '--interface-opts', dest='interface_opts',
+            help='Provide additional command-line options to the interactive interpreter, if it is not "python".',
+        )
 
     def ipython(self, options):
         from IPython import start_ipython
-        start_ipython(argv=[])
+        interface_opts = options['interface_opts']
+        if interface_opts is None:
+            start_ipython()
+        else:
+            start_ipython(argv=shlex.split(interface_opts))
 
     def bpython(self, options):
         import bpython
-        bpython.embed()
+        interface_opts = options['interface_opts']
+        if interface_opts is None:
+            bpython.embed()
+        else:
+            bpython.embed(args=shlex.split(interface_opts))
 
     def python(self, options):
         import code
