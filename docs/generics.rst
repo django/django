@@ -266,6 +266,14 @@ And if you just want to use the user from the django session, add ``http_user``:
 This will give you ``message.user``, which will be the same as ``request.user``
 would be on a regular View.
 
+And if you want to use both user and session from the django session, add ``http_user_and_session``::
+
+    class MyConsumer(WebsocketConsumer):
+
+        http_user_and_session = True
+
+This will give you ``message.user`` and ``message.http_session``.
+
 
 Applying Decorators
 -------------------
