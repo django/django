@@ -4005,7 +4005,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug3 = self.selenium.find_element_by_id('id_slug3').get_attribute('value')
         self.assertEqual(slug1, 'main-name-and-its-awesomeiii-2012-02-18')
         self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiii')
-        self.assertEqual(slug3, 'main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
+        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
