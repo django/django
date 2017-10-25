@@ -985,7 +985,7 @@ class Subquery(Expression):
                 )
                 # Add table alias to the parent query's aliases to prevent
                 # quoting.
-                if hasattr(resolved, 'alias'):
+                if hasattr(resolved, 'alias') and resolved.alias != resolved.target.model._meta.db_table:
                     clone.queryset.query.external_aliases.add(resolved.alias)
                 return resolved
             return child
