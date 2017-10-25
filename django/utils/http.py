@@ -382,7 +382,7 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
     Return a list of key/value tuples parsed from query string.
 
     Copied from urlparse with an additional "fields_limit" argument.
-    Copyright (C) 2013 Python Software Foundation (see LICENSE.python).
+    Copyright (C) 2013 Python Software Foundation (see LICENSE_python).
 
     Arguments:
 

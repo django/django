@@ -2,7 +2,7 @@ include AUTHORS
 include Gruntfile.js
 include INSTALL
 include LICENSE
-include LICENSE.python
+include LICENSE_python
 include MANIFEST.in
 include package.json
 include *.rst
