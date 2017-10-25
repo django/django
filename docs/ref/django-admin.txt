@@ -1495,6 +1495,10 @@ using the ``--username`` and ``--email`` arguments on the command
 line. If either of those is not supplied, ``createsuperuser`` will prompt for
 it when running interactively.
 
+.. django-admin-option:: --password PASSWORD
+
+Specifies the password of superuser.
+
 .. django-admin-option:: --database DATABASE
 
 Specifies the database into which the superuser object will be saved.
