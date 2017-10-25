@@ -16,3 +16,6 @@ Bugfixes
 
 * Made ``QuerySet.reverse()`` affect ``nulls_first`` and ``nulls_last``
   (:ticket:`28722`).
+
+* Fixed unquoted table names in ``Subquery`` SQL when using ``OuterRef``
+  (:ticket:`28689`).
