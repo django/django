@@ -280,8 +280,15 @@ def reloader_thread():
 
 
 def restart_with_reloader():
+    import django.__main__
     while True:
-        args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
+        args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions]
+        if sys.argv[0] == django.__main__.__file__:
+            # The server was started with `python -m django runserver`.
+            args += ['-m', 'django']
+            args += sys.argv[1:]
+        else:
+            args += sys.argv
         new_environ = os.environ.copy()
         new_environ["RUN_MAIN"] = 'true'
         exit_code = subprocess.call(args, env=new_environ)
