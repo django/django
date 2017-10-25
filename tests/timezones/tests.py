@@ -121,21 +121,31 @@ class LegacyDatabaseTests(TestCase):
         dt2 = datetime.datetime(2011, 9, 1, 14, 20, 30)
         Event.objects.create(dt=dt1)
         Event.objects.create(dt=dt2)
-        self.assertEqual(Event.objects.filter(dt__gte=dt1).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__gt=dt1).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__gte=dt2).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__gt=dt2).count(), 0)
+        test_values = (
+            (Event.objects.filter(dt__gte=dt1).count(), 2),
+            (Event.objects.filter(dt__gt=dt1).count(), 1),
+            (Event.objects.filter(dt__gte=dt2).count(), 1),
+            (Event.objects.filter(dt__gt=dt2).count(), 0)
+        )
+        for count_, expected in test_values:
+            with self.subTest(count_=count_):
+                self.assertEqual(count_, expected)
 
     def test_query_datetime_lookups(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0))
-        self.assertEqual(Event.objects.filter(dt__year=2011).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__month=1).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__day=1).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__week_day=7).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__hour=1).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__minute=30).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__second=0).count(), 2)
+        test_values = (
+            (Event.objects.filter(dt__year=2011).count(), 2),
+            (Event.objects.filter(dt__month=1).count(), 2),
+            (Event.objects.filter(dt__day=1).count(), 2),
+            (Event.objects.filter(dt__week_day=7).count(), 2),
+            (Event.objects.filter(dt__hour=1).count(), 1),
+            (Event.objects.filter(dt__minute=30).count(), 2),
+            (Event.objects.filter(dt__second=0).count(), 2)
+        )
+        for count_, expected in test_values:
+            with self.subTest(count_=count_):
+                self.assertEqual(count_, expected)
 
     def test_query_aggregation(self):
         # Only min and max make sense for datetimes.
@@ -157,40 +167,50 @@ class LegacyDatabaseTests(TestCase):
         SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 3, 20, 40), session=morning)
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
-        self.assertQuerysetEqual(
-            Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
-            [morning_min_dt, afternoon_min_dt],
-            transform=lambda d: d.dt)
-        self.assertQuerysetEqual(
-            Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
-            [morning_min_dt],
-            transform=lambda d: d.dt)
-        self.assertQuerysetEqual(
-            Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
-            [afternoon_min_dt],
-            transform=lambda d: d.dt)
+        test_values = (
+            (
+                Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
+                [morning_min_dt, afternoon_min_dt]
+            ),
+            (
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
+                [morning_min_dt],
+            ),
+            (
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
+                [afternoon_min_dt],
+            )
+        )
+        for querysets, dts in test_values:
+            with self.subTest(querysets=querysets):
+                self.assertQuerysetEqual(querysets, dts, transform=lambda d: d.dt)
 
     def test_query_datetimes(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0))
-        self.assertSequenceEqual(Event.objects.datetimes('dt', 'year'), [datetime.datetime(2011, 1, 1, 0, 0, 0)])
-        self.assertSequenceEqual(Event.objects.datetimes('dt', 'month'), [datetime.datetime(2011, 1, 1, 0, 0, 0)])
-        self.assertSequenceEqual(Event.objects.datetimes('dt', 'day'), [datetime.datetime(2011, 1, 1, 0, 0, 0)])
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'hour'),
+        test_values = (
+            (Event.objects.datetimes('dt', 'year'), [datetime.datetime(2011, 1, 1, 0, 0, 0)]),
+            (Event.objects.datetimes('dt', 'month'), [datetime.datetime(2011, 1, 1, 0, 0, 0)]),
+            (Event.objects.datetimes('dt', 'day'), [datetime.datetime(2011, 1, 1, 0, 0, 0)]),
+        )
+        for dts, expected in test_values:
+            with self.subTest(dts=dts):
+                self.assertSequenceEqual(dts, expected)
+
+        test_values_ = (
+            (Event.objects.datetimes('dt', 'hour'), 
             [datetime.datetime(2011, 1, 1, 1, 0, 0),
-             datetime.datetime(2011, 1, 1, 4, 0, 0)]
-        )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'minute'),
+             datetime.datetime(2011, 1, 1, 4, 0, 0)]),
+            (Event.objects.datetimes('dt', 'minute'),
             [datetime.datetime(2011, 1, 1, 1, 30, 0),
-             datetime.datetime(2011, 1, 1, 4, 30, 0)]
-        )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'second'),
+             datetime.datetime(2011, 1, 1, 4, 30, 0)]),
+            (Event.objects.datetimes('dt', 'second'),
             [datetime.datetime(2011, 1, 1, 1, 30, 0),
-             datetime.datetime(2011, 1, 1, 4, 30, 0)]
+             datetime.datetime(2011, 1, 1, 4, 30, 0)]),
         )
+        for dts, expected in test_values_:
+            with self.subTest(dts=dts):
+                self.assertSequenceEqual(dts, expected)
 
     def test_raw_sql(self):
         # Regression test for #17755
@@ -305,10 +325,15 @@ class NewDatabaseTests(TestCase):
         dt2 = datetime.datetime(2011, 9, 1, 14, 20, 30, tzinfo=EAT)
         Event.objects.create(dt=dt1)
         Event.objects.create(dt=dt2)
-        self.assertEqual(Event.objects.filter(dt__gte=dt1).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__gt=dt1).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__gte=dt2).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__gt=dt2).count(), 0)
+        test_values = (
+            (Event.objects.filter(dt__gte=dt1).count(), 2),
+            (Event.objects.filter(dt__gt=dt1).count(), 1),
+            (Event.objects.filter(dt__gte=dt2).count(), 1),
+            (Event.objects.filter(dt__gt=dt2).count(), 0)
+        )
+        for count_, expected in test_values:
+            with self.subTest(count_=count_):
+                self.assertEqual(count_, expected)
 
     def test_query_filter_with_pytz_timezones(self):
         tz = pytz.timezone('Europe/Paris')
@@ -316,11 +341,16 @@ class NewDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         next = dt + datetime.timedelta(seconds=3)
         prev = dt - datetime.timedelta(seconds=3)
-        self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__exact=next).count(), 0)
-        self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
-        self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
+        test_values = (
+            (Event.objects.filter(dt__exact=dt).count(), 1),
+            (Event.objects.filter(dt__exact=next).count(), 0),
+            (Event.objects.filter(dt__in=(prev, next)).count(), 0),
+            (Event.objects.filter(dt__in=(prev, dt, next)).count(), 1),
+            (Event.objects.filter(dt__range=(prev, next)).count(), 1)
+        )
+        for count_, expected in test_values:
+            with self.subTest(count_=count_):
+                self.assertEqual(count_, expected)
 
     @requires_tz_support
     def test_query_filter_with_naive_datetime(self):
@@ -330,10 +360,16 @@ class NewDatabaseTests(TestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('always')
             # naive datetimes are interpreted in local time
-            self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__lte=dt).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__gt=dt).count(), 0)
-            self.assertEqual(len(recorded), 3)
+            test_values = (
+                (Event.objects.filter(dt__exact=dt).count(), 1),
+                (Event.objects.filter(dt__lte=dt).count(), 1),
+                (Event.objects.filter(dt__gt=dt).count(), 0),
+                (len(recorded), 3)
+            )
+            for count_, expected in test_values:
+                with self.subTest(count_=count_):
+                    self.assertEqual(count_, expected)
+
             for warning in recorded:
                 msg = str(warning.message)
                 self.assertTrue(msg.startswith("DateTimeField Event.dt "
@@ -343,13 +379,18 @@ class NewDatabaseTests(TestCase):
     def test_query_datetime_lookups(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
-        self.assertEqual(Event.objects.filter(dt__year=2011).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__month=1).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__day=1).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__week_day=7).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__hour=1).count(), 1)
-        self.assertEqual(Event.objects.filter(dt__minute=30).count(), 2)
-        self.assertEqual(Event.objects.filter(dt__second=0).count(), 2)
+        test_values = (
+            (Event.objects.filter(dt__year=2011).count(), 2),
+            (Event.objects.filter(dt__month=1).count(), 2),
+            (Event.objects.filter(dt__day=1).count(), 2),
+            (Event.objects.filter(dt__week_day=7).count(), 2),
+            (Event.objects.filter(dt__hour=1).count(), 1),
+            (Event.objects.filter(dt__minute=30).count(), 2),
+            (Event.objects.filter(dt__second=0).count(), 2)
+        )
+        for count_, expected in test_values:
+            with self.subTest(count_=count_):
+                self.assertEqual(count_, expected)
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetime_lookups_in_other_timezone(self):
@@ -358,13 +399,18 @@ class NewDatabaseTests(TestCase):
         with timezone.override(UTC):
             # These two dates fall in the same day in EAT, but in different days,
             # years and months in UTC.
-            self.assertEqual(Event.objects.filter(dt__year=2011).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__month=1).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__day=1).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__week_day=7).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__hour=22).count(), 1)
-            self.assertEqual(Event.objects.filter(dt__minute=30).count(), 2)
-            self.assertEqual(Event.objects.filter(dt__second=0).count(), 2)
+            test_values = (
+                (Event.objects.filter(dt__year=2011).count(), 1),
+                (Event.objects.filter(dt__month=1).count(), 1),
+                (Event.objects.filter(dt__day=1).count(), 1),
+                (Event.objects.filter(dt__week_day=7).count(), 1),
+                (Event.objects.filter(dt__hour=22).count(), 1),
+                (Event.objects.filter(dt__minute=30).count(), 2),
+                (Event.objects.filter(dt__second=0).count(), 2)
+            )
+            for count_, expected in test_values:
+                with self.subTest(count_=count_):
+                    self.assertEqual(count_, expected)
 
     def test_query_aggregation(self):
         # Only min and max make sense for datetimes.
@@ -386,86 +432,83 @@ class NewDatabaseTests(TestCase):
         SessionEvent.objects.create(dt=datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT), session=morning)
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        self.assertQuerysetEqual(
-            Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
-            [morning_min_dt, afternoon_min_dt],
-            transform=lambda d: d.dt)
-        self.assertQuerysetEqual(
-            Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
-            [morning_min_dt],
-            transform=lambda d: d.dt)
-        self.assertQuerysetEqual(
-            Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
-            [afternoon_min_dt],
-            transform=lambda d: d.dt)
+        test_values = (
+            (
+                Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
+                [morning_min_dt, afternoon_min_dt]
+            ),
+            (
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
+                [morning_min_dt],
+            ),
+            (
+                Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
+                [afternoon_min_dt],
+            )
+        )
+        for querysets, dts in test_values:
+            with self.subTest(querysets=querysets):
+                self.assertQuerysetEqual(querysets, dts, transform=lambda d: d.dt)
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetimes(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'year'),
-            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]
+        test_values = (
+            (Event.objects.datetimes('dt', 'year'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
+            (Event.objects.datetimes('dt', 'month'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
+            (Event.objects.datetimes('dt', 'day'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
         )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'month'),
-            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]
-        )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'day'),
-            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]
-        )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'hour'),
+        for dts, expected in test_values:
+            with self.subTest(dts=dts):
+                self.assertSequenceEqual(dts, expected)
+
+        test_values_ = (
+            (Event.objects.datetimes('dt', 'hour'), 
             [datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=EAT),
-             datetime.datetime(2011, 1, 1, 4, 0, 0, tzinfo=EAT)]
-        )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'minute'),
+             datetime.datetime(2011, 1, 1, 4, 0, 0, tzinfo=EAT)]),
+            (Event.objects.datetimes('dt', 'minute'),
             [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
-             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]
-        )
-        self.assertSequenceEqual(
-            Event.objects.datetimes('dt', 'second'),
+             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]),
+            (Event.objects.datetimes('dt', 'second'),
             [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
-             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]
+             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]),
         )
+        for dts, expected in test_values_:
+            with self.subTest(dts=dts):
+                self.assertSequenceEqual(dts, expected)
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetimes_in_other_timezone(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
         with timezone.override(UTC):
-            self.assertSequenceEqual(
-                Event.objects.datetimes('dt', 'year'),
+            test_values = (
+                (Event.objects.datetimes('dt', 'year'),
                 [datetime.datetime(2010, 1, 1, 0, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]
-            )
-            self.assertSequenceEqual(
-                Event.objects.datetimes('dt', 'month'),
+                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
+                (Event.objects.datetimes('dt', 'month'),
                 [datetime.datetime(2010, 12, 1, 0, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]
-            )
-            self.assertSequenceEqual(
-                Event.objects.datetimes('dt', 'day'),
+                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
+                (Event.objects.datetimes('dt', 'day'),
                 [datetime.datetime(2010, 12, 31, 0, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]
-            )
-            self.assertSequenceEqual(
-                Event.objects.datetimes('dt', 'hour'),
+                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
+                (Event.objects.datetimes('dt', 'hour'),
                 [datetime.datetime(2010, 12, 31, 22, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=UTC)]
-            )
-            self.assertSequenceEqual(
-                Event.objects.datetimes('dt', 'minute'),
+                 datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=UTC)]),
+                (Event.objects.datetimes('dt', 'minute'),
                 [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)]
-            )
-            self.assertSequenceEqual(
-                Event.objects.datetimes('dt', 'second'),
+                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)]),
+                (Event.objects.datetimes('dt', 'second'),
                 [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)]
+                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)])
             )
+            for dts, expected in test_values:
+                with self.subTest(dts=dts):
+                    self.assertSequenceEqual(dts, expected)
 
     def test_raw_sql(self):
         # Regression test for #17755
@@ -1170,15 +1213,25 @@ class AdminTests(TestCase):
     def test_change_editable(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
         response = self.client.get(reverse('admin_tz:timezones_event_change', args=(e.pk,)))
-        self.assertContains(response, e.dt.astimezone(EAT).date().isoformat())
-        self.assertContains(response, e.dt.astimezone(EAT).time().isoformat())
+        test_values = (
+            e.dt.astimezone(EAT).date().isoformat(),
+            e.dt.astimezone(EAT).time().isoformat()
+        )
+        for dt_ in test_values:
+            with self.subTest(dt_=dt_):
+                self.assertContains(response, dt_)
 
     def test_change_editable_in_other_timezone(self):
         e = Event.objects.create(dt=datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC))
         with timezone.override(ICT):
             response = self.client.get(reverse('admin_tz:timezones_event_change', args=(e.pk,)))
-        self.assertContains(response, e.dt.astimezone(ICT).date().isoformat())
-        self.assertContains(response, e.dt.astimezone(ICT).time().isoformat())
+            test_values = (
+                e.dt.astimezone(ICT).date().isoformat(),
+                e.dt.astimezone(ICT).time().isoformat()
+            )
+            for dt_ in test_values:
+                with self.subTest(dt_=dt_):
+                    self.assertContains(response, dt_)
 
     @requires_tz_support
     def test_change_readonly(self):
