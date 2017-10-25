@@ -142,9 +142,8 @@ Authenticating users
         example, it's used by the
         :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`. Unless
         you are writing your own authentication system, you probably won't use
-        this. Rather if you are looking for a way to limit access to logged in
-        users, see the :func:`~django.contrib.auth.decorators.login_required`
-        decorator.
+        this. Rather if you're looking for a way to login a user, use the
+        :class:`~django.contrib.auth.views.LoginView`.
 
 .. _topic-authorization:
 
