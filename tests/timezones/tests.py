@@ -198,15 +198,15 @@ class LegacyDatabaseTests(TestCase):
                 self.assertSequenceEqual(dts, expected)
 
         test_values_ = (
-            (Event.objects.datetimes('dt', 'hour'), 
-            [datetime.datetime(2011, 1, 1, 1, 0, 0),
-             datetime.datetime(2011, 1, 1, 4, 0, 0)]),
+            (Event.objects.datetimes('dt', 'hour'),
+             [datetime.datetime(2011, 1, 1, 1, 0, 0),
+              datetime.datetime(2011, 1, 1, 4, 0, 0)]),
             (Event.objects.datetimes('dt', 'minute'),
-            [datetime.datetime(2011, 1, 1, 1, 30, 0),
-             datetime.datetime(2011, 1, 1, 4, 30, 0)]),
+             [datetime.datetime(2011, 1, 1, 1, 30, 0),
+              datetime.datetime(2011, 1, 1, 4, 30, 0)]),
             (Event.objects.datetimes('dt', 'second'),
-            [datetime.datetime(2011, 1, 1, 1, 30, 0),
-             datetime.datetime(2011, 1, 1, 4, 30, 0)]),
+             [datetime.datetime(2011, 1, 1, 1, 30, 0),
+              datetime.datetime(2011, 1, 1, 4, 30, 0)]),
         )
         for dts, expected in test_values_:
             with self.subTest(dts=dts):
@@ -456,26 +456,26 @@ class NewDatabaseTests(TestCase):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
         test_values = (
             (Event.objects.datetimes('dt', 'year'),
-            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
+             [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
             (Event.objects.datetimes('dt', 'month'),
-            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
+             [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
             (Event.objects.datetimes('dt', 'day'),
-            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
+             [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)]),
         )
         for dts, expected in test_values:
             with self.subTest(dts=dts):
                 self.assertSequenceEqual(dts, expected)
 
         test_values_ = (
-            (Event.objects.datetimes('dt', 'hour'), 
-            [datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=EAT),
-             datetime.datetime(2011, 1, 1, 4, 0, 0, tzinfo=EAT)]),
+            (Event.objects.datetimes('dt', 'hour'),
+             [datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=EAT),
+              datetime.datetime(2011, 1, 1, 4, 0, 0, tzinfo=EAT)]),
             (Event.objects.datetimes('dt', 'minute'),
-            [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
-             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]),
+             [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
+              datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]),
             (Event.objects.datetimes('dt', 'second'),
-            [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
-             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]),
+             [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
+              datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)]),
         )
         for dts, expected in test_values_:
             with self.subTest(dts=dts):
@@ -488,23 +488,23 @@ class NewDatabaseTests(TestCase):
         with timezone.override(UTC):
             test_values = (
                 (Event.objects.datetimes('dt', 'year'),
-                [datetime.datetime(2010, 1, 1, 0, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
+                 [datetime.datetime(2010, 1, 1, 0, 0, 0, tzinfo=UTC),
+                  datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
                 (Event.objects.datetimes('dt', 'month'),
-                [datetime.datetime(2010, 12, 1, 0, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
+                 [datetime.datetime(2010, 12, 1, 0, 0, 0, tzinfo=UTC),
+                  datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
                 (Event.objects.datetimes('dt', 'day'),
-                [datetime.datetime(2010, 12, 31, 0, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
+                 [datetime.datetime(2010, 12, 31, 0, 0, 0, tzinfo=UTC),
+                  datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)]),
                 (Event.objects.datetimes('dt', 'hour'),
-                [datetime.datetime(2010, 12, 31, 22, 0, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=UTC)]),
+                 [datetime.datetime(2010, 12, 31, 22, 0, 0, tzinfo=UTC),
+                  datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=UTC)]),
                 (Event.objects.datetimes('dt', 'minute'),
-                [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)]),
+                 [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
+                  datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)]),
                 (Event.objects.datetimes('dt', 'second'),
-                [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
-                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)])
+                 [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
+                  datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)])
             )
             for dts, expected in test_values:
                 with self.subTest(dts=dts):
