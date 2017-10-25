@@ -33,6 +33,8 @@ Here is an example of its usage::
     {'country_code': 'US', 'country_name': 'United States'}
     >>> g.city('72.14.207.99')
     {'city': 'Mountain View',
+    'continent_code': 'NA',
+    'continent_name': 'North America',
     'country_code': 'US',
     'country_name': 'United States',
     'dma_code': 807,

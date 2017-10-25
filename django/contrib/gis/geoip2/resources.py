@@ -1,6 +1,8 @@
 def City(response):
     return {
         'city': response.city.name,
+        'continent_code': response.continent.code,
+        'continent_name': response.continent.name,
         'country_code': response.country.iso_code,
         'country_name': response.country.name,
         'dma_code': response.location.metro_code,
