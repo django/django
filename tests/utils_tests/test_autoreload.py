@@ -252,3 +252,28 @@ class ResetTranslationsTests(SimpleTestCase):
         self.assertEqual(trans_real._translations, {})
         self.assertIsNone(trans_real._default)
         self.assertIsInstance(trans_real._active, _thread._local)
+
+
+class RestartWithReloaderTests(SimpleTestCase):
+    executable = '/usr/bin/python'
+
+    def patch_autoreload(self, argv):
+        patch_call = mock.patch('django.utils.autoreload.subprocess.call', return_value=0)
+        patches = [
+            mock.patch('django.utils.autoreload.sys.argv', argv),
+            mock.patch('django.utils.autoreload.sys.executable', self.executable),
+            mock.patch('django.utils.autoreload.sys.warnoptions', ['all']),
+        ]
+        for p in patches:
+            p.start()
+            self.addCleanup(p.stop)
+        mock_call = patch_call.start()
+        self.addCleanup(patch_call.stop)
+        return mock_call
+
+    def test_manage_py(self):
+        argv = ['./manage.py', 'runserver']
+        mock_call = self.patch_autoreload(argv)
+        autoreload.restart_with_reloader()
+        self.assertEqual(mock_call.call_count, 1)
+        self.assertEqual(mock_call.call_args[0][0], [self.executable, '-Wall'] + argv)
