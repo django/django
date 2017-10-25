@@ -1939,7 +1939,7 @@ This has a number of caveats though:
   unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
 
-The ``batch_size`` parameter controls how many objects are created in single
+The ``batch_size`` parameter controls how many objects are created in a single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
 
