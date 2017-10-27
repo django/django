@@ -244,7 +244,7 @@ FORCE_SCRIPT_NAME = None
 #         re.compile(r'^NaverBot.*'),
 #         re.compile(r'^EmailSiphon.*'),
 #         re.compile(r'^SiteSucker.*'),
-#         re.compile(r'^sohu-search')
+#         re.compile(r'^sohu-search'),
 #     ]
 DISALLOWED_USER_AGENTS = []
 
@@ -255,9 +255,9 @@ ABSOLUTE_URL_OVERRIDES = {}
 #    import re
 #    IGNORABLE_404_URLS = [
 #        re.compile(r'^/apple-touch-icon.*\.png$'),
-#        re.compile(r'^/favicon.ico$),
-#        re.compile(r'^/robots.txt$),
-#        re.compile(r'^/phpmyadmin/),
+#        re.compile(r'^/favicon.ico$'),
+#        re.compile(r'^/robots.txt$'),
+#        re.compile(r'^/phpmyadmin/'),
 #        re.compile(r'\.(cgi|php|pl)$'),
 #    ]
 IGNORABLE_404_URLS = []
