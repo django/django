@@ -1061,7 +1061,10 @@ class ModelAdmin(BaseModelAdmin):
             'has_add_permission': self.has_add_permission(request),
             'has_change_permission': self.has_change_permission(request, obj),
             'has_delete_permission': self.has_delete_permission(request, obj),
-            'has_file_field': True,  # FIXME - this should check if form or formsets have a FileField,
+            'has_file_field': context['adminform'].form.is_multipart() or any(
+                admin_formset.formset.form().is_multipart()
+                for admin_formset in context['inline_admin_formsets']
+            ),
             'has_absolute_url': view_on_site_url is not None,
             'absolute_url': view_on_site_url,
             'form_url': form_url,
