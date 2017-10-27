@@ -176,6 +176,15 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_in_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__in=IntegerArrayModel.objects.all().values_list('field', flat=True)
+            ),
+            self.objs[2:3]
+        )
+
     @unittest.expectedFailure
     def test_in_including_F_object(self):
         # This test asserts that Array objects passed to filters can be
