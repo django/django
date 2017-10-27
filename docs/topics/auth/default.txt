@@ -1537,21 +1537,20 @@ The currently logged-in user's permissions are stored in the template variable
 ``django.contrib.auth.context_processors.PermWrapper``, which is a
 template-friendly proxy of permissions.
 
-In the ``{{ perms }}`` object, single-attribute lookup is a proxy to
-:meth:`User.has_module_perms <django.contrib.auth.models.User.has_module_perms>`.
-This example would display ``True`` if the logged-in user had any permissions
-in the ``foo`` app::
+Evaluating a single-attribute lookup of ``{{ perms }}`` as a boolean is a proxy
+to :meth:`User.has_module_perms()
+<django.contrib.auth.models.User.has_module_perms>`. For example, to check if
+the logged-in user has any permissions in the ``foo`` app::
 
-    {{ perms.foo }}
+    {% if perms.foo %}
 
-Two-level-attribute lookup is a proxy to
-:meth:`User.has_perm <django.contrib.auth.models.User.has_perm>`. This example
-would display ``True`` if the logged-in user had the permission
-``foo.can_vote``::
+Evaluating a two-level-attribute lookup as a boolean is a proxy to
+:meth:`User.has_perm() <django.contrib.auth.models.User.has_perm>`. For example,
+to check if the logged-in user has the permission ``foo.can_vote``::
 
-    {{ perms.foo.can_vote }}
+    {% if perms.foo.can_vote %}
 
-Thus, you can check permissions in template ``{% if %}`` statements:
+Here's a more complete example of checking permissions in a template:
 
 .. code-block:: html+django
 
