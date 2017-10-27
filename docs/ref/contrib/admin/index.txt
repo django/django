@@ -1044,6 +1044,10 @@ subclass::
     of the source fields, and then by transforming that result into a valid
     slug (e.g. substituting dashes for spaces).
 
+    Fields are prepopulated on add forms but not on change forms. It's usually
+    undesired that slugs change after an object is created (which would cause
+    an object's URL to change if the slug is used in it).
+
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
 
