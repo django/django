@@ -75,14 +75,13 @@ widget on the field. In the following example, the
 See the :ref:`built-in widgets` for more information about which widgets
 are available and which arguments they accept.
 
-Widgets inheriting from the ``Select`` widget
-=============================================
+Widgets inheriting from the ``ChoiceWidget`` class
+==================================================
 
-Widgets inheriting from the :class:`Select` widget deal with choices. They
+Widgets inheriting from the ``ChoiceWidget`` class deal with choices. They
 present the user with a list of options to choose from. The different widgets
-present this choice differently; the :class:`Select` widget itself uses a
-``<select>`` HTML list representation, while :class:`RadioSelect` uses radio
-buttons.
+present this choice differently; the :class:`Select` widget uses a ``<select>``
+HTML list representation, while :class:`RadioSelect` uses radio buttons.
 
 :class:`Select` widgets are used by default on :class:`ChoiceField` fields. The
 choices displayed on the widget are inherited from the :class:`ChoiceField` and
