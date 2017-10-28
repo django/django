@@ -1512,6 +1512,46 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get('/nonexistent/')
         self.assertEqual(response.status_code, 404)
 
+@override_settings(
+    USE_I18N=True,
+    LANGUAGES=[
+        ('en', 'English'),
+        ('fr', 'French'),
+    ],
+    MIDDLEWARE=[
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ],
+    ROOT_URLCONF='i18n.i18n_unprefixed_urls',
+    LANGUAGE_CODE='en',
+)
+class UnprefixedI18nSetLang(TestCase):
+    def test_en2fr(self):
+        response = self.client.post(
+            '/i18n/setlang/',
+            data={'language': 'fr'},
+            HTTP_REFERER='/admin/',
+            follow=False,
+        )
+        self.assertEqual(
+            response.url,
+            '/fr/admin/',
+            'Setlang did not change from unprefixed English to French admin'
+        )
+
+    def test_fr2en(self):
+        response = self.client.post(
+            '/i18n/setlang/',
+            data={'language': 'en'},
+            HTTP_REFERER='/fr/admin/',
+            follow=False,
+        )
+        self.assertEqual(
+            response.url,
+            '/admin/',
+            'Setlang did not change from French to unprefixed English admin',
+            )
+
 
 @override_settings(
     USE_I18N=True,
