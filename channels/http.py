@@ -17,7 +17,7 @@ from django.utils import six
 from django.utils.functional import cached_property
 
 from asgiref.applications import sync_to_async, async_to_sync
-from channels.exceptions import RequestAborted, RequestTimeout, ResponseLater as ResponseLaterOuter
+from channels.exceptions import RequestAborted, RequestTimeout
 
 try:
     from django.urls import set_script_prefix
@@ -33,8 +33,6 @@ class AsgiRequest(http.HttpRequest):
     Custom request subclass that decodes from an ASGI-standard request
     dict, and wraps request body handling.
     """
-
-    ResponseLater = ResponseLaterOuter
 
     # Number of seconds until a Request gives up on trying to read a request
     # body and aborts.
@@ -217,39 +215,20 @@ class AsgiHandler(base.BaseHandler):
             # Client closed connection on us mid request. Abort!
             return
         else:
-            try:
-                response = self.get_response(request)
-                # Fix chunk size on file responses
-                if isinstance(response, FileResponse):
-                    response.block_size = 1024 * 512
-            except AsgiRequest.ResponseLater:
-                # The view has promised something else
-                # will send a response at a later time
-                return
+            response = self.get_response(request)
+            # Fix chunk size on file responses
+            if isinstance(response, FileResponse):
+                response.block_size = 1024 * 512
         # Transform response into messages, which we yield back to caller
         for response_message in self.encode_response(response):
             self.send(response_message)
         # Close the response now we're done with it
         response.close()
 
-    def process_exception_by_middleware(self, exception, request):
-        """
-        Catches ResponseLater and re-raises it, else tries to delegate
-        to middleware exception handling.
-        """
-        if isinstance(exception, AsgiRequest.ResponseLater):
-            raise
-        else:
-            return super(AsgiHandler, self).process_exception_by_middleware(exception, request)
-
     def handle_uncaught_exception(self, request, resolver, exc_info):
         """
-        Propagates ResponseLater up into the higher handler method,
-        processes everything else
+        Last-chance handler for exceptions.
         """
-        # ResponseLater needs to be bubbled up the stack
-        if issubclass(exc_info[0], AsgiRequest.ResponseLater):
-            raise
         # There's no WSGI server to catch the exception further up if this fails,
         # so translate it into a plain text response.
         try:

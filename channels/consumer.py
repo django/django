@@ -1,7 +1,10 @@
-import inspect
-from concurrent.futures import ThreadPoolExecutor
+import asyncio
+import functools
 
 from asgiref.applications import sync_to_async, async_to_sync
+
+from .layers import get_channel_layer
+from .utils import await_many_dispatch
 
 
 def get_handler_name(message):
@@ -25,6 +28,8 @@ class AsyncConsumer:
     on their type.
     """
 
+    _sync = False
+
     def __init__(self, scope):
         self.scope = scope
 
@@ -32,17 +37,27 @@ class AsyncConsumer:
         """
         Dispatches incoming messages to type-based handlers asynchronously.
         """
+        # Initalize channel layer
+        self.channel_layer = get_channel_layer()
+        self.channel_name = self.channel_layer.new_channel()
+        self.channel_receive = functools.partial(self.channel_layer.receive, self.channel_name)
         # Store send function
-        self.base_send = send
-        while True:
-            # Get the next message
-            message = await receive()
-            # Get and execute the handler
-            handler = getattr(self, get_handler_name(message), None)
-            if handler:
-                await handler(message)
-            else:
-                raise ValueError("No handler for message type %s" % message["type"])
+        if self._sync:
+            self.base_send = async_to_sync(send)
+        else:
+            self.base_send = send
+        # Pass messages in from channel layer or client to dispatch method
+        await await_many_dispatch([receive, self.channel_receive], self.dispatch)
+
+    async def dispatch(self, message):
+        """
+        Works out what to do with a message.
+        """
+        handler = getattr(self, get_handler_name(message), None)
+        if handler:
+            await handler(message)
+        else:
+            raise ValueError("No handler for message type %s" % message["type"])
 
     async def send(self, message):
         """
@@ -51,7 +66,7 @@ class AsyncConsumer:
         await self.base_send(message)
 
 
-class SyncConsumer:
+class SyncConsumer(AsyncConsumer):
     """
     Synchronous version of the consumer, which is what we write most of the
     generic consumers against (for now). Calls handlers in a threadpool and
@@ -62,18 +77,10 @@ class SyncConsumer:
     for user-called methods very confusing as there'd be two types of each.
     """
 
-    def __init__(self, scope):
-        self.scope = scope
-
-    async def __call__(self, receive, send):
-        # Store send function as a sync version
-        self.base_send = async_to_sync(send)
-        while True:
-            message = await receive()
-            await self.sync_call(message)
+    _sync = True
 
     @sync_to_async
-    def sync_call(self, message):
+    def dispatch(self, message):
         """
         Dispatches incoming messages to type-based handlers asynchronously.
         """

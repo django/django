@@ -1,6 +1,7 @@
 from django.core.serializers.json import DjangoJSONEncoder, json
 
-from channels.consumer import SyncConsumer
+from ..consumer import SyncConsumer
+from ..exceptions import AcceptConnection, DenyConnection
 
 
 class WebsocketConsumer(SyncConsumer):
@@ -14,7 +15,12 @@ class WebsocketConsumer(SyncConsumer):
         Called when a WebSocket connection is opened.
         """
         # TODO: group joining
-        self.connect(message)
+        try:
+            self.connect(message)
+        except AcceptConnection:
+            self.accept()
+        except DenyConnection:
+            self.close()
 
     def connect(self, message):
         self.accept()
