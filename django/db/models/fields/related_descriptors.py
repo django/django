@@ -428,13 +428,10 @@ class ReverseOneToOneDescriptor:
 
         if value is None:
             # Update the cached related instance (if any) & clear the cache.
-            try:
-                # Following the example above, this would be the cached
-                # ``restaurant`` instance (if any).
-                rel_obj = self.related.get_cached_value(instance)
-            except KeyError:
-                pass
-            else:
+            # Following the example above, this would be the cached
+            # ``restaurant`` instance (if any).
+            rel_obj = self.related.get_cached_value(instance, default=None)
+            if rel_obj is not None:
                 # Remove the ``restaurant`` instance from the ``place``
                 # instance cache.
                 self.related.delete_cached_value(instance)
