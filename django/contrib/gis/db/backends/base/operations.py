@@ -16,7 +16,7 @@ class BaseSpatialOperations:
     spatial_version = None
 
     # How the geometry column should be selected.
-    select = None
+    select = '%s'
 
     @cached_property
     def select_extent(self):

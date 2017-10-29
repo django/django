@@ -266,8 +266,7 @@ class GeometryField(BaseSpatialField):
         of the spatial backend. For example, Oracle and MySQL require custom
         selection formats in order to retrieve geometries in OGC WKB.
         """
-        select = compiler.connection.ops.select
-        return select % sql if select else sql, params
+        return compiler.connection.ops.select % sql, params
 
 
 # The OpenGIS Geometry Type Fields
