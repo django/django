@@ -1,10 +1,13 @@
 from django import forms
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.test import ignore_warnings
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.translation import gettext_lazy as _
 
 from .widgets import OpenLayersWidget
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 class GeometryField(forms.Field):
     """
     This is the basic form field for a Geometry.  Any textual input that is

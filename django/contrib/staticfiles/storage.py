@@ -3,6 +3,7 @@ import json
 import os
 import posixpath
 import re
+import warnings
 from collections import OrderedDict
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
@@ -14,6 +15,7 @@ from django.core.cache import (
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import force_bytes
 from django.utils.functional import LazyObject
 
@@ -478,6 +480,11 @@ class CachedStaticFilesStorage(CachedFilesMixin, StaticFilesStorage):
     A static file system storage backend which also saves
     hashed copies of the files it saves.
     """
+    warnings.warn(
+        "CachedStaticFilesStorage is deprecated in "
+        "favor of ManifestStaticFilesStorage.",
+        RemovedInDjango30Warning, stacklevel=2,
+    )
     pass
 
 

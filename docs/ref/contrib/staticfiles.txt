@@ -353,6 +353,8 @@ hashing algorithm.
 
 .. class:: storage.CachedStaticFilesStorage
 
+.. deprecated:: 2.1
+
 ``CachedStaticFilesStorage`` is a similar class like the
 :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
 but uses Django's :doc:`caching framework</topics/cache>` for storing the

@@ -1,12 +1,14 @@
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings
-from django.test.utils import patch_logger
+from django.test.utils import ignore_warnings, patch_logger
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .admin import UnmodifiableAdmin
 from .models import City, site
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
 class GeoAdminTest(TestCase):
 
