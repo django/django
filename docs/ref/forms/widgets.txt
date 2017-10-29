@@ -187,7 +187,7 @@ Styling ``ChoiceWidget`` choices
 
 .. versionadded:: 2.1
 
-Similarly to how you can style an entire wighet using the :attr:`Widget.attrs`
+Similarly to how you can style an entire widget using the :attr:`Widget.attrs`
 attribute it is also possible to style individual choices for widgets inheriting
 from the ``ChoiceWidget`` class. To do so, you can pass a keyword argument
 ``opt_attrs`` to the constructors of such widgets. This argument should be a
@@ -196,7 +196,7 @@ widget.
 
 Besides constants, values may be given as callable types. If a callable option
 attribute is given it is called every time an option is created and is passed
-a keyword list with keys including ``value``, ``label`` and ``index``.
+keyword arguments including ``value``, ``label`` and ``index``.
 
 For example, take the following form field:
 
