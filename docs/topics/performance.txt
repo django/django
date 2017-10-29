@@ -290,13 +290,13 @@ Static files
 Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By taking advantage of web browsers' caching abilities, you can
 eliminate network hits entirely for a given file after the initial download.
 
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` appends a
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` appends a
 content-dependent tag to the filenames of :doc:`static files
 </ref/contrib/staticfiles>` to make it safe for browsers to cache them
 long-term without missing future changes - when a file changes, so will the

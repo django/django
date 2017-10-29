@@ -5,7 +5,8 @@ from django.contrib.gis.forms import BaseGeometryWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import patch_logger
+from django.test.utils import ignore_warnings, patch_logger
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.html import escape
 
 
@@ -195,6 +196,7 @@ class SpecializedFieldTest(SimpleTestCase):
                                                "7.657470703125 -1.25244140625))"),
         }
 
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def assertMapWidget(self, form_instance):
         """
         Make sure the MapWidget js is passed in the form media and a MapWidget

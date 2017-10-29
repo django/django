@@ -232,7 +232,7 @@ Features deprecated in 2.1
 Miscellaneous
 -------------
 
-* ...
+* ``CachedStaticFilesStorage`` is deprecated in favor of ``ManifestStaticFilesStorage``.
 
 .. _removed-features-2.1:
 

@@ -12,7 +12,8 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -232,6 +233,7 @@ class TestHashedFiles:
         self.assertPostCondition()
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
 )
@@ -299,6 +301,7 @@ class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
             self.hashed_file_path('cached/styles.css')
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(
     STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsCachedStaticFilesStorage',
 )
@@ -436,6 +439,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.hashed_file_path(missing_file_name)
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(
     STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
 )
@@ -541,6 +545,7 @@ class TestStaticFilePermissions(CollectionTestCase):
         self.assertEqual(dir_mode, 0o740)
 
 
+@ignore_warnings(category=RemovedInDjango30Warning)
 @override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
 )
