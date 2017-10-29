@@ -171,14 +171,13 @@ class GeoModelTest(TestCase):
     def test_raw_sql_query(self):
         "Testing raw SQL query."
         cities1 = City.objects.all()
-        # Only PostGIS would support a 'select *' query because of its recognized
-        # HEXEWKB format for geometry fields
-        as_text = 'ST_AsText(%s)' if postgis else connection.ops.select
-        cities2 = City.objects.raw(
-            'select id, name, %s from geoapp_city' % as_text % 'point'
-        )
-        self.assertEqual(len(cities1), len(list(cities2)))
-        self.assertIsInstance(cities2[0].point, Point)
+        point_select = connection.ops.select % 'point'
+        cities2 = list(City.objects.raw(
+            'select id, name, %s as point from geoapp_city' % point_select
+        ))
+        self.assertEqual(len(cities1), len(cities2))
+        with self.assertNumQueries(0):  # Ensure point isn't deferred.
+            self.assertIsInstance(cities2[0].point, Point)
 
     def test_dumpdata_loaddata_cycle(self):
         """
