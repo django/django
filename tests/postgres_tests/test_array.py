@@ -11,7 +11,6 @@ from django.db import IntegrityError, connection, models
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
-
 from . import PostgreSQLTestCase, PostgreSQLWidgetTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
@@ -174,6 +173,17 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__in=[[1], [2]]),
             self.objs[:2]
+        )
+
+    def test_in_subquery(self):
+        IntegerArrayModel.objects.create(field=[2, 3])
+
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__in=IntegerArrayModel.objects.all().values_list(
+                    "field", flat=True)
+            ),
+            self.objs[2:3]
         )
 
     @unittest.expectedFailure
