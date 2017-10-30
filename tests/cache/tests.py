@@ -59,6 +59,12 @@ class Unpicklable:
         raise pickle.PickleError()
 
 
+KEY_ERRORS_WITH_MEMCACHED_MSG = (
+    'Cache key contains characters that will cause errors if used with '
+    'memcached: %r'
+)
+
+
 @override_settings(CACHES={
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
@@ -93,6 +99,10 @@ class DummyCacheTests(SimpleTestCase):
         cache.set('d', 'd')
         self.assertEqual(cache.get_many(['a', 'c', 'd']), {})
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {})
+
+    def test_get_many_invalid_key(self):
+        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+            cache.get_many(['key with spaces'])
 
     def test_delete(self):
         "Cache deletion is transparently ignored on the dummy cache backend"
@@ -176,9 +186,17 @@ class DummyCacheTests(SimpleTestCase):
         self.assertEqual(cache.set_many({'a': 1, 'b': 2}), [])
         self.assertEqual(cache.set_many({'a': 1, 'b': 2}, timeout=2, version='1'), [])
 
+    def test_set_many_invalid_key(self):
+        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+            cache.set_many({'key with spaces': 'foo'})
+
     def test_delete_many(self):
         "delete_many does nothing for the dummy cache backend"
         cache.delete_many(['a', 'b'])
+
+    def test_delete_many_invalid_key(self):
+        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+            cache.delete_many({'key with spaces': 'foo'})
 
     def test_clear(self):
         "clear does nothing for the dummy cache backend"
@@ -596,11 +614,7 @@ class BaseCacheTests:
     def test_invalid_key_characters(self):
         # memcached doesn't allow whitespace or control characters in keys.
         key = 'key with spaces and 清'
-        expected_warning = (
-            "Cache key contains characters that will cause errors if used "
-            "with memcached: %r" % key
-        )
-        self._perform_invalid_key_test(key, expected_warning)
+        self._perform_invalid_key_test(key, KEY_ERRORS_WITH_MEMCACHED_MSG % key)
 
     def test_invalid_key_length(self):
         # memcached limits key length to 250.

@@ -25,19 +25,10 @@ class DummyCache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
 
-    def get_many(self, keys, version=None):
-        return {}
-
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         return False
-
-    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        return []
-
-    def delete_many(self, keys, version=None):
-        pass
 
     def clear(self):
         pass
