@@ -95,30 +95,10 @@ Core system checks
 Backwards compatibility
 -----------------------
 
-The following checks are performed to warn the user of any potential problems
-that might occur as a result of a version upgrade.
+Compatibility checks warn of potential problems that might occur after
+upgrading Django.
 
-* **1_6.W001**: Some project unit tests may not execute as expected. *This
-  check was removed in Django 1.8 due to false positives*.
-* **1_6.W002**: ``BooleanField`` does not have a default value. *This
-  check was removed in Django 1.8 due to false positives*.
-* **1_7.W001**:  Django 1.7 changed the global defaults for the
-  ``MIDDLEWARE_CLASSES.``
-  ``django.contrib.sessions.middleware.SessionMiddleware``,
-  ``django.contrib.auth.middleware.AuthenticationMiddleware``, and
-  ``django.contrib.messages.middleware.MessageMiddleware`` were removed from
-  the defaults. If your project needs these middleware then you should
-  configure this setting. *This check was removed in Django 1.9*.
-* **1_8.W001**: The standalone ``TEMPLATE_*`` settings were deprecated in
-  Django 1.8 and the :setting:`TEMPLATES` dictionary takes precedence. You must
-  put the values of the following settings into your defaults ``TEMPLATES``
-  dict: ``TEMPLATE_DIRS``, ``TEMPLATE_CONTEXT_PROCESSORS``, ``TEMPLATE_DEBUG``,
-  ``TEMPLATE_LOADERS``, ``TEMPLATE_STRING_IF_INVALID``. *This check was removed
-  in Django 2.0*.
-* **1_10.W001**: The ``MIDDLEWARE_CLASSES`` setting is deprecated in Django
-  1.10  and the :setting:`MIDDLEWARE` setting takes precedence. Since you've
-  set ``MIDDLEWARE``, the value of ``MIDDLEWARE_CLASSES`` is ignored. *This
-  check was removed in Django 2.0*.
+Currently, there aren't any of these checks.
 
 Caches
 ------
