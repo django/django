@@ -75,7 +75,7 @@ Create another ``Article``, and set it to appear in both ``Publications``::
     >>> a2.publications.add(p1, p2)
     >>> a2.publications.add(p3)
 
-Adding a second time is OK::
+Adding a second time is OK, it will not duplicate the relation::
 
     >>> a2.publications.add(p3)
 

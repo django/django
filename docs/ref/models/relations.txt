@@ -56,11 +56,15 @@ Related objects reference
         manager perform the update by calling ``e.save()``.
 
         Using ``add()`` with a many-to-many relationship, however, will not
-        call any ``save()`` methods, but rather create the relationships
-        using :meth:`QuerySet.bulk_create()
+        call any ``save()`` methods (the ``bulk`` argument doesn't exist), but
+        rather create the relationships using :meth:`QuerySet.bulk_create()
         <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
         some custom logic when a relationship is created, listen to the
-        :data:`~django.db.models.signals.m2m_changed` signal.
+        :data:`~django.db.models.signals.m2m_changed` signal, which will
+        trigger ``pre_add`` and ``post_add`` actions.
+
+        Using ``add()`` on a relation that already exists won't duplicate the
+        relation, but it will still trigger signals.
 
     .. method:: create(**kwargs)
 
