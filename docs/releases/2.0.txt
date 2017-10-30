@@ -12,9 +12,9 @@ their deprecation cycle, and we've :ref:`begun the deprecation process for some
 features <deprecated-features-2.0>`.
 
 This release starts Django's use of a :ref:`loose form of semantic versioning
-<internal-release-cadence>`, however, there aren't any major backwards
-incompatible changes that might be expected of a 2.0 release. Upgrading should
-be a similar amount of effort as past feature releases.
+<internal-release-cadence>`, but there aren't any major backwards incompatible
+changes that might be expected of a 2.0 release. Upgrading should be a similar
+amount of effort as past feature releases.
 
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
@@ -60,10 +60,13 @@ could be written as::
 
 The new syntax supports type coercion of URL parameters. In the example, the
 view will receive the ``year`` keyword argument as an integer rather than as
-a string.
+a string. Also, the URLs that will match are slightly less constrained in the
+rewritten example. For example, the year 10000 will now match since the year
+integers aren't constrained to be exactly four digits long as they are in the
+regular expression.
 
 The ``django.conf.urls.url()`` function from previous versions is now available
-as :func:`django.urls.re_path`, however, the old location remains for backwards
+as :func:`django.urls.re_path`. The old location remains for backwards
 compatibility, without an imminent deprecation. The old
 ``django.conf.urls.include()`` function is now importable from ``django.urls``
 so you can use ``from django.urls import include, path, re_path`` in your
@@ -75,8 +78,8 @@ and provide more details.
 Mobile-friendly ``contrib.admin``
 ---------------------------------
 
-The admin is now responsive and supports all major mobile devices.
-Older browsers may experience varying levels of graceful degradation.
+The admin is now responsive and supports all major mobile devices. Older
+browsers may experience varying levels of graceful degradation.
 
 Window expressions
 ------------------
@@ -172,8 +175,8 @@ Minor features
 Cache
 ~~~~~
 
-* On memcached, ``cache.set_many()`` returns a list of keys that failed to be
-  inserted.
+* ``cache.set_many()`` now returns a list of keys that failed to be inserted.
+  For the built-in backends, failed inserts can only happen on memcached.
 
 File Storage
 ~~~~~~~~~~~~
@@ -222,8 +225,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* The new :option:`squashmigrations --squashed-name`  option allows naming
-  the squashed migration.
+* The new :option:`squashmigrations --squashed-name` option allows naming the
+  squashed migration.
 
 Models
 ~~~~~~
@@ -242,7 +245,7 @@ Models
   controls the number of results Django fetches from the database adapter.
 
 * :meth:`.QuerySet.earliest`, :meth:`.QuerySet.latest`, and
-  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>`  now
+  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>` now
   allow ordering by several fields.
 
 * Added the :class:`~django.db.models.functions.ExtractQuarter` function to
@@ -776,7 +779,8 @@ See :ref:`deprecated-features-1.10` for details on these changes.
 
 * The ``shell --plain`` option is removed.
 
-* The ``django.core.urlresolvers`` module is removed.
+* The ``django.core.urlresolvers`` module is removed in favor of its new
+  location, ``django.urls``.
 
 * ``CommaSeparatedIntegerField`` is removed, except for support in historical
   migrations.
@@ -797,7 +801,7 @@ See :ref:`deprecated-features-1.10` for details on these changes.
 * Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
   rather than properties is no longer supported.
 
-* The  ``Model._meta.virtual_fields`` attribute is removed.
+* The ``Model._meta.virtual_fields`` attribute is removed.
 
 * The keyword arguments ``virtual_only`` in ``Field.contribute_to_class()`` and
   ``virtual`` in ``Model._meta.add_field()`` are removed.
