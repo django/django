@@ -23,7 +23,6 @@ re_chars = re.compile(r'<.*?>|(.)', re.S)
 re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
-re_duplicate_dash = re.compile('-{2,}')
 
 
 @keep_lazy_text
@@ -413,8 +412,7 @@ def slugify(value, allow_unicode=False):
     else:
         value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
-    text = re.sub(r'[-\s\_]+', '-', value)
-    text = re_duplicate_dash.sub('-', text).strip('-')
+    text = re.sub(r'[-\s\_]+', '-', value).strip('-')
     return mark_safe(text)
 
 
