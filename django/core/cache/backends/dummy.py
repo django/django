@@ -34,7 +34,7 @@ class DummyCache(BaseCache):
         return False
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        pass
+        return []
 
     def delete_many(self, keys, version=None):
         pass
