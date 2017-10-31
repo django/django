@@ -64,8 +64,8 @@ def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
     any '/', '_' and ':' and similarly problematic characters.
-    Similar to urllib.quote, except that the quoting is slightly different so
-    that it doesn't get automatically unquoted by the Web browser.
+    Similar to urllib.parse.quote(), except that the quoting is slightly
+    different so that it doesn't get automatically unquoted by the Web browser.
     """
     if not isinstance(s, str):
         return s
@@ -78,9 +78,7 @@ def quote(s):
 
 
 def unquote(s):
-    """
-    Undo the effects of quote(). Based heavily on urllib.unquote().
-    """
+    """Undo the effects of quote(). Based heavily on urllib.parse.unquote()."""
     mychr = chr
     myatoi = int
     list = s.split('_')
