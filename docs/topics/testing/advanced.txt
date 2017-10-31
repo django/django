@@ -298,7 +298,7 @@ Advanced features of ``TransactionTestCase``
     recommended that you do not hard code primary key values in tests.
 
     Using ``reset_sequences = True`` will slow down the test, since the primary
-    key reset is an relatively expensive database operation.
+    key reset is a relatively expensive database operation.
 
 .. _testing-reusable-applications:
 

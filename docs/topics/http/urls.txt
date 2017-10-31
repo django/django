@@ -227,7 +227,7 @@ This usage isn't particularly recommended as it makes it easier to accidentally
 introduce errors between the intended meaning of a match and the arguments
 of the view.
 
-In either case, using only one style within an given regex is recommended. When
+In either case, using only one style within a given regex is recommended. When
 both styles are mixed, any unnamed groups are ignored and only named groups are
 passed to the view function.
 

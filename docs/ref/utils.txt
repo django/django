@@ -966,7 +966,7 @@ appropriate entities.
 
 .. function:: make_naive(value, timezone=None)
 
-    Returns an naive :class:`~datetime.datetime` that represents in
+    Returns a naive :class:`~datetime.datetime` that represents in
     ``timezone``  the same point in time as ``value``, ``value`` being an
     aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
