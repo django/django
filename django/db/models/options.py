@@ -33,6 +33,8 @@ DEFAULT_NAMES = (
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
     'indexes',
+    # For backwards compatibility with Django 1.11. RemovedInDjango30Warning
+    'manager_inheritance_from_future',
 )
 
 
