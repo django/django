@@ -220,6 +220,59 @@ class UniqueTogetherTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
+class IndexesTests(SimpleTestCase):
+
+    def test_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=['missing_field'], name='name')]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to the nonexistent field 'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                indexes = [models.Index(fields=['m2m'], name='name')]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'indexes' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'indexes'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    def test_pointing_to_non_local_field(self):
+        class Foo(models.Model):
+            field1 = models.IntegerField()
+
+        class Bar(Foo):
+            field2 = models.IntegerField()
+
+            class Meta:
+                indexes = [models.Index(fields=['field2', 'field1'], name='name')]
+
+        self.assertEqual(Bar.check(), [
+            Error(
+                "'indexes' refers to field 'field1' which is not local to "
+                "model 'Bar'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Bar,
+                id='models.E016',
+            ),
+        ])
+
+
+@isolate_apps('invalid_models_tests')
 class FieldNamesTests(SimpleTestCase):
 
     def test_ending_with_underscore(self):
