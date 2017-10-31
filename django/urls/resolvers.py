@@ -440,8 +440,8 @@ class URLResolver:
                                     (
                                         new_matches,
                                         p_pattern + pat,
-                                        dict(defaults, **url_pattern.default_kwargs),
-                                        dict(self.pattern.converters, **converters)
+                                        {**defaults, **url_pattern.default_kwargs},
+                                        {**self.pattern.converters, **converters}
                                     )
                                 )
                         for namespace, (prefix, sub_pattern) in url_pattern.namespace_dict.items():
@@ -500,7 +500,7 @@ class URLResolver:
                 else:
                     if sub_match:
                         # Merge captured arguments in match with submatch
-                        sub_match_dict = dict(kwargs, **self.default_kwargs)
+                        sub_match_dict = {**kwargs, **self.default_kwargs}
                         # Update the sub_match_dict with the kwargs from the sub_match.
                         sub_match_dict.update(sub_match.kwargs)
                         # If there are *any* named groups, ignore all non-named groups.

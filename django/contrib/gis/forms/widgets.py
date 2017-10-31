@@ -60,19 +60,15 @@ class BaseGeometryWidget(Widget):
                         value.srid, self.map_srid, err
                     )
 
-        if attrs is None:
-            attrs = {}
-
-        build_attrs_kwargs = {
+        context.update(self.build_attrs(self.attrs, {
             'name': name,
             'module': 'geodjango_%s' % name.replace('-', '_'),  # JS-safe
             'serialized': self.serialize(value),
             'geom_type': gdal.OGRGeomType(self.attrs['geom_type']),
             'STATIC_URL': settings.STATIC_URL,
             'LANGUAGE_BIDI': translation.get_language_bidi(),
-        }
-        build_attrs_kwargs.update(attrs)
-        context.update(self.build_attrs(self.attrs, build_attrs_kwargs))
+            **(attrs or {}),
+        }))
         return context
 
 

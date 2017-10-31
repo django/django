@@ -565,7 +565,7 @@ class Func(SQLiteNumericMixin, Expression):
 
     def __repr__(self):
         args = self.arg_joiner.join(str(arg) for arg in self.source_expressions)
-        extra = dict(self.extra, **self._get_repr_options())
+        extra = {**self.extra, **self._get_repr_options()}
         if extra:
             extra = ', '.join(str(key) + '=' + str(val) for key, val in sorted(extra.items()))
             return "{}({}, {})".format(self.__class__.__name__, args, extra)
@@ -596,8 +596,7 @@ class Func(SQLiteNumericMixin, Expression):
             arg_sql, arg_params = compiler.compile(arg)
             sql_parts.append(arg_sql)
             params.extend(arg_params)
-        data = self.extra.copy()
-        data.update(**extra_context)
+        data = {**self.extra, **extra_context}
         # Use the first supplied value in this order: the parameter to this
         # method, a value supplied in __init__()'s **extra (the value in
         # `data`), or the value defined on the class.
@@ -921,8 +920,7 @@ class Case(Expression):
         connection.ops.check_expression_support(self)
         if not self.cases:
             return compiler.compile(self.default)
-        template_params = self.extra.copy()
-        template_params.update(extra_context)
+        template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
         for case in self.cases:
@@ -1017,8 +1015,7 @@ class Subquery(Expression):
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
-        template_params = self.extra.copy()
-        template_params.update(extra_context)
+        template_params = {**self.extra, **extra_context}
         template_params['subquery'], sql_params = self.queryset.query.get_compiler(connection=connection).as_sql()
 
         template = template or template_params.get('template', self.template)
@@ -1103,8 +1100,8 @@ class OrderBy(BaseExpression):
         placeholders = {
             'expression': expression_sql,
             'ordering': 'DESC' if self.descending else 'ASC',
+            **extra_context,
         }
-        placeholders.update(extra_context)
         template = template or self.template
         params *= template.count('%(expression)s')
         return (template % placeholders).rstrip(), params

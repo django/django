@@ -39,10 +39,10 @@ if version < (1, 3, 3):
 # MySQLdb returns TIME columns as timedelta -- they are more like timedelta in
 # terms of actual behavior as they are signed and include days -- and Django
 # expects time.
-django_conversions = conversions.copy()
-django_conversions.update({
-    FIELD_TYPE.TIME: backend_utils.typecast_time,
-})
+django_conversions = {
+    **conversions,
+    **{FIELD_TYPE.TIME: backend_utils.typecast_time},
+}
 
 # This should match the numerical portion of the version numbers (we can treat
 # versions like 5.0.24 and 5.0.24a as the same).

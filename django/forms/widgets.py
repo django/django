@@ -241,10 +241,7 @@ class Widget(metaclass=MediaDefiningClass):
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """Build an attribute dictionary."""
-        attrs = base_attrs.copy()
-        if extra_attrs is not None:
-            attrs.update(extra_attrs)
-        return attrs
+        return {**base_attrs, **(extra_attrs or {})}
 
     def value_from_datadict(self, data, files, name):
         """

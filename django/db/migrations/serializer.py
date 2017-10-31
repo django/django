@@ -119,9 +119,8 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        imports = {"import %s" % module}
         v_string, v_imports = serializer_factory(self.value.value).serialize()
-        imports.update(v_imports)
+        imports = {'import %s' % module, *v_imports}
         return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
 
 
@@ -161,15 +160,12 @@ class FunctionTypeSerializer(BaseSerializer):
 
 class FunctoolsPartialSerializer(BaseSerializer):
     def serialize(self):
-        imports = {'import functools'}
         # Serialize functools.partial() arguments
         func_string, func_imports = serializer_factory(self.value.func).serialize()
         args_string, args_imports = serializer_factory(self.value.args).serialize()
         keywords_string, keywords_imports = serializer_factory(self.value.keywords).serialize()
         # Add any imports needed by arguments
-        imports.update(func_imports)
-        imports.update(args_imports)
-        imports.update(keywords_imports)
+        imports = {'import functools', *func_imports, *args_imports, *keywords_imports}
         return (
             'functools.%s(%s, *%s, **%s)' % (
                 self.value.__class__.__name__,
@@ -221,14 +217,12 @@ class OperationSerializer(BaseSerializer):
 
 class RegexSerializer(BaseSerializer):
     def serialize(self):
-        imports = {"import re"}
         regex_pattern, pattern_imports = serializer_factory(self.value.pattern).serialize()
         # Turn off default implicit flags (e.g. re.U) because regexes with the
         # same implicit and explicit flags aren't equal.
         flags = self.value.flags ^ re.compile('').flags
         regex_flags, flag_imports = serializer_factory(flags).serialize()
-        imports.update(pattern_imports)
-        imports.update(flag_imports)
+        imports = {'import re', *pattern_imports, *flag_imports}
         args = [regex_pattern]
         if flags:
             args.append(regex_flags)

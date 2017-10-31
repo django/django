@@ -9,16 +9,16 @@ class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     Sublcass that includes updates the `base_data_types_reverse` dict
     for geometry field types.
     """
-    base_data_types_reverse = FlexibleFieldLookupDict.base_data_types_reverse.copy()
-    base_data_types_reverse.update(
-        {'point': 'GeometryField',
-         'linestring': 'GeometryField',
-         'polygon': 'GeometryField',
-         'multipoint': 'GeometryField',
-         'multilinestring': 'GeometryField',
-         'multipolygon': 'GeometryField',
-         'geometrycollection': 'GeometryField',
-         })
+    base_data_types_reverse = {
+        **FlexibleFieldLookupDict.base_data_types_reverse,
+        'point': 'GeometryField',
+        'linestring': 'GeometryField',
+        'polygon': 'GeometryField',
+        'multipoint': 'GeometryField',
+        'multilinestring': 'GeometryField',
+        'multipolygon': 'GeometryField',
+        'geometrycollection': 'GeometryField',
+    }
 
 
 class SpatiaLiteIntrospection(DatabaseIntrospection):

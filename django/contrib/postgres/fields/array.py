@@ -183,13 +183,12 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                 )
 
     def formfield(self, **kwargs):
-        defaults = {
+        return super().formfield(**{
             'form_class': SimpleArrayField,
             'base_field': self.base_field.formfield(),
             'max_length': self.size,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
 
 
 @ArrayField.register_lookup

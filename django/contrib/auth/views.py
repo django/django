@@ -31,9 +31,7 @@ class SuccessURLAllowedHostsMixin:
     success_url_allowed_hosts = set()
 
     def get_success_url_allowed_hosts(self):
-        allowed_hosts = {self.request.get_host()}
-        allowed_hosts.update(self.success_url_allowed_hosts)
-        return allowed_hosts
+        return {self.request.get_host(), *self.success_url_allowed_hosts}
 
 
 class LoginView(SuccessURLAllowedHostsMixin, FormView):
@@ -98,9 +96,8 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             self.redirect_field_name: self.get_redirect_url(),
             'site': current_site,
             'site_name': current_site.name,
+            **(self.extra_context or {})
         })
-        if self.extra_context is not None:
-            context.update(self.extra_context)
         return context
 
 
@@ -158,9 +155,8 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
             'site': current_site,
             'site_name': current_site.name,
             'title': _('Logged out'),
+            **(self.extra_context or {})
         })
-        if self.extra_context is not None:
-            context.update(self.extra_context)
         return context
 
 
@@ -201,9 +197,10 @@ class PasswordContextMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.title
-        if self.extra_context is not None:
-            context.update(self.extra_context)
+        context.update({
+            'title': self.title,
+            **(self.extra_context or {})
+        })
         return context
 
 

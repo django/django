@@ -135,7 +135,7 @@ class SplitArrayWidget(forms.Widget):
             except IndexError:
                 widget_value = None
             if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+                final_attrs = {**final_attrs, 'id': '%s_%s' % (id_, i)}
             context['widget']['subwidgets'].append(
                 self.widget.get_context(name + '_%s' % i, widget_value, final_attrs)['widget']
             )

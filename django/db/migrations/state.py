@@ -553,8 +553,7 @@ class ModelState:
     def render(self, apps):
         """Create a Model object from our current state into the given apps."""
         # First, make a Meta object
-        meta_contents = {'app_label': self.app_label, "apps": apps}
-        meta_contents.update(self.options)
+        meta_contents = {'app_label': self.app_label, 'apps': apps, **self.options}
         meta = type("Meta", (), meta_contents)
         # Then, work out our bases
         try:
