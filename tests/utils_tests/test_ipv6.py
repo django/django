@@ -30,6 +30,7 @@ class TestUtilsIPv6(unittest.TestCase):
         self.assertFalse(is_valid_ipv6_address('1:::2'))
         self.assertFalse(is_valid_ipv6_address('fe80::223: 6cff:fe8a:2e8a'))
         self.assertFalse(is_valid_ipv6_address('2a02::223:6cff :fe8a:2e8a'))
+        self.assertFalse(is_valid_ipv6_address('::ffff:0.52.18.52'))
 
     def test_validates_incorrect_with_v4mapping(self):
         self.assertFalse(is_valid_ipv6_address('::ffff:999.42.16.14'))
@@ -50,7 +51,7 @@ class TestUtilsIPv6(unittest.TestCase):
         self.assertEqual(clean_ipv6_address('::ffff:0a0a:0a0a'), '::ffff:10.10.10.10')
         self.assertEqual(clean_ipv6_address('::ffff:1234:1234'), '::ffff:18.52.18.52')
         self.assertEqual(clean_ipv6_address('::ffff:18.52.18.52'), '::ffff:18.52.18.52')
-        self.assertEqual(clean_ipv6_address('::ffff:0.52.18.52'), '::ffff:0.52.18.52')
+        self.assertEqual(clean_ipv6_address('::ffff:1.52.18.52'), '::ffff:1.52.18.52')
         self.assertEqual(clean_ipv6_address('::ffff:0.0.0.0'), '::ffff:0.0.0.0')
 
     def test_unpacks_ipv4(self):

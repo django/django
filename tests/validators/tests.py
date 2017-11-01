@@ -139,6 +139,7 @@ TEST_DATA = [
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
     (validate_ipv4_address, '1.1.1.1\n', ValidationError),
     (validate_ipv4_address, '٧.2٥.3٣.243', ValidationError),
+    (validate_ipv4_address, '0.1.2.3', ValidationError),
 
     # validate_ipv6_address uses django.utils.ipv6, which
     # is tested in much greater detail in its own testcase
