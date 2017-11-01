@@ -752,10 +752,9 @@ Methods
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
       will be calculated.
     * Use ``domain`` if you want to set a cross-domain cookie. For example,
-      ``domain=".lawrence.com"`` will set a cookie that is readable by
-      the domains www.lawrence.com, blogs.lawrence.com and
-      calendars.lawrence.com. Otherwise, a cookie will only be readable by
-      the domain that set it.
+      ``domain="example.com"`` will set a cookie that is readable by the
+      domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
+      only be readable by the domain that set it.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 

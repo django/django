@@ -309,7 +309,7 @@ Default: ``None``
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``".example.com"`` to allow a POST request from a form on one subdomain to be
+``"example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -1733,8 +1733,8 @@ The age of the language cookie, in seconds.
 Default: ``None``
 
 The domain to use for the language cookie. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
+``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
@@ -2958,8 +2958,8 @@ The age of session cookies, in seconds.
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
+``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used

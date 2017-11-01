@@ -452,7 +452,7 @@ SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_NAME = 'sessionid'
 # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
-# A string like ".example.com", or None for standard domain cookie.
+# A string like "example.com", or None for standard domain cookie.
 SESSION_COOKIE_DOMAIN = None
 # Whether the session cookie should be secure (https:// only).
 SESSION_COOKIE_SECURE = False
