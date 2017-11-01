@@ -450,6 +450,10 @@ instantiating the model field as any arguments relating to data validation
 (``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
 output value.
 
+Django also uses ``output_field`` to send the value to the database with the
+correct type, for example a value of ``[1, 2]`` could be sent as a
+``JSONField()`` or as an ``ArrayField()``.
+
 ``ExpressionWrapper()`` expressions
 -----------------------------------
 

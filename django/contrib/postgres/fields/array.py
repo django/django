@@ -1,5 +1,7 @@
 import json
 
+import psycopg2.extensions
+
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
@@ -14,6 +16,25 @@ from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
+
+
+class ArrayLiteral:
+    """
+    An object which psycopg2 serializes into an array, but is hashable and
+    comparable like a tuple.
+    """
+
+    def __init__(self, value):
+        self.value = tuple(value)
+
+    def __conform__(self, protocol):
+        return psycopg2.extensions.adapt(list(self.value))
+
+    def __hash__(self):
+        return hash(self.value)
+
+    def __eq__(self, other):
+        return self.value == other.value
 
 
 class ArrayField(CheckFieldDefaultMixin, Field):
@@ -86,7 +107,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):
-            return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
+            return ArrayLiteral(self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value)
         return value
 
     def deconstruct(self):

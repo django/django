@@ -366,7 +366,12 @@ class BaseExpression:
 
     def __hash__(self):
         path, args, kwargs = self.deconstruct()
-        return hash((path,) + args + tuple(kwargs.items()))
+        try:
+            return hash((path,) + args + tuple(kwargs.items()))
+        except TypeError:
+            # args or kwargs may include a mutable object, in this case we fall back to
+            # a less unique hash.
+            return hash(path)
 
 
 class Expression(BaseExpression, Combinable):

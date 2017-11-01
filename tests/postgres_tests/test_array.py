@@ -129,6 +129,7 @@ class TestQuerying(PostgreSQLTestCase):
             NullableIntegerArrayModel.objects.create(field=[2]),
             NullableIntegerArrayModel.objects.create(field=[2, 3]),
             NullableIntegerArrayModel.objects.create(field=[20, 30, 40]),
+            NullableIntegerArrayModel.objects.create(field=[]),
             NullableIntegerArrayModel.objects.create(field=None),
         ]
 
@@ -136,6 +137,20 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]),
             self.objs[:1]
+        )
+
+    def test_value(self):
+        value = models.Value([1], output_field=ArrayField(models.IntegerField()))
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=value),
+            self.objs[:1]
+        )
+
+    def test_value_empty(self):
+        value = models.Value([], output_field=ArrayField(models.IntegerField()))
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=value),
+            [self.objs[4]]
         )
 
     def test_exact_charfield(self):
@@ -167,7 +182,7 @@ class TestQuerying(PostgreSQLTestCase):
     def test_lt(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__lt=[2]),
-            self.objs[:1]
+            [self.objs[0], self.objs[4]]
         )
 
     def test_in(self):
@@ -199,13 +214,13 @@ class TestQuerying(PostgreSQLTestCase):
     def test_in_as_F_object(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__in=[models.F('field')]),
-            self.objs[:4]
+            self.objs[:5]
         )
 
     def test_contained_by(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contained_by=[1, 2]),
-            self.objs[:2]
+            [self.objs[0], self.objs[1], self.objs[4]]
         )
 
     @unittest.expectedFailure
@@ -288,14 +303,13 @@ class TestQuerying(PostgreSQLTestCase):
     def test_len(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__len__lte=2),
-            self.objs[0:3]
+            self.objs[0:3] + [self.objs[4]]
         )
 
     def test_len_empty_array(self):
-        obj = NullableIntegerArrayModel.objects.create(field=[])
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__len=0),
-            [obj]
+            [self.objs[4]]
         )
 
     def test_slice(self):
@@ -323,6 +337,31 @@ class TestQuerying(PostgreSQLTestCase):
                 id__in=NullableIntegerArrayModel.objects.filter(field__len=3)
             ),
             [self.objs[3]]
+        )
+
+    def test_value_annotate(self):
+        value = models.Value([5], output_field=ArrayField(models.IntegerField()))
+        self.assertEqual(
+            NullableIntegerArrayModel.objects.annotate(value=value).first().value,
+            [5]
+        )
+
+    @unittest.expectedFailure
+    def test_value_annotate_empty(self):
+        # Ticket 28767
+        value = models.Value([], output_field=ArrayField(models.IntegerField()))
+        self.assertEqual(
+            NullableIntegerArrayModel.objects.annotate(value=value).first().value,
+            []
+        )
+
+    def test_value_annotate_aggregate(self):
+        value = models.Value([1], output_field=ArrayField(models.IntegerField()))
+        one = models.Func(value, 1, function='ARRAY_LENGTH')
+        query_annotated_by_value = NullableIntegerArrayModel.objects.annotate(size=one)
+        self.assertSequenceEqual(
+            query_annotated_by_value.values('size').annotate(count=models.Count('pk')).values('size', 'count'),
+            [{'size': 1, 'count': len(self.objs)}]
         )
 
     def test_unsupported_lookup(self):
