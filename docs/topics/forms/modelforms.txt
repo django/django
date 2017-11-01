@@ -1148,6 +1148,10 @@ a particular author, you could do this::
     >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
+``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
+(``<model name>_set`` ). If ``Book``'s ``ForeignKey`` to ``Author`` has a
+:attr:`~django.db.models.ForeignKey.related_name`, that's used instead.
+
 .. note::
 
     :func:`~django.forms.models.inlineformset_factory` uses

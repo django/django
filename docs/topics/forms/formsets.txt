@@ -578,6 +578,32 @@ argument - the index of the form in the formset. The index is ``None`` for the
     ...         kwargs['custom_kwarg'] = index
     ...         return kwargs
 
+.. _formset-prefix:
+
+Customizing a formset's prefix
+==============================
+
+In the rendered HTML, formsets include a prefix on each field's name. By
+default, the prefix is ``'form'``, but it can be customized using the formset's
+``prefix`` argument.
+
+For example, in the default case, you might see:
+
+.. code-block:: html
+
+    <label for="id_form-0-title">Title:</label>
+    <input type="text" name="form-0-title" id="id_form-0-title" />
+
+But with ``ArticleFormset(prefix='article')`` that becomes:
+
+.. code-block:: html
+
+    <label for="id_article-0-title">Title:</label>
+    <input type="text" name="article-0-title" id="id_article-0-title" />
+
+This is useful if you want to :ref:`use more than one formset in a view
+<multiple-formsets-in-view>`.
+
 Using a formset in views and templates
 ======================================
 
@@ -653,6 +679,8 @@ If you manually render fields in the template, you can render
 Similarly, if the formset has the ability to order (``can_order=True``), it is
 possible to render it with ``{{ form.ORDER }}``.
 
+.. _multiple-formsets-in-view:
+
 Using more than one formset in a view
 -------------------------------------
 
@@ -686,3 +714,6 @@ a look at how this might be accomplished::
 You would then render the formsets as normal. It is important to point out
 that you need to pass ``prefix`` on both the POST and non-POST cases so that
 it is rendered and processed correctly.
+
+Each formset's :ref:`prefix <formset-prefix>` replaces the default ``form``
+prefix that's added to each field's ``name`` and ``id`` HTML attributes.
