@@ -26,23 +26,27 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.url_name, 'articles-2003')
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {})
+        self.assertEqual(match.route, 'articles/2003/')
 
     def test_path_lookup_with_typed_parameters(self):
         match = resolve('/articles/2015/')
         self.assertEqual(match.url_name, 'articles-year')
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {'year': 2015})
+        self.assertEqual(match.route, 'articles/<int:year>/')
 
     def test_path_lookup_with_multiple_paramaters(self):
         match = resolve('/articles/2015/04/12/')
         self.assertEqual(match.url_name, 'articles-year-month-day')
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {'year': 2015, 'month': 4, 'day': 12})
+        self.assertEqual(match.route, 'articles/<int:year>/<int:month>/<int:day>/')
 
     def test_two_variable_at_start_of_path_pattern(self):
         match = resolve('/en/foo/')
         self.assertEqual(match.url_name, 'lang-and-path')
         self.assertEqual(match.kwargs, {'lang': 'en', 'url': 'foo'})
+        self.assertEqual(match.route, '<lang>/<path:url>/')
 
     def test_path_reverse_without_parameter(self):
         url = reverse('articles-2003')

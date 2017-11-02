@@ -28,11 +28,12 @@ from .utils import get_callable
 
 
 class ResolverMatch:
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.url_name = url_name
+        self.route = route
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -345,7 +346,8 @@ class URLPattern:
             new_path, args, kwargs = match
             # Pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
-            return ResolverMatch(self.callback, args, kwargs, self.pattern.name)
+            return ResolverMatch(self.callback, args, kwargs, self.pattern.name,
+                                 route=getattr(self.pattern, '_route', None))
 
     @cached_property
     def lookup_str(self):
@@ -541,6 +543,7 @@ class URLResolver:
                             sub_match.url_name,
                             [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces,
+                            getattr(pattern.pattern, '_route', None),
                         )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
