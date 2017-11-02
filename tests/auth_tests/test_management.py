@@ -25,6 +25,12 @@ from .models import (
     CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
 )
 
+MOCK_INPUT_KEY_TO_PROMPTS = {
+    # @mock_inputs dict key: [expected prompt messages],
+    'email': ['Email address: '],
+    'username': ['Username: ', lambda: "Username (leave blank to use '%s'): " % get_default_username()],
+}
+
 
 def mock_inputs(inputs):
     """
@@ -42,14 +48,21 @@ def mock_inputs(inputs):
 
             def mock_input(prompt):
                 assert '__proxy__' not in prompt
-                response = ''
+                response = None
                 for key, val in inputs.items():
-                    if key in prompt.lower():
+                    # get() fallback because sometimes 'key' is the actual
+                    # prompt rather than a shortcut name.
+                    prompt_msgs = MOCK_INPUT_KEY_TO_PROMPTS.get(key, key)
+                    if isinstance(prompt_msgs, list):
+                        prompt_msgs = [msg() if callable(msg) else msg for msg in prompt_msgs]
+                    if prompt in prompt_msgs:
                         if callable(val):
                             response = val()
                         else:
                             response = val
                         break
+                if response is None:
+                    raise ValueError('Mock input for %r not found.' % prompt)
                 return response
 
             old_getpass = createsuperuser.getpass
@@ -72,6 +85,13 @@ class MockTTY:
     """
     def isatty(self):
         return True
+
+
+class MockInputTests(TestCase):
+    @mock_inputs({'username': 'alice'})
+    def test_input_not_found(self):
+        with self.assertRaisesMessage(ValueError, "Mock input for 'Email address: ' not found."):
+            call_command('createsuperuser', stdin=MockTTY())
 
 
 class GetDefaultUsernameTestCase(TestCase):
@@ -236,27 +256,31 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
-    @mock_inputs({
-        'password': "nopasswd",
-        'u\u017eivatel': 'foo',  # username (cz)
-        'email': 'nolocale@somewhere.org'})
     def test_non_ascii_verbose_name(self):
-        username_field = User._meta.get_field('username')
-        old_verbose_name = username_field.verbose_name
-        username_field.verbose_name = _('u\u017eivatel')
-        new_io = StringIO()
-        try:
-            call_command(
-                "createsuperuser",
-                interactive=True,
-                stdout=new_io,
-                stdin=MockTTY(),
-            )
-        finally:
-            username_field.verbose_name = old_verbose_name
+        @mock_inputs({
+            'password': "nopasswd",
+            "Uživatel (leave blank to use '%s'): " % get_default_username(): 'foo',  # username (cz)
+            'email': 'nolocale@somewhere.org',
+        })
+        def test(self):
+            username_field = User._meta.get_field('username')
+            old_verbose_name = username_field.verbose_name
+            username_field.verbose_name = _('u\u017eivatel')
+            new_io = StringIO()
+            try:
+                call_command(
+                    "createsuperuser",
+                    interactive=True,
+                    stdout=new_io,
+                    stdin=MockTTY(),
+                )
+            finally:
+                username_field.verbose_name = old_verbose_name
 
-        command_output = new_io.getvalue().strip()
-        self.assertEqual(command_output, 'Superuser created successfully.')
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+
+        test(self)
 
     def test_verbosity_zero(self):
         # We can suppress output on the management command
@@ -445,9 +469,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         @mock_inputs({
             'password': 'nopasswd',
-            'username (email.id)': email.pk,
-            'email (email.email)': email.email,
-            'group (group.id)': group.pk,
+            'Username (Email.id): ': email.pk,
+            'Email (Email.email): ': email.email,
+            'Group (Group.id): ': group.pk,
         })
         def test(self):
             call_command(
@@ -475,7 +499,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         def return_passwords():
             return entered_passwords.pop(0)
 
-        @mock_inputs({'password': return_passwords, 'username': ''})
+        @mock_inputs({'password': return_passwords, 'username': '', 'email': ''})
         def test(self):
             call_command(
                 'createsuperuser',
@@ -506,6 +530,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs({
             'password': bad_then_good_password,
             'username': 'joe1234567890',
+            'email': '',
         })
         def test(self):
             call_command(
@@ -554,7 +579,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         def return_usernames():
             return entered_usernames.pop(0)
 
-        @mock_inputs({'password': return_passwords, 'username': return_usernames})
+        @mock_inputs({'password': return_passwords, 'username': return_usernames, 'email': ''})
         def test(self):
             call_command(
                 'createsuperuser',
@@ -585,7 +610,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         def return_usernames():
             return entered_usernames.pop(0)
 
-        @mock_inputs({'password': return_passwords, 'username': return_usernames})
+        @mock_inputs({'password': return_passwords, 'username': return_usernames, 'email': ''})
         def test(self):
             call_command(
                 'createsuperuser',
@@ -618,6 +643,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs({
             'password': mismatched_passwords_then_matched,
             'username': 'joe1234567890',
+            'email': '',
         })
         def test(self):
             call_command(
@@ -651,6 +677,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         @mock_inputs({
             'password': blank_passwords_then_valid,
             'username': 'joe1234567890',
+            'email': '',
         })
         def test(self):
             call_command(
