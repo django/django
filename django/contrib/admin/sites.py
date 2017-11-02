@@ -274,7 +274,7 @@ class AdminSite:
         # If there were ModelAdmins registered, we should have a list of app
         # labels for which we need to allow access to the app_index view,
         if valid_app_labels:
-            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
+            regex = r'^(?P<app_label>' + '|'.join(sorted(valid_app_labels)) + ')/$'
             urlpatterns += [
                 re_path(regex, wrap(self.app_index), name='app_list'),
             ]
