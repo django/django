@@ -268,7 +268,8 @@ Tests
 URLs
 ~~~~
 
-* ...
+* The new :attr:`.ResolverMatch.route` attribute stores the route of the
+  matching URL pattern.
 
 Validators
 ~~~~~~~~~~
