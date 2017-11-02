@@ -1,0 +1,12 @@
+===========================
+Django 1.11.8 release notes
+===========================
+
+*Expected December 1, 2017*
+
+Django 1.11.8 fixes several bugs in 1.11.7.
+
+Bugfixes
+========
+
+* ...
