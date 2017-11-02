@@ -59,6 +59,10 @@ the Django Project.
 
 The discussion about the development of Django itself takes place here.
 
+Before asking a question about how to contribute, read
+:doc:`/internals/contributing/index`. Many frequently asked questions are
+answered there.
+
 .. note::
 
     Please make use of
