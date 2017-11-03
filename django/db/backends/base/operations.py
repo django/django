@@ -300,7 +300,7 @@ class BaseDatabaseOperations:
             import sqlparse
         except ImportError:
             raise ImproperlyConfigured(
-                "sqlparse is required if you don't split your SQL "
+                "The sqlparse package is required if you don't split your SQL "
                 "statements manually."
             )
         else:
