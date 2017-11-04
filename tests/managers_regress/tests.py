@@ -5,7 +5,7 @@ from django.test.utils import isolate_apps
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
-    Child4, Child5, Child6, Child7, RelatedModel, OldRelatedModel,
+    Child4, Child5, Child6, Child7, OldRelatedModel, RelatedModel,
     RelationModel,
 )
 

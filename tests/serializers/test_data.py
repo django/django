@@ -23,10 +23,10 @@ from .models import (
     GenericData, GenericIPAddressData, GenericIPAddressPKData,
     InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
     Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
-    ModifyingSaveData, NullBooleanData, O2OData, PositiveIntegerData,
-    PositiveIntegerPKData, PositiveSmallIntegerData,
+    ModifyingSaveData, NullBooleanData, NulledBooleanData, O2OData,
+    PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
-    Tag, TextData, TimeData, UniqueAnchor, UUIDData, NulledBooleanData,
+    Tag, TextData, TimeData, UniqueAnchor, UUIDData,
 )
 from .tests import register_tests
 
