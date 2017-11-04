@@ -654,11 +654,19 @@ should avoid them if possible.
 
 .. warning::
 
-    You should be very careful to escape any parameters that the user can
-    control by using ``params`` in order to protect against :ref:`SQL injection
-    attacks <sql-injection-protection>`. ``params`` is a required argument to
-    force you to acknowledge that you're not interpolating your SQL with user
-    provided data.
+    To protect against `SQL injection attacks
+    <https://en.wikipedia.org/wiki/SQL_injection>`_, you must escape any
+    parameters that the user can control by using ``params``. ``params`` is a
+    required argument to force you to acknowledge that you're not interpolating
+    your SQL with user-provided data.
+
+    You also must not quote placeholders in the SQL string. This example is
+    vulnerable to SQL injection because of the quotes around ``%s``::
+
+        RawSQL("select col from sometable where othercol = '%s'")  # unsafe!
+
+    You can read more about how Django's :ref:`SQL injection protection
+    <sql-injection-protection>` works.
 
 Window functions
 ----------------
