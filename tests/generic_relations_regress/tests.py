@@ -180,6 +180,34 @@ class GenericRelationTests(TestCase):
         self.assertSequenceEqual(B.objects.filter(a__flag=None), [b1, b3])
         self.assertSequenceEqual(B.objects.exclude(a__flag=None), [b2])
 
+    def test_ticket_20564_nullbooleanfield(self):
+        b1 = B.objects.create()
+        b2 = B.objects.create()
+        b3 = B.objects.create()
+        c1 = C.objects.create(b=b1)
+        c2 = C.objects.create(b=b2)
+        c3 = C.objects.create(b=b3)
+        A.objects.create(old_flag=None, content_object=b1)
+        A.objects.create(old_flag=True, content_object=b2)
+        self.assertSequenceEqual(C.objects.filter(b__a__old_flag=None), [c1, c3])
+        self.assertSequenceEqual(C.objects.exclude(b__a__old_flag=None), [c2])
+
+    def test_ticket_20564_nullable_fk_nullbooleanfield(self):
+        b1 = B.objects.create()
+        b2 = B.objects.create()
+        b3 = B.objects.create()
+        d1 = D.objects.create(b=b1)
+        d2 = D.objects.create(b=b2)
+        d3 = D.objects.create(b=b3)
+        d4 = D.objects.create()
+        A.objects.create(old_flag=None, content_object=b1)
+        A.objects.create(old_flag=True, content_object=b1)
+        A.objects.create(old_flag=True, content_object=b2)
+        self.assertSequenceEqual(D.objects.exclude(b__a__old_flag=None), [d2])
+        self.assertSequenceEqual(D.objects.filter(b__a__old_flag=None), [d1, d3, d4])
+        self.assertSequenceEqual(B.objects.filter(a__old_flag=None), [b1, b3])
+        self.assertSequenceEqual(B.objects.exclude(a__old_flag=None), [b2])
+
     def test_extra_join_condition(self):
         # A crude check that content_type_id is taken in account in the
         # join/subquery condition.
