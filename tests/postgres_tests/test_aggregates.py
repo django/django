@@ -40,6 +40,10 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('boolean_field'))
         self.assertEqual(values, {'arrayagg': [True, False, False, True]})
 
+    def test_array_agg_old_booleanfield(self):
+        values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('old_boolean_field'))
+        self.assertEqual(values, {'arrayagg': [True, False, False, True]})
+
     def test_array_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field'))
@@ -47,6 +51,8 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('integer_field'))
         self.assertEqual(values, {'arrayagg': []})
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('boolean_field'))
+        self.assertEqual(values, {'arrayagg': []})
+        values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('old_boolean_field'))
         self.assertEqual(values, {'arrayagg': []})
 
     def test_bit_and_general(self):
@@ -93,18 +99,36 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
         self.assertEqual(values, {'booland': False})
 
+    def test_bool_and_general_old(self):
+        values = AggregateTestModel.objects.aggregate(booland=BoolAnd('old_boolean_field'))
+        self.assertEqual(values, {'booland': False})
+
     def test_bool_and_empty_result(self):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(booland=BoolAnd('boolean_field'))
+        self.assertEqual(values, {'booland': None})
+
+    def test_bool_and_empty_result_old(self):
+        AggregateTestModel.objects.all().delete()
+        values = AggregateTestModel.objects.aggregate(booland=BoolAnd('old_boolean_field'))
         self.assertEqual(values, {'booland': None})
 
     def test_bool_or_general(self):
         values = AggregateTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
         self.assertEqual(values, {'boolor': True})
 
+    def test_bool_or_general_old(self):
+        values = AggregateTestModel.objects.aggregate(boolor=BoolOr('old_boolean_field'))
+        self.assertEqual(values, {'boolor': True})
+
     def test_bool_or_empty_result(self):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(boolor=BoolOr('boolean_field'))
+        self.assertEqual(values, {'boolor': None})
+
+    def test_bool_or_empty_result_old(self):
+        AggregateTestModel.objects.all().delete()
+        values = AggregateTestModel.objects.aggregate(boolor=BoolOr('old_boolean_field'))
         self.assertEqual(values, {'boolor': None})
 
     def test_string_agg_requires_delimiter(self):
