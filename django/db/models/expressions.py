@@ -818,6 +818,8 @@ class When(Expression):
             condition, lookups = Q(**lookups), None
         if condition is None or not getattr(condition, 'conditional', False) or lookups:
             raise TypeError("__init__() takes either a Q object or lookups as keyword arguments")
+        if isinstance(condition, Q) and not condition:
+            raise ValueError("An empty Q() can't be used as a When() condition.")
         super().__init__(output_field=None)
         self.condition = condition
         self.result = self._parse_expressions(then)[0]
