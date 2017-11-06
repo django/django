@@ -2508,7 +2508,7 @@ SQL equivalent::
 ``in``
 ~~~~~~
 
-In a given list.
+In a given iterable; often a list, tuple, or queryset.
 
 Example::
 
