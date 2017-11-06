@@ -9,13 +9,14 @@ from django.db.models.query_utils import DeferredAttribute
 
 
 class SpatialProxy(DeferredAttribute):
-    def __init__(self, klass, field):
+    def __init__(self, klass, field, load_func=None):
         """
         Initialize on the given Geometry or Raster class (not an instance)
         and the corresponding field.
         """
         self._field = field
         self._klass = klass
+        self._load_func = load_func or klass
         super().__init__(field.attname, klass)
 
     def __get__(self, instance, cls=None):
@@ -42,7 +43,7 @@ class SpatialProxy(DeferredAttribute):
         else:
             # Otherwise, a geometry or raster object is built using the field's
             # contents, and the model's corresponding attribute is set.
-            geo_obj = self._klass(geo_value)
+            geo_obj = self._load_func(geo_value)
             setattr(instance, self._field.attname, geo_obj)
         return geo_obj
 
@@ -61,7 +62,7 @@ class SpatialProxy(DeferredAttribute):
             # For raster fields, assure input is None or a string, dict, or
             # raster instance.
             pass
-        elif isinstance(value, self._klass) and (str(value.geom_type).upper() == gtype or gtype == 'GEOMETRY'):
+        elif isinstance(value, self._klass):
             # The geometry type must match that of the field -- unless the
             # general GeometryField is used.
             if value.srid is None:
