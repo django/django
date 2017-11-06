@@ -130,7 +130,7 @@ class BaseDatabaseIntrospection:
                     # we don't need to reset the sequence.
                     if f.remote_field.through is None:
                         sequence = self.get_sequences(cursor, f.m2m_db_table())
-                        sequence_list.extend(sequence if sequence else [{'table': f.m2m_db_table(), 'column': None}])
+                        sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
         return sequence_list
 
     def get_sequences(self, cursor, table_name, table_fields=()):

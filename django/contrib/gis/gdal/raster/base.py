@@ -56,7 +56,7 @@ class GDALRasterBase(GDALBase):
                 counter += 1
                 item = data[counter]
             # The default domain values are returned if domain is None.
-            result[domain if domain else 'DEFAULT'] = domain_meta
+            result[domain or 'DEFAULT'] = domain_meta
         return result
 
     @metadata.setter

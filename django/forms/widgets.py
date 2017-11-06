@@ -474,7 +474,7 @@ class DateTimeBaseInput(TextInput):
 
     def __init__(self, attrs=None, format=None):
         super().__init__(attrs)
-        self.format = format if format else None
+        self.format = format or None
 
     def format_value(self, value):
         return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])

@@ -323,9 +323,9 @@ class Command(BaseCommand):
             raise CommandError("currently makemessages only supports domains "
                                "'django' and 'djangojs'")
         if self.domain == 'djangojs':
-            exts = extensions if extensions else ['js']
+            exts = extensions or ['js']
         else:
-            exts = extensions if extensions else ['html', 'txt', 'py']
+            exts = extensions or ['html', 'txt', 'py']
         self.extensions = handle_extensions(exts)
 
         if (locale is None and not exclude and not process_all) or self.domain is None:
@@ -501,9 +501,7 @@ class Command(BaseCommand):
                             locale_dir = path
                             break
                     if not locale_dir:
-                        locale_dir = self.default_locale_path
-                    if not locale_dir:
-                        locale_dir = NO_LOCALE_DIR
+                        locale_dir = self.default_locale_path or NO_LOCALE_DIR
                     all_files.append(self.translatable_file_class(dirpath, filename, locale_dir))
         return sorted(all_files)
 

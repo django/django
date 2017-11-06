@@ -28,7 +28,7 @@ Compiler library and Java version 6 or later."""
     parser.add_argument("-q", "--quiet", action="store_false", dest="verbose")
     options = parser.parse_args()
 
-    compiler = Path(closure_compiler if closure_compiler else options.compiler).expanduser()
+    compiler = Path(closure_compiler or options.compiler).expanduser()
     if not compiler.exists():
         sys.exit(
             "Google Closure compiler jar file %s not found. Please use the -c "
