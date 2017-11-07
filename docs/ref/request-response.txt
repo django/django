@@ -284,6 +284,15 @@ Methods
 
     Example: ``"/music/bands/the_beatles/?print=true"``
 
+.. method:: HttpRequest.get_full_path_info()
+
+    .. versionadded:: 2.1
+
+    Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
+    :attr:`path`.
+
+    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
+
 .. method:: HttpRequest.build_absolute_uri(location)
 
     Returns the absolute URI form of ``location``. If no location is provided,
