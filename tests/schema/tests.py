@@ -1931,6 +1931,7 @@ class SchemaTests(TransactionTestCase):
                     "using": "",
                     "columns": editor.quote_name(column),
                     "extra": "",
+                    "opclass": "",
                 }
             )
             if connection.features.uppercases_column_names:
