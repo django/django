@@ -50,7 +50,7 @@ times with multiple contexts)
 """
 
 from collections.abc import Mapping
-from inspect import getfullargspec, Signature
+from inspect import Signature
 import logging
 import re
 
@@ -708,23 +708,20 @@ class FilterExpression:
                 obj = new_obj
         return obj
 
-    def args_check(name, func, provided):
-        provided = list(provided)
+    @staticmethod
+    def args_check(name, func, provided_args):
         # First argument, filter input, is implied.
-        plen = len(provided) + 1
+        provided_args_count = len(provided_args) + 1
         # Check to see if a decorator is providing the real function.
+        # TODO this could be removed if the decorated function was properly wrapped with functools.wraps
         func = getattr(func, '_decorated_function', func)
-
-        args, _, _, defaults, _, _, _ = getfullargspec(func)
-        alen = len(args)
-        dlen = len(defaults or [])
-        # Not enough OR Too many
-        if plen < (alen - dlen) or plen > alen:
-            raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
-                                      (name, alen - dlen, plen))
-
-        return True
-    args_check = staticmethod(args_check)
+        args_count = len(Signature.from_callable(func).parameters)
+        defaults_count = 0 if func.__defaults__ is None else len(func.__defaults__)
+        required_args = args_count - defaults_count
+        if required_args <= provided_args_count <= args_count:
+            return
+        raise TemplateSyntaxError("%s requires %d arguments, %d provided" %
+                                  (name, required_args, provided_args_count))
 
     def __str__(self):
         return self.token
