@@ -49,9 +49,10 @@ times with multiple contexts)
 '<html></html>'
 """
 
+from collections.abc import Mapping
+from inspect import getcallargs, getfullargspec
 import logging
 import re
-from inspect import getcallargs, getfullargspec
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -64,8 +65,10 @@ from django.utils.text import (
 )
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
+from django.utils.typing import Sequence
 
-from .exceptions import TemplateSyntaxError
+from django.template.exceptions import TemplateSyntaxError
+
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
@@ -827,30 +830,44 @@ class Variable:
         """
         current = context
         try:  # catch-all for silent variable failures
-            for bit in self.lookups:
-                try:  # dictionary lookup
-                    current = current[bit]
-                    # ValueError/IndexError are for numpy.array lookup on
-                    # numpy < 1.9 and 1.9+ respectively
-                except (TypeError, AttributeError, KeyError, ValueError, IndexError):
-                    try:  # attribute lookup
-                        # Don't return class attributes if the class is the context:
-                        if isinstance(current, BaseContext) and getattr(type(current), bit):
-                            raise AttributeError
-                        current = getattr(current, bit)
-                    except (TypeError, AttributeError):
-                        # Reraise if the exception was raised by a @property
-                        if not isinstance(current, BaseContext) and bit in dir(current):
-                            raise
-                        try:  # list-index lookup
-                            current = current[int(bit)]
-                        except (IndexError,  # list index out of range
-                                ValueError,  # invalid literal for int()
-                                KeyError,    # current is a dict without `int(bit)` key
-                                TypeError):  # unsubscriptable object
-                            raise VariableDoesNotExist("Failed lookup for key "
-                                                       "[%s] in %r",
-                                                       (bit, current))  # missing attribute
+            for token in self.lookups:
+                lookup_exception = VariableDoesNotExist(
+                    "Failed lookup for key [{token}] in {current!r}".format(token=token, current=current)
+                )
+
+                # Context lookup
+                if isinstance(current, BaseContext):
+                    # Don't return class attributes
+                    if hasattr(current.__class__, token) and token not in current:
+                        raise lookup_exception
+                    # this is essentially a mapping lookup and should be deduplicated
+                    if token in current:
+                        current = current[token]
+                    else:
+                        raise lookup_exception
+                # Mapping lookup
+                elif isinstance(current, Mapping):
+                    if token in current:
+                        current = current[token]
+                    elif token.isdigit() and int(token) in current:
+                        current = current[int(token)]
+                    else:
+                        raise lookup_exception
+                # Attribute lookup
+                elif token in dir(current):
+                    current = getattr(current, token)
+                # Index lookup
+                elif isinstance(current, Sequence) and token.isdigit():
+                    try:
+                        current = current[int(token)]
+                    except IndexError:
+                        raise lookup_exception
+                # TODO last resort via __getitem__ as deprecation
+                # Invalid lookup
+                else:
+                    raise lookup_exception
+
+                # Resolving a callable
                 if callable(current):
                     if getattr(current, 'do_not_call_in_templates', False):
                         pass
@@ -870,7 +887,7 @@ class Variable:
             template_name = getattr(context, 'template_name', None) or 'unknown'
             logger.debug(
                 "Exception while resolving variable '%s' in template '%s'.",
-                bit,
+                token,
                 template_name,
                 exc_info=True,
             )
