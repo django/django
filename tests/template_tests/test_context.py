@@ -211,6 +211,22 @@ class ContextTests(SimpleTestCase):
         self.assertEqual(len(c.dicts), 3)
         self.assertEqual(c.dicts[-1]['a'], 2)
 
+    def test_item_lookup_on_non_mapping_type(self):
+        class HunkyDory:
+            def __getitem__(self, item):
+                if item == 'kooks':
+                    return 'undesired'
+                raise AttributeError
+
+            @property
+            def kooks(self):
+                return 'desired'
+
+        self.assertEqual(
+            Variable('hunky_dory.kooks').resolve({'hunky_dory': HunkyDory()}),
+            'desired'
+        )
+
 
 class RequestContextTests(SimpleTestCase):
 
@@ -231,7 +247,7 @@ class RequestContextTests(SimpleTestCase):
 
     def test_stack_size(self):
         """
-        #7116 -- Optimize RequetsContext construction
+        #7116 -- Optimize RequestContext construction
         """
         request = RequestFactory().get('/')
         ctx = RequestContext(request, {})
