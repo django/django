@@ -9,7 +9,13 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import CS_PTR
-from django.contrib.gis.shortcuts import numpy
+from django.utils.typing import NUMPY_IS_AVAILABLE
+
+if NUMPY_IS_AVAILABLE:
+    import numpy
+    COORDINATE_SEQUENCE_TYPES = (tuple, list, numpy.ndarray)
+else:
+    COORDINATE_SEQUENCE_TYPES = (tuple, list)
 
 
 class GEOSCoordSeq(GEOSBase):
@@ -45,9 +51,7 @@ class GEOSCoordSeq(GEOSBase):
     def __setitem__(self, index, value):
         "Set the coordinate sequence value at the given index."
         # Checking the input value
-        if isinstance(value, (list, tuple)):
-            pass
-        elif numpy and isinstance(value, numpy.ndarray):
+        if isinstance(value, COORDINATE_SEQUENCE_TYPES):
             pass
         else:
             raise TypeError('Must set coordinate with a sequence (list, tuple, or numpy array).')

@@ -3,7 +3,13 @@ from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.point import Point
-from django.contrib.gis.shortcuts import numpy
+from django.utils.typing import NUMPY_IS_AVAILABLE
+
+if NUMPY_IS_AVAILABLE:
+    import numpy
+    LINESTRING_TYPES = (tuple, list, numpy.ndarray)
+else:
+    LINESTRING_TYPES = (tuple, list)
 
 
 class LineString(LinearGeometryMixin, GEOSGeometry):
@@ -29,7 +35,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         else:
             coords = args
 
-        if not (isinstance(coords, (tuple, list)) or numpy and isinstance(coords, numpy.ndarray)):
+        if not isinstance(coords, LINESTRING_TYPES):
             raise TypeError('Invalid initialization input for LineStrings.')
 
         # If SRID was passed in with the keyword arguments
@@ -141,7 +147,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         Return a numpy array if possible.
         """
         lst = [func(i) for i in range(len(self))]
-        if numpy:
+        if NUMPY_IS_AVAILABLE:
             return numpy.array(lst)  # ARRRR!
         else:
             return lst

@@ -3,12 +3,18 @@ from ctypes import byref, c_double, c_int, c_void_p
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
-from django.contrib.gis.shortcuts import numpy
 from django.utils.encoding import force_text
+from django.utils.typing import NUMPY_IS_AVAILABLE
 
 from .const import (
     GDAL_COLOR_TYPES, GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES,
 )
+
+if NUMPY_IS_AVAILABLE:
+    import numpy
+    BYTES_TYPES = (bytes, memoryview, numpy.ndarray)
+else:
+    BYTES_TYPES = (bytes, memoryview)
 
 
 class GDALBand(GDALRasterBase):
@@ -214,7 +220,7 @@ class GDALBand(GDALRasterBase):
             access_flag = 1
 
             # Instantiate ctypes array holding the input data
-            if isinstance(data, (bytes, memoryview)) or (numpy and isinstance(data, numpy.ndarray)):
+            if isinstance(data, BYTES_TYPES):
                 data_array = ctypes_array.from_buffer_copy(data)
             else:
                 data_array = ctypes_array(*data)
@@ -228,7 +234,7 @@ class GDALBand(GDALRasterBase):
         if data is None:
             if as_memoryview:
                 return memoryview(data_array)
-            elif numpy:
+            elif NUMPY_IS_AVAILABLE:
                 # reshape() needs a reshape parameter with the height first.
                 return numpy.frombuffer(
                     data_array, dtype=numpy.dtype(data_array)
