@@ -50,7 +50,7 @@ times with multiple contexts)
 """
 
 from collections.abc import Mapping
-from inspect import getcallargs, getfullargspec
+from inspect import getfullargspec, Signature
 import logging
 import re
 
@@ -799,7 +799,7 @@ class Variable:
         """Resolve this variable against a given context."""
         if self.lookups is not None:
             # We're dealing with a variable that needs to be resolved
-            value = self._resolve_lookup(context)
+            value = self._resolve_lookups(context)
         else:
             # We're dealing with a literal, so it's already been "resolved"
             value = self.literal
@@ -819,7 +819,7 @@ class Variable:
     def __str__(self):
         return self.var
 
-    def _resolve_lookup(self, context):
+    def _resolve_lookups(self, context):
         """
         Perform resolution of a real variable (i.e. not a literal) against the
         given context.
@@ -831,73 +831,77 @@ class Variable:
         current = context
         try:  # catch-all for silent variable failures
             for token in self.lookups:
-                lookup_exception = VariableDoesNotExist(
-                    "Failed lookup for key [{token}] in {current!r}".format(token=token, current=current)
-                )
-
-                # Context lookup
-                if isinstance(current, BaseContext):
-                    # Don't return class attributes
-                    if hasattr(current.__class__, token) and token not in current:
-                        raise lookup_exception
-                    # this is essentially a mapping lookup and should be deduplicated
-                    if token in current:
-                        current = current[token]
-                    else:
-                        raise lookup_exception
-                # Mapping lookup
-                elif isinstance(current, Mapping):
-                    if token in current:
-                        current = current[token]
-                    elif token.isdigit() and int(token) in current:
-                        current = current[int(token)]
-                    else:
-                        raise lookup_exception
-                # Attribute lookup
-                elif token in dir(current):
-                    current = getattr(current, token)
-                # Index lookup
-                elif isinstance(current, Sequence) and token.isdigit():
-                    try:
-                        current = current[int(token)]
-                    except IndexError:
-                        raise lookup_exception
-                # TODO last resort via __getitem__ as deprecation
-                # Invalid lookup
-                else:
-                    raise lookup_exception
-
-                # Resolving a callable
+                current = self._perform_lookup(current, token)
                 if callable(current):
-                    if getattr(current, 'do_not_call_in_templates', False):
-                        pass
-                    elif getattr(current, 'alters_data', False):
-                        current = context.template.engine.string_if_invalid
-                    else:
-                        try:  # method call (assuming no args required)
-                            current = current()
-                        except TypeError:
-                            try:
-                                getcallargs(current)
-                            except TypeError:  # arguments *were* required
-                                current = context.template.engine.string_if_invalid  # invalid method call
-                            else:
-                                raise
+                    current = self._resolve_callable(current, context.template.engine.string_if_invalid)
         except Exception as e:
             template_name = getattr(context, 'template_name', None) or 'unknown'
             logger.debug(
                 "Exception while resolving variable '%s' in template '%s'.",
-                token,
-                template_name,
-                exc_info=True,
+                token, template_name, exc_info=True,
             )
-
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid
             else:
                 raise
 
         return current
+
+    @staticmethod
+    def _perform_lookup(lookup_context, token):
+        def doesnt_exist():
+            raise VariableDoesNotExist(
+                "Failed lookup for key [{token}] in {current!r}".format(token=token, current=lookup_context)
+            )
+
+        def mapping_lookup():
+            # a string key is preferred
+            if token in lookup_context:
+                return lookup_context[token]
+            # yet, there could be a corresponding integer key
+            if token.isdigit() and int(token) in lookup_context:
+                return lookup_context[int(token)]
+            doesnt_exist()
+
+        # TODO simplify when BaseContext is a ChainMap
+        # Context lookup
+        if isinstance(lookup_context, BaseContext):
+            try:
+                return mapping_lookup()
+            except VariableDoesNotExist:
+                pass
+            # Don't return class attributes
+            if hasattr(lookup_context.__class__, token):
+                doesnt_exist()
+        # Mapping lookup
+        elif isinstance(lookup_context, Mapping):
+            return mapping_lookup()
+
+        # Attribute lookup
+        if token in dir(lookup_context):
+            return getattr(lookup_context, token)
+
+        # Index lookup
+        if isinstance(lookup_context, Sequence) and token.isdigit():
+            try:
+                return lookup_context[int(token)]
+            except IndexError:
+                doesnt_exist()
+        # TODO last resort via __getitem__ as deprecation
+
+        # Invalid lookup
+        doesnt_exist()
+
+    @staticmethod
+    def _resolve_callable(obj, string_if_invalid):
+        if getattr(obj, 'do_not_call_in_templates', False):
+            return obj
+        if getattr(obj, 'alters_data', False):
+            return string_if_invalid
+        if not Signature.from_callable(obj).parameters:
+            return obj()
+        # the callable requires arguments (and defaults aren't considered here)
+        return string_if_invalid
 
 
 class Node:
