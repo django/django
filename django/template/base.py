@@ -49,14 +49,15 @@ times with multiple contexts)
 '<html></html>'
 """
 
-from collections.abc import Mapping
-from inspect import Signature
 import logging
 import re
+from collections.abc import Mapping
+from inspect import Signature
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
+from django.template.exceptions import TemplateSyntaxError
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.safestring import SafeData, mark_safe
@@ -66,9 +67,6 @@ from django.utils.text import (
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
 from django.utils.typing import Sequence
-
-from django.template.exceptions import TemplateSyntaxError
-
 
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
