@@ -210,20 +210,26 @@ argument.
 
 .. warning::
 
-    **Do not use string formatting on raw queries!**
+    **Do not use string formatting on raw queries or quote placeholders in your
+    SQL strings!**
 
     It's tempting to write the above query as::
 
         >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s' % lname
         >>> Person.objects.raw(query)
 
-    **Don't.**
+    You might also think you should write your query like this (with quotes
+    around ``%s``)::
 
-    Using the ``params`` argument completely protects you from `SQL injection
-    attacks`__, a common exploit where attackers inject arbitrary SQL into
-    your database. If you use string interpolation, sooner or later you'll
-    fall victim to SQL injection. As long as you remember to always use the
-    ``params`` argument you'll be protected.
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = '%s'"
+
+    **Don't make either of these mistakes.**
+
+    As discussed in :ref:`sql-injection-protection`, using the ``params``
+    argument and leaving the placeholders unquoted protects you from `SQL
+    injection attacks`__, a common exploit where attackers inject arbitrary
+    SQL into your database. If you use string interpolation or quote the
+    placeholder, you're at risk for SQL injection.
 
 __ https://en.wikipedia.org/wiki/SQL_injection
 
@@ -256,6 +262,9 @@ For example::
             row = cursor.fetchone()
 
         return row
+
+To protect against SQL injection, you must not include quotes around the ``%s``
+placeholders in the SQL string.
 
 Note that if you want to include literal percent signs in the query, you have to
 double them in the case you are passing parameters::
