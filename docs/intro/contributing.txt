@@ -258,6 +258,14 @@ a dependency for one or more of the Python packages. Consult the failing
 package's documentation or search the Web with the error message that you
 encounter.
 
+The previous command will not install django for you, it installs the dependences for development.
+You should install the django version shipped with cloned repository using the following
+from the root of the cloned directory using:
+
+.. code-block:: console
+
+    $ python setup.py install
+
 Now we are ready to run the test suite. If you're using GNU/Linux, macOS, or
 some other flavor of Unix, run:
 
