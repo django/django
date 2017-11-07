@@ -98,7 +98,9 @@ Backwards compatibility
 Compatibility checks warn of potential problems that might occur after
 upgrading Django.
 
-Currently, there aren't any of these checks.
+* **2_0.W001**: Your URL pattern ``<pattern>`` has a ``route`` that contains
+  ``(?P<``, begins with a ``^``, or ends with a ``$``. This was likely an
+  oversight when migrating from ``url()`` to :func:`~django.urls.path`.
 
 Caches
 ------
