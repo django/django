@@ -15,7 +15,7 @@ __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
 
 class UploadedFile(File):
     """
-    A abstract uploaded file (``TemporaryUploadedFile`` and
+    An abstract uploaded file (``TemporaryUploadedFile`` and
     ``InMemoryUploadedFile`` are the built-in concrete subclasses).
 
     An ``UploadedFile`` object behaves somewhat like a file object and

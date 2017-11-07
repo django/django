@@ -204,7 +204,7 @@ class BaseStorageFinder(BaseFinder):
             raise ImproperlyConfigured("The staticfiles storage finder %r "
                                        "doesn't have a storage class "
                                        "assigned." % self.__class__)
-        # Make sure we have an storage instance here.
+        # Make sure we have a storage instance here.
         if not isinstance(self.storage, (Storage, LazyObject)):
             self.storage = self.storage()
         super().__init__(*args, **kwargs)

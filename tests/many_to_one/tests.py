@@ -570,12 +570,12 @@ class ManyToOneTests(TestCase):
         Third.objects.create(name='Third 1')
         Third.objects.create(name='Third 2')
         th = Third(name="testing")
-        # The object isn't saved an thus the relation field is null - we won't even
+        # The object isn't saved and thus the relation field is null - we won't even
         # execute a query in this case.
         with self.assertNumQueries(0):
             self.assertEqual(th.child_set.count(), 0)
         th.save()
-        # Now the model is saved, so we will need to execute an query.
+        # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):
             self.assertEqual(th.child_set.count(), 0)
 
@@ -591,7 +591,7 @@ class ManyToOneTests(TestCase):
 
         self.assertEqual(public_student.school, public_school)
 
-        # Make sure the base manager is used so that an student can still access
+        # Make sure the base manager is used so that a student can still access
         # its related school even if the default manager doesn't normally
         # allow it.
         self.assertEqual(private_student.school, private_school)

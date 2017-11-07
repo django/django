@@ -354,7 +354,7 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_generic_inline_model_admin_non_generic_model(self):
         """
         A model without a GenericForeignKey raises problems if it's included
-        in an GenericInlineModelAdmin definition.
+        in a GenericInlineModelAdmin definition.
         """
         class BookInline(GenericStackedInline):
             model = Book

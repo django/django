@@ -40,7 +40,7 @@ class Group(models.Model):
         return self.name
 
 
-# A set of models that use an non-abstract inherited model as the 'through' model.
+# A set of models that use a non-abstract inherited model as the 'through' model.
 class A(models.Model):
     a_text = models.CharField(max_length=20)
 

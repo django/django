@@ -188,7 +188,7 @@ class ModelTests(TestCase):
 
     @skipUnlessDBFeature("supports_timezones")
     def test_timezones(self):
-        # Saving an updating with timezone-aware datetime Python objects.
+        # Saving and updating with timezone-aware datetime Python objects.
         # Regression test for #10443.
         # The idea is that all these creations and saving should work without
         # crashing. It's not rocket science.

@@ -1146,7 +1146,7 @@ class AutodetectorTests(TestCase):
         # a CreateModel operation w/o any definition on the original model
         model_state_not_specified = ModelState("a", "model", [("id", models.AutoField(primary_key=True))])
         # Explicitly testing for None, since this was the issue in #23452 after
-        # a AlterFooTogether operation with e.g. () as value
+        # an AlterFooTogether operation with e.g. () as value
         model_state_none = ModelState("a", "model", [
             ("id", models.AutoField(primary_key=True))
         ], {
