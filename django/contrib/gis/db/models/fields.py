@@ -247,7 +247,7 @@ class GeometryField(BaseSpatialField):
         super().contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
-        setattr(cls, self.attname, SpatialProxy(GEOSGeometry, self))
+        setattr(cls, self.attname, SpatialProxy(self.geom_class or GEOSGeometry, self, load_func=GEOSGeometry))
 
     def formfield(self, **kwargs):
         defaults = {'form_class': self.form_class,
