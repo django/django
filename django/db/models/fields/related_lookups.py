@@ -63,7 +63,7 @@ class RelatedIn(In):
         if isinstance(self.lhs, MultiColSource):
             # For multicolumn lookups we need to build a multicolumn where clause.
             # This clause is either a SubqueryConstraint (for values that need to be compiled to
-            # SQL) or a OR-combined list of (col1 = val1 AND col2 = val2 AND ...) clauses.
+            # SQL) or an OR-combined list of (col1 = val1 AND col2 = val2 AND ...) clauses.
             from django.db.models.sql.where import WhereNode, SubqueryConstraint, AND, OR
 
             root_constraint = WhereNode(connector=OR)

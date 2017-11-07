@@ -50,7 +50,7 @@ def shortcut(request, content_type_id, object_id):
 
         opts = obj._meta
 
-        # First, look for an many-to-many relationship to Site.
+        # First, look for a many-to-many relationship to Site.
         for field in opts.many_to_many:
             if field.remote_field.model is Site:
                 try:

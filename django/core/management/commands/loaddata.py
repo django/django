@@ -72,7 +72,7 @@ class Command(BaseCommand):
             self.loaddata(fixture_labels)
 
         # Close the DB connection -- unless we're still in a transaction. This
-        # is required as a workaround for an  edge case in MySQL: if the same
+        # is required as a workaround for an edge case in MySQL: if the same
         # connection is used to create tables, load data, and query, the query
         # can return incorrect results. See Django #7572, MySQL #37735.
         if transaction.get_autocommit(self.using):

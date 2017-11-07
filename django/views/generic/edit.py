@@ -159,7 +159,7 @@ class FormView(TemplateResponseMixin, BaseFormView):
 
 class BaseCreateView(ModelFormMixin, ProcessFormView):
     """
-    Base view for creating an new object instance.
+    Base view for creating a new object instance.
 
     Using this base class requires subclassing to provide a response mixin.
     """
