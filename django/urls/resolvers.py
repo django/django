@@ -1,7 +1,7 @@
 """
 This module converts requested URLs to callback view functions.
 
-RegexURLResolver is the main class here. Its resolve() method takes a URL (as
+URLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
