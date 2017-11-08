@@ -1174,6 +1174,9 @@ class Model(metaclass=ModelBase):
                 continue
             try:
                 setattr(self, f.attname, f.clean(raw_value, self))
+                if hasattr(self, 'clean_%s' % f.attname):
+                    value = getattr(self, 'clean_%s' % f.attname)()
+                    setattr(self, f.attname, value)
             except ValidationError as e:
                 errors[f.name] = e.error_list
 
