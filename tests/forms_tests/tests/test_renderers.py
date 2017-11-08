@@ -17,7 +17,6 @@ class SharedTests:
 
     def test_installed_apps_template_found(self):
         """Can find a custom template in INSTALLED_APPS."""
-        return
         renderer = self.renderer()
         # Found because forms_tests is .
         tpl = renderer.get_template('forms_tests/custom_widget.html')
