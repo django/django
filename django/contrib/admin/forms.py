@@ -7,16 +7,18 @@ class AdminAuthenticationForm(AuthenticationForm):
     """
     A custom authentication form used in the admin app.
     """
-    error_messages = {
+    error_messages = dict(AuthenticationForm.error_messages)
+    error_messages.update({
         'invalid_login': _(
             "Please enter the correct %(username)s and password for a staff "
             "account. Note that both fields may be case-sensitive."
         ),
-    }
+    })
     required_css_class = 'required'
 
     def confirm_login_allowed(self, user):
-        if not user.is_active or not user.is_staff:
+        super().confirm_login_allowed(user)
+        if not user.is_staff:
             raise forms.ValidationError(
                 self.error_messages['invalid_login'],
                 code='invalid_login',
