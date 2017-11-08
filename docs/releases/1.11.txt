@@ -730,6 +730,12 @@ Miscellaneous
   ``Content-Length`` header as this is now done by
   :class:`~django.middleware.common.CommonMiddleware`.
 
+  If you have a middleware that modifies a response's content and appears
+  before ``CommonMiddleware`` in the ``MIDDLEWARE`` or ``MIDDLEWARE_CLASSES``
+  settings, you must reorder your middleware so that responses aren't modified
+  after ``Content-Length`` is set, or have the response modifying middleware
+  reset the ``Content-Length`` header.
+
 * :meth:`~django.apps.AppConfig.get_model` and
   :meth:`~django.apps.AppConfig.get_models` now raise
   :exc:`~django.core.exceptions.AppRegistryNotReady` if they're called before

@@ -488,7 +488,9 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 
-   Before any middleware that may change the response (it calculates ``ETags``).
+   Before any middleware that may change the response (it sets the ``ETag`` and
+   ``Content-Length`` headers). A middleware that appears before
+   ``CommonMiddleware`` and changes the response must reset the headers.
 
    After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
    contents.
