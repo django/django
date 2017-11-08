@@ -471,6 +471,10 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 
+   Before any middleware that may change the response (it sets the
+   ``Content-Length`` header). A middleware that appears before
+   ``CommonMiddleware`` and changes the response must reset ``Content-Length``.
+
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.
 
