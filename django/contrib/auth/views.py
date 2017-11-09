@@ -238,10 +238,6 @@ class PasswordResetView(PasswordContextMixin, FormView):
         return super().form_valid(form)
 
 
-INTERNAL_RESET_URL_TOKEN = 'set-password'
-INTERNAL_RESET_SESSION_TOKEN = '_password_reset_token'
-
-
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     template_name = 'registration/password_reset_done.html'
     title = _('Password reset sent')
@@ -255,6 +251,8 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
     token_generator = default_token_generator
+    internal_reset_url_token = 'set-password'
+    internal_reset_session_token = '_password_reset_token'
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
@@ -266,8 +264,8 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
         if self.user is not None:
             token = kwargs['token']
-            if token == INTERNAL_RESET_URL_TOKEN:
-                session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
+            if token == self.internal_reset_url_token:
+                session_token = self.request.session.get(self.internal_reset_session_token)
                 if self.token_generator.check_token(self.user, session_token):
                     # If the token is valid, display the password reset form.
                     self.validlink = True
@@ -278,8 +276,8 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
                     # password reset form at a URL without the token. That
                     # avoids the possibility of leaking the token in the
                     # HTTP Referer header.
-                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
-                    redirect_url = self.request.path.replace(token, INTERNAL_RESET_URL_TOKEN)
+                    self.request.session[self.internal_reset_session_token] = token
+                    redirect_url = self.request.path.replace(token, self.internal_reset_url_token)
                     return HttpResponseRedirect(redirect_url)
 
         # Display the "Password reset unsuccessful" page.
@@ -301,7 +299,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def form_valid(self, form):
         user = form.save()
-        del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
+        del self.request.session[self.internal_reset_session_token]
         if self.post_reset_login:
             auth_login(self.request, user, self.post_reset_login_backend)
         return super().form_valid(form)

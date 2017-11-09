@@ -16,8 +16,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.models import User
 from django.contrib.auth.views import (
-    INTERNAL_RESET_SESSION_TOKEN, LoginView, logout_then_login,
-    redirect_to_login,
+    LoginView, PasswordResetConfirmView, logout_then_login, redirect_to_login,
 )
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
@@ -282,7 +281,7 @@ class PasswordResetTest(AuthViewsTestCase):
         u = User.objects.get(email='staffmember@example.com')
         self.assertTrue(u.check_password("anewpassword"))
         # The reset token is deleted from the session.
-        self.assertNotIn(INTERNAL_RESET_SESSION_TOKEN, self.client.session)
+        self.assertNotIn(PasswordResetConfirmView.internal_reset_session_token, self.client.session)
 
         # Check we can't use the link again
         response = self.client.get(path)
