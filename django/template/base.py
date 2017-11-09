@@ -51,6 +51,7 @@ times with multiple contexts)
 
 import logging
 import re
+import warnings
 from collections.abc import Mapping
 from inspect import Signature
 
@@ -58,6 +59,7 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.template.exceptions import TemplateSyntaxError
+from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.safestring import SafeData, mark_safe
@@ -870,7 +872,24 @@ class Variable:
                 return lookup_context[int(token)]
             except IndexError:
                 doesnt_exist()
-        # TODO last resort via __getitem__ as deprecation
+
+        if not isinstance(lookup_context, Mapping) and hasattr(lookup_context, '__getitem__'):
+            warnings.warn(
+                "Template variable lookup on types that to not derive from `collections.abc.Mapping` via the "
+                "`__getitem__`-method is deprecated. If the type `{_type}` from `{module}` is supposed to act as a "
+                "mapping, refactor it to base it on the mentioned abstract meta class. See PEP 3119 for details."
+                .format(_type=lookup_context.__class__.__name__, module=lookup_context.__class__.__module__),
+                RemovedInNextVersionWarning
+            )
+            try:
+                return lookup_context.__getitem__(token)
+            except TypeError:
+                try:
+                    return lookup_context.__getitem__(int(token))
+                except ValueError:
+                    doesnt_exist()
+            except KeyError:
+                doesnt_exist()
 
         # Invalid lookup
         doesnt_exist()
