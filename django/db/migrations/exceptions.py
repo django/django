@@ -52,3 +52,8 @@ class MigrationSchemaMissing(DatabaseError):
 
 class InvalidMigrationPlan(ValueError):
     pass
+
+
+class InconsistentMigrationFileHistory(Exception):
+    """An applied migration file has been deleted"""
+    pass

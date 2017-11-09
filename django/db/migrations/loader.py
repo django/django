@@ -9,7 +9,7 @@ from django.db.migrations.recorder import MigrationRecorder
 
 from .exceptions import (
     AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
-    NodeNotFoundError,
+    NodeNotFoundError, InconsistentMigrationFileHistory
 )
 
 MIGRATIONS_MODULE_NAME = 'migrations'
@@ -265,6 +265,27 @@ class MigrationLoader:
                         exc.node
                     ) from exc
             raise exc
+
+    def check_consistent_migration_file(self, connection):
+        """
+        Raise InconsistentMigrationFileHistory if a migration file is deleted.
+        """
+        recorder = MigrationRecorder(connection)
+        applied = recorder.applied_migrations()
+        # If the migration is unknown, record that as removed file
+        deleted_migrations = {}
+        for migration in applied:
+            if migration not in self.graph.nodes:
+                deleted_migrations.setdefault(migration[0], []).append(migration[1])
+        error_messages = []
+
+        for app_label in deleted_migrations:
+            error_messages.append("   App '%s':\n" % app_label)
+            for file_name in deleted_migrations[app_label]:
+                error_messages.append("   \t'%s'\n" % file_name)
+        if error_messages:
+            raise InconsistentMigrationFileHistory(
+                "WARNING: Inconsistent migrations\n%s" % "".join(error_messages))
 
     def check_consistent_history(self, connection):
         """

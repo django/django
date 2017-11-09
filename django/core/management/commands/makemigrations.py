@@ -16,6 +16,7 @@ from django.db.migrations.questioner import (
 from django.db.migrations.state import ProjectState
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
+from django.db.migrations.exceptions import InconsistentMigrationFileHistory
 
 
 class Command(BaseCommand):
@@ -50,6 +51,11 @@ class Command(BaseCommand):
             '--check', action='store_true', dest='check_changes',
             help='Exit with a non-zero status if model changes are missing migrations.',
         )
+        parser.add_argument(
+            '--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.',
+        )
 
     def handle(self, *app_labels, **options):
         self.verbosity = options['verbosity']
@@ -76,6 +82,13 @@ class Command(BaseCommand):
         # Load the current graph state. Pass in None for the connection so
         # the loader doesn't try to resolve replaced migrations from DB.
         loader = MigrationLoader(None, ignore_no_migrations=True)
+
+        db = options['database']
+        connection = connections[db]
+        try:
+            loader.check_consistent_migration_file(connection)
+        except InconsistentMigrationFileHistory as e:
+            self.stderr.write(str(e))
 
         # Raise an error if any migrations are applied before their dependencies.
         consistency_check_labels = {config.label for config in apps.get_app_configs()}
