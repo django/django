@@ -11,7 +11,9 @@ import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
+import urllib
 from io import StringIO
 from unittest import mock
 
@@ -119,7 +121,7 @@ class AdminScriptTestCase(unittest.TestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, script, args, settings_file=None, apps=None):
+    def run_test_subprocess(self, script, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -150,21 +152,23 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Move to the test directory and run
         os.chdir(self.test_dir)
-        out, err = subprocess.Popen(
+        p = subprocess.Popen(
             [sys.executable, script] + args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             env=test_environ, universal_newlines=True,
-        ).communicate()
+        )
         # Move back to the old working directory
         os.chdir(old_cwd)
+        return p
 
-        return out, err
+    def run_test(self, script, args, settings_file=None, apps=None):
+        return self.run_test_subprocess(script, args, settings_file, apps).communicate()
 
     def run_django_admin(self, args, settings_file=None):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
         return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
 
-    def run_manage(self, args, settings_file=None):
+    def run_manage_subprocess(self, args, settings_file=None):
         def safe_remove(path):
             try:
                 os.remove(path)
@@ -185,7 +189,10 @@ class AdminScriptTestCase(unittest.TestCase):
             fp.write(manage_py_contents)
         self.addCleanup(safe_remove, test_manage_py)
 
-        return self.run_test('./manage.py', args, settings_file)
+        return self.run_test_subprocess('./manage.py', args, settings_file)
+
+    def run_manage(self, args, settings_file=None):
+        return self.run_manage_subprocess(args, settings_file).communicate()
 
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
@@ -1344,6 +1351,28 @@ class ManageRunserver(AdminScriptTestCase):
             self.cmd.check_migrations()
         # You have # ...
         self.assertIn('unapplied migration(s)', self.output.getvalue())
+
+    @unittest.skipIf(
+        sys.platform.startswith('win'),
+        'Windows SIGTERM behaves in a different way.'
+    )
+    def test_shutdown_on_sigterm(self):
+        """
+        Ensure development server shuts down on SIGTERM
+        """
+        self.write_settings('settings', sdict={'DEBUG': True}, is_dir=True)
+        p = self.run_manage_subprocess(['runserver', '--settings=test_project.settings'])
+        # wait for the default welcome page to show, so that we can
+        # be sure the server is fully initialized before sending SIGTERM
+        timeout = 10
+        while timeout >= 0:
+            timeout -= 1
+            try:
+                urllib.request.urlopen('http://localhost:8000', timeout=3)
+            except urllib.error.URLError:
+                time.sleep(0.25)
+        p.terminate()
+        self.assertEqual(0, p.wait())
 
 
 class ManageRunserverMigrationWarning(TestCase):

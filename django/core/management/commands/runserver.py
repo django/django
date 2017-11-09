@@ -1,6 +1,7 @@
 import errno
 import os
 import re
+import signal
 import socket
 import sys
 from datetime import datetime
@@ -99,10 +100,24 @@ class Command(BaseCommand):
         """Run the server, using the autoreloader if needed."""
         use_reloader = options['use_reloader']
 
+        signal.signal(
+            signal.SIGTERM,
+            self._get_sigterm_handler(options.get('shutdown_message', ''))
+        )
         if use_reloader:
             autoreload.main(self.inner_run, None, options)
         else:
             self.inner_run(None, **options)
+
+    def _get_sigterm_handler(self, shutdown_message):
+        def sigterm_handler(signum, frame):
+            self._shutdown(shutdown_message)
+        return sigterm_handler
+
+    def _shutdown(self, shutdown_message):
+        if shutdown_message:
+            self.stdout.write(shutdown_message)
+        sys.exit(0)
 
     def inner_run(self, *args, **options):
         # If an exception was silenced in ManagementUtility.execute in order
@@ -153,9 +168,7 @@ class Command(BaseCommand):
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
         except KeyboardInterrupt:
-            if shutdown_message:
-                self.stdout.write(shutdown_message)
-            sys.exit(0)
+            self._shutdown(shutdown_message)
 
 
 # Kept for backward compatibility
