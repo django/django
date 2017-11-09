@@ -849,7 +849,8 @@ class Variable:
                 "Failed lookup for key [{token}] in {current!r}".format(token=token, current=lookup_context)
             )
 
-        def mapping_lookup():
+        # Mapping lookup
+        if isinstance(lookup_context, (Mapping, BaseContext)):
             # a string key is preferred
             if token in lookup_context:
                 return lookup_context[token]
@@ -858,22 +859,9 @@ class Variable:
                 return lookup_context[int(token)]
             doesnt_exist()
 
-        # TODO simplify when BaseContext is a ChainMap
-        # Context lookup
-        if isinstance(lookup_context, BaseContext):
-            try:
-                return mapping_lookup()
-            except VariableDoesNotExist:
-                pass
-            # Don't return class attributes
-            if hasattr(lookup_context.__class__, token):
-                doesnt_exist()
-        # Mapping lookup
-        elif isinstance(lookup_context, Mapping):
-            return mapping_lookup()
-
-        # Attribute lookup
-        if token in dir(lookup_context):
+        # Attribute lookup, but not for attributes of a context object's class
+        if token in dir(lookup_context) and \
+                not (isinstance(lookup_context, BaseContext) and token in dir(lookup_context.__class__)):
             return getattr(lookup_context, token)
 
         # Index lookup
