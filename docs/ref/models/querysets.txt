@@ -813,10 +813,17 @@ duplicate values, use the ``all=True`` argument.
 of the type of the first ``QuerySet`` even if the arguments are ``QuerySet``\s
 of other models. Passing different models works as long as the ``SELECT`` list
 is the same in all ``QuerySet``\s (at least the types, the names don't matter
-as long as the types in the same order).
+as long as the types in the same order). In such cases, you must use the column
+names from the first ``QuerySet`` in ``QuerySet`` methods applied to the
+resulting ``QuerySet``. For example::
 
-In addition, only ``LIMIT``, ``OFFSET``, ``COUNT(*)``, and ``ORDER BY`` (i.e.
-slicing, :meth:`count`, and :meth:`order_by`) are allowed on the resulting
+    >>> qs1 = Author.objects.values_list('name')
+    >>> qs2 = Entry.objects.values_list('headline')
+    >>> qs1.union(qs2).order_by('name')
+
+In addition, only ``LIMIT``, ``OFFSET``, ``COUNT(*)``, ``ORDER BY``, and
+specifying columns (i.e. slicing, :meth:`count`, :meth:`order_by`, and
+:meth:`values()`/:meth:`values_list()`) are allowed on the resulting
 ``QuerySet``. Further, databases place restrictions on what operations are
 allowed in the combined queries. For example, most databases don't allow
 ``LIMIT`` or ``OFFSET`` in the combined queries.

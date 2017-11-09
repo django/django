@@ -11,3 +11,7 @@ Bugfixes
 
 * Reallowed, following a regression in Django 1.10, ``AuthenticationForm`` to
   raise the inactive user error when using ``ModelBackend`` (:ticket:`28645`).
+
+* Added support for ``QuerySet.values()`` and ``values_list()`` for
+  ``union()``, ``difference()``, and ``intersection()`` queries
+  (:ticket:`28781`).
