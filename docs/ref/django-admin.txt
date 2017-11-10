@@ -1339,7 +1339,7 @@ Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use. However,
 you can force to run certain tests in the same process by mixing
-:class:`django.test.runner.NotTestedInParallelMixin` into your test class.
+:class:`~django.test.runner.NotTestedInParallelMixin` into your test class.
 
 This option requires the third-party ``tblib`` package to display tracebacks
 correctly:
