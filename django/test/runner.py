@@ -681,7 +681,7 @@ def partition_suite_by_case(suite):
     return groups
 
 
-class NotTestedInParallelMixin(object):
+class NotTestedInParallelMixin:
     pass
 
 
