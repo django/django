@@ -123,9 +123,9 @@ The ``register`` decorator
         class AuthorAdmin(admin.ModelAdmin):
             pass
 
-    It is given one or more model classes to register with the ``ModelAdmin``
-    and an optional keyword argument ``site`` if you are not using the default
-    ``AdminSite``::
+    It's given one or more model classes to register with the ``ModelAdmin``.
+    If you're using a custom :class:`AdminSite`, pass it using the ``site`` keyword
+    argument::
 
         from django.contrib import admin
         from .models import Author, Reader, Editor
