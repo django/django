@@ -251,7 +251,7 @@ def raise_last_exception():
 def ensure_echo_on():
     if termios:
         fd = sys.stdin
-        if fd.isatty():
+        if fd is not None and fd.isatty():
             attr_list = termios.tcgetattr(fd)
             if not attr_list[3] & termios.ECHO:
                 attr_list[3] |= termios.ECHO
