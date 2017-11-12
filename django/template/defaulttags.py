@@ -292,7 +292,7 @@ class IfNode(Node):
 
     @property
     def nodelist(self):
-        return NodeList(iter(self))
+        return NodeList(self)
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
