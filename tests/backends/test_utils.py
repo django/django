@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.utils import truncate_name
+from django.db.backends.utils import split_identifier, truncate_name
 from django.db.utils import load_backend
 from django.test import SimpleTestCase
 from django.utils import six
@@ -25,3 +25,9 @@ class TestLoadBackend(SimpleTestCase):
         self.assertEqual(truncate_name('username"."some_table', 10), 'username"."some_table')
         self.assertEqual(truncate_name('username"."some_long_table', 10), 'username"."some_la38a')
         self.assertEqual(truncate_name('username"."some_long_table', 10, 3), 'username"."some_loa38')
+
+    def test_split_identifier(self):
+        self.assertEqual(split_identifier('some_table'), ('', 'some_table'))
+        self.assertEqual(split_identifier('"some_table"'), ('', 'some_table'))
+        self.assertEqual(split_identifier('namespace"."some_table'), ('namespace', 'some_table'))
+        self.assertEqual(split_identifier('"namespace"."some_table"'), ('namespace', 'some_table'))

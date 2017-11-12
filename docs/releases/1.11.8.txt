@@ -15,3 +15,6 @@ Bugfixes
 * Added support for ``QuerySet.values()`` and ``values_list()`` for
   ``union()``, ``difference()``, and ``intersection()`` queries
   (:ticket:`28781`).
+
+* Fixed incorrect index name truncation when using a namespaced ``db_table``
+  (:ticket:`28792`).
