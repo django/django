@@ -5,7 +5,7 @@ from datetime import datetime
 from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.db.backends.utils import strip_quotes
+from django.db.backends.utils import split_identifier
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -858,7 +858,7 @@ class BaseDatabaseSchemaEditor:
         The name is divided into 3 parts: the table name, the column names,
         and a unique digest and suffix.
         """
-        table_name = strip_quotes(table_name)
+        _, table_name = split_identifier(table_name)
         hash_data = [table_name] + list(column_names)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
