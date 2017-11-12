@@ -3,7 +3,6 @@ import decimal
 import functools
 import hashlib
 import logging
-import re
 from time import time
 
 from django.conf import settings
@@ -194,20 +193,35 @@ def rev_typecast_decimal(d):
     return str(d)
 
 
-def truncate_name(name, length=None, hash_len=4):
+def split_identifier(identifier):
     """
-    Shorten a string to a repeatable mangled version with the given length.
-    If a quote stripped name contains a username, e.g. USERNAME"."TABLE,
+    Split a SQL identifier into a two element tuple of (namespace, name).
+
+    The identifier could be a table, column, or sequence name might be prefixed
+    by a namespace.
+    """
+    try:
+        namespace, name = identifier.split('"."')
+    except ValueError:
+        namespace, name = '', identifier
+    return namespace.strip('"'), name.strip('"')
+
+
+def truncate_name(identifier, length=None, hash_len=4):
+    """
+    Shorten a SQL identifier to a repeatable mangled version with the given
+    length.
+
+    If a quote stripped name contains a namespace, e.g. USERNAME"."TABLE,
     truncate the table portion only.
     """
-    match = re.match(r'([^"]+)"\."([^"]+)', name)
-    table_name = match.group(2) if match else name
+    namespace, name = split_identifier(identifier)
 
-    if length is None or len(table_name) <= length:
-        return name
+    if length is None or len(name) <= length:
+        return identifier
 
-    hsh = hashlib.md5(force_bytes(table_name)).hexdigest()[:hash_len]
-    return '%s%s%s' % (match.group(1) + '"."' if match else '', table_name[:length - hash_len], hsh)
+    digest = hashlib.md5(force_bytes(name)).hexdigest()[:hash_len]
+    return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
 
 
 def format_number(value, max_digits, decimal_places):
