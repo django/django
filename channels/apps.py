@@ -14,6 +14,6 @@ class ChannelsConfig(AppConfig):
         check_all()
         # Do django monkeypatches
         from .hacks import monkeypatch_django
-        #monkeypatch_django()
+        monkeypatch_django()
         # Instantiate bindings
         #BindingMetaclass.register_all()

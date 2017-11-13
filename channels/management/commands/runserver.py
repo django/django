@@ -1,20 +1,15 @@
 import datetime
 import sys
-import threading
 
 from daphne.server import Server
 from daphne.endpoints import build_endpoint_description_strings
-from django.apps import apps
 from django.conf import settings
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.utils import six
 from django.utils.encoding import get_system_encoding
 
-from channels import DEFAULT_CHANNEL_LAYER, channel_layers
-from channels.handler import AsgiHandler
+from channels.routing import get_default_application
 from channels.log import setup_logger
-from channels.staticfiles import StaticFilesHandler
-from channels.worker import Worker
 
 
 class Command(RunserverCommand):
@@ -23,8 +18,6 @@ class Command(RunserverCommand):
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)
-        parser.add_argument('--noworker', action='store_false', dest='run_worker', default=True,
-            help='Tells Django not to run a worker thread; you\'ll need to run one separately.')
         parser.add_argument('--noasgi', action='store_false', dest='use_asgi', default=True,
             help='Run the old WSGI-based runserver rather than the ASGI-based one')
         parser.add_argument('--http_timeout', action='store', dest='http_timeout', type=int, default=60,
@@ -42,15 +35,10 @@ class Command(RunserverCommand):
 
     def inner_run(self, *args, **options):
         # Maybe they want the wsgi one?
-        if not options.get("use_asgi", True) or DEFAULT_CHANNEL_LAYER not in channel_layers:
+        if not options.get("use_asgi", True):
             if hasattr(RunserverCommand, "server_cls"):
                 self.server_cls = RunserverCommand.server_cls
             return RunserverCommand.inner_run(self, *args, **options)
-        # Check a handler is registered for http reqs; if not, add default one
-        self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
-        self.channel_layer.router.check_default(
-            http_consumer=self.get_consumer(*args, **options),
-        )
         # Run checks
         self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
@@ -63,8 +51,7 @@ class Command(RunserverCommand):
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting Channels development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Channel layer %(layer)s\n"
+            "Starting ASGI/Channels development server at %(protocol)s://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
@@ -73,16 +60,8 @@ class Command(RunserverCommand):
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
-            "layer": self.channel_layer,
         })
 
-        # Launch workers as subthreads
-        if options.get("run_worker", True):
-            worker_count = 4 if options.get("use_threading", True) else 1
-            for _ in range(worker_count):
-                worker = WorkerThread(self.channel_layer, self.logger)
-                worker.daemon = True
-                worker.start()
         # Launch server in 'main' thread. Signals are disabled as it's still
         # actually a subthread under the autoreloader.
         self.logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
@@ -91,7 +70,7 @@ class Command(RunserverCommand):
         endpoints = build_endpoint_description_strings(host=self.addr, port=self.port)
         try:
             self.server_cls(
-                channel_layer=self.channel_layer,
+                application=get_default_application(),
                 endpoints=endpoints,
                 signal_handlers=not options['use_reloader'],
                 action_logger=self.log_action,
@@ -144,35 +123,3 @@ class Command(RunserverCommand):
             msg += "WebSocket REJECT %(path)s [%(client)s]\n" % details
 
         sys.stderr.write(msg)
-
-    def get_consumer(self, *args, **options):
-        """
-        Returns the static files serving handler wrapping the default handler,
-        if static files should be served. Otherwise just returns the default
-        handler.
-        """
-        staticfiles_installed = apps.is_installed("django.contrib.staticfiles")
-        use_static_handler = options.get('use_static_handler', staticfiles_installed)
-        insecure_serving = options.get('insecure_serving', False)
-        if use_static_handler and (settings.DEBUG or insecure_serving):
-            return StaticFilesHandler()
-        else:
-            return AsgiHandler()
-
-
-class WorkerThread(threading.Thread):
-    """
-    Class that runs a worker
-    """
-
-    def __init__(self, channel_layer, logger):
-        super(WorkerThread, self).__init__()
-        self.channel_layer = channel_layer
-        self.logger = logger
-
-    def run(self):
-        self.logger.debug("Worker thread running")
-        worker = Worker(channel_layer=self.channel_layer, signal_handlers=False)
-        worker.ready()
-        worker.run()
-        self.logger.debug("Worker thread exited")

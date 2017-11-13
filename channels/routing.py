@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
-import re
+import importlib
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from channels.http import AsgiHandler
 
@@ -10,6 +12,25 @@ All Routing instances inside this file are also valid ASGI applications - with
 new Channels routing, whatever you end up with as the top level object is just
 served up as the "ASGI application".
 """
+
+
+def get_default_application():
+    """
+    Gets the default application, set in the ASGI_APPLICATION setting.
+    """
+    try:
+        path, name = settings.ASGI_APPLICATION.rsplit(".", 1)
+    except (ValueError, AttributeError):
+        raise ImproperlyConfigured("Cannot find ASGI_APPLICATION setting.")
+    try:
+        module = importlib.import_module(path)
+    except ImportError:
+        raise ImproperlyConfigured("Cannot import ASGI_APPLICATION module %r" % path)
+    try:
+        value = getattr(module, name)
+    except AttributeError:
+        raise ImproperlyConfigured("Cannot find %r in ASGI_APPLICATION module %s" % (name, path))
+    return value
 
 
 class ProtocolTypeRouter:
