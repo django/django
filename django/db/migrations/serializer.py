@@ -46,11 +46,6 @@ class BaseSimpleSerializer(BaseSerializer):
         return repr(self.value), set()
 
 
-class ByteTypeSerializer(BaseSerializer):
-    def serialize(self):
-        return repr(self.value), set()
-
-
 class DatetimeSerializer(BaseSerializer):
     def serialize(self):
         if self.value.tzinfo is not None and self.value.tzinfo != utc:
@@ -254,11 +249,6 @@ class SettingsReferenceSerializer(BaseSerializer):
         return "settings.%s" % self.value.setting_name, {"from django.conf import settings"}
 
 
-class TextTypeSerializer(BaseSerializer):
-    def serialize(self):
-        return repr(self.value), set()
-
-
 class TimedeltaSerializer(BaseSerializer):
     def serialize(self):
         return repr(self.value), {"import datetime"}
@@ -346,12 +336,8 @@ def serializer_factory(value):
         return SettingsReferenceSerializer(value)
     if isinstance(value, float):
         return FloatSerializer(value)
-    if isinstance(value, (bool, int, type(None))):
+    if isinstance(value, (bool, int, type(None), bytes, str)):
         return BaseSimpleSerializer(value)
-    if isinstance(value, bytes):
-        return ByteTypeSerializer(value)
-    if isinstance(value, str):
-        return TextTypeSerializer(value)
     if isinstance(value, decimal.Decimal):
         return DecimalSerializer(value)
     if isinstance(value, functools.partial):
