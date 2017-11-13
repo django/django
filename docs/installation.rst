@@ -18,7 +18,7 @@ Once that's done, you should add ``channels`` to your
     )
 
 That's it! Once enabled, ``channels`` will integrate itself into Django and
-take control of the ``runserver`` command. See :doc:`getting-started` for more.
+take control of the ``runserver`` command. See :doc:`introduction` for more.
 
 .. note::
   Please be wary of any other third-party apps that require an overloaded or
@@ -28,6 +28,7 @@ take control of the ``runserver`` command. See :doc:`getting-started` for more.
   from `whitenoise <https://github.com/evansd/whitenoise>`_. In order to
   solve such issues, try moving ``channels`` to the top of your ``INSTALLED_APPS``
   or remove the offending app altogether.
+
 
 Installing the latest development version
 -----------------------------------------

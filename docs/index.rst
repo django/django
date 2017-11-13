@@ -1,29 +1,29 @@
 Django Channels
 ===============
 
-Channels is a project to make Django able to handle more than just plain
-HTTP requests, including WebSockets and HTTP2, as well as the ability to
-run code after a response has been sent for things like thumbnailing or
-background calculation.
+Channels is a project that takes Django and extends its abilities beyond
+HTTP - to handle WebSockets, chat protocols, IoT protocols, and more.
 
-It's an easy-to-understand extension of the Django view model, and easy
-to integrate and deploy.
+It does this by taking the core of Django and layering a fully asynchronous
+layer underneath, running Django itself in a synchronous mode but handling
+connections and sockets asynchronously, and giving you the choice to write
+in either style.
 
-First, read our :doc:`concepts` documentation to get an idea of the
-data model underlying Channels and how they're used inside Django.
+To get started understanding how Channels works, read our :doc:`introduction`,
+which will walk through how things work. If you're upgrading from Channels 1,
+take a look at :doc:`one-to-two` to get an overview of the changes; things
+are substantially different.
 
-Then, read :doc:`getting-started` to see how to get up and running with
-WebSockets with only 30 lines of code.
-
-If you want a quick overview, start with :doc:`inshort`.
-
-If you are interested in contributing, please read our :doc:`contributing` docs!
+.. warning::
+   This is incomplete documentation for an upcoming release. If you are looking
+   for documentation for the stable release of Channels, please select "stable"
+   in the bottom-left corner of the page.
 
 
 Projects
 --------
 
-Channels is comprised of five packages:
+Channels is comprised of several packages:
 
 * `Channels <https://github.com/django/channels/>`_, the Django integration layer
 * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
@@ -42,20 +42,11 @@ Topics
 .. toctree::
    :maxdepth: 2
 
-   inshort
-   concepts
+   introduction
    installation
-   getting-started
    deploying
-   generics
-   routing
-   binding
+   one-to-two
    javascript
-   backends
-   delay
-   testing
-   reference
-   faqs
    asgi
    community
    contributing
