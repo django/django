@@ -21,8 +21,7 @@ class ContextMixin:
     extra_context = None
 
     def get_context_data(self, **kwargs):
-        if 'view' not in kwargs:
-            kwargs['view'] = self
+        kwargs.setdefault('view', self)
         if self.extra_context is not None:
             kwargs.update(self.extra_context)
         return kwargs

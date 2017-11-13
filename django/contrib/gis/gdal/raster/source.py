@@ -381,27 +381,14 @@ class GDALRaster(GDALRasterBase):
         consult the GDAL_RESAMPLE_ALGORITHMS constant.
         """
         # Get the parameters defining the geotransform, srid, and size of the raster
-        if 'width' not in ds_input:
-            ds_input['width'] = self.width
-
-        if 'height' not in ds_input:
-            ds_input['height'] = self.height
-
-        if 'srid' not in ds_input:
-            ds_input['srid'] = self.srs.srid
-
-        if 'origin' not in ds_input:
-            ds_input['origin'] = self.origin
-
-        if 'scale' not in ds_input:
-            ds_input['scale'] = self.scale
-
-        if 'skew' not in ds_input:
-            ds_input['skew'] = self.skew
-
+        ds_input.setdefault('width', self.width)
+        ds_input.setdefault('height', self.height)
+        ds_input.setdefault('srid', self.srs.srid)
+        ds_input.setdefault('origin', self.origin)
+        ds_input.setdefault('scale', self.scale)
+        ds_input.setdefault('skew', self.skew)
         # Get the driver, name, and datatype of the target raster
-        if 'driver' not in ds_input:
-            ds_input['driver'] = self.driver.name
+        ds_input.setdefault('driver', self.driver.name)
 
         if 'name' not in ds_input:
             ds_input['name'] = self.name + '_copy.' + self.driver.name

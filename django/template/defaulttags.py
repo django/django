@@ -225,8 +225,7 @@ class IfChangedNode(Node):
     def render(self, context):
         # Init state storage
         state_frame = self._get_context_stack_frame(context)
-        if self not in state_frame:
-            state_frame[self] = None
+        state_frame.setdefault(self)
 
         nodelist_true_output = None
         if self._varlist:

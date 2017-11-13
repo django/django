@@ -136,10 +136,7 @@ class HttpResponseBase:
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
-        try:
-            del self._headers[header.lower()]
-        except KeyError:
-            pass
+        self._headers.pop(header.lower(), False)
 
     def __getitem__(self, header):
         return self._headers[header.lower()][1]

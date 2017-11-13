@@ -37,10 +37,10 @@ class SecurityMiddleware(MiddlewareMixin):
                 sts_header = sts_header + "; preload"
             response["strict-transport-security"] = sts_header
 
-        if self.content_type_nosniff and 'x-content-type-options' not in response:
-            response["x-content-type-options"] = "nosniff"
+        if self.content_type_nosniff:
+            response.setdefault('x-content-type-options', 'nosniff')
 
-        if self.xss_filter and 'x-xss-protection' not in response:
-            response["x-xss-protection"] = "1; mode=block"
+        if self.xss_filter:
+            response.setdefault('x-xss-protection', '1; mode=block')
 
         return response

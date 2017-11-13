@@ -103,8 +103,8 @@ def condition(etag_func=None, last_modified_func=None):
             if request.method in ('GET', 'HEAD'):
                 if res_last_modified and not response.has_header('Last-Modified'):
                     response['Last-Modified'] = http_date(res_last_modified)
-                if res_etag and not response.has_header('ETag'):
-                    response['ETag'] = res_etag
+                if res_etag:
+                    response.setdefault('ETag', res_etag)
 
             return response
 

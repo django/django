@@ -692,8 +692,7 @@ class Query:
             # in the parent list. Again, it must be mentioned to ensure that
             # only "must include" fields are pulled in.
             for model in orig_opts.get_parent_list():
-                if model not in seen:
-                    seen[model] = set()
+                seen.setdefault(model, set())
             for model, values in seen.items():
                 callback(target, model, values)
 
