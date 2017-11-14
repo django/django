@@ -38,7 +38,7 @@ class IsolationLevelTests(TestCase):
     @staticmethod
     def get_isolation_level(connection):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT @@session.tx_isolation")
+            cursor.execute("SELECT @@session.%s" % connection.transaction_isolation_variable)
             return cursor.fetchone()[0]
 
     def test_auto_is_null_auto_config(self):

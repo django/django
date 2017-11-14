@@ -222,7 +222,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         ', '.join("'%s'" % s for s in sorted(self.isolation_levels))
                     ))
             # The variable assignment form of setting transaction isolation
-            # levels will be used, e.g. "set tx_isolation='repeatable-read'".
+            # levels will be used, e.g. "set transaction_isolation='repeatable-read'".
             isolation_level = isolation_level.replace(' ', '-')
         self.isolation_level = isolation_level
         kwargs.update(options)
@@ -230,6 +230,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_new_connection(self, conn_params):
         return Database.connect(**conn_params)
+
+    @cached_property
+    def transaction_isolation_variable(self):
+        return 'tx_isolation' if self.mysql_version < (5, 7, 20) else 'transaction_isolation'
 
     def init_connection_state(self):
         assignments = []
@@ -241,7 +245,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             assignments.append('SQL_AUTO_IS_NULL = 0')
 
         if self.isolation_level:
-            assignments.append("TX_ISOLATION = '%s'" % self.isolation_level)
+            assignments.append("%s = '%s'" % (self.transaction_isolation_variable, self.isolation_level))
 
         if assignments:
             with self.cursor() as cursor:
