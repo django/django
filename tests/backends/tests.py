@@ -377,9 +377,15 @@ class PostgreSQLTests(TestCase):
         from django.db.backends.postgresql.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
-        for lookup in ('iexact', 'contains', 'icontains', 'startswith',
-                       'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
+        lookups = (
+            'iexact', 'contains', 'icontains', 'startswith', 'istartswith',
+            'endswith', 'iendswith', 'regex', 'iregex',
+        )
+        for lookup in lookups:
             self.assertIn('::text', do.lookup_cast(lookup))
+        for lookup in lookups:
+            for field_type in ('CICharField', 'CIEmailField', 'CITextField'):
+                self.assertIn('::citext', do.lookup_cast(lookup, internal_type=field_type))
 
     def test_correct_extraction_psycopg2_version(self):
         from django.db.backends.postgresql.base import psycopg2_version

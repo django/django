@@ -83,6 +83,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                            'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
             if internal_type in ('IPAddressField', 'GenericIPAddressField'):
                 lookup = "HOST(%s)"
+            elif internal_type in ('CICharField', 'CIEmailField', 'CITextField'):
+                lookup = '%s::citext'
             else:
                 lookup = "%s::text"
 
