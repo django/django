@@ -24,3 +24,6 @@ Bugfixes
 
 * Fixed crash on SQLite and MySQL when ordering by a filtered subquery that
   uses ``nulls_first`` or ``nulls_last`` (:ticket:`28848`).
+
+* Made query lookups for ``CICharField``, ``CIEmailField``, and ``CITextField``
+  use a ``citext`` cast (:ticket:`28702`).

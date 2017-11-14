@@ -138,6 +138,10 @@ class Tests(TestCase):
         for lookup in lookups:
             with self.subTest(lookup=lookup):
                 self.assertIn('::text', do.lookup_cast(lookup))
+        for lookup in lookups:
+            for field_type in ('CICharField', 'CIEmailField', 'CITextField'):
+                with self.subTest(lookup=lookup, field_type=field_type):
+                    self.assertIn('::citext', do.lookup_cast(lookup, internal_type=field_type))
 
     def test_correct_extraction_psycopg2_version(self):
         from django.db.backends.postgresql.base import psycopg2_version
