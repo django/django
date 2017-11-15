@@ -2,6 +2,7 @@ import collections
 from datetime import datetime
 from math import ceil
 from operator import attrgetter
+from unittest import skipIf
 
 from django.core.exceptions import FieldError
 from django.db import connection
@@ -854,6 +855,7 @@ class LookupTests(TestCase):
             [self.a1, self.a2, self.a3, self.a4]
         )
 
+    @skipIf(connection.vendor == 'oracle', "Oracle doesn't support sliced subqueries with equal operator until #28670")
     def test_exact_sliced_queryset_limit_one_offset(self):
         self.assertCountEqual(
             Article.objects.filter(author=Author.objects.all()[1:2]),
