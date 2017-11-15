@@ -125,7 +125,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='Forest')
-        self.assertSequenceEqual(searched, self.verses)
+        self.assertCountEqual(searched, self.verses)
 
     def test_non_exact_match(self):
         searched = Line.objects.annotate(
@@ -143,7 +143,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('character__name', 'dialogue'),
         ).filter(search='minstrel')
-        self.assertSequenceEqual(searched, self.verses)
+        self.assertCountEqual(searched, self.verses)
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='minstrelbravely')
