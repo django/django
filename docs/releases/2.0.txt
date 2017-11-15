@@ -349,6 +349,12 @@ of binary fields or HTTP streams, for example). You might have to update your
 code to limit bytestring usage to a minimum, as Django no longer accepts
 bytestrings in certain code paths.
 
+For example, ``reverse()`` now uses ``str()`` instead of ``force_text()`` to
+coerce the ``args`` and ``kwargs`` it receives, prior to their placement in
+the URL. For bytestrings, this creates a string with an undesired ``b`` prefix
+as well as additional quotes (``str(b'foo')`` is ``"b'foo'"``). To adapt, call
+``decode()`` on the bytestring before passing it to ``reverse()``.
+
 Database backend API
 --------------------
 
