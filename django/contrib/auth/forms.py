@@ -7,7 +7,6 @@ from django.contrib.auth import (
 from django.contrib.auth.hashers import (
     UNUSABLE_PASSWORD_PREFIX, identify_hasher,
 )
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
@@ -83,9 +82,9 @@ class UserCreationForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
-        fields = ("username",)
-        field_classes = {'username': UsernameField}
+        model = UserModel
+        fields = (UserModel.USERNAME_FIELD,)
+        field_classes = {UserModel.USERNAME_FIELD: UsernameField}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,9 +131,9 @@ class UserChangeForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
+        model = UserModel
         fields = '__all__'
-        field_classes = {'username': UsernameField}
+        field_classes = {UserModel.USERNAME_FIELD: UsernameField}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

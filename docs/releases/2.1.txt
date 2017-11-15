@@ -48,6 +48,10 @@ Minor features
 * :djadmin:`createsuperuser` now gives a prompt to allow bypassing the
   :setting:`AUTH_PASSWORD_VALIDATORS` checks.
 
+* :class:`~django.contrib.auth.forms.UserCreationForm` and
+  :class:`~django.contrib.auth.forms.UserChangeForm` no longer need to be
+  rewritten for a custom user model.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

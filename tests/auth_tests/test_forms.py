@@ -1,7 +1,9 @@
 import datetime
 import re
+from importlib import reload
 from unittest import mock
 
+import django
 from django import forms
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm, AuthenticationForm, PasswordChangeForm,
@@ -11,7 +13,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
-from django.core import mail
+from django.core import mail, signals
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -27,6 +29,24 @@ from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
 
+def reload_auth_forms(sender, setting, value, enter, **kwargs):
+    if setting == 'AUTH_USER_MODEL':
+        reload(django.contrib.auth.forms)
+
+
+class ReloadFormsMixin:
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        signals.setting_changed.connect(reload_auth_forms)
+
+    @classmethod
+    def tearDownClass(cls):
+        signals.setting_changed.disconnect(reload_auth_forms)
+        super().tearDownClass()
+
+
 class TestDataMixin:
 
     @classmethod
@@ -37,9 +57,10 @@ class TestDataMixin:
         cls.u4 = User.objects.create(username='empty_password', password='')
         cls.u5 = User.objects.create(username='unmanageable_password', password='$')
         cls.u6 = User.objects.create(username='unknown_password', password='foo$bar')
+        cls.u7 = ExtensionUser.objects.create(username='extension_client', date_of_birth='1998-02-24')
 
 
-class UserCreationFormTest(TestDataMixin, TestCase):
+class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
 
     def test_user_already_exists(self):
         data = {
@@ -175,19 +196,25 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         )
 
     def test_custom_form(self):
-        class CustomUserCreationForm(UserCreationForm):
-            class Meta(UserCreationForm.Meta):
-                model = ExtensionUser
-                fields = UserCreationForm.Meta.fields + ('date_of_birth',)
+        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
+            from django.contrib.auth.forms import UserCreationForm
+            self.assertEqual(UserCreationForm.Meta.model, ExtensionUser)
 
-        data = {
-            'username': 'testclient',
-            'password1': 'testclient',
-            'password2': 'testclient',
-            'date_of_birth': '1988-02-24',
-        }
-        form = CustomUserCreationForm(data)
-        self.assertTrue(form.is_valid())
+            class CustomUserCreationForm(UserCreationForm):
+                class Meta(UserCreationForm.Meta):
+                    fields = UserCreationForm.Meta.fields + ('date_of_birth',)
+
+            data = {
+                'username': 'testclient',
+                'password1': 'testclient',
+                'password2': 'testclient',
+                'date_of_birth': '1988-02-24',
+            }
+            form = CustomUserCreationForm(data)
+            self.assertTrue(form.is_valid())
+        # reload_auth_forms() reloads the form.
+        from django.contrib.auth.forms import UserCreationForm
+        self.assertEqual(UserCreationForm.Meta.model, User)
 
     def test_custom_form_with_different_username_field(self):
         class CustomUserCreationForm(UserCreationForm):
@@ -260,6 +287,30 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             form.errors['password2'],
             ['The password is too similar to the first name.'],
         )
+
+    def test_with_custom_user_model(self):
+        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
+            data = {
+                'username': 'test_username',
+                'password1': 'test_password',
+                'password2': 'test_password',
+            }
+            from django.contrib.auth.forms import UserCreationForm
+            self.assertEqual(UserCreationForm.Meta.model, ExtensionUser)
+            form = UserCreationForm(data)
+            self.assertTrue(form.is_valid())
+
+    def test_customer_user_model_with_different_username_field(self):
+        with override_settings(AUTH_USER_MODEL='auth_tests.CustomUser'):
+            from django.contrib.auth.forms import UserCreationForm
+            self.assertEqual(UserCreationForm.Meta.model, CustomUser)
+            data = {
+                'email': 'testchange@test.com',
+                'password1': 'test_password',
+                'password2': 'test_password',
+            }
+            form = UserCreationForm(data)
+            self.assertTrue(form.is_valid())
 
 
 class AuthenticationFormTest(TestDataMixin, TestCase):
@@ -605,7 +656,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
 
 
-class UserChangeFormTest(TestDataMixin, TestCase):
+class UserChangeFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
 
     def test_username_validity(self):
         user = User.objects.get(username='testclient')
@@ -679,22 +730,51 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.initial['password'], form['password'].value())
 
     def test_custom_form(self):
-        class CustomUserChangeForm(UserChangeForm):
-            class Meta(UserChangeForm.Meta):
-                model = ExtensionUser
-                fields = ('username', 'password', 'date_of_birth',)
+        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
+            from django.contrib.auth.forms import UserChangeForm
+            self.assertEqual(UserChangeForm.Meta.model, ExtensionUser)
 
-        user = User.objects.get(username='testclient')
-        data = {
-            'username': 'testclient',
-            'password': 'testclient',
-            'date_of_birth': '1998-02-24',
-        }
-        form = CustomUserChangeForm(data, instance=user)
-        self.assertTrue(form.is_valid())
-        form.save()
-        self.assertEqual(form.cleaned_data['username'], 'testclient')
-        self.assertEqual(form.cleaned_data['date_of_birth'], datetime.date(1998, 2, 24))
+            class CustomUserChangeForm(UserChangeForm):
+                class Meta(UserChangeForm.Meta):
+                    fields = ('username', 'password', 'date_of_birth')
+
+            data = {
+                'username': 'testclient',
+                'password': 'testclient',
+                'date_of_birth': '1998-02-24',
+            }
+            form = CustomUserChangeForm(data, instance=self.u7)
+            self.assertTrue(form.is_valid())
+            form.save()
+            self.assertEqual(form.cleaned_data['username'], 'testclient')
+            self.assertEqual(form.cleaned_data['date_of_birth'], datetime.date(1998, 2, 24))
+        # reload_auth_forms() reloads the form.
+        from django.contrib.auth.forms import UserChangeForm
+        self.assertEqual(UserChangeForm.Meta.model, User)
+
+    def test_with_custom_user_model(self):
+        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
+            from django.contrib.auth.forms import UserChangeForm
+            self.assertEqual(UserChangeForm.Meta.model, ExtensionUser)
+            data = {
+                'username': 'testclient',
+                'date_joined': '1998-02-24',
+                'date_of_birth': '1998-02-24',
+            }
+            form = UserChangeForm(data, instance=self.u7)
+            self.assertTrue(form.is_valid())
+
+    def test_customer_user_model_with_different_username_field(self):
+        with override_settings(AUTH_USER_MODEL='auth_tests.CustomUser'):
+            from django.contrib.auth.forms import UserChangeForm
+            self.assertEqual(UserChangeForm.Meta.model, CustomUser)
+            user = CustomUser.custom_objects.create(email='test@test.com', date_of_birth='1998-02-24')
+            data = {
+                'email': 'testchange@test.com',
+                'date_of_birth': '1998-02-24',
+            }
+            form = UserChangeForm(data, instance=user)
+            self.assertTrue(form.is_valid())
 
 
 @override_settings(TEMPLATES=AUTH_TEMPLATES)
