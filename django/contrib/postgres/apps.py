@@ -2,10 +2,30 @@ from django.apps import AppConfig
 from django.db import connections
 from django.db.backends.signals import connection_created
 from django.db.models import CharField, TextField
+from django.test.signals import setting_changed
 from django.utils.translation import gettext_lazy as _
 
 from .lookups import SearchLookup, TrigramSimilar, Unaccent
 from .signals import register_type_handlers
+
+
+def uninstall_if_needed(setting, value, enter, **kwargs):
+    """
+    Undo the effects of PostgresConfig.ready() when django.contrib.postgres
+    is "uninstalled" by override_settings().
+    """
+    if not enter and setting == 'INSTALLED_APPS' and 'django.contrib.postgres' not in set(value):
+        connection_created.disconnect(register_type_handlers)
+        CharField._unregister_lookup(Unaccent)
+        TextField._unregister_lookup(Unaccent)
+        CharField._unregister_lookup(SearchLookup)
+        TextField._unregister_lookup(SearchLookup)
+        CharField._unregister_lookup(TrigramSimilar)
+        TextField._unregister_lookup(TrigramSimilar)
+        # Disconnect this receiver until the next time this app is installed
+        # and ready() connects it again to prevent unnecessary processing on
+        # each setting change.
+        setting_changed.disconnect(uninstall_if_needed)
 
 
 class PostgresConfig(AppConfig):
@@ -13,6 +33,7 @@ class PostgresConfig(AppConfig):
     verbose_name = _('PostgreSQL extensions')
 
     def ready(self):
+        setting_changed.connect(uninstall_if_needed)
         # Connections may already exist before we are called.
         for conn in connections.all():
             if conn.vendor == 'postgresql':
