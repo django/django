@@ -200,7 +200,7 @@ Minor features
   and :meth:`~django.contrib.auth.models.User.has_module_perms`
   to short-circuit permission checking.
 * :class:`~django.contrib.auth.forms.PasswordResetForm` now
-  has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_email`
+  has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_mail`
   that can be overridden to customize the mail to be sent.
 
 * The ``max_length`` of :attr:`Permission.name
