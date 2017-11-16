@@ -1673,7 +1673,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form for generating and emailing a one-time use link to reset a
     user's password.
 
-    .. method:: send_email(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
+    .. method:: send_mail(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
 
         Uses the arguments to send an ``EmailMultiAlternatives``.
         Can be overridden to customize how the email is sent to the user.
