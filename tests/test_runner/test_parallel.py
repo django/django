@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from django.test import SimpleTestCase
@@ -79,7 +80,8 @@ class RemoteTestResultTest(SimpleTestCase):
         event = events[1]
         self.assertEqual(event[0], 'addSubTest')
         self.assertEqual(str(event[2]), 'dummy_test (test_runner.test_parallel.SampleFailingSubtest) (index=0)')
-        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1',)")
+        trailing_comma = '' if sys.version_info >= (3, 7) else ','
+        self.assertEqual(repr(event[3][1]), "AssertionError('0 != 1'%s)" % trailing_comma)
 
         event = events[2]
-        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1',)")
+        self.assertEqual(repr(event[3][1]), "AssertionError('2 != 1'%s)" % trailing_comma)
