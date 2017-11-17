@@ -148,9 +148,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                related_url += '?' + '&amp;'.join(
-                    '%s=%s' % (k, v) for k, v in params.items(),
-                )
+                related_url += '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
             context['related_url'] = mark_safe(related_url)
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
