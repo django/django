@@ -727,7 +727,8 @@ computation. See :ref:`window-frames` for details.
 For example, to annotate each movie with the average rating for the movies by
 the same studio in the same genre and release year::
 
-    >>> from django.db.models import Avg, ExtractYear, F, Window
+    >>> from django.db.models import Avg, F, Window
+    >>> from django.db.models.functions import ExtractYear
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
@@ -745,7 +746,8 @@ genre, and release year) by using three window functions in the same query. The
 partition and ordering from the previous example is extracted into a dictionary
 to reduce repetition::
 
-    >>> from django.db.models import Avg, ExtractYear, F, Max, Min, Window
+    >>> from django.db.models import Avg, F, Max, Min, Window
+    >>> from django.db.models.functions import ExtractYear
     >>> window = {
     >>>    'partition': [F('studio'), F('genre')],
     >>>    'order_by': ExtractYear('released').asc(),
@@ -826,7 +828,8 @@ If a movie's "peers" are described as movies released by the same studio in the
 same genre in the same year, this ``RowRange`` example annotates each movie
 with the average rating of a movie's two prior and two following peers::
 
-    >>> from django.db.models import Avg, ExtractYear, F, RowRange, Window
+    >>> from django.db.models import Avg, F, RowRange, Window
+    >>> from django.db.models.functions import ExtractYear
     >>> Movie.objects.annotate(
     >>>     avg_rating=Window(
     >>>         expression=Avg('rating'),
