@@ -141,8 +141,10 @@ class OGRInspectTest(TestCase):
         else:
             self.assertIn('    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)', model_def)
         self.assertIn('    f_int = models.IntegerField()', model_def)
-        self.assertIn('    f_datetime = models.DateTimeField()', model_def)
-        self.assertIn('    f_time = models.TimeField()', model_def)
+        if connection.vendor != 'mysql' or not connection.mysql_is_mariadb:
+            # Probably a bug between GDAL and MariaDB on time fields.
+            self.assertIn('    f_datetime = models.DateTimeField()', model_def)
+            self.assertIn('    f_time = models.TimeField()', model_def)
         if connection.vendor == 'sqlite':
             self.assertIn('    f_float = models.CharField(max_length=0)', model_def)
         else:
