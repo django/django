@@ -833,12 +833,12 @@ class SQLCompiler(object):
             row[pos] = value
         return tuple(row)
 
-    def results_iter(self, results=None):
+    def results_iter(self, results=None, chunked_fetch=False):
         """
         Returns an iterator over the results from executing this query.
         """
         if results is None:
-            results = self.execute_sql(MULTI)
+            results = self.execute_sql(MULTI, chunked_fetch=chunked_fetch)
         fields = [s[0] for s in self.select[0:self.col_count]]
         converters = self.get_converters(fields)
         for rows in results:

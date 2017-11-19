@@ -103,7 +103,7 @@ class ValuesIterable(BaseIterable):
         # extra(select=...) cols are always at the start of the row.
         names = extra_names + field_names + annotation_names
 
-        for row in compiler.results_iter():
+        for row in compiler.results_iter(chunked_fetch=self.chunked_fetch):
             yield dict(zip(names, row))
 
 
@@ -119,7 +119,7 @@ class ValuesListIterable(BaseIterable):
         compiler = query.get_compiler(queryset.db)
 
         if not query.extra_select and not query.annotation_select:
-            for row in compiler.results_iter():
+            for row in compiler.results_iter(chunked_fetch=self.chunked_fetch):
                 yield tuple(row)
         else:
             field_names = list(query.values_select)
@@ -135,7 +135,7 @@ class ValuesListIterable(BaseIterable):
             else:
                 fields = names
 
-            for row in compiler.results_iter():
+            for row in compiler.results_iter(chunked_fetch=self.chunked_fetch):
                 data = dict(zip(names, row))
                 yield tuple(data[f] for f in fields)
 
@@ -149,7 +149,7 @@ class FlatValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
-        for row in compiler.results_iter():
+        for row in compiler.results_iter(chunked_fetch=self.chunked_fetch):
             yield row[0]
 
 
