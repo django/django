@@ -18,3 +18,6 @@ Bugfixes
 
 * Fixed incorrect index name truncation when using a namespaced ``db_table``
   (:ticket:`28792`).
+
+* Made ``QuerySet.iterator()`` use server-side cursors on PostgreSQL after
+  ``values()`` and ``values_list()`` (:ticket:`28817`).

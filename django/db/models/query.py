@@ -105,7 +105,7 @@ class ValuesIterable(BaseIterable):
         names = extra_names + field_names + annotation_names
 
         indexes = range(len(names))
-        for row in compiler.results_iter():
+        for row in compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size):
             yield {names[i]: row[i] for i in indexes}
 
 
@@ -133,8 +133,11 @@ class ValuesListIterable(BaseIterable):
                 # Reorder according to fields.
                 index_map = {name: idx for idx, name in enumerate(names)}
                 rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
-                return map(rowfactory, compiler.results_iter())
-        return compiler.results_iter(tuple_expected=True)
+                return map(
+                    rowfactory,
+                    compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+                )
+        return compiler.results_iter(tuple_expected=True, chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
 
 
 class NamedValuesListIterable(ValuesListIterable):
@@ -174,7 +177,7 @@ class FlatValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
-        return chain.from_iterable(compiler.results_iter())
+        return chain.from_iterable(compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size))
 
 
 class QuerySet:

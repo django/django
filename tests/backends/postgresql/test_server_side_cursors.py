@@ -3,7 +3,7 @@ import unittest
 from collections import namedtuple
 from contextlib import contextmanager
 
-from django.db import connection
+from django.db import connection, models
 from django.test import TestCase
 
 from ..models import Person
@@ -52,6 +52,19 @@ class ServerSideCursorsPostgres(TestCase):
 
     def test_server_side_cursor(self):
         self.assertUsesCursor(Person.objects.iterator())
+
+    def test_values(self):
+        self.assertUsesCursor(Person.objects.values('first_name').iterator())
+
+    def test_values_list(self):
+        self.assertUsesCursor(Person.objects.values_list('first_name').iterator())
+
+    def test_values_list_flat(self):
+        self.assertUsesCursor(Person.objects.values_list('first_name', flat=True).iterator())
+
+    def test_values_list_fields_not_equal_to_names(self):
+        expr = models.Count('id')
+        self.assertUsesCursor(Person.objects.annotate(id__count=expr).values_list(expr, 'id__count').iterator())
 
     def test_server_side_cursor_many_cursors(self):
         persons = Person.objects.iterator()
