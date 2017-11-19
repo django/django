@@ -105,8 +105,8 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Achtung: Sie sind %s Stunde der Serverzeit vorraus."
-msgstr[1] "Achtung: Sie sind %s Stunden der Serverzeit vorraus."
+msgstr[0] "Achtung: Sie sind %s Stunde der Serverzeit voraus."
+msgstr[1] "Achtung: Sie sind %s Stunden der Serverzeit voraus."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
