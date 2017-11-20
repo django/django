@@ -155,12 +155,14 @@ class BaseChannelLayer:
             return name
 
 
-
 def get_channel_layer(alias="default"):
     """
-    Returns a channel layer by alias.
+    Returns a channel layer by alias, or None if it is not configured.
     """
-    return channel_layers[alias]
+    try:
+        return channel_layers[alias]
+    except KeyError:
+        return None
 
 
 # Default global instance of the channel layer manager
