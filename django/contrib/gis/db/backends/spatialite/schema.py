@@ -1,5 +1,4 @@
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
-from django.db.utils import DatabaseError
 
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):
@@ -14,18 +13,6 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         "%(geom_type)s, %(dim)s)"
     )
     sql_remove_geometry_metadata = "SELECT DiscardGeometryColumn(%(table)s, %(column)s)"
-    sql_discard_geometry_columns = "DELETE FROM %(geom_table)s WHERE f_table_name = %(table)s"
-    sql_update_geometry_columns = (
-        "UPDATE %(geom_table)s SET f_table_name = %(new_table)s "
-        "WHERE f_table_name = %(old_table)s"
-    )
-
-    geometry_tables = [
-        "geometry_columns",
-        "geometry_columns_auth",
-        "geometry_columns_time",
-        "geometry_columns_statistics",
-    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,17 +74,6 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
                 self.remove_geometry_metadata(model, field)
-        # Make sure all geom stuff is gone
-        for geom_table in self.geometry_tables:
-            try:
-                self.execute(
-                    self.sql_discard_geometry_columns % {
-                        "geom_table": geom_table,
-                        "table": self.quote_name(model._meta.db_table),
-                    }
-                )
-            except DatabaseError:
-                pass
         super().delete_model(model, **kwargs)
 
     def add_field(self, model, field):
@@ -136,18 +112,6 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 )
         # Alter table
         super().alter_db_table(model, old_db_table, new_db_table)
-        # Repoint any straggler names
-        for geom_table in self.geometry_tables:
-            try:
-                self.execute(
-                    self.sql_update_geometry_columns % {
-                        "geom_table": geom_table,
-                        "old_table": self.quote_name(old_db_table),
-                        "new_table": self.quote_name(new_db_table),
-                    }
-                )
-            except DatabaseError:
-                pass
         # Re-add geometry-ness and rename spatial index tables
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
