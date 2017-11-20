@@ -20,7 +20,7 @@ class IsolationLevelTests(TestCase):
     read_committed = 'read committed'
     repeatable_read = 'repeatable read'
     isolation_values = {
-        level: level.replace(' ', '-').upper()
+        level: level.upper()
         for level in (read_committed, repeatable_read)
     }
 
@@ -38,8 +38,8 @@ class IsolationLevelTests(TestCase):
     @staticmethod
     def get_isolation_level(connection):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT @@session.%s" % connection.transaction_isolation_variable)
-            return cursor.fetchone()[0]
+            cursor.execute("SHOW VARIABLES WHERE variable_name IN ('transaction_isolation', 'tx_isolation')")
+            return cursor.fetchone()[1].replace('-', ' ')
 
     def test_auto_is_null_auto_config(self):
         query = 'set sql_auto_is_null = 0'

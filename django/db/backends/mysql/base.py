@@ -221,19 +221,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         isolation_level,
                         ', '.join("'%s'" % s for s in sorted(self.isolation_levels))
                     ))
-            # The variable assignment form of setting transaction isolation
-            # levels will be used, e.g. "set transaction_isolation='repeatable-read'".
-            isolation_level = isolation_level.replace(' ', '-')
         self.isolation_level = isolation_level
         kwargs.update(options)
         return kwargs
 
     def get_new_connection(self, conn_params):
         return Database.connect(**conn_params)
-
-    @cached_property
-    def transaction_isolation_variable(self):
-        return 'tx_isolation' if self.mysql_version < (5, 7, 20) else 'transaction_isolation'
 
     def init_connection_state(self):
         assignments = []
@@ -242,14 +235,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # a recently inserted row will return when the field is tested
             # for NULL. Disabling this brings this aspect of MySQL in line
             # with SQL standards.
-            assignments.append('SQL_AUTO_IS_NULL = 0')
+            assignments.append('SET SQL_AUTO_IS_NULL = 0')
 
         if self.isolation_level:
-            assignments.append("%s = '%s'" % (self.transaction_isolation_variable, self.isolation_level))
+            assignments.append('SET SESSION TRANSACTION ISOLATION LEVEL %s' % self.isolation_level.upper())
 
         if assignments:
             with self.cursor() as cursor:
-                cursor.execute('SET ' + ', '.join(assignments))
+                cursor.execute('; '.join(assignments))
 
     def create_cursor(self, name=None):
         cursor = self.connection.cursor()
