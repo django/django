@@ -681,6 +681,31 @@ def partition_suite_by_case(suite):
     return groups
 
 
+class NotTestedInParallelMixin:
+    pass
+
+
+def partition_suite_by_non_parallel_and_rest_by_case(suite):
+    suite_class = type(suite)
+
+    non_parallel = OrderedSet()
+    rest = OrderedSet()
+    non_parallel_and_rest_bins = [non_parallel, rest]
+
+    partition_suite_by_type(suite, [NotTestedInParallelMixin], non_parallel_and_rest_bins)
+
+    non_parallel_suite = suite_class()
+    non_parallel_suite.addTests(non_parallel)
+
+    rest_suite = suite_class()
+    rest_suite.addTests(rest)
+
+    rest_partitioned_by_case = partition_suite_by_case(rest_suite)
+
+    result = [non_parallel_suite] + rest_partitioned_by_case
+    return result
+
+
 def filter_tests_by_tags(suite, tags, exclude_tags):
     suite_class = type(suite)
     filtered_suite = suite_class()
