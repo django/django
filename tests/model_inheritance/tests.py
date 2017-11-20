@@ -9,8 +9,8 @@ from django.utils.version import PY36
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
-    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
-    Supplier, Title, Worker, ProxyChef,
+    MixinModel, ParkingLot, Place, Post, ProxyChef, Restaurant, Student,
+    SubBase, Supplier, Title, Worker,
 )
 
 
