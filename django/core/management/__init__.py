@@ -317,6 +317,8 @@ class ManagementUtility:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
             self.settings_exception = exc
+        except ImportError as exc:
+            self.settings_exception = exc
 
         if settings.configured:
             # Start the auto-reloading dev server even if the code is broken.
