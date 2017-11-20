@@ -1711,6 +1711,41 @@ class OperationTests(OperationTestBase):
         managers = new_state.models["test_almomae", "food"].managers
         self.assertEqual(managers, [])
 
+    def test_foreign_key_also_primary_key(self):
+        operation1 = migrations.CreateModel(
+            "Pony",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pink", models.IntegerField(default=1)),
+            ],
+        )
+        operation2 = migrations.CreateModel(
+            "Rider",
+            [
+                ("pony", models.ForeignKey("test_fk_also_pk.Pony", models.CASCADE, primary_key=True)),
+            ],
+        )
+        operation3 = migrations.RemoveField("Rider", "pony")
+
+        # Test the database alteration
+        project_state = ProjectState()
+        self.assertTableNotExists("test_fk_also_pk_pony")
+        self.assertTableNotExists("test_fk_also_pk_rider")
+        with connection.schema_editor() as editor:
+            new_state = project_state.clone()
+            operation1.state_forwards("test_fk_also_pk", new_state)
+            operation1.database_forwards("test_fk_also_pk", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation2.state_forwards("test_fk_also_pk", new_state)
+            operation2.database_forwards("test_fk_also_pk", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation3.state_forwards("test_fk_also_pk", new_state)
+            operation3.database_forwards("test_fk_also_pk", editor, project_state, new_state)
+
+        self.assertTableExists("test_fk_also_pk_pony")
+        self.assertTableExists("test_fk_also_pk_rider")
+        self.assertColumnNotExists("test_fk_also_pk_rider", "pony_id")
+
     def test_alter_fk(self):
         """
         Creating and then altering an FK works correctly
