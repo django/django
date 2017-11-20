@@ -84,6 +84,12 @@ class Chef(models.Model):
         return "%s the chef" % self.name
 
 
+class ProxyChef(Chef):
+
+    class Meta:
+        proxy = True
+
+
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)

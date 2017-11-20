@@ -9,8 +9,8 @@ from django.utils.version import PY36
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
-    MixinModel, ParkingLot, Place, Post, Restaurant, Student, SubBase,
-    Supplier, Title, Worker,
+    MixinModel, ParkingLot, Place, Post, ProxyChef, Restaurant, Student,
+    SubBase, Supplier, Title, Worker,
 )
 
 
@@ -187,7 +187,7 @@ class ModelInheritanceDataTests(TestCase):
             rating=2,
         )
 
-        chef = Chef.objects.create(name="Albert")
+        chef = Chef.objects.create(name="Albert", id=1)
         cls.italian_restaurant = ItalianRestaurant.objects.create(
             name="Ristorante Miron",
             address="1234 W. Ash",
@@ -330,6 +330,13 @@ class ModelInheritanceDataTests(TestCase):
         r1 = Restaurant.objects.get(pk=self.restaurant.pk)
         self.assertFalse(r1.serves_hot_dogs)
         self.assertEqual(r1.name, "Demon Puppies")
+
+    def test_update_query_counts_for_proxy(self):
+        """
+        #28820
+        """
+        with self.assertNumQueries(1):
+            ProxyChef.objects.filter(id=1).update(name='William')
 
     def test_values_works_on_parent_model_fields(self):
         # The values() command also works on fields from parent models.
