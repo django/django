@@ -122,7 +122,7 @@ class UpdateQuery(Query):
                     'Cannot update model field %r (only non-relations and '
                     'foreign keys permitted).' % field
                 )
-            if model is not self.get_meta().model:
+            if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
