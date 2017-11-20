@@ -1,7 +1,7 @@
 import asyncio
 import functools
 
-from asgiref.applications import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async, async_to_sync
 
 from .layers import get_channel_layer
 from .utils import await_many_dispatch
@@ -39,15 +39,19 @@ class AsyncConsumer:
         """
         # Initalize channel layer
         self.channel_layer = get_channel_layer()
-        self.channel_name = self.channel_layer.new_channel()
-        self.channel_receive = functools.partial(self.channel_layer.receive, self.channel_name)
+        if self.channel_layer is not None:
+            self.channel_name = self.channel_layer.new_channel()
+            self.channel_receive = functools.partial(self.channel_layer.receive, self.channel_name)
         # Store send function
         if self._sync:
             self.base_send = async_to_sync(send)
         else:
             self.base_send = send
         # Pass messages in from channel layer or client to dispatch method
-        await await_many_dispatch([receive, self.channel_receive], self.dispatch)
+        if self.channel_layer is not None:
+            await await_many_dispatch([receive, self.channel_receive], self.dispatch)
+        else:
+            await await_many_dispatch([receive], self.dispatch)
 
     async def dispatch(self, message):
         """

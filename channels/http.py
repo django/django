@@ -16,7 +16,7 @@ from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
-from asgiref.applications import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async, async_to_sync
 from channels.exceptions import RequestAborted, RequestTimeout
 
 try:
