@@ -48,14 +48,13 @@ of the case of the actual model class name.
 Default: ``[]`` (Empty list)
 
 A list of all the people who get code error notifications. When
-``DEBUG=False`` and a view raises an exception, Django will email these people
-with the full exception information. Each item in the list should be a tuple
-of (Full name, email address). Example::
+:setting:`DEBUG=False <DEBUG>` and :class:`~django.utils.log.AdminEmailHandler`
+is configured in :setting:`LOGGING` (done by default), Django emails these
+people the details of exceptions raised in the request/response cycle.
+
+Each item in the list should be a tuple of (Full name, email address). Example::
 
     [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
-
-Note that Django will email *all* of these people whenever an error happens.
-See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_HOSTS
 
