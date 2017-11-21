@@ -37,28 +37,27 @@ class ServerSideCursorsPostgres(TestCase):
             connection.settings_dict[setting] = kwargs[setting]
             yield
 
-    def test_server_side_cursor(self):
-        persons = Person.objects.iterator()
-        next(persons)  # Open a server-side cursor
+    def assertUsesCursor(self, queryset, num_expected=1):
+        next(queryset)  # Open a server-side cursor
         cursors = self.inspect_cursors()
-        self.assertEqual(len(cursors), 1)
-        self.assertIn('_django_curs_', cursors[0].name)
-        self.assertFalse(cursors[0].is_scrollable)
-        self.assertFalse(cursors[0].is_holdable)
-        self.assertFalse(cursors[0].is_binary)
-
-    def test_server_side_cursor_many_cursors(self):
-        persons = Person.objects.iterator()
-        persons2 = Person.objects.iterator()
-        next(persons)  # Open a server-side cursor
-        next(persons2)  # Open a second server-side cursor
-        cursors = self.inspect_cursors()
-        self.assertEqual(len(cursors), 2)
+        self.assertEqual(len(cursors), num_expected)
         for cursor in cursors:
             self.assertIn('_django_curs_', cursor.name)
             self.assertFalse(cursor.is_scrollable)
             self.assertFalse(cursor.is_holdable)
             self.assertFalse(cursor.is_binary)
+
+    def asserNotUsesCursor(self, queryset):
+        self.assertUsesCursor(queryset, num_expected=0)
+
+    def test_server_side_cursor(self):
+        self.assertUsesCursor(Person.objects.iterator())
+
+    def test_server_side_cursor_many_cursors(self):
+        persons = Person.objects.iterator()
+        persons2 = Person.objects.iterator()
+        next(persons)  # Open a server-side cursor
+        self.assertUsesCursor(persons2, num_expected=2)
 
     def test_closed_server_side_cursor(self):
         persons = Person.objects.iterator()
@@ -70,13 +69,8 @@ class ServerSideCursorsPostgres(TestCase):
     def test_server_side_cursors_setting(self):
         with self.override_db_setting(DISABLE_SERVER_SIDE_CURSORS=False):
             persons = Person.objects.iterator()
-            next(persons)  # Open a server-side cursor
-            cursors = self.inspect_cursors()
-            self.assertEqual(len(cursors), 1)
+            self.assertUsesCursor(persons)
             del persons  # Close server-side cursor
 
         with self.override_db_setting(DISABLE_SERVER_SIDE_CURSORS=True):
-            persons = Person.objects.iterator()
-            next(persons)  # Should not open a server-side cursor
-            cursors = self.inspect_cursors()
-            self.assertEqual(len(cursors), 0)
+            self.asserNotUsesCursor(Person.objects.iterator())
