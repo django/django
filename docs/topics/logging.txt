@@ -377,13 +377,13 @@ This logging configuration does the following things:
 
 * Defines two handlers:
 
-  * ``console``, a StreamHandler, which will print any ``INFO``
-    (or higher) message to stderr. This handler uses the ``simple`` output
-    format.
+  * ``console``, a :class:`~logging.StreamHandler`, which prints any ``INFO``
+    (or higher) message to ``sys.stderr``. This handler uses the ``simple``
+    output format.
 
-  * ``mail_admins``, an AdminEmailHandler, which will email any
-    ``ERROR`` (or higher) message to the site admins. This handler uses
-    the ``special`` filter.
+  * ``mail_admins``, an :class:`AdminEmailHandler`, which emails any ``ERROR``
+    (or higher) message to the site :setting:`ADMINS`. This handler uses the
+    ``special`` filter.
 
 * Configures three loggers:
 
@@ -590,7 +590,7 @@ Python logging module.
 
 .. class:: AdminEmailHandler(include_html=False, email_backend=None)
 
-    This handler sends an email to the site admins for each log
+    This handler sends an email to the site :setting:`ADMINS` for each log
     message it receives.
 
     If the log record contains a ``request`` attribute, the full details
