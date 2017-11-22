@@ -241,7 +241,7 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
 Or if :mod:`~django.contrib.staticfiles` is configured using the
-`~django.contib.staticfiles.ManifestStaticFilesStorage`::
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`::
 
     >>> w = CalendarWidget()
     >>> print(w.media)
