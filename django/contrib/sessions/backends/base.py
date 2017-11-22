@@ -12,6 +12,7 @@ from django.utils.crypto import (
 )
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
+from django.utils import signing
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -87,33 +88,14 @@ class SessionBase:
     def delete_test_cookie(self):
         del self[self.TEST_COOKIE_NAME]
 
-    def _hash(self, value):
-        key_salt = "django.contrib.sessions" + self.__class__.__name__
-        return salted_hmac(key_salt, value).hexdigest()
+    def _salt(self):
+        return "django.contrib.sessions" + self.__class__.__name__
 
-    def encode(self, session_dict):
-        "Return the given session dictionary serialized and encoded as a string."
-        serialized = self.serializer().dumps(session_dict)
-        hash = self._hash(serialized)
-        return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
+    def encode(self, session_dict, compress=False):
+        return signing.dumps(session_dict, salt=self._salt(), self.serializer, compress)
 
-    def decode(self, session_data):
-        encoded_data = base64.b64decode(force_bytes(session_data))
-        try:
-            # could produce ValueError if there is no ':'
-            hash, serialized = encoded_data.split(b':', 1)
-            expected_hash = self._hash(serialized)
-            if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousSession("Session data corrupted")
-            else:
-                return self.serializer().loads(serialized)
-        except Exception as e:
-            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
-            # these happen, just return an empty dictionary (an empty session).
-            if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                logger.warning(str(e))
-            return {}
+    def decode(self, session_data, max_age=None):
+        return signing.loads(session_dict, salt=self._salt())
 
     def update(self, dict_):
         self._session.update(dict_)
