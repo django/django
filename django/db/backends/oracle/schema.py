@@ -1,11 +1,9 @@
-import binascii
 import copy
 import datetime
 import re
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
-from django.utils.encoding import force_text
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -25,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, str):
             return "'%s'" % value.replace("\'", "\'\'")
         elif isinstance(value, (bytes, bytearray, memoryview)):
-            return "'%s'" % force_text(binascii.hexlify(value))
+            return "'%s'" % value.hex()
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:

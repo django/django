@@ -1,6 +1,5 @@
 import json
 import pickle
-from binascii import b2a_hex
 
 from django.contrib.gis.gdal import (
     CoordTransform, GDALException, OGRGeometry, OGRGeomType, SpatialReference,
@@ -100,7 +99,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
-            self.assertEqual(b2a_hex(wkb).upper(), g.hex.encode())
+            self.assertEqual(wkb.hex().upper(), g.hex)
             # Constructing w/WKB.
             geom2 = OGRGeometry(wkb)
             self.assertEqual(geom1, geom2)

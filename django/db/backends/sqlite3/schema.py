@@ -1,4 +1,3 @@
-import codecs
 import contextlib
 import copy
 from decimal import Decimal
@@ -49,13 +48,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, (bytes, bytearray, memoryview)):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
-            # character:
-            # value = b'\x01\x02' => value_hex = b'0102' => return X'0102'
-            value = bytes(value)
-            hex_encoder = codecs.getencoder('hex_codec')
-            value_hex, _length = hex_encoder(value)
-            # Use 'ascii' encoding for b'01' => '01', no need to use force_text here.
-            return "X'%s'" % value_hex.decode('ascii')
+            # character.
+            return "X'%s'" % value.hex()
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
