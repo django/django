@@ -15,6 +15,7 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
+from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
 
 RAISE_ERROR = object()
@@ -176,14 +177,27 @@ class HttpRequest:
             location = '//%s' % self.get_full_path()
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
-            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
-                                                           host=self.get_host(),
-                                                           path=self.path)
-            # Join the constructed URL with the provided location, which will
-            # allow the provided ``location`` to apply query strings to the
-            # base path as well as override the host, if it begins with //
-            location = urljoin(current_uri, location)
+            # Handle the simple, most common case. If the location is absolute
+            # and a scheme or host (netloc) isn't provided, skip an expensive
+            # urljoin() as long as no path segments are '.' or '..'.
+            if (bits.path.startswith('/') and not bits.scheme and not bits.netloc and
+                    '/./' not in bits.path and '/../' not in bits.path):
+                # If location starts with '//' but has no netloc, reuse the
+                # schema and netloc from the current request. Strip the double
+                # slashes and continue as if it wasn't specified.
+                if location.startswith('//'):
+                    location = location[2:]
+                location = self._current_scheme_host + location
+            else:
+                # Join the constructed URL with the provided location, which
+                # allows the provided location to apply query strings to the
+                # base path.
+                location = urljoin(self._current_scheme_host + self.path, location)
         return iri_to_uri(location)
+
+    @cached_property
+    def _current_scheme_host(self):
+        return '{}://{}'.format(self.scheme, self.get_host())
 
     def _get_scheme(self):
         """
