@@ -29,7 +29,7 @@ def list_to_queryset(model, data):
         )
     if not isinstance(data, list):
         raise ValueError(
-            "%s must be Dictionary Object" % data
+            "%s must be List Object" % data
         )
     
     pk_list = [obj.pk for obj in data]
