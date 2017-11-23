@@ -4,7 +4,6 @@ The main QuerySet implementation. This provides the public API for the ORM.
 
 import copy
 import operator
-import sys
 import warnings
 from collections import OrderedDict, namedtuple
 from functools import lru_cache
@@ -521,13 +520,12 @@ class QuerySet:
                 params = {k: v() if callable(v) else v for k, v in params.items()}
                 obj = self.create(**params)
             return obj, True
-        except IntegrityError:
-            exc_info = sys.exc_info()
+        except IntegrityError as e:
             try:
                 return self.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
+            raise e
 
     def _extract_model_params(self, defaults, **kwargs):
         """

@@ -480,9 +480,9 @@ class Client(RequestFactory):
             # Also make sure that the signalled exception is cleared from
             # the local cache!
             if self.exc_info:
-                exc_info = self.exc_info
+                _, exc_value, _ = self.exc_info
                 self.exc_info = None
-                raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
+                raise exc_value
 
             # Save the client and request that stimulated the response.
             response.client = self
