@@ -245,7 +245,7 @@ def check_errors(fn):
 def raise_last_exception():
     global _exception
     if _exception is not None:
-        raise _exception[0](_exception[1]).with_traceback(_exception[2])
+        raise _exception[1]
 
 
 def ensure_echo_on():
