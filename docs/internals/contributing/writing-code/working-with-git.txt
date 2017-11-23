@@ -138,6 +138,16 @@ related Trac ticket explaining what you've done. In particular, you should note
 the environment in which you ran the tests, for instance: "all tests pass
 under SQLite and MySQL".
 
+.. tip::
+
+    If the title of your pull request (PR) contains a "#xxxxx" mention then,
+    thanks to some magic present in our Trac instance, its page for ticket xxxxx
+    will have a *Pull Requests* field automatically added to the Summary
+    section with a link to the PR. As GitHub already puts by default in the PR
+    title the subject line of its first commit then if you followed the
+    :ref:`commit message guidelines <committing-guidelines>` you might find you
+    don't need to do anything to get your PR linked from the ticket page.
+
 Pull requests at GitHub have only two states: open and closed. The committer
 who will deal with your pull request has only two options: merge it or close
 it. For this reason, it isn't useful to make a pull request until the code is
