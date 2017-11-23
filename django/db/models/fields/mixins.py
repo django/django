@@ -12,6 +12,22 @@ class FieldCacheMixin:
         try:
             return instance._state.fields_cache[cache_name]
         except KeyError:
+            # An ancestor link will exist if this field is defined on a
+            # multi-table inheritance parent of the instance's class.
+            ancestor_link = instance._meta.get_ancestor_link(self.model)
+            if ancestor_link:
+                try:
+                    # The value might be cached on an ancestor if the instance
+                    # originated from walking down the inheritance chain.
+                    ancestor = ancestor_link.get_cached_value(instance)
+                except KeyError:
+                    pass
+                else:
+                    value = self.get_cached_value(ancestor)
+                    # Cache the ancestor value locally to speed up future
+                    # lookups.
+                    self.set_cached_value(instance, value)
+                    return value
             if default is NOT_PROVIDED:
                 raise
             return default
