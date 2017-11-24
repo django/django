@@ -188,7 +188,9 @@ def write_pot_file(potfile, msgs):
                 header_read = True
             lines.append(line)
     msgs = '\n'.join(lines)
-    with open(potfile, 'a', encoding='utf-8') as fp:
+    # Force newlines of POT files to '\n' to work around
+    # https://savannah.gnu.org/bugs/index.php?52395
+    with open(potfile, 'a', encoding='utf-8', newline='\n') as fp:
         fp.write(msgs)
 
 
