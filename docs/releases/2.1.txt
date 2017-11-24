@@ -239,7 +239,8 @@ Features deprecated in 2.1
 Miscellaneous
 -------------
 
-* ...
+* The ``ForceRHR`` GIS function is deprecated in favor of the new
+  :class:`~django.contrib.gis.db.models.functions.ForcePolygonCW` function.
 
 .. _removed-features-2.1:
 

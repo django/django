@@ -158,6 +158,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 'LengthSpheroid': 'ST_length_spheroid',
                 'MemSize': 'ST_mem_size',
             })
+        if self.spatial_version < (2, 4, 0):
+            function_names['ForcePolygonCW'] = 'ST_ForceRHR'
         return function_names
 
     @cached_property
