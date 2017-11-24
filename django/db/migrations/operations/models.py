@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ModelState
-from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import normalize_together
 from django.utils.functional import cached_property
 
@@ -278,14 +277,6 @@ class RenameModel(ModelOperation):
             [],
             kwargs
         )
-
-    def _get_model_tuple(self, remote_model, app_label, model_name):
-        if remote_model == RECURSIVE_RELATIONSHIP_CONSTANT:
-            return app_label, model_name.lower()
-        elif '.' in remote_model:
-            return tuple(remote_model.lower().split('.'))
-        else:
-            return app_label, remote_model.lower()
 
     def state_forwards(self, app_label, state):
         # Add a new model.
