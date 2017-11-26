@@ -1118,6 +1118,7 @@ class OrderBy(BaseExpression):
         }
         placeholders.update(extra_context)
         template = template or self.template
+        params *= template.count('%(expression)s')
         return (template % placeholders).rstrip(), params
 
     def as_sqlite(self, compiler, connection):
