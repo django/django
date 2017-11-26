@@ -16,7 +16,7 @@ except ImportError:
 ROOT = os.path.dirname(__file__)
 
 
-@functools.lru_cache()
+@functools.lru_cache(maxsize=None)
 def get_default_renderer():
     renderer_class = import_string(settings.FORM_RENDERER)
     return renderer_class()
