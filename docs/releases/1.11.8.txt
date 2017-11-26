@@ -21,3 +21,6 @@ Bugfixes
 
 * Made ``QuerySet.iterator()`` use server-side cursors on PostgreSQL after
   ``values()`` and ``values_list()`` (:ticket:`28817`).
+
+* Fixed crash on SQLite and MySQL when ordering by a filtered subquery that
+  uses ``nulls_first`` or ``nulls_last`` (:ticket:`28848`).
