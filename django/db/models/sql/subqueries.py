@@ -52,7 +52,7 @@ class DeleteQuery(Query):
         innerq.get_initial_alias()
         # The same for our new query.
         self.get_initial_alias()
-        innerq_used_tables = tuple([t for t in innerq.alias_map if innerq.alias_refcount[t]])
+        innerq_used_tables = tuple(t for t in innerq.alias_map if innerq.alias_refcount[t])
         if not innerq_used_tables or innerq_used_tables == tuple(self.alias_map):
             # There is only the base table in use in the query.
             self.where = innerq.where
