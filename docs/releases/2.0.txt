@@ -534,6 +534,13 @@ rebuild tables using a script similar to this::
 This script hasn't received extensive testing and needs adaption for various
 cases such as multiple databases. Feel free to contribute improvements.
 
+In addition, because of a table alteration limitation of SQLite, it's prohibited
+to perform :class:`~django.db.migrations.operations.RenameModel` and
+:class:`~django.db.migrations.operations.RenameField` operations on models or
+fields referenced by other models in a transaction. In order to allow migrations
+containing these operations to be applied, you must set the
+``Migration.atomic`` attribute to ``False``.
+
 Miscellaneous
 -------------
 

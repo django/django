@@ -164,6 +164,9 @@ class BaseDatabaseFeatures:
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
 
+    # Does it support operations requiring references rename in a transaction?
+    supports_atomic_references_rename = True
+
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 

@@ -173,7 +173,7 @@ class SchemaTests(TransactionTestCase):
         index_orders = constraints[index]['orders']
         self.assertTrue(all(val == expected for val, expected in zip(index_orders, order)))
 
-    def assertForeignKeyExists(self, model, column, expected_fk_table):
+    def assertForeignKeyExists(self, model, column, expected_fk_table, field='id'):
         """
         Fail if the FK constraint on `model.Meta.db_table`.`column` to
         `expected_fk_table`.id doesn't exist.
@@ -184,7 +184,7 @@ class SchemaTests(TransactionTestCase):
             if details['columns'] == [column] and details['foreign_key']:
                 constraint_fk = details['foreign_key']
                 break
-        self.assertEqual(constraint_fk, (expected_fk_table, 'id'))
+        self.assertEqual(constraint_fk, (expected_fk_table, field))
 
     def assertForeignKeyNotExists(self, model, column, expected_fk_table):
         with self.assertRaises(AssertionError):
@@ -1147,6 +1147,30 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['display_name'][0], "CharField")
         self.assertNotIn("name", columns)
 
+    @isolate_apps('schema')
+    def test_rename_referenced_field(self):
+        class Author(Model):
+            name = CharField(max_length=255, unique=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        class Book(Model):
+            author = ForeignKey(Author, CASCADE, to_field='name')
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        new_field = CharField(max_length=255, unique=True)
+        new_field.set_attributes_from_name('renamed')
+        with connection.schema_editor(atomic=connection.features.supports_atomic_references_rename) as editor:
+            editor.alter_field(Author, Author._meta.get_field('name'), new_field)
+        # Ensure the foreign key reference was updated.
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_author', 'renamed')
+
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_rename_keep_null_status(self):
         """
@@ -1625,25 +1649,41 @@ class SchemaTests(TransactionTestCase):
             ),
         )
 
+    @isolate_apps('schema')
     def test_db_table(self):
         """
         Tests renaming of the table
         """
-        # Create the table
+        class Author(Model):
+            name = CharField(max_length=255)
+
+            class Meta:
+                app_label = 'schema'
+
+        class Book(Model):
+            author = ForeignKey(Author, CASCADE)
+
+            class Meta:
+                app_label = 'schema'
+
+        # Create the table and one referring it.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
+            editor.create_model(Book)
         # Ensure the table is there to begin with
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
         # Alter the table
-        with connection.schema_editor() as editor:
+        with connection.schema_editor(atomic=connection.features.supports_atomic_references_rename) as editor:
             editor.alter_db_table(Author, "schema_author", "schema_otherauthor")
         # Ensure the table is there afterwards
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
+        # Ensure the foreign key reference was updated
+        self.assertForeignKeyExists(Book, "author_id", "schema_otherauthor")
         # Alter the table again
-        with connection.schema_editor() as editor:
+        with connection.schema_editor(atomic=connection.features.supports_atomic_references_rename) as editor:
             editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
         # Ensure the table is still there
         Author._meta.db_table = "schema_author"
