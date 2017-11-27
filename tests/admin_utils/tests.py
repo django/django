@@ -202,6 +202,13 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_value([1, 2, 'buckle', 'my', 'shoe'], self.empty_value)
         self.assertEqual(display_value, '1, 2, buckle, my, shoe')
 
+    def test_empty_values_display_for_value(self):
+        display_value = display_for_value("", self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
+        display_value = display_for_value(None, self.empty_value)
+        self.assertEqual(display_value, self.empty_value)
+
     def test_label_for_field(self):
         """
         Tests for label_for_field

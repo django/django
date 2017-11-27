@@ -407,7 +407,7 @@ def display_for_field(value, field, empty_value_display):
     # before the general null test.
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
         return _boolean_icon(value)
-    elif value is None:
+    elif value is None or isinstance(value, str) and value == '':
         return empty_value_display
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
@@ -428,7 +428,7 @@ def display_for_value(value, empty_value_display, boolean=False):
 
     if boolean:
         return _boolean_icon(value)
-    elif value is None:
+    elif value is None or isinstance(value, str) and value == '':
         return empty_value_display
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
