@@ -803,8 +803,8 @@ class Query:
         # "group by" and "where".
         self.where.relabel_aliases(change_map)
         if isinstance(self.group_by, tuple):
-            self.group_by = tuple([col.relabeled_clone(change_map) for col in self.group_by])
-        self.select = tuple([col.relabeled_clone(change_map) for col in self.select])
+            self.group_by = tuple(col.relabeled_clone(change_map) for col in self.group_by)
+        self.select = tuple(col.relabeled_clone(change_map) for col in self.select)
         if self._annotations:
             self._annotations = OrderedDict(
                 (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
