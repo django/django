@@ -37,7 +37,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         except sqlite3.ProgrammingError:
             pass
         # Manual emulation of SQLite parameter quoting
-        if isinstance(value, type(True)):
+        if isinstance(value, bool):
             return str(int(value))
         elif isinstance(value, (Decimal, float, int)):
             return str(value)
