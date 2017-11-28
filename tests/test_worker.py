@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 
+import time
+import threading
+
 from channels import DEFAULT_CHANNEL_LAYER, Channel, route
 from channels.asgi import channel_layers
 from channels.exceptions import ConsumeLater
 from channels.test import ChannelTestCase
-from channels.worker import Worker
+from channels.worker import Worker, WorkerGroup
 
 try:
     from unittest import mock
@@ -91,5 +94,38 @@ class WorkerTests(ChannelTestCase):
         worker.termed = 2
 
         worker.run()
+        self.assertEqual(consumer.call_count, 1)
+        self.assertEqual(channel_layer.send.call_count, 0)
+
+
+class WorkerGroupTests(ChannelTestCase):
+
+    def test_graceful_stop(self):
+
+        callback_is_running = threading.Event()
+
+        def callback(channel, message):
+            callback_is_running.set()
+            # emulate some delay to validate graceful stop
+            time.sleep(0.1)
+            callback_is_running.clear()
+
+        consumer = mock.Mock()
+        Channel('test').send({'test': 'test'}, immediately=True)
+        channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
+        channel_layer.router.add_route(route('test', consumer))
+        old_send = channel_layer.send
+        channel_layer.send = mock.Mock(side_effect=old_send)  # proxy 'send' for counting
+        worker_group = WorkerGroup(channel_layer, n_threads=3,
+                                   signal_handlers=False, stop_gracefully=True,
+                                   callback=callback)
+        worker_group_t = threading.Thread(target=worker_group.run)
+        worker_group_t.daemon = True
+        worker_group_t.start()
+        # wait when a worker starts the callback and terminate the worker group
+        callback_is_running.wait()
+        self.assertRaises(SystemExit, worker_group.sigterm_handler, None, None)
+        self.assertFalse(callback_is_running.is_set())
+
         self.assertEqual(consumer.call_count, 1)
         self.assertEqual(channel_layer.send.call_count, 0)

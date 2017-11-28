@@ -149,6 +149,8 @@ class Worker(object):
             finally:
                 # Send consumer finished so DB conns close etc.
                 consumer_finished.send(sender=self.__class__)
+        # Reset the flag to have a correct value after finishing the run loop
+        self.in_job = False
 
 
 class WorkerGroup(Worker):
@@ -159,12 +161,21 @@ class WorkerGroup(Worker):
 
     def __init__(self, *args, **kwargs):
         n_threads = kwargs.pop('n_threads', multiprocessing.cpu_count()) - 1
+        self.stop_gracefully = kwargs.pop('stop_gracefully', False)
         super(WorkerGroup, self).__init__(*args, **kwargs)
         kwargs['signal_handlers'] = False
         self.workers = [Worker(*args, **kwargs) for ii in range(n_threads)]
 
     def sigterm_handler(self, signo, stack_frame):
-        logger.info("Shutdown signal received by WorkerGroup, terminating immediately.")
+        self.termed = True
+        for worker in self.workers:
+            worker.termed = True
+        msg_prefix = "Shutdown signal received by WorkerGroup, "
+        if self.stop_gracefully:
+            logger.info(msg_prefix + "waiting for sub-workers.")
+            self.wait_for_workers()
+        else:
+            logger.info(msg_prefix + "terminating immediately.")
         sys.exit(0)
 
     def ready(self):
@@ -182,3 +193,12 @@ class WorkerGroup(Worker):
             t.daemon = True
             t.start()
         super(WorkerGroup, self).run()
+        if self.stop_gracefully:
+            self.wait_for_workers()
+
+    def wait_for_workers(self):
+        while self.in_job or any(
+                self.threads[worker_id].is_alive() and
+                self.workers[worker_id].in_job
+                for worker_id in range(len(self.workers))):
+            time.sleep(0.1)

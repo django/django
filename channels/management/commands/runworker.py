@@ -34,6 +34,10 @@ class Command(BaseCommand):
             default=1, type=int,
             help='Number of threads to execute.'
         )
+        parser.add_argument(
+            '--disable-graceful-stop', action='store_false', dest='stop_gracefully',
+            help='Disable graceful stop for a worker group (instant exit on termination signal).',
+        )
 
     def handle(self, *args, **options):
         # Get the backend to use
@@ -68,6 +72,7 @@ class Command(BaseCommand):
             self.logger.info("Using multi-threaded worker, {} thread(s).".format(self.n_threads))
             worker_cls = WorkerGroup
             worker_kwargs['n_threads'] = self.n_threads
+            worker_kwargs['stop_gracefully'] = self.options.get('stop_gracefully')
         # Run the worker
         self.logger.info("Running worker against channel layer %s", self.channel_layer)
         try:
