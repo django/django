@@ -25,8 +25,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
     data_types_reverse = GeoFlexibleFieldLookupDict()
 
     def get_geometry_type(self, table_name, geo_col):
-        cursor = self.connection.cursor()
-        try:
+        with self.connection.cursor() as cursor:
             # Querying the `geometry_columns` table to get additional metadata.
             cursor.execute('SELECT coord_dimension, srid, geometry_type '
                            'FROM geometry_columns '
@@ -55,9 +54,6 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
                 field_params['srid'] = srid
             if (isinstance(dim, str) and 'Z' in dim) or dim == 3:
                 field_params['dim'] = 3
-        finally:
-            cursor.close()
-
         return field_type, field_params
 
     def get_constraints(self, cursor, table_name):

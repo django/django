@@ -664,7 +664,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    cursor = connections['my_db_alias'].cursor()
+    with connections['my_db_alias'].cursor() as cursor:
+        ...
 
 Limitations of multiple databases
 =================================

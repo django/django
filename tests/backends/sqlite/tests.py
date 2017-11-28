@@ -82,11 +82,11 @@ class LastExecutedQueryTest(TestCase):
         # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
         # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
         # can hit the SQLITE_MAX_COLUMN limit (#26063).
-        cursor = connection.cursor()
-        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
-        params = list(range(2001))
-        # This should not raise an exception.
-        cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+        with connection.cursor() as cursor:
+            sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
+            params = list(range(2001))
+            # This should not raise an exception.
+            cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
@@ -97,9 +97,9 @@ class EscapingChecks(TestCase):
     """
     def test_parameter_escaping(self):
         # '%s' escaping support for sqlite3 (#13648).
-        cursor = connection.cursor()
-        cursor.execute("select strftime('%s', date('now'))")
-        response = cursor.fetchall()[0][0]
+        with connection.cursor() as cursor:
+            cursor.execute("select strftime('%s', date('now'))")
+            response = cursor.fetchall()[0][0]
         # response should be an non-zero integer
         self.assertTrue(int(response))
 

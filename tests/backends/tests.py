@@ -56,8 +56,8 @@ class LastExecutedQueryTest(TestCase):
         last_executed_query should not raise an exception even if no previous
         query has been run.
         """
-        cursor = connection.cursor()
-        connection.ops.last_executed_query(cursor, '', ())
+        with connection.cursor() as cursor:
+            connection.ops.last_executed_query(cursor, '', ())
 
     def test_debug_sql(self):
         list(Reporter.objects.filter(first_name="test"))
@@ -78,16 +78,16 @@ class ParameterHandlingTest(TestCase):
 
     def test_bad_parameter_count(self):
         "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
-        cursor = connection.cursor()
-        query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
-            connection.introspection.table_name_converter('backends_square'),
-            connection.ops.quote_name('root'),
-            connection.ops.quote_name('square')
-        ))
-        with self.assertRaises(Exception):
-            cursor.executemany(query, [(1, 2, 3)])
-        with self.assertRaises(Exception):
-            cursor.executemany(query, [(1,)])
+        with connection.cursor() as cursor:
+            query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
+                connection.introspection.table_name_converter('backends_square'),
+                connection.ops.quote_name('root'),
+                connection.ops.quote_name('square')
+            ))
+            with self.assertRaises(Exception):
+                cursor.executemany(query, [(1, 2, 3)])
+            with self.assertRaises(Exception):
+                cursor.executemany(query, [(1,)])
 
 
 class LongNameTest(TransactionTestCase):
@@ -133,9 +133,10 @@ class LongNameTest(TransactionTestCase):
                 'table': VLM._meta.db_table
             },
         ]
-        cursor = connection.cursor()
-        for statement in connection.ops.sql_flush(no_style(), tables, sequences):
-            cursor.execute(statement)
+        sql_list = connection.ops.sql_flush(no_style(), tables, sequences)
+        with connection.cursor() as cursor:
+            for statement in sql_list:
+                cursor.execute(statement)
 
 
 class SequenceResetTest(TestCase):
@@ -146,10 +147,10 @@ class SequenceResetTest(TestCase):
         Post.objects.create(id=10, name='1st post', text='hello world')
 
         # Reset the sequences for the database
-        cursor = connection.cursor()
         commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [Post])
-        for sql in commands:
-            cursor.execute(sql)
+        with connection.cursor() as cursor:
+            for sql in commands:
+                cursor.execute(sql)
 
         # If we create a new object now, it should have a PK greater
         # than the PK we specified manually.
@@ -192,14 +193,14 @@ class EscapingChecks(TestCase):
     bare_select_suffix = connection.features.bare_select_suffix
 
     def test_paramless_no_escaping(self):
-        cursor = connection.cursor()
-        cursor.execute("SELECT '%s'" + self.bare_select_suffix)
-        self.assertEqual(cursor.fetchall()[0][0], '%s')
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT '%s'" + self.bare_select_suffix)
+            self.assertEqual(cursor.fetchall()[0][0], '%s')
 
     def test_parameter_escaping(self):
-        cursor = connection.cursor()
-        cursor.execute("SELECT '%%', %s" + self.bare_select_suffix, ('%d',))
-        self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT '%%', %s" + self.bare_select_suffix, ('%d',))
+            self.assertEqual(cursor.fetchall()[0], ('%', '%d'))
 
 
 @override_settings(DEBUG=True)
@@ -215,7 +216,6 @@ class BackendTestCase(TransactionTestCase):
         self.create_squares(args, 'format', True)
 
     def create_squares(self, args, paramstyle, multiple):
-        cursor = connection.cursor()
         opts = Square._meta
         tbl = connection.introspection.table_name_converter(opts.db_table)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
@@ -226,10 +226,11 @@ class BackendTestCase(TransactionTestCase):
             query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
         else:
             raise ValueError("unsupported paramstyle in test")
-        if multiple:
-            cursor.executemany(query, args)
-        else:
-            cursor.execute(query, args)
+        with connection.cursor() as cursor:
+            if multiple:
+                cursor.executemany(query, args)
+            else:
+                cursor.execute(query, args)
 
     def test_cursor_executemany(self):
         # Test cursor.executemany #4896
@@ -297,18 +298,18 @@ class BackendTestCase(TransactionTestCase):
         Person(first_name="Clark", last_name="Kent").save()
         opts2 = Person._meta
         f3, f4 = opts2.get_field('first_name'), opts2.get_field('last_name')
-        cursor = connection.cursor()
-        cursor.execute(
-            'SELECT %s, %s FROM %s ORDER BY %s' % (
-                qn(f3.column),
-                qn(f4.column),
-                connection.introspection.table_name_converter(opts2.db_table),
-                qn(f3.column),
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT %s, %s FROM %s ORDER BY %s' % (
+                    qn(f3.column),
+                    qn(f4.column),
+                    connection.introspection.table_name_converter(opts2.db_table),
+                    qn(f3.column),
+                )
             )
-        )
-        self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
-        self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
-        self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
+            self.assertEqual(cursor.fetchone(), ('Clark', 'Kent'))
+            self.assertEqual(list(cursor.fetchmany(2)), [('Jane', 'Doe'), ('John', 'Doe')])
+            self.assertEqual(list(cursor.fetchall()), [('Mary', 'Agnelline'), ('Peter', 'Parker')])
 
     def test_unicode_password(self):
         old_password = connection.settings_dict['PASSWORD']
@@ -344,10 +345,10 @@ class BackendTestCase(TransactionTestCase):
 
     def test_duplicate_table_error(self):
         """ Creating an existing table returns a DatabaseError """
-        cursor = connection.cursor()
         query = 'CREATE TABLE %s (id INTEGER);' % Article._meta.db_table
-        with self.assertRaises(DatabaseError):
-            cursor.execute(query)
+        with connection.cursor() as cursor:
+            with self.assertRaises(DatabaseError):
+                cursor.execute(query)
 
     def test_cursor_contextmanager(self):
         """

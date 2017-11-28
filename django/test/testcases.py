@@ -852,9 +852,9 @@ class TransactionTestCase(SimpleTestCase):
                 no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.atomic(using=db_name):
-                    cursor = conn.cursor()
-                    for sql in sql_list:
-                        cursor.execute(sql)
+                    with conn.cursor() as cursor:
+                        for sql in sql_list:
+                            cursor.execute(sql)
 
     def _fixture_setup(self):
         for db_name in self._databases_names(include_mirrors=False):

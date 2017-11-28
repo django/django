@@ -279,8 +279,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    cursor = connections['my_db_alias'].cursor()
-    # Your code here...
+    with connections['my_db_alias'].cursor() as cursor:
+        # Your code here...
 
 By default, the Python DB API will return results without their field names,
 which means you end up with a ``list`` of values, rather than a ``dict``. At a
