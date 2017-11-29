@@ -4,6 +4,7 @@ from itertools import chain
 from django import forms
 from django.contrib.postgres.validators import (
     ArrayMaxLengthValidator, ArrayMinLengthValidator,
+    ChoiceMaxCountValidator, ChoiceMinCountValidator
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -202,3 +203,80 @@ class SplitArrayField(forms.Field):
         if errors:
             raise ValidationError(list(chain.from_iterable(errors)))
         return cleaned_data
+
+
+class ChoiceArrayField(forms.TypedMultipleChoiceField):
+    widget = forms.CheckboxSelectMultiple
+
+    default_error_messages = {
+        'item_invalid': _('Choice %(name)s did not validate: '),
+    }
+
+    def __init__(self, base_field, *, max_length=None, min_length=None, **kwargs):
+        self.base_field = base_field
+        super().__init__(**kwargs)
+        if min_length is not None:
+            self.min_length = min_length
+            self.validators.append(ChoiceMinCountValidator(int(min_length)))
+        if max_length is not None:
+            self.max_length = max_length
+            self.validators.append(ChoiceMaxCountValidator(int(max_length)))
+
+    def to_python(self, value):
+        items = value
+        errors = []
+        values = []
+
+        for item in items:
+            try:
+
+                values.append(self.base_field.coerce(item))
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'name': item},
+                ))
+        if errors:
+            raise ValidationError(errors)
+        return values
+
+    def validate(self, value):
+        super().validate(value)
+        errors = []
+        for item in value:
+            try:
+                self.base_field.validate(item)
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'name': name},
+                ))
+        if errors:
+            raise ValidationError(errors)
+
+    def run_validators(self, value):
+        super().run_validators(value)
+        errors = []
+        for item in value:
+            try:
+                self.base_field.run_validators(item)
+            except ValidationError as error:
+                errors.append(prefix_validation_error(
+                    error,
+                    prefix=self.error_messages['item_invalid'],
+                    code='item_invalid',
+                    params={'nth': item},
+                ))
+        if errors:
+            raise ValidationError(errors)
+
+    def has_changed(self, initial, data):
+        if self.disabled:
+            return False
+        if isinstance(initial, list) and isinstance(data, list):
+            return sorted(initial) != sorted(data)
+        return initial != data

@@ -23,6 +23,7 @@ try:
     from django.contrib.postgres.fields import ArrayField
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
+        ChoiceArrayField
     )
 except ImportError:
     pass
@@ -695,11 +696,6 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
-    def test_model_field_choices(self):
-        model_field = ArrayField(models.IntegerField(choices=((1, 'A'), (2, 'B'))))
-        form_field = model_field.formfield()
-        self.assertEqual(form_field.clean('1,2'), [1, 2])
-
     def test_already_converted_value(self):
         field = SimpleArrayField(forms.CharField())
         vals = ['a', 'b', 'c']
@@ -867,3 +863,24 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)
+
+
+class TestChoiceArrayField(PostgreSQLTestCase):
+
+    def test_choice_array_field_is_selected_when_model_field_has_choices(self):
+        class Sample(models.Model):
+            choices = ((1, 'a'), (2, 'b'))
+            tags = ArrayField(models.IntegerField(choices=choices))
+
+        class SampleForm(forms.ModelForm):
+            class Meta:
+                model = Sample
+                fields = '__all__'
+
+        field =  SampleForm().fields['tags']
+        self.assertIsInstance(field, ChoiceArrayField)
+
+    def test_model_field_choices(self):
+        model_field = ArrayField(models.IntegerField(choices=((1, 'A'), (2, 'B'))))
+        form_field = model_field.formfield()
+        self.assertEqual(form_field.clean(['1', '2']), [1, 2])

@@ -23,6 +23,20 @@ class ArrayMinLengthValidator(MinLengthValidator):
         'limit_value')
 
 
+class ChoiceMaxCountValidator(MaxLengthValidator):
+    message = ngettext_lazy(
+        'You have selected %(show_value)d item, you cannot select more than %(limit_value)d.',
+        'You have selected %(show_value)d items, you cannot select more than %(limit_value)d.',
+        'limit_value')
+
+
+class ChoiceMinCountValidator(MinLengthValidator):
+    message = ngettext_lazy(
+        'You have selected %(show_value)d item, you should at least select %(limit_value)d.',
+        'You have selected %(show_value)d items, you should at least select %(limit_value)d.',
+        'limit_value')
+
+
 @deconstructible
 class KeysValidator:
     """A validator designed for HStore to require/restrict keys."""
