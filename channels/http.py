@@ -267,8 +267,8 @@ class AsgiHandler(base.BaseHandler):
                 )
             )
         # Make initial response message
-        message = {
-            "type": "http.response",
+        yield {
+            "type": "http.response.start",
             "status": response.status_code,
             "headers": response_headers,
         }
@@ -277,24 +277,27 @@ class AsgiHandler(base.BaseHandler):
             # Access `__iter__` and not `streaming_content` directly in case
             # it has been overridden in a subclass.
             for part in response:
-                for chunk, more in cls.chunk_bytes(part):
-                    message['content'] = chunk
-                    # We ignore "more" as there may be more parts; instead,
-                    # we use an empty final closing message with False.
-                    message['more_content'] = True
-                    yield dict(message)
-                    message = {"type": "http.response.hunk"}
+                for chunk, _ in cls.chunk_bytes(part):
+                    yield {
+                        "type": "http.response.chunk",
+                        "content": chunk,
+                        # We ignore "more" as there may be more parts; instead,
+                        # we use an empty final closing message with False.
+                        "more_content": True,
+                    }
             # Final closing message
-            message["more_content"] = False
-            yield message
+            yield {
+                "type": "http.response.chunk",
+            }
         # Other responses just need chunking
         else:
             # Yield chunks of response
             for chunk, last in cls.chunk_bytes(response.content):
-                message['content'] = chunk
-                message['more_content'] = not last
-                yield message
-                message = {"type": "http.response.hunk"}
+                yield {
+                    "type": "http.response.chunk",
+                    "content": chunk,
+                    "more_content": not last,
+                }
 
     @classmethod
     def chunk_bytes(cls, data):
