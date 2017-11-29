@@ -279,7 +279,7 @@ class AsgiHandler(base.BaseHandler):
             for part in response:
                 for chunk, _ in cls.chunk_bytes(part):
                     yield {
-                        "type": "http.response.chunk",
+                        "type": "http.response.content",
                         "content": chunk,
                         # We ignore "more" as there may be more parts; instead,
                         # we use an empty final closing message with False.
@@ -287,14 +287,14 @@ class AsgiHandler(base.BaseHandler):
                     }
             # Final closing message
             yield {
-                "type": "http.response.chunk",
+                "type": "http.response.content",
             }
         # Other responses just need chunking
         else:
             # Yield chunks of response
             for chunk, last in cls.chunk_bytes(response.content):
                 yield {
-                    "type": "http.response.chunk",
+                    "type": "http.response.content",
                     "content": chunk,
                     "more_content": not last,
                 }
