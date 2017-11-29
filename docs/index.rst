@@ -47,7 +47,7 @@ Topics
    deploying
    one-to-two
    javascript
-   asgi
+   channel_layer_spec
    community
    contributing
    releases/index
