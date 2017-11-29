@@ -228,12 +228,17 @@ class GenericForeignKey(FieldCacheMixin):
 
         rel_obj = self.get_cached_value(instance, default=None)
         if rel_obj is not None:
-            ct_match = ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
-            pk_match = rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
-            if ct_match and pk_match:
-                return rel_obj
-            else:
+            if ct_id != self.get_content_type(obj=rel_obj, using=instance._state.db).id:
                 rel_obj = None
+            else:
+                pk = rel_obj._meta.pk
+                # If the primary key is a remote field, use the referenced
+                # field's to_python().
+                pk_to_python = pk.target_field.to_python if pk.remote_field else pk.to_python
+                if pk_to_python(pk_val) != rel_obj._get_pk_val():
+                    rel_obj = None
+                else:
+                    return rel_obj
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
             try:
