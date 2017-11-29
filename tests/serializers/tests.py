@@ -90,10 +90,6 @@ class SerializerRegistrationTests(SimpleTestCase):
 class SerializersTestBase:
     serializer_name = None  # Set by subclasses to the serialization format name
 
-    @staticmethod
-    def _comparison_value(value):
-        return value
-
     def setUp(self):
         sports = Category.objects.create(name="Sports")
         music = Category.objects.create(name="Music")
@@ -193,7 +189,7 @@ class SerializersTestBase:
         self.assertFalse(self._get_field_values(serial_str, 'author'))
 
         for obj in serializers.deserialize(self.serializer_name, serial_str):
-            self.assertEqual(obj.object.pk, self._comparison_value(self.joe.pk))
+            self.assertEqual(obj.object.pk, self.joe.pk)
 
     def test_serialize_field_subset(self):
         """Output can be restricted to a subset of fields"""

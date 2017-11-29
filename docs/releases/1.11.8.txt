@@ -27,3 +27,6 @@ Bugfixes
 
 * Made query lookups for ``CICharField``, ``CIEmailField``, and ``CITextField``
   use a ``citext`` cast (:ticket:`28702`).
+
+* Fixed a regression in caching of a ``GenericForeignKey`` when the referenced
+  model instance uses multi-table inheritance (:ticket:`28856`).

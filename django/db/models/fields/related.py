@@ -872,6 +872,9 @@ class ForeignKey(ForeignObject):
             kwargs['to_field'] = self.remote_field.field_name
         return name, path, args, kwargs
 
+    def to_python(self, value):
+        return self.target_field.to_python(value)
+
     @property
     def target_field(self):
         return self.foreign_related_fields[0]
