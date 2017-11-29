@@ -21,10 +21,11 @@ Fork, then clone the repo:
 
 Make sure the tests pass:
 
-    tox
+    pip install -e .[tests]
+    pytest
 
 Make your change. Add tests for your change. Make the tests pass:
 
-    tox
+    pytest
 
 Push to your fork and `submit a pull request <https://github.com/django/channels/compare/>`_.

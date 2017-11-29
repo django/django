@@ -7,21 +7,19 @@ setup(
     url='http://github.com/django/channels',
     author='Django Software Foundation',
     author_email='foundation@djangoproject.com',
-    description="Brings event-driven capabilities to Django with a channel system. Django 1.8 and up only.",
+    description="Brings async, event-driven capabilities to Django. Django 1.11 and up only.",
     license='BSD',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=[
-        'Django>=1.8',
-        'asgiref~=1.1',
-        'daphne~=1.3',
+        'Django>=1.11',
+        'asgiref~=2.0',
+        'daphne~=2.0',
     ],
     extras_require={
         'tests': [
-            'coverage',
-            'mock ; python_version < "3.0"',
-            'flake8>=2.0,<3.0',
-            'isort',
+            'pytest~=3.3',
+            'coverage~=4.4',
         ],
     },
     classifiers=[
