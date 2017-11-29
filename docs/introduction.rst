@@ -12,6 +12,10 @@ Django views, fully asynchronous, or a mixture of both. On top of this, it
 provides integrations with Django's auth system, session system, and more,
 making it easier than ever to extend your HTTP-only project to other protocols.
 
+It also bundles this event-driven architecture with *channel layers*,
+a system that allows you to easily communicate between processes, and separate
+your project into different processes.
+
 If you haven't get installed Channels, you may want to read :doc:`installation`
 first to get it installed. This introduction isn't a direct tutorial, but
 you should be able to use it to follow along and make changes to an existing
@@ -79,3 +83,82 @@ A basic consumer looks like this::
 
         def disconnect(self, message):
             pass
+
+Each different protocol has different kinds of events that happen, and
+each type is represented by a different method. You write code that handles
+each event, and Channels will take care of scheduling them and running them
+all in parallel.
+
+Underneath, Channels is running on a fully asynchronous event loop, and
+if you write code like above, it will get called in a synchronous thread.
+This means you can safely do blocking operations, like calling the Django ORM::
+
+    class LogConsumer(WebsocketConsumer)L
+
+        def connect(self, message):
+            Log.objects.create(
+                type="connected",
+                client=self.scope["client"],
+            )
+
+However, if you want more control and you're willing to work only in
+asynchronous functions, you can write fully asynchronous consumers::
+
+    class PingConsumer(AsyncConsumer):
+
+        async def websocket_receive(self, message):
+            await self.send({
+                "type": "websocket.send",
+                "text": "pong",
+            })
+
+
+Multiple Protocols
+------------------
+
+Channels is not just built around the world of HTTP and WebSockets - it also
+allows you to build any protocol into a Django environment, by building a
+server that maps those protocols into a similar set of events. For example,
+you can build a chatbot in a similar style::
+
+    class ChattyBotConsumer(SyncConsumer):
+
+        def telegram_message(self, message):
+            """
+            Simple echo handler for telegram messages in any chat.
+            """
+            self.send({
+                "type": "telegram.message",
+                "text": "You said: %s" % message["text"],
+            })
+
+The goal of Channels is to let you build out your Django projects to work
+across any protocol or transport you might encounter in the modern web, while
+letting you work with the familiar components and coding style you're used to.
+
+
+Cross-Process Communication
+---------------------------
+
+Much like a standard WSGI server, your application code that is handling
+protocol events runs inside the server process itself - for example, WebSocket
+handling code runs inside your WebSocket server process.
+
+Each socket or connection to your overall application is handled by a
+*application instance* inside one of these servers. They get called and can
+send data back to the client directly.
+
+However, as you build more complex application systems you start needing to
+communicate between different *application instances* - for example, if you
+are building a chatroom, when one *application instance* receives an incoming
+message, it needs to distribute it out to any other instances that represent
+people in the chatroom.
+
+You can do this by polling a database, but Channels introduces the idea of
+a *channel layer*, a low-level abstraction around a set of transports that
+allow you to send information between different processes. Each application
+instance has a unique *channel name*, and can join *groups*, allowing both
+point-to-point and broadcast messaging.
+
+Channel layers are an optional part of Channels, and can be disabled if you
+want (by setting the ``CHANNEL_LAYERS`` setting to an empty value).
