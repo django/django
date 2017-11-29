@@ -420,7 +420,7 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
                 nv.append('')
             else:
                 continue
-        if len(nv[1]) or keep_blank_values:
+        if nv[1] or keep_blank_values:
             name = nv[0].replace('+', ' ')
             name = unquote(name, encoding=encoding, errors=errors)
             value = nv[1].replace('+', ' ')

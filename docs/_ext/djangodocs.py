@@ -277,7 +277,7 @@ class DjangoHTMLTranslator(HTMLTranslator):
         if version_text:
             title = "%s%s" % (
                 version_text % node['version'],
-                ":" if len(node) else "."
+                ":" if node else "."
             )
             self.body.append('<span class="title">%s</span> ' % title)
 

@@ -476,7 +476,7 @@ class FormatStylePlaceholderCursor:
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
             query = query % args
-        elif unify_by_values and len(params) > 0:
+        elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params

@@ -247,7 +247,7 @@ def get_text_list(list_, last_word=gettext_lazy('or')):
     >>> get_text_list([])
     ''
     """
-    if len(list_) == 0:
+    if not list_:
         return ''
     if len(list_) == 1:
         return str(list_[0])

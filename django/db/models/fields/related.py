@@ -600,7 +600,7 @@ class ForeignObject(RelatedField):
         return name, path, args, kwargs
 
     def resolve_related_fields(self):
-        if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
+        if not self.from_fields or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
         if isinstance(self.remote_field.model, str):
             raise ValueError('Related model %r cannot be resolved' % self.remote_field.model)
@@ -1165,7 +1165,7 @@ class ManyToManyField(RelatedField):
                 )
             )
 
-        if len(self._validators) > 0:
+        if self._validators:
             warnings.append(
                 checks.Warning(
                     'ManyToManyField does not support validators.',

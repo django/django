@@ -1061,7 +1061,7 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        if len(lookups) == 0:
+        if not lookups:
             lookups = ['exact']
 
         for name in lookups[:-1]:

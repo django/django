@@ -1219,7 +1219,7 @@ class MigrationAutodetector:
                 return "%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
             elif isinstance(ops[0], operations.RemoveField):
                 return "remove_%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
-        elif len(ops) > 1:
+        elif ops:
             if all(isinstance(o, operations.CreateModel) for o in ops):
                 return "_".join(sorted(o.name_lower for o in ops))
         return "auto_%s" % get_migration_name_timestamp()

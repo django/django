@@ -133,7 +133,7 @@ class MigrationLoader:
             raise AmbiguityError(
                 "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
             )
-        elif len(results) == 0:
+        elif not results:
             raise KeyError("There no migrations for '%s' with the prefix '%s'" % (app_label, name_prefix))
         else:
             return self.disk_migrations[results[0]]

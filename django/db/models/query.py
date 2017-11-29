@@ -1433,7 +1433,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     Populate prefetched object caches for a list of model instances based on
     the lookups/Prefetch instances given.
     """
-    if len(model_instances) == 0:
+    if not model_instances:
         return  # nothing to do
 
     # We need to be able to dynamically add to the list of prefetch_related
@@ -1461,7 +1461,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
         through_attrs = lookup.prefetch_through.split(LOOKUP_SEP)
         for level, through_attr in enumerate(through_attrs):
             # Prepare main instances
-            if len(obj_list) == 0:
+            if not obj_list:
                 break
 
             prefetch_to = lookup.get_current_prefetch_to(level)

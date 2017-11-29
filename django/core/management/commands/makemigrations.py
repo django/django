@@ -162,10 +162,11 @@ class Command(BaseCommand):
         if not changes:
             # No changes? Tell them.
             if self.verbosity >= 1:
-                if len(app_labels) == 1:
-                    self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
-                elif len(app_labels) > 1:
-                    self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
+                if app_labels:
+                    if len(app_labels) == 1:
+                        self.stdout.write("No changes detected in app '%s'" % app_labels.pop())
+                    else:
+                        self.stdout.write("No changes detected in apps '%s'" % ("', '".join(app_labels)))
                 else:
                     self.stdout.write("No changes detected")
         else:

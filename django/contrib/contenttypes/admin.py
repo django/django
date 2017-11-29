@@ -25,7 +25,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
             f for f in obj.model._meta.private_fields
             if isinstance(f, GenericForeignKey)
         ]
-        if len(gfks) == 0:
+        if not gfks:
             return [
                 checks.Error(
                     "'%s.%s' has no GenericForeignKey." % (

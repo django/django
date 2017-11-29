@@ -351,7 +351,7 @@ class ManagementUtility:
         if subcommand == 'help':
             if '--commands' in args:
                 sys.stdout.write(self.main_help_text(commands_only=True) + '\n')
-            elif len(options.args) < 1:
+            elif not options.args:
                 sys.stdout.write(self.main_help_text() + '\n')
             else:
                 self.fetch_command(options.args[0]).print_help(self.prog_name, options.args[0])

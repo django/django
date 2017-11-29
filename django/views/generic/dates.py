@@ -333,7 +333,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         if not allow_empty:
             # When pagination is enabled, it's better to do a cheap query
             # than to load the unpaginated queryset in memory.
-            is_empty = len(qs) == 0 if paginate_by is None else not qs.exists()
+            is_empty = not qs if paginate_by is None else not qs.exists()
             if is_empty:
                 raise Http404(_("No %(verbose_name_plural)s available") % {
                     'verbose_name_plural': qs.model._meta.verbose_name_plural,

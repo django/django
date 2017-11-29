@@ -583,7 +583,7 @@ class Model(metaclass=ModelBase):
         of the field will call this method.
         """
         if fields is not None:
-            if len(fields) == 0:
+            if not fields:
                 return
             if any(LOOKUP_SEP in f for f in fields):
                 raise ValueError(
@@ -688,7 +688,7 @@ class Model(metaclass=ModelBase):
             # If update_fields is empty, skip the save. We do also check for
             # no-op saves later on for inheritance cases. This bailout is
             # still needed for skipping signal sending.
-            if len(update_fields) == 0:
+            if not update_fields:
                 return
 
             update_fields = frozenset(update_fields)
@@ -736,7 +736,7 @@ class Model(metaclass=ModelBase):
         """
         using = using or router.db_for_write(self.__class__, instance=self)
         assert not (force_insert and (force_update or update_fields))
-        assert update_fields is None or len(update_fields) > 0
+        assert update_fields is None or update_fields
         cls = origin = self.__class__
         # Skip proxies, but keep the origin as the proxy model.
         if cls._meta.proxy:

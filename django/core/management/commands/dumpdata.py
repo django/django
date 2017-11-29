@@ -84,7 +84,7 @@ class Command(BaseCommand):
 
         excluded_models, excluded_apps = parse_apps_and_model_labels(excludes)
 
-        if len(app_labels) == 0:
+        if not app_labels:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
             app_list = OrderedDict.fromkeys(

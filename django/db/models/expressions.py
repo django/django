@@ -161,7 +161,7 @@ class BaseExpression:
         return []
 
     def set_source_expressions(self, exprs):
-        assert len(exprs) == 0
+        assert not exprs
 
     def _parse_expressions(self, *expressions):
         return [
@@ -780,7 +780,7 @@ class ExpressionList(Func):
     template = '%(expressions)s'
 
     def __init__(self, *expressions, **extra):
-        if len(expressions) == 0:
+        if not expressions:
             raise ValueError('%s requires at least one expression.' % self.__class__.__name__)
         super().__init__(*expressions, **extra)
 

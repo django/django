@@ -568,7 +568,7 @@ def slice_filter(value, arg):
     try:
         bits = []
         for x in arg.split(':'):
-            if len(x) == 0:
+            if not x:
                 bits.append(None)
             else:
                 bits.append(int(x))

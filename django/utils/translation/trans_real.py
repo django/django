@@ -304,15 +304,15 @@ def gettext(message):
 
     eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
 
-    if len(eol_message) == 0:
-        # Return an empty value of the corresponding type if an empty message
-        # is given, instead of metadata, which is the default gettext behavior.
-        result = type(message)("")
-    else:
+    if eol_message:
         _default = _default or translation(settings.LANGUAGE_CODE)
         translation_object = getattr(_active, "value", _default)
 
         result = translation_object.gettext(eol_message)
+    else:
+        # Return an empty value of the corresponding type if an empty message
+        # is given, instead of metadata, which is the default gettext behavior.
+        result = type(message)('')
 
     if isinstance(message, SafeData):
         return mark_safe(result)

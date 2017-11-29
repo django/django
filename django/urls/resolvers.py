@@ -379,7 +379,7 @@ class URLResolver:
         self._local = threading.local()
 
     def __repr__(self):
-        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+        if isinstance(self.urlconf_name, list) and self.urlconf_name:
             # Don't bother to output the whole list, it can be huge
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
