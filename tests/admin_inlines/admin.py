@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.db import models
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
@@ -73,8 +74,16 @@ class InnerInline2(admin.StackedInline):
         js = ('my_awesome_inline_scripts.js',)
 
 
+class CustomNumberWidget(forms.NumberInput):
+    class Media:
+        js = ('custom_number.js',)
+
+
 class InnerInline3(admin.StackedInline):
     model = Inner3
+    formfield_overrides = {
+        models.IntegerField: {'widget': CustomNumberWidget},
+    }
 
     class Media:
         js = ('my_awesome_inline_scripts.js',)
