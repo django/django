@@ -17,10 +17,11 @@ logger = logging.getLogger('django.channels')
 
 
 class StopWorkerGroupLoop(Exception):
-    """The exception is used to break worker group main thread loop from
-    SIGTERM/SIGINT handler when there is no job in process. If there is
-    a job in process, the loop will end by itself after processing it due
-    to self.termed flag and manual interruption is not needed.
+    """
+    The exception is used to break worker group main thread loop from
+    SIGTERM/SIGINT handler when there is no job in process. If there
+    is a job in process, the loop will end by itself after processing
+    it due to self.termed flag and manual interruption is not needed.
     """
 
 
