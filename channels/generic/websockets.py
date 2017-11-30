@@ -37,27 +37,27 @@ class WebsocketConsumer(SyncConsumer):
         to receive().
         """
         if "text" in message:
-            self.receive(text=message['text'])
+            self.receive(text_data=message['text'])
         else:
-            self.receive(bytes=message['bytes'])
+            self.receive(bytes_data=message['bytes'])
 
-    def receive(self, text=None, bytes=None):
+    def receive(self, text_data=None, bytes_data=None):
         """
         Called with a decoded WebSocket frame.
         """
         pass
 
-    def send(self, text=None, bytes=None, close=False):
+    def send(self, text_data=None, bytes_data=None, close=False):
         """
         Sends a reply back down the WebSocket
         """
         if text is not None:
             super(WebsocketConsumer, self).send(
-                {"type": "websocket.send", "text": text},
+                {"type": "websocket.send", "text": text_data},
             )
-        elif bytes is not None:
+        elif bytes_data is not None:
             super(WebsocketConsumer, self).send(
-                {"type": "websocket.send", "bytes": bytes},
+                {"type": "websocket.send", "bytes": bytes_data},
             )
         if close:
             self.close(close)
@@ -114,13 +114,13 @@ class JsonWebsocketConsumer(WebsocketConsumer):
         Encode the given content as JSON and send it to the client.
         """
         super(JsonWebsocketConsumer, self).send(
-            text=self.encode_json(content),
+            text_data=self.encode_json(content),
             close=close,
         )
 
     @classmethod
-    def decode_json(cls, text):
-        return json.loads(text)
+    def decode_json(cls, text_data):
+        return json.loads(text_data)
 
     @classmethod
     def encode_json(cls, content):
