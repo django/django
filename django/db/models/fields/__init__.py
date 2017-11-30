@@ -241,30 +241,54 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_choices(self):
-        if self.choices:
-            if isinstance(self.choices, str) or not is_iterable(self.choices):
-                return [
-                    checks.Error(
-                        "'choices' must be an iterable (e.g., a list or tuple).",
-                        obj=self,
-                        id='fields.E004',
-                    )
-                ]
-            elif any(isinstance(choice, str) or
-                     not is_iterable(choice) or len(choice) != 2
-                     for choice in self.choices):
-                return [
-                    checks.Error(
-                        "'choices' must be an iterable containing "
-                        "(actual value, human readable name) tuples.",
-                        obj=self,
-                        id='fields.E005',
-                    )
-                ]
-            else:
-                return []
+        if not self.choices:
+            return []
+
+        def is_value(value):
+            return isinstance(value, str) or not is_iterable(value)
+
+        if is_value(self.choices):
+            return [
+                checks.Error(
+                    "'choices' must be an iterable (e.g., a list or tuple).",
+                    obj=self,
+                    id='fields.E004',
+                )
+            ]
+
+        # Expect [group_name, [value, display]]
+        for choices_group in self.choices:
+            try:
+                group_name, group_choices = choices_group
+            except ValueError:
+                # Containing non-pairs
+                break
+            try:
+                if not all(
+                    is_value(value) and is_value(human_name)
+                    for value, human_name in group_choices
+                ):
+                    break
+            except (TypeError, ValueError):
+                # No groups, choices in the form [value, display]
+                value, human_name = group_name, group_choices
+                if not is_value(value) or not is_value(human_name):
+                    break
+
+            # Special case: choices=['ab']
+            if isinstance(choices_group, str):
+                break
         else:
             return []
+
+        return [
+            checks.Error(
+                "'choices' must be an iterable containing "
+                "(actual value, human readable name) tuples.",
+                obj=self,
+                id='fields.E005',
+            )
+        ]
 
     def _check_db_index(self):
         if self.db_index not in (None, True, False):
