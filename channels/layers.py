@@ -1,14 +1,15 @@
 from __future__ import unicode_literals
 
+import asyncio
 import fnmatch
+import random
 import re
+import string
 
-import django
 from django.conf import settings
 from django.utils.module_loading import import_string
 
 from .exceptions import InvalidChannelLayerError
-from .utils import name_that_thing
 
 
 class ChannelLayerManager:
@@ -82,10 +83,15 @@ class BaseChannelLayer:
     common functionality.
     """
 
+    def __init__(self, expiry=60, capacity=100, channel_capacity=None):
+        self.expiry = expiry
+        self.capacity = capacity
+        self.channel_capacity = channel_capacity or {}
+
     def compile_capacities(self, channel_capacity):
         """
         Takes an input channel_capacity dict and returns the compiled list
-        of regexes that get_capacity will look for as self.channel_capacity/
+        of regexes that get_capacity will look for as self.channel_capacity
         """
         result = []
         for pattern, value in channel_capacity.items():
@@ -153,6 +159,57 @@ class BaseChannelLayer:
             return name[:name.find("!")+1]
         else:
             return name
+
+
+class InMemoryChannelLayer(BaseChannelLayer):
+    """
+    In-memory channel layer implementation for testing purposes.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(InMemoryChannelLayer, self).__init__(*args, **kwargs)
+        self.channels = {}
+
+    async def send(self, channel, message):
+        """
+        Send a message onto a (general or specific) channel.
+        """
+        # Typecheck
+        assert isinstance(message, dict), "message is not a dict"
+        assert self.valid_channel_name(channel), "Channel name not valid"
+        # If it's a process-local channel, strip off local part and stick full name in message
+        assert "__asgi_channel__" not in message
+        if "!" in channel:
+            message = dict(message.items())
+            message['__asgi_channel__'] = channel
+            channel = self.non_local_name(channel)
+        # Store it in our channels list
+        self.channels.setdefault(channel, []).append(message)
+
+    async def receive(self, channel):
+        """
+        Receive the first message that arrives on the channel.
+        If more than one coroutine waits on the same channel, a random one
+        of the waiting coroutines will get the result.
+        """
+        assert self.valid_channel_name(channel)
+        while True:
+            try:
+                message = self.channels.get(channel, []).pop(0)
+            except IndexError:
+                asyncio.sleep(0.01)
+            else:
+                return message
+
+    def new_channel(self, prefix="specific."):
+        """
+        Returns a new channel name that can be used by something in our
+        process as a specific channel.
+        """
+        return "%s.inmemory!%s" % (
+            prefix,
+            "".join(random.choice(string.ascii_letters) for i in range(12)),
+        )
 
 
 def get_channel_layer(alias="default"):

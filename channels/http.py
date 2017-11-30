@@ -38,9 +38,8 @@ class AsgiRequest(http.HttpRequest):
     # body and aborts.
     body_receive_timeout = 60
 
-    def __init__(self, scope, message):
+    def __init__(self, scope, body):
         self.scope = scope
-        self.message = message
         self._content_length = 0
         self._post_parse_error = False
         self._read_started = False
@@ -118,7 +117,7 @@ class AsgiRequest(http.HttpRequest):
                 pass
         # Body handling
         # TODO: chunked bodies
-        self._body = self.message.get("body", b"")
+        self._body = body
         assert isinstance(self._body, six.binary_type), "Body is not bytes"
         # Add a stream-a-like for the body
         self._stream = BytesIO(self._body)
@@ -180,25 +179,32 @@ class AsgiHandler(base.BaseHandler):
         threadpool.
         """
         self.send = async_to_sync(send)
+        body = b""
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
                 # Once they disconnect, that's it. GOOD DAY SIR. I SAID GOOD. DAY.
-                break
+                return
             else:
-                await self.handle(message)
+                # See if the message has body, and if it's the end, launch into
+                # handling (and a synchronous subthread)
+                if "body" in message:
+                    body += message["body"]
+                if not message.get("more_body", False):
+                    await self.handle(body)
+                    return
 
     @sync_to_async
-    def handle(self, message):
+    def handle(self, body):
         """
         Synchronous message processing.
         """
         # Set script prefix from message root_path, turning None into empty string
-        set_script_prefix(message.get('root_path', '') or '')
-        signals.request_started.send(sender=self.__class__, message=message)
+        set_script_prefix(self.scope.get('root_path', '') or '')
+        signals.request_started.send(sender=self.__class__, scope=self.scope)
         # Run request through view system
         try:
-            request = self.request_class(self.scope, message)
+            request = self.request_class(self.scope, body)
         except UnicodeDecodeError:
             logger.warning(
                 'Bad Request (UnicodeDecodeError)',
@@ -279,32 +285,30 @@ class AsgiHandler(base.BaseHandler):
             for part in response:
                 for chunk, _ in cls.chunk_bytes(part):
                     yield {
-                        "type": "http.response.content",
-                        "content": chunk,
+                        "type": "http.response.body",
+                        "body": chunk,
                         # We ignore "more" as there may be more parts; instead,
                         # we use an empty final closing message with False.
-                        "more_content": True,
+                        "more_body": True,
                     }
             # Final closing message
             yield {
-                "type": "http.response.content",
+                "type": "http.response.body",
             }
         # Other responses just need chunking
         else:
             # Yield chunks of response
-            for chunk, last in cls.chunk_bytes(response.content):
+            for chunk, last in cls.chunk_bytes(response.body):
                 yield {
-                    "type": "http.response.content",
-                    "content": chunk,
-                    "more_content": not last,
+                    "type": "http.response.body",
+                    "body": chunk,
+                    "more_body": not last,
                 }
 
     @classmethod
     def chunk_bytes(cls, data):
         """
-        Chunks some data into chunks based on the current ASGI channel layer's
-        message size and reasonable defaults.
-
+        Chunks some data up so it can be sent in reasonable size messages.
         Yields (chunk, last_chunk) tuples.
         """
         position = 0
