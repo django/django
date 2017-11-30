@@ -1,5 +1,10 @@
 from django.apps import AppConfig
 
+# We import this here to ensure the reactor is installed very early on
+# in case other packages accidentally import twisted.internet.reactor
+# (e.g. raven does this).
+import daphne.server  # noqa
+
 #from .binding.base import BindingMetaclass
 from .package_checks import check_all
 
