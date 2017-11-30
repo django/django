@@ -1577,8 +1577,8 @@ render API <low-level-widget-render-api>`.
 
 Default: ``None``
 
-A full Python path to a Python package that contains format definitions for
-project locales. If not ``None``, Django will check for a ``formats.py``
+A full Python path to a Python package that contains custom format definitions
+for project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
 
@@ -1605,12 +1605,22 @@ paths until it finds a module that actually defines the given format. This
 means that formats defined in packages farther up in the list will take
 precedence over the same formats in packages farther down.
 
-Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
-:setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,
-:setting:`MONTH_DAY_FORMAT`, :setting:`SHORT_DATE_FORMAT`,
-:setting:`SHORT_DATETIME_FORMAT`, :setting:`FIRST_DAY_OF_WEEK`,
-:setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
-:setting:`NUMBER_GROUPING`.
+Available formats are:
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`,
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`FIRST_DAY_OF_WEEK`
+* :setting:`MONTH_DAY_FORMAT`
+* :setting:`NUMBER_GROUPING`
+* :setting:`SHORT_DATE_FORMAT`
+* :setting:`SHORT_DATETIME_FORMAT`
+* :setting:`THOUSAND_SEPARATOR`
+* :setting:`TIME_FORMAT`
+* :setting:`TIME_INPUT_FORMATS`
+* :setting:`YEAR_MONTH_FORMAT`
 
 .. setting:: IGNORABLE_404_URLS
 

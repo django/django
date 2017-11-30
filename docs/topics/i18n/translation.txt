@@ -2076,6 +2076,10 @@ translations for the same literal:
     following a similar but not identical algorithm. See
     :class:`.JavaScriptCatalog` for more details.
 
+    You can also put :ref:`custom format files <custom-format-files>` in the
+    :setting:`LOCALE_PATHS` directories if you also set
+    :setting:`FORMAT_MODULE_PATH`.
+
 In all cases the name of the directory containing the translation is expected to
 be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
 etc.
