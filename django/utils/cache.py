@@ -93,11 +93,10 @@ def get_max_age(response):
     if not response.has_header('Cache-Control'):
         return
     cc = dict(_to_tuple(el) for el in cc_delim_re.split(response['Cache-Control']))
-    if 'max-age' in cc:
-        try:
-            return int(cc['max-age'])
-        except (ValueError, TypeError):
-            pass
+    try:
+        return int(cc['max-age'])
+    except (ValueError, TypeError, KeyError):
+        pass
 
 
 def set_response_etag(response):
