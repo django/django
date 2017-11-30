@@ -201,11 +201,18 @@ class CleanFilesTests(SimpleTestCase):
             [None, 'file1.pyo', 'file2.pyc', 'myclass$py.class'],
             ['file1.py', 'file2.py', 'myclass.py'],
         ),
-        'with_path': (['django/utils/file.pyc'], ['django/utils/file.py']),
+        'with_path': ([os.path.join('django', 'utils', 'file.pyc')], [os.path.join('django', 'utils', 'file.py')]),
         'python3': (
-            ['django/utils/__pycache__/file1.cpython-36.pyc', '/__pycache__/file2.cpython-36.pyc',
-             '__pycache__/file3.cpython-36.pyc'],
-            ['django/utils/file1.py', '/file2.py', 'file3.py']
+            [
+                os.path.join('django', 'utils', '__pycache__', 'file1.cpython-36.pyc'),
+                os.path.join(os.path.sep, '__pycache__', 'file2.cpython-36.pyc'),
+                os.path.join('__pycache__', 'file3.cpython-36.pyc')
+            ],
+            [
+                os.path.join('django', 'utils', 'file1.py'),
+                os.path.join(os.path.sep + 'file2.py'),
+                'file3.py'
+            ]
         ),
     }
 
