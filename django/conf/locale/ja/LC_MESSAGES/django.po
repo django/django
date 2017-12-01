@@ -4,15 +4,16 @@
 # xiu1 <d84ea@hotmail.co.jp>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kentaro Hori <kentaro0919@gmail.com>, 2015
+# Masashi SHIBATA <contact@c-bata.link>, 2017
 # Shinya Okano <tokibito@gmail.com>, 2012-2017
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-25 09:49+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -318,6 +319,7 @@ msgstr "整数を正しく入力してください。"
 msgid "Enter a valid email address."
 msgstr "有効なメールアドレスを入力してください。"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "slug には半角の英数字、アンダースコア、ハイフン以外は使用できません。"
@@ -401,6 +403,9 @@ msgid ""
 msgstr ""
 "ファイル拡張子 '%(extension)s' は許可されていません。許可されている拡張子は "
 "'%(allowed_extensions)s' です。"
+
+msgid "Null characters are not allowed."
+msgstr "何か文字を入力してください。"
 
 msgid "and"
 msgstr "と"
@@ -727,15 +732,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "下記の重複したデータを修正してください。"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "インライン外部キーが親インスタンスの主キーと一致しません。"
+msgid "The inline value did not match the parent instance."
+msgstr "インライン値が親のインスタンスに一致しません。"
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "正しく選択してください。選択したものは候補にありません。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" は主キーとして無効な値です。"
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" は無効な値です。"
 
 #, python-format
 msgid ""
@@ -1093,6 +1098,19 @@ msgstr ""
 "originリクエストのために、少なくともこのサイトでは再度有効にしてください。"
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"もし <meta name=\"referrer\" content=\"no-referrer\">タグを使用しているか "
+"'Referrer-Policy: no-referrer' ヘッダーを含んでいる場合は、削除してください。"
+"CSRFプロテクションは、厳密に referer をチェックするために 'Referer' ヘッダー"
+"が必要です。プライバシーについて心配がある場合は、<a rel=\"noreferrer\" ...>"
+"等を用いて、外部のサイトにリンクしてください。"
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1111,32 +1129,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "詳細な情報は DEBUG=True を設定すると利用できます。"
 
-msgid "Welcome to Django"
-msgstr "Djangoへようこそ"
-
-msgid "It worked!"
-msgstr "うまくいった！"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "おめでとうございます、Djangoで出力された最初のページです。"
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"次は、 <code>python manage.py startapp [app_label]</code> を実行して、最初の"
-"アプリを開始します。"
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"このメッセージは、Djangoのsettingsファイルに <code>DEBUG = True</code> が含ま"
-"れ、まだURLが何も設定されていないため表示されています。さあ、仕事に取り掛かり"
-"ましょう！"
-
 msgid "No year specified"
 msgstr "年が未指定です"
+
+msgid "Date out of range"
+msgstr "日付が有効範囲外です"
 
 msgid "No month specified"
 msgstr "月が未指定です"
@@ -1188,3 +1185,44 @@ msgstr "\"%(path)s\" does not exist"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index of %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: 納期を逃さない開発者のためのWebフレームワーク"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django%(version)sの<a href=\"https://docs.djangoproject.com/en/%(version)s/"
+"releases/\" target=\"_blank\" rel=\"noopener\">リリースノート</a>を見てくださ"
+"い。"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "インストールは成功しました！おめでとうございます！"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "Django ドキュメント"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "トピック、リファレンス、 &amp; ハウツー"
+
+msgid "Tutorial: A Polling App"
+msgstr "チュートリアル: 投票アプリケーション"
+
+msgid "Get started with Django"
+msgstr "Djangoを始めよう"
+
+msgid "Django Community"
+msgstr "Djangoのコミュニティ"
+
+msgid "Connect, get help, or contribute"
+msgstr "つながり、助け合い、貢献しよう"

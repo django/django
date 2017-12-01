@@ -2,7 +2,7 @@
 #
 # Translators:
 # Apostolis Bessas <mpessas+txc@transifex.com>, 2013
-# Dimitris Glezos <glezos@transifex.com>, 2011,2013
+# Dimitris Glezos <glezos@transifex.com>, 2011,2013,2017
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2017
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-21 10:58+0000\n"
-"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-25 01:42+0000\n"
+"Last-Translator: Dimitris Glezos <glezos@transifex.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -324,6 +324,7 @@ msgstr "Εισάγετε έναν έγκυρο ακέραιο."
 msgid "Enter a valid email address."
 msgstr "Εισάγετε μια έγκυρη διεύθυνση ηλ. ταχυδρομείου."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -422,6 +423,9 @@ msgid ""
 msgstr ""
 "Η επέκταση '%(extension)s' του αρχείου δεν επιτρέπεται. Οι επιτρεπόμενες "
 "επεκτάσεις είναι: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Δεν επιτρέπονται null (μηδενικοί) χαρακτήρες"
 
 msgid "and"
 msgstr "και"
@@ -762,10 +766,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Έχετε ξαναεισάγει την ίδια τιμη. Βεβαιωθείτε ότι είναι μοναδική."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Το inline foreign key δεν αντιστοιχεί με το primary κλειδί του γονικού "
-"object."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -773,8 +775,8 @@ msgstr ""
 "επιλογές."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "Το \"%(pk)s\" δεν είναι έγκυρη τιμή για πρωτεύων κλειδί"
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "Το \"%(pk)s\" δεν είναι έγκυρη τιμή."
 
 #, python-format
 msgid ""
@@ -1140,6 +1142,14 @@ msgstr ""
 "τις συνδέσεις HTTPS ή για τα 'same-origin' requests."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1159,32 +1169,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Περισσότερες πληροφορίες είναι διαθέσιμες με DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Καλωσήρθατε στο Django"
-
-msgid "It worked!"
-msgstr "Δούλεψε!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Συγχαρητήρια στην πρώτη Django-τροφοδοτούμενη σελίδα σας."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Επόμενο βήμα, είναι να ξεκινήσετε την πρώτη σας εφαρμογή εκτελώντας την "
-"εντολή <code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Βλέπετε αυτό το μήνυμα επείδη έχετε <code>DEBUG = True</code> στο αρχείο "
-"settings του Django σας και δεν έχετε ρυθμίσει καμία URL. Στρωθείτε στην "
-"δουλειά!"
-
 msgid "No year specified"
 msgstr "Δεν έχει οριστεί χρονιά"
+
+msgid "Date out of range"
+msgstr "Ημερομηνία εκτός εύρους"
 
 msgid "No month specified"
 msgstr "Δεν έχει οριστεί μήνας"
@@ -1240,3 +1229,44 @@ msgstr "Το \"%(path)s\" δεν υπάρχει"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Ευρετήριο του %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: το Web framework για τελειομανείς με προθεσμίες."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Δείτε τις <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">σημειώσεις κυκλοφορίας</a> για το "
+"Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Η εγκατάσταση δούλεψε με επιτυχία! Συγχαρητήρια!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "Εγχειρίδιο Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr "Εγχειρίδιο: Ένα App Ψηφοφορίας"
+
+msgid "Get started with Django"
+msgstr "Ξεκινήστε με το Django"
+
+msgid "Django Community"
+msgstr "Κοινότητα Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Συνδεθείτε, λάβετε βοήθεια, ή συνεισφέρετε"

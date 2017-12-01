@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-25 23:04+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-17 09:05+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -300,13 +300,13 @@ msgid "Syndication"
 msgstr "Syndication"
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Номерът на страницата не е цяло число"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Номерът на страницата е по-малък от 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "В тази страница няма резултати"
 
 msgid "Enter a valid value."
 msgstr "Въведете валидна стойност.  "
@@ -320,6 +320,7 @@ msgstr "Въведете валидно число."
 msgid "Enter a valid email address."
 msgstr "Въведете валиден имейл адрес."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -415,6 +416,9 @@ msgid ""
 msgstr ""
 "Не са разрешени файлове с раширение '%(extension)s'. Позволените разширения "
 "са:  '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr ""
 
 msgid "and"
 msgstr "и"
@@ -748,15 +752,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Моля, коригирайте повтарящите се стойности по-долу."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Невалидна избрана стойност."
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Направете валиден избор. Този не е един от възможните избори.  "
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" не е валидна стойност за първичен ключ."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1122,6 +1126,14 @@ msgstr ""
 "origin' заявки."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1141,27 +1153,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Повече информация е на разположение с DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Добре дошли в Django"
-
-msgid "It worked!"
-msgstr "Той работи!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Поздравления за първата си Django страница."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-
 msgid "No year specified"
 msgstr "Не е посочена година"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Не е посочен месец"
@@ -1213,3 +1209,45 @@ msgstr "\"%(path)s\" не съществува"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Индекс %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: Фреймуоркът за перфекционисти с крайни срокове."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Вие виждате тази страница защото <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> е във вашият settings файл и не сте конфигурирали никакви "
+"URL-и"
+
+msgid "Django Documentation"
+msgstr "Django Документация"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr "Започнете с Django"
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

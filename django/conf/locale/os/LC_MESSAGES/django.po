@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
 "os/)\n"
@@ -294,6 +294,15 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
+
 msgid "Enter a valid value."
 msgstr "Раст бӕрц бафысс."
 
@@ -306,6 +315,7 @@ msgstr ""
 msgid "Enter a valid email address."
 msgstr "Раст email адрис бафысс."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -390,6 +400,15 @@ msgstr[0] ""
 "Дӕ хъус бадар цӕмӕй дӕсон стъӕлфы размӕ %(max)s цифрӕйӕ фылдӕр ма уа."
 msgstr[1] ""
 "Дӕ хъус бадар цӕмӕй дӕсон стъӕлфы размӕ %(max)s цифрӕйӕ фылдӕр ма уа."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
 
 msgid "and"
 msgstr "ӕмӕ"
@@ -707,15 +726,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Дӕ хорзӕхӕй, бындӕр цы  дывӕр рардтӕ ис, уыдон сраст кӕн."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Ӕддагон амонӕнӕн нӕ разынд хистӕры фыццаг амонӕн."
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Раст фадат равзар. УКыцы фадат фадӕтты ӕхсӕн нӕй."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" фыццаг амонӕнӕн нӕ бӕззы."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -725,14 +744,14 @@ msgstr ""
 "%(datetime)s нӕ бӕрӕг кӕны ацы рӕстӕджы тагы %(current_timezone)s; гӕнӕн ис "
 "бирӕнысанон у кӕнӕ та нӕй."
 
+msgid "Clear"
+msgstr "Сыгъдӕг"
+
 msgid "Currently"
 msgstr "Ныр"
 
 msgid "Change"
 msgstr "Фӕивын"
-
-msgid "Clear"
-msgstr "Сыгъдӕг"
 
 msgid "Unknown"
 msgstr "Ӕнӕбӕрӕг"
@@ -1074,6 +1093,14 @@ msgid ""
 msgstr ""
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1087,27 +1114,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr ""
 
-msgid "Welcome to Django"
-msgstr ""
-
-msgid "It worked!"
-msgstr ""
-
-msgid "Congratulations on your first Django-powered page."
-msgstr ""
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-
 msgid "No year specified"
 msgstr "Аз амынд нӕ уыд"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Мӕй амынд нӕ уыд"
@@ -1159,3 +1170,41 @@ msgstr "\"%(path)s\" нӕй"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s-ы индекс"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""
