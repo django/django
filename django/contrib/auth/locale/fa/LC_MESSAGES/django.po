@@ -4,16 +4,16 @@
 # Ali Nikneshan <ali@nikneshan.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# ka7eh, 2015
+# Kaveh Karimi, 2015
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-08-16 13:54+0000\n"
-"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -71,12 +71,8 @@ msgstr "برای تائید، رمز عبور قبلی را وارد کنید."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"رمزهای عبور خام ذخیره نمیشوند، بنابراین راهی برای دیدن رمز عبور این کاربر "
-"وجود ندارد، اما می‌توانید رمز عبور را با استفاده از <a href=\"../password/"
-"\">این فرم</a> تغییر دهید."
 
 #, python-format
 msgid ""

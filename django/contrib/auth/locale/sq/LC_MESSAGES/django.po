@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2011,2015
+# Besnik <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-29 22:24+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -67,12 +67,11 @@ msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më parë."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Fjalëkalimet shqeto nuk depozitohen, ndaj s’ka ndonjë mënyrë si të shihet "
-"fjalëkalimi i këtij përdoruesi, por mund ta ndryshoni fjalëkalimin duke "
-"përdorur <a href=\"../password/\">këtë formular</a>."
+"Nuk depozitohen fjalëkalime të papërpunuar, ndaj s’ka ndonjë mënyrë për të "
+"parë fjalëkalimin e këtij përdoruesi, por mund ta ndryshoni fjalëkalimin "
+"duke përdorur <a href=\"{}\">këtë fjalëkalim</a>."
 
 #, python-format
 msgid ""
@@ -118,25 +117,25 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "larmi"
 
 msgid "version"
-msgstr ""
+msgstr "version"
 
 msgid "memory cost"
-msgstr ""
+msgstr "kosto kujtese"
 
 msgid "time cost"
-msgstr ""
+msgstr "kosto në kohë"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelizëm"
 
 msgid "work factor"
 msgstr ""
 
 msgid "checksum"
-msgstr ""
+msgstr "checksum"
 
 msgid "name"
 msgstr "emër"
@@ -186,6 +185,7 @@ msgstr "emër përdoruesi"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"E domosdoshme. 150 ose më pak shenja. Vetëm shkronja, shifra, dhe @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Ka tashmë një emër të tillë përdoruesi."
@@ -213,7 +213,7 @@ msgid ""
 "instead of deleting accounts."
 msgstr ""
 "Përcakton nëse ky përdorues do të duhej trajtuar si aktiv. Shpërzgjidheni "
-"këtë, në vend se të fshihni llogarira."
+"këtë, në vend se të fshihni llogari."
 
 msgid "date joined"
 msgstr "datë anëtarësimi"
@@ -254,7 +254,7 @@ msgstr ""
 "personale tuajat."
 
 msgid "This password is too common."
-msgstr "Ky fjalëkalim është shumë i zakonshëm."
+msgstr "Ky fjalëkalim është shumë i rëndomtë."
 
 msgid "Your password can't be a commonly used password."
 msgstr "Fjalëkalim juaj s’mund të jetë një fjalëkalim i përdorur rëndom."
@@ -273,11 +273,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Jepni një emër përdoruesi të vlefshëm. Kjo vlerë mund të përmbajë vetëm "
+"shkronja anglishtje, numra dhe shenjat @/./+/-/_ ."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Jepni një emër përdoruesi të vlefshëm. Kjo vlerë mund të përmbajë vetëm "
+"shkronja, numra dhe shenjat @/./+/-/_ ."
 
 msgid "Logged out"
 msgstr "I dalë"

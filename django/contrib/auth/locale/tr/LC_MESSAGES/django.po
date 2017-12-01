@@ -2,9 +2,9 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2016
+# BouRock, 2015-2017
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@gmail.com>, 2013
+# Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:23+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 15:49+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -75,11 +75,10 @@ msgstr "Doğrulama için önceki gibi aynı parolayı girin."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Ham parolalar saklanmazlar, bu yüzden bu kullanıcının parolasını görmenin "
-"yolu yoktur, fakat <a href=\"../password/\">bu formu</a> kullanarak parolayı "
+"Ham parolalar saklanmaz, bu yüzden bu kullanıcının parolasını görmenin yolu "
+"yoktur, fakat <a href=\"{}\">bu formu</a> kullanarak parolayı "
 "değiştirebilirsiniz."
 
 #, python-format

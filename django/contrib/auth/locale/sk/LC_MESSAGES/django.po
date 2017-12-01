@@ -3,14 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Juraj Bubniak <translations@jbub.eu>, 2012-2014
-# Marian Andre <marian@andre.sk>, 2015
+# Marian Andre <marian@andre.sk>, 2015,2017
+# Martin Tóth <ezimir@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-03 20:25+0000\n"
+"Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,7 +30,7 @@ msgstr "Dôležité dátumy"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Objekt %(name)s s primárnym kľúčom %(key)r neexistuje."
 
 msgid "Password changed successfully."
 msgstr "Heslo úspešne zmenené."
@@ -63,13 +64,15 @@ msgid "Password confirmation"
 msgstr "Potvrdenie hesla"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Kvôli overeniu, znovu zadajte rovnaké heslo."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Heslá v pôvodnom tvare nie sú ukladané, takže neexistuje spôsob zobraziť "
+"heslo užívateľa. Môžete ho však zmeniť pomocou <a href=\"{}\">tohoto "
+"formulára</a>."
 
 #, python-format
 msgid ""
@@ -113,19 +116,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "druh"
 
 msgid "version"
-msgstr ""
+msgstr "verzia"
 
 msgid "memory cost"
-msgstr ""
+msgstr "pamäťová náročnosť"
 
 msgid "time cost"
-msgstr ""
+msgstr "časová náročnosť"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelizmus"
 
 msgid "work factor"
 msgstr "faktor práce"
@@ -137,7 +140,7 @@ msgid "name"
 msgstr "meno"
 
 msgid "content type"
-msgstr ""
+msgstr "typ obsahu"
 
 msgid "codename"
 msgstr "kódové meno"
@@ -168,18 +171,20 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Skupiny do ktorých používateľ patrí. Používateľ dostane všetky oprávnenia z "
+"každej z jeho skupín."
 
 msgid "user permissions"
 msgstr "používateľské oprávnenia"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Konkrétne oprávnenia pre tohto používateľa."
 
 msgid "username"
 msgstr "používateľské meno"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Povinné. 150 znakov alebo menej. Iba písmená, číslice a @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Používateľ s takým používateľským menom už existuje."
@@ -225,34 +230,37 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znak."
 msgstr[1] ""
+"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)d znaky."
 msgstr[2] ""
+"Toto heslo je príliš krátke. Musí obsahovať aspoň %(min_length)dznakov."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Vaše heslo musí obsahovať aspoň %(min_length)d znak."
+msgstr[1] "Vaše heslo musí obsahovať aspoň %(min_length)d znaky."
+msgstr[2] "Vaše heslo musí obsahovať aspoň %(min_length)d znakov."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Heslo sa príliš podobá na %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Vaše heslo sa nesmie príliš podobať na ostatné osobné informácie."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Toto heslo je používané príliš často."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Vaše heslo nemôže byť jedno z často používaných."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Toto heslo pozostáva iba z číslic."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Vaše heslo nemôže pozostávať iba z číslic."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -262,32 +270,36 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Zadajte platné používateľské meno. Táto hodnota môže obsahovať len písmená, "
+"číslice a znaky @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Zadajte platné používateľské meno. Táto hodnota môže obsahovať len písmená, "
+"číslice a znaky @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Odhlásený"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Obnovenie hesla"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Obnovenie hesla odoslané"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Zadajte nové heslo"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Obnovenie hesla sa nepodarilo"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Obnovenie hesla ukončené"
 
 msgid "Password change"
-msgstr ""
+msgstr "Zmena hesla"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Zmena hesla úspešná"

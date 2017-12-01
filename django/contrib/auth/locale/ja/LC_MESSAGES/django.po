@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Masashi SHIBATA <contact@c-bata.link>, 2017
 # Shinya Okano <tokibito@gmail.com>, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-26 16:41+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 17:59+0000\n"
+"Last-Translator: Masashi SHIBATA <contact@c-bata.link>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -67,12 +68,11 @@ msgstr "確認のため、再度パスワードを入力してください。"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"生のパスワードが格納されていないので、このユーザーのパスワードは参照できませ"
-"んが、 <a href=\"../password/\">このフォーム</a> を使用してパスワードを変更で"
-"きます 。"
+"生のパスワードは格納されていないため、このユーザのパスワードを確認する方法は"
+"ありません。しかし<a href=\"{}\">このフォーム</a>をしようして　パスワードを変"
+"更できます。"
 
 #, python-format
 msgid ""

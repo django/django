@@ -2,19 +2,19 @@
 #
 # Translators:
 # Andre Machado <csantos.machado@gmail.com>, 2016
-# Carlos E C Leite <caduado@gmail.com>, 2016
+# Carlos Leite <caduado@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
-# rafaelribeiroo <pereiraribeirorafael@gmail.com>, 2016
+# Rafael Ribeiro <pereiraribeirorafael@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-06 02:30+0000\n"
-"Last-Translator: Luiz Boaretto <lboaretto@gmail.com>\n"
+"PO-Revision-Date: 2017-09-23 20:42+0000\n"
+"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"

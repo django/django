@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013-2016
+# Erik Wognsen <r4mses@gmail.com>, 2013-2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Stevenn, 2013
 # valberg <valberg@orn.li>, 2015
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:45+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 16:13+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -69,12 +69,11 @@ msgstr "Indtast den samme adgangskode som før, for bekræftelse."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Rå adgangskoder gemmes ikke, så det er ikke muligt at se denne brugers "
-"adgangskode, men du kan ændre adgangskoden ved hjælp af <a href=\"../"
-"password/\">denne formular</a>."
+"adgangskode, men du kan ændre adgangskoden ved hjælp af <a href=\"{}\">denne "
+"formular</a>."
 
 #, python-format
 msgid ""
