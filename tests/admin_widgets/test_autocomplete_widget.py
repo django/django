@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib import admin
 from django.contrib.admin.widgets import AutocompleteSelect
 from django.forms import ModelChoiceField
 from django.test import TestCase, override_settings
@@ -14,10 +15,12 @@ class AlbumForm(forms.ModelForm):
         widgets = {
             'band': AutocompleteSelect(
                 Album._meta.get_field('band').remote_field,
+                admin.site,
                 attrs={'class': 'my-class'},
             ),
             'featuring': AutocompleteSelect(
                 Album._meta.get_field('featuring').remote_field,
+                admin.site,
             )
         }
 
@@ -25,7 +28,7 @@ class AlbumForm(forms.ModelForm):
 class NotRequiredBandForm(forms.Form):
     band = ModelChoiceField(
         queryset=Album.objects.all(),
-        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field),
+        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
         required=False,
     )
 
@@ -33,7 +36,7 @@ class NotRequiredBandForm(forms.Form):
 class RequiredBandForm(forms.Form):
     band = ModelChoiceField(
         queryset=Album.objects.all(),
-        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field),
+        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
         required=True,
     )
 
@@ -68,7 +71,7 @@ class AutocompleteMixinTests(TestCase):
 
     def test_get_url(self):
         rel = Album._meta.get_field('band').remote_field
-        w = AutocompleteSelect(rel)
+        w = AutocompleteSelect(rel, admin.site)
         url = w.get_url()
         self.assertEqual(url, '/admin_widgets/band/autocomplete/')
 
@@ -130,4 +133,4 @@ class AutocompleteMixinTests(TestCase):
                 else:
                     expected_files = base_files
                 with translation.override(lang):
-                    self.assertEqual(AutocompleteSelect(rel).media._js, expected_files)
+                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, expected_files)

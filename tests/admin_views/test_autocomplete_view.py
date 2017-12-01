@@ -17,6 +17,7 @@ PAGINATOR_SIZE = AutocompleteJsonView.paginate_by
 
 
 class AuthorAdmin(admin.ModelAdmin):
+    ordering = ['id']
     search_fields = ['id']
 
 
@@ -229,3 +230,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element_by_id('id_related_questions'))
         self.assertEqual(len(select.all_selected_options), 2)
+
+    def test_inline_add_another_widgets(self):
+        def assertNoResults(row):
+            elem = row.find_element_by_css_selector('.select2-selection')
+            elem.click()  # Open the autocomplete dropdown.
+            results = self.selenium.find_element_by_css_selector('.select2-results')
+            self.assertTrue(results.is_displayed())
+            option = self.selenium.find_element_by_css_selector('.select2-results__option')
+            self.assertEqual(option.text, 'No results found')
+
+        # Autocomplete works in rows present when the page loads.
+        self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_book_add'))
+        rows = self.selenium.find_elements_by_css_selector('.dynamic-authorship_set')
+        self.assertEqual(len(rows), 3)
+        assertNoResults(rows[0])
+        # Autocomplete works in rows added using the "Add another" button.
+        self.selenium.find_element_by_link_text('Add another Authorship').click()
+        rows = self.selenium.find_elements_by_css_selector('.dynamic-authorship_set')
+        self.assertEqual(len(rows), 4)
+        assertNoResults(rows[-1])

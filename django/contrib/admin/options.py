@@ -220,7 +220,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         db = kwargs.get('using')
 
         if db_field.name in self.get_autocomplete_fields(request):
-            kwargs['widget'] = AutocompleteSelect(db_field.remote_field, using=db)
+            kwargs['widget'] = AutocompleteSelect(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in self.radio_fields:
@@ -248,7 +248,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         autocomplete_fields = self.get_autocomplete_fields(request)
         if db_field.name in autocomplete_fields:
-            kwargs['widget'] = AutocompleteSelectMultiple(db_field.remote_field, using=db)
+            kwargs['widget'] = AutocompleteSelectMultiple(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
         elif db_field.name in list(self.filter_vertical) + list(self.filter_horizontal):
