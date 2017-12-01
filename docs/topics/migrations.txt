@@ -661,14 +661,18 @@ Django can serialize the following:
 - ``decimal.Decimal`` instances
 - ``enum.Enum`` instances
 - ``uuid.UUID`` instances
-- ``functools.partial`` instances which have serializable ``func``, ``args``,
-  and ``keywords`` values.
+- :func:`functools.partial` and :class:`functools.partialmethod` instances
+  which have serializable ``func``, ``args``, and ``keywords`` values.
 - ``LazyObject`` instances which wrap a serializable value.
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 2.1
+
+    Serialization support for :class:`functools.partialmethod` was added.
 
 Django cannot serialize:
 

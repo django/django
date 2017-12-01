@@ -171,8 +171,11 @@ class FunctoolsPartialSerializer(BaseSerializer):
         imports.update(args_imports)
         imports.update(keywords_imports)
         return (
-            "functools.partial(%s, *%s, **%s)" % (
-                func_string, args_string, keywords_string,
+            'functools.%s(%s, *%s, **%s)' % (
+                self.value.__class__.__name__,
+                func_string,
+                args_string,
+                keywords_string,
             ),
             imports,
         )
@@ -340,7 +343,7 @@ def serializer_factory(value):
         return BaseSimpleSerializer(value)
     if isinstance(value, decimal.Decimal):
         return DecimalSerializer(value)
-    if isinstance(value, functools.partial):
+    if isinstance(value, (functools.partial, functools.partialmethod)):
         return FunctoolsPartialSerializer(value)
     if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
         return FunctionTypeSerializer(value)

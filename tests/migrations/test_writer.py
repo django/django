@@ -520,6 +520,14 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.args, value.args)
         self.assertEqual(result.keywords, value.keywords)
 
+    def test_serialize_functools_partialmethod(self):
+        value = functools.partialmethod(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertIsInstance(result, functools.partialmethod)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.

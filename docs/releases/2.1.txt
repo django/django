@@ -150,7 +150,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Added support for serialization of ``functools.partialmethod`` objects.
 
 Models
 ~~~~~~
