@@ -10,17 +10,17 @@
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
-# Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
+# Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
-# Zoriana Zaiats, 2016
+# Zoriana Zaiats, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-22 13:44+0000\n"
-"Last-Translator: Igor Melnyk\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -327,6 +327,7 @@ msgstr "Введіть коректне ціле число."
 msgid "Enter a valid email address."
 msgstr "Введіть коректну email адресу."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -436,6 +437,9 @@ msgid ""
 msgstr ""
 "Розширення файлу '%(extension)s' не дозволено. Дозволені розширення: ' "
 "%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr ""
 
 msgid "and"
 msgstr "та"
@@ -773,17 +777,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Будь ласка, виправте повторювані значення нижче."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Зв'язаний зовнішній ключ не відповідає первісному ключу батьківського "
-"екземпляру."
+msgid "The inline value did not match the parent instance."
+msgstr "Зв'язане значення не відповідає батьківському екземпляру."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Зробить коректний вибір. Такого варіанту нема серед доступних."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" не є допустимим значенням для первинного ключа."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" не є допустимим значенням."
 
 #, python-format
 msgid ""
@@ -1157,6 +1159,14 @@ msgstr ""
 "запитів."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1176,31 +1186,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Більше інформації можна отримати з DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Ласкаво просимо до Django"
-
-msgid "It worked!"
-msgstr "Воно працює!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Вітаємо Вас на першій сторінці яка створена за допомогою Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Наступним кроком, розпочніть створення Вашого першого додатку, виконавши "
-"<code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Ви бачите це повідомлення тому, що у Вас <code>DEBUG = True</code> у вашому "
-"файлі налаштувань Django і ви не налаштували жодного URL. Вперед до роботи!"
-
 msgid "No year specified"
 msgstr "Рік не вказано"
+
+msgid "Date out of range"
+msgstr "Дата поза діапазоном"
 
 msgid "No month specified"
 msgstr "Місяць не вказано"
@@ -1252,3 +1242,43 @@ msgstr "\"%(path)s\" не існує"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Вміст директорії %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
+"\"_blank\" rel=\"noopener\">Нотатки релізу</a> for Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Вітаємо, команда install завершилась успішно!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "Документація Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""
