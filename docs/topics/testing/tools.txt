@@ -1619,6 +1619,25 @@ You can also tag a test case::
     class SampleTestCase(TestCase):
         ...
 
+Subclasses inherit tags from superclasses, and methods inherit tags from their
+class. Given::
+
+    @tag('foo')
+    class SampleTestCaseChild(SampleTestCase):
+
+        @tag('bar')
+        def test(self):
+            ...
+
+``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
+``'bar'``, and ``'foo'``.
+
+.. versionchanged:: 2.1
+
+   In older versions, tagged tests don't inherit tags from classes, and
+   tagged subclasses don't inherit tags from superclasses. For example,
+   ``SampleTestCaseChild.test`` is labeled only with ``'bar'``.
+
 Then you can choose which tests to run. For example, to run only fast tests:
 
 .. code-block:: console
