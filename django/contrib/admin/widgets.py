@@ -400,10 +400,11 @@ class AutocompleteMixin:
     Renders the necessary data attributes for select2 and adds the static form
     media.
     """
-    url_name = 'admin:%s_%s_autocomplete'
+    url_name = '%s:%s_%s_autocomplete'
 
-    def __init__(self, rel, attrs=None, choices=(), using=None):
+    def __init__(self, rel, admin_site, attrs=None, choices=(), using=None):
         self.rel = rel
+        self.admin_site = admin_site
         self.db = using
         self.choices = choices
         if attrs is not None:
@@ -413,7 +414,7 @@ class AutocompleteMixin:
 
     def get_url(self):
         model = self.rel.model
-        return reverse(self.url_name % (model._meta.app_label, model._meta.model_name))
+        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
