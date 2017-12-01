@@ -7,15 +7,15 @@
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011-2013
-# rodin <romihardiyanto@gmail.com>, 2013-2016
+# rodin <romihardiyanto@gmail.com>, 2013-2017
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-05 13:15+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"PO-Revision-Date: 2017-11-24 14:12+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "%(name)s \"%(obj)s\" berhasil dihapus."
 
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s dengan ID \"%(key)s\" tidak ada. Mungkin itu telah dihapus?"
+msgstr "%(name)s dengan ID \"%(key)s\" tidak ada. Mungkin telah dihapus?"
 
 #, python-format
 msgid "Add %s"

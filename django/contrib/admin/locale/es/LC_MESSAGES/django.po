@@ -10,7 +10,7 @@
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jorge Puente-Sarrín <puentesarrin@gmail.com>, 2014-2015
-# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
+# José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-14 07:36+0000\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Miguel Angel Tribaldos <mtribaldos@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"

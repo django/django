@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-09-15 10:02+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-20 00:13+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -69,12 +69,11 @@ msgstr "Дзеля пэўнасьці набярыце такі самы пар�
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
-"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы <a href=\"../"
-"password/\">гэту форму</a>."
+"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы<a href="
+"\"{}\">гэту форму </a>."
 
 #, python-format
 msgid ""

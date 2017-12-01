@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Zorig <zorig_ezd@yahoo.com>, 2016
+# Zorig <zorig_ezd@yahoo.com>, 2016-2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-21 22:44+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -29,12 +29,12 @@ msgstr "Массивд байгаа %(nth)s буруу байна"
 msgid "Nested arrays must have the same length."
 msgstr "Түүвэрлэсэн массив ижил урттай байх ёстой."
 
-msgid "Map of strings to strings"
-msgstr ""
+msgid "Map of strings to strings/nulls"
+msgstr "Тэмдэгтийг тэмдэгт/null руу заагч"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "\"%(key)s\" -ийн утга тэмдэгт мөр биш байна."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" -ийн утга тэмдэгт мөр биш эсвэл null биш байна."
 
 msgid "A JSON object"
 msgstr "JSON объект"
@@ -46,7 +46,7 @@ msgid "Could not load JSON data."
 msgstr "JSON дата-г уншиж чадахгүй байна."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Оролт JSON dictionary байх ёстой."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

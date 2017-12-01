@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015-2016
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -68,10 +68,10 @@ msgid "This year"
 msgstr "Anul acesta"
 
 msgid "No date"
-msgstr ""
+msgstr "Fără dată"
 
 msgid "Has date"
-msgstr ""
+msgstr "Are o dată"
 
 #, python-format
 msgid ""
@@ -137,7 +137,7 @@ msgstr "Obiect LogEntry"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "S-a adăugat {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Adăugat."
@@ -147,15 +147,15 @@ msgstr "și"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "S-au schimbat {fields} pentru {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "S-au schimbat {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "S-a șters {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Niciun câmp modificat."
@@ -173,31 +173,37 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" a fost adăugat cu succes. Poți să îl editezi în continuare "
+"mai jos."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" a fost adăugat cu succes. Poți adăuga alt {name} mai jos."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" a fost adăugat cu succes."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" a fost modificat cu succes. Poți să îl editezi în "
+"continuare mai jos."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" a fost modificat cu succes. Poți adăuga alt {name} mai jos."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" a fost schimbat cu succes."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -214,8 +220,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" eliminat(ă) cu succes."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Obiectul %(name)s ce are cheie primară %(key)r nu există."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s cu ID \"%(key)s\" inexistent. Posibil să fi fost șters?"
 
 #, python-format
 msgid "Add %s"
@@ -471,10 +477,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Nu nicio permisiune de editare."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Acțiuni recente"
 
 msgid "My actions"
-msgstr ""
+msgstr "Acțiunile mele"
 
 msgid "None available"
 msgstr "Niciuna"

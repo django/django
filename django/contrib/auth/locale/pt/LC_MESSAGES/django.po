@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2015
-# Nuno Mariz <nmariz@gmail.com>, 2013,2015
+# Nuno Mariz <nmariz@gmail.com>, 2013,2015,2017
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-30 23:58+0000\n"
+"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -69,12 +70,11 @@ msgstr "Introduza a palavra-passe como acima, para verificação."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Não são guardadas palavras-passe sem encriptação, portanto não é possível "
 "visualizar a password deste utilizador, mas poderá modificar a palavra-passe "
-"através <a href=\"password/\">deste formulário</a>."
+"através <a href=\"{}\">deste formulário</a>."
 
 #, python-format
 msgid ""
@@ -120,19 +120,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "variedade"
 
 msgid "version"
-msgstr ""
+msgstr "versão"
 
 msgid "memory cost"
-msgstr ""
+msgstr "custo da memória"
 
 msgid "time cost"
-msgstr ""
+msgstr "custo de tempo"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralelismo"
 
 msgid "work factor"
 msgstr "fator trabalho"
@@ -188,7 +188,7 @@ msgid "username"
 msgstr "utilizador"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
+msgstr "Obrigatório. 150 carateres ou menos. Apenas letras, dígitos @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Já existe um utilizador com esse nome."
@@ -278,11 +278,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Insira um nome de utilizador válido. Este valor apenas deverá conter letras, "
+"números e carateres @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Insira um nome de utilizador válido. Este valor apenas deverá conter letras, "
+"números e carateres @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Saiu"

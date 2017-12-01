@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada <abraham.estrada@gmail.com>, 2011-2013
+# Abraham Estrada, 2011-2013
 # Alex Dzul <alexexc2@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
@@ -211,8 +211,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Se eliminó con éxito %(name)s \"%(obj)s\"."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "No existe un objeto %(name)s con una clave primaria %(key)r."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
