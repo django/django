@@ -96,6 +96,7 @@ LANGUAGES = [
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
     ('ka', gettext_noop('Georgian')),
+    ('kab', gettext_noop('Kabyle')),
     ('kk', gettext_noop('Kazakh')),
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
