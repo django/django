@@ -1,7 +1,6 @@
 import json
 
 from django.contrib import admin
-from django.contrib.admin import site
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User
@@ -30,6 +29,7 @@ class BookAdmin(admin.ModelAdmin):
     inlines = [AuthorshipInline]
 
 
+site = admin.AdminSite(name='autocomplete_admin')
 site.register(Question, QuestionAdmin)
 site.register(Answer, AnswerAdmin)
 site.register(Author, AuthorAdmin)
@@ -39,7 +39,7 @@ site.register(Book, BookAdmin)
 class AutocompleteJsonViewTests(AdminViewBasicTestCase):
     as_view_args = {'model_admin': QuestionAdmin(Question, site)}
     factory = RequestFactory()
-    url = reverse_lazy('admin:admin_views_question_autocomplete')
+    url = reverse_lazy('autocomplete_admin:admin_views_question_autocomplete')
 
     @classmethod
     def setUpTestData(cls):
@@ -156,12 +156,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.superuser = User.objects.create_superuser(
             username='super', password='secret', email='super@example.com',
         )
-        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        self.admin_login(username='super', password='secret', login_url=reverse('autocomplete_admin:index'))
 
     def test_select(self):
         from selenium.webdriver.common.keys import Keys
         from selenium.webdriver.support.ui import Select
-        self.selenium.get(self.live_server_url + reverse('admin:admin_views_answer_add'))
+        self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_answer_add'))
         elem = self.selenium.find_element_by_css_selector('.select2-selection')
         elem.click()  # Open the autocomplete dropdown.
         results = self.selenium.find_element_by_css_selector('.select2-results')
@@ -196,7 +196,7 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_select_multiple(self):
         from selenium.webdriver.common.keys import Keys
         from selenium.webdriver.support.ui import Select
-        self.selenium.get(self.live_server_url + reverse('admin:admin_views_question_add'))
+        self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_question_add'))
         elem = self.selenium.find_element_by_css_selector('.select2-selection')
         elem.click()  # Open the autocomplete dropdown.
         results = self.selenium.find_element_by_css_selector('.select2-results')
