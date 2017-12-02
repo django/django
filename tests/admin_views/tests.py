@@ -4032,9 +4032,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
         initial_select2_inputs = self.selenium.find_elements_by_class_name('select2-selection')
         # Inline formsets have empty/invisible forms.
-        # 4 visible select2 inputs and 6 hidden inputs.
+        # Only the 4 visible select2 inputs are initialized.
         num_initial_select2_inputs = len(initial_select2_inputs)
-        self.assertEqual(num_initial_select2_inputs, 10)
+        self.assertEqual(num_initial_select2_inputs, 4)
 
         # Add an inline
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
