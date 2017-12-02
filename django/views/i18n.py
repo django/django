@@ -22,9 +22,9 @@ LANGUAGE_QUERY_PARAMETER = 'language'
 
 def set_language(request):
     """
-    Redirect to a given URL while setting the chosen language in the session or
-    cookie. The URL and the language code need to be specified in the request
-    parameters.
+    Redirect to a given URL while setting the chosen language in the session
+    (if enabled) and in a cookie. The URL and the language code need to be
+    specified in the request parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
@@ -49,13 +49,12 @@ def set_language(request):
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
-            else:
-                response.set_cookie(
-                    settings.LANGUAGE_COOKIE_NAME, lang_code,
-                    max_age=settings.LANGUAGE_COOKIE_AGE,
-                    path=settings.LANGUAGE_COOKIE_PATH,
-                    domain=settings.LANGUAGE_COOKIE_DOMAIN,
-                )
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME, lang_code,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+            )
     return response
 
 

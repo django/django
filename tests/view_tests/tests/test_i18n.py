@@ -37,6 +37,12 @@ class SetLanguageTests(TestCase):
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i_should_not_be_used/')
         self.assertRedirects(response, '/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        # The language is set in a cookie.
+        language_cookie = self.client.cookies[settings.LANGUAGE_COOKIE_NAME]
+        self.assertEqual(language_cookie.value, lang_code)
+        self.assertEqual(language_cookie['domain'], '')
+        self.assertEqual(language_cookie['path'], '/')
+        self.assertEqual(language_cookie['max-age'], '')
 
     def test_setlang_unsafe_next(self):
         """

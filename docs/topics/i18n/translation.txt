@@ -1761,10 +1761,14 @@ Activate this view by adding the following line to your URLconf::
     language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
-parameter set in request. If session support is enabled, the view
-saves the language choice in the user's session. Otherwise, it saves the
-language choice in a cookie that is by default named ``django_language``.
-(The name can be changed through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+parameter set in request. If session support is enabled, the view saves the
+language choice in the user's session. It also saves the language choice in a
+cookie that is named ``django_language`` by default. (The name can be changed
+through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
+
+.. versionchanged:: 2.1
+
+    In older versions, the cookie is only set if session support isn't enabled.
 
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
