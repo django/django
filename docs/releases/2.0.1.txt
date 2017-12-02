@@ -1,0 +1,12 @@
+==========================
+Django 2.0.1 release notes
+==========================
+
+*Expected January 1, 2018*
+
+Django 2.0.1 fixes several bugs in 2.0.
+
+Bugfixes
+========
+
+* ...
