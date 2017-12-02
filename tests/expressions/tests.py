@@ -73,6 +73,7 @@ class BasicExpressionsTests(TestCase):
             ],
         )
 
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
     def test_filtering_on_annotate_that_uses_q(self):
         self.assertEqual(
             Company.objects.annotate(
