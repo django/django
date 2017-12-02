@@ -73,6 +73,15 @@ class BasicExpressionsTests(TestCase):
             ],
         )
 
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
+    def test_filtering_on_annotate_that_uses_q(self):
+        self.assertEqual(
+            Company.objects.annotate(
+                num_employees_check=ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
+            ).filter(num_employees_check=True).count(),
+            2,
+        )
+
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater
