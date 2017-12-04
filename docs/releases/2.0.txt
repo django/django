@@ -707,7 +707,7 @@ to remove usage of these features.
 
 * The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
   required in models and migrations. Consider squashing migrations so that you
-  have less of them to update.
+  have fewer of them to update.
 
 * ``django.db.models.fields.add_lazy_relation()`` is removed.
 
