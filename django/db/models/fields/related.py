@@ -808,8 +808,7 @@ class ForeignKey(ForeignObject):
             parent_link=parent_link,
             on_delete=on_delete,
         )
-
-        kwargs['db_index'] = kwargs.get('db_index', True)
+        kwargs.setdefault('db_index', True)
 
         super().__init__(to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 

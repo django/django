@@ -1652,7 +1652,7 @@ class EmailField(CharField):
 
     def __init__(self, *args, **kwargs):
         # max_length=254 to be compliant with RFCs 3696 and 5321
-        kwargs['max_length'] = kwargs.get('max_length', 254)
+        kwargs.setdefault('max_length', 254)
         super().__init__(*args, **kwargs)
 
     def deconstruct(self):
@@ -1678,7 +1678,7 @@ class FilePathField(Field):
                  recursive=False, allow_files=True, allow_folders=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
-        kwargs['max_length'] = kwargs.get('max_length', 100)
+        kwargs.setdefault('max_length', 100)
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
@@ -2258,7 +2258,7 @@ class URLField(CharField):
     description = _("URL")
 
     def __init__(self, verbose_name=None, name=None, **kwargs):
-        kwargs['max_length'] = kwargs.get('max_length', 200)
+        kwargs.setdefault('max_length', 200)
         super().__init__(verbose_name, name, **kwargs)
 
     def deconstruct(self):

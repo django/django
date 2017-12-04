@@ -226,7 +226,7 @@ class FileField(Field):
         self.storage = storage or default_storage
         self.upload_to = upload_to
 
-        kwargs['max_length'] = kwargs.get('max_length', 100)
+        kwargs.setdefault('max_length', 100)
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
