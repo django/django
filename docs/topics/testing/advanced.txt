@@ -25,7 +25,7 @@ restricted subset of the test client API:
   :meth:`~Client.options()`, and :meth:`~Client.trace()`.
 
 * These methods accept all the same arguments *except* for
-  ``follows``. Since this is just a factory for producing
+  ``follow``. Since this is just a factory for producing
   requests, it's up to you to handle the response.
 
 * It does not support middleware. Session and authentication
