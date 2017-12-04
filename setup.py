@@ -48,6 +48,7 @@ setup(
         'django-admin = django.core.management:execute_from_command_line',
     ]},
     install_requires=['pytz'],
+    python_requires=">=3.5",
     extras_require={
         "bcrypt": ["bcrypt"],
         "argon2": ["argon2-cffi >= 16.1.0"],
