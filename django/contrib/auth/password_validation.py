@@ -177,7 +177,7 @@ class CommonPasswordValidator:
             with open(password_list_path) as f:
                 common_passwords_lines = f.readlines()
 
-        self.passwords = {p.strip() for p in common_passwords_lines}
+        self.passwords = {p.strip().lower() for p in common_passwords_lines}
 
     def validate(self, password, user=None):
         if password.lower().strip() in self.passwords:
