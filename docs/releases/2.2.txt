@@ -82,8 +82,9 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
   ordering of the aggregated elements.
 
-* The new :class:`~django.contrib.postgres.indexes.HashIndex` class
-  allows creating ``hash`` indexes in the database.
+* The new :class:`~django.contrib.postgres.indexes.HashIndex` and
+  :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
+  creating ``hash`` and ``SP-GiST`` indexes in the database.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
