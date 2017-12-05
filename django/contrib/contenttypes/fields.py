@@ -234,7 +234,15 @@ class GenericForeignKey(FieldCacheMixin):
                 pk = rel_obj._meta.pk
                 # If the primary key is a remote field, use the referenced
                 # field's to_python().
-                pk_to_python = pk.target_field.to_python if pk.remote_field else pk.to_python
+                to_python_field = pk
+                # Out of an abundance of caution, avoid infinite loops.
+                seen = {to_python_field}
+                while to_python_field.remote_field:
+                    to_python_field = to_python_field.target_field
+                    if to_python_field in seen:
+                        break
+                    seen.add(to_python_field)
+                pk_to_python = to_python_field.to_python
                 if pk_to_python(pk_val) != rel_obj._get_pk_val():
                     rel_obj = None
                 else:
