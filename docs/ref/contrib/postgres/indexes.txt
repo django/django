@@ -93,3 +93,18 @@ available from the ``django.contrib.postgres.indexes`` module.
         with PostgreSQL ≥ 10.
 
     .. _fillfactor: https://www.postgresql.org/docs/current/static/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
+``SpGistIndex``
+===============
+
+.. class:: SpGistIndex(fillfactor=None, **options)
+
+    .. versionadded:: 2.2
+
+    Creates an `SP-GiST index
+    <https://www.postgresql.org/docs/current/static/spgist.html>`_.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. _fillfactor: https://www.postgresql.org/docs/current/static/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS

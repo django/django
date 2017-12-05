@@ -1,7 +1,7 @@
 from django.db.models import Index
 from django.utils.functional import cached_property
 
-__all__ = ['BrinIndex', 'GinIndex', 'GistIndex', 'HashIndex']
+__all__ = ['BrinIndex', 'GinIndex', 'GistIndex', 'HashIndex', 'SpGistIndex']
 
 
 class PostgresIndex(Index):
@@ -102,6 +102,26 @@ class GistIndex(PostgresIndex):
 
 class HashIndex(PostgresIndex):
     suffix = 'hash'
+
+    def __init__(self, *, fillfactor=None, **kwargs):
+        self.fillfactor = fillfactor
+        super().__init__(**kwargs)
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        if self.fillfactor is not None:
+            kwargs['fillfactor'] = self.fillfactor
+        return path, args, kwargs
+
+    def get_with_params(self):
+        with_params = []
+        if self.fillfactor is not None:
+            with_params.append('fillfactor = %d' % self.fillfactor)
+        return with_params
+
+
+class SpGistIndex(PostgresIndex):
+    suffix = 'spgist'
 
     def __init__(self, *, fillfactor=None, **kwargs):
         self.fillfactor = fillfactor
