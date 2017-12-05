@@ -520,6 +520,14 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.args, value.args)
         self.assertEqual(result.keywords, value.keywords)
 
+    def test_serialize_functools_partial_keywords_argument(self):
+        value = mock.Mock(spec=functools.partial, func=int, args=('123',), keywords=None)
+        result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, {})
+        self.assertNotEqual(result.keywords, None)
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
