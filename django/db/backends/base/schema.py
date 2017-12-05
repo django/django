@@ -951,7 +951,7 @@ class BaseDatabaseSchemaEditor(object):
     def _create_fk_sql(self, model, field, suffix):
         from_table = model._meta.db_table
         from_column = field.column
-        to_table = field.target_field.model._meta.db_table
+        _, to_table = split_identifier(field.target_field.model._meta.db_table)
         to_column = field.target_field.column
         suffix = suffix % {
             "to_table": to_table,
@@ -962,7 +962,7 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(from_table),
             "name": self.quote_name(self._create_index_name(model, [from_column], suffix=suffix)),
             "column": self.quote_name(from_column),
-            "to_table": self.quote_name(to_table),
+            "to_table": self.quote_name(field.target_field.model._meta.db_table),
             "to_column": self.quote_name(to_column),
             "deferrable": self.connection.ops.deferrable_sql(),
         }
