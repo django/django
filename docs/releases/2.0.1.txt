@@ -9,4 +9,5 @@ Django 2.0.1 fixes several bugs in 2.0.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
+  subwidgets (:ticket:`28890`).

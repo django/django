@@ -9,4 +9,5 @@ Django 1.11.9 fixes several bugs in 1.11.8.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
+  subwidgets (:ticket:`28890`).
