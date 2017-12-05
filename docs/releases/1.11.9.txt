@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed incorrect class-based model index name generation for models with
   quoted ``db_table`` (:ticket:`28876`).
+
+* Fixed incorrect foreign key constraint name for models with quoted
+  ``db_table`` (:ticket:`28876`).
