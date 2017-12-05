@@ -8,7 +8,8 @@ from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
-from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature, \
+    tag
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import MigrationTestBase
@@ -2565,6 +2566,42 @@ class SwappableOperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards('test_rminigsw', editor, project_state, new_state)
             operation.database_backwards('test_rminigsw', editor, new_state, project_state)
+
+    @tag('mine')
+    def test_change_primary_key(self):
+        # Create a model with two fields
+        operation1 = migrations.CreateModel(
+            'SimpleModel',
+            [
+                ("field1", models.SlugField(max_length=20, primary_key=True)),
+                ("field2", models.SlugField(max_length=20)),
+            ],
+        )
+        # Drop field1 primary key constraint - this doesn't fail
+        operation2 = migrations.AlterField(
+            "SimpleModel",
+            "field1",
+            models.SlugField(max_length=20, primary_key=False),
+        )
+        # Add a primary key constraint to field2 - this fails
+        operation3 = migrations.AlterField(
+            "SimpleModel",
+            "field2",
+            models.SlugField(max_length=20, primary_key=True),
+        )
+
+        project_state = ProjectState()
+
+        with connection.schema_editor() as editor:
+            new_state = project_state.clone()
+            operation1.state_forwards("migrtest", new_state)
+            operation1.database_forwards("migrtest", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation2.state_forwards("migrtest", new_state)
+            operation2.database_forwards("migrtest", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation3.state_forwards("migrtest", new_state)
+            operation3.database_forwards("migrtest", editor, project_state, new_state)
 
 
 class TestCreateModel(SimpleTestCase):

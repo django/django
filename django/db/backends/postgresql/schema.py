@@ -126,6 +126,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 (not old_field.unique and new_field.unique)):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
+                for sql in list(self.deferred_sql):
+                    if str(sql) == str(like_index_statement):
+                        self.deferred_sql.remove(sql)
                 self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
