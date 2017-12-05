@@ -743,7 +743,7 @@ to reduce repetition::
     >>> from django.db.models import Avg, F, Max, Min, Window
     >>> from django.db.models.functions import ExtractYear
     >>> window = {
-    >>>    'partition': [F('studio'), F('genre')],
+    >>>    'partition_by': [F('studio'), F('genre')],
     >>>    'order_by': ExtractYear('released').asc(),
     >>> }
     >>> Movie.objects.annotate(
