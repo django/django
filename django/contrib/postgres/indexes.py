@@ -1,4 +1,5 @@
 from django.db.models import Index
+from django.db.utils import NotSupportedError
 from django.utils.functional import cached_property
 
 __all__ = [
@@ -18,6 +19,7 @@ class PostgresIndex(Index):
         return Index.max_name_length - len(Index.suffix) + len(self.suffix)
 
     def create_sql(self, model, schema_editor, using=''):
+        self.check_supported(schema_editor)
         statement = super().create_sql(model, schema_editor, using=' USING %s' % self.suffix)
         with_params = self.get_with_params()
         if with_params:
@@ -26,6 +28,9 @@ class PostgresIndex(Index):
                 statement.parts['extra'],
             )
         return statement
+
+    def check_supported(self, schema_editor):
+        pass
 
     def get_with_params(self):
         return []
@@ -48,6 +53,12 @@ class BrinIndex(PostgresIndex):
         if self.pages_per_range is not None:
             kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
+
+    def check_supported(self, schema_editor):
+        if not schema_editor.connection.features.has_brin_index_support:
+            raise NotSupportedError('BRIN indexes require PostgreSQL 9.5+.')
+        if self.autosummarize and not schema_editor.connection.features.has_brin_autosummarize:
+            raise NotSupportedError('BRIN option autosummarize requires PostgreSQL 10+.')
 
     def get_with_params(self):
         with_params = []
