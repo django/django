@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
   subwidgets (:ticket:`28890`).
+
+* Fixed incorrect class-based model index name generation for models with
+  quoted ``db_table`` (:ticket:`28876`).
