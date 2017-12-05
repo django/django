@@ -145,8 +145,9 @@ class Statement(Reference):
     that might have to be adjusted if they're referencing a table or column
     that is removed
     """
-    def __init__(self, template, **parts):
+    def __init__(self, template, *, creates_field_index=False, **parts):
         self.template = template
+        self.creates_field_index = creates_field_index
         self.parts = parts
 
     def references_table(self, table):
