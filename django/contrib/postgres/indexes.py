@@ -105,6 +105,10 @@ class GinIndex(PostgresIndex):
             kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
         return path, args, kwargs
 
+    def check_supported(self, schema_editor):
+        if self.gin_pending_list_limit and not schema_editor.connection.features.has_gin_pending_list_limit:
+            raise NotSupportedError('GIN option gin_pending_list_limit requires PostgreSQL 9.5+.')
+
     def get_with_params(self):
         with_params = []
         if self.gin_pending_list_limit is not None:

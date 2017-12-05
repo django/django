@@ -185,6 +185,16 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
+    def test_gin_parameters_exception(self):
+        index_name = 'gin_options_exception'
+        index = GinIndex(fields=['field'], name=index_name, gin_pending_list_limit=64)
+        msg = 'GIN option gin_pending_list_limit requires PostgreSQL 9.5+.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with mock.patch('django.db.connection.features.has_gin_pending_list_limit', False):
+                with connection.schema_editor() as editor:
+                    editor.add_index(IntegerArrayModel, index)
+        self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
+
     @skipUnlessDBFeature('has_brin_index_support')
     def test_brin_index(self):
         index_name = 'char_field_model_field_brin'
