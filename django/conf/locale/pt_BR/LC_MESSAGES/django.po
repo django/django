@@ -764,10 +764,10 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Certifique-se de que o arquivo tenha no máximo %(max)d caractere (ele possui "
+"Certifique-se de que o nome do arquivo tenha no máximo %(max)d caractere (ele possui "
 "%(length)d)."
 msgstr[1] ""
-"Certifique-se de que o arquivo tenha no máximo %(max)d caracteres (ele "
+"Certifique-se de que o nome do arquivo tenha no máximo %(max)d caracteres (ele "
 "possui %(length)d)."
 
 #: forms/fields.py:571
