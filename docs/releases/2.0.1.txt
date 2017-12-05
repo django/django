@@ -34,3 +34,6 @@ Bugfixes
 
 * Fixed crash when coercing a translatable URL pattern to ``str``
   (:ticket:`28947`).
+
+* Fixed crash on SQLite when renaming a field in a model referenced by a
+  ``ManyToManyField`` (:ticket:`28884`).
