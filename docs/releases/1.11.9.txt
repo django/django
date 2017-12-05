@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
   subwidgets (:ticket:`28890`).
+
+* Fixed invalid migrations caused by the ``functool.partial()`` ``keywords``
+  attribute not being serialized to a dictionary in some versions of Python.
+  (:ticket:`28894`).

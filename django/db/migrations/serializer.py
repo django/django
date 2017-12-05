@@ -165,7 +165,7 @@ class FunctoolsPartialSerializer(BaseSerializer):
         # Serialize functools.partial() arguments
         func_string, func_imports = serializer_factory(self.value.func).serialize()
         args_string, args_imports = serializer_factory(self.value.args).serialize()
-        keywords_string, keywords_imports = serializer_factory(self.value.keywords).serialize()
+        keywords_string, keywords_imports = serializer_factory(self.value.keywords or {}).serialize()
         # Add any imports needed by arguments
         imports.update(func_imports)
         imports.update(args_imports)
