@@ -70,9 +70,9 @@ probably got the answers.
 
 .. admonition:: Python 3 required!
 
-    The current development version of Django doesn't support Python 2.7. Get
-    Python 3 at `Python's download page <https://www.python.org/downloads/>`_ or
-    with your operating system's package manager.
+    The current version of Django doesn't support Python 2.7. Get Python 3 at
+    `Python's download page <https://www.python.org/downloads/>`_ or with your
+    operating system's package manager.
 
 .. admonition:: For Windows users
 
