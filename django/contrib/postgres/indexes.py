@@ -1,17 +1,21 @@
 from django.db.models import Index
+from django.utils.functional import cached_property
 
 __all__ = ['BrinIndex', 'GinIndex', 'GistIndex']
 
 
-class MaxLengthMixin:
-    # Allow an index name longer than 30 characters since the suffix is 4
-    # characters (usual limit is 3). Since this index can only be used on
-    # PostgreSQL, the 30 character limit for cross-database compatibility isn't
-    # applicable.
-    max_name_length = 31
+class PostgresIndex(Index):
+
+    @cached_property
+    def max_name_length(self):
+        # Allow an index name longer than 30 characters when the suffix is
+        # longer than the usual 3 character limit. The 30 character limit for
+        # cross-database compatibility isn't applicable to PostgreSQL-specific
+        # indexes.
+        return Index.max_name_length - len(Index.suffix) + len(self.suffix)
 
 
-class BrinIndex(MaxLengthMixin, Index):
+class BrinIndex(PostgresIndex):
     suffix = 'brin'
 
     def __init__(self, *, pages_per_range=None, **kwargs):
@@ -35,7 +39,7 @@ class BrinIndex(MaxLengthMixin, Index):
         return statement
 
 
-class GinIndex(Index):
+class GinIndex(PostgresIndex):
     suffix = 'gin'
 
     def __init__(self, *, fastupdate=None, gin_pending_list_limit=None, **kwargs):
@@ -63,7 +67,7 @@ class GinIndex(Index):
         return statement
 
 
-class GistIndex(MaxLengthMixin, Index):
+class GistIndex(PostgresIndex):
     suffix = 'gist'
 
     def __init__(self, *, buffering=None, fillfactor=None, **kwargs):
