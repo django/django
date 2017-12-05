@@ -61,8 +61,27 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
+    def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
+        """
+        Return whether or not the provided table name is referenced by another
+        one. If `column_name` is specified, only references pointing to that
+        column are considered. If `ignore_self` is True, self-referential
+        constraints are ignored.
+        """
+        with self.connection.cursor() as cursor:
+            for other_table in self.connection.introspection.get_table_list(cursor):
+                if ignore_self and other_table.name == table_name:
+                    continue
+                constraints = self.connection.introspection._get_foreign_key_constraints(cursor, other_table.name)
+                for constraint in constraints.values():
+                    constraint_table, constraint_column = constraint['foreign_key']
+                    if (constraint_table == table_name and
+                            (column_name is None or constraint_column == column_name)):
+                        return True
+        return False
+
     def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
-        if model._meta.related_objects and disable_constraints:
+        if disable_constraints and self._is_referenced_by_fk_constraint(old_db_table):
             if self.connection.in_atomic_block:
                 raise NotSupportedError((
                     'Renaming the %r table while in a transaction is not '
@@ -77,8 +96,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def alter_field(self, model, old_field, new_field, strict=False):
         old_field_name = old_field.name
+        table_name = model._meta.db_table
+        _, old_column_name = old_field.get_attname_column()
         if (new_field.name != old_field_name and
-                any(r.field_name == old_field.name for r in model._meta.related_objects)):
+                self._is_referenced_by_fk_constraint(table_name, old_column_name, ignore_self=True)):
             if self.connection.in_atomic_block:
                 raise NotSupportedError((
                     'Renaming the %r.%r column while in a transaction is not '
@@ -93,9 +114,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 with self.connection.cursor() as cursor:
                     schema_version = cursor.execute('PRAGMA schema_version').fetchone()[0]
                     cursor.execute('PRAGMA writable_schema = 1')
-                    table_name = model._meta.db_table
                     references_template = ' REFERENCES "%s" ("%%s") ' % table_name
-                    old_column_name = old_field.get_attname_column()[1]
                     new_column_name = new_field.get_attname_column()[1]
                     search = references_template % old_column_name
                     replacement = references_template % new_column_name

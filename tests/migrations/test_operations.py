@@ -722,7 +722,7 @@ class OperationTests(OperationTestBase):
 
         project_state = self.apply_operations(app_label, project_state, operations=[
             migrations.RenameModel("Pony", "Pony2"),
-        ])
+        ], atomic=connection.features.supports_atomic_references_rename)
         Pony = project_state.apps.get_model(app_label, "Pony2")
         Rider = project_state.apps.get_model(app_label, "Rider")
         pony = Pony.objects.create()
@@ -1231,12 +1231,13 @@ class OperationTests(OperationTestBase):
         second_state = first_state.clone()
         operation = migrations.AlterModelTable(name='pony', table=None)
         operation.state_forwards(app_label, second_state)
-        with connection.schema_editor() as editor:
+        atomic_rename = connection.features.supports_atomic_references_rename
+        with connection.schema_editor(atomic=atomic_rename) as editor:
             operation.database_forwards(app_label, editor, first_state, second_state)
         self.assertTableExists(new_m2m_table)
         self.assertTableNotExists(original_m2m_table)
         # And test reversal
-        with connection.schema_editor() as editor:
+        with connection.schema_editor(atomic=atomic_rename) as editor:
             operation.database_backwards(app_label, editor, second_state, first_state)
         self.assertTableExists(original_m2m_table)
         self.assertTableNotExists(new_m2m_table)
