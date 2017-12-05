@@ -72,3 +72,24 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     .. _buffering build: https://www.postgresql.org/docs/current/static/gist-implementation.html#GIST-BUFFERING-BUILD
     .. _fillfactor: https://www.postgresql.org/docs/current/static/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
+``HashIndex``
+=============
+
+.. class:: HashIndex(fillfactor=None, **options)
+
+    .. versionadded:: 2.2
+
+    Creates a hash index.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. warning:
+
+        Although hash indexes have been available in PostgreSQL for a long
+        time, they have suffered from a number of issues with data integrity in
+        the past. It is therefore recommended that this index type is only used
+        with PostgreSQL ≥ 10.
+
+    .. _fillfactor: https://www.postgresql.org/docs/current/static/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
