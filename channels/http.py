@@ -298,7 +298,7 @@ class AsgiHandler(base.BaseHandler):
         # Other responses just need chunking
         else:
             # Yield chunks of response
-            for chunk, last in cls.chunk_bytes(response.body):
+            for chunk, last in cls.chunk_bytes(response.content):
                 yield {
                     "type": "http.response.body",
                     "body": chunk,
