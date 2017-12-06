@@ -240,6 +240,23 @@ class LookupTests(TestCase):
             models.DateField._unregister_lookup(YearTransform)
             models.DateField._unregister_lookup(YearTransform, custom_transform_name)
 
+    def test_custom_exact_lookup_none_rhs(self):
+        """
+        __exact=None is transformed to __isnull=True if a custom lookup class
+        with lookup_name != 'exact' is registered as the `exact` lookup.
+        """
+        class CustomExactLookup(models.Lookup):
+            lookup_name = 'somecustomlookup'
+
+        field = Author._meta.get_field('birthdate')
+        OldExactLookup = field.get_lookup('exact')
+        author = Author.objects.create(name='author', birthdate=None)
+        try:
+            type(field).register_lookup(Exactly, 'exact')
+            self.assertEqual(Author.objects.get(birthdate__exact=None), author)
+        finally:
+            type(field).register_lookup(OldExactLookup, 'exact')
+
     def test_basic_lookup(self):
         a1 = Author.objects.create(name='a1', age=1)
         a2 = Author.objects.create(name='a2', age=2)
