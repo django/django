@@ -180,7 +180,7 @@ class SchemaTests(TransactionTestCase):
         """
         constraints = self.get_constraints(model._meta.db_table)
         constraint_fk = None
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == [column] and details['foreign_key']:
                 constraint_fk = details['foreign_key']
                 break
@@ -836,7 +836,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(LocalBook)
         # Ensure no FK constraint exists
         constraints = self.get_constraints(LocalBook._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['foreign_key']:
                 self.fail('Found an unexpected FK constraint to %s' % details['columns'])
         old_field = LocalBook._meta.get_field("author")
@@ -1430,7 +1430,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
         # Ensure the constraint exists
         constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ["height"] and details['check']:
                 break
         else:
@@ -1442,7 +1442,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
         constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ["height"] and details['check']:
                 self.fail("Check constraint for height found")
         # Alter the column to re-add it
@@ -1450,7 +1450,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, new_field2, strict=True)
         constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ["height"] and details['check']:
                 break
         else:

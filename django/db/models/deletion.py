@@ -308,7 +308,7 @@ class Collector:
                         )
 
         # update collected instances
-        for model, instances_for_fieldvalues in self.field_updates.items():
+        for instances_for_fieldvalues in self.field_updates.values():
             for (field, value), instances in instances_for_fieldvalues.items():
                 for obj in instances:
                     setattr(obj, field.attname, value)

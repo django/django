@@ -264,7 +264,7 @@ class Command(BaseCommand):
         to the given database table name.
         """
         unique_together = []
-        for index, params in constraints.items():
+        for params in constraints.values():
             if params['unique']:
                 columns = params['columns']
                 if len(columns) > 1:

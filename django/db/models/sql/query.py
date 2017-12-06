@@ -1749,7 +1749,7 @@ class Query:
         """
         group_by = list(self.select)
         if self.annotation_select:
-            for alias, annotation in self.annotation_select.items():
+            for annotation in self.annotation_select.values():
                 for col in annotation.get_group_by_cols():
                     group_by.append(col)
         self.group_by = tuple(group_by)
