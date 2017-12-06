@@ -164,7 +164,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 cleansed = request.POST.copy()
                 if sensitive_post_parameters == '__ALL__':
                     # Cleanse all parameters.
-                    for k, v in cleansed.items():
+                    for k in cleansed:
                         cleansed[k] = CLEANSED_SUBSTITUTE
                     return cleansed
                 else:
@@ -213,7 +213,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         if self.is_active(request) and sensitive_variables:
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
-                for name, value in tb_frame.f_locals.items():
+                for name in tb_frame.f_locals:
                     cleansed[name] = CLEANSED_SUBSTITUTE
             else:
                 # Cleanse specified variables

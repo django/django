@@ -176,7 +176,7 @@ class IntrospectionTests(TransactionTestCase):
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
         index = {}
         index2 = {}
-        for key, val in constraints.items():
+        for val in constraints.values():
             if val['columns'] == ['headline', 'pub_date']:
                 index = val
             if val['columns'] == ['headline', 'response_to_id', 'pub_date', 'reporter_id']:
@@ -198,7 +198,7 @@ class IntrospectionTests(TransactionTestCase):
             ['response_to_id'],
             ['headline', 'response_to_id', 'pub_date', 'reporter_id'],
         ]
-        for key, val in constraints.items():
+        for val in constraints.values():
             if val['index'] and not (val['primary_key'] or val['unique']):
                 self.assertIn(val['columns'], expected_columns)
                 self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))

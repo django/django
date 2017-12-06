@@ -128,7 +128,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         # the WSGI environ. This prevents header-spoofing based on ambiguity
         # between underscores and dashes both normalized to underscores in WSGI
         # env vars. Nginx and Apache 2.4+ both do this as well.
-        for k, v in self.headers.items():
+        for k in self.headers:
             if '_' in k:
                 del self.headers[k]
 

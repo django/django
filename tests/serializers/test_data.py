@@ -106,7 +106,7 @@ def inherited_create(pk, klass, data):
     #     automatically is easier than manually creating both.
     models.Model.save(instance)
     created = [instance]
-    for klass, field in instance._meta.parents.items():
+    for klass in instance._meta.parents:
         created.append(klass.objects.get(id=pk))
     return created
 

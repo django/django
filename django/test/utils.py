@@ -160,7 +160,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
 
     old_names = []
 
-    for signature, (db_name, aliases) in test_databases.items():
+    for db_name, aliases in test_databases.values():
         first_alias = None
         for alias in aliases:
             connection = connections[alias]

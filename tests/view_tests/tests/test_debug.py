@@ -769,7 +769,7 @@ class ExceptionReportTestMixin:
             self.assertContains(response, 'sauce', status_code=500)
             self.assertNotContains(response, 'worcestershire', status_code=500)
         if check_for_POST_params:
-            for k, v in self.breakfast_data.items():
+            for k in self.breakfast_data:
                 # All POST parameters' names are shown.
                 self.assertContains(response, k, status_code=500)
             # Non-sensitive POST parameters' values are shown.
@@ -858,7 +858,7 @@ class ExceptionReportTestMixin:
             self.assertNotIn('worcestershire', body_html)
 
             if check_for_POST_params:
-                for k, v in self.breakfast_data.items():
+                for k in self.breakfast_data:
                     # All POST parameters' names are shown.
                     self.assertIn(k, body_plain)
                 # Non-sensitive POST parameters' values are shown.

@@ -47,7 +47,7 @@ class GetUniqueCheckTests(unittest.TestCase):
                     (('foo', 'bar'), ('bar', 'baz'))),
         }
 
-        for test_name, (unique_together, normalized) in data.items():
+        for unique_together, normalized in data.values():
             class M(models.Model):
                 foo = models.IntegerField()
                 bar = models.IntegerField()
