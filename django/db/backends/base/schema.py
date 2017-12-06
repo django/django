@@ -462,7 +462,7 @@ class BaseDatabaseSchemaEditor:
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
-        # Remove all deferred statements referencing the deleted table.
+        # Remove all deferred statements referencing the deleted column.
         for sql in list(self.deferred_sql):
             if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
                 self.deferred_sql.remove(sql)
@@ -576,6 +576,8 @@ class BaseDatabaseSchemaEditor:
                     # is to look at its name (refs #28053).
                     continue
                 self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+            # Also remove indexes that aren't yet created.
+            self._remove_deferred_index_creation(model, old_field)
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -687,6 +689,8 @@ class BaseDatabaseSchemaEditor:
         # False              | True             | True               | False
         # True               | True             | True               | False
         if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
+            # Remove indexes that aren't yet created, as we'll create them now.
+            self._remove_deferred_index_creation(model, old_field)
             self.execute(self._create_index_sql(model, [new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
@@ -1025,6 +1029,18 @@ class BaseDatabaseSchemaEditor:
                     continue
                 result.append(name)
         return result
+
+    def _remove_deferred_index_creation(self, model, field, index_name=None):
+        removed_deferred_sqls = []
+        for sql in list(self.deferred_sql):
+            if isinstance(sql, Statement) and sql.references_column(model._meta.db_table, field.column):
+                if not isinstance(sql.parts.get('name'), IndexName):
+                    continue
+                if index_name and str(index_name) != str(sql.parts['name']):
+                    continue
+                self.deferred_sql.remove(sql)
+                removed_deferred_sqls.append(sql)
+        return removed_deferred_sqls
 
     def _delete_primary_key(self, model, strict=False):
         constraint_names = self._constraint_names(model, primary_key=True)
