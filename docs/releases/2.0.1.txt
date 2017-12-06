@@ -21,3 +21,5 @@ Bugfixes
 * Fixed a regression in caching of a ``GenericForeignKey`` when the referenced
   model instance uses more than one level of multi-table inheritance
   (:ticket:`28856`).
+
+* Reallowed filtering a queryset with ``GeometryField=None`` (:ticket:`28896`).
