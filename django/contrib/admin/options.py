@@ -364,9 +364,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # As ``limit_choices_to`` can be a callable, invoke it here.
             if callable(fk_lookup):
                 fk_lookup = fk_lookup()
-            for k, v in widgets.url_params_from_lookup_dict(fk_lookup).items():
-                if k == lookup and v == value:
-                    return True
+            if (lookup, value) in widgets.url_params_from_lookup_dict(fk_lookup).items():
+                return True
 
         relation_parts = []
         prev_field = None
