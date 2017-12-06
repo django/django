@@ -1069,23 +1069,24 @@ class Query:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
-        lookup_class = lhs.get_lookup(lookups[-1])
+        lookup_name = lookups[-1]
+        lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
-                raise FieldError('Related Field got invalid lookup: {}'.format(lookups[-1]))
+                raise FieldError('Related Field got invalid lookup: {}'.format(lookup_name))
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
-            lhs = self.try_transform(lhs, lookups[-1])
-            lookup_class = lhs.get_lookup('exact')
-
-        if not lookup_class:
-            return
+            lhs = self.try_transform(lhs, lookup_name)
+            lookup_name = 'exact'
+            lookup_class = lhs.get_lookup(lookup_name)
+            if not lookup_class:
+                return
 
         lookup = lookup_class(lhs, rhs)
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
         if lookup.rhs is None:
-            if lookup.lookup_name not in ('exact', 'iexact'):
+            if lookup_name not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
             return lhs.get_lookup('isnull')(lhs, True)
 
@@ -1094,7 +1095,7 @@ class Query:
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
         if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-                lookup.lookup_name == 'exact' and lookup.rhs == ''):
+                lookup_name == 'exact' and lookup.rhs == ''):
             return lhs.get_lookup('isnull')(lhs, True)
 
         return lookup
