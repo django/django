@@ -385,6 +385,9 @@ class GeoLookupTest(TestCase):
         # Puerto Rico should be NULL (it's a commonwealth unincorporated territory)
         self.assertEqual(1, len(nullqs))
         self.assertEqual('Puerto Rico', nullqs[0].name)
+        # GeometryField=None is an alias for __isnull=True.
+        self.assertCountEqual(State.objects.filter(poly=None), nullqs)
+        self.assertCountEqual(State.objects.exclude(poly=None), validqs)
 
         # The valid states should be Colorado & Kansas
         self.assertEqual(2, len(validqs))

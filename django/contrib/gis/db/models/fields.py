@@ -167,6 +167,8 @@ class BaseSpatialField(Field):
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
+        if obj is None:
+            return None
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
         if isinstance(obj, GEOSGeometry):
