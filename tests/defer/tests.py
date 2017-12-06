@@ -2,7 +2,8 @@ from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
 from .models import (
-    BigChild, Child, ChildProxy, Primary, RefreshPrimaryProxy, Secondary,
+    BigChild, Child, ChildProxy, Primary, Publication, RefreshPrimaryProxy,
+    Secondary, User,
 )
 
 
@@ -271,3 +272,21 @@ class TestDefer2(AssertionMixin, TestCase):
             # access of any of them.
             self.assertEqual(rf2.name, 'new foo')
             self.assertEqual(rf2.value, 'new bar')
+
+    def test_defaul_defer_fields(self):
+        """
+        The model `Publication` has two fields which are marked as deferred:
+        `title` and `user`. This two fields must be deferred during getting
+        object from DB
+        """
+        u = User.objects.create()
+        p = Publication()
+        p.user = u
+        p.save()
+        p = Publication.objects.get()
+        publication = Publication.objects.defer('text').get()
+        self.assertEqual(len(p.get_deferred_fields()), 2)
+        self.assertEqual(len(publication.get_deferred_fields()), 3)
+        self.assertEqual(p.user, u)
+        self.assertEqual(publication.text, "Test text")
+        self.assertEqual(p.title, "Test Title")

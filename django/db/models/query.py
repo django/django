@@ -189,6 +189,12 @@ class QuerySet:
         self._sticky_filter = False
         self._for_write = False
         self._prefetch_related_lookups = ()
+        # Fixed #23816 - Ability to defer model field by default
+        # Getting fields form "deffer_fields" attribute of the Meta class
+        # Before executing query, those fields will be mark as deferred
+        self._prefetch_deferred_fields = ()
+        if model is not None and hasattr(model._meta, 'deffer_fields'):
+            self._prefetch_deferred_fields = [x for x in model._meta.deffer_fields]
         self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
@@ -1167,6 +1173,10 @@ class QuerySet:
         c._known_related_objects = self._known_related_objects
         c._iterable_class = self._iterable_class
         c._fields = self._fields
+        # Fixed #23816 - Ability to defer model field by default
+
+        # Add fields from `_prefetch_deferred_fields` to deferred loading
+        c.query.add_deferred_loading(self._prefetch_deferred_fields)
         return c
 
     def _fetch_all(self):

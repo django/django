@@ -44,3 +44,16 @@ class RefreshPrimaryProxy(Primary):
             if fields.intersection(deferred_fields):
                 fields = fields.union(deferred_fields)
         super().refresh_from_db(using, fields, **kwargs)
+
+
+class User(models.Model):
+    username = models.CharField(max_length=50)
+
+
+class Publication(models.Model):
+    title = models.CharField(max_length=240, default="Test Title")
+    text = models.TextField(default="Test text")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        deffer_fields = ('title', 'user')
