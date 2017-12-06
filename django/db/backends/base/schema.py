@@ -576,6 +576,7 @@ class BaseDatabaseSchemaEditor:
                     # is to look at its name (refs #28053).
                     continue
                 self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+            self._clear_deferred_index_creation(model, old_field)
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -687,7 +688,9 @@ class BaseDatabaseSchemaEditor:
         # False              | True             | True               | False
         # True               | True             | True               | False
         if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
-            self.execute(self._create_index_sql(model, [new_field]))
+            self._clear_deferred_index_creation(model, old_field)
+            for sql in self._field_indexes_sql(model, new_field):
+                self.execute(sql)
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -761,6 +764,13 @@ class BaseDatabaseSchemaEditor:
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
+
+    def _clear_deferred_index_creation(self, model, field):
+        for sql in list(self.deferred_sql):
+            if (isinstance(sql, Statement) and
+                sql.references_column(model._meta.db_table,
+                                      field.column) and sql.creates_field_index):
+                self.deferred_sql.remove(sql)
 
     def _alter_column_null_sql(self, model, old_field, new_field):
         """
@@ -917,6 +927,7 @@ class BaseDatabaseSchemaEditor:
 
         return Statement(
             sql_create_index,
+            creates_field_index=True,
             table=Table(table, self.quote_name),
             name=IndexName(table, columns, suffix, create_index_name),
             using=using,
