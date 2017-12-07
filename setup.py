@@ -49,8 +49,26 @@ setup(
     ]},
     install_requires=['pytz'],
     extras_require={
-        "bcrypt": ["bcrypt"],
-        "argon2": ["argon2-cffi >= 16.1.0"],
+        'admindocs': ['docutils'],
+        'argon2': ['argon2_cffi>=16.1.0'],
+        'bcrypt': ['bcrypt'],
+        'gis': [
+            'geoip2',
+            'numpy'
+        ],
+        'geoip': ['geoip2'],
+        'jinja2': ['Jinja2>=2.9.2'],
+        'memcached': ['python3-memcached'],
+        'numpy': ['numpy'],
+        'mysql': ['mysqlclient>=1.3.7'],
+        'oracle': ['Oracle'],
+        'images': ['Pillow'],
+        'postgresql': ['psycopg2>=2.5.4'],
+        'pylibmc': ['pylibmc; sys.platform != "win32"'],
+        'sqlparse': ['sqlparse'],
+        'selenium': ['selenium'],
+        'test-parallel': ['tblib'],
+        'yaml': ['PyYAML'],
     },
     zip_safe=False,
     classifiers=[
