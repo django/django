@@ -61,7 +61,7 @@ setup(
         'memcached': ['python3-memcached'],
         'numpy': ['numpy'],
         'mysql': ['mysqlclient>=1.3.7'],
-        'oracle': ['Oracle'],
+        'oracle': ['cx_Oracle>=5.2'],
         'images': ['Pillow'],
         'postgresql': ['psycopg2>=2.5.4'],
         'pylibmc': ['pylibmc; sys.platform != "win32"'],
