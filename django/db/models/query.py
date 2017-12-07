@@ -62,9 +62,8 @@ class ModelIterable(BaseIterable):
         related_populators = get_related_populators(klass_info, select, db)
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
-            if related_populators:
-                for rel_populator in related_populators:
-                    rel_populator.populate(row, obj)
+            for rel_populator in related_populators:
+                rel_populator.populate(row, obj)
             if annotation_col_map:
                 for attr_name, col_pos in annotation_col_map.items():
                     setattr(obj, attr_name, row[col_pos])
@@ -1771,9 +1770,8 @@ class RelatedPopulator:
             obj = None
         else:
             obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
-            if self.related_populators:
-                for rel_iter in self.related_populators:
-                    rel_iter.populate(row, obj)
+            for rel_iter in self.related_populators:
+                rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
         if obj is not None:
             self.remote_setter(obj, from_obj)

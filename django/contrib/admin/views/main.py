@@ -104,37 +104,36 @@ class ChangeList:
                 raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []
-        if self.list_filter:
-            for list_filter in self.list_filter:
-                if callable(list_filter):
-                    # This is simply a custom list filter class.
-                    spec = list_filter(request, lookup_params, self.model, self.model_admin)
+        for list_filter in self.list_filter:
+            if callable(list_filter):
+                # This is simply a custom list filter class.
+                spec = list_filter(request, lookup_params, self.model, self.model_admin)
+            else:
+                field_path = None
+                if isinstance(list_filter, (tuple, list)):
+                    # This is a custom FieldListFilter class for a given field.
+                    field, field_list_filter_class = list_filter
                 else:
-                    field_path = None
-                    if isinstance(list_filter, (tuple, list)):
-                        # This is a custom FieldListFilter class for a given field.
-                        field, field_list_filter_class = list_filter
-                    else:
-                        # This is simply a field name, so use the default
-                        # FieldListFilter class that has been registered for
-                        # the type of the given field.
-                        field, field_list_filter_class = list_filter, FieldListFilter.create
-                    if not isinstance(field, models.Field):
-                        field_path = field
-                        field = get_fields_from_path(self.model, field_path)[-1]
+                    # This is simply a field name, so use the default
+                    # FieldListFilter class that has been registered for the
+                    # type of the given field.
+                    field, field_list_filter_class = list_filter, FieldListFilter.create
+                if not isinstance(field, models.Field):
+                    field_path = field
+                    field = get_fields_from_path(self.model, field_path)[-1]
 
-                    lookup_params_count = len(lookup_params)
-                    spec = field_list_filter_class(
-                        field, request, lookup_params,
-                        self.model, self.model_admin, field_path=field_path
-                    )
-                    # field_list_filter_class removes any lookup_params it
-                    # processes. If that happened, check if distinct() is
-                    # needed to remove duplicate results.
-                    if lookup_params_count > len(lookup_params):
-                        use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
-                if spec and spec.has_output():
-                    filter_specs.append(spec)
+                lookup_params_count = len(lookup_params)
+                spec = field_list_filter_class(
+                    field, request, lookup_params,
+                    self.model, self.model_admin, field_path=field_path,
+                )
+                # field_list_filter_class removes any lookup_params it
+                # processes. If that happened, check if distinct() is needed to
+                # remove duplicate results.
+                if lookup_params_count > len(lookup_params):
+                    use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
+            if spec and spec.has_output():
+                filter_specs.append(spec)
 
         # At this point, all the parameters used by the various ListFilters
         # have been removed from lookup_params, which now only contains other
