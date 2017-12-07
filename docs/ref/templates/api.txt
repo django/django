@@ -1036,7 +1036,7 @@ Template origin
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
 
-.. class:: Origin
+.. class:: Origin(name, template_name=None, loader=None)
 
     .. attribute:: name
 
@@ -1054,3 +1054,14 @@ they are loaded from.
 
         If the template is instantiated directly rather than through a
         template loader, this is ``None``.
+
+    .. attribute:: loader
+
+        The template loader instance that constructed this ``Origin``.
+
+        If the template is instantiated directly rather than through a
+        template loader, this is ``None``.
+
+        :class:`django.template.loaders.cached.Loader` requires all of its
+        wrapped loaders to set this attribute, typically by instantiating
+        the ``Origin`` with ``loader=self``.
