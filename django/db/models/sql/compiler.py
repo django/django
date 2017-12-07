@@ -1215,12 +1215,10 @@ class SQLInsertCompiler(SQLCompiler):
         qn = self.connection.ops.quote_name
         opts = self.query.get_meta()
         result = ['INSERT INTO %s' % qn(opts.db_table)]
-
-        has_fields = bool(self.query.fields)
-        fields = self.query.fields if has_fields else [opts.pk]
+        fields = self.query.fields or [opts.pk]
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
-        if has_fields:
+        if self.query.fields:
             value_rows = [
                 [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
                 for obj in self.query.objs

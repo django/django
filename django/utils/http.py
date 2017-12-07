@@ -324,7 +324,6 @@ def _urlsplit(url, scheme='', allow_fragments=True):
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
-    allow_fragments = bool(allow_fragments)
     netloc = query = fragment = ''
     i = url.find(':')
     if i > 0:
