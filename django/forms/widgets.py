@@ -681,7 +681,7 @@ class Select(ChoiceWidget):
     def _choice_has_empty_value(choice):
         """Return True if the choice's value is empty string or None."""
         value, _ = choice
-        return (isinstance(value, str) and not bool(value)) or value is None
+        return (isinstance(value, str) and not value) or value is None
 
     def use_required_attribute(self, initial):
         """
