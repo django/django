@@ -12,13 +12,8 @@ class SessionStore(SessionBase):
         if signature fails.
         """
         try:
-            return signing.loads(
-                self.session_key,
-                serializer=self.serializer,
-                # This doesn't handle non-default expiry dates, see #19201
-                max_age=settings.SESSION_COOKIE_AGE,
-                salt='django.contrib.sessions.backends.signed_cookies',
-            )
+            # This doesn't handle non-default expiry dates, see #19201
+            self.decode(self.session_key, max_age=settings.SESSION_COOKIE_AGE)
         except Exception:
             # BadSignature, ValueError, or unpickling exceptions. If any of
             # these happen, reset the session.
@@ -66,16 +61,15 @@ class SessionStore(SessionBase):
         """
         self.save()
 
+    def _salt(self):
+        return 'django.contrib.sessions.backends.signed_cookies'
+
     def _get_session_key(self):
         """
         Instead of generating a random string, generate a secure url-safe
         base64-encoded string of data as our session key.
         """
-        return signing.dumps(
-            self._session, compress=True,
-            salt='django.contrib.sessions.backends.signed_cookies',
-            serializer=self.serializer,
-        )
+        return self.encode(self._session, compress=True)
 
     @classmethod
     def clear_expired(cls):
