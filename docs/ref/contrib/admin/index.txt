@@ -1475,7 +1475,7 @@ templates used by the :class:`ModelAdmin` views:
 
     .. versionadded:: 2.0
 
-    The ``get_readonly_fields()`` method is given the ``HttpRequest`` and is
+    The ``get_autocomplete_fields()`` method is given the ``HttpRequest`` and is
     expected to return a ``list`` or ``tuple`` of field names that will be
     displayed with an autocomplete widget as described above in the
     :attr:`ModelAdmin.autocomplete_fields` section.
