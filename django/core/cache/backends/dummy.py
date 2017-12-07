@@ -5,7 +5,7 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 
 class DummyCache(BaseCache):
     def __init__(self, host, *args, **kwargs):
-        BaseCache.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
