@@ -54,7 +54,7 @@ setup(
         'bcrypt': ['bcrypt'],
         'gis': [
             'geoip2',
-            'numpy'
+            'numpy',
         ],
         'geoip': ['geoip2'],
         'jinja2': ['Jinja2>=2.9.2'],
