@@ -95,7 +95,7 @@ If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
 
 .. console::
 
-   $ python -m pip install -U Django
+   $ python -m pip install --upgrade django
 
 .. _pip: https://pip.pypa.io/
 

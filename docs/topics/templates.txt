@@ -558,7 +558,7 @@ Requires Jinja2_ to be installed:
 
 .. console::
 
-    $ python -m pip install Jinja2
+    $ python -m pip install jinja2
 
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
 ``'django.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.

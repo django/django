@@ -81,7 +81,7 @@ Django can be installed easily using ``pip`` within your virtual environment.
 In the command prompt, ensure your virtual environment is active, and execute
 the following command::
 
-    ...\> py -m pip install Django
+    ...\> py -m pip install django
 
 This will download and install the latest Django release.
 
@@ -119,7 +119,7 @@ Common pitfalls
   than one Python version installed.
 
 * If you are connecting to the internet behind a proxy, there might be problems
-  in running the command ``py -m pip install Django``. Set the environment
+  in running the command ``py -m pip install django``. Set the environment
   variables for proxy configuration in the command prompt as follows::
 
     ...\> set http_proxy=http://username:password@proxyserver:proxyport

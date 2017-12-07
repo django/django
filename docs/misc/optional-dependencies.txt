@@ -1,0 +1,79 @@
+=====================
+Optional dependencies
+=====================
+
+The following optional dependencies are required to provide support for some of
+the functionality within Django. For convenience it is possible to install
+these dependencies along with django, e.g. ``pip install django[gis,mysql]``.
+
++------------+-------------------+------------------------------------+
+| Category   | Extra Name        | Requirements                       |
++============+===================+====================================+
+| Caches     | ``pymemcache``    | ``pymemcache>=3.4.0``              |
++            +-------------------+------------------------------------+
+|            | ``pylibmc``       | ``pylibmc>=1.4.0``                 |
++            +-------------------+------------------------------------+
+|            | ``memcached``     | ``python-memcached>=1.59``         |
++------------+-------------------+------------------------------------+
+| Databases  | ``mysql``         | ``mysqlclient>=1.4.0``             |
++            +-------------------+------------------------------------+
+|            | ``oracle``        | ``cx-oracle>=7.0``                 |
++            +-------------------+------------------------------------+
+|            | ``postgresql``    | ``psycopg2>=2.7.3.2``              |
++------------+-------------------+------------------------------------+
+| GIS        | ``geoip``         | ``geoip2``                         |
++            +-------------------+------------------------------------+
+|            | ``numpy``         | ``numpy>=1.12.0``                  |
++            +-------------------+------------------------------------+
+|            | ``gis``           | ``geoip2``, ``numpy>=1.12.0``      |
++------------+-------------------+------------------------------------+
+| Security   | ``argon2``        | ``argon2-cffi>=16.3.0``            |
++            +-------------------+------------------------------------+
+|            | ``bcrypt``        | ``bcrypt>=3.1.2``                  |
++------------+-------------------+------------------------------------+
+| Testing    | ``selenium``      | ``selenium``                       |
++            +-------------------+------------------------------------+
+|            | ``test-parallel`` | ``tblib>=1.5.0``                   |
++            +-------------------+------------------------------------+
+|            | ``testing``       | (All non-database packages.)       |
++------------+-------------------+------------------------------------+
+| Other      | ``admindocs``     | ``docutils>=0.6``                  |
++            +-------------------+------------------------------------+
+|            | ``color``         | ``colorama``                       |
++            +-------------------+------------------------------------+
+|            | ``images``        | ``pillow>=6.2.0``                  |
++            +-------------------+------------------------------------+
+|            | ``jinja2``        | ``jinja2>=2.9.2``                  |
++            +-------------------+------------------------------------+
+|            | ``pywatchman``    | ``pywatchman``                     |
++            +-------------------+------------------------------------+
+|            | ``tzdata``        | ``backports.zoneinfo``, ``tzdata`` |
++            +-------------------+------------------------------------+
+|            | ``yaml``          | ``pyyaml>=3.08``                   |
++------------+-------------------+------------------------------------+
+
+Official packages
+=================
+
+The following packages were once part of ``django.contrib`` but were separated
+into standalone packages to reduce clutter in the core framework:
+
+- `Comments`__: A framework for attaching comments to models.
+- `Form Tools`__: A set of high-level abstractions for forms.
+- `Local Flavour`__: Additional country-specific helpers, e.g. form fields.
+
+__ https://github.com/django/django-contrib-comments
+__ https://github.com/jazzband/django-formtools
+__ https://github.com/django/django-localflavor
+
+The following packages are other projects officially supported by Django:
+
+- `Channels`__: A project bringing support for WebSockets, etc. to Django.
+
+__ https://github.com/django/channels
+
+Third-party packages
+====================
+
+Various third-party packages for Django can be found in the `Python Package
+Index <https://pypi.org/search/?q=&o=&c=Framework+%3A%3A+Django>`__.
