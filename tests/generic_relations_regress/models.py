@@ -38,11 +38,6 @@ class Restaurant(Place):
         return "Restaurant: %s" % self.name
 
 
-class Cafe(Restaurant):
-    def __str__(self):
-        return "Cafe: %s" % self.name
-
-
 class Address(models.Model):
     street = models.CharField(max_length=80)
     city = models.CharField(max_length=50)
