@@ -82,7 +82,7 @@ class AdminEmailHandler(logging.Handler):
     """
 
     def __init__(self, include_html=False, email_backend=None):
-        logging.Handler.__init__(self)
+        super().__init__()
         self.include_html = include_html
         self.email_backend = email_backend
 

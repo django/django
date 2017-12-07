@@ -136,7 +136,7 @@ def linebreaks(value, autoescape=False):
 
 class MLStripper(HTMLParser):
     def __init__(self):
-        HTMLParser.__init__(self, convert_charrefs=False)
+        super().__init__(convert_charrefs=False)
         self.reset()
         self.fed = []
 
