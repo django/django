@@ -53,6 +53,7 @@ class Q(tree.Node):
     AND = 'AND'
     OR = 'OR'
     default = AND
+    conditional = True
 
     def __init__(self, *args, **kwargs):
         connector = kwargs.pop('_connector', None)
