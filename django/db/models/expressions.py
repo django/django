@@ -817,7 +817,7 @@ class When(Expression):
     def __init__(self, condition=None, then=None, **lookups):
         if lookups and condition is None:
             condition, lookups = Q(**lookups), None
-        if condition is None or not isinstance(condition, Q) or lookups:
+        if condition is None or not getattr(condition, 'conditional', False) or lookups:
             raise TypeError("__init__() takes either a Q object or lookups as keyword arguments")
         super().__init__(output_field=None)
         self.condition = condition

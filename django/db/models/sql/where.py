@@ -27,6 +27,7 @@ class WhereNode(tree.Node):
     """
     default = AND
     resolved = False
+    conditional = True
 
     def split_having(self, negated=False):
         """
