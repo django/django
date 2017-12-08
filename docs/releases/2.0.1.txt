@@ -23,3 +23,6 @@ Bugfixes
   (:ticket:`28856`).
 
 * Reallowed filtering a queryset with ``GeometryField=None`` (:ticket:`28896`).
+
+* Corrected admin check to allow a ``OneToOneField`` in
+  ``ModelAdmin.autocomplete_fields`` (:ticket:`28898`).
