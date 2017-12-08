@@ -1546,8 +1546,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
-            'is_popup': (IS_POPUP_VAR in request.POST or
-                         IS_POPUP_VAR in request.GET),
+            'is_popup': IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
             'to_field': to_field,
             'media': media,
             'inline_admin_formsets': inline_formsets,
@@ -1787,8 +1786,7 @@ class ModelAdmin(BaseModelAdmin):
             'opts': opts,
             'app_label': app_label,
             'preserved_filters': self.get_preserved_filters(request),
-            'is_popup': (IS_POPUP_VAR in request.POST or
-                         IS_POPUP_VAR in request.GET),
+            'is_popup': IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
             'to_field': to_field,
             **(extra_context or {}),
         }
