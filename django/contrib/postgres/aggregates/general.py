@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db.models.aggregates import Aggregate
 
 __all__ = [
@@ -9,6 +9,10 @@ __all__ = [
 class ArrayAgg(Aggregate):
     function = 'ARRAY_AGG'
     template = '%(function)s(%(distinct)s%(expressions)s)'
+
+    @property
+    def output_field(self):
+        return ArrayField(self.source_expressions[0].output_field)
 
     def __init__(self, expression, distinct=False, **extra):
         super().__init__(expression, distinct='DISTINCT ' if distinct else '', **extra)
