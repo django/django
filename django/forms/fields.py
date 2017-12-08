@@ -4,7 +4,6 @@ Field classes.
 
 import copy
 import datetime
-import itertools
 import math
 import os
 import re
@@ -112,7 +111,7 @@ class Field:
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = list(itertools.chain(self.default_validators, validators))
+        self.validators = [*self.default_validators, *validators]
 
         super().__init__()
 

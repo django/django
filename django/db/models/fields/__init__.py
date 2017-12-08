@@ -2,7 +2,6 @@ import collections
 import copy
 import datetime
 import decimal
-import itertools
 import operator
 import uuid
 import warnings
@@ -549,7 +548,7 @@ class Field(RegisterLookupMixin):
         Some validators can't be created at field initialization time.
         This method provides a way to delay their creation until required.
         """
-        return list(itertools.chain(self.default_validators, self._validators))
+        return [*self.default_validators, *self._validators]
 
     def run_validators(self, value):
         if value in self.empty_values:
