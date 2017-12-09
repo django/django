@@ -85,6 +85,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['From'], 'from@example.com')
         self.assertEqual(message['To'], 'to@example.com, other@example.com')
 
+    def test_header_omitted_for_no_to_recipients(self):
+        message = EmailMessage('Subject', 'Content', 'from@example.com', cc=['cc@example.com']).message()
+        self.assertNotIn('To', message)
+
     def test_recipients_with_empty_strings(self):
         """
         Empty strings in various recipient arguments are always stripped

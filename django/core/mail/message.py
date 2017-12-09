@@ -254,7 +254,7 @@ class EmailMessage:
         msg = self._create_message(msg)
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
-        msg['To'] = self.extra_headers.get('To', ', '.join(map(str, self.to)))
+        self._set_list_header_if_not_empty(msg, 'To', self.to)
         self._set_list_header_if_not_empty(msg, 'Cc', self.cc)
         self._set_list_header_if_not_empty(msg, 'Reply-To', self.reply_to)
 
@@ -271,7 +271,7 @@ class EmailMessage:
             # Use cached DNS_NAME for performance
             msg['Message-ID'] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
-            if name.lower() in ('from', 'to'):  # From and To are already handled
+            if name.lower() == 'from':  # From is already handled
                 continue
             msg[name] = value
         return msg
