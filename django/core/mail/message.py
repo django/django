@@ -255,10 +255,8 @@ class EmailMessage:
         msg['Subject'] = self.subject
         msg['From'] = self.extra_headers.get('From', self.from_email)
         msg['To'] = self.extra_headers.get('To', ', '.join(map(str, self.to)))
-        if self.cc:
-            msg['Cc'] = ', '.join(str(cc) for cc in self.cc)
-        if self.reply_to:
-            msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(str(r) for r in self.reply_to))
+        self._set_list_header_if_not_empty(msg, 'Cc', self.cc)
+        self._set_list_header_if_not_empty(msg, 'Reply-To', self.reply_to)
 
         # Email header names are case-insensitive (RFC 2045), so we have to
         # accommodate that when doing comparisons.
@@ -407,6 +405,18 @@ class EmailMessage:
             attachment.add_header('Content-Disposition', 'attachment',
                                   filename=filename)
         return attachment
+
+    def _set_list_header_if_not_empty(self, msg, header, values):
+        """
+        Set msg's header, either from self.extra_headers, if present, or from
+        the values argument.
+        """
+        if values:
+            try:
+                value = self.extra_headers[header]
+            except KeyError:
+                value = ', '.join(str(v) for v in values)
+            msg[header] = value
 
 
 class EmailMultiAlternatives(EmailMessage):

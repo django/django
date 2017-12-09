@@ -132,6 +132,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com']
         )
 
+    def test_cc_headers(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            cc=['foo@example.com'], headers={'Cc': 'override@example.com'},
+        ).message()
+        self.assertEqual(message['Cc'], 'override@example.com')
+
     def test_cc_in_headers_only(self):
         message = EmailMessage(
             'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
