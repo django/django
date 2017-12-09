@@ -27,6 +27,10 @@ except ImportError:
 logger = logging.getLogger('django.request')
 
 
+class HttpResponseLater(HttpResponse):
+    status_code = 113
+
+
 class AsgiRequest(http.HttpRequest):
     """
     Custom request subclass that decodes from an ASGI-standard request
@@ -224,6 +228,9 @@ class AsgiHandler(base.BaseHandler):
             except AsgiRequest.ResponseLater:
                 # The view has promised something else
                 # will send a response at a later time
+                return
+            if response.status_code == HttpResponseLater.status_code:
+                # equal to ResponseLater exception above
                 return
         # Transform response into messages, which we yield back to caller
         for message in self.encode_response(response):
