@@ -9,6 +9,7 @@ Pillow != 5.4.0
 pylibmc; sys.platform != 'win32'
 python-memcached >= 1.59
 pytz
+pywatchman; sys.platform != 'win32'
 PyYAML
 selenium
 sqlparse

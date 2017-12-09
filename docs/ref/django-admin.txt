@@ -879,13 +879,26 @@ needed. You don't need to restart the server for code changes to take effect.
 However, some actions like adding files don't trigger a restart, so you'll
 have to restart the server in these cases.
 
-If you are using Linux and install `pyinotify`_, kernel signals will be used to
-autoreload the server (rather than polling file modification timestamps each
-second). This offers better scaling to large projects, reduction in response
-time to code modification, more robust change detection, and battery usage
-reduction.
+If you're using Linux or MacOS and install both `pywatchman`_ and the
+`Watchman`_ service, kernel signals will be used to autoreload the server
+(rather than polling file modification timestamps each second). This offers
+better performance on large projects, reduced response time after code changes,
+more robust change detection, and a reduction in power usage.
 
-.. _pyinotify: https://pypi.org/project/pyinotify/
+.. admonition:: Large directories with many files may cause performance issues
+
+    When using Watchman with a project that includes large non-Python
+    directories like ``node_modules``, it's advisable to ignore this directory
+    for optimal performance. See the `watchman documentation`_ for information
+    on how to do this.
+
+.. _Watchman: https://facebook.github.io/watchman/
+.. _pywatchman: https://pypi.org/project/pywatchman/
+.. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs
+
+.. versionchanged:: 2.2
+
+   Watchman support replaced support for `pyinotify`.
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django

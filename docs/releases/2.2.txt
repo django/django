@@ -203,6 +203,10 @@ Management Commands
   comments in generated migration file(s). This option is also available for
   :djadmin:`squashmigrations`.
 
+* :djadmin:`runserver` can now use `Watchman
+  <https://facebook.github.io/watchman/>`_ to improve the performance of
+  watching a large number of files for changes.
+
 Migrations
 ~~~~~~~~~~
 
@@ -486,6 +490,8 @@ Miscellaneous
   new :option:`ping_google --sitemap-uses-http` option. If you use the
   :func:`~django.contrib.sitemaps.ping_google` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
+
+* :djadmin:`runserver` no longer supports `pyinotify` (replaced by Watchman).
 
 .. _deprecated-features-2.2:
 

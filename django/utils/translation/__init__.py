@@ -4,6 +4,7 @@ Internationalization support.
 import re
 from contextlib import ContextDecorator
 
+from django.utils.autoreload import autoreload_started, file_changed
 from django.utils.functional import lazy
 
 __all__ = [
@@ -52,6 +53,9 @@ class Trans:
         from django.conf import settings
         if settings.USE_I18N:
             from django.utils.translation import trans_real as trans
+            from django.utils.translation.reloader import watch_for_translation_changes, translation_file_changed
+            autoreload_started.connect(watch_for_translation_changes, dispatch_uid='translation_file_changed')
+            file_changed.connect(translation_file_changed, dispatch_uid='translation_file_changed')
         else:
             from django.utils.translation import trans_null as trans
         setattr(self, real_name, getattr(trans, real_name))

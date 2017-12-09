@@ -99,7 +99,7 @@ class Command(BaseCommand):
         use_reloader = options['use_reloader']
 
         if use_reloader:
-            autoreload.main(self.inner_run, None, options)
+            autoreload.run_with_reloader(self.inner_run, **options)
         else:
             self.inner_run(None, **options)
 
