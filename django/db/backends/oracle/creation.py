@@ -23,8 +23,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         settings_dict = settings.DATABASES[self.connection.alias]
         user = settings_dict.get('SAVED_USER') or settings_dict['USER']
         password = settings_dict.get('SAVED_PASSWORD') or settings_dict['PASSWORD']
-        settings_dict = settings_dict.copy()
-        settings_dict.update(USER=user, PASSWORD=password)
+        settings_dict = {**settings_dict, 'USER': user, 'PASSWORD': password}
         DatabaseWrapper = type(self.connection)
         return DatabaseWrapper(settings_dict, alias=self.connection.alias)
 

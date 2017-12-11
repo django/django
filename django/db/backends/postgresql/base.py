@@ -151,8 +151,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "Please supply the NAME value.")
         conn_params = {
             'database': settings_dict['NAME'] or 'postgres',
+            **settings_dict['OPTIONS'],
         }
-        conn_params.update(settings_dict['OPTIONS'])
         conn_params.pop('isolation_level', None)
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']

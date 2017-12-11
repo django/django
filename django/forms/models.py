@@ -564,9 +564,7 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, *, initial=None, **kwargs):
         self.queryset = queryset
         self.initial_extra = initial
-        defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        defaults.update(kwargs)
-        super().__init__(**defaults)
+        super().__init__(**{'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix, **kwargs})
 
     def initial_form_count(self):
         """Return the number of forms that are required in this FormSet."""

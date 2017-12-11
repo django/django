@@ -157,9 +157,7 @@ class NamedValuesListIterable(ValuesListIterable):
             names = queryset._fields
         else:
             query = queryset.query
-            names = list(query.extra_select)
-            names.extend(query.values_select)
-            names.extend(query.annotation_select)
+            names = [*query.extra_select, *query.values_select, *query.annotation_select]
         tuple_class = self.create_namedtuple_class(*names)
         new = tuple.__new__
         for row in super().__iter__():

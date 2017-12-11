@@ -62,10 +62,8 @@ class AdminDateWidget(forms.DateInput):
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
-        final_attrs = {'class': 'vDateField', 'size': '10'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs, format=format)
+        attrs = {'class': 'vDateField', 'size': '10', **(attrs or {})}
+        super().__init__(attrs=attrs, format=format)
 
 
 class AdminTimeWidget(forms.TimeInput):
@@ -81,10 +79,8 @@ class AdminTimeWidget(forms.TimeInput):
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
-        final_attrs = {'class': 'vTimeField', 'size': '8'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs, format=format)
+        attrs = {'class': 'vTimeField', 'size': '8', **(attrs or {})}
+        super().__init__(attrs=attrs, format=format)
 
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
@@ -328,36 +324,24 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
 class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vLargeTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vLargeTextField', **(attrs or {})})
 
 
 class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vTextField', **(attrs or {})})
 
 
 class AdminEmailInputWidget(forms.EmailInput):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vTextField', **(attrs or {})})
 
 
 class AdminURLFieldWidget(forms.URLInput):
     template_name = 'admin/widgets/url.html'
 
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vURLField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vURLField', **(attrs or {})})
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -371,10 +355,7 @@ class AdminIntegerFieldWidget(forms.NumberInput):
     class_name = 'vIntegerField'
 
     def __init__(self, attrs=None):
-        final_attrs = {'class': self.class_name}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': self.class_name, **(attrs or {})})
 
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):

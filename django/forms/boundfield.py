@@ -153,7 +153,7 @@ class BoundField:
         if id_:
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = dict(attrs or {}, **{'for': id_for_label})
+                attrs = {**(attrs or {}), 'for': id_for_label}
             if self.field.required and hasattr(self.form, 'required_css_class'):
                 attrs = attrs or {}
                 if 'class' in attrs:

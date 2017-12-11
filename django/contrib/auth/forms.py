@@ -299,9 +299,8 @@ class PasswordResetForm(forms.Form):
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
+                **(extra_email_context or {}),
             }
-            if extra_email_context is not None:
-                context.update(extra_email_context)
             self.send_mail(
                 subject_template_name, email_template_name, context, from_email,
                 email, html_email_template_name=html_email_template_name,
@@ -357,9 +356,10 @@ class PasswordChangeForm(SetPasswordForm):
     A form that lets a user change their password by entering their old
     password.
     """
-    error_messages = dict(SetPasswordForm.error_messages, **{
+    error_messages = {
+        **SetPasswordForm.error_messages,
         'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
-    })
+    }
     old_password = forms.CharField(
         label=_("Old password"),
         strip=False,

@@ -121,8 +121,7 @@ class Count(Aggregate):
         )
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        return dict(options, distinct=self.extra['distinct'] != '')
+        return {**super()._get_repr_options(), 'distinct': self.extra['distinct'] != ''}
 
     def convert_value(self, value, expression, connection):
         return 0 if value is None else value
@@ -147,8 +146,7 @@ class StdDev(Aggregate):
         super().__init__(expression, **extra)
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        return dict(options, sample=self.function == 'STDDEV_SAMP')
+        return {**super()._get_repr_options(), 'sample': self.function == 'STDDEV_SAMP'}
 
 
 class Sum(Aggregate):
@@ -174,5 +172,4 @@ class Variance(Aggregate):
         super().__init__(expression, **extra)
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        return dict(options, sample=self.function == 'VAR_SAMP')
+        return {**super()._get_repr_options(), 'sample': self.function == 'VAR_SAMP'}

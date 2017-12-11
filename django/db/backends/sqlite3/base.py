@@ -137,8 +137,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs = {
             'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+            **settings_dict['OPTIONS'],
         }
-        kwargs.update(settings_dict['OPTIONS'])
         # Always allow the underlying SQLite connection to be shareable
         # between multiple threads. The safe-guarding will be handled at a
         # higher level by the `BaseDatabaseWrapper.allow_thread_sharing`

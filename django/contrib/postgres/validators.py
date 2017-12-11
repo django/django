@@ -1,5 +1,3 @@
-import copy
-
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     MaxLengthValidator, MaxValueValidator, MinLengthValidator,
@@ -37,8 +35,7 @@ class KeysValidator:
         self.keys = set(keys)
         self.strict = strict
         if messages is not None:
-            self.messages = copy.copy(self.messages)
-            self.messages.update(messages)
+            self.messages = {**self.messages, **messages}
 
     def __call__(self, value):
         keys = set(value)

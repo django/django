@@ -102,8 +102,8 @@ class SyndicationFeed:
             'feed_copyright': to_str(feed_copyright),
             'id': feed_guid or link,
             'ttl': to_str(ttl),
+            **kwargs,
         }
-        self.feed.update(kwargs)
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
@@ -119,7 +119,7 @@ class SyndicationFeed:
             return str(s) if s is not None else s
         if categories:
             categories = [to_str(c) for c in categories]
-        item = {
+        self.items.append({
             'title': to_str(title),
             'link': iri_to_uri(link),
             'description': to_str(description),
@@ -135,9 +135,8 @@ class SyndicationFeed:
             'categories': categories or (),
             'item_copyright': to_str(item_copyright),
             'ttl': to_str(ttl),
-        }
-        item.update(kwargs)
-        self.items.append(item)
+            **kwargs,
+        })
 
     def num_items(self):
         return len(self.items)

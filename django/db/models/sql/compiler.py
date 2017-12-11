@@ -476,10 +476,7 @@ class SQLCompiler:
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
-                result.append(', '.join(out_cols))
-
-                result.append('FROM')
-                result.extend(from_)
+                result += [', '.join(out_cols), 'FROM', *from_]
                 params.extend(f_params)
 
                 if self.query.select_for_update and self.connection.features.has_select_for_update:

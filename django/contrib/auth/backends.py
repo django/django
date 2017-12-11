@@ -75,9 +75,10 @@ class ModelBackend:
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = set()
-            user_obj._perm_cache.update(self.get_user_permissions(user_obj))
-            user_obj._perm_cache.update(self.get_group_permissions(user_obj))
+            user_obj._perm_cache = {
+                *self.get_user_permissions(user_obj),
+                *self.get_group_permissions(user_obj),
+            }
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):

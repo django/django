@@ -635,7 +635,7 @@ class SimpleTestCase(unittest.TestCase):
         if field_kwargs is None:
             field_kwargs = {}
         required = fieldclass(*field_args, **field_kwargs)
-        optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
+        optional = fieldclass(*field_args, **{**field_kwargs, 'required': False})
         # test valid inputs
         for input, output in valid.items():
             self.assertEqual(required.clean(input), output)

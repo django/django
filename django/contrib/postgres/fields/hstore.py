@@ -44,11 +44,10 @@ class HStoreField(Field):
         return json.dumps(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
-        defaults = {
+        return super().formfield(**{
             'form_class': forms.HStoreField,
-        }
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+            **kwargs,
+        })
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)

@@ -96,7 +96,7 @@ def response_for_exception(request, exc):
 def get_exception_response(request, resolver, status_code, exception, sender=None):
     try:
         callback, param_dict = resolver.resolve_error_handler(status_code)
-        response = callback(request, **dict(param_dict, exception=exception))
+        response = callback(request, **{**param_dict, 'exception': exception})
     except Exception:
         signals.got_request_exception.send(sender=sender, request=request)
         response = handle_uncaught_exception(request, resolver, sys.exc_info())

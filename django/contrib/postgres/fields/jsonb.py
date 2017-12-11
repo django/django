@@ -77,9 +77,10 @@ class JSONField(CheckFieldDefaultMixin, Field):
         return self.value_from_object(obj)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.JSONField}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+        return super().formfield(**{
+            'form_class': forms.JSONField,
+            **kwargs,
+        })
 
 
 JSONField.register_lookup(lookups.DataContains)

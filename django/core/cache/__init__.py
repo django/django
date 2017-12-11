@@ -44,8 +44,7 @@ def _create_cache(backend, **kwargs):
             location = kwargs.pop('LOCATION', '')
             params = kwargs
         else:
-            params = conf.copy()
-            params.update(kwargs)
+            params = {**conf, **kwargs}
             backend = params.pop('BACKEND')
             location = params.pop('LOCATION', '')
         backend_cls = import_string(backend)

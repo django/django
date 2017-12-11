@@ -40,9 +40,11 @@ class BaseAdminDocsView(TemplateView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs.update({'root_path': reverse('admin:index')})
-        kwargs.update(admin.site.each_context(self.request))
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{
+            **kwargs,
+            'root_path': reverse('admin:index'),
+            **admin.site.each_context(self.request),
+        })
 
 
 class BookmarkletsView(BaseAdminDocsView):
@@ -87,8 +89,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
                         'meta': metadata,
                         'library': tag_library,
                     })
-        kwargs.update({'tags': tags})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'tags': tags})
 
 
 class TemplateFilterIndexView(BaseAdminDocsView):
@@ -121,8 +122,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
                         'meta': metadata,
                         'library': tag_library,
                     })
-        kwargs.update({'filters': filters})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'filters': filters})
 
 
 class ViewIndexView(BaseAdminDocsView):
@@ -145,8 +145,7 @@ class ViewIndexView(BaseAdminDocsView):
                 'namespace': ':'.join((namespace or [])),
                 'name': name,
             })
-        kwargs.update({'views': views})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'views': views})
 
 
 class ViewDetailView(BaseAdminDocsView):
@@ -181,13 +180,13 @@ class ViewDetailView(BaseAdminDocsView):
             body = utils.parse_rst(body, 'view', _('view:') + view)
         for key in metadata:
             metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
-        kwargs.update({
+        return super().get_context_data(**{
+            **kwargs,
             'name': view,
             'summary': title,
             'body': body,
             'meta': metadata,
         })
-        return super().get_context_data(**kwargs)
 
 
 class ModelIndexView(BaseAdminDocsView):
@@ -195,8 +194,7 @@ class ModelIndexView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         m_list = [m._meta for m in apps.get_models()]
-        kwargs.update({'models': m_list})
-        return super().get_context_data(**kwargs)
+        return super().get_context_data(**{**kwargs, 'models': m_list})
 
 
 class ModelDetailView(BaseAdminDocsView):
@@ -319,14 +317,14 @@ class ModelDetailView(BaseAdminDocsView):
                 'data_type': 'Integer',
                 'verbose': utils.parse_rst(_("number of %s") % verbose, 'model', _('model:') + opts.model_name),
             })
-        kwargs.update({
+        return super().get_context_data(**{
+            **kwargs,
             'name': '%s.%s' % (opts.app_label, opts.object_name),
             'summary': title,
             'description': body,
             'fields': fields,
             'methods': methods,
         })
-        return super().get_context_data(**kwargs)
 
 
 class TemplateDetailView(BaseAdminDocsView):
@@ -355,11 +353,11 @@ class TemplateDetailView(BaseAdminDocsView):
                     'contents': template_contents,
                     'order': index,
                 })
-        kwargs.update({
+        return super().get_context_data(**{
+            **kwargs,
             'name': template,
             'templates': templates,
         })
-        return super().get_context_data(**kwargs)
 
 
 ####################

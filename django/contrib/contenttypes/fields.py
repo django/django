@@ -72,11 +72,11 @@ class GenericForeignKey(FieldCacheMixin):
         return '%s.%s.%s' % (app, model._meta.object_name, self.name)
 
     def check(self, **kwargs):
-        errors = []
-        errors.extend(self._check_field_name())
-        errors.extend(self._check_object_id_field())
-        errors.extend(self._check_content_type_field())
-        return errors
+        return [
+            *self._check_field_name(),
+            *self._check_object_id_field(),
+            *self._check_content_type_field(),
+        ]
 
     def _check_field_name(self):
         if self.name.endswith("_"):
@@ -308,9 +308,10 @@ class GenericRelation(ForeignObject):
         self.for_concrete_model = for_concrete_model
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_generic_foreign_key_existence())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_generic_foreign_key_existence(),
+        ]
 
     def _is_matching_generic_foreign_key(self, field):
         """
