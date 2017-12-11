@@ -304,6 +304,12 @@ Models
   a certain (database-dependent) limit. Values from ``1`` to ``32767`` are safe
   in all databases supported by Django.
 
+* :class:`~django.db.models.AutoField`,
+  :class:`~django.db.models.BigAutoField`, and
+  :class:`~django.db.models.SmallAutoField` now inherit from
+  ``IntegerField``, ``BigIntegerField`` and ``SmallIntegerField`` respectively.
+  System checks and validators are now also properly inherited.
+
 * :attr:`.FileField.upload_to` now supports :class:`pathlib.Path`.
 
 Requests and Responses
@@ -401,6 +407,11 @@ backends.
 
 * ``DatabaseOperations.return_insert_id()`` now requires an additional
   ``field`` argument with the model field.
+
+* Entries for ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are added
+  to  ``DatabaseOperations.integer_field_ranges`` to support the integer range
+  validators on these field types. Third-party backends may need to customize
+  the default entries.
 
 :mod:`django.contrib.admin`
 ---------------------------

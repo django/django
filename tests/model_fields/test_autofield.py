@@ -1,32 +1,32 @@
-from django.test import TestCase
+from django.db import models
+from django.test import SimpleTestCase
 
 from .models import AutoModel, BigAutoModel, SmallAutoModel
+from .test_integerfield import (
+    BigIntegerFieldTests, IntegerFieldTests, SmallIntegerFieldTests,
+)
 
 
-class AutoFieldTests(TestCase):
+class AutoFieldTests(IntegerFieldTests):
     model = AutoModel
 
-    def test_invalid_value(self):
-        tests = [
-            (TypeError, ()),
-            (TypeError, []),
-            (TypeError, {}),
-            (TypeError, set()),
-            (TypeError, object()),
-            (TypeError, complex()),
-            (ValueError, 'non-numeric string'),
-            (ValueError, b'non-numeric byte-string'),
-        ]
-        for exception, value in tests:
-            with self.subTest(value=value):
-                msg = "Field 'value' expected a number but got %r." % (value,)
-                with self.assertRaisesMessage(exception, msg):
-                    self.model.objects.create(value=value)
 
-
-class BigAutoFieldTests(AutoFieldTests):
+class BigAutoFieldTests(BigIntegerFieldTests):
     model = BigAutoModel
 
 
-class SmallAutoFieldTests(AutoFieldTests):
+class SmallAutoFieldTests(SmallIntegerFieldTests):
     model = SmallAutoModel
+
+
+class AutoFieldInheritanceTests(SimpleTestCase):
+
+    def test_isinstance_of_autofield(self):
+        for field in (models.BigAutoField, models.SmallAutoField):
+            with self.subTest(field.__name__):
+                self.assertIsInstance(field(), models.AutoField)
+
+    def test_issubclass_of_autofield(self):
+        for field in (models.BigAutoField, models.SmallAutoField):
+            with self.subTest(field.__name__):
+                self.assertTrue(issubclass(field, models.AutoField))

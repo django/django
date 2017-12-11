@@ -125,7 +125,7 @@ class IntegerFieldTests(TestCase):
                         ranged_value_field.run_validators(max_backend_value + 1)
 
     def test_types(self):
-        instance = self.model(value=0)
+        instance = self.model(value=1)
         self.assertIsInstance(instance.value, int)
         instance.save()
         self.assertIsInstance(instance.value, int)

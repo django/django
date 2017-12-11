@@ -898,110 +898,6 @@ class Field(RegisterLookupMixin):
         return getattr(obj, self.attname)
 
 
-class AutoField(Field):
-    description = _("Integer")
-
-    empty_strings_allowed = False
-    default_error_messages = {
-        'invalid': _('“%(value)s” value must be an integer.'),
-    }
-
-    def __init__(self, *args, **kwargs):
-        kwargs['blank'] = True
-        super().__init__(*args, **kwargs)
-
-    def check(self, **kwargs):
-        return [
-            *super().check(**kwargs),
-            *self._check_primary_key(),
-        ]
-
-    def _check_primary_key(self):
-        if not self.primary_key:
-            return [
-                checks.Error(
-                    'AutoFields must set primary_key=True.',
-                    obj=self,
-                    id='fields.E100',
-                ),
-            ]
-        else:
-            return []
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        del kwargs['blank']
-        kwargs['primary_key'] = True
-        return name, path, args, kwargs
-
-    def get_internal_type(self):
-        return "AutoField"
-
-    def to_python(self, value):
-        if value is None:
-            return value
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            raise exceptions.ValidationError(
-                self.error_messages['invalid'],
-                code='invalid',
-                params={'value': value},
-            )
-
-    def rel_db_type(self, connection):
-        return IntegerField().db_type(connection=connection)
-
-    def validate(self, value, model_instance):
-        pass
-
-    def get_db_prep_value(self, value, connection, prepared=False):
-        if not prepared:
-            value = self.get_prep_value(value)
-            value = connection.ops.validate_autopk_value(value)
-        return value
-
-    def get_prep_value(self, value):
-        from django.db.models.expressions import OuterRef
-        value = super().get_prep_value(value)
-        if value is None or isinstance(value, OuterRef):
-            return value
-        try:
-            return int(value)
-        except (TypeError, ValueError) as e:
-            raise e.__class__(
-                "Field '%s' expected a number but got %r." % (self.name, value),
-            ) from e
-
-    def contribute_to_class(self, cls, name, **kwargs):
-        assert not cls._meta.auto_field, "Model %s can't have more than one AutoField." % cls._meta.label
-        super().contribute_to_class(cls, name, **kwargs)
-        cls._meta.auto_field = self
-
-    def formfield(self, **kwargs):
-        return None
-
-
-class BigAutoField(AutoField):
-    description = _("Big (8 byte) integer")
-
-    def get_internal_type(self):
-        return "BigAutoField"
-
-    def rel_db_type(self, connection):
-        return BigIntegerField().db_type(connection=connection)
-
-
-class SmallAutoField(AutoField):
-    description = _('Small integer')
-
-    def get_internal_type(self):
-        return 'SmallAutoField'
-
-    def rel_db_type(self, connection):
-        return SmallIntegerField().db_type(connection=connection)
-
-
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
@@ -2395,3 +2291,113 @@ class UUIDField(Field):
             'form_class': forms.UUIDField,
             **kwargs,
         })
+
+
+class AutoFieldMixin:
+
+    def __init__(self, *args, **kwargs):
+        kwargs['blank'] = True
+        super().__init__(*args, **kwargs)
+
+    def check(self, **kwargs):
+        return [
+            *super().check(**kwargs),
+            *self._check_primary_key(),
+        ]
+
+    def _check_primary_key(self):
+        if not self.primary_key:
+            return [
+                checks.Error(
+                    'AutoFields must set primary_key=True.',
+                    obj=self,
+                    id='fields.E100',
+                ),
+            ]
+        else:
+            return []
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        del kwargs['blank']
+        kwargs['primary_key'] = True
+        return name, path, args, kwargs
+
+    def validate(self, value, model_instance):
+        pass
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if not prepared:
+            value = self.get_prep_value(value)
+            value = connection.ops.validate_autopk_value(value)
+        return value
+
+    def get_prep_value(self, value):
+        from django.db.models.expressions import OuterRef
+        return value if isinstance(value, OuterRef) else super().get_prep_value(value)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        assert not cls._meta.auto_field, (
+            "Model %s can't have more than one auto-generated field."
+            % cls._meta.label
+        )
+        super().contribute_to_class(cls, name, **kwargs)
+        cls._meta.auto_field = self
+
+    def formfield(self, **kwargs):
+        return None
+
+
+class AutoFieldMeta(type):
+    """
+    Metaclass to maintain backward inheritance compatibility for AutoField.
+
+    It is intended that AutoFieldMixin become public API when it is possible to
+    create a non-integer automatically-generated field using column defaults
+    stored in the database.
+
+    In many areas Django also relies on using isinstance() to check for an
+    automatically-generated field as a subclass of AutoField. A new flag needs
+    to be implemented on Field to be used instead.
+
+    When these issues have been addressed, this metaclass could be used to
+    deprecate inheritance from AutoField and use of isinstance() with AutoField
+    for detecting automatically-generated fields.
+    """
+
+    @property
+    def _subclasses(self):
+        return (BigAutoField, SmallAutoField)
+
+    def __instancecheck__(self, instance):
+        return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
+
+    def __subclasscheck__(self, subclass):
+        return subclass in self._subclasses or super().__subclasscheck__(subclass)
+
+
+class AutoField(AutoFieldMixin, IntegerField, metaclass=AutoFieldMeta):
+
+    def get_internal_type(self):
+        return 'AutoField'
+
+    def rel_db_type(self, connection):
+        return IntegerField().db_type(connection=connection)
+
+
+class BigAutoField(AutoFieldMixin, BigIntegerField):
+
+    def get_internal_type(self):
+        return 'BigAutoField'
+
+    def rel_db_type(self, connection):
+        return BigIntegerField().db_type(connection=connection)
+
+
+class SmallAutoField(AutoFieldMixin, SmallIntegerField):
+
+    def get_internal_type(self):
+        return 'SmallAutoField'
+
+    def rel_db_type(self, connection):
+        return SmallIntegerField().db_type(connection=connection)

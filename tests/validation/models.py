@@ -130,4 +130,7 @@ try:
         auto2 = models.AutoField(primary_key=True)
 except AssertionError as exc:
     assertion_error = exc
-assert str(assertion_error) == "Model validation.MultipleAutoFields can't have more than one AutoField."
+assert str(assertion_error) == (
+    "Model validation.MultipleAutoFields can't have more than one "
+    "auto-generated field."
+)
