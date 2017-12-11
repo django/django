@@ -143,7 +143,8 @@ Model fields
   appeared before support for null values was added in Django 2.1.*
 * **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
 * **fields.E121**: ``max_length`` must be a positive integer.
-* **fields.W122**: ``max_length`` is ignored when used with ``IntegerField``.
+* **fields.W122**: ``max_length`` is ignored when used with
+  ``<integer field type>``.
 * **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
