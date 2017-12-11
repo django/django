@@ -1056,7 +1056,7 @@ class CheckCondition:
         self.conditions = conditions
 
     def add_condition(self, condition, reason):
-        return self.__class__(*self.conditions + ((condition, reason),))
+        return self.__class__(*self.conditions, (condition, reason))
 
     def __get__(self, instance, cls=None):
         # Trigger access for all bases.

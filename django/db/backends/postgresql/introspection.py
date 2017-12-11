@@ -75,7 +75,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
         return [
-            FieldInfo(*(line[0:6] + (field_map[line.name][0] == 'YES', field_map[line.name][1])))
+            FieldInfo(*line[0:6], field_map[line.name][0] == 'YES', field_map[line.name][1])
             for line in cursor.description
         ]
 
