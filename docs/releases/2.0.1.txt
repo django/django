@@ -26,3 +26,6 @@ Bugfixes
 
 * Corrected admin check to allow a ``OneToOneField`` in
   ``ModelAdmin.autocomplete_fields`` (:ticket:`28898`).
+
+* Fixed a regression on SQLite where ``DecimalField`` returned a result with
+  trailing zeros in the fractional part truncated (:ticket:`28915`).
