@@ -1827,7 +1827,6 @@ class IntegerField(Field):
 
 
 class BigIntegerField(IntegerField):
-    empty_strings_allowed = False
     description = _("Big (8 byte) integer")
     MAX_BIGINT = 9223372036854775807
 
