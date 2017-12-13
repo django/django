@@ -104,7 +104,7 @@ class BaseModelAdminChecks:
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label, model=model, obj=obj, id='admin.E037')
         else:
-            if not (field.many_to_many or field.many_to_one):
+            if not field.many_to_many and not isinstance(field, models.ForeignKey):
                 return must_be(
                     'a foreign key or a many-to-many field',
                     option=label, obj=obj, id='admin.E038'
