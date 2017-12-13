@@ -1,12 +1,13 @@
 import datetime
+import decimal
 import uuid
-from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import utils
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import aggregates, fields
+from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.duration import duration_string
@@ -242,8 +243,12 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def convert_decimalfield_value(self, value, expression, connection):
         if value is not None:
+            if not isinstance(expression, Col):
+                # SQLite stores only 15 significant digits. Digits coming from
+                # float inaccuracy must be removed.
+                return decimal.Context(prec=15).create_decimal_from_float(value)
             value = expression.output_field.format_number(value)
-            value = Decimal(value)
+            return decimal.Decimal(value)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection):
