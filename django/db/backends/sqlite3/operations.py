@@ -14,6 +14,10 @@ from django.utils.duration import duration_string
 
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = 'text'
+    cast_data_types = {
+        'DateField': 'TEXT',
+        'DateTimeField': 'TEXT',
+    }
 
     def bulk_batch_size(self, fields, objs):
         """
