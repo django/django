@@ -111,7 +111,7 @@ class Media:
         last_insert_index = len(list_1)
         # Walk list_2 in reverse, inserting each element into combined_list if
         # it doesn't already exist.
-        for path in reversed(list_2):
+        for path in reversed(list(list_2)):
             try:
                 # Does path already exist in the list?
                 index = combined_list.index(path)
