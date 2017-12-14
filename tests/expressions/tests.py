@@ -1250,6 +1250,16 @@ class FTimeDeltaTests(TestCase):
         ]
         self.assertEqual(over_estimate, ['e4'])
 
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subtraction_microseconds(self):
+        delta = datetime.timedelta(microseconds=8999999999999999)
+        Experiment.objects.update(end=F('start') + delta)
+        qs = Experiment.objects.annotate(
+            delta=ExpressionWrapper(F('end') - F('start'), output_field=models.DurationField())
+        )
+        for e in qs:
+            self.assertEqual(e.delta, delta)
+
     def test_duration_with_datetime(self):
         # Exclude e1 which has very high precision so we can test this on all
         # backends regardless of whether or not it supports
@@ -1258,6 +1268,15 @@ class FTimeDeltaTests(TestCase):
             completed__gt=self.stime + F('estimated_time'),
         ).order_by('name')
         self.assertQuerysetEqual(over_estimate, ['e3', 'e4', 'e5'], lambda e: e.name)
+
+    def test_duration_with_datetime_microseconds(self):
+        delta = datetime.timedelta(microseconds=8999999999999999)
+        qs = Experiment.objects.annotate(dt=ExpressionWrapper(
+            F('start') + delta,
+            output_field=models.DateTimeField(),
+        ))
+        for e in qs:
+            self.assertEqual(e.dt, e.start + delta)
 
     def test_date_minus_duration(self):
         more_than_4_days = Experiment.objects.filter(
