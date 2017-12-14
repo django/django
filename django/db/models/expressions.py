@@ -395,28 +395,35 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         self.lhs, self.rhs = exprs
 
     def as_sql(self, compiler, connection):
+        lhs, rhs = self.lhs, self.rhs
         try:
-            lhs_output = self.lhs.output_field
+            lhs_output = lhs.output_field
         except FieldError:
             lhs_output = None
         try:
-            rhs_output = self.rhs.output_field
+            rhs_output = rhs.output_field
         except FieldError:
             rhs_output = None
-        if (not connection.features.has_native_duration_field and
-                ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
-                 (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
-            return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
-        if (lhs_output and rhs_output and self.connector == self.SUB and
-            lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
-                lhs_output.get_internal_type() == rhs_output.get_internal_type()):
-            return TemporalSubtraction(self.lhs, self.rhs).as_sql(compiler, connection)
+        lhs_type = lhs_output and lhs_output.get_internal_type()
+        rhs_type = rhs_output and rhs_output.get_internal_type()
+        datetime_fields = {'DateField', 'DateTimeField', 'TimeField'}
+        if not connection.features.has_native_duration_field and 'DurationField' in (lhs_type, rhs_type):
+            if not datetime_fields.isdisjoint((lhs_type, rhs_type)):
+                return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
+            if isinstance(lhs, DurationValue):
+                lhs = lhs.copy()
+                lhs.__class__ = Value
+            if isinstance(rhs, DurationValue):
+                rhs = rhs.copy()
+                rhs.__class__ = Value
+        if self.connector == self.SUB and lhs_type == rhs_type and lhs_type in datetime_fields:
+            return TemporalSubtraction(lhs, rhs).as_sql(compiler, connection)
         expressions = []
         expression_params = []
-        sql, params = compiler.compile(self.lhs)
+        sql, params = compiler.compile(lhs)
         expressions.append(sql)
         expression_params.extend(params)
-        sql, params = compiler.compile(self.rhs)
+        sql, params = compiler.compile(rhs)
         expressions.append(sql)
         expression_params.extend(params)
         # order of precedence

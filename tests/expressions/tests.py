@@ -1207,6 +1207,21 @@ class FTimeDeltaTests(TestCase):
         ]
         self.assertEqual(delta_math, ['e4'])
 
+    def test_duration_expressions(self):
+        deltas = [
+            datetime.timedelta.max / 10,
+            datetime.timedelta.min / 10,
+            datetime.timedelta.resolution,
+            -datetime.timedelta.resolution,
+            datetime.timedelta(microseconds=674999999999999999),
+        ]
+        for delta in deltas:
+            for obj in Experiment.objects.annotate(duration=F('estimated_time') + delta):
+                self.assertEqual(obj.duration, obj.estimated_time + delta)
+
+            for obj in Experiment.objects.annotate(duration=2 * F('estimated_time') + delta / 2):
+                self.assertEqual(obj.duration, 2 * obj.estimated_time + delta / 2)
+
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_date_subtraction(self):
         queryset = Experiment.objects.annotate(
