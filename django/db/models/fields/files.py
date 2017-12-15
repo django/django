@@ -226,14 +226,15 @@ class FileField(Field):
         self.storage = storage or default_storage
         self.upload_to = upload_to
 
-        kwargs['max_length'] = kwargs.get('max_length', 100)
+        kwargs.setdefault('max_length', 100)
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_primary_key())
-        errors.extend(self._check_upload_to())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_primary_key(),
+            *self._check_upload_to(),
+        ]
 
     def _check_primary_key(self):
         if self._primary_key_set_explicitly:
@@ -318,9 +319,11 @@ class FileField(Field):
             setattr(instance, self.name, data)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.FileField, 'max_length': self.max_length}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+        return super().formfield(**{
+            'form_class': forms.FileField,
+            'max_length': self.max_length,
+            **kwargs,
+        })
 
 
 class ImageFileDescriptor(FileDescriptor):
@@ -363,9 +366,10 @@ class ImageField(FileField):
         super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(self._check_image_library_installed())
-        return errors
+        return [
+            *super().check(**kwargs),
+            *self._check_image_library_installed(),
+        ]
 
     def _check_image_library_installed(self):
         try:
@@ -458,6 +462,7 @@ class ImageField(FileField):
             setattr(instance, self.height_field, height)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.ImageField}
-        defaults.update(kwargs)
-        return super().formfield(**defaults)
+        return super().formfield(**{
+            'form_class': forms.ImageField,
+            **kwargs,
+        })

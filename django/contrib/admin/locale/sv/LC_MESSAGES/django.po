@@ -10,14 +10,14 @@
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mikko Hellsing <mikko@aino.se>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
+# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-01-20 08:14+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2017-09-15 13:27+0000\n"
+"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -221,6 +221,7 @@ msgstr "%(name)s \"%(obj)s\" togs bort."
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
 msgstr ""
+"%(name)s med id \"%(key)s\" existerar inte. Kanske har den tagits bort?"
 
 #, python-format
 msgid "Add %s"

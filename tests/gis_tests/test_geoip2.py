@@ -115,6 +115,8 @@ class GeoIPTest(unittest.TestCase):
 
             # City information dictionary.
             d = g.city(query)
+            self.assertEqual('NA', d['continent_code'])
+            self.assertEqual('North America', d['continent_name'])
             self.assertEqual('US', d['country_code'])
             self.assertEqual('Houston', d['city'])
             self.assertEqual('TX', d['region'])

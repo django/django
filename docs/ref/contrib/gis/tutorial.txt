@@ -645,16 +645,21 @@ of abstraction::
 
 __ http://spatialreference.org/ref/epsg/32140/
 
+.. _gis-raw-sql:
+
 .. admonition:: Raw queries
 
-    When using :doc:`raw queries </topics/db/sql>`, you should generally wrap
-    your geometry fields with the ``asText()`` SQL function (or ``ST_AsText``
-    for PostGIS) so that the field value will be recognized by GEOS::
+    When using :doc:`raw queries </topics/db/sql>`, you must wrap your geometry
+    fields so that the field value can be recognized by GEOS::
 
-        City.objects.raw('SELECT id, name, asText(point) from myapp_city')
+        from django.db import connection
+        # or if you're querying a non-default database:
+        from django.db import connections
+        connection = connections['your_gis_db_alias']
 
-    This is not absolutely required by PostGIS, but generally you should only
-    use raw queries when you know exactly what you are doing.
+        City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.ops.select % 'point'))
+
+    You should only use raw queries when you know exactly what you're doing.
 
 Lazy Geometries
 ---------------

@@ -1,21 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bayarkhuu Bataa, 2015
+# Bayarkhuu Bataa, 2015,2017
 # Delgermurun Purevkhuuu <info@delgermurun.com>, 2013
 # dolugen <dolugen@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # miigaa ... <b.myagmardorj@gmail.com>, 2015
-# Zorig <zorig_ezd@yahoo.com>, 2013-2014
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014,2017
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-19 13:49+0000\n"
+"Last-Translator: Bayarkhuu Bataa\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr "Чухал огноо"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(key)r анхдагч түлхүүртэй %(name)s обектийн байхгүй байна."
+msgstr "%(key)r анхдагч түлхүүртэй %(name)s обьект олдсонгүй."
 
 msgid "Password changed successfully."
 msgstr "Нууц үг амжилттай өөрчлөгдлөө."
@@ -45,7 +45,7 @@ msgid "Change password: %s"
 msgstr "Нууц үг өөрчлөх: %s"
 
 msgid "Authentication and Authorization"
-msgstr "Нэвтрэлт ба Зөвшөөрөл"
+msgstr "Нэвтрэлт ба зөвшөөрөл"
 
 msgid "password"
 msgstr "нууц үг"
@@ -66,16 +66,17 @@ msgid "Password"
 msgstr "Нууц үг "
 
 msgid "Password confirmation"
-msgstr "Нууц үгийн баталгаа"
+msgstr "Нууц үгийн баталгаажуулалт"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Баталгаажуулахын тулд дээрх нууц үгээ ахин оруулна уу."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Хэрэглэгчийн нууц үгийг хувиргалгүйгээр хадгалдаггүй учир шууд харах "
+"боломжгүй, гэхдээ <a href=\"{}\">энэ маягт</a> ашиглан өөрчилж болно."
 
 #, python-format
 msgid ""
@@ -89,13 +90,13 @@ msgid "This account is inactive."
 msgstr "Энэ бүртгэл идэвхгүй байна."
 
 msgid "Email"
-msgstr "Имайл"
+msgstr "Имэйл"
 
 msgid "New password"
 msgstr "Шинэ нууц үг"
 
 msgid "New password confirmation"
-msgstr "Шинэ нууц үгийн баталгаа"
+msgstr "Шинэ нууц үгийн баталгаажуулалт"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Хуучин нууц үгээ буруу оруулсан байна. Ахин оруулна уу."
@@ -104,10 +105,10 @@ msgid "Old password"
 msgstr "Хуучин нууц үг"
 
 msgid "Password (again)"
-msgstr "Нууц үг (ахиад)"
+msgstr "Нууц үг (давтан)"
 
 msgid "algorithm"
-msgstr "Алгоритм"
+msgstr "алгоритм"
 
 msgid "iterations"
 msgstr "давталтууд"
@@ -119,19 +120,19 @@ msgid "hash"
 msgstr "хаш"
 
 msgid "variety"
-msgstr ""
+msgstr "боломж"
 
 msgid "version"
-msgstr ""
+msgstr "хувилбар"
 
 msgid "memory cost"
-msgstr ""
+msgstr "санах ойн өртөг"
 
 msgid "time cost"
-msgstr ""
+msgstr "цагын зардал"
 
 msgid "parallelism"
-msgstr ""
+msgstr "зэрэгцүүлэлт"
 
 msgid "work factor"
 msgstr "ажлын байгуулагч"
@@ -172,8 +173,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"Бүлэгүүд энэ хэрэглэгчийнхээс тусдаа. Хэрэглэгч нарт сонгосон бүлэгт "
-"олгогдсон бүх эрх зөвшөөрөгдөх болно."
+"Хэрэглэгчийн харьяалагдах бүлгүүд. Хэрэглэгчид сонгосон бүлгийн бүх эрх "
+"зөвшөөрөгдөх болно. "
 
 msgid "user permissions"
 msgstr "хэрэглэгчийн эрхүүд"
@@ -186,6 +187,8 @@ msgstr "хэрэглэгчийн нэр"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Заавал. 150 ба түүнээс бага үсэгтэй. Зөвхөн латин үсэг, тоо болон @/./+/-/_ "
+"тэмдэгтүүдийг зөвшөөрнө."
 
 msgid "A user with that username already exists."
 msgstr "Ийм хэрэглэгчийн нэртэй хэрэглэгч өмнө нь бүртгүүлсэн байна."
@@ -197,7 +200,7 @@ msgid "last name"
 msgstr "овог"
 
 msgid "email address"
-msgstr "имайл хаяг"
+msgstr "имэйл хаяг"
 
 msgid "staff status"
 msgstr "Хэрэглэгчдийн төлөв"
@@ -233,46 +236,54 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Нууц үг хэтэрхий богино байна. Хамгийн багадаа %(min_length)d тэмдэгтээс "
+"бүрдэх ёстой."
 msgstr[1] ""
+"Нууц үг хэтэрхий богино байна. Хамгийн багадаа %(min_length)d тэмдэгтээс "
+"бүрдэх ёстой."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Нууц хамгийн багадаа %(min_length)d тэмдэгтээс бүрдэх ёстой."
+msgstr[1] "Нууц хамгийн багадаа %(min_length)d тэмдэгтээс бүрдэх ёстой."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Нууц үг %(verbose_name)s мэдээлэлтэй хэтэрхий адилхан байна."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Таны нууц үг бусад хувийн мэдээлэлтэй төстэй байж болохгүй."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Энэ нууц үг хэтэрхий нийтлэг байна."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Таны нууц үг хүмүүсийн нийтлэг ашигладаг нууц үг байж болохгүй."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Нууц үг дан тооноос бүрдсэн байна."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Таны нууц үг бүхэлдээ тооноос бүрдэж болохгүй."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr "%(site_name)s cайт дээрх нууц үг сэргээлт"
+msgstr "%(site_name)s cайт дээрх нууц үг шинэчлэлт"
 
 msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Зөв хэрэглэгчийн нэр оруулна уу. Англи хэлний үсэг, тоо болон @ . + - _ "
+"тэмдэгтүүдийг ашиглаж болно."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Зөв хэрэглэгчийн нэр оруулна уу. Англи хэлний үсэг, тоо болон @ . + - _ "
+"тэмдэгтүүдийг ашиглаж болно."
 
 msgid "Logged out"
 msgstr "Гарсан"
@@ -281,19 +292,19 @@ msgid "Password reset"
 msgstr "Нууц үг шинэчлэх"
 
 msgid "Password reset sent"
-msgstr "Нууц үг шинэчлэх хүсэлт явуулах"
+msgstr "Нууц үг шинэчлэх хүсэлт илгээгдлээ"
 
 msgid "Enter new password"
 msgstr "Шинэ нууц үг оруулах"
 
 msgid "Password reset unsuccessful"
-msgstr "Нууц үг шинэчилэх амжилтгүй боллоо"
+msgstr "Нууц үг шинэчлэлт амжилтгүй боллоо"
 
 msgid "Password reset complete"
-msgstr "Нууц үг шинэчилэх явц дууслаа"
+msgstr "Нууц үг шинэчилж дууслаа"
 
 msgid "Password change"
-msgstr "Нууц үгийн өөрчлөлт"
+msgstr "Нууц үг солих"
 
 msgid "Password change successful"
-msgstr "Нууц үгийн өөрчлөлт амжилттай"
+msgstr "Нууц үг амжилттай солилоо"

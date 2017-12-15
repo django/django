@@ -9,6 +9,7 @@ from threading import local
 
 from django import forms
 from django.conf import settings
+from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template
 from django.test import (
@@ -328,6 +329,20 @@ class FormattingTests(SimpleTestCase):
             'f': self.f,
             'l': self.long,
         })
+
+    def test_all_format_strings(self):
+        all_locales = LANG_INFO.keys()
+        some_date = datetime.date(2017, 10, 14)
+        some_datetime = datetime.datetime(2017, 10, 14, 10, 23)
+        for locale in all_locales:
+            with self.subTest(locale=locale), translation.override(locale):
+                self.assertIn('2017', date_format(some_date))  # Uses DATE_FORMAT by default
+                self.assertIn('23', time_format(some_datetime))  # Uses TIME_FORMAT by default
+                self.assertIn('2017', date_format(some_datetime, format=get_format('DATETIME_FORMAT')))
+                self.assertIn('2017', date_format(some_date, format=get_format('YEAR_MONTH_FORMAT')))
+                self.assertIn('14', date_format(some_date, format=get_format('MONTH_DAY_FORMAT')))
+                self.assertIn('2017', date_format(some_date, format=get_format('SHORT_DATE_FORMAT')))
+                self.assertIn('2017', date_format(some_datetime, format=get_format('SHORT_DATETIME_FORMAT')))
 
     def test_locale_independent(self):
         """
@@ -1002,20 +1017,30 @@ class FormattingTests(SimpleTestCase):
 
     def test_localize_templatetag_and_filter(self):
         """
-        Tests the {% localize %} templatetag
+        Test the {% localize %} templatetag and the localize/unlocalize filters.
         """
-        context = Context({'value': 3.14})
+        context = Context({'float': 3.14, 'date': datetime.date(2016, 12, 31)})
         template1 = Template(
-            '{% load l10n %}{% localize %}{{ value }}{% endlocalize %};'
-            '{% localize on %}{{ value }}{% endlocalize %}'
+            '{% load l10n %}{% localize %}{{ float }}/{{ date }}{% endlocalize %}; '
+            '{% localize on %}{{ float }}/{{ date }}{% endlocalize %}'
         )
-        template2 = Template("{% load l10n %}{{ value }};{% localize off %}{{ value }};{% endlocalize %}{{ value }}")
-        template3 = Template('{% load l10n %}{{ value }};{{ value|unlocalize }}')
-        template4 = Template('{% load l10n %}{{ value }};{{ value|localize }}')
-        output1 = '3,14;3,14'
-        output2 = '3,14;3.14;3,14'
-        output3 = '3,14;3.14'
-        output4 = '3.14;3,14'
+        template2 = Template(
+            '{% load l10n %}{{ float }}/{{ date }}; '
+            '{% localize off %}{{ float }}/{{ date }};{% endlocalize %} '
+            '{{ float }}/{{ date }}'
+        )
+        template3 = Template(
+            '{% load l10n %}{{ float }}/{{ date }}; {{ float|unlocalize }}/{{ date|unlocalize }}'
+        )
+        template4 = Template(
+            '{% load l10n %}{{ float }}/{{ date }}; {{ float|localize }}/{{ date|localize }}'
+        )
+        expected_localized = '3,14/31. Dezember 2016'
+        expected_unlocalized = '3.14/Dez. 31, 2016'
+        output1 = '; '.join([expected_localized, expected_localized])
+        output2 = '; '.join([expected_localized, expected_unlocalized, expected_localized])
+        output3 = '; '.join([expected_localized, expected_unlocalized])
+        output4 = '; '.join([expected_unlocalized, expected_localized])
         with translation.override('de', deactivate=True):
             with self.settings(USE_L10N=False):
                 self.assertEqual(template1.render(context), output1)
@@ -1098,45 +1123,42 @@ class MiscTests(SimpleTestCase):
         values according to the spec (and that we extract all the pieces in
         the right order).
         """
-        p = trans_real.parse_accept_lang_header
-        # Good headers.
-        self.assertEqual([('de', 1.0)], p('de'))
-        self.assertEqual([('en-au', 1.0)], p('en-AU'))
-        self.assertEqual([('es-419', 1.0)], p('es-419'))
-        self.assertEqual([('*', 1.0)], p('*;q=1.00'))
-        self.assertEqual([('en-au', 0.123)], p('en-AU;q=0.123'))
-        self.assertEqual([('en-au', 0.5)], p('en-au;q=0.5'))
-        self.assertEqual([('en-au', 1.0)], p('en-au;q=1.0'))
-        self.assertEqual([('da', 1.0), ('en', 0.5), ('en-gb', 0.25)], p('da, en-gb;q=0.25, en;q=0.5'))
-        self.assertEqual([('en-au-xx', 1.0)], p('en-au-xx'))
-        self.assertEqual(
-            [('de', 1.0), ('en-au', 0.75), ('en-us', 0.5), ('en', 0.25), ('es', 0.125), ('fa', 0.125)],
-            p('de,en-au;q=0.75,en-us;q=0.5,en;q=0.25,es;q=0.125,fa;q=0.125')
-        )
-        self.assertEqual([('*', 1.0)], p('*'))
-        self.assertEqual([('de', 0.0)], p('de;q=0.'))
-        self.assertEqual([('en', 1.0), ('*', 0.5)], p('en; q=1.0, * ; q=0.5'))
-        self.assertEqual([('en', 1.0)], p('en; q=1,'))
-        self.assertEqual([], p(''))
-
-        # Bad headers; should always return [].
-        self.assertEqual([], p('en-gb;q=1.0000'))
-        self.assertEqual([], p('en;q=0.1234'))
-        self.assertEqual([], p('en;q=.2'))
-        self.assertEqual([], p('abcdefghi-au'))
-        self.assertEqual([], p('**'))
-        self.assertEqual([], p('en,,gb'))
-        self.assertEqual([], p('en-au;q=0.1.0'))
-        self.assertEqual(
-            [],
-            p('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXZ,en')
-        )
-        self.assertEqual([], p('da, en-gb;q=0.8, en;q=0.7,#'))
-        self.assertEqual([], p('de;q=2.0'))
-        self.assertEqual([], p('de;q=0.a'))
-        self.assertEqual([], p('12-345'))
-        self.assertEqual([], p(''))
-        self.assertEqual([], p('en;q=1e0'))
+        tests = [
+            # Good headers
+            ('de', [('de', 1.0)]),
+            ('en-AU', [('en-au', 1.0)]),
+            ('es-419', [('es-419', 1.0)]),
+            ('*;q=1.00', [('*', 1.0)]),
+            ('en-AU;q=0.123', [('en-au', 0.123)]),
+            ('en-au;q=0.5', [('en-au', 0.5)]),
+            ('en-au;q=1.0', [('en-au', 1.0)]),
+            ('da, en-gb;q=0.25, en;q=0.5', [('da', 1.0), ('en', 0.5), ('en-gb', 0.25)]),
+            ('en-au-xx', [('en-au-xx', 1.0)]),
+            ('de,en-au;q=0.75,en-us;q=0.5,en;q=0.25,es;q=0.125,fa;q=0.125',
+             [('de', 1.0), ('en-au', 0.75), ('en-us', 0.5), ('en', 0.25), ('es', 0.125), ('fa', 0.125)]),
+            ('*', [('*', 1.0)]),
+            ('de;q=0.', [('de', 0.0)]),
+            ('en; q=1,', [('en', 1.0)]),
+            ('en; q=1.0, * ; q=0.5', [('en', 1.0), ('*', 0.5)]),
+            # Bad headers
+            ('en-gb;q=1.0000', []),
+            ('en;q=0.1234', [], ),
+            ('en;q=.2', []),
+            ('abcdefghi-au', []),
+            ('**', []),
+            ('en,,gb', []),
+            ('en-au;q=0.1.0', []),
+            (('X' * 97) + 'Z,en', []),
+            ('da, en-gb;q=0.8, en;q=0.7,#', []),
+            ('de;q=2.0', []),
+            ('de;q=0.a', []),
+            ('12-345', []),
+            ('', []),
+            ('en;q=1e0', []),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(trans_real.parse_accept_lang_header(value), tuple(expected))
 
     def test_parse_literal_http_header(self):
         """

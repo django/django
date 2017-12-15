@@ -115,11 +115,12 @@ class _AssertTemplateUsedContext:
 
         if not self.test():
             message = self.message()
-            if len(self.rendered_templates) == 0:
-                message += ' No template was rendered.'
-            else:
+            if self.rendered_templates:
                 message += ' Following templates were rendered: %s' % (
-                    ', '.join(self.rendered_template_names))
+                    ', '.join(self.rendered_template_names)
+                )
+            else:
+                message += ' No template was rendered.'
             self.test_case.fail(message)
 
 
@@ -256,7 +257,7 @@ class SimpleTestCase(unittest.TestCase):
         if hasattr(response, 'redirect_chain'):
             # The request was a followed redirect
             self.assertTrue(
-                len(response.redirect_chain) > 0,
+                response.redirect_chain,
                 msg_prefix + "Response didn't redirect as expected: Response code was %d (expected %d)"
                 % (response.status_code, status_code)
             )
@@ -492,7 +493,7 @@ class SimpleTestCase(unittest.TestCase):
                 elif form_index is not None:
                     non_field_errors = context[formset].forms[form_index].non_field_errors()
                     self.assertFalse(
-                        len(non_field_errors) == 0,
+                        not non_field_errors,
                         msg_prefix + "The formset '%s', form %d in context %d "
                         "does not contain any non-field errors." % (formset, form_index, i)
                     )
@@ -505,7 +506,7 @@ class SimpleTestCase(unittest.TestCase):
                 else:
                     non_form_errors = context[formset].non_form_errors()
                     self.assertFalse(
-                        len(non_form_errors) == 0,
+                        not non_form_errors,
                         msg_prefix + "The formset '%s' in context %d does not "
                         "contain any non-form errors." % (formset, i)
                     )
@@ -606,7 +607,7 @@ class SimpleTestCase(unittest.TestCase):
             kwargs: Extra kwargs.
         """
         callable_obj = None
-        if len(args):
+        if args:
             callable_obj = args[0]
             args = args[1:]
 
@@ -638,7 +639,7 @@ class SimpleTestCase(unittest.TestCase):
         if field_kwargs is None:
             field_kwargs = {}
         required = fieldclass(*field_args, **field_kwargs)
-        optional = fieldclass(*field_args, **dict(field_kwargs, required=False))
+        optional = fieldclass(*field_args, **{**field_kwargs, 'required': False})
         # test valid inputs
         for input, output in valid.items():
             self.assertEqual(required.clean(input), output)
@@ -896,9 +897,9 @@ class TransactionTestCase(SimpleTestCase):
                 no_style(), conn.introspection.sequence_list())
             if sql_list:
                 with transaction.atomic(using=db_name):
-                    cursor = conn.cursor()
-                    for sql in sql_list:
-                        cursor.execute(sql)
+                    with conn.cursor() as cursor:
+                        for sql in sql_list:
+                            cursor.execute(sql)
 
     def _fixture_setup(self):
         for db_name in self._databases_names(include_mirrors=False):

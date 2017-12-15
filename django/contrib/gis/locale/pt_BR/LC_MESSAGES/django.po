@@ -2,18 +2,18 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
-# Carlos E C Leite <caduado@gmail.com>, 2015-2016
+# Carlos Leite <caduado@gmail.com>, 2015-2016
 # Eduardo Cereto Carvalho, 2011
-# Guilherme Gondim, 2012
+# semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-06-05 14:08+0000\n"
-"Last-Translator: Carlos E C Leite <caduado@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -82,9 +82,6 @@ msgstr "Deletar todas os elementos"
 
 msgid "WKT debugging window:"
 msgstr "Janela de debug WKT"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps via GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr "Janela de debug (valor seralizado)"

@@ -44,33 +44,23 @@ class Deferred:
 DEFERRED = Deferred()
 
 
-def subclass_exception(name, parents, module, attached_to=None):
+def subclass_exception(name, bases, module, attached_to):
     """
     Create exception subclass. Used by ModelBase below.
 
-    If 'attached_to' is supplied, the exception will be created in a way that
-    allows it to be pickled, assuming the returned exception class will be added
-    as an attribute to the 'attached_to' class.
+    The exception is created in a way that allows it to be pickled, assuming
+    that the returned exception class will be added as an attribute to the
+    'attached_to' class.
     """
-    class_dict = {'__module__': module}
-    if attached_to is not None:
-        def __reduce__(self):
-            # Exceptions are special - they've got state that isn't
-            # in self.__dict__. We assume it is all in self.args.
-            return (unpickle_inner_exception, (attached_to, name), self.args)
-
-        def __setstate__(self, args):
-            self.args = args
-
-        class_dict['__reduce__'] = __reduce__
-        class_dict['__setstate__'] = __setstate__
-
-    return type(name, parents, class_dict)
+    return type(name, bases, {
+        '__module__': module,
+        '__qualname__': '%s.%s' % (attached_to.__qualname__, name),
+    })
 
 
 class ModelBase(type):
     """Metaclass for all models."""
-    def __new__(cls, name, bases, attrs):
+    def __new__(cls, name, bases, attrs, **kwargs):
         super_new = super().__new__
 
         # Also ensure initialization is only performed for subclasses of Model
@@ -85,7 +75,7 @@ class ModelBase(type):
         classcell = attrs.pop('__classcell__', None)
         if classcell is not None:
             new_attrs['__classcell__'] = classcell
-        new_class = super_new(cls, name, bases, new_attrs)
+        new_class = super_new(cls, name, bases, new_attrs, **kwargs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
         if not attr_meta:
@@ -593,7 +583,7 @@ class Model(metaclass=ModelBase):
         of the field will call this method.
         """
         if fields is not None:
-            if len(fields) == 0:
+            if not fields:
                 return
             if any(LOOKUP_SEP in f for f in fields):
                 raise ValueError(
@@ -627,6 +617,12 @@ class Model(metaclass=ModelBase):
                 related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
                 if local_val != related_val or (local_val is None and related_val is None):
                     field.delete_cached_value(self)
+
+        # Clear cached relations.
+        for field in self._meta.related_objects:
+            if field.is_cached(self):
+                field.delete_cached_value(self)
+
         self._state.db = db_instance._state.db
 
     def serializable_value(self, field_name):
@@ -678,6 +674,10 @@ class Model(metaclass=ModelBase):
                         "save() prohibited to prevent data loss due to "
                         "unsaved related object '%s'." % field.name
                     )
+                # If the relationship's pk was changed, clear the cached
+                # relationship.
+                if obj and obj.pk != getattr(self, field.attname):
+                    field.delete_cached_value(self)
 
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
@@ -688,7 +688,7 @@ class Model(metaclass=ModelBase):
             # If update_fields is empty, skip the save. We do also check for
             # no-op saves later on for inheritance cases. This bailout is
             # still needed for skipping signal sending.
-            if len(update_fields) == 0:
+            if not update_fields:
                 return
 
             update_fields = frozenset(update_fields)
@@ -736,7 +736,7 @@ class Model(metaclass=ModelBase):
         """
         using = using or router.db_for_write(self.__class__, instance=self)
         assert not (force_insert and (force_update or update_fields))
-        assert update_fields is None or len(update_fields) > 0
+        assert update_fields is None or update_fields
         cls = origin = self.__class__
         # Skip proxies, but keep the origin as the proxy model.
         if cls._meta.proxy:
@@ -1186,14 +1186,13 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def check(cls, **kwargs):
-        errors = []
-        errors.extend(cls._check_swappable())
-        errors.extend(cls._check_model())
-        errors.extend(cls._check_managers(**kwargs))
+        errors = [*cls._check_swappable(), *cls._check_model(), *cls._check_managers(**kwargs)]
         if not cls._meta.swapped:
-            errors.extend(cls._check_fields(**kwargs))
-            errors.extend(cls._check_m2m_through_same_relationship())
-            errors.extend(cls._check_long_column_names())
+            errors += [
+                *cls._check_fields(**kwargs),
+                *cls._check_m2m_through_same_relationship(),
+                *cls._check_long_column_names(),
+            ]
             clash_errors = (
                 cls._check_id_field() +
                 cls._check_field_name_clashes() +
@@ -1204,9 +1203,11 @@ class Model(metaclass=ModelBase):
             # clashes.
             if not clash_errors:
                 errors.extend(cls._check_column_name_clashes())
-            errors.extend(cls._check_index_together())
-            errors.extend(cls._check_unique_together())
-            errors.extend(cls._check_ordering())
+            errors += [
+                *cls._check_index_together(),
+                *cls._check_unique_together(),
+                *cls._check_ordering(),
+            ]
 
         return errors
 
@@ -1718,9 +1719,3 @@ def model_unpickle(model_id):
 
 
 model_unpickle.__safe_for_unpickle__ = True
-
-
-def unpickle_inner_exception(klass, exception_name):
-    # Get the exception class from the class it is attached to:
-    exception = getattr(klass, exception_name)
-    return exception.__new__(exception)

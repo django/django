@@ -274,7 +274,7 @@ class RequestFactory:
         # - HTTP_COOKIE: for cookie support,
         # - REMOTE_ADDR: often useful, see #8551.
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
-        environ = {
+        return {
             'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
             'PATH_INFO': '/',
             'REMOTE_ADDR': '127.0.0.1',
@@ -290,10 +290,9 @@ class RequestFactory:
             'wsgi.multiprocess': True,
             'wsgi.multithread': False,
             'wsgi.run_once': False,
+            **self.defaults,
+            **request,
         }
-        environ.update(self.defaults)
-        environ.update(request)
-        return environ
 
     def request(self, **request):
         "Construct a generic request object."
@@ -325,11 +324,10 @@ class RequestFactory:
     def get(self, path, data=None, secure=False, **extra):
         """Construct a GET request."""
         data = {} if data is None else data
-        r = {
+        return self.generic('GET', path, secure=secure, **{
             'QUERY_STRING': urlencode(data, doseq=True),
-        }
-        r.update(extra)
-        return self.generic('GET', path, secure=secure, **r)
+            **extra,
+        })
 
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              secure=False, **extra):
@@ -343,11 +341,10 @@ class RequestFactory:
     def head(self, path, data=None, secure=False, **extra):
         """Construct a HEAD request."""
         data = {} if data is None else data
-        r = {
+        return self.generic('HEAD', path, secure=secure, **{
             'QUERY_STRING': urlencode(data, doseq=True),
-        }
-        r.update(extra)
-        return self.generic('HEAD', path, secure=secure, **r)
+            **extra,
+        })
 
     def trace(self, path, secure=False, **extra):
         """Construct a TRACE request."""
@@ -480,9 +477,9 @@ class Client(RequestFactory):
             # Also make sure that the signalled exception is cleared from
             # the local cache!
             if self.exc_info:
-                exc_info = self.exc_info
+                _, exc_value, _ = self.exc_info
                 self.exc_info = None
-                raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
+                raise exc_value
 
             # Save the client and request that stimulated the response.
             response.client = self

@@ -142,9 +142,8 @@ Authenticating users
         example, it's used by the
         :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`. Unless
         you are writing your own authentication system, you probably won't use
-        this. Rather if you are looking for a way to limit access to logged in
-        users, see the :func:`~django.contrib.auth.decorators.login_required`
-        decorator.
+        this. Rather if you're looking for a way to login a user, use the
+        :class:`~django.contrib.auth.views.LoginView`.
 
 .. _topic-authorization:
 
@@ -888,19 +887,19 @@ easiest way is to include the provided URLconf in ``django.contrib.auth.urls``
 in your own URLconf, for example::
 
     urlpatterns = [
-        path('', include('django.contrib.auth.urls')),
+        path('accounts/', include('django.contrib.auth.urls')),
     ]
 
 This will include the following URL patterns::
 
-    ^login/$ [name='login']
-    ^logout/$ [name='logout']
-    ^password_change/$ [name='password_change']
-    ^password_change/done/$ [name='password_change_done']
-    ^password_reset/$ [name='password_reset']
-    ^password_reset/done/$ [name='password_reset_done']
-    ^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$ [name='password_reset_confirm']
-    ^reset/done/$ [name='password_reset_complete']
+    accounts/login/ [name='login']
+    accounts/logout/ [name='logout']
+    accounts/password_change/ [name='password_change']
+    accounts/password_change/done/ [name='password_change_done']
+    accounts/password_reset/ [name='password_reset']
+    accounts/password_reset/done/ [name='password_reset_done']
+    accounts/reset/<uidb64>/<token>/ [name='password_reset_confirm']
+    accounts/reset/done/ [name='password_reset_complete']
 
 The views provide a URL name for easier reference. See :doc:`the URL
 documentation </topics/http/urls>` for details on using named URL patterns.
@@ -1453,7 +1452,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form for generating and emailing a one-time use link to reset a
     user's password.
 
-    .. method:: send_email(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
+    .. method:: send_mail(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
 
         Uses the arguments to send an ``EmailMultiAlternatives``.
         Can be overridden to customize how the email is sent to the user.
@@ -1538,21 +1537,20 @@ The currently logged-in user's permissions are stored in the template variable
 ``django.contrib.auth.context_processors.PermWrapper``, which is a
 template-friendly proxy of permissions.
 
-In the ``{{ perms }}`` object, single-attribute lookup is a proxy to
-:meth:`User.has_module_perms <django.contrib.auth.models.User.has_module_perms>`.
-This example would display ``True`` if the logged-in user had any permissions
-in the ``foo`` app::
+Evaluating a single-attribute lookup of ``{{ perms }}`` as a boolean is a proxy
+to :meth:`User.has_module_perms()
+<django.contrib.auth.models.User.has_module_perms>`. For example, to check if
+the logged-in user has any permissions in the ``foo`` app::
 
-    {{ perms.foo }}
+    {% if perms.foo %}
 
-Two-level-attribute lookup is a proxy to
-:meth:`User.has_perm <django.contrib.auth.models.User.has_perm>`. This example
-would display ``True`` if the logged-in user had the permission
-``foo.can_vote``::
+Evaluating a two-level-attribute lookup as a boolean is a proxy to
+:meth:`User.has_perm() <django.contrib.auth.models.User.has_perm>`. For example,
+to check if the logged-in user has the permission ``foo.can_vote``::
 
-    {{ perms.foo.can_vote }}
+    {% if perms.foo.can_vote %}
 
-Thus, you can check permissions in template ``{% if %}`` statements:
+Here's a more complete example of checking permissions in a template:
 
 .. code-block:: html+django
 

@@ -56,9 +56,10 @@ from .models import (
     UnorderedObject, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
 
-
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
+
+MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
 
 
 class AdminFieldExtractionMixin:
@@ -3522,6 +3523,13 @@ class AdminInlineFileUploadTest(TestCase):
         self.picture = Picture(name="Test Picture", image=filename, gallery=self.gallery)
         self.picture.save()
 
+    def test_form_has_multipart_enctype(self):
+        response = self.client.get(
+            reverse('admin:admin_views_gallery_change', args=(self.gallery.id,))
+        )
+        self.assertIs(response.context['has_file_field'], True)
+        self.assertContains(response, MULTIPART_ENCTYPE)
+
     def test_inline_file_upload_edit_validation_error_post(self):
         """
         Inline file uploads correctly display prior data (#10002).
@@ -3657,6 +3665,10 @@ class AdminInlineTests(TestCase):
         # The PK link exists on the rendered form
         response = self.client.get(collector_url)
         self.assertContains(response, 'name="widget_set-0-id"')
+
+        # No file or image fields, no enctype on the forms
+        self.assertIs(response.context['has_file_field'], False)
+        self.assertNotContains(response, MULTIPART_ENCTYPE)
 
         # Now resave that inline
         self.post_data['widget_set-INITIAL_FORMS'] = "1"
@@ -4005,7 +4017,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         slug3 = self.selenium.find_element_by_id('id_slug3').get_attribute('value')
         self.assertEqual(slug1, 'main-name-and-its-awesomeiii-2012-02-18')
         self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiii')
-        self.assertEqual(slug3, 'main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
+        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
@@ -4020,9 +4032,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
         initial_select2_inputs = self.selenium.find_elements_by_class_name('select2-selection')
         # Inline formsets have empty/invisible forms.
-        # 4 visible select2 inputs and 6 hidden inputs.
+        # Only the 4 visible select2 inputs are initialized.
         num_initial_select2_inputs = len(initial_select2_inputs)
-        self.assertEqual(num_initial_select2_inputs, 10)
+        self.assertEqual(num_initial_select2_inputs, 4)
 
         # Add an inline
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
@@ -5451,7 +5463,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the form action.
         form_action = re.search(
-            '<form enctype="multipart/form-data" action="(.*?)" method="post" id="user_form".*?>',
+            '<form action="(.*?)" method="post" id="user_form".*?>',
             force_text(response.content)
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
@@ -5515,7 +5527,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the form action.
         form_action = re.search(
-            '<form enctype="multipart/form-data" action="(.*?)" method="post" id="user_form".*?>',
+            '<form action="(.*?)" method="post" id="user_form".*?>',
             force_text(response.content)
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())

@@ -8,6 +8,8 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.fields import Field, IntegerField
+from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
@@ -24,9 +26,9 @@ from .admin import (
     site as custom_site,
 )
 from .models import (
-    Band, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser, Event,
-    Genre, Group, Invitation, Membership, Musician, OrderedObject, Parent,
-    Quartet, Swallow, SwallowOneToOne, UnorderedObject,
+    Band, CharPK, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser,
+    Event, Genre, Group, Invitation, Membership, Musician, OrderedObject,
+    Parent, Quartet, Swallow, SwallowOneToOne, UnorderedObject,
 )
 
 
@@ -402,6 +404,78 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/concert/', data={SEARCH_VAR: band.pk + 5})
         cl = m.get_changelist_instance(request)
         self.assertEqual(cl.queryset.count(), 0)
+
+    def test_builtin_lookup_in_search_fields(self):
+        band = Group.objects.create(name='The Hype')
+        concert = Concert.objects.create(name='Woodstock', group=band)
+
+        m = ConcertAdmin(Concert, custom_site)
+        m.search_fields = ['name__iexact']
+
+        request = self.factory.get('/', data={SEARCH_VAR: 'woodstock'})
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [concert])
+
+        request = self.factory.get('/', data={SEARCH_VAR: 'wood'})
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [])
+
+    def test_custom_lookup_in_search_fields(self):
+        band = Group.objects.create(name='The Hype')
+        concert = Concert.objects.create(name='Woodstock', group=band)
+
+        m = ConcertAdmin(Concert, custom_site)
+        m.search_fields = ['group__name__cc']
+        Field.register_lookup(Contains, 'cc')
+        try:
+            request = self.factory.get('/', data={SEARCH_VAR: 'Hype'})
+            cl = m.get_changelist_instance(request)
+            self.assertCountEqual(cl.queryset, [concert])
+
+            request = self.factory.get('/', data={SEARCH_VAR: 'Woodstock'})
+            cl = m.get_changelist_instance(request)
+            self.assertCountEqual(cl.queryset, [])
+        finally:
+            Field._unregister_lookup(Contains, 'cc')
+
+    def test_spanning_relations_with_custom_lookup_in_search_fields(self):
+        hype = Group.objects.create(name='The Hype')
+        concert = Concert.objects.create(name='Woodstock', group=hype)
+        vox = Musician.objects.create(name='Vox', age=20)
+        Membership.objects.create(music=vox, group=hype)
+        # Register a custom lookup on IntegerField to ensure that field
+        # traversing logic in ModelAdmin.get_search_results() works.
+        IntegerField.register_lookup(Exact, 'exactly')
+        try:
+            m = ConcertAdmin(Concert, custom_site)
+            m.search_fields = ['group__members__age__exactly']
+
+            request = self.factory.get('/', data={SEARCH_VAR: '20'})
+            cl = m.get_changelist_instance(request)
+            self.assertCountEqual(cl.queryset, [concert])
+
+            request = self.factory.get('/', data={SEARCH_VAR: '21'})
+            cl = m.get_changelist_instance(request)
+            self.assertCountEqual(cl.queryset, [])
+        finally:
+            IntegerField._unregister_lookup(Exact, 'exactly')
+
+    def test_custom_lookup_with_pk_shortcut(self):
+        self.assertEqual(CharPK._meta.pk.name, 'char_pk')  # Not equal to 'pk'.
+        m = admin.ModelAdmin(CustomIdUser, custom_site)
+
+        abc = CharPK.objects.create(char_pk='abc')
+        abcd = CharPK.objects.create(char_pk='abcd')
+        m = admin.ModelAdmin(CharPK, custom_site)
+        m.search_fields = ['pk__exact']
+
+        request = self.factory.get('/', data={SEARCH_VAR: 'abc'})
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [abc])
+
+        request = self.factory.get('/', data={SEARCH_VAR: 'abcd'})
+        cl = m.get_changelist_instance(request)
+        self.assertCountEqual(cl.queryset, [abcd])
 
     def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """

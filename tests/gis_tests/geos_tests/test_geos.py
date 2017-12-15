@@ -2,7 +2,7 @@ import ctypes
 import json
 import pickle
 import random
-from binascii import a2b_hex, b2a_hex
+from binascii import a2b_hex
 from io import BytesIO
 from unittest import mock
 
@@ -102,7 +102,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
             wkb = geom.wkb
-            self.assertEqual(b2a_hex(wkb).decode().upper(), g.hex)
+            self.assertEqual(wkb.hex().upper(), g.hex)
 
     def test_create_hex(self):
         "Testing creation from HEX."
@@ -115,7 +115,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_create_wkb(self):
         "Testing creation from WKB."
         for g in self.geometries.hex_wkt:
-            wkb = memoryview(a2b_hex(g.hex.encode()))
+            wkb = memoryview(bytes.fromhex(g.hex))
             geom_h = GEOSGeometry(wkb)
             # we need to do this so decimal places get normalized
             geom_t = fromstr(g.wkt)

@@ -1,5 +1,5 @@
 from django.db.models.aggregates import StdDev
-from django.db.utils import ProgrammingError
+from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 
 
@@ -164,6 +164,9 @@ class BaseDatabaseFeatures:
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
 
+    # Does it support operations requiring references rename in a transaction?
+    supports_atomic_references_rename = True
+
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
@@ -269,9 +272,9 @@ class BaseDatabaseFeatures:
         """Confirm support for STDDEV and related stats functions."""
         try:
             self.connection.ops.check_expression_support(StdDev(1))
-            return True
-        except NotImplementedError:
+        except NotSupportedError:
             return False
+        return True
 
     def introspected_boolean_field_type(self, field=None):
         """

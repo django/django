@@ -4,7 +4,6 @@ Field classes.
 
 import copy
 import datetime
-import itertools
 import math
 import os
 import re
@@ -112,7 +111,7 @@ class Field:
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = list(itertools.chain(self.default_validators, validators))
+        self.validators = [*self.default_validators, *validators]
 
         super().__init__()
 
@@ -469,6 +468,12 @@ class DateTimeField(BaseTemporalField):
 class DurationField(Field):
     default_error_messages = {
         'invalid': _('Enter a valid duration.'),
+        'overflow': _(
+            'The number of days must be between {min_days} and {max_days}.'.format(
+                min_days=datetime.timedelta.min.days,
+                max_days=datetime.timedelta.max.days,
+            )
+        )
     }
 
     def prepare_value(self, value):
@@ -481,7 +486,10 @@ class DurationField(Field):
             return None
         if isinstance(value, datetime.timedelta):
             return value
-        value = parse_duration(str(value))
+        try:
+            value = parse_duration(str(value))
+        except OverflowError:
+            raise ValidationError(self.error_messages['overflow'], code='overflow')
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value

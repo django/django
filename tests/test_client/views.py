@@ -331,3 +331,12 @@ def django_project_redirect(request):
 def upload_view(request):
     """Prints keys of request.FILES to the response."""
     return HttpResponse(', '.join(request.FILES))
+
+
+class TwoArgException(Exception):
+    def __init__(self, one, two):
+        pass
+
+
+def two_arg_exception(request):
+    raise TwoArgException('one', 'two')

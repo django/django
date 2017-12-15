@@ -564,9 +564,7 @@ class BaseModelFormSet(BaseFormSet):
                  queryset=None, *, initial=None, **kwargs):
         self.queryset = queryset
         self.initial_extra = initial
-        defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        defaults.update(kwargs)
-        super().__init__(**defaults)
+        super().__init__(**{'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix, **kwargs})
 
     def initial_form_count(self):
         """Return the number of forms that are required in this FormSet."""
@@ -1006,7 +1004,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 raise ValueError(
                     "fk_name '%s' is not a ForeignKey to '%s'." % (fk_name, parent_model._meta.label)
                 )
-        elif len(fks_to_parent) == 0:
+        elif not fks_to_parent:
             raise ValueError(
                 "'%s' has no field named '%s'." % (model._meta.label, fk_name)
             )
@@ -1021,7 +1019,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         ]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
-        elif len(fks_to_parent) == 0:
+        elif not fks_to_parent:
             if can_fail:
                 return
             raise ValueError(

@@ -5,7 +5,7 @@ from datetime import datetime
 from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.db.backends.utils import strip_quotes
+from django.db.backends.utils import split_identifier
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -536,9 +536,15 @@ class BaseDatabaseSchemaEditor:
                 ))
             for constraint_name in constraint_names:
                 self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
-        # Drop incoming FK constraints if we're a primary key and things are going
-        # to change.
-        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+        # Drop incoming FK constraints if the field is a primary key or unique,
+        # which might be a to_field target, and things are going to change.
+        drop_foreign_keys = (
+            (
+                (old_field.primary_key and new_field.primary_key) or
+                (old_field.unique and new_field.unique)
+            ) and old_type != new_type
+        )
+        if drop_foreign_keys:
             # '_meta.related_field' also contains M2M reverse fields, these
             # will be filtered out
             for _old_rel, new_rel in _related_non_m2m_objects(old_field, new_field):
@@ -727,7 +733,7 @@ class BaseDatabaseSchemaEditor:
                 new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
-        if old_field.primary_key and new_field.primary_key and old_type != new_type:
+        if drop_foreign_keys:
             for rel in new_field.model._meta.related_objects:
                 if not rel.many_to_many and rel.field.db_constraint:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
@@ -858,7 +864,7 @@ class BaseDatabaseSchemaEditor:
         The name is divided into 3 parts: the table name, the column names,
         and a unique digest and suffix.
         """
-        table_name = strip_quotes(table_name)
+        _, table_name = split_identifier(table_name)
         hash_data = [table_name] + list(column_names)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
@@ -960,7 +966,7 @@ class BaseDatabaseSchemaEditor:
     def _create_fk_sql(self, model, field, suffix):
         from_table = model._meta.db_table
         from_column = field.column
-        to_table = field.target_field.model._meta.db_table
+        _, to_table = split_identifier(field.target_field.model._meta.db_table)
         to_column = field.target_field.column
 
         def create_fk_name(*args, **kwargs):
@@ -971,8 +977,8 @@ class BaseDatabaseSchemaEditor:
             table=Table(from_table, self.quote_name),
             name=ForeignKeyName(from_table, [from_column], to_table, [to_column], suffix, create_fk_name),
             column=Columns(from_table, [from_column], self.quote_name),
-            to_table=Table(to_table, self.quote_name),
-            to_column=Columns(to_table, [to_column], self.quote_name),
+            to_table=Table(field.target_field.model._meta.db_table, self.quote_name),
+            to_column=Columns(field.target_field.model._meta.db_table, [to_column], self.quote_name),
             deferrable=self.connection.ops.deferrable_sql(),
         )
 

@@ -242,7 +242,7 @@ class GDALBand(GDALRasterBase):
 class BandList(list):
     def __init__(self, source):
         self.source = source
-        list.__init__(self)
+        super().__init__()
 
     def __iter__(self):
         for idx in range(1, len(self) + 1):

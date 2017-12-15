@@ -222,8 +222,10 @@ setting is ``False``. By using this you acknowledge the fact that it's
 **grossly inefficient** and probably **insecure**. This is only intended for
 local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
-in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
+in your project's :setting:`INSTALLED_APPS` setting.
+
 ``--insecure`` doesn't work with
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` or
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
 
 Example usage::

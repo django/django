@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import connection, models
 from django.test import SimpleTestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models import Book, ChildModel1, ChildModel2
 
@@ -69,6 +70,18 @@ class IndexesTests(SimpleTestCase):
         msg = 'Index too long for multiple database support. Is self.suffix longer than 3 characters?'
         with self.assertRaisesMessage(AssertionError, msg):
             long_field_index.set_name_with_model(Book)
+
+    @isolate_apps('model_indexes')
+    def test_name_auto_generation_with_quoted_db_table(self):
+        class QuotedDbTable(models.Model):
+            name = models.CharField(max_length=50)
+
+            class Meta:
+                db_table = '"t_quoted"'
+
+        index = models.Index(fields=['name'])
+        index.set_name_with_model(QuotedDbTable)
+        self.assertEqual(index.name, 't_quoted_name_e4ed1b_idx')
 
     def test_deconstruction(self):
         index = models.Index(fields=['title'], db_tablespace='idx_tbls')

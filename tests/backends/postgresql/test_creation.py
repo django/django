@@ -33,7 +33,7 @@ class DatabaseCreationTests(SimpleTestCase):
         try:
             yield
         finally:
-            for name, value in kwargs.items():
+            for name in kwargs:
                 if name in saved_values:
                     settings[name] = saved_values[name]
                 else:

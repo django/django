@@ -161,7 +161,7 @@ class BaseExpression:
         return []
 
     def set_source_expressions(self, exprs):
-        assert len(exprs) == 0
+        assert not exprs
 
     def _parse_expressions(self, *expressions):
         return [
@@ -565,7 +565,7 @@ class Func(SQLiteNumericMixin, Expression):
 
     def __repr__(self):
         args = self.arg_joiner.join(str(arg) for arg in self.source_expressions)
-        extra = dict(self.extra, **self._get_repr_options())
+        extra = {**self.extra, **self._get_repr_options()}
         if extra:
             extra = ', '.join(str(key) + '=' + str(val) for key, val in sorted(extra.items()))
             return "{}({}, {})".format(self.__class__.__name__, args, extra)
@@ -596,8 +596,7 @@ class Func(SQLiteNumericMixin, Expression):
             arg_sql, arg_params = compiler.compile(arg)
             sql_parts.append(arg_sql)
             params.extend(arg_params)
-        data = self.extra.copy()
-        data.update(**extra_context)
+        data = {**self.extra, **extra_context}
         # Use the first supplied value in this order: the parameter to this
         # method, a value supplied in __init__()'s **extra (the value in
         # `data`), or the value defined on the class.
@@ -780,7 +779,7 @@ class ExpressionList(Func):
     template = '%(expressions)s'
 
     def __init__(self, *expressions, **extra):
-        if len(expressions) == 0:
+        if not expressions:
             raise ValueError('%s requires at least one expression.' % self.__class__.__name__)
         super().__init__(*expressions, **extra)
 
@@ -817,7 +816,7 @@ class When(Expression):
     def __init__(self, condition=None, then=None, **lookups):
         if lookups and condition is None:
             condition, lookups = Q(**lookups), None
-        if condition is None or not isinstance(condition, Q) or lookups:
+        if condition is None or not getattr(condition, 'conditional', False) or lookups:
             raise TypeError("__init__() takes either a Q object or lookups as keyword arguments")
         super().__init__(output_field=None)
         self.condition = condition
@@ -921,8 +920,7 @@ class Case(Expression):
         connection.ops.check_expression_support(self)
         if not self.cases:
             return compiler.compile(self.default)
-        template_params = self.extra.copy()
-        template_params.update(extra_context)
+        template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
         for case in self.cases:
@@ -985,7 +983,7 @@ class Subquery(Expression):
                 )
                 # Add table alias to the parent query's aliases to prevent
                 # quoting.
-                if hasattr(resolved, 'alias'):
+                if hasattr(resolved, 'alias') and resolved.alias != resolved.target.model._meta.db_table:
                     clone.queryset.query.external_aliases.add(resolved.alias)
                 return resolved
             return child
@@ -1017,8 +1015,7 @@ class Subquery(Expression):
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
-        template_params = self.extra.copy()
-        template_params.update(extra_context)
+        template_params = {**self.extra, **extra_context}
         template_params['subquery'], sql_params = self.queryset.query.get_compiler(connection=connection).as_sql()
 
         template = template or template_params.get('template', self.template)
@@ -1103,9 +1100,10 @@ class OrderBy(BaseExpression):
         placeholders = {
             'expression': expression_sql,
             'ordering': 'DESC' if self.descending else 'ASC',
+            **extra_context,
         }
-        placeholders.update(extra_context)
         template = template or self.template
+        params *= template.count('%(expression)s')
         return (template % placeholders).rstrip(), params
 
     def as_sqlite(self, compiler, connection):
@@ -1132,6 +1130,9 @@ class OrderBy(BaseExpression):
 
     def reverse_ordering(self):
         self.descending = not self.descending
+        if self.nulls_first or self.nulls_last:
+            self.nulls_first = not self.nulls_first
+            self.nulls_last = not self.nulls_last
         return self
 
     def asc(self):

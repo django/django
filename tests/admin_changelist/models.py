@@ -28,6 +28,7 @@ class Band(models.Model):
 
 class Musician(models.Model):
     name = models.CharField(max_length=30)
+    age = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -111,3 +112,7 @@ class OrderedObject(models.Model):
 
 class CustomIdUser(models.Model):
     uuid = models.AutoField(primary_key=True)
+
+
+class CharPK(models.Model):
+    char_pk = models.CharField(max_length=100, primary_key=True)

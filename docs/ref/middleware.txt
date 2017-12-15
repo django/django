@@ -456,6 +456,14 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
+#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+
+   Before any middleware that may change the response (it sets the ``ETag``
+   header).
+
+   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
+   contents.
+
 #. :class:`~django.middleware.locale.LocaleMiddleware`
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
@@ -463,10 +471,9 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 
-   Before any middleware that may change the response (it calculates ``ETags``).
-
-   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
-   contents.
+   Before any middleware that may change the response (it sets the
+   ``Content-Length`` header). A middleware that appears before
+   ``CommonMiddleware`` and changes the response must reset ``Content-Length``.
 
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.

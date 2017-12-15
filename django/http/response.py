@@ -136,10 +136,7 @@ class HttpResponseBase:
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
-        try:
-            del self._headers[header.lower()]
-        except KeyError:
-            pass
+        self._headers.pop(header.lower(), False)
 
     def __getitem__(self, header):
         return self._headers[header.lower()][1]
@@ -489,7 +486,7 @@ class JsonResponse(HttpResponse):
     :param data: Data to be dumped into json. By default only ``dict`` objects
       are allowed to be passed due to a security flaw before EcmaScript 5. See
       the ``safe`` parameter for more information.
-    :param encoder: Should be an json encoder class. Defaults to
+    :param encoder: Should be a json encoder class. Defaults to
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
       to ``True``.

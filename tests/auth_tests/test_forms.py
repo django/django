@@ -262,9 +262,6 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         )
 
 
-# To verify that the login form rejects inactive users, use an authentication
-# backend that allows them.
-@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
 class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_username(self):
@@ -323,6 +320,8 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             self.assertFalse(form.is_valid())
             self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
+    # Use an authentication backend that allows inactive users.
+    @override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
     def test_custom_login_allowed_policy(self):
         # The user is inactive, but our custom form policy allows them to log in.
         data = {
@@ -377,6 +376,31 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.non_field_errors(), [])
 
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomEmailField')
+    def test_username_field_max_length_matches_user_model(self):
+        self.assertEqual(CustomEmailField._meta.get_field('username').max_length, 255)
+        data = {
+            'username': 'u' * 255,
+            'password': 'pwd',
+            'email': 'test@example.com',
+        }
+        CustomEmailField.objects.create_user(**data)
+        form = AuthenticationForm(None, data)
+        self.assertEqual(form.fields['username'].max_length, 255)
+        self.assertEqual(form.errors, {})
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
+    def test_username_field_max_length_defaults_to_254(self):
+        self.assertIsNone(IntegerUsernameUser._meta.get_field('username').max_length)
+        data = {
+            'username': '0123456',
+            'password': 'password',
+        }
+        IntegerUsernameUser.objects.create_user(**data)
+        form = AuthenticationForm(None, data)
+        self.assertEqual(form.fields['username'].max_length, 254)
+        self.assertEqual(form.errors, {})
+
     def test_username_field_label(self):
 
         class CustomAuthenticationForm(AuthenticationForm):
@@ -427,6 +451,17 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['password'], data['password'])
         self.assertEqual(form.errors, {})
         self.assertEqual(form.user_cache, user)
+
+    def test_get_invalid_login_error(self):
+        error = AuthenticationForm().get_invalid_login_error()
+        self.assertIsInstance(error, forms.ValidationError)
+        self.assertEqual(
+            error.message,
+            'Please enter a correct %(username)s and password. Note that both '
+            'fields may be case-sensitive.',
+        )
+        self.assertEqual(error.code, 'invalid_login')
+        self.assertEqual(error.params, {'username': 'username'})
 
 
 class SetPasswordFormTest(TestDataMixin, TestCase):

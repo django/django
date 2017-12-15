@@ -1,7 +1,7 @@
 """
 This module converts requested URLs to callback view functions.
 
-RegexURLResolver is the main class here. Its resolve() method takes a URL (as
+URLResolver is the main class here. Its resolve() method takes a URL (as
 a string) and returns a ResolverMatch object which provides access to all
 attributes of the resolved URL match.
 """
@@ -63,7 +63,6 @@ class ResolverMatch:
 @functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
-        from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return URLResolver(RegexPattern(r'^/'), urlconf)
 
@@ -119,7 +118,7 @@ class CheckURLMixin:
             # Skip check as it can be useful to start a URL pattern with a slash
             # when APPEND_SLASH=False.
             return []
-        if regex_pattern.startswith(('/', '^/', '^\/')) and not regex_pattern.endswith('/'):
+        if regex_pattern.startswith(('/', '^/', '^\\/')) and not regex_pattern.endswith('/'):
             warning = Warning(
                 "Your URL pattern {} has a route beginning with a '/'. Remove this "
                 "slash as it is unnecessary. If this pattern is targeted in an "
@@ -187,7 +186,7 @@ class RegexPattern(CheckURLMixin):
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
-    '<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
+    r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
 )
 
 
@@ -256,7 +255,16 @@ class RoutePattern(CheckURLMixin):
         return None
 
     def check(self):
-        return self._check_pattern_startswith_slash()
+        warnings = self._check_pattern_startswith_slash()
+        route = self._route
+        if '(?P<' in route or route.startswith('^') or route.endswith('$'):
+            warnings.append(Warning(
+                "Your URL pattern {} has a route that contains '(?P<', begins "
+                "with a '^', or ends with a '$'. This was likely an oversight "
+                "when migrating to django.urls.path().".format(self.describe()),
+                id='2_0.W001',
+            ))
+        return warnings
 
     def _compile(self, route):
         return re.compile(_route_to_regex(route, self._is_endpoint)[0])
@@ -371,7 +379,7 @@ class URLResolver:
         self._local = threading.local()
 
     def __repr__(self):
-        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+        if isinstance(self.urlconf_name, list) and self.urlconf_name:
             # Don't bother to output the whole list, it can be huge
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
@@ -432,8 +440,8 @@ class URLResolver:
                                     (
                                         new_matches,
                                         p_pattern + pat,
-                                        dict(defaults, **url_pattern.default_kwargs),
-                                        dict(self.pattern.converters, **converters)
+                                        {**defaults, **url_pattern.default_kwargs},
+                                        {**self.pattern.converters, **converters}
                                     )
                                 )
                         for namespace, (prefix, sub_pattern) in url_pattern.namespace_dict.items():
@@ -492,7 +500,7 @@ class URLResolver:
                 else:
                     if sub_match:
                         # Merge captured arguments in match with submatch
-                        sub_match_dict = dict(kwargs, **self.default_kwargs)
+                        sub_match_dict = {**kwargs, **self.default_kwargs}
                         # Update the sub_match_dict with the kwargs from the sub_match.
                         sub_match_dict.update(sub_match.kwargs)
                         # If there are *any* named groups, ignore all non-named groups.

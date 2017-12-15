@@ -653,7 +653,7 @@ you'll be logged in as the attacker and might inadvertently enter your
 sensitive personal data (e.g. credit card info) into the attackers account.
 
 Another possible attack would be if ``good.example.com`` sets its
-:setting:`SESSION_COOKIE_DOMAIN` to ``".example.com"`` which would cause
+:setting:`SESSION_COOKIE_DOMAIN` to ``"example.com"`` which would cause
 session cookies from that site to be sent to ``bad.example.com``.
 
 Technical details

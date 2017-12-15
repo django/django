@@ -104,13 +104,16 @@ class BaseDatabaseOperations:
         truncates the given date field field_name to a date object with only
         the given specificity.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_trunc_sql() method.')
 
     def datetime_cast_date_sql(self, field_name, tzname):
         """
         Return the SQL to cast a datetime value to date value.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'datetime_cast_date_sql() method.'
+        )
 
     def datetime_cast_time_sql(self, field_name, tzname):
         """
@@ -201,6 +204,22 @@ class BaseDatabaseOperations:
             ' SKIP LOCKED' if skip_locked else '',
         )
 
+    def _get_limit_offset_params(self, low_mark, high_mark):
+        offset = low_mark or 0
+        if high_mark is not None:
+            return (high_mark - offset), offset
+        elif offset:
+            return self.connection.ops.no_limit_value(), offset
+        return None, offset
+
+    def limit_offset_sql(self, low_mark, high_mark):
+        """Return LIMIT/OFFSET SQL clause."""
+        limit, offset = self._get_limit_offset_params(low_mark, high_mark)
+        return '%s%s' % (
+            (' LIMIT %d' % limit) if limit else '',
+            (' OFFSET %d' % offset) if offset else '',
+        )
+
     def last_executed_query(self, cursor, sql, params):
         """
         Return a string of the query last executed by the given cursor, with
@@ -281,7 +300,7 @@ class BaseDatabaseOperations:
             import sqlparse
         except ImportError:
             raise ImproperlyConfigured(
-                "sqlparse is required if you don't split your SQL "
+                "The sqlparse package is required if you don't split your SQL "
                 "statements manually."
             )
         else:
@@ -560,7 +579,7 @@ class BaseDatabaseOperations:
         This is used on specific backends to rule out known expressions
         that have problematic or nonexistent implementations. If the
         expression has a known problem, the backend should raise
-        NotImplementedError.
+        NotSupportedError.
         """
         pass
 

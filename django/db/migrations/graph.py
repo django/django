@@ -360,7 +360,7 @@ class MigrationGraph:
         """
         if nodes is None:
             nodes = list(self.leaf_nodes())
-        if len(nodes) == 0:
+        if not nodes:
             return ProjectState()
         if not isinstance(nodes[0], tuple):
             nodes = [nodes]

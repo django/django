@@ -2,7 +2,7 @@
 Django 1.11.6 release notes
 ===========================
 
-*Expected October 2, 2017*
+*October 5, 2017*
 
 Django 1.11.6 fixes several bugs in 1.11.5.
 

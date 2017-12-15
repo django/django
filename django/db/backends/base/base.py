@@ -573,11 +573,10 @@ class BaseDatabaseWrapper:
         Provide a cursor: with self.temporary_connection() as cursor: ...
         """
         must_close = self.connection is None
-        cursor = self.cursor()
         try:
-            yield cursor
+            with self.cursor() as cursor:
+                yield cursor
         finally:
-            cursor.close()
             if must_close:
                 self.close()
 

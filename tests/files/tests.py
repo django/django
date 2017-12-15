@@ -244,7 +244,7 @@ class DimensionClosingBug(unittest.TestCase):
         """
         # We need to inject a modified open() builtin into the images module
         # that checks if the file was closed properly if the function is
-        # called with a filename instead of an file object.
+        # called with a filename instead of a file object.
         # get_image_dimensions will call our catching_open instead of the
         # regular builtin one.
 

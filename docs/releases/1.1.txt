@@ -207,7 +207,7 @@ detail in :doc:`the ORM aggregation documentation </topics/db/aggregation>`.
 Query expressions
 ~~~~~~~~~~~~~~~~~
 
-Queries can now refer to a another field on the query and can traverse
+Queries can now refer to another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
 new :class:`~django.db.models.F` object; for full details, including examples,
 consult the :class:`F expressions documentation <django.db.models.F>`.

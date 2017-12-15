@@ -39,10 +39,10 @@ if version < (1, 3, 3):
 # MySQLdb returns TIME columns as timedelta -- they are more like timedelta in
 # terms of actual behavior as they are signed and include days -- and Django
 # expects time.
-django_conversions = conversions.copy()
-django_conversions.update({
-    FIELD_TYPE.TIME: backend_utils.typecast_time,
-})
+django_conversions = {
+    **conversions,
+    **{FIELD_TYPE.TIME: backend_utils.typecast_time},
+}
 
 # This should match the numerical portion of the version numbers (we can treat
 # versions like 5.0.24 and 5.0.24a as the same).
@@ -57,7 +57,10 @@ class CursorWrapper:
     Implemented as a wrapper, rather than a subclass, so that it isn't stuck
     to the particular underlying representation returned by Connection.cursor().
     """
-    codes_for_integrityerror = (1048,)
+    codes_for_integrityerror = (
+        1048,  # Column cannot be null
+        1690,  # BIGINT UNSIGNED value is out of range
+    )
 
     def __init__(self, cursor):
         self.cursor = cursor
@@ -218,9 +221,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         isolation_level,
                         ', '.join("'%s'" % s for s in sorted(self.isolation_levels))
                     ))
-            # The variable assignment form of setting transaction isolation
-            # levels will be used, e.g. "set tx_isolation='repeatable-read'".
-            isolation_level = isolation_level.replace(' ', '-')
         self.isolation_level = isolation_level
         kwargs.update(options)
         return kwargs
@@ -235,14 +235,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # a recently inserted row will return when the field is tested
             # for NULL. Disabling this brings this aspect of MySQL in line
             # with SQL standards.
-            assignments.append('SQL_AUTO_IS_NULL = 0')
+            assignments.append('SET SQL_AUTO_IS_NULL = 0')
 
         if self.isolation_level:
-            assignments.append("TX_ISOLATION = '%s'" % self.isolation_level)
+            assignments.append('SET SESSION TRANSACTION ISOLATION LEVEL %s' % self.isolation_level.upper())
 
         if assignments:
             with self.cursor() as cursor:
-                cursor.execute('SET ' + ', '.join(assignments))
+                cursor.execute('; '.join(assignments))
 
     def create_cursor(self, name=None):
         cursor = self.connection.cursor()
@@ -294,36 +294,37 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Backends can override this method if they can more directly apply
         constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
-        cursor = self.cursor()
-        if table_names is None:
-            table_names = self.introspection.table_names(cursor)
-        for table_name in table_names:
-            primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
-            if not primary_key_column_name:
-                continue
-            key_columns = self.introspection.get_key_columns(cursor, table_name)
-            for column_name, referenced_table_name, referenced_column_name in key_columns:
-                cursor.execute(
-                    """
-                    SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
-                    LEFT JOIN `%s` as REFERRED
-                    ON (REFERRING.`%s` = REFERRED.`%s`)
-                    WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL
-                    """ % (
-                        primary_key_column_name, column_name, table_name,
-                        referenced_table_name, column_name, referenced_column_name,
-                        column_name, referenced_column_name,
-                    )
-                )
-                for bad_row in cursor.fetchall():
-                    raise utils.IntegrityError(
-                        "The row in table '%s' with primary key '%s' has an invalid "
-                        "foreign key: %s.%s contains a value '%s' that does not have a corresponding value in %s.%s."
-                        % (
-                            table_name, bad_row[0], table_name, column_name,
-                            bad_row[1], referenced_table_name, referenced_column_name,
+        with self.cursor() as cursor:
+            if table_names is None:
+                table_names = self.introspection.table_names(cursor)
+            for table_name in table_names:
+                primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
+                if not primary_key_column_name:
+                    continue
+                key_columns = self.introspection.get_key_columns(cursor, table_name)
+                for column_name, referenced_table_name, referenced_column_name in key_columns:
+                    cursor.execute(
+                        """
+                        SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
+                        LEFT JOIN `%s` as REFERRED
+                        ON (REFERRING.`%s` = REFERRED.`%s`)
+                        WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL
+                        """ % (
+                            primary_key_column_name, column_name, table_name,
+                            referenced_table_name, column_name, referenced_column_name,
+                            column_name, referenced_column_name,
                         )
                     )
+                    for bad_row in cursor.fetchall():
+                        raise utils.IntegrityError(
+                            "The row in table '%s' with primary key '%s' has an invalid "
+                            "foreign key: %s.%s contains a value '%s' that does not "
+                            "have a corresponding value in %s.%s."
+                            % (
+                                table_name, bad_row[0], table_name, column_name,
+                                bad_row[1], referenced_table_name, referenced_column_name,
+                            )
+                        )
 
     def is_usable(self):
         try:

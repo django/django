@@ -10,8 +10,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    Case, Col, Exists, ExpressionList, ExpressionWrapper, F, Func, OrderBy,
-    OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
+    Case, Col, Combinable, Exists, ExpressionList, ExpressionWrapper, F, Func,
+    OrderBy, OuterRef, Random, RawSQL, Ref, Subquery, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -71,6 +71,15 @@ class BasicExpressionsTests(TestCase):
                 '<Company: Foobar Ltd.>',
                 '<Company: Test GmbH>',
             ],
+        )
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
+    def test_filtering_on_annotate_that_uses_q(self):
+        self.assertEqual(
+            Company.objects.annotate(
+                num_employees_check=ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
+            ).filter(num_employees_check=True).count(),
+            2,
         )
 
     def test_filter_inter_attribute(self):
@@ -544,6 +553,11 @@ class BasicExpressionsTests(TestCase):
 
         expr = FuncB(FuncA())
         self.assertEqual(expr.output_field, FuncA.output_field)
+
+    def test_outerref_mixed_case_table_name(self):
+        inner = Result.objects.filter(result_time__gte=OuterRef('experiment__assigned'))
+        outer = Result.objects.filter(pk__in=Subquery(inner.values('pk')))
+        self.assertFalse(outer.exists())
 
 
 class IterableLookupInnerExpressionsTests(TestCase):
@@ -1387,3 +1401,23 @@ class ReprTests(TestCase):
             repr(Variance('a', sample=True, filter=filter)),
             "Variance(F(a), filter=(AND: ('a', 1)), sample=True)"
         )
+
+
+class CombinableTests(SimpleTestCase):
+    bitwise_msg = 'Use .bitand() and .bitor() for bitwise logical operations.'
+
+    def test_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() & Combinable()
+
+    def test_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            Combinable() | Combinable()
+
+    def test_reversed_and(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() & Combinable()
+
+    def test_reversed_or(self):
+        with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
+            object() | Combinable()

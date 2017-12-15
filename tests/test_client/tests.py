@@ -29,7 +29,7 @@ from django.test import (
 )
 from django.urls import reverse_lazy
 
-from .views import get_view, post_view, trace_view
+from .views import TwoArgException, get_view, post_view, trace_view
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')
@@ -712,6 +712,11 @@ class ClientTest(TestCase):
         """
         with self.assertRaisesMessage(Exception, 'exception message'):
             self.client.get('/nesting_exception_view/')
+
+    def test_response_raises_multi_arg_exception(self):
+        """A request may raise an exception with more than one required arg."""
+        with self.assertRaises(TwoArgException):
+            self.client.get('/two_arg_exception/')
 
     def test_uploading_temp_file(self):
         with tempfile.TemporaryFile() as test_file:

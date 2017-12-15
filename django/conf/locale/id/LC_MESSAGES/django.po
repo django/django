@@ -1,20 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Adiyat Mubarak <adiyatmubarak@gmail.com>, 2017
 # Fery Setiawan <gembelweb@gmail.com>, 2015-2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011
 # rodin <romihardiyanto@gmail.com>, 2013-2016
-# Sutrisno Efendi <kangfend@gmail.com>, 2015
+# Sutrisno Efendi <kangfend@gmail.com>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-03-05 13:15+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -294,7 +295,7 @@ msgid "Site Maps"
 msgstr "Peta Situs"
 
 msgid "Static Files"
-msgstr "Bidang Tetap"
+msgstr "Berkas statis"
 
 msgid "Syndication"
 msgstr "Sindikasi"
@@ -306,7 +307,7 @@ msgid "That page number is less than 1"
 msgstr "Nomor halaman itu kurang dari 1"
 
 msgid "That page contains no results"
-msgstr "Halaman itu mengandung tidak ada hasil"
+msgstr "Tidak ada hasil untuk halaman tersebut"
 
 msgid "Enter a valid value."
 msgstr "Masukkan nilai yang valid."
@@ -320,6 +321,7 @@ msgstr "Masukan sebuah bilangan bulat yang benar"
 msgid "Enter a valid email address."
 msgstr "Masukkan alamat email yang valid."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -405,6 +407,9 @@ msgid ""
 msgstr ""
 "Tambahan berkas '%(extension)s' tidak diizinkan. Tambahan diizinkan adalah: "
 "'%(allowed_extensions)s'. "
+
+msgid "Null characters are not allowed."
+msgstr "Karakter null tidak diperbolehkan."
 
 msgid "and"
 msgstr "dan"
@@ -734,9 +739,8 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Perbaiki nilai ganda di bawah ini."
 
-msgid "The inline foreign key did not match the parent instance primary key."
+msgid "The inline value did not match the parent instance."
 msgstr ""
-"Kunci asing 'inline' tidak cocok dengan kunci utama 'instance' milik induk."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
@@ -744,8 +748,8 @@ msgstr ""
 "yang tersedia."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" bukan nilai yang benar untuk kunci utama."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"1%(pk)s\" bukan nilai yang benar."
 
 #, python-format
 msgid ""
@@ -1104,6 +1108,14 @@ msgstr ""
 "atau untuk 'same-origin' requests."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1122,32 +1134,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Informasi lebih lanjut tersedia dengan DEBUG=True"
 
-msgid "Welcome to Django"
-msgstr "Selamat datang di Django"
-
-msgid "It worked!"
-msgstr "Berhasil!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Selamat untuk halaman Django pertama Anda."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Selanjutnya, mulai aplikasi pertama anda dengan menjalankan <code>python "
-"manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Anda dapat meilhat pesan ini karena ada <code>DEBUG = True</code> di berkas "
-"konfigurasi Django dan belum dikonfigurasi untuk suatu URL apapun. Get to "
-"work!"
-
 msgid "No year specified"
 msgstr "Tidak ada tahun dipilih"
+
+msgid "Date out of range"
+msgstr "Tanggal diluar kisaran"
 
 msgid "No month specified"
 msgstr "Tidak ada bulan dipilih"
@@ -1201,3 +1192,42 @@ msgstr "\"%(path)s\" tidak ada"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Daftar isi %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+"Django: Kerangka kerja Web untuk sang perfeksionis dengan tenggat waktu."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Selamat! Pemasangan berjalan lancar!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr "Dokumentasi Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Topik, referensi &amp; cara pemakaian"
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr "Memulai dengan Django"
+
+msgid "Django Community"
+msgstr "Komunitas Django"
+
+msgid "Connect, get help, or contribute"
+msgstr ""

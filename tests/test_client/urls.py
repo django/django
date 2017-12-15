@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^mass_mail_sending_view/$', views.mass_mail_sending_view),
     url(r'^nesting_exception_view/$', views.nesting_exception_view),
     url(r'^django_project_redirect/$', views.django_project_redirect),
+    url(r'^two_arg_exception/$', views.two_arg_exception),
 
     url(r'^accounts/$', RedirectView.as_view(url='login/')),
     url(r'^accounts/no_trailing_slash$', RedirectView.as_view(url='login/')),

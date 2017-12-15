@@ -13,7 +13,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func, Value
-from django.db.utils import ProgrammingError
+from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
@@ -231,7 +231,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             geom_type = f.geom_type
         if f.geography:
             if f.srid != 4326:
-                raise NotImplementedError('PostGIS only supports geography columns with an SRID of 4326.')
+                raise NotSupportedError('PostGIS only supports geography columns with an SRID of 4326.')
 
             return 'geography(%s,%d)' % (geom_type, f.srid)
         else:

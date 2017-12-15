@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-10-13 09:29+0000\n"
-"Last-Translator: peterisb <pb@sungis.lv>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-17 20:12+0000\n"
+"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +34,7 @@ msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekts ar primāro atslēgu %(key)r neeksistē."
 
 msgid "Password changed successfully."
-msgstr "Paroles nomainīta sekmīgi."
+msgstr "Parole nomainīta sekmīgi."
 
 #, python-format
 msgid "Change password: %s"
@@ -68,12 +69,11 @@ msgstr "Ievadi iepriekš norādīto paroli verifikācijai."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Neapstrādātas paroles sistēmā netiek glabātas, līdz ar to nav iespējams "
-"redzēt lietotāja paroli, bet tu vari nomainīt paroli lietojot <a href=\"../"
-"password/\">šo formu</a>."
+"Neapstrādātas paroles netiek glabātas, tāpēc nav iespējams apskatīt "
+"lietotāja paroli, bet jūs variet to nomainīt, izmantojot <a href=\"{}\">šo "
+"formu</a>."
 
 #, python-format
 msgid ""
@@ -130,10 +130,10 @@ msgid "time cost"
 msgstr "laika izmaksas"
 
 msgid "parallelism"
-msgstr ""
+msgstr "paralēlisms"
 
 msgid "work factor"
-msgstr ""
+msgstr "darba faktors"
 
 msgid "checksum"
 msgstr "kontrolsumma"
@@ -234,7 +234,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmi garai.."
 msgstr[2] ""
-"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmju garai."
+"Šī parole ir pārāk īsa. Tai ir jābūt vismaz %(min_length)d zīmēm garai."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."

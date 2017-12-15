@@ -349,7 +349,7 @@ class MigrationAutodetector:
                 m2.dependencies.append((app_label, m1.name))
 
         # De-dupe dependencies
-        for app_label, migrations in self.migrations.items():
+        for migrations in self.migrations.values():
             for migration in migrations:
                 migration.dependencies = list(set(migration.dependencies))
 
@@ -590,7 +590,7 @@ class MigrationAutodetector:
             # Generate other opns
             related_dependencies = [
                 (app_label, model_name, name, True)
-                for name, field in sorted(related_fields.items())
+                for name in sorted(related_fields)
             ]
             related_dependencies.append((app_label, model_name, None, True))
             for index in indexes:
@@ -738,7 +738,7 @@ class MigrationAutodetector:
                     )
                 )
             # Then remove each related field
-            for name, field in sorted(related_fields.items()):
+            for name in sorted(related_fields):
                 self.add_operation(
                     app_label,
                     operations.RemoveField(
@@ -759,7 +759,7 @@ class MigrationAutodetector:
                 if not related_object.many_to_many:
                     dependencies.append((related_object_app_label, object_name, field_name, "alter"))
 
-            for name, field in sorted(related_fields.items()):
+            for name in sorted(related_fields):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
             through_user = self.through_users.get((app_label, model_state.name_lower))
@@ -1173,7 +1173,7 @@ class MigrationAutodetector:
                 next_number += 1
                 migration.name = new_name
         # Now fix dependencies
-        for app_label, migrations in changes.items():
+        for migrations in changes.values():
             for migration in migrations:
                 migration.dependencies = [name_map.get(d, d) for d in migration.dependencies]
         return changes
@@ -1219,7 +1219,7 @@ class MigrationAutodetector:
                 return "%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
             elif isinstance(ops[0], operations.RemoveField):
                 return "remove_%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
-        elif len(ops) > 1:
+        elif ops:
             if all(isinstance(o, operations.CreateModel) for o in ops):
                 return "_".join(sorted(o.name_lower for o in ops))
         return "auto_%s" % get_migration_name_timestamp()

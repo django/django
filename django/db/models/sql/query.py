@@ -606,7 +606,7 @@ class Query:
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
-        self.order_by = rhs.order_by if rhs.order_by else self.order_by
+        self.order_by = rhs.order_by or self.order_by
         self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
     def deferred_to_data(self, target, callback):
@@ -692,8 +692,7 @@ class Query:
             # in the parent list. Again, it must be mentioned to ensure that
             # only "must include" fields are pulled in.
             for model in orig_opts.get_parent_list():
-                if model not in seen:
-                    seen[model] = set()
+                seen.setdefault(model, set())
             for model, values in seen.items():
                 callback(target, model, values)
 
@@ -1062,30 +1061,31 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        if len(lookups) == 0:
+        if not lookups:
             lookups = ['exact']
 
         for name in lookups[:-1]:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
         # supports both transform and lookup for the name.
-        lookup_class = lhs.get_lookup(lookups[-1])
+        lookup_name = lookups[-1]
+        lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
-                raise FieldError('Related Field got invalid lookup: {}'.format(lookups[-1]))
+                raise FieldError('Related Field got invalid lookup: {}'.format(lookup_name))
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
-            lhs = self.try_transform(lhs, lookups[-1])
-            lookup_class = lhs.get_lookup('exact')
-
-        if not lookup_class:
-            return
+            lhs = self.try_transform(lhs, lookup_name)
+            lookup_name = 'exact'
+            lookup_class = lhs.get_lookup(lookup_name)
+            if not lookup_class:
+                return
 
         lookup = lookup_class(lhs, rhs)
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
         if lookup.rhs is None:
-            if lookup.lookup_name not in ('exact', 'iexact'):
+            if lookup_name not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
             return lhs.get_lookup('isnull')(lhs, True)
 
@@ -1094,7 +1094,7 @@ class Query:
         # DEFAULT_DB_ALIAS isn't nice but it's the best that can be done here.
         # A similar thing is done in is_nullable(), too.
         if (connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
-                lookup.lookup_name == 'exact' and lookup.rhs == ''):
+                lookup_name == 'exact' and lookup.rhs == ''):
             return lhs.get_lookup('isnull')(lhs, True)
 
         return lookup
@@ -1627,6 +1627,9 @@ class Query:
         """Clear any existing limits."""
         self.low_mark, self.high_mark = 0, None
 
+    def has_limit_one(self):
+        return self.high_mark is not None and (self.high_mark - self.low_mark) == 1
+
     def can_filter(self):
         """
         Return True if adding filters to this instance is still possible.
@@ -1747,7 +1750,7 @@ class Query:
         """
         group_by = list(self.select)
         if self.annotation_select:
-            for alias, annotation in self.annotation_select.items():
+            for annotation in self.annotation_select.values():
                 for col in annotation.get_group_by_cols():
                     group_by.append(col)
         self.group_by = tuple(group_by)

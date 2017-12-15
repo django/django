@@ -2,13 +2,9 @@
 Cached, database-backed sessions.
 """
 
-import logging
-
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.core.cache import caches
-from django.core.exceptions import SuspiciousOperation
-from django.utils import timezone
 
 KEY_PREFIX = "django.contrib.sessions.cached_db"
 
@@ -36,20 +32,11 @@ class SessionStore(DBStore):
             data = None
 
         if data is None:
-            # Duplicate DBStore.load, because we need to keep track
-            # of the expiry date to set it properly in the cache.
-            try:
-                s = self.model.objects.get(
-                    session_key=self.session_key,
-                    expire_date__gt=timezone.now()
-                )
+            s = self._get_session_from_db()
+            if s:
                 data = self.decode(s.session_data)
                 self._cache.set(self.cache_key, data, self.get_expiry_age(expiry=s.expire_date))
-            except (self.model.DoesNotExist, SuspiciousOperation) as e:
-                if isinstance(e, SuspiciousOperation):
-                    logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                    logger.warning(str(e))
-                self._session_key = None
+            else:
                 data = {}
         return data
 

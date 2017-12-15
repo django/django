@@ -304,15 +304,15 @@ def gettext(message):
 
     eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
 
-    if len(eol_message) == 0:
-        # Return an empty value of the corresponding type if an empty message
-        # is given, instead of metadata, which is the default gettext behavior.
-        result = type(message)("")
-    else:
+    if eol_message:
         _default = _default or translation(settings.LANGUAGE_CODE)
         translation_object = getattr(_active, "value", _default)
 
         result = translation_object.gettext(eol_message)
+    else:
+        # Return an empty value of the corresponding type if an empty message
+        # is given, instead of metadata, which is the default gettext behavior.
+        result = type(message)('')
 
     if isinstance(message, SafeData):
         return mark_safe(result)
@@ -509,25 +509,26 @@ def get_language_from_request(request, check_path=False):
         return settings.LANGUAGE_CODE
 
 
+@functools.lru_cache(maxsize=1000)
 def parse_accept_lang_header(lang_string):
     """
     Parse the lang_string, which is the body of an HTTP Accept-Language
-    header, and return a list of (lang, q-value), ordered by 'q' values.
+    header, and return a tuple of (lang, q-value), ordered by 'q' values.
 
-    Return an empty list if there are any format errors in lang_string.
+    Return an empty tuple if there are any format errors in lang_string.
     """
     result = []
     pieces = accept_language_re.split(lang_string.lower())
     if pieces[-1]:
-        return []
+        return ()
     for i in range(0, len(pieces) - 1, 3):
         first, lang, priority = pieces[i:i + 3]
         if first:
-            return []
+            return ()
         if priority:
             priority = float(priority)
         else:
             priority = 1.0
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
-    return result
+    return tuple(result)

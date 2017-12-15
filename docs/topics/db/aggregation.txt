@@ -70,7 +70,7 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     # Difference between the highest priced book and the average price of all books.
     >>> from django.db.models import FloatField
     >>> Book.objects.aggregate(
-    ...     price_diff=Max('price', output_field=FloatField()) - Avg('price')))
+    ...     price_diff=Max('price', output_field=FloatField()) - Avg('price'))
     {'price_diff': 46.85}
 
     # All the following queries involve traversing the Book<->Publisher

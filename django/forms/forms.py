@@ -139,7 +139,7 @@ class BaseForm:
         if self._errors is None:
             is_valid = "Unknown"
         else:
-            is_valid = self.is_bound and not bool(self._errors)
+            is_valid = self.is_bound and not self._errors
         return '<%(cls)s bound=%(bound)s, valid=%(valid)s, fields=(%(fields)s)>' % {
             'cls': self.__class__.__name__,
             'bound': self.is_bound,
@@ -199,8 +199,7 @@ class BaseForm:
         for name, field in self.fields.items():
             html_class_attr = ''
             bf = self[name]
-            # Escape and cache in local variable.
-            bf_errors = self.error_class([conditional_escape(error) for error in bf.errors])
+            bf_errors = self.error_class(bf.errors)
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(

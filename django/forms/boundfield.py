@@ -87,20 +87,10 @@ class BoundField:
 
         attrs = attrs or {}
         attrs = self.build_widget_attrs(attrs, widget)
-        auto_id = self.auto_id
-        if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
-            if not only_initial:
-                attrs['id'] = auto_id
-            else:
-                attrs['id'] = self.html_initial_id
-
-        if not only_initial:
-            name = self.html_name
-        else:
-            name = self.html_initial_name
-
+        if self.auto_id and 'id' not in widget.attrs:
+            attrs.setdefault('id', self.html_initial_id if only_initial else self.auto_id)
         return widget.render(
-            name=name,
+            name=self.html_initial_name if only_initial else self.html_name,
             value=self.value(),
             attrs=attrs,
             renderer=self.form.renderer,
@@ -163,7 +153,7 @@ class BoundField:
         if id_:
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = dict(attrs or {}, **{'for': id_for_label})
+                attrs = {**(attrs or {}), 'for': id_for_label}
             if self.field.required and hasattr(self.form, 'required_css_class'):
                 attrs = attrs or {}
                 if 'class' in attrs:

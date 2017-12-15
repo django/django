@@ -26,10 +26,10 @@ class DatabaseErrorWrapperTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL test')
     def test_reraising_backend_specific_database_exception(self):
-        cursor = connection.cursor()
-        msg = 'table "X" does not exist'
-        with self.assertRaisesMessage(ProgrammingError, msg) as cm:
-            cursor.execute('DROP TABLE "X"')
+        with connection.cursor() as cursor:
+            msg = 'table "X" does not exist'
+            with self.assertRaisesMessage(ProgrammingError, msg) as cm:
+                cursor.execute('DROP TABLE "X"')
         self.assertNotEqual(type(cm.exception), type(cm.exception.__cause__))
         self.assertIsNotNone(cm.exception.__cause__)
         self.assertIsNotNone(cm.exception.__cause__.pgcode)

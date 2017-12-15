@@ -173,18 +173,18 @@ class SchemaTests(TransactionTestCase):
         index_orders = constraints[index]['orders']
         self.assertTrue(all(val == expected for val, expected in zip(index_orders, order)))
 
-    def assertForeignKeyExists(self, model, column, expected_fk_table):
+    def assertForeignKeyExists(self, model, column, expected_fk_table, field='id'):
         """
         Fail if the FK constraint on `model.Meta.db_table`.`column` to
         `expected_fk_table`.id doesn't exist.
         """
         constraints = self.get_constraints(model._meta.db_table)
         constraint_fk = None
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == [column] and details['foreign_key']:
                 constraint_fk = details['foreign_key']
                 break
-        self.assertEqual(constraint_fk, (expected_fk_table, 'id'))
+        self.assertEqual(constraint_fk, (expected_fk_table, field))
 
     def assertForeignKeyNotExists(self, model, column, expected_fk_table):
         with self.assertRaises(AssertionError):
@@ -836,7 +836,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(LocalBook)
         # Ensure no FK constraint exists
         constraints = self.get_constraints(LocalBook._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['foreign_key']:
                 self.fail('Found an unexpected FK constraint to %s' % details['columns'])
         old_field = LocalBook._meta.get_field("author")
@@ -1147,6 +1147,30 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['display_name'][0], "CharField")
         self.assertNotIn("name", columns)
 
+    @isolate_apps('schema')
+    def test_rename_referenced_field(self):
+        class Author(Model):
+            name = CharField(max_length=255, unique=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        class Book(Model):
+            author = ForeignKey(Author, CASCADE, to_field='name')
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        new_field = CharField(max_length=255, unique=True)
+        new_field.set_attributes_from_name('renamed')
+        with connection.schema_editor(atomic=connection.features.supports_atomic_references_rename) as editor:
+            editor.alter_field(Author, Author._meta.get_field('name'), new_field)
+        # Ensure the foreign key reference was updated.
+        self.assertForeignKeyExists(Book, 'author_id', 'schema_author', 'renamed')
+
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_rename_keep_null_status(self):
         """
@@ -1406,7 +1430,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
         # Ensure the constraint exists
         constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ["height"] and details['check']:
                 break
         else:
@@ -1418,7 +1442,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
         constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ["height"] and details['check']:
                 self.fail("Check constraint for height found")
         # Alter the column to re-add it
@@ -1426,7 +1450,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, new_field2, strict=True)
         constraints = self.get_constraints(Author._meta.db_table)
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ["height"] and details['check']:
                 break
         else:
@@ -1625,25 +1649,41 @@ class SchemaTests(TransactionTestCase):
             ),
         )
 
+    @isolate_apps('schema')
     def test_db_table(self):
         """
         Tests renaming of the table
         """
-        # Create the table
+        class Author(Model):
+            name = CharField(max_length=255)
+
+            class Meta:
+                app_label = 'schema'
+
+        class Book(Model):
+            author = ForeignKey(Author, CASCADE)
+
+            class Meta:
+                app_label = 'schema'
+
+        # Create the table and one referring it.
         with connection.schema_editor() as editor:
             editor.create_model(Author)
+            editor.create_model(Book)
         # Ensure the table is there to begin with
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
         # Alter the table
-        with connection.schema_editor() as editor:
+        with connection.schema_editor(atomic=connection.features.supports_atomic_references_rename) as editor:
             editor.alter_db_table(Author, "schema_author", "schema_otherauthor")
         # Ensure the table is there afterwards
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
+        # Ensure the foreign key reference was updated
+        self.assertForeignKeyExists(Book, "author_id", "schema_otherauthor")
         # Alter the table again
-        with connection.schema_editor() as editor:
+        with connection.schema_editor(atomic=connection.features.supports_atomic_references_rename) as editor:
             editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
         # Ensure the table is still there
         Author._meta.db_table = "schema_author"
@@ -1873,6 +1913,28 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("author_other_really_long_named_i_mean_so_long_fk")
         with connection.schema_editor() as editor:
             editor.add_field(BookWithLongName, new_field)
+
+    @isolate_apps('schema')
+    @skipUnlessDBFeature('supports_foreign_keys')
+    def test_add_foreign_key_quoted_db_table(self):
+        class Author(Model):
+            class Meta:
+                db_table = '"table_author_double_quoted"'
+                app_label = 'schema'
+
+        class Book(Model):
+            author = ForeignKey(Author, CASCADE)
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        if connection.vendor == 'mysql':
+            self.assertForeignKeyExists(Book, 'author_id', '"table_author_double_quoted"')
+        else:
+            self.assertForeignKeyExists(Book, 'author_id', 'table_author_double_quoted')
 
     def test_add_foreign_object(self):
         with connection.schema_editor() as editor:
@@ -2369,6 +2431,21 @@ class SchemaTests(TransactionTestCase):
             editor, Author, tob_auto_now_add, 'tob_auto_now_add', now.time(),
             cast_function=lambda x: x.time(),
         )
+
+    def test_namespaced_db_table_create_index_name(self):
+        """
+        Table names are stripped of their namespace/schema before being used to
+        generate index names.
+        """
+        with connection.schema_editor() as editor:
+            max_name_length = connection.ops.max_name_length() or 200
+            namespace = 'n' * max_name_length
+            table_name = 't' * max_name_length
+            namespaced_table_name = '"%s"."%s"' % (namespace, table_name)
+            self.assertEqual(
+                editor._create_index_name(table_name, []),
+                editor._create_index_name(namespaced_table_name, []),
+            )
 
     @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle specific db_table syntax')
     def test_creation_with_db_table_double_quotes(self):

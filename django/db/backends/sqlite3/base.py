@@ -33,7 +33,7 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode())
 
 
-Database.register_converter("bool", lambda s: s == b'1')
+Database.register_converter("bool", b'1'.__eq__)
 Database.register_converter("time", decoder(parse_time))
 Database.register_converter("date", decoder(parse_date))
 Database.register_converter("datetime", decoder(parse_datetime))
@@ -137,8 +137,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs = {
             'database': settings_dict['NAME'],
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+            **settings_dict['OPTIONS'],
         }
-        kwargs.update(settings_dict['OPTIONS'])
         # Always allow the underlying SQLite connection to be shareable
         # between multiple threads. The safe-guarding will be handled at a
         # higher level by the `BaseDatabaseWrapper.allow_thread_sharing`
@@ -153,9 +153,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 'for controlling thread shareability.',
                 RuntimeWarning
             )
-        kwargs.update({'check_same_thread': False})
-        if self.features.can_share_in_memory_db:
-            kwargs.update({'uri': True})
+        kwargs.update({'check_same_thread': False, 'uri': True})
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -239,37 +237,37 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Backends can override this method if they can more directly apply
         constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
-        cursor = self.cursor()
-        if table_names is None:
-            table_names = self.introspection.table_names(cursor)
-        for table_name in table_names:
-            primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
-            if not primary_key_column_name:
-                continue
-            key_columns = self.introspection.get_key_columns(cursor, table_name)
-            for column_name, referenced_table_name, referenced_column_name in key_columns:
-                cursor.execute(
-                    """
-                    SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
-                    LEFT JOIN `%s` as REFERRED
-                    ON (REFERRING.`%s` = REFERRED.`%s`)
-                    WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL
-                    """
-                    % (
-                        primary_key_column_name, column_name, table_name,
-                        referenced_table_name, column_name, referenced_column_name,
-                        column_name, referenced_column_name,
-                    )
-                )
-                for bad_row in cursor.fetchall():
-                    raise utils.IntegrityError(
-                        "The row in table '%s' with primary key '%s' has an "
-                        "invalid foreign key: %s.%s contains a value '%s' that "
-                        "does not have a corresponding value in %s.%s." % (
-                            table_name, bad_row[0], table_name, column_name,
-                            bad_row[1], referenced_table_name, referenced_column_name,
+        with self.cursor() as cursor:
+            if table_names is None:
+                table_names = self.introspection.table_names(cursor)
+            for table_name in table_names:
+                primary_key_column_name = self.introspection.get_primary_key_column(cursor, table_name)
+                if not primary_key_column_name:
+                    continue
+                key_columns = self.introspection.get_key_columns(cursor, table_name)
+                for column_name, referenced_table_name, referenced_column_name in key_columns:
+                    cursor.execute(
+                        """
+                        SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
+                        LEFT JOIN `%s` as REFERRED
+                        ON (REFERRING.`%s` = REFERRED.`%s`)
+                        WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL
+                        """
+                        % (
+                            primary_key_column_name, column_name, table_name,
+                            referenced_table_name, column_name, referenced_column_name,
+                            column_name, referenced_column_name,
                         )
                     )
+                    for bad_row in cursor.fetchall():
+                        raise utils.IntegrityError(
+                            "The row in table '%s' with primary key '%s' has an "
+                            "invalid foreign key: %s.%s contains a value '%s' that "
+                            "does not have a corresponding value in %s.%s." % (
+                                table_name, bad_row[0], table_name, column_name,
+                                bad_row[1], referenced_table_name, referenced_column_name,
+                            )
+                        )
 
     def is_usable(self):
         return True

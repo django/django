@@ -31,7 +31,7 @@ class Options:
 
 class BaseDatabaseCache(BaseCache):
     def __init__(self, table, params):
-        BaseCache.__init__(self, params)
+        super().__init__(params)
         self._table = table
 
         class CacheEntry:

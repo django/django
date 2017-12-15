@@ -26,10 +26,10 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
+from django.utils.version import PY36
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
-PY36 = sys.version_info >= (3, 6)
 SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 
@@ -235,6 +235,16 @@ class DjangoAdminNoSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
+
+    def test_commands_with_invalid_settings(self):
+        """"
+        Commands that don't require settings succeed if the settings file
+        doesn't exist.
+        """
+        args = ['startproject']
+        out, err = self.run_django_admin(args, settings_file='bad_settings')
+        self.assertNoOutput(out)
+        self.assertOutput(err, "You must provide a project name", regex=True)
 
 
 class DjangoAdminDefaultSettings(AdminScriptTestCase):

@@ -70,7 +70,8 @@ class LiveServerViews(LiveServerBase):
             conn.request('GET', '/example_view/', headers={'Connection': 'keep-alive'})
             response = conn.getresponse().read()
             conn.request('GET', '/example_view/', headers={'Connection': 'close'})
-            with self.assertRaises(RemoteDisconnected, msg='Server did not close the connection'):
+            # macOS may give ConnectionResetError.
+            with self.assertRaises((RemoteDisconnected, ConnectionResetError)):
                 try:
                     conn.getresponse()
                 except ConnectionAbortedError:

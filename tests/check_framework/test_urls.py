@@ -135,6 +135,36 @@ class CheckUrlConfigTests(SimpleTestCase):
         self.assertEqual(result, [])
 
 
+class UpdatedToPathTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.contains_re_named_group')
+    def test_contains_re_named_group(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, '2_0.W001')
+        expected_msg = "Your URL pattern '(?P<named-group>\\d+)' has a route"
+        self.assertIn(expected_msg, warning.msg)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.beginning_with_caret')
+    def test_beginning_with_caret(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, '2_0.W001')
+        expected_msg = "Your URL pattern '^beginning-with-caret' has a route"
+        self.assertIn(expected_msg, warning.msg)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.path_compatibility.ending_with_dollar')
+    def test_ending_with_dollar(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, '2_0.W001')
+        expected_msg = "Your URL pattern 'ending-with-dollar$' has a route"
+        self.assertIn(expected_msg, warning.msg)
+
+
 class CheckURLSettingsTests(SimpleTestCase):
 
     @override_settings(STATIC_URL='a/', MEDIA_URL='b/')

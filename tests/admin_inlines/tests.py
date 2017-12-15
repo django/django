@@ -453,6 +453,16 @@ class TestInlineMedia(TestDataMixin, TestCase):
         Inner3(dummy=42, holder=holder).save()
         change_url = reverse('admin:admin_inlines_holder3_change', args=(holder.id,))
         response = self.client.get(change_url)
+        self.assertEqual(
+            response.context['inline_admin_formsets'][0].media._js,
+            [
+                'admin/js/vendor/jquery/jquery.min.js',
+                'admin/js/jquery.init.js',
+                'admin/js/inlines.min.js',
+                'my_awesome_inline_scripts.js',
+                'custom_number.js',
+            ]
+        )
         self.assertContains(response, 'my_awesome_inline_scripts.js')
 
     def test_all_inline_media(self):

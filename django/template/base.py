@@ -762,17 +762,16 @@ class Variable:
             # Note that this could cause an OverflowError here that we're not
             # catching. Since this should only happen at compile time, that's
             # probably OK.
-            self.literal = float(var)
 
-            # So it's a float... is it an int? If the original value contained a
-            # dot or an "e" then it was a float, not an int.
-            if '.' not in var and 'e' not in var.lower():
-                self.literal = int(self.literal)
-
-            # "2." is invalid
-            if var.endswith('.'):
-                raise ValueError
-
+            # Try to interpret values containg a period or an 'e'/'E'
+            # (possibly scientific notation) as a float;  otherwise, try int.
+            if '.' in var or 'e' in var.lower():
+                self.literal = float(var)
+                # "2." is invalid
+                if var.endswith('.'):
+                    raise ValueError
+            else:
+                self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
             if var.startswith('_(') and var.endswith(')'):

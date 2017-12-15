@@ -109,7 +109,7 @@ or where it did not exceed a certain amount
     functionality which is possible in a database backend independent manner,
     and without duplicating functionality already in Django.
 
-We will start by writing a ``AbsoluteValue`` transformer. This will use the SQL
+We will start by writing an ``AbsoluteValue`` transformer. This will use the SQL
 function ``ABS()`` to transform the value before comparison::
 
   from django.db.models import Transform
@@ -257,7 +257,7 @@ operator. (Note that in reality almost all databases support both, including
 all the official databases supported by Django).
 
 We can change the behavior on a specific backend by creating a subclass of
-``NotEqual`` with a ``as_mysql`` method::
+``NotEqual`` with an ``as_mysql`` method::
 
   class MySQLNotEqual(NotEqual):
       def as_mysql(self, compiler, connection):

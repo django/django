@@ -138,7 +138,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         with mock.patch.object(self.UserModel, 'is_anonymous', True):
@@ -164,7 +164,7 @@ class BaseModelBackendTest:
         group.permissions.add(group_perm)
 
         self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
         self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         user.is_active = False

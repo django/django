@@ -312,7 +312,7 @@ class AdminSite:
         defaults = {
             'form_class': AdminPasswordChangeForm,
             'success_url': url,
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
@@ -325,7 +325,7 @@ class AdminSite:
         """
         from django.contrib.auth.views import PasswordChangeDoneView
         defaults = {
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
@@ -350,13 +350,13 @@ class AdminSite:
         """
         from django.contrib.auth.views import LogoutView
         defaults = {
-            'extra_context': dict(
-                self.each_context(request),
+            'extra_context': {
+                **self.each_context(request),
                 # Since the user isn't logged out at this point, the value of
                 # has_permission must be overridden.
-                has_permission=False,
+                'has_permission': False,
                 **(extra_context or {})
-            ),
+            },
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
@@ -378,12 +378,12 @@ class AdminSite:
         # it cannot import models from other applications at the module level,
         # and django.contrib.admin.forms eventually imports User.
         from django.contrib.admin.forms import AdminAuthenticationForm
-        context = dict(
-            self.each_context(request),
-            title=_('Log in'),
-            app_path=request.get_full_path(),
-            username=request.user.get_username(),
-        )
+        context = {
+            **self.each_context(request),
+            'title': _('Log in'),
+            'app_path': request.get_full_path(),
+            'username': request.user.get_username(),
+        }
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
             context[REDIRECT_FIELD_NAME] = reverse('admin:index', current_app=self.name)
@@ -486,12 +486,12 @@ class AdminSite:
         """
         app_list = self.get_app_list(request)
 
-        context = dict(
-            self.each_context(request),
-            title=self.index_title,
-            app_list=app_list,
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.each_context(request),
+            'title': self.index_title,
+            'app_list': app_list,
+            **(extra_context or {}),
+        }
 
         request.current_app = self.name
 
@@ -504,13 +504,13 @@ class AdminSite:
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         app_name = apps.get_app_config(app_label).verbose_name
-        context = dict(
-            self.each_context(request),
-            title=_('%(app)s administration') % {'app': app_name},
-            app_list=[app_dict],
-            app_label=app_label,
-        )
-        context.update(extra_context or {})
+        context = {
+            **self.each_context(request),
+            'title': _('%(app)s administration') % {'app': app_name},
+            'app_list': [app_dict],
+            'app_label': app_label,
+            **(extra_context or {}),
+        }
 
         request.current_app = self.name
 

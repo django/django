@@ -4,7 +4,6 @@ The main QuerySet implementation. This provides the public API for the ORM.
 
 import copy
 import operator
-import sys
 import warnings
 from collections import OrderedDict, namedtuple
 from functools import lru_cache
@@ -63,9 +62,8 @@ class ModelIterable(BaseIterable):
         related_populators = get_related_populators(klass_info, select, db)
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
-            if related_populators:
-                for rel_populator in related_populators:
-                    rel_populator.populate(row, obj)
+            for rel_populator in related_populators:
+                rel_populator.populate(row, obj)
             if annotation_col_map:
                 for attr_name, col_pos in annotation_col_map.items():
                     setattr(obj, attr_name, row[col_pos])
@@ -105,7 +103,7 @@ class ValuesIterable(BaseIterable):
         names = extra_names + field_names + annotation_names
 
         indexes = range(len(names))
-        for row in compiler.results_iter():
+        for row in compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size):
             yield {names[i]: row[i] for i in indexes}
 
 
@@ -133,8 +131,11 @@ class ValuesListIterable(BaseIterable):
                 # Reorder according to fields.
                 index_map = {name: idx for idx, name in enumerate(names)}
                 rowfactory = operator.itemgetter(*[index_map[f] for f in fields])
-                return map(rowfactory, compiler.results_iter())
-        return compiler.results_iter(tuple_expected=True)
+                return map(
+                    rowfactory,
+                    compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
+                )
+        return compiler.results_iter(tuple_expected=True, chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size)
 
 
 class NamedValuesListIterable(ValuesListIterable):
@@ -156,9 +157,7 @@ class NamedValuesListIterable(ValuesListIterable):
             names = queryset._fields
         else:
             query = queryset.query
-            names = list(query.extra_select)
-            names.extend(query.values_select)
-            names.extend(query.annotation_select)
+            names = [*query.extra_select, *query.values_select, *query.annotation_select]
         tuple_class = self.create_namedtuple_class(*names)
         new = tuple.__new__
         for row in super().__iter__():
@@ -174,7 +173,7 @@ class FlatValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
-        return chain.from_iterable(compiler.results_iter())
+        return chain.from_iterable(compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size))
 
 
 class QuerySet:
@@ -256,7 +255,7 @@ class QuerySet:
         """
         The queryset iterator protocol uses three nested iterators in the
         default case:
-            1. sql.compiler:execute_sql()
+            1. sql.compiler.execute_sql()
                - Returns 100 rows at time (constants.GET_ITERATOR_CHUNK_SIZE)
                  using cursor.fetchmany(). This part is responsible for
                  doing some column masking, and returning the rows in chunks.
@@ -438,7 +437,7 @@ class QuerySet:
         #    insert into the childmost table.
         # We currently set the primary keys on the objects when using
         # PostgreSQL via the RETURNING ID clause. It should be possible for
-        # Oracle as well, but the semantics for  extracting the primary keys is
+        # Oracle as well, but the semantics for extracting the primary keys is
         # trickier so it's not done yet.
         assert batch_size is None or batch_size > 0
         # Check that the parents share the same concrete model with the our
@@ -518,13 +517,12 @@ class QuerySet:
                 params = {k: v() if callable(v) else v for k, v in params.items()}
                 obj = self.create(**params)
             return obj, True
-        except IntegrityError:
-            exc_info = sys.exc_info()
+        except IntegrityError as e:
             try:
                 return self.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
+            raise e
 
     def _extract_model_params(self, defaults, **kwargs):
         """
@@ -1127,12 +1125,8 @@ class QuerySet:
 
     def _batched_insert(self, objs, fields, batch_size):
         """
-        A helper method for bulk_create() to insert the bulk one batch at a
-        time. Insert recursively a batch from the front of the bulk and then
-        _batched_insert() the remaining objects again.
+        Helper method for bulk_create() to insert objs one batch at a time.
         """
-        if not objs:
-            return
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
@@ -1436,7 +1430,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     Populate prefetched object caches for a list of model instances based on
     the lookups/Prefetch instances given.
     """
-    if len(model_instances) == 0:
+    if not model_instances:
         return  # nothing to do
 
     # We need to be able to dynamically add to the list of prefetch_related
@@ -1464,7 +1458,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
         through_attrs = lookup.prefetch_through.split(LOOKUP_SEP)
         for level, through_attr in enumerate(through_attrs):
             # Prepare main instances
-            if len(obj_list) == 0:
+            if not obj_list:
                 break
 
             prefetch_to = lookup.get_current_prefetch_to(level)
@@ -1774,9 +1768,8 @@ class RelatedPopulator:
             obj = None
         else:
             obj = self.model_cls.from_db(self.db, self.init_list, obj_data)
-            if self.related_populators:
-                for rel_iter in self.related_populators:
-                    rel_iter.populate(row, obj)
+            for rel_iter in self.related_populators:
+                rel_iter.populate(row, obj)
         self.local_setter(from_obj, obj)
         if obj is not None:
             self.remote_setter(obj, from_obj)

@@ -15,7 +15,7 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 
-from .models import City, Country, Person
+from .models import City, Country, Person, PersonProfile
 
 
 class SelectForUpdateTests(TransactionTestCase):
@@ -30,6 +30,7 @@ class SelectForUpdateTests(TransactionTestCase):
         self.city1 = City.objects.create(name='Liberchies', country=self.country1)
         self.city2 = City.objects.create(name='Samois-sur-Seine', country=self.country2)
         self.person = Person.objects.create(name='Reinhardt', born=self.city1, died=self.city2)
+        self.person_profile = PersonProfile.objects.create(person=self.person)
 
         # We need another database connection in transaction to test that one
         # connection issuing a SELECT ... FOR UPDATE will block.
@@ -225,13 +226,27 @@ class SelectForUpdateTests(TransactionTestCase):
         msg = (
             'Invalid field name(s) given in select_for_update(of=(...)): %s. '
             'Only relational fields followed in the query are allowed. '
-            'Choices are: self, born.'
+            'Choices are: self, born, profile.'
         )
         for name in ['born__country', 'died', 'died__country']:
             with self.subTest(name=name):
                 with self.assertRaisesMessage(FieldError, msg % name):
                     with transaction.atomic():
-                        Person.objects.select_related('born').select_for_update(of=(name,)).get()
+                        Person.objects.select_related(
+                            'born', 'profile',
+                        ).exclude(profile=None).select_for_update(of=(name,)).get()
+
+    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
+    def test_reverse_one_to_one_of_arguments(self):
+        """
+        Reverse OneToOneFields may be included in of=(...) as long as NULLs
+        are excluded because LEFT JOIN isn't allowed in SELECT FOR UPDATE.
+        """
+        with transaction.atomic():
+            person = Person.objects.select_related(
+                'profile',
+            ).exclude(profile=None).select_for_update(of=('profile',)).get()
+            self.assertEqual(person.profile, self.person_profile)
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_after_from(self):

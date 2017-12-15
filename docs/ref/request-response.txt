@@ -284,6 +284,15 @@ Methods
 
     Example: ``"/music/bands/the_beatles/?print=true"``
 
+.. method:: HttpRequest.get_full_path_info()
+
+    .. versionadded:: 2.1
+
+    Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
+    :attr:`path`.
+
+    Example: ``"/minfo/music/bands/the_beatles/?print=true"``
+
 .. method:: HttpRequest.build_absolute_uri(location)
 
     Returns the absolute URI form of ``location``. If no location is provided,
@@ -752,10 +761,9 @@ Methods
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
       will be calculated.
     * Use ``domain`` if you want to set a cross-domain cookie. For example,
-      ``domain=".lawrence.com"`` will set a cookie that is readable by
-      the domains www.lawrence.com, blogs.lawrence.com and
-      calendars.lawrence.com. Otherwise, a cookie will only be readable by
-      the domain that set it.
+      ``domain="example.com"`` will set a cookie that is readable by the
+      domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
+      only be readable by the domain that set it.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 

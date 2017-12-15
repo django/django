@@ -10,11 +10,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
 
     # MySQL stores positive fields as UNSIGNED ints.
-    integer_field_ranges = dict(
-        BaseDatabaseOperations.integer_field_ranges,
-        PositiveSmallIntegerField=(0, 65535),
-        PositiveIntegerField=(0, 4294967295),
-    )
+    integer_field_ranges = {
+        **BaseDatabaseOperations.integer_field_ranges,
+        'PositiveSmallIntegerField': (0, 65535),
+        'PositiveIntegerField': (0, 4294967295),
+    }
     cast_data_types = {
         'CharField': 'char(%(max_length)s)',
         'IntegerField': 'signed integer',
@@ -219,7 +219,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
-            converters.append(self.convert_datetimefield_value)
+            if settings.USE_TZ:
+                converters.append(self.convert_datetimefield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         return converters
@@ -236,8 +237,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def convert_datetimefield_value(self, value, expression, connection):
         if value is not None:
-            if settings.USE_TZ:
-                value = timezone.make_aware(value, self.connection.timezone)
+            value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection):

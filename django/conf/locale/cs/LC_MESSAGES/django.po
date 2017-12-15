@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-21 09:47+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 12:22+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -318,6 +318,7 @@ msgstr "Zadejte platné celé číslo."
 msgid "Enter a valid email address."
 msgstr "Zadejte platnou e-mailovou adresu."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -419,6 +420,9 @@ msgid ""
 msgstr ""
 "Přípona souboru '%(extension)s' není povolena. Povolené jsou tyto: "
 "'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Nulové znaky nejsou povoleny."
 
 msgid "and"
 msgstr "a"
@@ -753,16 +757,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Odstraňte duplicitní hodnoty níže."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Cizí klíč typu inline neodpovídá primárnímu klíči v rodičovské položce."
+msgid "The inline value did not match the parent instance."
+msgstr "Hodnota typu inline neodpovídá rodičovské položce."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Vyberte platnou možnost. Tato není k dispozici."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "Hodnota \"%(pk)s\" není platný primární klíč."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" není platná hodnota."
 
 #, python-format
 msgid ""
@@ -1135,6 +1138,19 @@ msgstr ""
 "\"stejný původ\" (same origin)."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Pokud používáte značku <meta name=\"referrer\" content=\"no-referrer\"> nebo "
+"záhlaví 'Referrer-Policy: no-referrer', odeberte je. Ochrana typu CSRF "
+"vyžaduje, aby záhlaví zajišťovalo striktní hlídání refereru. Pokud je pro "
+"vás soukromí důležité, použije k odkazům na cizí weby alternativní možnosti "
+"jako například <a rel=\"noreferrer\" ...>."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1153,32 +1169,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "V případě zapnutí volby DEBUG=True bude k dispozici více informací."
 
-msgid "Welcome to Django"
-msgstr "Vítejte v systému Django"
-
-msgid "It worked!"
-msgstr "Funguje to!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Gratulujeme, toto je vaše první stránka generována v prostředí Django."
-
-msgid ""
-"Next, start your first app by running <code>python manage.py startapp "
-"[app_label]</code>."
-msgstr ""
-"Nyní můžete začít práce na své první aplikaci spuštěním příkazu <code>python "
-"manage.py startapp [identifikátor_aplikace]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Tuto zprávu vidíte, protože máte v nastavení Djanga zapnutý vývojový režim "
-"<code>DEBUG = True</code> a zatím nemáte nastavena žádná URL. S chutí do "
-"práce!"
-
 msgid "No year specified"
 msgstr "Nebyl specifikován rok"
+
+msgid "Date out of range"
+msgstr "Datum je mimo rozsah"
 
 msgid "No month specified"
 msgstr "Nebyl specifikován měsíc"
@@ -1230,3 +1225,48 @@ msgstr "\"%(path)s\" neexistuje"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index adresáře %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: Webový framework pro perfekcionisty, kteří mají termín"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Zobrazit <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">poznámky k vydání</a> frameworku Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Instalace proběhla úspěšně, gratulujeme!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Tuto zprávu vidíte, protože máte v nastavení Djanga zapnutý vývojový režim "
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug"
+"\" target=\"_blank\" rel=\"noopener\">DEBUG=True</a> a zatím nemáte "
+"nastavena žádná URL."
+
+msgid "Django Documentation"
+msgstr "Dokumentace frameworku Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Témata, odkazy &amp; how-to"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutoriál: Hlasovací aplikace"
+
+msgid "Get started with Django"
+msgstr "Začínáme s frameworkem Django"
+
+msgid "Django Community"
+msgstr "Komunita kolem frameworku Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Propojte se, získejte pomoc, podílejte se"

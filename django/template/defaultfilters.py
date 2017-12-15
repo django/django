@@ -1,6 +1,7 @@
 """Default variable filters."""
 import random as random_module
 import re
+import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
@@ -37,12 +38,11 @@ def stringfilter(func):
     passed as the first positional argument will be converted to a string.
     """
     def _dec(*args, **kwargs):
-        if args:
-            args = list(args)
-            args[0] = str(args[0])
-            if (isinstance(args[0], SafeData) and
-                    getattr(_dec._decorated_function, 'is_safe', False)):
-                return mark_safe(func(*args, **kwargs))
+        args = list(args)
+        args[0] = str(args[0])
+        if (isinstance(args[0], SafeData) and
+                getattr(_dec._decorated_function, 'is_safe', False)):
+            return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
@@ -518,11 +518,11 @@ def first(value):
 @register.filter(is_safe=True, needs_autoescape=True)
 def join(value, arg, autoescape=True):
     """Join a list with a string, like Python's ``str.join(list)``."""
-    if autoescape:
-        value = [conditional_escape(v) for v in value]
     try:
+        if autoescape:
+            value = [conditional_escape(v) for v in value]
         data = conditional_escape(arg).join(value)
-    except AttributeError:  # fail silently but nicely
+    except TypeError:  # Fail silently if arg isn't iterable.
         return value
     return mark_safe(data)
 
@@ -568,7 +568,7 @@ def slice_filter(value, arg):
     try:
         bits = []
         for x in arg.split(':'):
-            if len(x) == 0:
+            if not x:
                 bits.append(None)
             else:
                 bits.append(int(x))
@@ -616,7 +616,7 @@ def unordered_list(value, autoescape=True):
                 except StopIteration:
                     yield item, None
                     break
-                if not isinstance(next_item, str):
+                if isinstance(next_item, (list, tuple, types.GeneratorType)):
                     try:
                         iter(next_item)
                     except TypeError:

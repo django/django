@@ -155,10 +155,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = UsernameField(
-        max_length=254,
-        widget=forms.TextInput(attrs={'autofocus': True}),
-    )
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
     password = forms.CharField(
         label=_("Password"),
         strip=False,
@@ -182,8 +179,9 @@ class AuthenticationForm(forms.Form):
         self.user_cache = None
         super().__init__(*args, **kwargs)
 
-        # Set the label for the "username" field.
+        # Set the max length and label for the "username" field.
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        self.fields['username'].max_length = self.username_field.max_length or 254
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
@@ -194,11 +192,16 @@ class AuthenticationForm(forms.Form):
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
-                raise forms.ValidationError(
-                    self.error_messages['invalid_login'],
-                    code='invalid_login',
-                    params={'username': self.username_field.verbose_name},
-                )
+                # An authentication backend may reject inactive users. Check
+                # if the user exists and is inactive, and raise the 'inactive'
+                # error if so.
+                try:
+                    self.user_cache = UserModel._default_manager.get_by_natural_key(username)
+                except UserModel.DoesNotExist:
+                    pass
+                else:
+                    self.confirm_login_allowed(self.user_cache)
+                raise self.get_invalid_login_error()
             else:
                 self.confirm_login_allowed(self.user_cache)
 
@@ -228,6 +231,13 @@ class AuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+    def get_invalid_login_error(self):
+        return forms.ValidationError(
+            self.error_messages['invalid_login'],
+            code='invalid_login',
+            params={'username': self.username_field.verbose_name},
+        )
 
 
 class PasswordResetForm(forms.Form):
@@ -289,9 +299,8 @@ class PasswordResetForm(forms.Form):
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
+                **(extra_email_context or {}),
             }
-            if extra_email_context is not None:
-                context.update(extra_email_context)
             self.send_mail(
                 subject_template_name, email_template_name, context, from_email,
                 email, html_email_template_name=html_email_template_name,
@@ -347,9 +356,10 @@ class PasswordChangeForm(SetPasswordForm):
     A form that lets a user change their password by entering their old
     password.
     """
-    error_messages = dict(SetPasswordForm.error_messages, **{
+    error_messages = {
+        **SetPasswordForm.error_messages,
         'password_incorrect': _("Your old password was entered incorrectly. Please enter it again."),
-    })
+    }
     old_password = forms.CharField(
         label=_("Old password"),
         strip=False,

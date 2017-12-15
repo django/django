@@ -48,14 +48,13 @@ of the case of the actual model class name.
 Default: ``[]`` (Empty list)
 
 A list of all the people who get code error notifications. When
-``DEBUG=False`` and a view raises an exception, Django will email these people
-with the full exception information. Each item in the list should be a tuple
-of (Full name, email address). Example::
+:setting:`DEBUG=False <DEBUG>` and :class:`~django.utils.log.AdminEmailHandler`
+is configured in :setting:`LOGGING` (done by default), Django emails these
+people the details of exceptions raised in the request/response cycle.
+
+Each item in the list should be a tuple of (Full name, email address). Example::
 
     [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
-
-Note that Django will email *all* of these people whenever an error happens.
-See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_HOSTS
 
@@ -309,7 +308,7 @@ Default: ``None``
 The domain to be used when setting the CSRF cookie.  This can be useful for
 easily allowing cross-subdomain requests to be excluded from the normal cross
 site request forgery protection.  It should be set to a string such as
-``".example.com"`` to allow a POST request from a form on one subdomain to be
+``"example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
 Please note that the presence of this setting does not imply that Django's CSRF
@@ -1733,8 +1732,8 @@ The age of the language cookie, in seconds.
 Default: ``None``
 
 The domain to use for the language cookie. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
+``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
@@ -1862,7 +1861,7 @@ __ https://github.com/django/django/blob/master/django/utils/log.py
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at a instance of Python's :ref:`dictConfig
+Django project. Points at an instance of Python's :ref:`dictConfig
 <logging-config-dictschema>` configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
@@ -2807,8 +2806,10 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``3``
 
-The number of days a password reset link is valid for. Used by the
-:mod:`django.contrib.auth` password reset mechanism.
+The minimum number of days a password reset link is valid for. Depending on
+when the link is generated, it will be valid for up to a day longer.
+
+Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
 .. setting:: PASSWORD_HASHERS
 
@@ -2956,8 +2957,8 @@ The age of session cookies, in seconds.
 Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
-``".example.com"`` (note the leading dot!) for cross-domain cookies, or use
-``None`` for a standard domain cookie.
+``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
+domain cookie.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used

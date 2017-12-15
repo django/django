@@ -41,7 +41,11 @@ class PasswordResetTokenGenerator:
         if not constant_time_compare(self._make_token_with_timestamp(user, ts), token):
             return False
 
-        # Check the timestamp is within limit
+        # Check the timestamp is within limit. Timestamps are rounded to
+        # midnight (server time) providing a resolution of only 1 day. If a
+        # link is generated 5 minutes before midnight and used 6 minutes later,
+        # that counts as 1 day. Therefore, PASSWORD_RESET_TIMEOUT_DAYS = 1 means
+        # "at least 1 day, could be up to 2."
         if (self._num_days(self._today()) - ts) > settings.PASSWORD_RESET_TIMEOUT_DAYS:
             return False
 

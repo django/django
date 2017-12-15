@@ -155,7 +155,7 @@ class MigrateTests(MigrationTestBase):
             # Fails because "migrations_tribble" does not exist but needs to in
             # order to make --fake-initial work.
             call_command("migrate", "migrations", fake_initial=True, verbosity=0)
-        # Fake a apply
+        # Fake an apply
         call_command("migrate", "migrations", fake=True, verbosity=0)
         call_command("migrate", "migrations", fake=True, verbosity=0, database="other")
         # Unmigrate everything

@@ -423,12 +423,12 @@ Models
 * A proxy model may now inherit multiple proxy models that share a common
   non-abstract parent class.
 
-* Added :class:`~django.db.models.functions.datetime.Extract` functions
-  to extract datetime components as integers, such as year and hour.
+* Added :class:`~django.db.models.functions.Extract` functions to extract
+  datetime components as integers, such as year and hour.
 
-* Added :class:`~django.db.models.functions.datetime.Trunc` functions to
-  truncate a date or datetime to a significant component. They enable queries
-  like sales-per-day or sales-per-hour.
+* Added :class:`~django.db.models.functions.Trunc` functions to truncate a date
+  or datetime to a significant component. They enable queries like
+  sales-per-day or sales-per-hour.
 
 * ``Model.__init__()`` now sets values of virtual fields from its keyword
   arguments.
@@ -894,8 +894,8 @@ Miscellaneous
   yourself.
 
 * Private expressions ``django.db.models.expressions.Date`` and ``DateTime``
-  are removed. The new :class:`~django.db.models.functions.datetime.Trunc`
-  expressions provide the same functionality.
+  are removed. The new :class:`~django.db.models.functions.Trunc` expressions
+  provide the same functionality.
 
 * The ``_base_manager`` and ``_default_manager`` attributes are removed from
   model instances. They remain accessible on the model class.

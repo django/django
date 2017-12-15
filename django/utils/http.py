@@ -88,11 +88,24 @@ def urlencode(query, doseq=False):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
-    return original_urlencode(
-        [(k, [str(i) for i in v] if isinstance(v, (list, tuple)) else str(v))
-         for k, v in query],
-        doseq
-    )
+    query_params = []
+    for key, value in query:
+        if isinstance(value, (str, bytes)):
+            query_val = value
+        else:
+            try:
+                iter(value)
+            except TypeError:
+                query_val = value
+            else:
+                # Consume generators and iterators, even when doseq=True, to
+                # work around https://bugs.python.org/issue31706.
+                query_val = [
+                    item if isinstance(item, bytes) else str(item)
+                    for item in value
+                ]
+        query_params.append((key, query_val))
+    return original_urlencode(query_params, doseq)
 
 
 def cookie_date(epoch_seconds=None):
@@ -132,7 +145,7 @@ def parse_http_date(date):
 
     Return an integer expressed in seconds since the epoch, in UTC.
     """
-    # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
+    # email.utils.parsedate() does the job for RFC1123 dates; unfortunately
     # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
@@ -311,7 +324,6 @@ def _urlsplit(url, scheme='', allow_fragments=True):
     Note that we don't break the components up in smaller bits
     (e.g. netloc is a single string) and we don't expand % escapes."""
     url, scheme, _coerce_result = _coerce_args(url, scheme)
-    allow_fragments = bool(allow_fragments)
     netloc = query = fragment = ''
     i = url.find(':')
     if i > 0:
@@ -407,7 +419,7 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
                 nv.append('')
             else:
                 continue
-        if len(nv[1]) or keep_blank_values:
+        if nv[1] or keep_blank_values:
             name = nv[0].replace('+', ' ')
             name = unquote(name, encoding=encoding, errors=errors)
             value = nv[1].replace('+', ' ')

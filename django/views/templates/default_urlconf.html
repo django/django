@@ -25,13 +25,13 @@
           a {
             background-color: transparent;
             -webkit-text-decoration-skip: objects;
-            color: #20AA76;
+            color: #19865C;
             text-decoration: none;
           }
           img {
             border-style: none;
           }
-          .next-step, header {
+          header {
             border-bottom: 1px solid #efefef;
           }
           svg:not(:root) {
@@ -221,17 +221,7 @@
             line-height: 20px;
             max-width: 390px;
             margin: 15px auto 0;
-            color: gray;
-          }
-          .next-step {
-            max-width: 120px;
-            margin: 150px auto 0;
-            padding-bottom: 8px;
-          }
-          .next-step h5 {
-            font-size: 12px;
-            color: #b3b3b3;
-            font-weight: 300;
+            color: #747755;
           }
           footer {
             padding: 30px 0;
@@ -274,14 +264,14 @@
             margin-right: 10px;
           }
           .option h4 {
-            color: #20AA76;
+            color: #19865C;
             font-size: 19px;
           }
           .option p {
             font-weight: 300;
             font-size: 15px;
             padding-top: 3px;
-            color: #8f8f8f;
+            color: #757575;
           }
           @media (max-width: 996px) {
             body, footer {
@@ -390,7 +380,7 @@
           </svg>
         </div>
         <h2>{% trans "The install worked successfully! Congratulations!" %}</h2>
-        <p>{% blocktrans %}You are seeing this page because <a href="https://docs.djangoproject.com/en/{{ version }}/ref/settings/#debug" target="_blank" rel="noopener">DEBUG=True</a> is in your settings file and have not configured any URLs.{% endblocktrans %}</p>
+        <p>{% blocktrans %}You are seeing this page because <a href="https://docs.djangoproject.com/en/{{ version }}/ref/settings/#debug" target="_blank" rel="noopener">DEBUG=True</a> is in your settings file and you have not configured any URLs.{% endblocktrans %}</p>
       </main>
       <footer class="u-clearfix">
         <a href="https://docs.djangoproject.com/en/{{ version }}/" target="_blank" rel="noopener">

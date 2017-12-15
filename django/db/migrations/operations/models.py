@@ -147,13 +147,11 @@ class CreateModel(ModelOperation):
                 ),
             ]
         elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
-            new_options = self.options.copy()
-            new_options.update(operation.options)
             return [
                 CreateModel(
                     self.name,
                     fields=self.fields,
-                    options=new_options,
+                    options={**self.options, **operation.options},
                     bases=self.bases,
                     managers=self.managers,
                 ),
@@ -690,11 +688,10 @@ class AlterModelOptions(ModelOptionOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name_lower]
-        model_state.options = dict(model_state.options)
-        model_state.options.update(self.options)
+        model_state.options = {**model_state.options, **self.options}
         for key in self.ALTER_OPTION_KEYS:
-            if key not in self.options and key in model_state.options:
-                del model_state.options[key]
+            if key not in self.options:
+                model_state.options.pop(key, False)
         state.reload_model(app_label, self.name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):

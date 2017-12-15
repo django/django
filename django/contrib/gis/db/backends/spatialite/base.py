@@ -61,5 +61,4 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         with self.cursor() as cursor:
             cursor.execute("PRAGMA table_info(geometry_columns);")
             if cursor.fetchall() == []:
-                arg = "1" if self.features.supports_initspatialmetadata_in_one_transaction else ""
-                cursor.execute("SELECT InitSpatialMetaData(%s)" % arg)
+                cursor.execute("SELECT InitSpatialMetaData(1)")

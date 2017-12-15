@@ -94,8 +94,6 @@ class CommonMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         """
-        Calculate the ETag, if needed.
-
         When the status code of the response is 404, it may redirect to a path
         with an appended slash if should_redirect_with_slash() returns True.
         """

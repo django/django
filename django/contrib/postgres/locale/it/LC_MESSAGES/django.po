@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# bbstuntman <Bbstuntman@gmail.com>, 2017
+# bbstuntman <claudiu.andrei.roman@gmail.com>, 2017
 # Flavio Curella <flavio.curella@gmail.com>, 2016
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-02-19 07:22+0000\n"
+"PO-Revision-Date: 2017-09-23 20:42+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"

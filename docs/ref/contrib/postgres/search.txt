@@ -80,9 +80,9 @@ looks for matches for all of the resulting terms.
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
     >>> from django.contrib.postgres.search import SearchQuery
-    >>> SearchQuery('potato') & SearchQuery('ireland')  # potato AND ireland
-    >>> SearchQuery('potato') | SearchQuery('penguin')  # potato OR penguin
-    >>> ~SearchQuery('sausage')  # NOT sausage
+    >>> SearchQuery('meat') & SearchQuery('cheese')  # AND
+    >>> SearchQuery('meat') | SearchQuery('cheese')  # OR
+    >>> ~SearchQuery('meat')  # NOT
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.

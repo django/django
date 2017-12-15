@@ -325,7 +325,7 @@ class DeletionTests(TestCase):
         # Calculate the number of queries needed.
         batch_size = connection.ops.bulk_batch_size(['pk'], objs)
         # The related fetches are done in batches.
-        batches = int(ceil(float(len(objs)) / batch_size))
+        batches = ceil(len(objs) / batch_size)
         # One query for Avatar.objects.all() and then one related fast delete for
         # each batch.
         fetches_to_mem = 1 + batches
@@ -342,12 +342,12 @@ class DeletionTests(TestCase):
 
         batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
 
-        # TEST_SIZE // batch_size (select related `T` instances)
+        # TEST_SIZE / batch_size (select related `T` instances)
         # + 1 (select related `U` instances)
-        # + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
+        # + TEST_SIZE / GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
         # + 1 (delete `s`)
-        expected_num_queries = (ceil(TEST_SIZE // batch_size) +
-                                ceil(TEST_SIZE // GET_ITERATOR_CHUNK_SIZE) + 2)
+        expected_num_queries = ceil(TEST_SIZE / batch_size)
+        expected_num_queries += ceil(TEST_SIZE / GET_ITERATOR_CHUNK_SIZE) + 2
 
         self.assertNumQueries(expected_num_queries, s.delete)
         self.assertFalse(S.objects.exists())

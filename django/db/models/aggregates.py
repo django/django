@@ -4,7 +4,6 @@ Classes to represent the definitions of aggregate functions.
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Case, Func, Star, When
 from django.db.models.fields import DecimalField, FloatField, IntegerField
-from django.db.models.query_utils import Q
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
@@ -72,9 +71,8 @@ class Aggregate(Func):
             else:
                 copy = self.copy()
                 copy.filter = None
-                condition = When(Q())
                 source_expressions = copy.get_source_expressions()
-                condition.set_source_expressions([self.filter, source_expressions[0]])
+                condition = When(self.filter, then=source_expressions[0])
                 copy.set_source_expressions([Case(condition)] + source_expressions[1:])
                 return super(Aggregate, copy).as_sql(compiler, connection, **extra_context)
         return super().as_sql(compiler, connection, **extra_context)
@@ -123,8 +121,7 @@ class Count(Aggregate):
         )
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        return dict(options, distinct=self.extra['distinct'] != '')
+        return {**super()._get_repr_options(), 'distinct': self.extra['distinct'] != ''}
 
     def convert_value(self, value, expression, connection):
         return 0 if value is None else value
@@ -149,8 +146,7 @@ class StdDev(Aggregate):
         super().__init__(expression, **extra)
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        return dict(options, sample=self.function == 'STDDEV_SAMP')
+        return {**super()._get_repr_options(), 'sample': self.function == 'STDDEV_SAMP'}
 
 
 class Sum(Aggregate):
@@ -176,5 +172,4 @@ class Variance(Aggregate):
         super().__init__(expression, **extra)
 
     def _get_repr_options(self):
-        options = super()._get_repr_options()
-        return dict(options, sample=self.function == 'VAR_SAMP')
+        return {**super()._get_repr_options(), 'sample': self.function == 'VAR_SAMP'}

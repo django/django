@@ -241,10 +241,7 @@ class Widget(metaclass=MediaDefiningClass):
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """Build an attribute dictionary."""
-        attrs = base_attrs.copy()
-        if extra_attrs is not None:
-            attrs.update(extra_attrs)
-        return attrs
+        return {**base_attrs, **(extra_attrs or {})}
 
     def value_from_datadict(self, data, files, name):
         """
@@ -474,7 +471,7 @@ class DateTimeBaseInput(TextInput):
 
     def __init__(self, attrs=None, format=None):
         super().__init__(attrs)
-        self.format = format if format else None
+        self.format = format or None
 
     def format_value(self, value):
         return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])
@@ -681,7 +678,7 @@ class Select(ChoiceWidget):
     def _choice_has_empty_value(choice):
         """Return True if the choice's value is empty string or None."""
         value, _ = choice
-        return (isinstance(value, str) and not bool(value)) or value is None
+        return value is None or value == ''
 
     def use_required_attribute(self, initial):
         """

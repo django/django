@@ -50,9 +50,6 @@ class Command(BaseCommand):
             test_runner_class.add_arguments(parser)
 
     def handle(self, *test_labels, **options):
-        from django.conf import settings
-        from django.test.utils import get_runner
-
         TestRunner = get_runner(settings, options['testrunner'])
 
         test_runner = TestRunner(**options)

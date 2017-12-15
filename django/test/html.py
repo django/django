@@ -148,7 +148,7 @@ class Parser(HTMLParser):
     )
 
     def __init__(self):
-        HTMLParser.__init__(self, convert_charrefs=False)
+        super().__init__(convert_charrefs=False)
         self.root = RootElement()
         self.open_tags = []
         self.element_positions = {}

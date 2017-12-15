@@ -158,7 +158,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             # to be the case.
             with self.disable_implicit_wait():
                 self.wait_until(
-                    lambda driver: len(driver.find_elements_by_css_selector(options_selector)) == 0
+                    lambda driver: not driver.find_elements_by_css_selector(options_selector)
                 )
 
     def assertSelectOptions(self, selector, values):

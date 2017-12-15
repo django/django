@@ -407,6 +407,11 @@ class SQLCompiler:
         parts = ()
         for compiler in compilers:
             try:
+                # If the columns list is limited, then all combined queries
+                # must have the same columns list. Set the selects defined on
+                # the query on all combined queries, if not already set.
+                if not compiler.query.values_select and self.query.values_select:
+                    compiler.query.set_values(self.query.values_select)
                 parts += (compiler.as_sql(),)
             except EmptyResultSet:
                 # Omit the empty queryset with UNION and with DIFFERENCE if the
@@ -439,6 +444,8 @@ class SQLCompiler:
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
             for_update_part = None
+            # Is a LIMIT/OFFSET clause needed?
+            with_limit_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
@@ -469,17 +476,14 @@ class SQLCompiler:
                     params.extend(s_params)
                     out_cols.append(s_sql)
 
-                result.append(', '.join(out_cols))
-
-                result.append('FROM')
-                result.extend(from_)
+                result += [', '.join(out_cols), 'FROM', *from_]
                 params.extend(f_params)
 
                 if self.query.select_for_update and self.connection.features.has_select_for_update:
                     if self.connection.get_autocommit():
                         raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
 
-                    if with_limits and not self.connection.features.supports_select_for_update_with_limit:
+                    if with_limit_offset and not self.connection.features.supports_select_for_update_with_limit:
                         raise NotSupportedError(
                             'LIMIT/OFFSET is not supported with '
                             'select_for_update on this database backend.'
@@ -531,15 +535,8 @@ class SQLCompiler:
                     params.extend(o_params)
                 result.append('ORDER BY %s' % ', '.join(ordering))
 
-            if with_limits:
-                if self.query.high_mark is not None:
-                    result.append('LIMIT %d' % (self.query.high_mark - self.query.low_mark))
-                if self.query.low_mark:
-                    if self.query.high_mark is None:
-                        val = self.connection.ops.no_limit_value()
-                        if val:
-                            result.append('LIMIT %d' % val)
-                    result.append('OFFSET %d' % self.query.low_mark)
+            if with_limit_offset:
+                result.append(self.connection.ops.limit_offset_sql(self.query.low_mark, self.query.high_mark))
 
             if for_update_part and not self.connection.features.for_update_after_from:
                 result.append(for_update_part)
@@ -564,7 +561,7 @@ class SQLCompiler:
                         subselect, subparams = select_clone.as_sql(self, self.connection)
                         sub_selects.append(subselect)
                         sub_params.extend(subparams)
-                return 'SELECT %s FROM (%s) AS subquery' % (
+                return 'SELECT %s FROM (%s) subquery' % (
                     ', '.join(sub_selects),
                     ' '.join(result),
                 ), sub_params + params
@@ -788,6 +785,7 @@ class SQLCompiler:
             klass_info = {
                 'model': f.remote_field.model,
                 'field': f,
+                'reverse': False,
                 'local_setter': f.set_cached_value,
                 'remote_setter': f.remote_field.set_cached_value if f.unique else lambda x, y: None,
                 'from_parent': False,
@@ -826,6 +824,7 @@ class SQLCompiler:
                 klass_info = {
                     'model': model,
                     'field': f,
+                    'reverse': True,
                     'local_setter': f.remote_field.set_cached_value,
                     'remote_setter': f.set_cached_value,
                     'from_parent': from_parent,
@@ -863,6 +862,7 @@ class SQLCompiler:
                     klass_info = {
                         'model': model,
                         'field': f,
+                        'reverse': True,
                         'local_setter': local_setter,
                         'remote_setter': remote_setter,
                         'from_parent': from_parent,
@@ -910,7 +910,10 @@ class SQLCompiler:
                     path = []
                     yield 'self'
                 else:
-                    path = parent_path + [klass_info['field'].name]
+                    field = klass_info['field']
+                    if klass_info['reverse']:
+                        field = field.remote_field
+                    path = parent_path + [field.name]
                     yield LOOKUP_SEP.join(path)
                 queue.extend(
                     (path, klass_info)
@@ -923,7 +926,10 @@ class SQLCompiler:
             klass_info = self.klass_info
             for part in parts:
                 for related_klass_info in klass_info.get('related_klass_infos', []):
-                    if related_klass_info['field'].name == part:
+                    field = related_klass_info['field']
+                    if related_klass_info['reverse']:
+                        field = field.remote_field
+                    if field.name == part:
                         klass_info = related_klass_info
                         break
                 else:
@@ -993,10 +999,11 @@ class SQLCompiler:
                 row[pos] = value
             yield row
 
-    def results_iter(self, results=None, tuple_expected=False):
+    def results_iter(self, results=None, tuple_expected=False, chunked_fetch=False,
+                     chunk_size=GET_ITERATOR_CHUNK_SIZE):
         """Return an iterator over the results from executing this query."""
         if results is None:
-            results = self.execute_sql(MULTI)
+            results = self.execute_sql(MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size)
         fields = [s[0] for s in self.select[0:self.col_count]]
         converters = self.get_converters(fields)
         rows = chain.from_iterable(results)
@@ -1052,8 +1059,7 @@ class SQLCompiler:
             raise
 
         if result_type == CURSOR:
-            # Caller didn't specify a result_type, so just give them back the
-            # cursor to process (and close).
+            # Give the caller the cursor to process and close.
             return cursor
         if result_type == SINGLE:
             try:
@@ -1206,12 +1212,10 @@ class SQLInsertCompiler(SQLCompiler):
         qn = self.connection.ops.quote_name
         opts = self.query.get_meta()
         result = ['INSERT INTO %s' % qn(opts.db_table)]
-
-        has_fields = bool(self.query.fields)
-        fields = self.query.fields if has_fields else [opts.pk]
+        fields = self.query.fields or [opts.pk]
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
-        if has_fields:
+        if self.query.fields:
             value_rows = [
                 [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
                 for obj in self.query.objs
@@ -1263,7 +1267,7 @@ class SQLInsertCompiler(SQLCompiler):
         with self.connection.cursor() as cursor:
             for sql, params in self.as_sql():
                 cursor.execute(sql, params)
-            if not (return_id and cursor):
+            if not return_id:
                 return
             if self.connection.features.can_return_ids_from_bulk_insert and len(self.query.objs) > 1:
                 return self.connection.ops.fetch_returned_insert_ids(cursor)

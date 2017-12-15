@@ -65,21 +65,21 @@ def check_dependencies(**kwargs):
 class BaseModelAdminChecks:
 
     def check(self, admin_obj, **kwargs):
-        errors = []
-        errors.extend(self._check_autocomplete_fields(admin_obj))
-        errors.extend(self._check_raw_id_fields(admin_obj))
-        errors.extend(self._check_fields(admin_obj))
-        errors.extend(self._check_fieldsets(admin_obj))
-        errors.extend(self._check_exclude(admin_obj))
-        errors.extend(self._check_form(admin_obj))
-        errors.extend(self._check_filter_vertical(admin_obj))
-        errors.extend(self._check_filter_horizontal(admin_obj))
-        errors.extend(self._check_radio_fields(admin_obj))
-        errors.extend(self._check_prepopulated_fields(admin_obj))
-        errors.extend(self._check_view_on_site_url(admin_obj))
-        errors.extend(self._check_ordering(admin_obj))
-        errors.extend(self._check_readonly_fields(admin_obj))
-        return errors
+        return [
+            *self._check_autocomplete_fields(admin_obj),
+            *self._check_raw_id_fields(admin_obj),
+            *self._check_fields(admin_obj),
+            *self._check_fieldsets(admin_obj),
+            *self._check_exclude(admin_obj),
+            *self._check_form(admin_obj),
+            *self._check_filter_vertical(admin_obj),
+            *self._check_filter_horizontal(admin_obj),
+            *self._check_radio_fields(admin_obj),
+            *self._check_prepopulated_fields(admin_obj),
+            *self._check_view_on_site_url(admin_obj),
+            *self._check_ordering(admin_obj),
+            *self._check_readonly_fields(admin_obj),
+        ]
 
     def _check_autocomplete_fields(self, obj):
         """
@@ -104,7 +104,7 @@ class BaseModelAdminChecks:
         except FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label, model=model, obj=obj, id='admin.E037')
         else:
-            if not (field.many_to_many or field.many_to_one):
+            if not field.many_to_many and not isinstance(field, models.ForeignKey):
                 return must_be(
                     'a foreign key or a many-to-many field',
                     option=label, obj=obj, id='admin.E038'
@@ -554,20 +554,21 @@ class BaseModelAdminChecks:
 class ModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, admin_obj, **kwargs):
-        errors = super().check(admin_obj)
-        errors.extend(self._check_save_as(admin_obj))
-        errors.extend(self._check_save_on_top(admin_obj))
-        errors.extend(self._check_inlines(admin_obj))
-        errors.extend(self._check_list_display(admin_obj))
-        errors.extend(self._check_list_display_links(admin_obj))
-        errors.extend(self._check_list_filter(admin_obj))
-        errors.extend(self._check_list_select_related(admin_obj))
-        errors.extend(self._check_list_per_page(admin_obj))
-        errors.extend(self._check_list_max_show_all(admin_obj))
-        errors.extend(self._check_list_editable(admin_obj))
-        errors.extend(self._check_search_fields(admin_obj))
-        errors.extend(self._check_date_hierarchy(admin_obj))
-        return errors
+        return [
+            *super().check(admin_obj),
+            *self._check_save_as(admin_obj),
+            *self._check_save_on_top(admin_obj),
+            *self._check_inlines(admin_obj),
+            *self._check_list_display(admin_obj),
+            *self._check_list_display_links(admin_obj),
+            *self._check_list_filter(admin_obj),
+            *self._check_list_select_related(admin_obj),
+            *self._check_list_per_page(admin_obj),
+            *self._check_list_max_show_all(admin_obj),
+            *self._check_list_editable(admin_obj),
+            *self._check_search_fields(admin_obj),
+            *self._check_date_hierarchy(admin_obj),
+        ]
 
     def _check_save_as(self, obj):
         """ Check save_as is a boolean. """
@@ -643,54 +644,32 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif hasattr(obj, item):
             return []
         elif hasattr(model, item):
-            # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
                 field = model._meta.get_field(item)
             except FieldDoesNotExist:
-                try:
-                    field = getattr(model, item)
-                except AttributeError:
-                    field = None
-
-            if field is None:
-                return [
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a "
-                        "callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                            label, item, obj.__class__.__name__, model._meta.app_label, model._meta.object_name
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E108',
-                    )
-                ]
-            elif isinstance(field, models.ManyToManyField):
-                return [
-                    checks.Error(
-                        "The value of '%s' must not be a ManyToManyField." % label,
-                        obj=obj.__class__,
-                        id='admin.E109',
-                    )
-                ]
+                return []
             else:
+                if isinstance(field, models.ManyToManyField):
+                    return [
+                        checks.Error(
+                            "The value of '%s' must not be a ManyToManyField." % label,
+                            obj=obj.__class__,
+                            id='admin.E109',
+                        )
+                    ]
                 return []
         else:
-            try:
-                model._meta.get_field(item)
-            except FieldDoesNotExist:
-                return [
-                    # This is a deliberate repeat of E108; there's more than one path
-                    # required to test this condition.
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, "
-                        "an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                            label, item, obj.__class__.__name__, model._meta.app_label, model._meta.object_name
-                        ),
-                        obj=obj.__class__,
-                        id='admin.E108',
-                    )
-                ]
-            else:
-                return []
+            return [
+                checks.Error(
+                    "The value of '%s' refers to '%s', which is not a callable, "
+                    "an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        label, item, obj.__class__.__name__,
+                        model._meta.app_label, model._meta.object_name,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E108',
+                )
+            ]
 
     def _check_list_display_links(self, obj):
         """ Check that list_display_links is a unique subset of list_display.
@@ -905,15 +884,16 @@ class ModelAdminChecks(BaseModelAdminChecks):
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, inline_obj, **kwargs):
-        errors = super().check(inline_obj)
         parent_model = inline_obj.parent_model
-        errors.extend(self._check_relation(inline_obj, parent_model))
-        errors.extend(self._check_exclude_of_parent_model(inline_obj, parent_model))
-        errors.extend(self._check_extra(inline_obj))
-        errors.extend(self._check_max_num(inline_obj))
-        errors.extend(self._check_min_num(inline_obj))
-        errors.extend(self._check_formset(inline_obj))
-        return errors
+        return [
+            *super().check(inline_obj),
+            *self._check_relation(inline_obj, parent_model),
+            *self._check_exclude_of_parent_model(inline_obj, parent_model),
+            *self._check_extra(inline_obj),
+            *self._check_max_num(inline_obj),
+            *self._check_min_num(inline_obj),
+            *self._check_formset(inline_obj),
+        ]
 
     def _check_exclude_of_parent_model(self, obj, parent_model):
         # Do not perform more specific checks if the base checks result in an

@@ -660,8 +660,9 @@ example:
 Sometimes you might want to cache multiple copies of a fragment depending on
 some dynamic data that appears inside the fragment. For example, you might want a
 separate cached copy of the sidebar used in the previous example for every user
-of your site. Do this by passing additional arguments to the ``{% cache %}``
-template tag to uniquely identify the cache fragment:
+of your site. Do this by passing one or more additional arguments, which may be
+variables with or without filters, to the ``{% cache %}`` template tag to
+uniquely identify the cache fragment:
 
 .. code-block:: html+django
 
@@ -669,9 +670,6 @@ template tag to uniquely identify the cache fragment:
     {% cache 500 sidebar request.user.username %}
         .. sidebar for logged in user ..
     {% endcache %}
-
-It's perfectly fine to specify more than one argument to identify the fragment.
-Simply pass as many arguments to ``{% cache %}`` as you need.
 
 If :setting:`USE_I18N` is set to ``True`` the per-site middleware cache will
 :ref:`respect the active language<i18n-cache-key>`. For the ``cache`` template

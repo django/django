@@ -7,6 +7,18 @@ module.
 
 .. currentmodule:: django.contrib.postgres.fields
 
+Indexing these fields
+=====================
+
+:class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
+B-tree index, which isn't particularly helpful when querying complex data types.
+Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
+:class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
+the index choice is dependent on the queries that you're using. Generally, GiST
+may be a good choice for the :ref:`range fields <range-fields>` and
+:class:`HStoreField`, and GIN may be helpful for :class:`ArrayField` and
+:class:`JSONField`.
+
 ``ArrayField``
 ==============
 
@@ -240,14 +252,6 @@ transform do not change. For example::
     down to the final underlying data, but most other slices behave strangely
     at the database level and cannot be supported in a logical, consistent
     fashion by Django.
-
-Indexing ``ArrayField``
------------------------
-
-At present using :attr:`~django.db.models.Field.db_index` will create a
-``btree`` index. This does not offer particularly significant help to querying.
-A more useful index is a ``GIN`` index, which you should create using a
-:class:`~django.db.migrations.operations.RunSQL` operation.
 
 ``CIText`` fields
 =================

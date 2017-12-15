@@ -73,10 +73,9 @@ class SessionStore(SessionBase):
         """
         Return the expiry time of the file storing the session's content.
         """
-        expiry = session_data.get('_session_expiry')
-        if not expiry:
-            expiry = self._last_modification() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
-        return expiry
+        return session_data.get('_session_expiry') or (
+            self._last_modification() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE)
+        )
 
     def load(self):
         session_data = {}

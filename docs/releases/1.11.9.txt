@@ -1,0 +1,23 @@
+===========================
+Django 1.11.9 release notes
+===========================
+
+*Expected January 1, 2018*
+
+Django 1.11.9 fixes several bugs in 1.11.8.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 1.11 that added newlines between ``MultiWidget``'s
+  subwidgets (:ticket:`28890`).
+
+* Fixed incorrect class-based model index name generation for models with
+  quoted ``db_table`` (:ticket:`28876`).
+
+* Fixed incorrect foreign key constraint name for models with quoted
+  ``db_table`` (:ticket:`28876`).
+
+* Fixed a regression in caching of a ``GenericForeignKey`` when the referenced
+  model instance uses more than one level of multi-table inheritance
+  (:ticket:`28856`).

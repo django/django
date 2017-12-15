@@ -38,16 +38,20 @@ class RequestsTests(SimpleTestCase):
 
     def test_httprequest_full_path(self):
         request = HttpRequest()
-        request.path = request.path_info = '/;some/?awful/=path/foo:bar/'
+        request.path = '/;some/?awful/=path/foo:bar/'
+        request.path_info = '/prefix' + request.path
         request.META['QUERY_STRING'] = ';some=query&+query=string'
         expected = '/%3Bsome/%3Fawful/%3Dpath/foo:bar/?;some=query&+query=string'
         self.assertEqual(request.get_full_path(), expected)
+        self.assertEqual(request.get_full_path_info(), '/prefix' + expected)
 
     def test_httprequest_full_path_with_query_string_and_fragment(self):
         request = HttpRequest()
-        request.path = request.path_info = '/foo#bar'
+        request.path = '/foo#bar'
+        request.path_info = '/prefix' + request.path
         request.META['QUERY_STRING'] = 'baz#quux'
         self.assertEqual(request.get_full_path(), '/foo%23bar?baz#quux')
+        self.assertEqual(request.get_full_path_info(), '/prefix/foo%23bar?baz#quux')
 
     def test_httprequest_repr(self):
         request = HttpRequest()
@@ -235,7 +239,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(response.cookies['c']['expires'], '')
 
     def test_far_expiration(self):
-        "Cookie will expire when an distant expiration time is provided"
+        "Cookie will expire when a distant expiration time is provided"
         response = HttpResponse()
         response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
         datetime_cookie = response.cookies['datetime']

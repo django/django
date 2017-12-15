@@ -1146,7 +1146,7 @@ class AutodetectorTests(TestCase):
         # a CreateModel operation w/o any definition on the original model
         model_state_not_specified = ModelState("a", "model", [("id", models.AutoField(primary_key=True))])
         # Explicitly testing for None, since this was the issue in #23452 after
-        # a AlterFooTogether operation with e.g. () as value
+        # an AlterFooTogether operation with e.g. () as value
         model_state_none = ModelState("a", "model", [
             ("id", models.AutoField(primary_key=True))
         ], {
@@ -1164,7 +1164,7 @@ class AutodetectorTests(TestCase):
 
         def test(from_state, to_state, msg):
             changes = self.get_changes([from_state], [to_state])
-            if len(changes) > 0:
+            if changes:
                 ops = ', '.join(o.__class__.__name__ for o in changes['a'][0].operations)
                 self.fail('Created operation(s) %s from %s' % (ops, msg))
 

@@ -62,10 +62,8 @@ class AdminDateWidget(forms.DateInput):
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
-        final_attrs = {'class': 'vDateField', 'size': '10'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs, format=format)
+        attrs = {'class': 'vDateField', 'size': '10', **(attrs or {})}
+        super().__init__(attrs=attrs, format=format)
 
 
 class AdminTimeWidget(forms.TimeInput):
@@ -81,10 +79,8 @@ class AdminTimeWidget(forms.TimeInput):
         return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
-        final_attrs = {'class': 'vTimeField', 'size': '8'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs, format=format)
+        attrs = {'class': 'vTimeField', 'size': '8', **(attrs or {})}
+        super().__init__(attrs=attrs, format=format)
 
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
@@ -162,9 +158,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                related_url += '?' + '&amp;'.join(
-                    '%s=%s' % (k, v) for k, v in params.items(),
-                )
+                related_url += '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
             context['related_url'] = mark_safe(related_url)
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
@@ -330,36 +324,24 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
 class AdminTextareaWidget(forms.Textarea):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vLargeTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vLargeTextField', **(attrs or {})})
 
 
 class AdminTextInputWidget(forms.TextInput):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vTextField', **(attrs or {})})
 
 
 class AdminEmailInputWidget(forms.EmailInput):
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vTextField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vTextField', **(attrs or {})})
 
 
 class AdminURLFieldWidget(forms.URLInput):
     template_name = 'admin/widgets/url.html'
 
     def __init__(self, attrs=None):
-        final_attrs = {'class': 'vURLField'}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': 'vURLField', **(attrs or {})})
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -373,10 +355,7 @@ class AdminIntegerFieldWidget(forms.NumberInput):
     class_name = 'vIntegerField'
 
     def __init__(self, attrs=None):
-        final_attrs = {'class': self.class_name}
-        if attrs is not None:
-            final_attrs.update(attrs)
-        super().__init__(attrs=final_attrs)
+        super().__init__(attrs={'class': self.class_name, **(attrs or {})})
 
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
@@ -402,10 +381,11 @@ class AutocompleteMixin:
     Renders the necessary data attributes for select2 and adds the static form
     media.
     """
-    url_name = 'admin:%s_%s_autocomplete'
+    url_name = '%s:%s_%s_autocomplete'
 
-    def __init__(self, rel, attrs=None, choices=(), using=None):
+    def __init__(self, rel, admin_site, attrs=None, choices=(), using=None):
         self.rel = rel
+        self.admin_site = admin_site
         self.db = using
         self.choices = choices
         if attrs is not None:
@@ -415,7 +395,7 @@ class AutocompleteMixin:
 
     def get_url(self):
         model = self.rel.model
-        return reverse(self.url_name % (model._meta.app_label, model._meta.model_name))
+        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """

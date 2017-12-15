@@ -26,6 +26,8 @@ class WhereNode(tree.Node):
     contains_aggregate attribute.
     """
     default = AND
+    resolved = False
+    conditional = True
 
     def split_having(self, negated=False):
         """
@@ -108,7 +110,7 @@ class WhereNode(tree.Node):
                 # around the inner SQL in the negated case, even if the
                 # inner SQL contains just a single expression.
                 sql_string = 'NOT (%s)' % sql_string
-            elif len(result) > 1:
+            elif len(result) > 1 or self.resolved:
                 sql_string = '(%s)' % sql_string
         return sql_string, result_params
 
@@ -180,6 +182,11 @@ class WhereNode(tree.Node):
     @property
     def is_summary(self):
         return any(child.is_summary for child in self.children)
+
+    def resolve_expression(self, *args, **kwargs):
+        clone = self.clone()
+        clone.resolved = True
+        return clone
 
 
 class NothingNode:

@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Prefetch, QuerySet
-from django.db.models.query import get_prefetcher
+from django.db.models.query import get_prefetcher, prefetch_related_objects
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 
@@ -1329,6 +1329,8 @@ class DirectPrefechedObjectCacheReuseTests(TestCase):
             AuthorAddress.objects.create(author=cls.author12, address='Haunted house'),
             AuthorAddress.objects.create(author=cls.author21, address='Happy place'),
         ]
+        cls.bookwithyear1 = BookWithYear.objects.create(title='Poems', published_year=2010)
+        cls.bookreview1 = BookReview.objects.create(book=cls.bookwithyear1)
 
     def test_detect_is_fetched(self):
         """
@@ -1404,6 +1406,14 @@ class DirectPrefechedObjectCacheReuseTests(TestCase):
             self.assertEqual(book1.first_authors[0].happy_place, [self.author1_address1])
             self.assertEqual(book1.first_authors[1].happy_place, [])
             self.assertEqual(book2.first_authors[0].happy_place, [self.author2_address1])
+
+    def test_prefetch_reverse_foreign_key(self):
+        with self.assertNumQueries(2):
+            bookwithyear1, = BookWithYear.objects.prefetch_related('bookreview_set')
+        with self.assertNumQueries(0):
+            self.assertCountEqual(bookwithyear1.bookreview_set.all(), [self.bookreview1])
+        with self.assertNumQueries(0):
+            prefetch_related_objects([bookwithyear1], 'bookreview_set')
 
 
 class ReadPrefetchedObjectsCacheTests(TestCase):

@@ -1,6 +1,6 @@
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -147,7 +147,7 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual('P2', qs.get().name)
         else:
             msg = "This backend doesn't support the Transform function."
-            with self.assertRaisesMessage(NotImplementedError, msg):
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 list(qs)
 
         # Should return the first Parcel, which has the center point equal
@@ -162,7 +162,7 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual('P1', qs.get().name)
         else:
             msg = "This backend doesn't support the Transform function."
-            with self.assertRaisesMessage(NotImplementedError, msg):
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 list(qs)
 
     def test07_values(self):

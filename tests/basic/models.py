@@ -17,6 +17,10 @@ class Article(models.Model):
         return self.headline
 
 
+class FeaturedArticle(models.Model):
+    article = models.OneToOneField(Article, models.CASCADE, related_name='featured')
+
+
 class ArticleSelectOnSave(Article):
     class Meta:
         proxy = True

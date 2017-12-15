@@ -136,15 +136,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE UPPER(TRANSLATE(%s USING NCHAR_CS)) ESCAPE TRANSLATE('\\' USING NCHAR_CS)",
     }
 
-    _likec_operators = _standard_operators.copy()
-    _likec_operators.update({
+    _likec_operators = {
+        **_standard_operators,
         'contains': "LIKEC %s ESCAPE '\\'",
         'icontains': "LIKEC UPPER(%s) ESCAPE '\\'",
         'startswith': "LIKEC %s ESCAPE '\\'",
         'endswith': "LIKEC %s ESCAPE '\\'",
         'istartswith': "LIKEC UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
-    })
+    }
 
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
@@ -476,7 +476,7 @@ class FormatStylePlaceholderCursor:
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
             query = query % args
-        elif unify_by_values and len(params) > 0:
+        elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
             # executemany() shares the formatted query with each of the params

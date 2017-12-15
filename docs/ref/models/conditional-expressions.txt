@@ -207,7 +207,7 @@ functions <aggregation-functions>` to achieve this::
     ...     account_type=Client.PLATINUM,
     ...     registered_on=date.today())
     >>> # Get counts for each value of account_type
-    >>> from django.db.models import IntegerField, Sum
+    >>> from django.db.models import Count
     >>> Client.objects.aggregate(
     ...     regular=Count('pk', filter=Q(account_type=Client.REGULAR)),
     ...     gold=Count('pk', filter=Q(account_type=Client.GOLD)),

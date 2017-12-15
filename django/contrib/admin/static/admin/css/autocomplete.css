@@ -122,8 +122,7 @@ select.admin-autocomplete {
     cursor: pointer;
     float: right;
     font-weight: bold;
-    margin-top: 5px;
-    margin-right: 10px;
+    margin: 5px;
 }
 
 .select2-container--admin-autocomplete .select2-selection--multiple .select2-selection__choice {

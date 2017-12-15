@@ -131,9 +131,11 @@ def parse_duration(value):
     Also supports ISO 8601 representation and PostgreSQL's day-time interval
     format.
     """
-    match = standard_duration_re.match(value)
-    if not match:
-        match = iso8601_duration_re.match(value) or postgres_interval_re.match(value)
+    match = (
+        standard_duration_re.match(value) or
+        iso8601_duration_re.match(value) or
+        postgres_interval_re.match(value)
+    )
     if match:
         kw = match.groupdict()
         days = datetime.timedelta(float(kw.pop('days', 0) or 0))

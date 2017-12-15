@@ -1,6 +1,8 @@
-============================================
-Django 2.0 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 2.0 release notes
+========================
+
+*December 2, 2017*
 
 Welcome to Django 2.0!
 
@@ -12,9 +14,9 @@ their deprecation cycle, and we've :ref:`begun the deprecation process for some
 features <deprecated-features-2.0>`.
 
 This release starts Django's use of a :ref:`loose form of semantic versioning
-<internal-release-cadence>`, however, there aren't any major backwards
-incompatible changes that might be expected of a 2.0 release. Upgrading should
-be a similar amount of effort as past feature releases.
+<internal-release-cadence>`, but there aren't any major backwards incompatible
+changes that might be expected of a 2.0 release. Upgrading should be a similar
+amount of effort as past feature releases.
 
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
@@ -60,10 +62,13 @@ could be written as::
 
 The new syntax supports type coercion of URL parameters. In the example, the
 view will receive the ``year`` keyword argument as an integer rather than as
-a string.
+a string. Also, the URLs that will match are slightly less constrained in the
+rewritten example. For example, the year 10000 will now match since the year
+integers aren't constrained to be exactly four digits long as they are in the
+regular expression.
 
 The ``django.conf.urls.url()`` function from previous versions is now available
-as :func:`django.urls.re_path`, however, the old location remains for backwards
+as :func:`django.urls.re_path`. The old location remains for backwards
 compatibility, without an imminent deprecation. The old
 ``django.conf.urls.include()`` function is now importable from ``django.urls``
 so you can use ``from django.urls import include, path, re_path`` in your
@@ -75,8 +80,8 @@ and provide more details.
 Mobile-friendly ``contrib.admin``
 ---------------------------------
 
-The admin is now responsive and supports all major mobile devices.
-Older browser may experience varying levels of graceful degradation.
+The admin is now responsive and supports all major mobile devices. Older
+browsers may experience varying levels of graceful degradation.
 
 Window expressions
 ------------------
@@ -172,8 +177,8 @@ Minor features
 Cache
 ~~~~~
 
-* On memcached, ``cache.set_many()`` returns a list of keys that failed to be
-  inserted.
+* ``cache.set_many()`` now returns a list of keys that failed to be inserted.
+  For the built-in backends, failed inserts can only happen on memcached.
 
 File Storage
 ~~~~~~~~~~~~
@@ -222,8 +227,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* The new :option:`squashmigrations --squashed-name`  option allows naming
-  the squashed migration.
+* The new :option:`squashmigrations --squashed-name` option allows naming the
+  squashed migration.
 
 Models
 ~~~~~~
@@ -242,23 +247,23 @@ Models
   controls the number of results Django fetches from the database adapter.
 
 * :meth:`.QuerySet.earliest`, :meth:`.QuerySet.latest`, and
-  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>`  now
+  :attr:`Meta.get_latest_by <django.db.models.Options.get_latest_by>` now
   allow ordering by several fields.
 
-* Added the :class:`~django.db.models.functions.datetime.ExtractQuarter`
-  function to extract the quarter from :class:`~django.db.models.DateField` and
+* Added the :class:`~django.db.models.functions.ExtractQuarter` function to
+  extract the quarter from :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField`, and exposed it through the
   :lookup:`quarter` lookup.
 
-* Added the :class:`~django.db.models.functions.datetime.TruncQuarter`
-  function to truncate :class:`~django.db.models.DateField` and
+* Added the :class:`~django.db.models.functions.TruncQuarter` function to
+  truncate :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` to the first day of a quarter.
 
 * Added the :attr:`~django.db.models.Index.db_tablespace` parameter to
   class-based indexes.
 
 * If the database supports a native duration field (Oracle and PostgreSQL),
-  :class:`~django.db.models.functions.datetime.Extract` now works with
+  :class:`~django.db.models.functions.Extract` now works with
   :class:`~django.db.models.DurationField`.
 
 * Added the ``of`` argument to :meth:`.QuerySet.select_for_update()`, supported
@@ -345,6 +350,12 @@ bytestrings should only be encountered around input/output boundaries (handling
 of binary fields or HTTP streams, for example). You might have to update your
 code to limit bytestring usage to a minimum, as Django no longer accepts
 bytestrings in certain code paths.
+
+For example, ``reverse()`` now uses ``str()`` instead of ``force_text()`` to
+coerce the ``args`` and ``kwargs`` it receives, prior to their placement in
+the URL. For bytestrings, this creates a string with an undesired ``b`` prefix
+as well as additional quotes (``str(b'foo')`` is ``"b'foo'"``). To adapt, call
+``decode()`` on the bytestring before passing it to ``reverse()``.
 
 Database backend API
 --------------------
@@ -525,6 +536,13 @@ rebuild tables using a script similar to this::
 This script hasn't received extensive testing and needs adaption for various
 cases such as multiple databases. Feel free to contribute improvements.
 
+In addition, because of a table alteration limitation of SQLite, it's prohibited
+to perform :class:`~django.db.migrations.operations.RenameModel` and
+:class:`~django.db.migrations.operations.RenameField` operations on models or
+fields referenced by other models in a transaction. In order to allow migrations
+containing these operations to be applied, you must set the
+``Migration.atomic`` attribute to ``False``.
+
 Miscellaneous
 -------------
 
@@ -608,6 +626,11 @@ Miscellaneous
 
 * Support for GEOS 3.3.x is dropped.
 
+* The way data is selected for ``GeometryField`` is changed to improve
+  performance, and in raw SQL queries, those fields must now be wrapped in
+  ``connection.ops.select``. See the :ref:`Raw queries note<gis-raw-sql>` in
+  the GIS tutorial for an example.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
@@ -641,7 +664,7 @@ Miscellaneous
 
 * ``django.shortcuts.render_to_response()`` is deprecated in favor of
   :func:`django.shortcuts.render`. ``render()`` takes the same arguments
-  except that is also requires a ``request``.
+  except that it also requires a ``request``.
 
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
   well with third-party apps and is obsolete since HTML5 has mostly superseded
@@ -661,9 +684,10 @@ Features removed in 2.0
 =======================
 
 These features have reached the end of their deprecation cycle and are removed
-in Django 2.0. See :ref:`deprecated-features-1.9` and
-:ref:`deprecated-features-1.10` for details, including how to remove usage of
-these features.
+in Django 2.0.
+
+See :ref:`deprecated-features-1.9` for details on these changes, including how
+to remove usage of these features.
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` is
   removed.
@@ -681,8 +705,9 @@ these features.
 
 * ``Field.rel`` and ``Field.remote_field.to`` are removed.
 
-* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` are now
-  required.
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` is now
+  required in models and migrations. Consider squashing migrations so that you
+  have fewer of them to update.
 
 * ``django.db.models.fields.add_lazy_relation()`` is removed.
 
@@ -751,6 +776,8 @@ these features.
   ``django.template.base.StringOrigin`` aliases for
   ``django.template.base.Origin`` are removed.
 
+See :ref:`deprecated-features-1.10` for details on these changes.
+
 * The ``makemigrations --exit`` option is removed.
 
 * Support for direct assignment to a reverse foreign key or many-to-many
@@ -772,7 +799,8 @@ these features.
 
 * The ``shell --plain`` option is removed.
 
-* The ``django.core.urlresolvers`` module is removed.
+* The ``django.core.urlresolvers`` module is removed in favor of its new
+  location, ``django.urls``.
 
 * ``CommaSeparatedIntegerField`` is removed, except for support in historical
   migrations.
@@ -793,7 +821,7 @@ these features.
 * Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
   rather than properties is no longer supported.
 
-* The  ``Model._meta.virtual_fields`` attribute is removed.
+* The ``Model._meta.virtual_fields`` attribute is removed.
 
 * The keyword arguments ``virtual_only`` in ``Field.contribute_to_class()`` and
   ``virtual`` in ``Model._meta.add_field()`` are removed.
