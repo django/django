@@ -1,6 +1,7 @@
 """
 SQLite3 backend for the sqlite3 module in the standard library.
 """
+import datetime
 import decimal
 import math
 import re
@@ -14,7 +15,7 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import timezone
-from django.utils.dateparse import parse_datetime, parse_duration, parse_time
+from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 
 from .client import DatabaseClient                          # isort:skip
@@ -426,20 +427,11 @@ def _sqlite_format_dtdelta(conn, lhs, rhs):
     """
     LHS and RHS can be either:
     - An integer number of microseconds
-    - A string representing a timedelta object
     - A string representing a datetime
     """
     try:
-        if isinstance(lhs, int):
-            lhs = str(decimal.Decimal(lhs) / decimal.Decimal(1000000))
-        real_lhs = parse_duration(lhs)
-        if real_lhs is None:
-            real_lhs = backend_utils.typecast_timestamp(lhs)
-        if isinstance(rhs, int):
-            rhs = str(decimal.Decimal(rhs) / decimal.Decimal(1000000))
-        real_rhs = parse_duration(rhs)
-        if real_rhs is None:
-            real_rhs = backend_utils.typecast_timestamp(rhs)
+        real_lhs = datetime.timedelta(0, 0, lhs) if isinstance(lhs, int) else backend_utils.typecast_timestamp(lhs)
+        real_rhs = datetime.timedelta(0, 0, rhs) if isinstance(rhs, int) else backend_utils.typecast_timestamp(rhs)
         if conn.strip() == '+':
             out = real_lhs + real_rhs
         else:

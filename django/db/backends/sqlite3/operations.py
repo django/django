@@ -10,7 +10,7 @@ from django.db.models import aggregates, fields
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.duration import duration_string
+from django.utils.duration import duration_microseconds
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -63,7 +63,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
     def date_interval_sql(self, timedelta):
-        return "'%s'" % duration_string(timedelta)
+        return str(duration_microseconds(timedelta))
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
