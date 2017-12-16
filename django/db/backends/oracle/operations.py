@@ -71,12 +71,6 @@ END;
             # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
-    def date_interval_sql(self, timedelta):
-        """
-        NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
-        """
-        return "NUMTODSINTERVAL(%06f, 'SECOND')" % timedelta.total_seconds()
-
     def date_trunc_sql(self, lookup_type, field_name):
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
