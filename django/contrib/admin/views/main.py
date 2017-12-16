@@ -1,5 +1,7 @@
 from collections import OrderedDict
+from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -18,6 +20,7 @@ from django.db import models
 from django.db.models.expressions import F, OrderBy
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
 # Changelist settings
@@ -135,6 +138,36 @@ class ChangeList:
                     use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
             if spec and spec.has_output():
                 filter_specs.append(spec)
+
+        if self.date_hierarchy:
+            # Create bounded lookup parameters so that the query is more
+            # efficient.
+            year = lookup_params.pop('%s__year' % self.date_hierarchy, None)
+            if year is not None:
+                month = lookup_params.pop('%s__month' % self.date_hierarchy, None)
+                day = lookup_params.pop('%s__day' % self.date_hierarchy, None)
+                try:
+                    from_date = datetime(
+                        int(year),
+                        int(month if month is not None else 1),
+                        int(day if day is not None else 1),
+                    )
+                except ValueError as e:
+                    raise IncorrectLookupParameters(e) from e
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                if day:
+                    to_date = from_date + timedelta(days=1)
+                elif month:
+                    # In this branch, from_date will always be the first of a
+                    # month, so advancing 32 days gives the next month.
+                    to_date = (from_date + timedelta(days=32)).replace(day=1)
+                else:
+                    to_date = from_date.replace(year=from_date.year + 1)
+                lookup_params.update({
+                    '%s__gte' % self.date_hierarchy: from_date,
+                    '%s__lt' % self.date_hierarchy: to_date,
+                })
 
         # At this point, all the parameters used by the various ListFilters
         # have been removed from lookup_params, which now only contains other
