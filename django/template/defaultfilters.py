@@ -134,10 +134,7 @@ def floatformat(text, arg=-1):
     if not m and p < 0:
         return mark_safe(formats.number_format('%d' % (int(d)), 0))
 
-    if p == 0:
-        exp = Decimal(1)
-    else:
-        exp = Decimal('1.0') / (Decimal(10) ** abs(p))
+    exp = Decimal(1).scaleb(-abs(p))
     # Set the precision high enough to avoid an exception (#15789).
     tupl = d.as_tuple()
     units = len(tupl[1])
