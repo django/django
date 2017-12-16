@@ -370,8 +370,7 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
-            days = getattr(days, 'dates')(field_name, 'day')
+            days = getattr(cl.queryset, 'dates')(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -384,8 +383,7 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = cl.queryset.filter(**{year_field: year_lookup})
-            months = getattr(months, 'dates')(field_name, 'month')
+            months = getattr(cl.queryset, 'dates')(field_name, 'month')
             return {
                 'show': True,
                 'back': {
