@@ -335,7 +335,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.3.3 or later.
+Django requires `mysqlclient`_ 1.3.7 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
