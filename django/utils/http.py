@@ -297,7 +297,8 @@ def is_safe_url(url, allowed_hosts=None, require_https=False):
     if not url:
         return False
     if allowed_hosts is None:
-        allowed_hosts = set()
+        from django.conf import settings
+        allowed_hosts = set(settings.ALLOWED_HOSTS)
     # Chrome treats \ completely as / in paths but it could be part of some
     # basic auth credentials so we need to check both URLs.
     return (_is_safe_url(url, allowed_hosts, require_https=require_https) and
@@ -378,7 +379,7 @@ def _is_safe_url(url, allowed_hosts, require_https=False):
     if not url_info.scheme and url_info.netloc:
         scheme = 'http'
     valid_schemes = ['https'] if require_https else ['http', 'https']
-    return ((not url_info.netloc or url_info.netloc in allowed_hosts) and
+    return ((not url_info.netloc or url_info.netloc in allowed_hosts or '*' in allowed_hosts) and
             (not scheme or scheme in valid_schemes))
 
 

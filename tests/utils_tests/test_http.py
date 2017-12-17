@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.http import (
@@ -164,6 +164,32 @@ class IsSafeURLTests(unittest.TestCase):
         self.assertIs(is_safe_url('/confirm/me@example.com'), True)
         # Basic auth without host is not allowed.
         self.assertIs(is_safe_url(r'http://testserver\@example.com'), False)
+
+    def test_is_safe_url_from_settings(self):
+        test_cases = [
+            ('https://testserver/', ['testserver', 'otherserver'], True),
+            ('https://testserver/', ['*'], True),
+            ('https://testserver/', {'*'}, True),
+            ('https://testserver/', ['otherserver', '*'], True),
+            ('https://testserver/', '*', True),
+            ('https://testserver/', [], False),
+            ('https://testserver/', {}, False),
+            ('https://testserver/', ['otherserver'], False),
+            ('https://testserver/', {'otherserver'}, False),
+            ('https://otherserver/', ['testserver', 'otherserver'], True),
+            ('https://otherserver/', ['*'], True),
+            ('https://otherserver/', {'*'}, True),
+            ('https://otherserver/', ['testserver', '*'], True),
+            ('https://otherserver/', '*', True),
+            ('https://otherserver/', [], False),
+            ('https://otherserver/', {}, False),
+            ('https://otherserver/', ['testserver'], False),
+            ('https://otherserver/', {'testserver'}, False),
+        ]
+        for url, allowed_hosts, expected_answer in test_cases:
+            with override_settings(ALLOWED_HOSTS=allowed_hosts), self.subTest(url=url, allowed_hosts=allowed_hosts,
+                                                                              expected_answer=expected_answer):
+                self.assertEqual(is_safe_url(url), expected_answer)
 
     def test_secure_param_https_urls(self):
         secure_urls = (
