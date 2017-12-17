@@ -350,6 +350,8 @@ class OracleParam:
         elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
+        elif isinstance(param, datetime.datetime):
+            self.input_size = Database.TIMESTAMP
         else:
             self.input_size = None
 

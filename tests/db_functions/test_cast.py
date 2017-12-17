@@ -1,6 +1,6 @@
 import datetime
 
-from django.db import connection, models
+from django.db import models
 from django.db.models.expressions import Value
 from django.db.models.functions import Cast
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
@@ -51,9 +51,6 @@ class CastTests(TestCase):
 
     def test_cast_from_python_to_datetime(self):
         now = datetime.datetime.now()
-        if connection.vendor == 'oracle':
-            # Workaround until #28934 is fixed.
-            now = now.replace(microsecond=0)
         dates = Author.objects.annotate(cast_datetime=Cast(now, models.DateTimeField()))
         self.assertEqual(dates.get().cast_datetime, now)
 
