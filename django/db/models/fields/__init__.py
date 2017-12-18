@@ -2295,14 +2295,17 @@ class BinaryField(Field):
     empty_values = [None, b'']
 
     def __init__(self, *args, **kwargs):
-        kwargs['editable'] = False
+        kwargs.setdefault('editable', False)
         super().__init__(*args, **kwargs)
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        del kwargs['editable']
+        if self.editable:
+            kwargs['editable'] = True
+        else:
+            del kwargs['editable']
         return name, path, args, kwargs
 
     def get_internal_type(self):

@@ -62,6 +62,11 @@ Model field                         Form field
                                     ``min_value`` set to -9223372036854775808
                                     and ``max_value`` set to 9223372036854775807.
 
+:class:`BinaryField`                :class:`~django.forms.CharField`, if
+                                    :attr:`~.Field.editable` is set to
+                                    ``True`` on the model field, otherwise not
+                                    represented in the form.
+
 :class:`BooleanField`               :class:`~django.forms.BooleanField`
 
 :class:`CharField`                  :class:`~django.forms.CharField` with

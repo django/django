@@ -157,6 +157,9 @@ Models
 
 * Models can now use ``__init_subclass__()`` from :pep:`487`.
 
+* A ``BinaryField`` may now be set to ``editable=True`` if you wish to include
+  it in model forms.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
