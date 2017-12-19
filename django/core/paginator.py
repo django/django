@@ -111,7 +111,7 @@ class Paginator:
         and non-empty.
         """
         ordered = getattr(self.object_list, 'ordered', None)
-        if ordered is not None and not ordered and self.object_list:
+        if ordered is not None and not ordered and self.count:
             obj_list_repr = (
                 '{} {}'.format(self.object_list.model, self.object_list.__class__.__name__)
                 if hasattr(self.object_list, 'model')
