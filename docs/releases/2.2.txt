@@ -183,7 +183,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* The new :meth:`.SimpleTestCase.assertURLEqual` assertion checks for a given
+  URL, ignoring the ordering of the query string.
+  :meth:`~.SimpleTestCase.assertRedirects` uses the new assertion.
 
 URLs
 ~~~~

@@ -700,6 +700,7 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
     <SimpleTestCase.assertContains>`.
   * Verifying that a template :meth:`has/hasn't been used to generate a given
     response content <SimpleTestCase.assertTemplateUsed>`.
+  * Verifying that two :meth:`URLs <SimpleTestCase.assertURLEqual>` are equal.
   * Verifying a HTTP :meth:`redirect <SimpleTestCase.assertRedirects>` is
     performed by the app.
   * Robustly testing two :meth:`HTML fragments <SimpleTestCase.assertHTMLEqual>`
@@ -1476,6 +1477,15 @@ your test suite.
 
     You can use this as a context manager in the same way as
     :meth:`~SimpleTestCase.assertTemplateUsed`.
+
+.. method:: SimpleTestCase.assertURLEqual(url1, url2, msg_prefix='')
+
+    .. versionadded:: 2.2
+
+    Asserts that two URLs are the same, ignoring the order of query string
+    parameters except for parameters with the same name. For example,
+    ``/path/?x=1&y=2`` is equal to ``/path/?y=2&x=1``, but
+    ``/path/?a=1&a=2`` isn't equal to ``/path/?a=2&a=1``.
 
 .. method:: SimpleTestCase.assertRedirects(response, expected_url, status_code=302, target_status_code=200, msg_prefix='', fetch_redirect_response=True)
 

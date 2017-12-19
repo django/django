@@ -911,6 +911,54 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
+class AssertURLEqualTests(SimpleTestCase):
+    def test_equal(self):
+        valid_tests = (
+            ('http://example.com/?', 'http://example.com/'),
+            ('http://example.com/?x=1&', 'http://example.com/?x=1'),
+            ('http://example.com/?x=1&y=2', 'http://example.com/?y=2&x=1'),
+            ('http://example.com/?x=1&y=2', 'http://example.com/?y=2&x=1'),
+            ('http://example.com/?x=1&y=2&a=1&a=2', 'http://example.com/?a=1&a=2&y=2&x=1'),
+            ('/path/to/?x=1&y=2&z=3', '/path/to/?z=3&y=2&x=1'),
+            ('?x=1&y=2&z=3', '?z=3&y=2&x=1'),
+        )
+        for url1, url2 in valid_tests:
+            with self.subTest(url=url1):
+                self.assertURLEqual(url1, url2)
+
+    def test_not_equal(self):
+        invalid_tests = (
+            # Protocol must be the same.
+            ('http://example.com/', 'https://example.com/'),
+            ('http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1'),
+            ('http://example.com/?x=1&y=bar&x=2', 'https://example.com/?y=bar&x=2&x=1'),
+            # Parameters of the same name must be in the same order.
+            ('/path/to?a=1&a=2', '/path/to/?a=2&a=1')
+        )
+        for url1, url2 in invalid_tests:
+            with self.subTest(url=url1), self.assertRaises(AssertionError):
+                self.assertURLEqual(url1, url2)
+
+    def test_message(self):
+        msg = (
+            "Expected 'http://example.com/?x=1&x=2' to equal "
+            "'https://example.com/?x=2&x=1'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertURLEqual('http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1')
+
+    def test_msg_prefix(self):
+        msg = (
+            "Prefix: Expected 'http://example.com/?x=1&x=2' to equal "
+            "'https://example.com/?x=2&x=1'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertURLEqual(
+                'http://example.com/?x=1&x=2', 'https://example.com/?x=2&x=1',
+                msg_prefix='Prefix: ',
+            )
+
+
 class FirstUrls:
     urlpatterns = [url(r'first/$', empty_response, name='first')]
 
