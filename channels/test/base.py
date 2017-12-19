@@ -88,8 +88,10 @@ class Client(object):
     with determined the reply channel
     """
 
-    def __init__(self, alias=DEFAULT_CHANNEL_LAYER):
-        self.reply_channel = alias + ''.join([random.choice(string.ascii_letters) for _ in range(5)])
+    def __init__(self, alias=DEFAULT_CHANNEL_LAYER, reply_channel=None):
+        if reply_channel is None:
+            reply_channel = alias
+        self.reply_channel = reply_channel + ''.join([random.choice(string.ascii_letters) for _ in range(5)])
         self.alias = alias
 
     @property
