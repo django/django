@@ -1,4 +1,6 @@
-from django.db import models
+import datetime
+
+from django.db import connection, models
 from django.db.models.expressions import Value
 from django.db.models.functions import Cast
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
@@ -41,6 +43,19 @@ class CastTests(TestCase):
             with self.subTest(field_class=field_class):
                 numbers = Author.objects.annotate(cast_int=Cast('alias', field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
+
+    def test_cast_from_python_to_date(self):
+        today = datetime.date.today()
+        dates = Author.objects.annotate(cast_date=Cast(today, models.DateField()))
+        self.assertEqual(dates.get().cast_date, today)
+
+    def test_cast_from_python_to_datetime(self):
+        now = datetime.datetime.now()
+        if connection.vendor == 'oracle':
+            # Workaround until #28934 is fixed.
+            now = now.replace(microsecond=0)
+        dates = Author.objects.annotate(cast_datetime=Cast(now, models.DateTimeField()))
+        self.assertEqual(dates.get().cast_datetime, now)
 
     def test_cast_from_python(self):
         numbers = Author.objects.annotate(cast_float=Cast(0, models.FloatField()))
