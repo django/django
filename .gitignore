@@ -8,8 +8,12 @@ __pycache__/
 *.swp
 *.pyc
 .coverage.*
+# Coverage combine and html output.
+.coverage
+coverage_html/
 TODO
 node_modules
+.python-version
 
 # IDE and Tooling files
 .idea/*
