@@ -31,3 +31,6 @@ Bugfixes
   trailing zeros in the fractional part truncated (:ticket:`28915`).
 
 * Fixed crash in the ``testserver`` command startup (:ticket:`28941`).
+
+* Fixed crash when coercing a translatable URL pattern to ``str``
+  (:ticket:`28947`).

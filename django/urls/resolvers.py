@@ -183,7 +183,7 @@ class RegexPattern(CheckURLMixin):
             )
 
     def __str__(self):
-        return self._regex
+        return str(self._regex)
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
@@ -271,7 +271,7 @@ class RoutePattern(CheckURLMixin):
         return re.compile(_route_to_regex(route, self._is_endpoint)[0])
 
     def __str__(self):
-        return self._route
+        return str(self._route)
 
 
 class LocalePrefixPattern:
