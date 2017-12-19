@@ -200,7 +200,20 @@ class CleanFilesTests(SimpleTestCase):
         'combined': (
             [None, 'file1.pyo', 'file2.pyc', 'myclass$py.class'],
             ['file1.py', 'file2.py', 'myclass.py'],
-        )
+        ),
+        'with_path': ([os.path.join('django', 'utils', 'file.pyc')], [os.path.join('django', 'utils', 'file.py')]),
+        'python3': (
+            [
+                os.path.join('django', 'utils', '__pycache__', 'file1.cpython-36.pyc'),
+                os.path.join(os.path.sep, '__pycache__', 'file2.cpython-36.pyc'),
+                os.path.join('__pycache__', 'file3.cpython-36.pyc')
+            ],
+            [
+                os.path.join('django', 'utils', 'file1.py'),
+                os.path.join(os.path.sep + 'file2.py'),
+                'file3.py'
+            ]
+        ),
     }
 
     def _run_tests(self, mock_files_exist=True):
@@ -210,7 +223,7 @@ class CleanFilesTests(SimpleTestCase):
                 self.assertEqual(
                     autoreload.clean_files(filenames),
                     expected_returned_filenames if mock_files_exist else [],
-                    msg='{} failed for input file list: {}; returned file list: {}'.format(
+                    msg='{} failed for input file list: {}; expected file list return value: {}'.format(
                         description, filenames, expected_returned_filenames
                     ),
                 )

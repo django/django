@@ -132,7 +132,14 @@ def clean_files(filelist):
         if not filename:
             continue
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
-            filename = filename[:-1]
+            py_filename = filename[:-1]
+            head, tail = os.path.split(filename)
+            if head:
+                path, dirname = os.path.split(head)
+                if dirname == '__pycache__':
+                    basename = tail.rsplit('.', 2)[0]
+                    py_filename = os.path.join(path, basename + '.py')
+            filename = py_filename
         if filename.endswith("$py.class"):
             filename = filename[:-9] + ".py"
         if os.path.exists(filename):
