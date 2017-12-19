@@ -60,14 +60,12 @@ class WebsocketCloseException(ChannelSocketException):
     """
 
     def __init__(self, code=None):
-        if code is not None and not isinstance(code, six.integer_types) \
-                and code != 1000 and not (3000 <= code <= 4999):
+        if code is not None and (not isinstance(code, six.integer_types)
+                                 or (code != 1000 and not (3000 <= code <= 4999))):
             raise ValueError("invalid close code {} (must be 1000 or from [3000, 4999])".format(code))
         self._code = code
 
     def run(self, message):
-        if message.reply_channel.name.split('.')[0] != "websocket":
-            raise ValueError("You cannot raise CloseWebsocketError from a non-websocket handler.")
         message.reply_channel.send({"close": self._code or True})
 
 

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.http.cookie import parse_cookie
 
 from channels import route
-from channels.exceptions import ChannelSocketException
+from channels.exceptions import ChannelSocketException, WebsocketCloseException
 from channels.handler import AsgiRequest
 from channels.test import ChannelTestCase, WSClient, apply_routes
 from channels.sessions import enforce_ordering
@@ -121,3 +121,35 @@ class WSClientTests(ChannelTestCase):
             client.send_and_consume('websocket.receive')
 
             self.assertEqual(client.receive(json=False), 'error')
+
+    def test_websocket_close_exception(self):
+
+        def consumer(message):
+            raise WebsocketCloseException
+
+        client = WSClient(reply_channel='daphne.response.1')
+
+        with apply_routes(route('websocket.receive', consumer)):
+            client.send_and_consume('websocket.receive')
+
+        self.assertEqual(client.get_next_message(client.reply_channel).content, {'close': True})
+
+    def test_websocket_close_exception_close_code(self):
+
+        def consumer(message):
+            raise WebsocketCloseException(3001)
+
+        client = WSClient(reply_channel='daphne.response.1')
+
+        with apply_routes(route('websocket.receive', consumer)):
+            client.send_and_consume('websocket.receive')
+
+        self.assertEqual(client.get_next_message(client.reply_channel).content, {'close': 3001})
+
+    def test_websocket_close_exception_invalid_close_code(self):
+
+        with self.assertRaises(ValueError):
+            WebsocketCloseException(2000)
+
+        with self.assertRaises(ValueError):
+            WebsocketCloseException('code')
