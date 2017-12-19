@@ -351,6 +351,9 @@ class ModelPaginationTests(TestCase):
         self.assertIsInstance(p.object_list, list)
 
     def test_paginating_unordered_queryset_raises_warning(self):
+        """
+        Unordered object list warning with an non-empty queryset.
+        """
         with warnings.catch_warnings(record=True) as warns:
             # Prevent the RuntimeWarning subclass from appearing as an
             # exception due to the warnings.simplefilter() in runtests.py.
@@ -368,11 +371,14 @@ class ModelPaginationTests(TestCase):
 
     def test_paginating_unordered_object_list_raises_warning(self):
         """
-        Unordered object list warning with an object that has an orderd
-        attribute but not a model attribute.
+        Unordered object list warning with an non-empty object that has an
+        orderd attribute but not a model attribute.
         """
         class ObjectList:
             ordered = False
+
+            def __len__(self):
+                return 1
         object_list = ObjectList()
         with warnings.catch_warnings(record=True) as warns:
             warnings.filterwarnings('always', category=UnorderedObjectListWarning)
@@ -382,3 +388,29 @@ class ModelPaginationTests(TestCase):
             "Pagination may yield inconsistent results with an unordered "
             "object_list: {!r}.".format(object_list)
         ))
+
+    def test_paginating_unordered_empty_queryset(self):
+        """
+        Empty unordered queryset not warning, such as Article.objects.none().
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            # Prevent the RuntimeWarning subclass from appearing as an
+            # exception due to the warnings.simplefilter() in runtests.py.
+            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
+            Paginator(Article.objects.none(), 5)
+        self.assertEqual(len(warns), 0)
+
+    def test_paginating_unordered_empty_object_list(self):
+        """
+        Empty unordered object list not warning.
+        """
+        class ObjectList:
+            ordered = False
+
+            def __len__(self):
+                return 0
+        object_list = ObjectList()
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.filterwarnings('always', category=UnorderedObjectListWarning)
+            Paginator(object_list, 5)
+        self.assertEqual(len(warns), 0)
