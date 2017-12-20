@@ -22,7 +22,12 @@ from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
 from django.core.management.commands.loaddata import Command as LoaddataCommand
-from django.core.management.commands.runserver import Command as RunserverCommand
+from django.core.management.commands.runserver import (
+    Command as RunserverCommand,
+)
+from django.core.management.commands.testserver import (
+    Command as TestserverCommand,
+)
 from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
@@ -1271,13 +1276,11 @@ class ManageCheck(AdminScriptTestCase):
 
 class ManageRunserver(AdminScriptTestCase):
     def setUp(self):
-        from django.core.management.commands.runserver import Command
-
         def monkey_run(*args, **options):
             return
 
         self.output = StringIO()
-        self.cmd = Command(stdout=self.output)
+        self.cmd = RunserverCommand(stdout=self.output)
         self.cmd.run = monkey_run
 
     def assertServerSettings(self, addr, port, ipv6=False, raw_ipv6=False):
@@ -1361,9 +1364,8 @@ class ManageRunserver(AdminScriptTestCase):
 class ManageRunserverMigrationWarning(TestCase):
 
     def setUp(self):
-        from django.core.management.commands.runserver import Command
         self.stdout = StringIO()
-        self.runserver_command = Command(stdout=self.stdout)
+        self.runserver_command = RunserverCommand(stdout=self.stdout)
 
     @override_settings(INSTALLED_APPS=["admin_scripts.app_waiting_migration"])
     def test_migration_warning_one_app(self):
@@ -1405,7 +1407,6 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 
 
 class ManageTestserver(AdminScriptTestCase):
-    from django.core.management.commands.testserver import Command as TestserverCommand
 
     @mock.patch.object(TestserverCommand, 'handle', return_value='')
     def test_testserver_handle_params(self, mock_handle):
