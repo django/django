@@ -402,6 +402,14 @@ class FormatStylePlaceholderCursor:
         return decimal.Decimal(value) if '.' in value else int(value)
 
     @staticmethod
+    def _get_decimal_converter(precision, scale):
+        if scale == 0:
+            return int
+        context = decimal.Context(prec=precision)
+        quantize_value = decimal.Decimal(1).scaleb(-scale)
+        return lambda v: decimal.Decimal(v).quantize(quantize_value, context=context)
+
+    @staticmethod
     def _output_type_handler(cursor, name, defaultType, length, precision, scale):
         """
         Called for each db column fetched from cursors. Return numbers as the
@@ -421,7 +429,7 @@ class FormatStylePlaceholderCursor:
             elif precision > 0:
                 # NUMBER(p,s) column: decimal-precision fixed point.
                 # This comes from IntegerField and DecimalField columns.
-                outconverter = int if scale == 0 else decimal.Decimal
+                outconverter = FormatStylePlaceholderCursor._get_decimal_converter(precision, scale)
             else:
                 # No type information. This normally comes from a
                 # mathematical expression in the SELECT list. Guess int
