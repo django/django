@@ -371,8 +371,8 @@ class ModelPaginationTests(TestCase):
 
     def test_paginating_unordered_object_list_raises_warning(self):
         """
-        Unordered object list warning with an non-empty object that has an
-        orderd attribute but not a model attribute.
+        Unordered object list warning with an object that has an orderd
+        attribute but not a model attribute.
         """
         class ObjectList:
             ordered = False
@@ -389,9 +389,9 @@ class ModelPaginationTests(TestCase):
             "object_list: {!r}.".format(object_list)
         ))
 
-    def test_paginating_unordered_empty_queryset(self):
+    def test_paginating_empty_unordered_queryset(self):
         """
-        Empty unordered queryset not warning, such as Article.objects.none().
+        Empty unordered QuerySet not warning, such as Article.objects.none().
         """
         with warnings.catch_warnings(record=True) as warns:
             # Prevent the RuntimeWarning subclass from appearing as an
@@ -400,9 +400,9 @@ class ModelPaginationTests(TestCase):
             Paginator(Article.objects.none(), 5)
         self.assertEqual(len(warns), 0)
 
-    def test_paginating_unordered_empty_object_list(self):
+    def test_paginating_empty_unordered_object_list(self):
         """
-        Empty unordered object list not warning.
+        Empty unordered bojects not warning, if bool(object_list) is False
         """
         class ObjectList:
             ordered = False
@@ -414,3 +414,10 @@ class ModelPaginationTests(TestCase):
             warnings.filterwarnings('always', category=UnorderedObjectListWarning)
             Paginator(object_list, 5)
         self.assertEqual(len(warns), 0)
+
+    def test_paginator_init_queries(self):
+        """
+        There should be none quesies while init the Paginator.
+        """
+        self.assertNumQueries(0, Paginator, Article.objects.all().order_by('id'), 5)
+        self.assertNumQueries(0, Paginator, Article.objects.none(), 5)
