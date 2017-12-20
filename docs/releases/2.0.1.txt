@@ -29,3 +29,5 @@ Bugfixes
 
 * Fixed a regression on SQLite where ``DecimalField`` returned a result with
   trailing zeros in the fractional part truncated (:ticket:`28915`).
+
+* Fixed crash in the ``testserver`` command startup (:ticket:`28941`).

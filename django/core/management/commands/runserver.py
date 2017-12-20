@@ -27,6 +27,7 @@ class Command(BaseCommand):
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
     leave_locale_alone = True
+    stealth_options = ('shutdown_message',)
 
     default_addr = '127.0.0.1'
     default_addr_ipv6 = '::1'
