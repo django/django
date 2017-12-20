@@ -82,6 +82,7 @@ class DecimalFieldTests(TestCase):
         with self.assertRaisesMessage(ValidationError, expected_message):
             field.clean(Decimal('999'), None)
 
+    @unittest.skipIf(connection.vendor == 'oracle', 'Fixed in later versions of Django (#28932).')
     def test_roundtrip_with_trailing_zeros(self):
         """Trailing zeros in the fractional part aren't truncated."""
         obj = Foo.objects.create(a='bar', d=Decimal('8.320'))
