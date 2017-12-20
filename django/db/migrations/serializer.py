@@ -50,7 +50,7 @@ class DatetimeSerializer(BaseSerializer):
     def serialize(self):
         if self.value.tzinfo is not None and self.value.tzinfo != utc:
             self.value = self.value.astimezone(utc)
-        value_repr = repr(self.value).replace("<UTC>", "utc")
+        value_repr = repr(self.value).replace("datetime.timezone(datetime.timedelta(0), 'UTC')", 'utc')
         if isinstance(self.value, datetime_safe.datetime):
             value_repr = "datetime.%s" % value_repr
         imports = ["import datetime"]
