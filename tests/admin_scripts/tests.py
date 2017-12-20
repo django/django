@@ -21,7 +21,9 @@ from django.conf import settings
 from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
-from django.db import ConnectionHandler
+from django.core.management.commands.loaddata import Command as LoaddataCommand
+from django.core.management.commands.runserver import Command as RunserverCommand
+from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
@@ -1414,6 +1416,31 @@ class ManageTestserver(AdminScriptTestCase):
             stdout=out, settings=None, pythonpath=None, verbosity=1,
             traceback=False, addrport='', no_color=False, use_ipv6=False,
             skip_checks=True, interactive=True,
+        )
+
+    @mock.patch('django.db.connection.creation.create_test_db', return_value='test_db')
+    @mock.patch.object(LoaddataCommand, 'handle', return_value='')
+    @mock.patch.object(RunserverCommand, 'handle', return_value='')
+    def test_params_to_runserver(self, mock_runserver_handle, mock_loaddata_handle, mock_create_test_db):
+        out = StringIO()
+        call_command('testserver', 'blah.json', stdout=out)
+        mock_runserver_handle.assert_called_with(
+            addrport='',
+            insecure_serving=False,
+            no_color=False,
+            pythonpath=None,
+            settings=None,
+            shutdown_message=(
+                "\nServer stopped.\nNote that the test database, 'test_db', "
+                "has not been deleted. You can explore it on your own."
+            ),
+            skip_checks=True,
+            traceback=False,
+            use_ipv6=False,
+            use_reloader=False,
+            use_static_handler=True,
+            use_threading=connection.features.test_db_allows_multiple_connections,
+            verbosity=1,
         )
 
 
