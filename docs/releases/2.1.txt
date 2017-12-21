@@ -35,6 +35,8 @@ Minor features
 * :attr:`.ModelAdmin.search_fields` now accepts any lookup such as
   ``field__exact``.
 
+* jQuery is upgraded from version 2.2.3 to 3.2.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
