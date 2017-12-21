@@ -307,24 +307,11 @@ def python_reloader(main_func, args, kwargs):
             pass
 
 
-def jython_reloader(main_func, args, kwargs):
-    from _systemrestart import SystemRestart
-    _thread.start_new_thread(main_func, args)
-    while True:
-        if code_changed():
-            raise SystemRestart
-        time.sleep(1)
-
-
 def main(main_func, args=None, kwargs=None):
     if args is None:
         args = ()
     if kwargs is None:
         kwargs = {}
-    if sys.platform.startswith('java'):
-        reloader = jython_reloader
-    else:
-        reloader = python_reloader
 
     wrapped_main_func = check_errors(main_func)
-    reloader(wrapped_main_func, args, kwargs)
+    python_reloader(wrapped_main_func, args, kwargs)
