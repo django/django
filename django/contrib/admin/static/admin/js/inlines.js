@@ -58,7 +58,7 @@
                     addButton = $this.filter(":last").next().find("a");
                 }
             }
-            addButton.click(function(e) {
+            addButton.on('click', function(e) {
                 e.preventDefault();
                 var template = $("#" + options.prefix + "-empty");
                 var row = template.clone(true);
@@ -91,7 +91,7 @@
                     addButton.parent().hide();
                 }
                 // The delete button of each row triggers a bunch of other things
-                row.find("a." + options.deleteCssClass).click(function(e1) {
+                row.find("a." + options.deleteCssClass).on('click', function(e1) {
                     e1.preventDefault();
                     // Remove the parent form containing this button:
                     row.remove();

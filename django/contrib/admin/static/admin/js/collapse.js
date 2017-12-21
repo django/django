@@ -12,7 +12,7 @@
             }
         });
         // Add toggle to anchor tag
-        $("fieldset.collapse a.collapse-toggle").click(function(ev) {
+        $("fieldset.collapse a.collapse-toggle").on('click', function(ev) {
             if ($(this).closest("fieldset").hasClass("collapsed")) {
                 // Show
                 $(this).text(gettext("Hide")).closest("fieldset").removeClass("collapsed").trigger("show.fieldset", [$(this).attr("id")]);
