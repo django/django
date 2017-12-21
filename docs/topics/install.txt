@@ -15,10 +15,10 @@ your operating system's package manager.
 
 .. admonition:: Django on Jython
 
-    If you use Jython_ (a Python implementation for the Java platform), you'll
-    need to follow a few additional steps. See :doc:`/howto/jython` for details.
+    Jython_ (a Python implementation for the Java platform) is not compatible
+    with Python 3, so Django ≥ 2.0 cannot run on Jython.
 
-.. _jython: http://jython.org/
+.. _jython: http://www.jython.org/
 
 .. admonition:: Python on Windows
 

@@ -100,15 +100,8 @@ class AdminScriptTestCase(unittest.TestCase):
         else:
             os.remove(full_name)
 
-        # Also try to remove the compiled file; if it exists, it could
+        # Also remove a __pycache__ directory, if it exists; it could
         # mess up later tests that depend upon the .py file not existing
-        try:
-            if sys.platform.startswith('java'):
-                # Jython produces module$py.class files
-                os.remove(re.sub(r'\.py$', '$py.class', full_name))
-        except OSError:
-            pass
-        # Also remove a __pycache__ directory, if it exists
         cache_name = os.path.join(self.test_dir, '__pycache__')
         if os.path.isdir(cache_name):
             shutil.rmtree(cache_name)
@@ -138,11 +131,6 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Define a temporary environment for the subprocess
         test_environ = os.environ.copy()
-        if sys.platform.startswith('java'):
-            python_path_var_name = 'JYTHONPATH'
-        else:
-            python_path_var_name = 'PYTHONPATH'
-
         old_cwd = os.getcwd()
 
         # Set the test environment
@@ -152,7 +140,7 @@ class AdminScriptTestCase(unittest.TestCase):
             del test_environ['DJANGO_SETTINGS_MODULE']
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
-        test_environ[python_path_var_name] = os.pathsep.join(python_path)
+        test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
 
         # Move to the test directory and run
