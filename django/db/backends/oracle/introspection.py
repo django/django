@@ -84,13 +84,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             name = desc[0]
             internal_size, default, is_autofield = field_map[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
-            description.append(FieldInfo(*(
-                (name.lower(),) +
-                desc[1:3] +
-                (internal_size, desc[4] or 0, desc[5] or 0) +
-                desc[6:] +
-                (default, is_autofield)
-            )))
+            description.append(FieldInfo(
+                name.lower(), *desc[1:3], internal_size, desc[4] or 0,
+                desc[5] or 0, *desc[6:], default, is_autofield,
+            ))
         return description
 
     def table_name_converter(self, name):
