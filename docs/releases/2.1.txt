@@ -94,6 +94,9 @@ Minor features
   :meth:`~.GEOSGeometry.buffer` that allows customizing the style of the
   buffer.
 
+* :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
+  OpenLayers 4.6.5 (previously 3.20.1).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
