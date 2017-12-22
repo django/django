@@ -70,3 +70,20 @@ in the same tablespace as the table.
 
     For a list of PostgreSQL-specific indexes, see
     :mod:`django.contrib.postgres.indexes`.
+
+``operator_class``
+------------------
+
+.. attribute:: Index.operator_class
+
+.. versionadded:: 2.1
+
+The name of the operator class to use for this index.
+
+For example ``GinIndex(fields=['jsonfield'], operator_class='jsonb_path_ops')``
+would create gin index on ``jsonfield`` using ``jsonb_path_ops``.
+
+.. note::
+
+    ``operator_class`` argument is only supported by PSQL
+    and will be ignored silently for other database backends.

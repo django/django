@@ -59,17 +59,23 @@ class ColumnsTests(TableTests):
 
 class IndexNameTests(ColumnsTests):
     def setUp(self):
-        def create_index_name(table_name, column_names, suffix):
-            return ', '.join("%s_%s_%s" % (table_name, column_name, suffix) for column_name in column_names)
+        def create_index_name(table_name, column_names, suffix, operator_class):
+            return ', '.join(
+                "%s_%s_%s_%s" % (table_name, column_name, suffix, operator_class)
+                for column_name in column_names
+            )
         self.reference = IndexName(
-            'table', ['first_column', 'second_column'], 'suffix', create_index_name
+            'table', ['first_column', 'second_column'], 'suffix', 'opclass', create_index_name
         )
 
     def test_repr(self):
-        self.assertEqual(repr(self.reference), "<IndexName 'table_first_column_suffix, table_second_column_suffix'>")
+        self.assertEqual(
+            repr(self.reference),
+            "<IndexName 'table_first_column_suffix_opclass, table_second_column_suffix_opclass'>"
+        )
 
     def test_str(self):
-        self.assertEqual(str(self.reference), 'table_first_column_suffix, table_second_column_suffix')
+        self.assertEqual(str(self.reference), 'table_first_column_suffix_opclass, table_second_column_suffix_opclass')
 
 
 class ForeignKeyNameTests(IndexNameTests):
