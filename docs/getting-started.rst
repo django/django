@@ -752,8 +752,7 @@ that ``connect`` will run before any ``receives`` even without the decorator.
 
 The decorator uses ``channel_session`` to keep track of what numbered messages
 have been processed, and if a worker tries to run a consumer on an out-of-order
-message, it raises the ``ConsumeLater`` exception, which puts the message
-back on the channel it came from and tells the worker to work on another message.
+message, it temporarily places the message on a wait channel to be processed later.
 
 There's a high cost to using ``enforce_ordering``, which is why it's an optional
 decorator. Here's an example of it being used::
@@ -764,6 +763,7 @@ decorator. Here's an example of it being used::
     from channels.auth import channel_session_user, channel_session_user_from_http
 
     # Connected to websocket.connect
+    @enforce_ordering
     @channel_session_user_from_http
     def ws_add(message):
         # This doesn't need a decorator - it always runs separately
