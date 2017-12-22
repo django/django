@@ -214,7 +214,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'TimeField':
             converters.append(self.convert_timefield_value)
         elif internal_type == 'DecimalField':
-            converters.append(self.convert_decimalfield_value)
+            converters.append(self.get_decimalfield_converter(expression))
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         elif internal_type in ('NullBooleanField', 'BooleanField'):
@@ -241,15 +241,21 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = parse_time(value)
         return value
 
-    def convert_decimalfield_value(self, value, expression, connection):
-        if value is not None:
-            if not isinstance(expression, Col):
-                # SQLite stores only 15 significant digits. Digits coming from
-                # float inaccuracy must be removed.
-                return decimal.Context(prec=15).create_decimal_from_float(value)
-            value = expression.output_field.format_number(value)
-            return decimal.Decimal(value)
-        return value
+    def get_decimalfield_converter(self, expression):
+        # SQLite stores only 15 significant digits. Digits coming from
+        # float inaccuracy must be removed.
+        create_decimal = decimal.Context(prec=15).create_decimal_from_float
+        if isinstance(expression, Col):
+            quantize_value = decimal.Decimal(1).scaleb(-expression.output_field.decimal_places)
+
+            def converter(value, expression, connection):
+                if value is not None:
+                    return create_decimal(value).quantize(quantize_value, context=expression.output_field.context)
+        else:
+            def converter(value, expression, connection):
+                if value is not None:
+                    return create_decimal(value)
+        return converter
 
     def convert_uuidfield_value(self, value, expression, connection):
         if value is not None:
