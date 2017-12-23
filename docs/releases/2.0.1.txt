@@ -37,3 +37,6 @@ Bugfixes
 
 * Fixed crash on SQLite when renaming a field in a model referenced by a
   ``ManyToManyField`` (:ticket:`28884`).
+
+* Fixed a crash when chaining ``values()`` or ``values_list()`` after
+  ``QuerySet.select_for_update(of=(...))`` (:ticket:`28944`).

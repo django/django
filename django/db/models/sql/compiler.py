@@ -190,7 +190,7 @@ class SQLCompiler:
         "AS alias" for the column (possibly None).
 
         The klass_info structure contains the following information:
-        - Which model to instantiate
+        - The base model of the query.
         - Which columns for that model are present in the query (by
           position of the select clause).
         - related_klass_infos: [f, klass_info] to descent into
@@ -207,20 +207,21 @@ class SQLCompiler:
             select_idx += 1
         assert not (self.query.select and self.query.default_cols)
         if self.query.default_cols:
+            cols = self.get_default_columns()
+        else:
+            # self.query.select is a special case. These columns never go to
+            # any model.
+            cols = self.query.select
+        if cols:
             select_list = []
-            for c in self.get_default_columns():
+            for col in cols:
                 select_list.append(select_idx)
-                select.append((c, None))
+                select.append((col, None))
                 select_idx += 1
             klass_info = {
                 'model': self.query.model,
                 'select_fields': select_list,
             }
-        # self.query.select is a special case. These columns never go to
-        # any model.
-        for col in self.query.select:
-            select.append((col, None))
-            select_idx += 1
         for alias, annotation in self.query.annotation_select.items():
             annotations[alias] = select_idx
             select.append((annotation, alias))
