@@ -3,7 +3,7 @@ import random as random_module
 import re
 import types
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
-from functools import wraps
+from functools import lru_cache, wraps
 from operator import itemgetter
 from pprint import pformat
 from urllib.parse import quote
@@ -82,6 +82,25 @@ def escapejs_filter(value):
     return escapejs(value)
 
 
+@lru_cache(maxsize=1024)
+def _decimal_digits(exp, d, p, m):
+    # Set the precision high enough to avoid an exception (#15789).
+    tupl = d.as_tuple()
+    units = len(tupl[1])
+    units += -tupl[2] if m else tupl[2]
+    prec = abs(p) + units + 1
+
+    # Avoid conversion to scientific notation by accessing `sign`, `digits`,
+    # and `exponent` from Decimal.as_tuple() directly.
+    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    digits = [str(digit) for digit in reversed(digits)]
+    digits.extend('0' * (abs(exponent) - len(digits) + 1))
+    digits.insert(-exponent, '.')
+    if sign:
+        digits.append('-')
+    return ''.join(reversed(digits))
+
+
 @register.filter(is_safe=True)
 def floatformat(text, arg=-1):
     """
@@ -135,23 +154,9 @@ def floatformat(text, arg=-1):
         return mark_safe(formats.number_format('%d' % (int(d)), 0))
 
     exp = Decimal(1).scaleb(-abs(p))
-    # Set the precision high enough to avoid an exception (#15789).
-    tupl = d.as_tuple()
-    units = len(tupl[1])
-    units += -tupl[2] if m else tupl[2]
-    prec = abs(p) + units + 1
+    decimal_string = _decimal_digits(exp, d, p, m)
 
-    # Avoid conversion to scientific notation by accessing `sign`, `digits`,
-    # and `exponent` from Decimal.as_tuple() directly.
-    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
-    digits = [str(digit) for digit in reversed(digits)]
-    while len(digits) <= abs(exponent):
-        digits.append('0')
-    digits.insert(-exponent, '.')
-    if sign:
-        digits.append('-')
-    number = ''.join(reversed(digits))
-    return mark_safe(formats.number_format(number, abs(p)))
+    return mark_safe(formats.number_format(decimal_string, abs(p)))
 
 
 @register.filter(is_safe=True)
