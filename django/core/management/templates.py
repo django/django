@@ -5,7 +5,6 @@ import posixpath
 import re
 import shutil
 import stat
-import sys
 import tempfile
 from importlib import import_module
 from os import path
@@ -27,7 +26,6 @@ class TemplateCommand(BaseCommand):
     """
     Copy either a Django application layout template or a Django project
     layout template into the specified directory.
-
     :param style: A color style object (see django.core.management.color).
     :param app_or_project: The string 'app' or 'project'.
     :param name: The name of the application or project.
@@ -336,9 +334,6 @@ class TemplateCommand(BaseCommand):
         Make sure that the file is writeable.
         Useful if our source is read-only.
         """
-        if sys.platform.startswith('java'):
-            # On Jython there is no os.access()
-            return
         if not os.access(filename, os.W_OK):
             st = os.stat(filename)
             new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR
