@@ -190,12 +190,9 @@ def keep_lazy(*resultclasses):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            for arg in itertools.chain(args, kwargs.values()):
-                if isinstance(arg, Promise):
-                    break
-            else:
-                return func(*args, **kwargs)
-            return lazy_func(*args, **kwargs)
+            if any(isinstance(arg, Promise) for arg in itertools.chain(args, kwargs.values())):
+                return lazy_func(*args, **kwargs)
+            return func(*args, **kwargs)
         return wrapper
     return decorator
 

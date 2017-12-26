@@ -90,12 +90,10 @@ class ModelBackend:
         """
         Return True if user_obj has any permissions in the given app_label.
         """
-        if not user_obj.is_active:
-            return False
-        for perm in self.get_all_permissions(user_obj):
-            if perm[:perm.index('.')] == app_label:
-                return True
-        return False
+        return user_obj.is_active and any(
+            perm[:perm.index('.')] == app_label
+            for perm in self.get_all_permissions(user_obj)
+        )
 
     def get_user(self, user_id):
         try:

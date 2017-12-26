@@ -553,10 +553,7 @@ def compare_xml(want, got):
         got_children = children(got_element)
         if len(want_children) != len(got_children):
             return False
-        for want, got in zip(want_children, got_children):
-            if not check_element(want, got):
-                return False
-        return True
+        return all(check_element(want, got) for want, got in zip(want_children, got_children))
 
     def first_node(document):
         for node in document.childNodes:

@@ -572,12 +572,7 @@ class URLResolver:
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue
-                    matches = True
-                    for k, v in defaults.items():
-                        if kwargs.get(k, v) != v:
-                            matches = False
-                            break
-                    if not matches:
+                    if any(kwargs.get(k, v) != v for k, v in defaults.items()):
                         continue
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().

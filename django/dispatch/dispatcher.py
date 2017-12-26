@@ -106,10 +106,7 @@ class Signal:
 
         with self.lock:
             self._clear_dead_receivers()
-            for r_key, _ in self.receivers:
-                if r_key == lookup_key:
-                    break
-            else:
+            if not any(r_key == lookup_key for r_key, _ in self.receivers):
                 self.receivers.append((lookup_key, receiver))
             self.sender_receivers_cache.clear()
 

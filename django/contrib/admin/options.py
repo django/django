@@ -973,11 +973,7 @@ class ModelAdmin(BaseModelAdmin):
                 or_queries = [models.Q(**{orm_lookup: bit})
                               for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(operator.or_, or_queries))
-            if not use_distinct:
-                for search_spec in orm_lookups:
-                    if lookup_needs_distinct(self.opts, search_spec):
-                        use_distinct = True
-                        break
+            use_distinct |= any(lookup_needs_distinct(self.opts, search_spec) for search_spec in orm_lookups)
 
         return queryset, use_distinct
 

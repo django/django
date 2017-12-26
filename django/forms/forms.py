@@ -351,13 +351,10 @@ class BaseForm:
                 del self.cleaned_data[field]
 
     def has_error(self, field, code=None):
-        if code is None:
-            return field in self.errors
-        if field in self.errors:
-            for error in self.errors.as_data()[field]:
-                if error.code == code:
-                    return True
-        return False
+        return field in self.errors and (
+            code is None or
+            any(error.code == code for error in self.errors.as_data()[field])
+        )
 
     def full_clean(self):
         """
@@ -464,10 +461,7 @@ class BaseForm:
         Return True if the form needs to be multipart-encoded, i.e. it has
         FileInput, or False otherwise.
         """
-        for field in self.fields.values():
-            if field.widget.needs_multipart_form:
-                return True
-        return False
+        return any(field.widget.needs_multipart_form for field in self.fields.values())
 
     def hidden_fields(self):
         """

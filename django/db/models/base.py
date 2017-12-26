@@ -970,11 +970,8 @@ class Model(metaclass=ModelBase):
 
         for model_class, unique_together in unique_togethers:
             for check in unique_together:
-                for name in check:
-                    # If this is an excluded field, don't add this check.
-                    if name in exclude:
-                        break
-                else:
+                if not any(name in exclude for name in check):
+                    # Add the check if the field isn't excluded.
                     unique_checks.append((model_class, tuple(check)))
 
         # These are checks for the unique_for_<date/year/month>.

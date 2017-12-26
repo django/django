@@ -10,12 +10,7 @@ def matches_patterns(path, patterns=None):
     Return True or False depending on whether the ``path`` should be
     ignored (if it matches any pattern in ``ignore_patterns``).
     """
-    if patterns is None:
-        patterns = []
-    for pattern in patterns:
-        if fnmatch.fnmatchcase(path, pattern):
-            return True
-    return False
+    return any(fnmatch.fnmatchcase(path, pattern) for pattern in (patterns or []))
 
 
 def get_files(storage, ignore_patterns=None, location=''):

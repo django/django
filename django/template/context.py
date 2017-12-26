@@ -87,10 +87,7 @@ class BaseContext:
         del self.dicts[-1][key]
 
     def __contains__(self, key):
-        for d in self.dicts:
-            if key in d:
-                return True
-        return False
+        return any(key in d for d in self.dicts)
 
     def get(self, key, otherwise=None):
         for d in reversed(self.dicts):
