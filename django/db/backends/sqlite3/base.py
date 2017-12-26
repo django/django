@@ -39,7 +39,6 @@ Database.register_converter("date", decoder(parse_date))
 Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
 Database.register_converter("TIMESTAMP", decoder(parse_datetime))
-Database.register_converter("decimal", decoder(decimal.Decimal))
 
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 
