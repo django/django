@@ -49,12 +49,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         if lookup_type in fields:
             format_str = fields[lookup_type]
             return "CAST(DATE_FORMAT(%s, '%s') AS DATE)" % (field_name, format_str)
-        elif lookup_type == 'quarter':
+        if lookup_type == 'quarter':
             return "MAKEDATE(YEAR(%s), 1) + INTERVAL QUARTER(%s) QUARTER - INTERVAL 1 QUARTER" % (
                 field_name, field_name
             )
-        else:
-            return "DATE(%s)" % (field_name)
+        return "DATE(%s)" % (field_name)
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
@@ -204,9 +203,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'POW(%s)' % ','.join(sub_expressions)
         # Convert the result to a signed integer since MySQL's binary operators
         # return an unsigned integer.
-        elif connector in ('&', '|', '<<'):
+        if connector in ('&', '|', '<<'):
             return 'CONVERT(%s, SIGNED)' % connector.join(sub_expressions)
-        elif connector == '>>':
+        if connector == '>>':
             lhs, rhs = sub_expressions
             return 'FLOOR(%(lhs)s / POW(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
         return super().combine_expression(connector, sub_expressions)

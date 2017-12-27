@@ -1941,16 +1941,15 @@ class Query:
         """
         if self._annotation_select_cache is not None:
             return self._annotation_select_cache
-        elif not self._annotations:
+        if not self._annotations:
             return {}
-        elif self.annotation_select_mask is not None:
+        if self.annotation_select_mask is not None:
             self._annotation_select_cache = OrderedDict(
                 (k, v) for k, v in self.annotations.items()
                 if k in self.annotation_select_mask
             )
             return self._annotation_select_cache
-        else:
-            return self.annotations
+        return self.annotations
 
     @property
     def extra_select(self):
@@ -1958,14 +1957,13 @@ class Query:
             return self._extra_select_cache
         if not self._extra:
             return {}
-        elif self.extra_select_mask is not None:
+        if self.extra_select_mask is not None:
             self._extra_select_cache = OrderedDict(
                 (k, v) for k, v in self.extra.items()
                 if k in self.extra_select_mask
             )
             return self._extra_select_cache
-        else:
-            return self.extra
+        return self.extra
 
     def trim_start(self, names_with_path):
         """

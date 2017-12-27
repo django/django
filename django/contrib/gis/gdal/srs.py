@@ -82,8 +82,7 @@ class SpatialReference(GDALBase):
         # If the pointer is NULL, throw an exception.
         if not srs:
             raise SRSException('Could not create spatial reference from: %s' % srs_input)
-        else:
-            self.ptr = srs
+        self.ptr = srs
 
         # Importing from either the user input string or an integer SRID.
         if srs_type == 'user':
@@ -170,12 +169,11 @@ class SpatialReference(GDALBase):
         "Return the name of this Spatial Reference."
         if self.projected:
             return self.attr_value('PROJCS')
-        elif self.geographic:
+        if self.geographic:
             return self.attr_value('GEOGCS')
-        elif self.local:
+        if self.local:
             return self.attr_value('LOCAL_CS')
-        else:
-            return None
+        return None
 
     @property
     def srid(self):

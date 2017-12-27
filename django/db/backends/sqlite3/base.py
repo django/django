@@ -314,12 +314,11 @@ def _sqlite_date_extract(lookup_type, dt):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
-    elif lookup_type == 'week':
+    if lookup_type == 'week':
         return dt.isocalendar()[1]
-    elif lookup_type == 'quarter':
+    if lookup_type == 'quarter':
         return math.ceil(dt.month / 3)
-    else:
-        return getattr(dt, lookup_type)
+    return getattr(dt, lookup_type)
 
 
 def _sqlite_date_trunc(lookup_type, dt):
@@ -329,12 +328,12 @@ def _sqlite_date_trunc(lookup_type, dt):
         return None
     if lookup_type == 'year':
         return "%i-01-01" % dt.year
-    elif lookup_type == 'quarter':
+    if lookup_type == 'quarter':
         month_in_quarter = dt.month - (dt.month - 1) % 3
         return '%i-%02i-01' % (dt.year, month_in_quarter)
-    elif lookup_type == 'month':
+    if lookup_type == 'month':
         return "%i-%02i-01" % (dt.year, dt.month)
-    elif lookup_type == 'day':
+    if lookup_type == 'day':
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
@@ -345,9 +344,9 @@ def _sqlite_time_trunc(lookup_type, dt):
         return None
     if lookup_type == 'hour':
         return "%02i:00:00" % dt.hour
-    elif lookup_type == 'minute':
+    if lookup_type == 'minute':
         return "%02i:%02i:00" % (dt.hour, dt.minute)
-    elif lookup_type == 'second':
+    if lookup_type == 'second':
         return "%02i:%02i:%02i" % (dt.hour, dt.minute, dt.second)
 
 
@@ -383,12 +382,11 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
-    elif lookup_type == 'week':
+    if lookup_type == 'week':
         return dt.isocalendar()[1]
-    elif lookup_type == 'quarter':
+    if lookup_type == 'quarter':
         return math.ceil(dt.month / 3)
-    else:
-        return getattr(dt, lookup_type)
+    return getattr(dt, lookup_type)
 
 
 def _sqlite_datetime_trunc(lookup_type, dt, tzname):
@@ -397,18 +395,18 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return None
     if lookup_type == 'year':
         return "%i-01-01 00:00:00" % dt.year
-    elif lookup_type == 'quarter':
+    if lookup_type == 'quarter':
         month_in_quarter = dt.month - (dt.month - 1) % 3
         return '%i-%02i-01 00:00:00' % (dt.year, month_in_quarter)
-    elif lookup_type == 'month':
+    if lookup_type == 'month':
         return "%i-%02i-01 00:00:00" % (dt.year, dt.month)
-    elif lookup_type == 'day':
+    if lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
-    elif lookup_type == 'hour':
+    if lookup_type == 'hour':
         return "%i-%02i-%02i %02i:00:00" % (dt.year, dt.month, dt.day, dt.hour)
-    elif lookup_type == 'minute':
+    if lookup_type == 'minute':
         return "%i-%02i-%02i %02i:%02i:00" % (dt.year, dt.month, dt.day, dt.hour, dt.minute)
-    elif lookup_type == 'second':
+    if lookup_type == 'second':
         return "%i-%02i-%02i %02i:%02i:%02i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
 

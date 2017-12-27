@@ -105,10 +105,9 @@ class MultipleObjectMixin(ContextMixin):
         """Get the name of the item to be used in the context."""
         if self.context_object_name:
             return self.context_object_name
-        elif hasattr(object_list, 'model'):
+        if hasattr(object_list, 'model'):
             return '%s_list' % object_list.model._meta.model_name
-        else:
-            return None
+        return None
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """Get the context for this view."""

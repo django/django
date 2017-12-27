@@ -806,8 +806,7 @@ class Variable:
             msgid = mark_safe(msgid) if is_safe else msgid
             if self.message_context:
                 return pgettext_lazy(self.message_context, msgid)
-            else:
-                return gettext_lazy(msgid)
+            return gettext_lazy(msgid)
         return value
 
     def __repr__(self):

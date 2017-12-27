@@ -98,11 +98,10 @@ class BaseSpatialOperations:
                 self.spatial_function_name('Transform'),
                 self.from_text, value.srid, f.srid,
             )
-        elif self.connection.features.has_spatialrefsys_table:
+        if self.connection.features.has_spatialrefsys_table:
             return '%s(%%s,%s)' % (self.from_text, f.srid)
-        else:
-            # For backwards compatibility on MySQL (#27464).
-            return '%s(%%s)' % self.from_text
+        # For backwards compatibility on MySQL (#27464).
+        return '%s(%%s)' % self.from_text
 
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):
@@ -145,10 +144,9 @@ class BaseSpatialOperations:
             if self.connection.features.supports_area_geodetic:
                 return 'sq_m'
             raise NotImplementedError('Area on geodetic coordinate systems not supported.')
-        else:
-            units_name = field.units_name(self.connection)
-            if units_name:
-                return AreaMeasure.unit_attname(units_name)
+        units_name = field.units_name(self.connection)
+        if units_name:
+            return AreaMeasure.unit_attname(units_name)
 
     def get_distance_att_for_field(self, field):
         dist_att = None

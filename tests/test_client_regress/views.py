@@ -52,8 +52,7 @@ def view_with_argument(request, name):
     """
     if name == 'Arthur Dent':
         return HttpResponse('Hi, Arthur')
-    else:
-        return HttpResponse('Howdy, %s' % name)
+    return HttpResponse('Howdy, %s' % name)
 
 
 def nested_view(request):

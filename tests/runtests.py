@@ -236,10 +236,8 @@ def actual_test_processes(parallel):
         # This doesn't work before django.setup() on some databases.
         if all(conn.features.can_clone_databases for conn in connections.all()):
             return default_test_processes()
-        else:
-            return 1
-    else:
-        return parallel
+        return 1
+    return parallel
 
 
 class ActionSelenium(argparse.Action):

@@ -31,8 +31,7 @@ def no_backend(test_func, backend):
         def inner():
             pass
         return inner
-    else:
-        return test_func
+    return test_func
 
 
 # Decorators to disable entire test functions for specific

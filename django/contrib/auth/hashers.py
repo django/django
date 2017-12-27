@@ -114,18 +114,16 @@ def get_hasher(algorithm='default'):
     """
     if hasattr(algorithm, 'algorithm'):
         return algorithm
-
-    elif algorithm == 'default':
+    if algorithm == 'default':
         return get_hashers()[0]
-
-    else:
-        hashers = get_hashers_by_algorithm()
-        try:
-            return hashers[algorithm]
-        except KeyError:
-            raise ValueError("Unknown password hashing algorithm '%s'. "
-                             "Did you specify it in the PASSWORD_HASHERS "
-                             "setting?" % algorithm)
+    hashers = get_hashers_by_algorithm()
+    try:
+        return hashers[algorithm]
+    except KeyError:
+        raise ValueError(
+            "Unknown password hashing algorithm '%s'. Did you specify it in "
+            "the PASSWORD_HASHERS setting?" % algorithm
+        )
 
 
 def identify_hasher(encoded):

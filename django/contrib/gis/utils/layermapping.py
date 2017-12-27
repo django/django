@@ -154,12 +154,10 @@ class LayerMapping:
         if fid_range:
             if isinstance(fid_range, (tuple, list)):
                 return slice(*fid_range)
-            elif isinstance(fid_range, slice):
+            if isinstance(fid_range, slice):
                 return fid_range
-            else:
-                raise TypeError
-        else:
-            return None
+            raise TypeError
+        return None
 
     def check_layer(self):
         """

@@ -19,7 +19,7 @@ def static(prefix, view=serve, **kwargs):
     """
     if not prefix:
         raise ImproperlyConfigured("Empty static prefix not permitted")
-    elif not settings.DEBUG or '://' in prefix:
+    if not settings.DEBUG or '://' in prefix:
         # No-op if not in debug mode or a non-local prefix.
         return []
     return [

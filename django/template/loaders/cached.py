@@ -47,7 +47,7 @@ class Loader(BaseLoader):
         if cached:
             if isinstance(cached, type) and issubclass(cached, TemplateDoesNotExist):
                 raise cached(template_name)
-            elif isinstance(cached, TemplateDoesNotExist):
+            if isinstance(cached, TemplateDoesNotExist):
                 raise copy_exception(cached)
             return cached
 
@@ -56,9 +56,7 @@ class Loader(BaseLoader):
         except TemplateDoesNotExist as e:
             self.get_template_cache[key] = copy_exception(e) if self.engine.debug else TemplateDoesNotExist
             raise
-        else:
-            self.get_template_cache[key] = template
-
+        self.get_template_cache[key] = template
         return template
 
     def get_template_sources(self, template_name):

@@ -82,10 +82,9 @@ class SingleObjectMixin(ContextMixin):
         """Get the name to use for the object."""
         if self.context_object_name:
             return self.context_object_name
-        elif isinstance(obj, models.Model):
+        if isinstance(obj, models.Model):
             return obj._meta.model_name
-        else:
-            return None
+        return None
 
     def get_context_data(self, **kwargs):
         """Insert the single object into the context dict."""

@@ -95,13 +95,11 @@ class WhereNode(tree.Node):
             if empty_needed == 0:
                 if self.negated:
                     return '', []
-                else:
-                    raise EmptyResultSet
+                raise EmptyResultSet
             if full_needed == 0:
                 if self.negated:
                     raise EmptyResultSet
-                else:
-                    return '', []
+                return '', []
         conn = ' %s ' % self.connector
         sql_string = conn.join(result)
         if sql_string:

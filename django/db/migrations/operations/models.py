@@ -127,15 +127,14 @@ class CreateModel(ModelOperation):
         """
         if isinstance(model, str):
             return model.split(".", 1)
-        else:
-            return model._meta.app_label, model._meta.object_name
+        return model._meta.app_label, model._meta.object_name
 
     def reduce(self, operation, in_between, app_label=None):
         if (isinstance(operation, DeleteModel) and
                 self.name_lower == operation.name_lower and
                 not self.options.get("proxy", False)):
             return []
-        elif isinstance(operation, RenameModel) and self.name_lower == operation.old_name_lower:
+        if isinstance(operation, RenameModel) and self.name_lower == operation.old_name_lower:
             return [
                 CreateModel(
                     operation.new_name,
@@ -155,7 +154,7 @@ class CreateModel(ModelOperation):
                     managers=self.managers,
                 ),
             ]
-        elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
+        if isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
             if isinstance(operation, AddField):
                 # Don't allow optimizations of FKs through models they reference
                 if hasattr(operation.field, "remote_field") and operation.field.remote_field:
@@ -178,7 +177,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-            elif isinstance(operation, AlterField):
+            if isinstance(operation, AlterField):
                 return [
                     CreateModel(
                         self.name,
@@ -191,7 +190,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-            elif isinstance(operation, RemoveField):
+            if isinstance(operation, RemoveField):
                 return [
                     CreateModel(
                         self.name,
@@ -205,7 +204,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-            elif isinstance(operation, RenameField):
+            if isinstance(operation, RenameField):
                 return [
                     CreateModel(
                         self.name,

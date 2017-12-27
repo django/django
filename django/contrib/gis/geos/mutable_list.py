@@ -160,7 +160,7 @@ class ListMixin:
                 return True
             if c:
                 return c
-            elif other[i] < self[i]:
+            if other[i] < self[i]:
                 return False
         return len(self) < olen
 

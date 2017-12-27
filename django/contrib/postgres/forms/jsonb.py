@@ -25,7 +25,7 @@ class JSONField(forms.CharField):
             return value
         if value in self.empty_values:
             return None
-        elif isinstance(value, (list, dict, int, float, JSONString)):
+        if isinstance(value, (list, dict, int, float, JSONString)):
             return value
         try:
             converted = json.loads(value)
@@ -37,8 +37,7 @@ class JSONField(forms.CharField):
             )
         if isinstance(converted, str):
             return JSONString(converted)
-        else:
-            return converted
+        return converted
 
     def bound_data(self, data, initial):
         if self.disabled:

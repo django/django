@@ -209,12 +209,11 @@ class MeasureBase:
         lower = unit_str.lower()
         if unit_str in cls.UNITS:
             return unit_str
-        elif lower in cls.UNITS:
+        if lower in cls.UNITS:
             return lower
-        elif lower in cls.LALIAS:
+        if lower in cls.LALIAS:
             return cls.LALIAS[lower]
-        else:
-            raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
+        raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
 
 
 class Distance(MeasureBase):
@@ -300,15 +299,14 @@ class Distance(MeasureBase):
                 default_unit=AREA_PREFIX + self._default_unit,
                 **{AREA_PREFIX + self.STANDARD_UNIT: (self.standard * other.standard)}
             )
-        elif isinstance(other, NUMERIC_TYPES):
+        if isinstance(other, NUMERIC_TYPES):
             return self.__class__(
                 default_unit=self._default_unit,
                 **{self.STANDARD_UNIT: (self.standard * other)}
             )
-        else:
-            raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
-                "distance": pretty_name(self.__class__),
-            })
+        raise TypeError('%(distance)s must be multiplied with number or %(distance)s' % {
+            "distance": pretty_name(self.__class__),
+        })
 
 
 class Area(MeasureBase):

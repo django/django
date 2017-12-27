@@ -241,7 +241,7 @@ class IfChangedNode(Node):
             state_frame[self] = compare_to
             # render true block if not already rendered
             return nodelist_true_output or self.nodelist_true.render(context)
-        elif self.nodelist_false:
+        if self.nodelist_false:
             return self.nodelist_false.render(context)
         return ''
 

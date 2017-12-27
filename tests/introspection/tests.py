@@ -211,5 +211,4 @@ def datatype(dbtype, description):
     dt = connection.introspection.get_field_type(dbtype, description)
     if type(dt) is tuple:
         return dt[0]
-    else:
-        return dt
+    return dt

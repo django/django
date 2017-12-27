@@ -121,10 +121,9 @@ def lazy(func, *resultclasses):
         def __cast(self):
             if self._delegate_bytes:
                 return self.__bytes_cast()
-            elif self._delegate_text:
+            if self._delegate_text:
                 return self.__text_cast()
-            else:
-                return func(*self.__args, **self.__kw)
+            return func(*self.__args, **self.__kw)
 
         def __str__(self):
             # object defines __str__(), so __prepare_class__() won't overload

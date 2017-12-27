@@ -236,8 +236,7 @@ class ImmutableList(tuple):
     def complain(self, *wargs, **kwargs):
         if isinstance(self.warning, Exception):
             raise self.warning
-        else:
-            raise AttributeError(self.warning)
+        raise AttributeError(self.warning)
 
     # All list mutation functions complain.
     __delitem__ = complain

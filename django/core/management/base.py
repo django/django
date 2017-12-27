@@ -408,9 +408,7 @@ class BaseCommand:
         if any(e.is_serious(fail_level) and not e.is_silenced() for e in all_issues):
             msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
             raise SystemCheckError(msg)
-        else:
-            msg = header + body + footer
-
+        msg = header + body + footer
         if msg:
             if visible_issue_count:
                 self.stderr.write(msg, lambda x: x)

@@ -58,11 +58,10 @@ class CursorWrapper:
         with self.db.wrap_database_errors:
             if params is None and kparams is None:
                 return self.cursor.callproc(procname)
-            elif kparams is None:
+            if kparams is None:
                 return self.cursor.callproc(procname, params)
-            else:
-                params = params or ()
-                return self.cursor.callproc(procname, params, kparams)
+            params = params or ()
+            return self.cursor.callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
         return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)

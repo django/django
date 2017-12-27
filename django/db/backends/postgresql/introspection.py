@@ -44,7 +44,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if description.default and 'nextval' in description.default:
             if field_type == 'IntegerField':
                 return 'AutoField'
-            elif field_type == 'BigIntegerField':
+            if field_type == 'BigIntegerField':
                 return 'BigAutoField'
         return field_type
 

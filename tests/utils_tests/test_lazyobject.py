@@ -376,7 +376,7 @@ class BaseBaz:
         for attr in ['bar', 'baz', 'quux']:
             if hasattr(self, attr) != hasattr(other, attr):
                 return False
-            elif getattr(self, attr, None) != getattr(other, attr, None):
+            if getattr(self, attr, None) != getattr(other, attr, None):
                 return False
         return True
 

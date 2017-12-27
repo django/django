@@ -698,8 +698,7 @@ class MakeMigrationsTests(MigrationTestBase):
         def patched_has_table(migration_recorder):
             if migration_recorder.connection is connections['other']:
                 raise Exception('Other connection')
-            else:
-                return mock.DEFAULT
+            return mock.DEFAULT
 
         self.assertTableNotExists('migrations_unicodemodel')
         apps.register_model('migrations', UnicodeModel)

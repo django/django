@@ -144,10 +144,9 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     def process_kwarg(kwarg):
         if isinstance(kwarg, (list, tuple)):
             return [s.lower() for s in kwarg]
-        elif kwarg:
+        if kwarg:
             return [s.lower() for s in ogr_fields]
-        else:
-            return []
+        return []
     null_fields = process_kwarg(null)
     blank_fields = process_kwarg(blank)
     decimal_fields = process_kwarg(decimal)
@@ -161,8 +160,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
             kwlist.append('blank=True')
         if kwlist:
             return ', ' + ', '.join(kwlist)
-        else:
-            return ''
+        return ''
 
     # For those wishing to disable the imports.
     if imports:

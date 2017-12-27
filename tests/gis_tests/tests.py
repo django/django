@@ -26,8 +26,7 @@ if HAS_POSTGRES:
             if func == 'postgis_lib_version':
                 if self.version is None:
                     raise ProgrammingError
-                else:
-                    return self.version
+                return self.version
             elif func == 'version':
                 pass
             else:

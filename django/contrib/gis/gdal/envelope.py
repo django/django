@@ -48,8 +48,7 @@ class Envelope:
                 # A tuple was passed in.
                 if len(args[0]) != 4:
                     raise GDALException('Incorrect number of tuple elements (%d).' % len(args[0]))
-                else:
-                    self._from_sequence(args[0])
+                self._from_sequence(args[0])
             else:
                 raise TypeError('Incorrect type of argument: %s' % type(args[0]))
         elif len(args) == 4:
@@ -73,11 +72,10 @@ class Envelope:
         if isinstance(other, Envelope):
             return (self.min_x == other.min_x) and (self.min_y == other.min_y) and \
                    (self.max_x == other.max_x) and (self.max_y == other.max_y)
-        elif isinstance(other, tuple) and len(other) == 4:
+        if isinstance(other, tuple) and len(other) == 4:
             return (self.min_x == other[0]) and (self.min_y == other[1]) and \
                    (self.max_x == other[2]) and (self.max_y == other[3])
-        else:
-            raise GDALException('Equivalence testing only works with other Envelopes.')
+        raise GDALException('Equivalence testing only works with other Envelopes.')
 
     def __str__(self):
         "Return a string representation of the tuple."
@@ -104,13 +102,13 @@ class Envelope:
         if len(args) == 1:
             if isinstance(args[0], Envelope):
                 return self.expand_to_include(args[0].tuple)
-            elif hasattr(args[0], 'x') and hasattr(args[0], 'y'):
+            if hasattr(args[0], 'x') and hasattr(args[0], 'y'):
                 return self.expand_to_include(args[0].x, args[0].y, args[0].x, args[0].y)
-            elif isinstance(args[0], (tuple, list)):
+            if isinstance(args[0], (tuple, list)):
                 # A tuple was passed in.
                 if len(args[0]) == 2:
                     return self.expand_to_include((args[0][0], args[0][1], args[0][0], args[0][1]))
-                elif len(args[0]) == 4:
+                if len(args[0]) == 4:
                     (minx, miny, maxx, maxy) = args[0]
                     if minx < self._envelope.MinX:
                         self._envelope.MinX = minx
@@ -126,7 +124,7 @@ class Envelope:
                 raise TypeError('Incorrect type of argument: %s' % type(args[0]))
         elif len(args) == 2:
             # An x and an y parameter were passed in
-                return self.expand_to_include((args[0], args[1], args[0], args[1]))
+            return self.expand_to_include((args[0], args[1], args[0], args[1]))
         elif len(args) == 4:
             # Individual parameters passed in.
             return self.expand_to_include(args)

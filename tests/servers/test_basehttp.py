@@ -101,7 +101,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         def makefile(mode, *a, **kw):
             if mode == 'rb':
                 return rfile
-            elif mode == 'wb':
+            if mode == 'wb':
                 return wfile
 
         request = Stub(makefile=makefile)

@@ -1279,7 +1279,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         value = self.prepare_value(value)
         if self.required and not value:
             raise ValidationError(self.error_messages['required'], code='required')
-        elif not self.required and not value:
+        if not self.required and not value:
             return self.queryset.none()
         if not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['list'], code='list')

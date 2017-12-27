@@ -34,7 +34,7 @@ class SafeBytes(bytes, SafeData):
         t = super().__add__(rhs)
         if isinstance(rhs, SafeText):
             return SafeText(t)
-        elif isinstance(rhs, SafeBytes):
+        if isinstance(rhs, SafeBytes):
             return SafeBytes(t)
         return t
 

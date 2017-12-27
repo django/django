@@ -147,10 +147,9 @@ class _WKBReader(IOBase):
         if isinstance(wkb, memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, (bytes, str)):
+        if isinstance(wkb, (bytes, str)):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
-        else:
-            raise TypeError
+        raise TypeError
 
 
 # ### WKB/WKT Writer Classes ###

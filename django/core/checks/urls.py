@@ -21,10 +21,9 @@ def check_resolver(resolver):
     check_method = getattr(resolver, 'check', None)
     if check_method is not None:
         return check_method()
-    elif not hasattr(resolver, 'resolve'):
+    if not hasattr(resolver, 'resolve'):
         return get_warning_for_invalid_pattern(resolver)
-    else:
-        return []
+    return []
 
 
 @register(Tags.urls)
