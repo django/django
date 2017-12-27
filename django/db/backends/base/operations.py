@@ -7,7 +7,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.dateparse import parse_duration
 from django.utils.encoding import force_text
 
 
@@ -568,9 +567,7 @@ class BaseDatabaseOperations:
 
     def convert_durationfield_value(self, value, expression, connection):
         if value is not None:
-            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
-            value = parse_duration(value)
-        return value
+            return datetime.timedelta(0, 0, value)
 
     def check_expression_support(self, expression):
         """
