@@ -94,6 +94,12 @@ class Avg(Aggregate):
             return FloatField()
         return super()._resolve_output_field()
 
+    def as_mysql(self, compiler, connection):
+        sql, params = super().as_sql(compiler, connection)
+        if self.output_field.get_internal_type() == 'DurationField':
+            sql = 'CAST(%s as SIGNED)' % sql
+        return sql, params
+
     def as_oracle(self, compiler, connection):
         if self.output_field.get_internal_type() == 'DurationField':
             expression = self.get_source_expressions()[0]
@@ -152,6 +158,12 @@ class StdDev(Aggregate):
 class Sum(Aggregate):
     function = 'SUM'
     name = 'Sum'
+
+    def as_mysql(self, compiler, connection):
+        sql, params = super().as_sql(compiler, connection)
+        if self.output_field.get_internal_type() == 'DurationField':
+            sql = 'CAST(%s as SIGNED)' % sql
+        return sql, params
 
     def as_oracle(self, compiler, connection):
         if self.output_field.get_internal_type() == 'DurationField':
