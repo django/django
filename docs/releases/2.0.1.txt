@@ -40,3 +40,6 @@ Bugfixes
 
 * Fixed a crash when chaining ``values()`` or ``values_list()`` after
   ``QuerySet.select_for_update(of=(...))`` (:ticket:`28944`).
+
+* Fixed admin changelist crash when using a query expression in the page's
+  ordering (:ticket:`28958`).

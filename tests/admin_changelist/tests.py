@@ -8,6 +8,8 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import F
+from django.db.models.functions import Upper
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
@@ -54,6 +56,20 @@ class ChangeListTests(TestCase):
         request = self.factory.get(url)
         request.user = user
         return request
+
+    def test_specified_ordering_by_f_expression(self):
+        class OrderedByFBandAdmin(admin.ModelAdmin):
+            list_display = ['name', 'genres', 'nr_of_members']
+            ordering = (
+                F('nr_of_members').desc(nulls_last=True),
+                Upper(F('name')).asc(),
+                F('genres').asc(),
+            )
+
+        m = OrderedByFBandAdmin(Band, custom_site)
+        request = self.factory.get('/band/')
+        cl = m.get_changelist_instance(request)
+        self.assertEqual(cl.get_ordering_field_columns(), {3: 'desc', 2: 'asc'})
 
     def test_select_related_preserved(self):
         """
