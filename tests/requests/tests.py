@@ -14,7 +14,7 @@ from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import freeze_time
-from django.utils.http import cookie_date
+from django.utils.http import http_date
 from django.utils.timezone import utc
 
 
@@ -234,7 +234,7 @@ class RequestsTests(SimpleTestCase):
         response.set_cookie('c', 'old-value')
         self.assertEqual(response.cookies['c']['expires'], '')
         response.delete_cookie('c')
-        self.assertEqual(response.cookies['c']['expires'], 'Thu, 01-Jan-1970 00:00:00 GMT')
+        self.assertEqual(response.cookies['c']['expires'], 'Thu, 01 Jan 1970 00:00:00 GMT')
         response.set_cookie('c', 'new-value')
         self.assertEqual(response.cookies['c']['expires'], '')
 
@@ -246,7 +246,7 @@ class RequestsTests(SimpleTestCase):
         self.assertIn(
             datetime_cookie['expires'],
             # assertIn accounts for slight time dependency (#23450)
-            ('Sat, 01-Jan-2028 04:05:06 GMT', 'Sat, 01-Jan-2028 04:05:07 GMT')
+            ('Sat, 01 Jan 2028 04:05:06 GMT', 'Sat, 01 Jan 2028 04:05:07 GMT')
         )
 
     def test_max_age_expiration(self):
@@ -257,7 +257,7 @@ class RequestsTests(SimpleTestCase):
             response.set_cookie('max_age', max_age=10)
         max_age_cookie = response.cookies['max_age']
         self.assertEqual(max_age_cookie['max-age'], 10)
-        self.assertEqual(max_age_cookie['expires'], cookie_date(set_cookie_time + 10))
+        self.assertEqual(max_age_cookie['expires'], http_date(set_cookie_time + 10))
 
     def test_httponly_cookie(self):
         response = HttpResponse()

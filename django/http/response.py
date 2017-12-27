@@ -14,7 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.encoding import force_bytes, iri_to_uri
-from django.utils.http import cookie_date
+from django.utils.http import http_date
 
 _charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
 
@@ -185,8 +185,7 @@ class HttpResponseBase:
             self.cookies[key]['max-age'] = max_age
             # IE requires expires, so set it if hasn't been already.
             if not expires:
-                self.cookies[key]['expires'] = cookie_date(time.time() +
-                                                           max_age)
+                self.cookies[key]['expires'] = http_date(time.time() + max_age)
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:
@@ -207,7 +206,7 @@ class HttpResponseBase:
 
     def delete_cookie(self, key, path='/', domain=None):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
-                        expires='Thu, 01-Jan-1970 00:00:00 GMT')
+                        expires='Thu, 01 Jan 1970 00:00:00 GMT')
 
     # Common methods used by subclasses
 
