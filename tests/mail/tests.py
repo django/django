@@ -132,6 +132,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com']
         )
 
+    def test_cc_in_headers_only(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'Cc': 'foo@example.com'},
+        ).message()
+        self.assertEqual(message['Cc'], 'foo@example.com')
+
     def test_reply_to(self):
         email = EmailMessage(
             'Subject', 'Content', 'from@example.com', ['to@example.com'],
@@ -243,6 +250,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['To'], 'list-subscriber@example.com, list-subscriber2@example.com')
         self.assertEqual(email.to, ['list-subscriber@example.com', 'list-subscriber2@example.com'])
 
+    def test_to_in_headers_only(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com',
+            headers={'To': 'to@example.com'},
+        ).message()
+        self.assertEqual(message['To'], 'to@example.com')
+
     def test_reply_to_header(self):
         """
         Specifying 'Reply-To' in headers should override reply_to.
@@ -253,6 +267,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         message = email.message()
         self.assertEqual(message['Reply-To'], 'override@example.com')
+
+    def test_reply_to_in_headers_only(self):
+        message = EmailMessage(
+            'Subject', 'Content', 'from@example.com', ['to@example.com'],
+            headers={'Reply-To': 'reply_to@example.com'},
+        ).message()
+        self.assertEqual(message['Reply-To'], 'reply_to@example.com')
 
     def test_multiple_message_call(self):
         """
