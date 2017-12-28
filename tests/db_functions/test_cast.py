@@ -1,3 +1,6 @@
+import datetime
+import decimal
+
 from django.db import models
 from django.db.models.expressions import Value
 from django.db.models.functions import Cast
@@ -42,6 +45,18 @@ class CastTests(TestCase):
                 numbers = Author.objects.annotate(cast_int=Cast('alias', field_class()))
                 self.assertEqual(numbers.get().cast_int, 1)
 
+    def test_cast_from_python_to_date(self):
+        today = datetime.date.today()
+        dates = Author.objects.annotate(cast_date=Cast(today, models.DateField()))
+        self.assertEqual(dates.get().cast_date, today)
+
+    def test_cast_from_python_to_datetime(self):
+        now = datetime.datetime.now()
+        dates = Author.objects.annotate(cast_datetime=Cast(now, models.DateTimeField()))
+        self.assertEqual(dates.get().cast_datetime, now)
+
     def test_cast_from_python(self):
-        numbers = Author.objects.annotate(cast_float=Cast(0, models.FloatField()))
-        self.assertEqual(numbers.get().cast_float, 0.0)
+        numbers = Author.objects.annotate(cast_float=Cast(decimal.Decimal(0.125), models.FloatField()))
+        cast_float = numbers.get().cast_float
+        self.assertIsInstance(cast_float, float)
+        self.assertEqual(cast_float, 0.125)

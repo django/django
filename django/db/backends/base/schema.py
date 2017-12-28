@@ -865,8 +865,7 @@ class BaseDatabaseSchemaEditor:
         and a unique digest and suffix.
         """
         _, table_name = split_identifier(table_name)
-        hash_data = [table_name] + list(column_names)
-        hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
+        hash_suffix_part = '%s%s' % (self._digest(table_name, *column_names), suffix)
         max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
         index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)

@@ -200,24 +200,15 @@ class BaseExpression:
 
     @cached_property
     def contains_aggregate(self):
-        for expr in self.get_source_expressions():
-            if expr and expr.contains_aggregate:
-                return True
-        return False
+        return any(expr and expr.contains_aggregate for expr in self.get_source_expressions())
 
     @cached_property
     def contains_over_clause(self):
-        for expr in self.get_source_expressions():
-            if expr and expr.contains_over_clause:
-                return True
-        return False
+        return any(expr and expr.contains_over_clause for expr in self.get_source_expressions())
 
     @cached_property
     def contains_column_references(self):
-        for expr in self.get_source_expressions():
-            if expr and expr.contains_column_references:
-                return True
-        return False
+        return any(expr and expr.contains_column_references for expr in self.get_source_expressions())
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         """
@@ -818,6 +809,8 @@ class When(Expression):
             condition, lookups = Q(**lookups), None
         if condition is None or not getattr(condition, 'conditional', False) or lookups:
             raise TypeError("__init__() takes either a Q object or lookups as keyword arguments")
+        if isinstance(condition, Q) and not condition:
+            raise ValueError("An empty Q() can't be used as a When() condition.")
         super().__init__(output_field=None)
         self.condition = condition
         self.result = self._parse_expressions(then)[0]

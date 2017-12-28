@@ -970,11 +970,8 @@ class Model(metaclass=ModelBase):
 
         for model_class, unique_together in unique_togethers:
             for check in unique_together:
-                for name in check:
-                    # If this is an excluded field, don't add this check.
-                    if name in exclude:
-                        break
-                else:
+                if not any(name in exclude for name in check):
+                    # Add the check if the field isn't excluded.
                     unique_checks.append((model_class, tuple(check)))
 
         # These are checks for the unique_for_<date/year/month>.
@@ -1206,6 +1203,7 @@ class Model(metaclass=ModelBase):
             errors += [
                 *cls._check_index_together(),
                 *cls._check_unique_together(),
+                *cls._check_indexes(),
                 *cls._check_ordering(),
             ]
 
@@ -1476,6 +1474,12 @@ class Model(metaclass=ModelBase):
             for fields in cls._meta.unique_together:
                 errors.extend(cls._check_local_fields(fields, "unique_together"))
             return errors
+
+    @classmethod
+    def _check_indexes(cls):
+        """Check the fields of indexes."""
+        fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
+        return cls._check_local_fields(fields, 'indexes')
 
     @classmethod
     def _check_local_fields(cls, fields, option):

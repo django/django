@@ -244,6 +244,20 @@ class NonAggregateAnnotationTestCase(TestCase):
                 sum_rating=Sum('rating')
             ).filter(sum_rating=F('nope')))
 
+    def test_decimal_annotation(self):
+        salary = Decimal(10) ** -Employee._meta.get_field('salary').decimal_places
+        Employee.objects.create(
+            first_name='Max',
+            last_name='Paine',
+            store=Store.objects.first(),
+            age=23,
+            salary=salary,
+        )
+        self.assertEqual(
+            Employee.objects.annotate(new_salary=F('salary') / 10).get().new_salary,
+            salary / 10,
+        )
+
     def test_filter_decimal_annotation(self):
         qs = Book.objects.annotate(new_price=F('price') + 1).filter(new_price=Decimal(31)).values_list('new_price')
         self.assertEqual(qs.get(), (Decimal(31),))

@@ -1560,20 +1560,6 @@ class DecimalField(Field):
                 params={'value': value},
             )
 
-    def format_number(self, value):
-        """
-        Format a number into a string with the requisite number of digits and
-        decimal places.
-        """
-        # Method moved to django.db.backends.utils.
-        #
-        # It is preserved because it is used by the oracle backend
-        # (django.db.backends.oracle.query), and also for
-        # backwards-compatibility with any external code which may have used
-        # this method.
-        from django.db.backends import utils
-        return utils.format_number(value, self.max_digits, self.decimal_places)
-
     def get_db_prep_save(self, value, connection):
         return connection.ops.adapt_decimalfield_value(self.to_python(value), self.max_digits, self.decimal_places)
 
@@ -1806,18 +1792,14 @@ class IntegerField(Field):
         validators_ = super().validators
         internal_type = self.get_internal_type()
         min_value, max_value = connection.ops.integer_field_range(internal_type)
-        if min_value is not None:
-            for validator in validators_:
-                if isinstance(validator, validators.MinValueValidator) and validator.limit_value >= min_value:
-                    break
-            else:
-                validators_.append(validators.MinValueValidator(min_value))
-        if max_value is not None:
-            for validator in validators_:
-                if isinstance(validator, validators.MaxValueValidator) and validator.limit_value <= max_value:
-                    break
-            else:
-                validators_.append(validators.MaxValueValidator(max_value))
+        if (min_value is not None and not
+            any(isinstance(validator, validators.MinValueValidator) and
+                validator.limit_value >= min_value for validator in validators_)):
+            validators_.append(validators.MinValueValidator(min_value))
+        if (max_value is not None and not
+            any(isinstance(validator, validators.MaxValueValidator) and
+                validator.limit_value <= max_value for validator in validators_)):
+            validators_.append(validators.MaxValueValidator(max_value))
         return validators_
 
     def get_prep_value(self, value):
@@ -2295,14 +2277,17 @@ class BinaryField(Field):
     empty_values = [None, b'']
 
     def __init__(self, *args, **kwargs):
-        kwargs['editable'] = False
+        kwargs.setdefault('editable', False)
         super().__init__(*args, **kwargs)
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        del kwargs['editable']
+        if self.editable:
+            kwargs['editable'] = True
+        else:
+            del kwargs['editable']
         return name, path, args, kwargs
 
     def get_internal_type(self):

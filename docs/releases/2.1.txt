@@ -35,6 +35,8 @@ Minor features
 * :attr:`.ModelAdmin.search_fields` now accepts any lookup such as
   ``field__exact``.
 
+* jQuery is upgraded from version 2.2.3 to 3.2.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -157,6 +159,9 @@ Models
 
 * Models can now use ``__init_subclass__()`` from :pep:`487`.
 
+* A ``BinaryField`` may now be set to ``editable=True`` if you wish to include
+  it in model forms.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -234,7 +239,8 @@ Features deprecated in 2.1
 Miscellaneous
 -------------
 
-* ...
+* The ``ForceRHR`` GIS function is deprecated in favor of the new
+  :class:`~django.contrib.gis.db.models.functions.ForcePolygonCW` function.
 
 .. _removed-features-2.1:
 

@@ -182,7 +182,7 @@ class RegexPattern(CheckURLMixin):
             )
 
     def __str__(self):
-        return self._regex
+        return str(self._regex)
 
 
 _PATH_PARAMETER_COMPONENT_RE = re.compile(
@@ -270,7 +270,7 @@ class RoutePattern(CheckURLMixin):
         return re.compile(_route_to_regex(route, self._is_endpoint)[0])
 
     def __str__(self):
-        return self._route
+        return str(self._route)
 
 
 class LocalePrefixPattern:
@@ -572,12 +572,7 @@ class URLResolver:
                 else:
                     if set(kwargs).symmetric_difference(params).difference(defaults):
                         continue
-                    matches = True
-                    for k, v in defaults.items():
-                        if kwargs.get(k, v) != v:
-                            matches = False
-                            break
-                    if not matches:
+                    if any(kwargs.get(k, v) != v for k, v in defaults.items()):
                         continue
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().

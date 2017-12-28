@@ -420,8 +420,14 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 
 A field to store raw binary data. It only supports ``bytes`` assignment. Be
 aware that this field has limited functionality. For example, it is not possible
-to filter a queryset on a ``BinaryField`` value. It is also not possible to
-include a ``BinaryField`` in a :class:`~django.forms.ModelForm`.
+to filter a queryset on a ``BinaryField`` value.
+
+By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
+case it can't be included in a :class:`~django.forms.ModelForm`.
+
+.. versionchanged:: 2.1
+
+    Older versions don't allow setting ``editable`` to ``True``.
 
 .. admonition:: Abusing ``BinaryField``
 

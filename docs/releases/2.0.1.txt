@@ -29,3 +29,17 @@ Bugfixes
 
 * Fixed a regression on SQLite where ``DecimalField`` returned a result with
   trailing zeros in the fractional part truncated (:ticket:`28915`).
+
+* Fixed crash in the ``testserver`` command startup (:ticket:`28941`).
+
+* Fixed crash when coercing a translatable URL pattern to ``str``
+  (:ticket:`28947`).
+
+* Fixed crash on SQLite when renaming a field in a model referenced by a
+  ``ManyToManyField`` (:ticket:`28884`).
+
+* Fixed a crash when chaining ``values()`` or ``values_list()`` after
+  ``QuerySet.select_for_update(of=(...))`` (:ticket:`28944`).
+
+* Fixed admin changelist crash when using a query expression in the page's
+  ordering (:ticket:`28958`).

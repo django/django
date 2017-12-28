@@ -394,10 +394,10 @@ def check_for_language(lang_code):
     # First, a quick check to make sure lang_code is well-formed (#21458)
     if lang_code is None or not language_code_re.search(lang_code):
         return False
-    for path in all_locale_paths():
-        if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
-            return True
-    return False
+    return any(
+        gettext_module.find('django', path, [to_locale(lang_code)]) is not None
+        for path in all_locale_paths()
+    )
 
 
 @functools.lru_cache()

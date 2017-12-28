@@ -139,18 +139,17 @@ class Collector:
         # The use of from_field comes from the need to avoid cascade back to
         # parent when parent delete is cascading to child.
         opts = model._meta
-        if any(link != from_field for link in opts.concrete_model._meta.parents.values()):
-            return False
-        # Foreign keys pointing to this model, both from m2m and other
-        # models.
-        for related in get_candidate_relations_to_delete(opts):
-            if related.field.remote_field.on_delete is not DO_NOTHING:
-                return False
-        for field in model._meta.private_fields:
-            if hasattr(field, 'bulk_related_objects'):
-                # It's something like generic foreign key.
-                return False
-        return True
+        return (
+            all(link == from_field for link in opts.concrete_model._meta.parents.values()) and
+            # Foreign keys pointing to this model.
+            all(
+                related.field.remote_field.on_delete is DO_NOTHING
+                for related in get_candidate_relations_to_delete(opts)
+            ) and (
+                # Something like generic foreign key.
+                not any(hasattr(field, 'bulk_related_objects') for field in model._meta.private_fields)
+            )
+        )
 
     def get_del_batches(self, objs, field):
         """

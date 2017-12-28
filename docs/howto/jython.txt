@@ -1,74 +1,14 @@
-========================
-Running Django on Jython
-========================
+================
+Django on Jython
+================
 
 .. index:: Jython, Java, JVM
 
 Jython_ is an implementation of Python that runs on the Java platform (JVM).
-This document will get you up and running with Django on top of Jython.
-
-Installing Jython
-=================
-
-Django works with Jython versions 2.7b2 and higher. See the Jython_ website for
-download and installation instructions.
 
 .. _jython: http://www.jython.org/
 
-Creating a servlet container
-============================
-
-If you just want to experiment with Django, skip ahead to the next section;
-Django includes a lightweight Web server you can use for testing, so you won't
-need to set up anything else until you're ready to deploy Django in production.
-
-If you want to use Django on a production site, use a Java servlet container,
-such as `Apache Tomcat`_. Full JavaEE applications servers such as `GlassFish`_
-or `JBoss`_ are also OK, if you need the extra features they include.
-
-.. _`Apache Tomcat`: https://tomcat.apache.org/
-.. _GlassFish: https://javaee.github.io/glassfish/
-.. _JBoss: https://www.jboss.org/
-
-Installing Django
-=================
-
-The next step is to install Django itself. This is exactly the same as
-installing Django on standard Python, so see
-:ref:`removing-old-versions-of-django` and :ref:`install-django-code` for
-instructions.
-
-Installing Jython platform support libraries
-============================================
-
-The `django-jython`_ project contains database backends and management commands
-for Django/Jython development. Note that the builtin Django backends won't work
-on top of Jython.
-
-.. _`django-jython`: https://github.com/beachmachine/django-jython
-
-To install it, follow the `installation instructions`_ detailed on the project
-website. Also, read the `database backends`_ documentation there.
-
-.. _`installation instructions`: https://pythonhosted.org/django-jython/quickstart.html#install
-.. _`database backends`: https://pythonhosted.org/django-jython/database-backends.html
-
-Differences with Django on Jython
-=================================
-
-.. index:: JYTHONPATH
-
-At this point, Django on Jython should behave nearly identically to Django
-running on standard Python. However, are a few differences to keep in mind:
-
-* Remember to use the ``jython`` command instead of ``python``. The
-  documentation uses ``python`` for consistency, but if you're using Jython
-  you'll want to mentally replace ``python`` with ``jython`` every time it
-  occurs.
-
-* Similarly, you'll need to use the ``JYTHONPATH`` environment variable
-  instead of ``PYTHONPATH``.
-
-* Any part of Django that requires `Pillow`_ will not work.
-
-.. _Pillow: https://pillow.readthedocs.io/en/latest/
+If you want to use Jython (which supports only Python 2.7 at the time of this
+writing), you must use Django 1.11.x (the last series to support Python 2).
+Jython support may be readded to Django if a Python 3 compatible Jython is
+released.

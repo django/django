@@ -562,7 +562,6 @@ class QuerySet:
         if fields and field_name is not None:
             raise ValueError('Cannot use both positional arguments and the field_name keyword argument.')
 
-        order_by = None
         if field_name is not None:
             warnings.warn(
                 'The field_name keyword argument to earliest() and latest() '

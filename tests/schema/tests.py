@@ -61,6 +61,9 @@ class SchemaTests(TransactionTestCase):
         # local_models should contain test dependent model classes that will be
         # automatically removed from the app cache on test tear down.
         self.local_models = []
+        # isolated_local_models contains models that are in test methods
+        # decorated with @isolate_apps.
+        self.isolated_local_models = []
 
     def tearDown(self):
         # Delete any tables made for our models
@@ -75,6 +78,10 @@ class SchemaTests(TransactionTestCase):
                     if through and through._meta.auto_created:
                         del new_apps.all_models['schema'][through._meta.model_name]
                 del new_apps.all_models['schema'][model._meta.model_name]
+        if self.isolated_local_models:
+            with connection.schema_editor() as editor:
+                for model in self.isolated_local_models:
+                    editor.delete_model(model)
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
@@ -1420,6 +1427,38 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_repoint_inherited(self):
         self._test_m2m_repoint(InheritedManyToManyField)
 
+    @isolate_apps('schema')
+    def test_m2m_rename_field_in_target_model(self):
+        class TagM2MTest(Model):
+            title = CharField(max_length=255)
+
+            class Meta:
+                app_label = 'schema'
+
+        class LocalM2M(Model):
+            tags = ManyToManyField(TagM2MTest)
+
+            class Meta:
+                app_label = 'schema'
+
+        # Create the tables.
+        with connection.schema_editor() as editor:
+            editor.create_model(LocalM2M)
+            editor.create_model(TagM2MTest)
+        # Ensure the m2m table is there.
+        self.assertEqual(len(self.column_classes(LocalM2M)), 1)
+        # Alter a field in TagM2MTest.
+        old_field = TagM2MTest._meta.get_field('title')
+        new_field = CharField(max_length=254)
+        new_field.contribute_to_class(TagM2MTest, 'title1')
+        # @isolate_apps() and inner models are needed to have the model
+        # relations populated, otherwise this doesn't act as a regression test.
+        self.assertEqual(len(new_field.model._meta.related_objects), 1)
+        with connection.schema_editor() as editor:
+            editor.alter_field(TagM2MTest, old_field, new_field, strict=True)
+        # Ensure the m2m table is still there.
+        self.assertEqual(len(self.column_classes(LocalM2M)), 1)
+
     @skipUnlessDBFeature('supports_column_check_constraints')
     def test_check_constraints(self):
         """
@@ -2371,6 +2410,7 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name('id')
         with connection.schema_editor() as editor:
             editor.alter_field(Node, old_field, new_field, strict=True)
+        self.assertForeignKeyExists(Node, 'parent_id', Node._meta.db_table)
 
     @mock.patch('django.db.backends.base.schema.datetime')
     @mock.patch('django.db.backends.base.schema.timezone')
@@ -2479,7 +2519,8 @@ class SchemaTests(TransactionTestCase):
         doc.students.add(student)
 
     def test_rename_table_renames_deferred_sql_references(self):
-        with connection.schema_editor() as editor:
+        atomic_rename = connection.features.supports_atomic_references_rename
+        with connection.schema_editor(atomic=atomic_rename) as editor:
             editor.create_model(Author)
             editor.create_model(Book)
             editor.alter_db_table(Author, 'schema_author', 'schema_renamed_author')
@@ -2506,3 +2547,60 @@ class SchemaTests(TransactionTestCase):
             for statement in editor.deferred_sql:
                 self.assertIs(statement.references_column('book', 'title'), False)
                 self.assertIs(statement.references_column('book', 'author_id'), False)
+
+    @isolate_apps('schema')
+    def test_referenced_field_without_constraint_rename_inside_atomic_block(self):
+        """
+        Foreign keys without database level constraint don't prevent the field
+        they reference from being renamed in an atomic block.
+        """
+        class Foo(Model):
+            field = CharField(max_length=255, unique=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        class Bar(Model):
+            foo = ForeignKey(Foo, CASCADE, to_field='field', db_constraint=False)
+
+            class Meta:
+                app_label = 'schema'
+
+        self.isolated_local_models = [Foo, Bar]
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+            editor.create_model(Bar)
+
+        new_field = CharField(max_length=255, unique=True)
+        new_field.set_attributes_from_name('renamed')
+        with connection.schema_editor(atomic=True) as editor:
+            editor.alter_field(Foo, Foo._meta.get_field('field'), new_field)
+
+    @isolate_apps('schema')
+    def test_referenced_table_without_constraint_rename_inside_atomic_block(self):
+        """
+        Foreign keys without database level constraint don't prevent the table
+        they reference from being renamed in an atomic block.
+        """
+        class Foo(Model):
+            field = CharField(max_length=255, unique=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        class Bar(Model):
+            foo = ForeignKey(Foo, CASCADE, to_field='field', db_constraint=False)
+
+            class Meta:
+                app_label = 'schema'
+
+        self.isolated_local_models = [Foo, Bar]
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+            editor.create_model(Bar)
+
+        new_field = CharField(max_length=255, unique=True)
+        new_field.set_attributes_from_name('renamed')
+        with connection.schema_editor(atomic=True) as editor:
+            editor.alter_db_table(Foo, Foo._meta.db_table, 'renamed_table')
+        Foo._meta.db_table = 'renamed_table'

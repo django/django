@@ -931,8 +931,7 @@ appropriate entities.
       :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
       current time in UTC. Note that :func:`now` will always return
       times in UTC regardless of the value of :setting:`TIME_ZONE`;
-      you can use :func:`localtime` to convert to a time in the current
-      time zone.
+      you can use :func:`localtime` to get the time in the current time zone.
 
 .. function:: is_aware(value)
 

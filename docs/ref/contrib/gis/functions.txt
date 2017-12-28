@@ -20,17 +20,18 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-==================  ========================   ======================  ===================  ==================  =====================
-Measurement         Relationships              Operations              Editors              Output format       Miscellaneous
-==================  ========================   ======================  ===================  ==================  =====================
-:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForceRHR`    :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
-:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
-:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
-..                  :class:`LineLocatePoint`                           :class:`SnapToGrid`  :class:`GeoHash`
-..                  :class:`PointOnSurface`                            :class:`Transform`
+==================  ========================   ======================  =======================  ==================  =====================
+Measurement         Relationships              Operations              Editors                  Output format       Miscellaneous
+==================  ========================   ======================  =======================  ==================  =====================
+:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`ForceRHR`        :class:`AsGML`      :class:`MemSize`
+:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`MakeValid`       :class:`AsKML`      :class:`NumGeometries`
+:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Reverse`         :class:`AsSVG`      :class:`NumPoints`
+..                  :class:`LineLocatePoint`                           :class:`Scale`           :class:`GeoHash`
+..                  :class:`PointOnSurface`                            :class:`SnapToGrid`
+..                                                                     :class:`Transform`
 ..                                                                     :class:`Translate`
-==================  ========================   ======================  ===================  ==================  =====================
+==================  ========================   ======================  =======================  ==================  =====================
 
 ``Area``
 ========
@@ -271,10 +272,28 @@ SpatiaLite
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
 
+``ForcePolygonCW``
+==================
+
+.. class:: ForcePolygonCW(expression, **extra)
+
+.. versionadded:: 2.1
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ForcePolygonCW.html>`__
+
+Accepts a single geographic field or expression and returns a modified version
+of the polygon/multipolygon in which all exterior rings are oriented clockwise
+and all interior rings are oriented counterclockwise. Non-polygonal geometries
+are returned unchanged.
+
 ``ForceRHR``
 ============
 
 .. class:: ForceRHR(expression, **extra)
+
+.. deprecated:: 2.1
+
+    Use :class:`ForcePolygonCW` instead.
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_ForceRHR.html>`__
 

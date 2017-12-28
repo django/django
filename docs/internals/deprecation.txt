@@ -29,6 +29,8 @@ details on these changes.
 * The ``field_name`` keyword argument of ``QuerySet.earliest()`` and
   ``latest()`` will be removed.
 
+* ``django.contrib.gis.db.models.functions.ForceRHR`` will be removed.
+
 See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
 details on these changes.
 
