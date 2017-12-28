@@ -75,9 +75,7 @@ class IndexTogetherTests(SimpleTestCase):
     def test_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
-                index_together = [
-                    ["missing_field"],
-                ]
+                index_together = [['missing_field']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -95,15 +93,13 @@ class IndexTogetherTests(SimpleTestCase):
             field2 = models.IntegerField()
 
             class Meta:
-                index_together = [
-                    ["field2", "field1"],
-                ]
+                index_together = [['field2', 'field1']]
 
         self.assertEqual(Bar.check(), [
             Error(
                 "'index_together' refers to field 'field1' which is not "
                 "local to model 'Bar'.",
-                hint=("This issue may be caused by multi-table inheritance."),
+                hint='This issue may be caused by multi-table inheritance.',
                 obj=Bar,
                 id='models.E016',
             ),
@@ -114,9 +110,7 @@ class IndexTogetherTests(SimpleTestCase):
             m2m = models.ManyToManyField('self')
 
             class Meta:
-                index_together = [
-                    ["m2m"],
-                ]
+                index_together = [['m2m']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -188,9 +182,7 @@ class UniqueTogetherTests(SimpleTestCase):
     def test_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
-                unique_together = [
-                    ["missing_field"],
-                ]
+                unique_together = [['missing_field']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -205,9 +197,7 @@ class UniqueTogetherTests(SimpleTestCase):
             m2m = models.ManyToManyField('self')
 
             class Meta:
-                unique_together = [
-                    ["m2m"],
-                ]
+                unique_together = [['m2m']]
 
         self.assertEqual(Model.check(), [
             Error(
@@ -311,21 +301,21 @@ class FieldNamesTests(SimpleTestCase):
         class ModelWithLongField(models.Model):
             m2m_field = models.ManyToManyField(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
-                related_name="rn1"
+                related_name='rn1',
             )
             m2m_field2 = models.ManyToManyField(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
-                related_name="rn2", through='m2msimple'
+                related_name='rn2', through='m2msimple',
             )
             m2m_field3 = models.ManyToManyField(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
-                related_name="rn3",
-                through='m2mcomplex'
+                related_name='rn3',
+                through='m2mcomplex',
             )
             fk = models.ForeignKey(
                 VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
                 models.CASCADE,
-                related_name="rn4",
+                related_name='rn4',
             )
 
         # Models used for setting `through` in M2M field.
@@ -567,7 +557,7 @@ class OtherModelTests(SimpleTestCase):
     def test_ordering_non_iterable(self):
         class Model(models.Model):
             class Meta:
-                ordering = "missing_field"
+                ordering = 'missing_field'
 
         self.assertEqual(Model.check(), [
             Error(
@@ -640,7 +630,7 @@ class OtherModelTests(SimpleTestCase):
     def test_ordering_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
-                ordering = ("missing_field",)
+                ordering = ('missing_field',)
 
         self.assertEqual(Model.check(), [
             Error(
@@ -651,13 +641,11 @@ class OtherModelTests(SimpleTestCase):
         ])
 
     def test_ordering_pointing_to_missing_foreignkey_field(self):
-        # refs #22711
-
         class Model(models.Model):
             missing_fk_field = models.IntegerField()
 
             class Meta:
-                ordering = ("missing_fk_field_id",)
+                ordering = ('missing_fk_field_id',)
 
         self.assertEqual(Model.check(), [
             Error(
@@ -667,9 +655,7 @@ class OtherModelTests(SimpleTestCase):
             )
         ])
 
-    def test_ordering_pointing_to_existing_foreignkey_field(self):
-        # refs #22711
-
+    def test_ordering_pointing_to_foreignkey_field(self):
         class Parent(models.Model):
             pass
 
@@ -677,7 +663,7 @@ class OtherModelTests(SimpleTestCase):
             parent = models.ForeignKey(Parent, models.CASCADE)
 
             class Meta:
-                ordering = ("parent_id",)
+                ordering = ('parent_id',)
 
         self.assertFalse(Child.check())
 
@@ -752,8 +738,8 @@ class OtherModelTests(SimpleTestCase):
             pass
 
         class Group(models.Model):
-            primary = models.ManyToManyField(Person, through="Membership", related_name="primary")
-            secondary = models.ManyToManyField(Person, through="Membership", related_name="secondary")
+            primary = models.ManyToManyField(Person, through='Membership', related_name='primary')
+            secondary = models.ManyToManyField(Person, through='Membership', related_name='secondary')
 
         class Membership(models.Model):
             person = models.ForeignKey(Person, models.CASCADE)
