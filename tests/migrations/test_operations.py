@@ -409,7 +409,7 @@ class OperationTests(OperationTestBase):
             "ProxyPony",
             [],
             options={"proxy": True},
-            bases=("test_crprmo.Pony", ),
+            bases=("test_crprmo.Pony",),
         )
         self.assertEqual(operation.describe(), "Create proxy model ProxyPony")
         new_state = project_state.clone()
@@ -443,7 +443,7 @@ class OperationTests(OperationTestBase):
             "UnmanagedPony",
             [],
             options={"proxy": True},
-            bases=("test_crummo.Pony", ),
+            bases=("test_crummo.Pony",),
         )
         self.assertEqual(operation.describe(), "Create proxy model UnmanagedPony")
         new_state = project_state.clone()

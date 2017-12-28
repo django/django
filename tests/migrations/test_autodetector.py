@@ -237,13 +237,13 @@ class AutodetectorTests(TestCase):
     author_proxy_options = ModelState("testapp", "AuthorProxy", [], {
         "proxy": True,
         "verbose_name": "Super Author",
-    }, ("testapp.author", ))
-    author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
-    author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
-    author_proxy_third_notproxy = ModelState("thirdapp", "AuthorProxy", [], {}, ("testapp.author", ))
-    author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
-    author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
-    author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
+    }, ("testapp.author",))
+    author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author",))
+    author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author",))
+    author_proxy_third_notproxy = ModelState("thirdapp", "AuthorProxy", [], {}, ("testapp.author",))
+    author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy",))
+    author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author",))
+    author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author",))
     author_unmanaged_default_pk = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
     author_unmanaged_custom_pk = ModelState("testapp", "Author", [
         ("pk_field", models.IntegerField(primary_key=True)),
@@ -430,14 +430,14 @@ class AutodetectorTests(TestCase):
     custom_user = ModelState("thirdapp", "CustomUser", [
         ("id", models.AutoField(primary_key=True)),
         ("username", models.CharField(max_length=255)),
-    ], bases=(AbstractBaseUser, ))
+    ], bases=(AbstractBaseUser,))
     custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [
         ("id", models.AutoField(primary_key=True)),
         ("username", models.CharField(max_length=255)),
     ])
     aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
-    aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
+    aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author",))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [
         ("id", models.OneToOneField("testapp.Author", models.CASCADE, primary_key=True)),
     ])
@@ -2071,7 +2071,7 @@ class AutodetectorTests(TestCase):
             tenant = ModelState("a", "Tenant", [
                 ("id", models.AutoField(primary_key=True)),
                 ("primary_address", models.ForeignKey("b.Address", models.CASCADE))],
-                bases=(AbstractBaseUser, )
+                bases=(AbstractBaseUser,)
             )
             address = ModelState("b", "Address", [
                 ("id", models.AutoField(primary_key=True)),
@@ -2105,7 +2105,7 @@ class AutodetectorTests(TestCase):
             tenant = ModelState("b", "Tenant", [
                 ("id", models.AutoField(primary_key=True)),
                 ("primary_address", models.ForeignKey("a.Address", models.CASCADE))],
-                bases=(AbstractBaseUser, )
+                bases=(AbstractBaseUser,)
             )
             changes = self.get_changes([], [address, tenant])
         # Right number/type of migrations?

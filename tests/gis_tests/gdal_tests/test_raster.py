@@ -256,7 +256,7 @@ class GDALRasterTests(SimpleTestCase):
         if numpy:
             result = result.flatten().tolist()
         # All band data is equal to nodata value.
-        self.assertEqual(result, [23, ] * 4)
+        self.assertEqual(result, [23] * 4)
 
     def test_set_nodata_none_on_raster_creation(self):
         if GDAL_VERSION < (2, 1):
@@ -299,7 +299,7 @@ class GDALRasterTests(SimpleTestCase):
         })
         # Set metadata on raster and on a band.
         metadata = {
-            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point', },
+            'DEFAULT': {'OWNER': 'Django', 'VERSION': '1.0', 'AREA_OR_POINT': 'Point'},
         }
         source.metadata = metadata
         source.bands[0].metadata = metadata
@@ -307,13 +307,13 @@ class GDALRasterTests(SimpleTestCase):
         self.assertEqual(source.bands[0].metadata['DEFAULT'], metadata['DEFAULT'])
         # Update metadata on raster.
         metadata = {
-            'DEFAULT': {'VERSION': '2.0', },
+            'DEFAULT': {'VERSION': '2.0'},
         }
         source.metadata = metadata
         self.assertEqual(source.metadata['DEFAULT']['VERSION'], '2.0')
         # Remove metadata on raster.
         metadata = {
-            'DEFAULT': {'OWNER': None, },
+            'DEFAULT': {'OWNER': None},
         }
         source.metadata = metadata
         self.assertNotIn('OWNER', source.metadata['DEFAULT'])

@@ -625,7 +625,7 @@ class ListFilterTests(CheckTestCase):
                 return 'awesomeness'
 
             def get_choices(self, request):
-                return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+                return (('bit', 'A bit awesome'), ('very', 'Very awesome'))
 
             def get_queryset(self, cl, qs):
                 return qs
@@ -655,7 +655,7 @@ class ListFilterTests(CheckTestCase):
                 return 'awesomeness'
 
             def get_choices(self, request):
-                return (('bit', 'A bit awesome'), ('very', 'Very awesome'), )
+                return (('bit', 'A bit awesome'), ('very', 'Very awesome'))
 
             def get_queryset(self, cl, qs):
                 return qs
@@ -1248,10 +1248,10 @@ class AutocompleteFieldsTests(CheckTestCase):
 
     def test_autocomplete_is_onetoone(self):
         class UserAdmin(ModelAdmin):
-            search_fields = ('name', )
+            search_fields = ('name',)
 
         class Admin(ModelAdmin):
-            autocomplete_fields = ('best_friend', )
+            autocomplete_fields = ('best_friend',)
 
         site = AdminSite()
         site.register(User, UserAdmin)

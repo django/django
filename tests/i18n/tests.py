@@ -1142,7 +1142,7 @@ class MiscTests(SimpleTestCase):
             ('en; q=1.0, * ; q=0.5', [('en', 1.0), ('*', 0.5)]),
             # Bad headers
             ('en-gb;q=1.0000', []),
-            ('en;q=0.1234', [], ),
+            ('en;q=0.1234', []),
             ('en;q=.2', []),
             ('abcdefghi-au', []),
             ('**', []),

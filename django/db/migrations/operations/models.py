@@ -249,7 +249,7 @@ class DeleteModel(ModelOperation):
             schema_editor.create_model(model)
 
     def describe(self):
-        return "Delete model %s" % (self.name, )
+        return "Delete model %s" % self.name
 
 
 class RenameModel(ModelOperation):
@@ -701,7 +701,7 @@ class AlterModelOptions(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change Meta options on %s" % (self.name, )
+        return "Change Meta options on %s" % self.name
 
 
 class AlterModelManagers(ModelOptionOperation):
@@ -732,7 +732,7 @@ class AlterModelManagers(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change managers on %s" % (self.name, )
+        return "Change managers on %s" % self.name
 
 
 class IndexOperation(Operation):

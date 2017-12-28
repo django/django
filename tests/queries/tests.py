@@ -2351,11 +2351,11 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
     def test_slicing_cannot_filter_queryset_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot filter a query once a slice has been taken."):
-            Article.objects.all()[0:5].filter(id=1, )
+            Article.objects.all()[0:5].filter(id=1)
 
     def test_slicing_cannot_reorder_queryset_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot reorder a query once a slice has been taken."):
-            Article.objects.all()[0:5].order_by('id', )
+            Article.objects.all()[0:5].order_by('id')
 
     def test_slicing_cannot_combine_queries_once_sliced(self):
         with self.assertRaisesMessage(AssertionError, "Cannot combine queries once a slice has been taken."):
@@ -3581,7 +3581,7 @@ class RelatedLookupTypeTests(TestCase):
         When passing proxy model objects, child objects, or parent objects,
         lookups work fine.
         """
-        out_a = ['<ObjectA: oa>', ]
+        out_a = ['<ObjectA: oa>']
         out_b = ['<ObjectB: ob>', '<ObjectB: pob>']
         out_c = ['<ObjectC: >']
 

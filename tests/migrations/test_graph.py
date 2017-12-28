@@ -147,7 +147,7 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0003"))
         # Test whole graph
         with self.assertRaises(CircularDependencyError):
-            graph.forwards_plan(("app_a", "0003"), )
+            graph.forwards_plan(("app_a", "0003"))
 
     def test_circular_graph_2(self):
         graph = MigrationGraph()

@@ -193,7 +193,7 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
         fieldsets = (
             (None, {'fields': ('url', 'title', 'content', 'sites')}),
             (_('Advanced options'), {
-                'classes': ('collapse', ),
+                'classes': ('collapse',),
                 'fields': (
                     'enable_comments',
                     'registration_required',

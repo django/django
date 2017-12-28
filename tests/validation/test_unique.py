@@ -28,7 +28,7 @@ class GetUniqueCheckTests(unittest.TestCase):
         self.assertEqual(
             ([(UniqueTogetherModel, ('ifield', 'cfield')),
               (UniqueTogetherModel, ('ifield', 'efield')),
-              (UniqueTogetherModel, ('id',)), ],
+              (UniqueTogetherModel, ('id',))],
              []),
             m._get_unique_checks()
         )

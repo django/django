@@ -369,7 +369,7 @@ class RasterField(BaseSpatialField):
             band_index = int(name)
             return type(
                 'SpecificRasterBandTransform',
-                (RasterBandTransform, ),
+                (RasterBandTransform,),
                 {'band_index': band_index}
             )
         except ValueError:

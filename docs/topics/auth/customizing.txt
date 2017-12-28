@@ -348,7 +348,7 @@ add it to a ``UserAdmin`` class which is registered with the
 
     # Define a new User admin
     class UserAdmin(BaseUserAdmin):
-        inlines = (EmployeeInline, )
+        inlines = (EmployeeInline,)
 
     # Re-register UserAdmin
     admin.site.unregister(User)

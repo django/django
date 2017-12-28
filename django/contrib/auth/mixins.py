@@ -67,7 +67,7 @@ class PermissionRequiredMixin(AccessMixin):
                 '{0}.get_permission_required().'.format(self.__class__.__name__)
             )
         if isinstance(self.permission_required, str):
-            perms = (self.permission_required, )
+            perms = (self.permission_required,)
         else:
             perms = self.permission_required
         return perms

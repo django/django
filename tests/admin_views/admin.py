@@ -568,7 +568,7 @@ class StoryForm(forms.ModelForm):
 class StoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title',)  # 'id' not in list_display_links
-    list_editable = ('content', )
+    list_editable = ('content',)
     form = StoryForm
     ordering = ['-id']
 
@@ -576,7 +576,7 @@ class StoryAdmin(admin.ModelAdmin):
 class OtherStoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'content')
     list_display_links = ('title', 'id')  # 'id' in list_display_links
-    list_editable = ('content', )
+    list_editable = ('content',)
     ordering = ['-id']
 
 
@@ -748,7 +748,7 @@ def callable_on_unknown(obj):
 
 
 class AttributeErrorRaisingAdmin(admin.ModelAdmin):
-    list_display = [callable_on_unknown, ]
+    list_display = [callable_on_unknown]
 
 
 class CustomManagerAdmin(admin.ModelAdmin):

@@ -276,7 +276,7 @@ class Command(BaseCommand):
                     biggest_number = max(x for x in numbers if x is not None)
                 except ValueError:
                     biggest_number = 1
-                subclass = type("Migration", (Migration, ), {
+                subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
                 migration_name = "%04i_%s" % (

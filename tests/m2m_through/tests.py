@@ -87,7 +87,7 @@ class M2mThroughTests(TestCase):
 
         self.assertQuerysetEqual(
             self.rock.members.all(),
-            ['Jim', ],
+            ['Jim'],
             attrgetter("name")
         )
 
@@ -156,7 +156,7 @@ class M2mThroughTests(TestCase):
 
         self.assertQuerysetEqual(
             self.bob.group_set.all(),
-            ['Rock', ],
+            ['Rock'],
             attrgetter('name')
         )
 
@@ -192,7 +192,7 @@ class M2mThroughTests(TestCase):
 
         self.assertQuerysetEqual(
             Group.objects.filter(members__name='Bob'),
-            ['Roll', ],
+            ['Roll'],
             attrgetter("name")
         )
 
