@@ -22,9 +22,7 @@ class TestDataMixin:
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
 
-# Set DEBUG to True to ensure {% include %} will raise exceptions.
-# That is how inlines are rendered and #9498 will bubble up if it is an issue.
-@override_settings(DEBUG=True, ROOT_URLCONF='generic_inline_admin.urls')
+@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
 class GenericAdminViewTest(TestDataMixin, TestCase):
 
     def setUp(self):
