@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
+from django.utils.duration import duration_microseconds
 
 from .client import DatabaseClient                          # isort:skip
 from .creation import DatabaseCreation                      # isort:skip
@@ -471,7 +472,7 @@ def _sqlite_time_diff(lhs, rhs):
 def _sqlite_timestamp_diff(lhs, rhs):
     left = backend_utils.typecast_timestamp(lhs)
     right = backend_utils.typecast_timestamp(rhs)
-    return (left - right).total_seconds() * 1000000
+    return duration_microseconds(left - right)
 
 
 def _sqlite_regexp(re_pattern, re_string):

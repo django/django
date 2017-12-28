@@ -24,7 +24,7 @@ from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
-from django.utils.duration import duration_string
+from django.utils.duration import duration_microseconds, duration_string
 from django.utils.encoding import force_bytes, smart_text
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
@@ -1617,8 +1617,7 @@ class DurationField(Field):
             return value
         if value is None:
             return None
-        # Discard any fractional microseconds due to floating point arithmetic.
-        return round(value.total_seconds() * 1000000)
+        return duration_microseconds(value)
 
     def get_db_converters(self, connection):
         converters = []

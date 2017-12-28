@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
+from django.utils.duration import duration_microseconds
 from django.utils.encoding import force_text
 
 
@@ -105,7 +106,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TIME(%s)" % (field_name)
 
     def date_interval_sql(self, timedelta):
-        return "INTERVAL '%06f' SECOND_MICROSECOND" % timedelta.total_seconds()
+        return 'INTERVAL %s MICROSECOND' % duration_microseconds(timedelta)
 
     def format_for_duration_arithmetic(self, sql):
         return 'INTERVAL %s MICROSECOND' % sql
