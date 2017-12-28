@@ -3,6 +3,7 @@ dist/
 build/
 docs/_build
 __pycache__/
+.cache
 *.sqlite3
 .tox/
 *.swp
