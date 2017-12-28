@@ -229,15 +229,15 @@ class EmployeeAdmin(ModelAdmin):
 
 
 class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
-    list_filter = [DepartmentListFilterLookupWithNonStringValue, ]
+    list_filter = [DepartmentListFilterLookupWithNonStringValue]
 
 
 class DepartmentFilterUnderscoredEmployeeAdmin(EmployeeAdmin):
-    list_filter = [DepartmentListFilterLookupWithUnderscoredParameter, ]
+    list_filter = [DepartmentListFilterLookupWithUnderscoredParameter]
 
 
 class DepartmentFilterDynamicValueBookAdmin(EmployeeAdmin):
-    list_filter = [DepartmentListFilterLookupWithDynamicValue, ]
+    list_filter = [DepartmentListFilterLookupWithDynamicValue]
 
 
 class BookmarkAdminGenericRelation(ModelAdmin):

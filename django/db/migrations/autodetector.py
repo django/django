@@ -419,7 +419,7 @@ class MigrationAutodetector:
             )
         # Unknown dependency. Raise an error.
         else:
-            raise ValueError("Can't handle dependency %r" % (dependency, ))
+            raise ValueError("Can't handle dependency %r" % (dependency,))
 
     def add_operation(self, app_label, operation, dependencies=None, beginning=False):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)

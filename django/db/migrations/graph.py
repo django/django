@@ -178,7 +178,7 @@ class MigrationGraph:
         except KeyError as err:
             raise NodeNotFoundError(
                 "Unable to find replacement node %r. It was either never added"
-                " to the migration graph, or has been removed." % (replacement, ),
+                " to the migration graph, or has been removed." % (replacement,),
                 replacement
             ) from err
         for replaced_key in replaced:
@@ -214,7 +214,7 @@ class MigrationGraph:
         except KeyError as err:
             raise NodeNotFoundError(
                 "Unable to remove replacement node %r. It was either never added"
-                " to the migration graph, or has been removed already." % (replacement, ),
+                " to the migration graph, or has been removed already." % (replacement,),
                 replacement
             ) from err
         replaced_nodes = set()
@@ -256,7 +256,7 @@ class MigrationGraph:
         follow if applying the migrations to a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
+            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
         # Use parent.key instead of parent to speed up the frequent hashing in ensure_not_cyclic
         self.ensure_not_cyclic(target, lambda x: (parent.key for parent in self.node_map[x].parents))
         self.cached = True
@@ -275,7 +275,7 @@ class MigrationGraph:
         would follow if removing the migrations from a database.
         """
         if target not in self.nodes:
-            raise NodeNotFoundError("Node %r not a valid node" % (target, ), target)
+            raise NodeNotFoundError("Node %r not a valid node" % (target,), target)
         # Use child.key instead of child to speed up the frequent hashing in ensure_not_cyclic
         self.ensure_not_cyclic(target, lambda x: (child.key for child in self.node_map[x].children))
         self.cached = True

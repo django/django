@@ -518,6 +518,6 @@ class CheckAllowedHostsTest(SimpleTestCase):
     def test_allowed_hosts_empty(self):
         self.assertEqual(self.func(None), [base.W020])
 
-    @override_settings(ALLOWED_HOSTS=['.example.com', ])
+    @override_settings(ALLOWED_HOSTS=['.example.com'])
     def test_allowed_hosts_set(self):
         self.assertEqual(self.func(None), [])

@@ -13,7 +13,7 @@ class StaticTestStorage(storage.StaticFilesStorage):
 
 @override_settings(
     STATIC_URL='http://media.example.com/static/',
-    INSTALLED_APPS=('django.contrib.staticfiles', ),
+    INSTALLED_APPS=('django.contrib.staticfiles',),
     STATICFILES_STORAGE='staticfiles_tests.test_forms.StaticTestStorage',
 )
 class StaticFilesFormsMediaTestCase(SimpleTestCase):

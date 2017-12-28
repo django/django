@@ -362,7 +362,7 @@ class ModelState:
         self.fields = fields
         self.options = options or {}
         self.options.setdefault('indexes', [])
-        self.bases = bases or (models.Model, )
+        self.bases = bases or (models.Model,)
         self.managers = managers or []
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):

@@ -153,7 +153,7 @@ class Command(BaseCommand):
                 replaces.append((migration.app_label, migration.name))
 
         # Make a new migration with those operations
-        subclass = type("Migration", (migrations.Migration, ), {
+        subclass = type("Migration", (migrations.Migration,), {
             "dependencies": dependencies,
             "operations": new_operations,
             "replaces": replaces,

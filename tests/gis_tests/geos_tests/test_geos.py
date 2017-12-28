@@ -1264,7 +1264,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         mp = MultiPolygon(p1, p2)
         path, args, kwargs = mp.deconstruct()
         self.assertEqual(path, 'django.contrib.gis.geos.collections.MultiPolygon')
-        self.assertEqual(args, (p1, p2, ))
+        self.assertEqual(args, (p1, p2))
         self.assertEqual(kwargs, {})
 
         poly = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))

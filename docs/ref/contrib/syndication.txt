@@ -1029,7 +1029,7 @@ attributes. Thus, you can subclass the appropriate feed generator class
 .. _georss: http://georss.org/
 .. _itunes podcast format: https://www.apple.com/itunes/podcasts/specs.html
 
-``SyndicationFeed.root_attributes(self, )``
+``SyndicationFeed.root_attributes(self)``
     Return a ``dict`` of attributes to add to the root feed element
     (``feed``/``channel``).
 

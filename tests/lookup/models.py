@@ -19,7 +19,7 @@ class Author(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
 
 
 class Article(models.Model):
@@ -40,7 +40,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name',)
 
 
 class NulledTextField(models.TextField):

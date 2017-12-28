@@ -284,7 +284,7 @@ man_pages = [(
     'Utility script for the Django Web framework',
     ['Django Software Foundation'],
     1
-), ]
+)]
 
 
 # -- Options for Texinfo output ------------------------------------------------

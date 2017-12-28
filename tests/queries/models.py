@@ -579,7 +579,7 @@ class Order(models.Model):
     id = models.IntegerField(primary_key=True)
 
     class Meta:
-        ordering = ('pk', )
+        ordering = ('pk',)
 
     def __str__(self):
         return '%s' % self.pk
@@ -590,7 +590,7 @@ class OrderItem(models.Model):
     status = models.IntegerField()
 
     class Meta:
-        ordering = ('pk', )
+        ordering = ('pk',)
 
     def __str__(self):
         return '%s' % self.pk
