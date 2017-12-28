@@ -1577,7 +1577,7 @@ render API <low-level-widget-render-api>`.
 
 Default: ``None``
 
-A full Python path to a Python package that contains format definitions for
+A full Python path to a Python package that contains custom format definitions for
 project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined in this file.
