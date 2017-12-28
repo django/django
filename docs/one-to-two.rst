@@ -91,6 +91,15 @@ a consumer in an async style and then have one method that calls the Django ORM
 run synchronously.
 
 
+Removed Components
+------------------
+
+The binding framework has been removed entirely - it was a simplistic
+implementation, and it being in the core package prevented people from exploring
+their own solutions. It's likely similar concepts and APIs will appear in a
+third-party (non-official-Django) package as an option for those who want them.
+
+
 How to Upgrade
 --------------
 
