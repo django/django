@@ -144,8 +144,8 @@ Here's the formal declaration of a ``QuerySet``:
 
     .. attribute:: empty
 
-        ``True`` if the ``QuerySet`` is an instance of ``EmptyQuerySet``,
-        e.g. ``Article.objects.none()``
+        ``True`` if the query is guaranteed to return no results, because it is
+        an ``EmptyQuerySet`` created with ``none()``.
 
     .. attribute:: db
 

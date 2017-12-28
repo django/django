@@ -402,7 +402,7 @@ class ModelPaginationTests(TestCase):
 
     def test_paginating_empty_unordered_object_list(self):
         """
-        Empty unordered bojects not warning, if bool(object_list) is False
+        Empty unordered objects not warning, if bool(object_list) is False
         """
         class ObjectList:
             ordered = False
