@@ -14,9 +14,7 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import timezone
-from django.utils.dateparse import (
-    parse_date, parse_datetime, parse_duration, parse_time,
-)
+from django.utils.dateparse import parse_datetime, parse_duration, parse_time
 from django.utils.duration import duration_microseconds
 
 from .client import DatabaseClient                          # isort:skip
@@ -36,7 +34,6 @@ def decoder(conv_func):
 
 Database.register_converter("bool", b'1'.__eq__)
 Database.register_converter("time", decoder(parse_time))
-Database.register_converter("date", decoder(parse_date))
 Database.register_converter("datetime", decoder(parse_datetime))
 Database.register_converter("timestamp", decoder(parse_datetime))
 Database.register_converter("TIMESTAMP", decoder(parse_datetime))
