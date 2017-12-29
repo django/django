@@ -292,6 +292,8 @@ Models
   underscore as it collides with the query lookup syntax.
 * **models.E024**: The model name ``<model>`` cannot contain double underscores
   as it collides with the query lookup syntax.
+* **models.E025**: The property ``<property name>`` clashes with a related
+  field accessor.
 
 Security
 --------

@@ -706,6 +706,22 @@ class OtherModelTests(SimpleTestCase):
             )
         ])
 
+    def test_property_and_related_field_accessor_clash(self):
+        class Model(models.Model):
+            fk = models.ForeignKey('self', models.CASCADE)
+
+            @property
+            def fk_id(self):
+                pass
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The property 'fk_id' clashes with a related field accessor.",
+                obj=Model,
+                id='models.E025',
+            )
+        ])
+
     @override_settings(TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model')
     def test_swappable_missing_app_name(self):
         class Model(models.Model):
