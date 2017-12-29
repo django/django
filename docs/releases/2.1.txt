@@ -229,7 +229,8 @@ supports PostgreSQL 9.4 and higher.
 Miscellaneous
 -------------
 
-* ...
+* The minimum supported version of ``mysqlclient`` is increased from 1.3.3 to
+  1.3.7.
 
 .. _deprecated-features-2.1:
 
