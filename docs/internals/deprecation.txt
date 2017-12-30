@@ -31,6 +31,8 @@ details on these changes.
 
 * ``django.contrib.gis.db.models.functions.ForceRHR`` will be removed.
 
+* ``django.utils.http.cookie_date()`` will be removed.
+
 See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
 details on these changes.
 

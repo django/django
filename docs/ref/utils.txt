@@ -682,6 +682,10 @@ escaping HTML.
 
 .. function:: cookie_date(epoch_seconds=None)
 
+    .. deprecated:: 2.1
+
+        Use :func:`http_date` instead, which follows the latest RFC.
+
     Formats the time to ensure compatibility with Netscape's cookie standard.
 
     Accepts a floating point number expressed in seconds since the epoch in

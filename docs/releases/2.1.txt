@@ -249,6 +249,10 @@ Miscellaneous
 * The ``ForceRHR`` GIS function is deprecated in favor of the new
   :class:`~django.contrib.gis.db.models.functions.ForcePolygonCW` function.
 
+* ``django.utils.http.cookie_date()`` is deprecated in favor of
+  :func:`~django.utils.http.http_date`, which follows the format of the latest
+  RFC.
+
 .. _removed-features-2.1:
 
 Features removed in 2.1

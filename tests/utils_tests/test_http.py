@@ -1,8 +1,9 @@
 import unittest
 from datetime import datetime
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.http import (
     base36_to_int, cookie_date, http_date, int_to_base36, is_safe_url,
     is_same_domain, parse_etags, parse_http_date, quote_etag, urlencode,
@@ -254,6 +255,7 @@ class HttpDateProcessingTests(unittest.TestCase):
         t = 1167616461.0
         self.assertEqual(http_date(t), 'Mon, 01 Jan 2007 01:54:21 GMT')
 
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_cookie_date(self):
         t = 1167616461.0
         self.assertEqual(cookie_date(t), 'Mon, 01-Jan-2007 01:54:21 GMT')
