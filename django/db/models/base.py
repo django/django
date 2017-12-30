@@ -591,7 +591,7 @@ class Model(metaclass=ModelBase):
                     'are not allowed in fields.' % LOOKUP_SEP)
 
         db = using if using is not None else self._state.db
-        db_instance_qs = self.__class__._default_manager.using(db).filter(pk=self.pk)
+        db_instance_qs = self.__class__._base_manager.using(db).filter(pk=self.pk)
 
         # Use provided fields, if not set then reload all non-deferred fields.
         deferred_fields = self.get_deferred_fields()
