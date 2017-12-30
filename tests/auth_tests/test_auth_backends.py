@@ -6,6 +6,7 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
+from django.contrib.auth.management import create_app_permissions
 from django.contrib.auth.models import AnonymousUser, Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -728,3 +729,25 @@ class AllowAllUsersModelBackendTest(TestCase):
         request.session = self.client.session
         user = get_user(request)
         self.assertEqual(user, self.user)
+
+
+@override_settings(INSTALLED_APPS=[
+    'django.contrib.sessions',
+    'django.contrib.auth',
+    'auth_tests.custom_perms',
+])
+class PerAppPermissionsTest(TestCase):
+
+    def setUp(self):
+        self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
+
+    def test_create_app_permissions(self):
+        create_app_permissions(verbosity=0)
+        self.assertEqual(Permission.objects.filter(app_label='custom_perms').count(), 1)
+
+    def test_has_perm(self):
+        perm = Permission.objects.create(name='test', content_type=None, codename='test', app_label='auth')
+        self.user1.user_permissions.add(perm)
+
+        self.assertIs(self.user1.has_perm('auth.test'), True)
+        self.assertIs(self.user1.has_module_perms('auth'), True)

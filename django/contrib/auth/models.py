@@ -23,11 +23,17 @@ def update_last_login(sender, user, **kwargs):
 class PermissionManager(models.Manager):
     use_in_migrations = True
 
-    def get_by_natural_key(self, codename, app_label, model):
-        return self.get(
-            codename=codename,
-            content_type=ContentType.objects.db_manager(self.db).get_by_natural_key(app_label, model),
-        )
+    def get_by_natural_key(self, codename, app_label, model=None):
+        if model:
+            return self.get(
+                codename=codename,
+                content_type=ContentType.objects.db_manager(self.db).get_by_natural_key(app_label, model),
+            )
+        else:
+            return self.get(
+                codename=codename,
+                app_label=app_label,
+            )
 
 
 class Permission(models.Model):
@@ -58,8 +64,11 @@ class Permission(models.Model):
         ContentType,
         models.CASCADE,
         verbose_name=_('content type'),
+        null=True,
+        blank=True,
     )
     codename = models.CharField(_('codename'), max_length=100)
+    app_label = models.CharField(max_length=100, blank=True, default='')
     objects = PermissionManager()
 
     class Meta:
@@ -70,14 +79,20 @@ class Permission(models.Model):
                     'codename')
 
     def __str__(self):
-        return "%s | %s | %s" % (
-            self.content_type.app_label,
-            self.content_type,
-            self.name,
-        )
+        if self.content_type:
+            return "{} | {} | {}".format(
+                self.content_type.app_label,
+                self.content_type,
+                self.name,
+            )
+        return '{} | {}'.format(self.app_label, self.name)
 
     def natural_key(self):
-        return (self.codename,) + self.content_type.natural_key()
+        if self.content_type:
+            return (self.codename,) + (self.content_type.natural_key() if self.content_type else None)
+        else:
+            return (self.codename, self.app_label,)
+
     natural_key.dependencies = ['contenttypes.contenttype']
 
 

@@ -82,6 +82,35 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
             print("Adding permission '%s'" % perm)
 
 
+def create_app_permissions(verbosity=2, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
+    '''
+    Create any custom apps define on each AppConfig.
+    '''
+    Permission = apps.get_model('auth', 'Permission')
+
+    all_app_perms = []
+
+    for app_config in apps.get_app_configs():
+        for codename, name in getattr(app_config, 'permissions', []):
+            all_app_perms.append((app_config.label, (codename, name)))
+
+    found_app_perms = set(
+        Permission.objects.using(using)
+        .filter(content_type=None)
+        .values('app_label', 'codename')
+    )
+
+    perms = [
+        Permission(codename=codename, name=name, content_type=None, app_label=app_label)
+        for app_label, (codename, name) in all_app_perms
+        if (app_label, codename) not in found_app_perms
+    ]
+    Permission.objects.using(using).bulk_create(perms)
+    if verbosity >= 2:
+        for perm in perms:
+            print("Adding permission '%s'" % perm)
+
+
 def get_system_username():
     """
     Return the current system user's username, or an empty string if the

@@ -48,6 +48,10 @@ Minor features
 * :djadmin:`createsuperuser` now gives a prompt to allow bypassing the
   :setting:`AUTH_PASSWORD_VALIDATORS` checks.
 
+* The :attr:`.Permission.content_type` field is now nullable.
+
+* A new field :attr:`.Permission.app_label` has been added.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
