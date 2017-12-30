@@ -18,9 +18,7 @@ directory whose name doesn't begin with an underscore. For example::
         __init__.py
         models.py
         management/
-            __init__.py
             commands/
-                __init__.py
                 _private.py
                 closepoll.py
         tests.py
