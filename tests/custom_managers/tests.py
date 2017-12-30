@@ -607,6 +607,16 @@ class CustomManagersRegressTestCase(TestCase):
         # there would now be two objects in the database.
         self.assertEqual(RestrictedModel.plain_manager.count(), 1)
 
+    def test_refresh_from_db_when_default_manager_filters(self):
+        """
+        Model.refresh_from_db() works for instances hidden by the default
+        manager.
+        """
+        book = Book._base_manager.create(is_published=False)
+        Book._base_manager.filter(pk=book.pk).update(title='Hi')
+        book.refresh_from_db()
+        self.assertEqual(book.title, 'Hi')
+
     def test_delete_related_on_filtered_manager(self):
         """Deleting related objects should also not be distracted by a
         restricted manager on the related object. This is a regression
