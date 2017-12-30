@@ -360,7 +360,7 @@ class DecimalField(IntegerField):
             if self.decimal_places is not None:
                 # Use exponential notation for small values since they might
                 # be parsed as 0 otherwise. ref #20765
-                step = str(Decimal('1') / 10 ** self.decimal_places).lower()
+                step = str(Decimal(1).scaleb(-self.decimal_places)).lower()
             else:
                 step = 'any'
             attrs.setdefault('step', step)
