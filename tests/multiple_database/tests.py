@@ -2,6 +2,7 @@ import datetime
 import pickle
 from io import StringIO
 from operator import attrgetter
+from unittest.mock import Mock
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -102,6 +103,14 @@ class QueryTestCase(TestCase):
         dive.refresh_from_db(using='default')
         self.assertEqual(dive.title, "Dive into Python (on default)")
         self.assertEqual(dive._state.db, "default")
+
+    def test_refresh_router_instance_hint(self):
+        router = Mock()
+        router.db_for_read.return_value = None
+        book = Book.objects.create(title='Dive Into Python', published=datetime.date(1957, 10, 12))
+        with self.settings(DATABASE_ROUTERS=[router]):
+            book.refresh_from_db()
+        router.db_for_read.assert_called_once_with(Book, instance=book)
 
     def test_basic_queries(self):
         "Queries are constrained to a single database"
