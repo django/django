@@ -138,7 +138,10 @@ class TemplateResponseMixin:
                 "TemplateResponseMixin requires either a definition of "
                 "'template_name' or an implementation of 'get_template_names()'")
         else:
-            return [self.template_name]
+            if 'template_name' in self.kwargs:
+                return [self.kwargs['template_name']]
+            else:
+                return [self.template_name]
 
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
