@@ -225,3 +225,7 @@ class SessionMiddlewareInstance:
                 "request completed. The user may have logged "
                 "out in a concurrent request, for example."
             )
+
+
+# Shortcut to include cookie middleware
+SessionMiddlewareStack = lambda inner: CookieMiddleware(SessionMiddleware(inner))

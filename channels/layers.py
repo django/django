@@ -9,6 +9,7 @@ import string
 from django.conf import settings
 from django.utils.module_loading import import_string
 
+from channels import DEFAULT_CHANNEL_LAYER
 from .exceptions import InvalidChannelLayerError
 
 
@@ -212,7 +213,7 @@ class InMemoryChannelLayer(BaseChannelLayer):
         )
 
 
-def get_channel_layer(alias="default"):
+def get_channel_layer(alias=DEFAULT_CHANNEL_LAYER):
     """
     Returns a channel layer by alias, or None if it is not configured.
     """
