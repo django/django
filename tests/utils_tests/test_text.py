@@ -167,6 +167,7 @@ class TestUtilsText(SimpleTestCase):
         items = (
             # given - expected - unicode?
             ('Hello, World!', 'hello-world', False),
+            ('this_is_a_test', 'this-is-a-test', True),
             ('spam & eggs', 'spam-eggs', False),
             ('spam & ıçüş', 'spam-ıçüş', True),
             ('foo ıç bar', 'foo-ıç-bar', True),
