@@ -1469,10 +1469,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Author)
         # Ensure the constraint exists
         constraints = self.get_constraints(Author._meta.db_table)
-        for details in constraints.values():
-            if details['columns'] == ["height"] and details['check']:
-                break
-        else:
+        if not any(details['columns'] == ['height'] and details['check'] for details in constraints.values()):
             self.fail("No check constraint for height found")
         # Alter the column to remove it
         old_field = Author._meta.get_field("height")
@@ -1489,10 +1486,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, new_field2, strict=True)
         constraints = self.get_constraints(Author._meta.db_table)
-        for details in constraints.values():
-            if details['columns'] == ["height"] and details['check']:
-                break
-        else:
+        if not any(details['columns'] == ['height'] and details['check'] for details in constraints.values()):
             self.fail("No check constraint for height found")
 
     def test_unique(self):
