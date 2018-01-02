@@ -37,8 +37,11 @@ functionality::
     > CREATE EXTENSION postgis;
 
 The database user must be a superuser in order to run
-``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
-process. An alternative is to use a migration operation in your project::
+``CREATE EXTENSION postgis;`` which is run during the :djadmin:`migrate`
+process. However if the extension already exists it wont create it
+during this process, hence the database user does not need superuser
+status to proceed. An alternative is to use a migration operation
+in your project::
 
     from django.contrib.postgres.operations import CreateExtension
     from django.db import migrations
