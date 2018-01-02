@@ -1,6 +1,6 @@
-=====================================
-ASGI Channel Layer Specification v0.9
-=====================================
+===========================
+Channel Layer Specification
+===========================
 
 .. note::
   This is still in progress.
@@ -16,9 +16,7 @@ them.
 This layer is intended to provide standard, predictable inter-process
 communication that other Python applications can build on top of to provide
 rich functionality. The primary design user is the
-:doc:`ASGI specification </asgi>` and Django's Channels project, but it has
-already been used to implement other patterns such as being the transport layer
-for a service-oriented architecture (SOA) system.
+:doc:`ASGI specification </asgi>` and Django's Channels project.
 
 
 Overview
