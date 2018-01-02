@@ -103,4 +103,89 @@ third-party (non-official-Django) package as an option for those who want them.
 How to Upgrade
 --------------
 
-TODO
+While this is not an exhaustive guide, here are some rough rules on how to
+proceed with an upgrade.
+
+
+Function-based consumers and Routing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Channels 1 allowed you to route by event type (e.g. ``websocket.connect``) and
+pass individual functions with routing that looked like this::
+
+    channel_routing = [
+        route("websocket.connect", connect_blog, path=r'^/liveblog/(?P<slug>[^/]+)/stream/$'),
+    ]
+
+And function-based consumers that looked like this::
+
+    def connect_blog(message, slug):
+        ...
+
+You'll need to convert these to be class-based consumers, as routing is now
+done once, at connection time, and so all the event handlers have to be together
+in a single ASGI application. In addition, URL arguments are no longer passed
+down into the individual functions - instead, they will be provided in ``scope``
+as the key ``url_route``, a dict with an ``args`` key containing a list of
+positional regex groups and a ``kwargs`` key with a dict of the named groups.
+
+Routing is also now the main entry point, so you will need to change routing
+to have a ProtocolTypeRouter with URLRouters nested inside it. See
+:doc:`/topics/routing` for more.
+
+
+channel_session and enforce_ordering
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Any use of the ``channel_session`` or ``enforce_ordering`` decorators can be
+removed; ordering is now always followed as protocols are handled in the same
+process, and ``channel_session`` is not needed as the same application instance
+now handles all traffic from a single client.
+
+Anywhere you stored information in the ``channel_session`` can be replaced by
+storing it on ``self`` inside a consumer.
+
+
+HTTP sessions and Django auth
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All :doc:`authentication </topics/authentication>` and
+:doc:`sessions </topics/session>` are now done with middleware. You can remove
+any decorators that handled them, like ``http_session``, ``channel_session_user``
+and so on (in fact, there are no decorators in Channels 2 - it's all middleware).
+
+To get auth now, wrap your URLRouter in an ``AuthMiddlewareStack``::
+
+    from channels.routing import ProtocolTypeRouter, URLRouter
+    from channels.auth import AuthMiddlewareStack
+
+    application = ProtocolTypeRouter({
+        "websocket": AuthMiddlewareStack(
+            URLRouter([
+                ...
+            ])
+        ),
+    })
+
+You need to replace accesses to ``message.http_session`` with
+``self.scope["session"]``, and ``message.user`` with ``self.scope["user"]``.
+There is no need to do a handoff like ``channel_session_user_from_http`` any
+more - just wrap the auth middleware around and the user will be in the scope
+for the lifetime of the connection.
+
+
+Delay server
+~~~~~~~~~~~~
+
+If you used the delay server before to put things on hold for a few seconds,
+you can now instead use an ``AsyncConsumer`` and ``asyncio.sleep``::
+
+    class PingConsumer(AsyncConsumer):
+
+        async def websocket_receive(self, message):
+            await asyncio.sleep(1)
+            await self.send({
+                "type": "websocket.send",
+                "text": "pong",
+            })
+

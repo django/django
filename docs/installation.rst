@@ -17,6 +17,19 @@ Once that's done, you should add ``channels`` to your
         'channels',
     )
 
+Then, make a default routing in ``myproject/routing.py``::
+
+    from channels.routing import ProtocolTypeRouter
+
+    application = ProtocolTypeRouter({
+        # Empty for now (http->django views is added by default)
+    })
+
+And finally, set your ``ASGI_APPLICATION`` setting to point to that routing
+object as your root application::
+
+    ASGI_APPLICATION = "myproject.routing.application"
+
 That's it! Once enabled, ``channels`` will integrate itself into Django and
 take control of the ``runserver`` command. See :doc:`introduction` for more.
 
