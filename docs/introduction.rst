@@ -27,8 +27,8 @@ Turtles All The Way Down
 
 Channels operates on the principle of "turtles all the way down" - we have
 a single idea of what a channels "application" is, and even the simplest of
-*consumers* (the equivalent of Django views) are an entirely valid *ASGI*
-application you can run by themselves.
+*consumers* (the equivalent of Django views) are an entirely valid
+:doc:`/asgi` application you can run by themselves.
 
 .. note::
     ASGI is the name for the asynchronous server specification that Channels
@@ -103,7 +103,7 @@ Within the lifetime of a scope - be that a chat, a HTTP request, a socket
 connection or something else - you will have one application instance handling
 all the events from it, and you can persist things onto the application
 instance as well. You can choose to write a raw ASGI application if you wish,
-but the tools Channels gives you for building on this is *consumers*.
+but Channels gives you an easy-to-use abstraction over them called *consumers*.
 
 
 What is a Consumer?
@@ -162,6 +162,7 @@ asynchronous functions, you can write fully asynchronous consumers::
     class PingConsumer(AsyncConsumer):
 
         async def websocket_receive(self, message):
+            await asyncio.sleep(1)
             await self.send({
                 "type": "websocket.send",
                 "text": "pong",
@@ -170,8 +171,16 @@ asynchronous functions, you can write fully asynchronous consumers::
 You can read more about consumers in :doc:`/topics/consumers`.
 
 
-Multiple Protocols
-------------------
+Routing and Multiple Protocols
+------------------------------
+
+You can combine multiple Consumers (which are, remember, their own ASGI apps)
+into one bigger app that represents your project using routing::
+
+    application = URLRouter([
+        url("^chat/admin/$", AdminChatConsumer),
+        url("^chat/$", PublicChatConsumer),
+    ])
 
 Channels is not just built around the world of HTTP and WebSockets - it also
 allows you to build any protocol into a Django environment, by building a
@@ -188,6 +197,19 @@ you can build a chatbot in a similar style::
                 "type": "telegram.message",
                 "text": "You said: %s" % message["text"],
             })
+
+And then use another router to have the one project able to serve both
+WebSockets and chat requests::
+
+    application = ProtocolTypeRouter({
+
+        "websocket": URLRouter([
+            url("^chat/admin/$", AdminChatConsumer),
+            url("^chat/$", PublicChatConsumer),
+        ])
+
+        "telegram": TelegramConsumer,
+    })
 
 The goal of Channels is to let you build out your Django projects to work
 across any protocol or transport you might encounter in the modern web, while
