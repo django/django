@@ -115,7 +115,7 @@ class DeferredAttribute:
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
     """
-    def __init__(self, field_name, model):
+    def __init__(self, field_name):
         self.field_name = field_name
 
     def __get__(self, instance, cls=None):
