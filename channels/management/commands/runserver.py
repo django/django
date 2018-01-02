@@ -4,6 +4,7 @@ import sys
 from daphne.server import Server
 from daphne.endpoints import build_endpoint_description_strings
 from django.conf import settings
+from django.core.management import CommandError
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.utils import six
 from django.utils.encoding import get_system_encoding
@@ -17,7 +18,7 @@ class Command(RunserverCommand):
     server_cls = Server
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument('--noasgi', action='store_false', dest='use_asgi', default=True,
             help='Run the old WSGI-based runserver rather than the ASGI-based one')
         parser.add_argument('--http_timeout', action='store', dest='http_timeout', type=int, default=60,
@@ -31,7 +32,11 @@ class Command(RunserverCommand):
         self.logger = setup_logger('django.channels', self.verbosity)
         self.http_timeout = options.get("http_timeout", 60)
         self.websocket_handshake_timeout = options.get("websocket_handshake_timeout", 5)
-        super(Command, self).handle(*args, **options)
+        # Check Channels is installed right
+        if not hasattr(settings, "ASGI_APPLICATION"):
+            raise CommandError("You have not set ASGI_APPLICATION, which is needed to run the server.")
+        # Dispatch upward
+        super().handle(*args, **options)
 
     def inner_run(self, *args, **options):
         # Maybe they want the wsgi one?
