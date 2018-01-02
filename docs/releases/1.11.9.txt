@@ -2,7 +2,7 @@
 Django 1.11.9 release notes
 ===========================
 
-*Expected January 1, 2018*
+*January 1, 2018*
 
 Django 1.11.9 fixes several bugs in 1.11.8.
 
