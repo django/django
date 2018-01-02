@@ -59,7 +59,7 @@ class TemplateCommand(BaseCommand):
         parser.add_argument(
             '--name', '-n', dest='files',
             action='append', default=[],
-            help='The file name(s) to render. Separate multiple extensions '
+            help='The file name(s) to render. Separate multiple file names '
                  'with commas, or use -n multiple times.'
         )
 
