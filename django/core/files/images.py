@@ -51,10 +51,7 @@ def get_image_dimensions(file_or_path, close=False):
         # and get the dimensions, but with some TIFF files Pillow needs to
         # parse the whole file.
         chunk_size = 1024
-        while 1:
-            data = file.read(chunk_size)
-            if not data:
-                break
+        while (data = file.read(chunk_size)):
             try:
                 p.feed(data)
             except zlib.error as e:
