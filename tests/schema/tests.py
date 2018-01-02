@@ -186,12 +186,9 @@ class SchemaTests(TransactionTestCase):
         `expected_fk_table`.id doesn't exist.
         """
         constraints = self.get_constraints(model._meta.db_table)
-        constraint_fk = None
-        for details in constraints.values():
-            if details['columns'] == [column] and details['foreign_key']:
-                constraint_fk = details['foreign_key']
-                break
-        self.assertEqual(constraint_fk, (expected_fk_table, field))
+        self.assertEqual(next((details['foreign_key'] for details in constraints.values()
+                               if details['columns'] == [column] and details['foreign_key']), None),
+                         (expected_fk_table, field))
 
     def assertForeignKeyNotExists(self, model, column, expected_fk_table):
         with self.assertRaises(AssertionError):
