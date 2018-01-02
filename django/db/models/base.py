@@ -590,8 +590,8 @@ class Model(metaclass=ModelBase):
                     'Found "%s" in fields argument. Relations and transforms '
                     'are not allowed in fields.' % LOOKUP_SEP)
 
-        db = using if using is not None else self._state.db
-        db_instance_qs = self.__class__._base_manager.using(db).filter(pk=self.pk)
+        hints = {'instance': self}
+        db_instance_qs = self.__class__._base_manager.db_manager(using, hints=hints).filter(pk=self.pk)
 
         # Use provided fields, if not set then reload all non-deferred fields.
         deferred_fields = self.get_deferred_fields()
