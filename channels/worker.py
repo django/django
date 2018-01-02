@@ -1,5 +1,4 @@
 import asyncio
-import functools
 
 from asgiref.server import StatelessServer
 
@@ -39,7 +38,7 @@ class Worker(StatelessServer):
             if not message.get("type", None):
                 raise ValueError("Worker received message with no type.")
             # Make a scope and get an application instance for it
-            scope = {"type": "channel", "name": channel}
+            scope = {"type": "channel", "channel": channel}
             instance_queue = self.get_or_create_application_instance(channel, scope)
             # Run the message into the app
             await instance_queue.put(message)

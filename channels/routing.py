@@ -82,3 +82,24 @@ class URLRouter:
                 return match.func(scope)
         else:
             raise ValueError("No route found for path %r." % path)
+
+
+class ChannelNameRouter:
+    """
+    Maps to different applications based on a "channel" key in the scope
+    (intended for the Channels worker mode)
+    """
+
+    def __init__(self, application_mapping):
+        self.application_mapping = application_mapping
+
+    def __call__(self, scope):
+        if "channel" not in scope:
+            raise ValueError(
+                "ChannelNameRouter got a scope without a 'channel' key. " +
+                "Did you make sure it's only being used for 'channel' type messages?"
+            )
+        if scope["channel"] in self.application_mapping:
+            return self.application_mapping[scope["channel"]](scope)
+        else:
+            raise ValueError("No application configured for channel name %r" % scope["channel"])
