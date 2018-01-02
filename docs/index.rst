@@ -44,9 +44,24 @@ Topics
 
    introduction
    installation
+   topics/consumers
+   topics/routing
+   topics/channel_layers
+   topics/sessions
+   topics/authentication
+   topics/worker
    deploying
    one-to-two
    javascript
+
+
+Reference
+---------
+
+.. toctree::
+   :maxdepth: 2
+
+   asgi
    channel_layer_spec
    community
    contributing

@@ -26,7 +26,7 @@ Turtles All The Way Down
 ------------------------
 
 Channels operates on the principle of "turtles all the way down" - we have
-a basic idea of what a channels "application" is, and even the simplest of
+a single idea of what a channels "application" is, and even the simplest of
 *consumers* (the equivalent of Django views) are an entirely valid *ASGI*
 application you can run by themselves.
 
@@ -45,11 +45,65 @@ We treat HTTP and the existing Django views as parts of a bigger whole.
 Traditional Django views are still there with Channels and still useable -
 we wrap them up in an ASGI application called ``channels.http.AsgiHandler`` -
 but you can now also write custom HTTP long-polling handling, or WebSocket
-receivers, and have that code sit alongside your existing code.
+receivers, and have that code sit alongside your existing code. URL routing,
+middleware - they are all just ASGI applications.
 
 Our belief is that you want the ability to use safe, synchronous techniques
 like Django views for most code, but have the option to drop down to a more
 direct, asynchronous interface for complex tasks.
+
+
+Scopes and Events
+------------------
+
+Channels splits up incoming connections into two components: a *scope*,
+and a series of *events*.
+
+The *scope* is a set of details about a single incoming connection - such as
+the path a web request was made from, or the originating IP address of a
+WebSocket, or the user messaging a chatbot - and persists throughout the
+connection.
+
+For HTTP, the scope just lasts a single request. For WebSocket, it lasts for
+the lifetime of the socket (but changes if the socket closes and reconnects).
+For other protocols, it varies based on how the protocol's ASGI spec is written;
+for example, it's likely that a chatbot protocol would keep one scope open
+for the entirety of a user's conversation with the bot, even if the underlying
+chat protocol is stateless.
+
+During the lifetime of this *scope*, a series of *events* occur. These
+represent user interactions - making a HTTP request, for example, or
+sending a WebSocket frame. Your Channels or ASGI applications will be
+**instantiated once per scope**, and then be fed the stream of *events*
+happening within that scope to decide what to do with.
+
+An example with HTTP:
+
+* The user makes a HTTP request.
+* We open up a new ``http`` type scope with details of the request's path,
+  method, headers, etc.
+* We send a ``http.request`` event with the HTTP body content
+* The Channels or ASGI application processes this and generates a
+  ``http.response`` event to send back to the browser and close the connection.
+* The HTTP request/response is completed and the scope is destroyed.
+
+An example with a chatbot:
+
+* The user sends a first message to the chatbot.
+* This opens a scope containing the user's username, chosen name, and user ID.
+* The application is given a ``chat.received_message`` event with the event text.
+  It does not have to respond, but could send one, two or more other chat messages
+  back as ``chat.send_message`` events if it wanted to.
+* The user sends more messages to the chatbot and more ``chat.received_message``
+  events are generated.
+* After a timeout or when the application process is restarted the scope is
+  closed.
+
+Within the lifetime of a scope - be that a chat, a HTTP request, a socket
+connection or something else - you will have one application instance handling
+all the events from it, and you can persist things onto the application
+instance as well. You can choose to write a raw ASGI application if you wish,
+but the tools Channels gives you for building on this is *consumers*.
 
 
 What is a Consumer?
@@ -63,7 +117,8 @@ connection, and start up a copy of it.
 
 This means that, unlike Django views, consumers are long-running. They can
 also be short-running - after all, HTTP requests can also be served by consumers -
-but they're built around the idea of living for a little while.
+but they're built around the idea of living for a little while (they live for
+the duration of a *scope*, as we described above).
 
 A basic consumer looks like this::
 
@@ -112,6 +167,8 @@ asynchronous functions, you can write fully asynchronous consumers::
                 "text": "pong",
             })
 
+You can read more about consumers in :doc:`/topics/consumers`.
+
 
 Multiple Protocols
 ------------------
@@ -135,6 +192,8 @@ you can build a chatbot in a similar style::
 The goal of Channels is to let you build out your Django projects to work
 across any protocol or transport you might encounter in the modern web, while
 letting you work with the familiar components and coding style you're used to.
+
+For more information about protocol routing, see :doc:`/topics/routing`.
 
 
 Cross-Process Communication
@@ -160,5 +219,41 @@ allow you to send information between different processes. Each application
 instance has a unique *channel name*, and can join *groups*, allowing both
 point-to-point and broadcast messaging.
 
-Channel layers are an optional part of Channels, and can be disabled if you
-want (by setting the ``CHANNEL_LAYERS`` setting to an empty value).
+.. note::
+
+    Channel layers are an optional part of Channels, and can be disabled if you
+    want (by setting the ``CHANNEL_LAYERS`` setting to an empty value).
+
+(insert cross-process example here)
+
+You can also send messages to a dedicated process that's listening on its own,
+fixed channel name::
+
+    # In a consumer
+    self.channel_layer.send(
+        "myproject.thumbnail_notifications",
+        {
+            "type": "thumbnail.generate",
+            "id": 90902949,
+        },
+    )
+
+You can read more about channel layers in :doc:`/topics/channel_layers`.
+
+
+Django Integration
+------------------
+
+Channels ships with easy drop-in support for common Django features, like
+sessions and authentication. You can combine authentication with your
+WebSocket views by just adding the right middleware around them::
+
+    application = ProtocolTypeRouter({
+        "websocket": AuthMiddlewareStack(
+            URLRouter([
+                url("^front(end)/$", consumers.AsyncChatConsumer),
+            ])
+        ),
+    })
+
+For more, see :doc:`/topics/sessions` and :doc:`/topics/authentication`.
