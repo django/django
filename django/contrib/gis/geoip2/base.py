@@ -115,17 +115,13 @@ class GeoIP2:
 
     @property
     def _reader(self):
-        if self._country:
-            return self._country
-        else:
-            return self._city
+        return self._country or self._city
 
     @property
     def _country_or_city(self):
         if self._country:
             return self._country.country
-        else:
-            return self._city.city
+        return self._city.city
 
     def __del__(self):
         # Cleanup any GeoIP file handles lying around.
@@ -151,9 +147,9 @@ class GeoIP2:
         # Extra checks for the existence of country and city databases.
         if city_or_country and not (self._country or self._city):
             raise GeoIP2Exception('Invalid GeoIP country and city data files.')
-        elif country and not self._country:
+        if country and not self._country:
             raise GeoIP2Exception('Invalid GeoIP country data file: %s' % self._country_file)
-        elif city and not self._city:
+        if city and not self._city:
             raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._city_file)
 
         # Return the query string back to the caller. GeoIP2 only takes IP addresses.

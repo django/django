@@ -41,19 +41,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Manual emulation of SQLite parameter quoting
         if isinstance(value, bool):
             return str(int(value))
-        elif isinstance(value, (Decimal, float, int)):
+        if isinstance(value, (Decimal, float, int)):
             return str(value)
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return "'%s'" % value.replace("\'", "\'\'")
-        elif value is None:
+        if value is None:
             return "NULL"
-        elif isinstance(value, (bytes, bytearray, memoryview)):
+        if isinstance(value, (bytes, bytearray, memoryview)):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
             # character.
             return "X'%s'" % value.hex()
-        else:
-            raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
+        raise ValueError('Cannot quote parameter value %r of type %s' % (value, type(value)))
 
     def _is_referenced_by_fk_constraint(self, table_name, column_name=None, ignore_self=False):
         """

@@ -11,12 +11,11 @@ def fix_os_paths(x):
         if x.startswith(PATH):
             x = x[len(PATH):]
         return x.replace('\\', '/')
-    elif isinstance(x, tuple):
+    if isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))
-    elif isinstance(x, list):
+    if isinstance(x, list):
         return [fix_os_paths(y) for y in x]
-    else:
-        return x
+    return x
 
 
 class FilePathFieldTest(SimpleTestCase):

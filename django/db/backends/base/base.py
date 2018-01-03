@@ -125,12 +125,11 @@ class BaseDatabaseWrapper:
         """
         if not settings.USE_TZ:
             return None
-        elif self.features.supports_timezones:
+        if self.features.supports_timezones:
             return None
-        elif self.settings_dict['TIME_ZONE'] is None:
+        if self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
-        else:
-            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+        return pytz.timezone(self.settings_dict['TIME_ZONE'])
 
     @cached_property
     def timezone_name(self):
@@ -139,10 +138,9 @@ class BaseDatabaseWrapper:
         """
         if not settings.USE_TZ:
             return settings.TIME_ZONE
-        elif self.settings_dict['TIME_ZONE'] is None:
+        if self.settings_dict['TIME_ZONE'] is None:
             return 'UTC'
-        else:
-            return self.settings_dict['TIME_ZONE']
+        return self.settings_dict['TIME_ZONE']
 
     @property
     def queries_logged(self):
@@ -204,7 +202,7 @@ class BaseDatabaseWrapper:
                 raise ImproperlyConfigured(
                     "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
                     "False." % self.alias)
-            elif self.features.supports_timezones:
+            if self.features.supports_timezones:
                 raise ImproperlyConfigured(
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)

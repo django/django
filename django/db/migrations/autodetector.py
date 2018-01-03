@@ -55,22 +55,22 @@ class MigrationAutodetector:
         """
         if isinstance(obj, list):
             return [self.deep_deconstruct(value) for value in obj]
-        elif isinstance(obj, tuple):
+        if isinstance(obj, tuple):
             return tuple(self.deep_deconstruct(value) for value in obj)
-        elif isinstance(obj, dict):
+        if isinstance(obj, dict):
             return {
                 key: self.deep_deconstruct(value)
                 for key, value in obj.items()
             }
-        elif isinstance(obj, functools.partial):
+        if isinstance(obj, functools.partial):
             return (obj.func, self.deep_deconstruct(obj.args), self.deep_deconstruct(obj.keywords))
-        elif isinstance(obj, COMPILED_REGEX_TYPE):
+        if isinstance(obj, COMPILED_REGEX_TYPE):
             return RegexObject(obj)
-        elif isinstance(obj, type):
+        if isinstance(obj, type):
             # If this is a type that implements 'deconstruct' as an instance method,
             # avoid treating this as being deconstructible itself - see #22951
             return obj
-        elif hasattr(obj, 'deconstruct'):
+        if hasattr(obj, 'deconstruct'):
             deconstructed = obj.deconstruct()
             if isinstance(obj, models.Field):
                 # we have a field which also returns a name
@@ -84,8 +84,7 @@ class MigrationAutodetector:
                     for key, value in kwargs.items()
                 },
             )
-        else:
-            return obj
+        return obj
 
     def only_relation_agnostic_fields(self, fields):
         """
@@ -370,7 +369,7 @@ class MigrationAutodetector:
                 operation.name_lower == dependency[1].lower()
             )
         # Created field
-        elif dependency[2] is not None and dependency[3] is True:
+        if dependency[2] is not None and dependency[3] is True:
             return (
                 (
                     isinstance(operation, operations.CreateModel) and
@@ -384,42 +383,41 @@ class MigrationAutodetector:
                 )
             )
         # Removed field
-        elif dependency[2] is not None and dependency[3] is False:
+        if dependency[2] is not None and dependency[3] is False:
             return (
                 isinstance(operation, operations.RemoveField) and
                 operation.model_name_lower == dependency[1].lower() and
                 operation.name_lower == dependency[2].lower()
             )
         # Removed model
-        elif dependency[2] is None and dependency[3] is False:
+        if dependency[2] is None and dependency[3] is False:
             return (
                 isinstance(operation, operations.DeleteModel) and
                 operation.name_lower == dependency[1].lower()
             )
         # Field being altered
-        elif dependency[2] is not None and dependency[3] == "alter":
+        if dependency[2] is not None and dependency[3] == "alter":
             return (
                 isinstance(operation, operations.AlterField) and
                 operation.model_name_lower == dependency[1].lower() and
                 operation.name_lower == dependency[2].lower()
             )
         # order_with_respect_to being unset for a field
-        elif dependency[2] is not None and dependency[3] == "order_wrt_unset":
+        if dependency[2] is not None and dependency[3] == "order_wrt_unset":
             return (
                 isinstance(operation, operations.AlterOrderWithRespectTo) and
                 operation.name_lower == dependency[1].lower() and
                 (operation.order_with_respect_to or "").lower() != dependency[2].lower()
             )
         # Field is removed and part of an index/unique_together
-        elif dependency[2] is not None and dependency[3] == "foo_together_change":
+        if dependency[2] is not None and dependency[3] == "foo_together_change":
             return (
                 isinstance(operation, (operations.AlterUniqueTogether,
                                        operations.AlterIndexTogether)) and
                 operation.name_lower == dependency[1].lower()
             )
         # Unknown dependency. Raise an error.
-        else:
-            raise ValueError("Can't handle dependency %r" % (dependency,))
+        raise ValueError("Can't handle dependency %r" % (dependency,))
 
     def add_operation(self, app_label, operation, dependencies=None, beginning=False):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
@@ -1231,11 +1229,11 @@ class MigrationAutodetector:
         if len(ops) == 1:
             if isinstance(ops[0], operations.CreateModel):
                 return ops[0].name_lower
-            elif isinstance(ops[0], operations.DeleteModel):
+            if isinstance(ops[0], operations.DeleteModel):
                 return "delete_%s" % ops[0].name_lower
-            elif isinstance(ops[0], operations.AddField):
+            if isinstance(ops[0], operations.AddField):
                 return "%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
-            elif isinstance(ops[0], operations.RemoveField):
+            if isinstance(ops[0], operations.RemoveField):
                 return "remove_%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
         elif ops:
             if all(isinstance(o, operations.CreateModel) for o in ops):

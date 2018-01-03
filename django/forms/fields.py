@@ -738,10 +738,9 @@ class NullBooleanField(BooleanField):
         """
         if value in (True, 'True', 'true', '1'):
             return True
-        elif value in (False, 'False', 'false', '0'):
+        if value in (False, 'False', 'false', '0'):
             return False
-        else:
-            return None
+        return None
 
     def validate(self, value):
         pass
@@ -855,7 +854,7 @@ class MultipleChoiceField(ChoiceField):
     def to_python(self, value):
         if not value:
             return []
-        elif not isinstance(value, (list, tuple)):
+        if not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['invalid_list'], code='invalid_list')
         return [str(val) for val in value]
 
@@ -1004,8 +1003,7 @@ class MultiValueField(Field):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
                     raise ValidationError(self.error_messages['required'], code='required')
-                else:
-                    return self.compress([])
+                return self.compress([])
         else:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         for i, field in enumerate(self.fields):

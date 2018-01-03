@@ -61,10 +61,9 @@ class SimpleTemplateResponse(HttpResponse):
         """Accept a template object, path-to-template, or list of paths."""
         if isinstance(template, (list, tuple)):
             return select_template(template, using=self.using)
-        elif isinstance(template, str):
+        if isinstance(template, str):
             return get_template(template, using=self.using)
-        else:
-            return template
+        return template
 
     def resolve_context(self, context):
         return context

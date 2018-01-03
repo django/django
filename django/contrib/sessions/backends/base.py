@@ -103,10 +103,9 @@ class SessionBase:
             # could produce ValueError if there is no ':'
             hash, serialized = encoded_data.split(b':', 1)
             expected_hash = self._hash(serialized)
-            if not constant_time_compare(hash.decode(), expected_hash):
-                raise SuspiciousSession("Session data corrupted")
-            else:
+            if constant_time_compare(hash.decode(), expected_hash):
                 return self.serializer().loads(serialized)
+            raise SuspiciousSession('Session data corrupted')
         except Exception as e:
             # ValueError, SuspiciousOperation, unpickling exceptions. If any of
             # these happen, just return an empty dictionary (an empty session).

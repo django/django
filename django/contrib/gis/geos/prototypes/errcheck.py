@@ -45,10 +45,9 @@ def check_predicate(result, func, cargs):
     "Error checking for unary/binary predicate functions."
     if result == 1:
         return True
-    elif result == 0:
+    if result == 0:
         return False
-    else:
-        raise GEOSException('Error encountered on GEOS C predicate function "%s".' % func.__name__)
+    raise GEOSException('Error encountered on GEOS C predicate function "%s".' % func.__name__)
 
 
 def check_sized_string(result, func, cargs):

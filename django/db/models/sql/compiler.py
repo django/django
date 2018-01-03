@@ -497,9 +497,9 @@ class SQLCompiler:
                     # possible deadlock.
                     if nowait and not self.connection.features.has_select_for_update_nowait:
                         raise NotSupportedError('NOWAIT is not supported on this database backend.')
-                    elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
+                    if skip_locked and not self.connection.features.has_select_for_update_skip_locked:
                         raise NotSupportedError('SKIP LOCKED is not supported on this database backend.')
-                    elif of and not self.connection.features.has_select_for_update_of:
+                    if of and not self.connection.features.has_select_for_update_of:
                         raise NotSupportedError('FOR UPDATE OF is not supported on this database backend.')
                     for_update_part = self.connection.ops.for_update_sql(
                         nowait=nowait,
@@ -1159,9 +1159,8 @@ class SQLInsertCompiler(SQLCompiler):
                 raise FieldError("Aggregate functions are not allowed in this query")
             if value.contains_over_clause:
                 raise FieldError('Window expressions are not allowed in this query.')
-        else:
-            value = field.get_db_prep_save(value, connection=self.connection)
-        return value
+            return value
+        return field.get_db_prep_save(value, connection=self.connection)
 
     def pre_save_val(self, field, obj):
         """

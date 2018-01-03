@@ -202,8 +202,7 @@ class AuthenticationForm(forms.Form):
                 else:
                     self.confirm_login_allowed(self.user_cache)
                 raise self.get_invalid_login_error()
-            else:
-                self.confirm_login_allowed(self.user_cache)
+            self.confirm_login_allowed(self.user_cache)
 
         return self.cleaned_data
 

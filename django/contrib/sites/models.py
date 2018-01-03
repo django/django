@@ -58,7 +58,7 @@ class SiteManager(models.Manager):
         if getattr(settings, 'SITE_ID', ''):
             site_id = settings.SITE_ID
             return self._get_site_by_id(site_id)
-        elif request:
+        if request:
             return self._get_site_by_request(request)
 
         raise ImproperlyConfigured(

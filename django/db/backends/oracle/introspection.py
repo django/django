@@ -34,13 +34,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if scale == 0:
                 if precision > 11:
                     return 'BigAutoField' if description.is_autofield else 'BigIntegerField'
-                elif precision == 1:
+                if precision == 1:
                     return 'BooleanField'
-                elif description.is_autofield:
+                if description.is_autofield:
                     return 'AutoField'
-                else:
-                    return 'IntegerField'
-            elif scale == -127:
+                return 'IntegerField'
+            if scale == -127:
                 return 'FloatField'
 
         return super().get_field_type(data_type, description)

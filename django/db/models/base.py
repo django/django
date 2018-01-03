@@ -1453,8 +1453,7 @@ class Model(metaclass=ModelBase):
                     id='models.E008',
                 )
             ]
-
-        elif any(not isinstance(fields, (tuple, list)) for fields in cls._meta.index_together):
+        if any(not isinstance(fields, (tuple, list)) for fields in cls._meta.index_together):
             return [
                 checks.Error(
                     "All 'index_together' elements must be lists or tuples.",
@@ -1462,12 +1461,10 @@ class Model(metaclass=ModelBase):
                     id='models.E009',
                 )
             ]
-
-        else:
-            errors = []
-            for fields in cls._meta.index_together:
-                errors.extend(cls._check_local_fields(fields, "index_together"))
-            return errors
+        errors = []
+        for fields in cls._meta.index_together:
+            errors.extend(cls._check_local_fields(fields, 'index_together'))
+        return errors
 
     @classmethod
     def _check_unique_together(cls):
@@ -1481,7 +1478,7 @@ class Model(metaclass=ModelBase):
                 )
             ]
 
-        elif any(not isinstance(fields, (tuple, list)) for fields in cls._meta.unique_together):
+        if any(not isinstance(fields, (tuple, list)) for fields in cls._meta.unique_together):
             return [
                 checks.Error(
                     "All 'unique_together' elements must be lists or tuples.",
@@ -1490,11 +1487,10 @@ class Model(metaclass=ModelBase):
                 )
             ]
 
-        else:
-            errors = []
-            for fields in cls._meta.unique_together:
-                errors.extend(cls._check_local_fields(fields, "unique_together"))
-            return errors
+        errors = []
+        for fields in cls._meta.unique_together:
+            errors.extend(cls._check_local_fields(fields, 'unique_together'))
+        return errors
 
     @classmethod
     def _check_indexes(cls):

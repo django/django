@@ -51,8 +51,7 @@ class NotNinetiesListFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == 'the 90s':
             return queryset.filter(year__gte=1990, year__lte=1999)
-        else:
-            return queryset.exclude(year__gte=1990, year__lte=1999)
+        return queryset.exclude(year__gte=1990, year__lte=1999)
 
 
 class DecadeListFilterWithTitleAndParameter(DecadeListFilter):
@@ -127,10 +126,9 @@ class DepartmentListFilterLookupWithDynamicValue(DecadeListFilterWithTitleAndPar
     def lookups(self, request, model_admin):
         if self.value() == 'the 80s':
             return (('the 90s', "the 1990's"),)
-        elif self.value() == 'the 90s':
+        if self.value() == 'the 90s':
             return (('the 80s', "the 1980's"),)
-        else:
-            return (('the 80s', "the 1980's"), ('the 90s', "the 1990's"),)
+        return (('the 80s', "the 1980's"), ('the 90s', "the 1990's"),)
 
 
 class CustomUserAdmin(UserAdmin):

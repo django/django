@@ -33,20 +33,19 @@ def trace_view(request):
     """
     if request.method.upper() != "TRACE":
         return HttpResponseNotAllowed("TRACE")
-    elif request.body:
+    if request.body:
         return HttpResponseBadRequest("TRACE requests MUST NOT include an entity")
-    else:
-        protocol = request.META["SERVER_PROTOCOL"]
-        t = Template(
-            '{{ method }} {{ uri }} {{ version }}',
-            name="TRACE Template",
-        )
-        c = Context({
-            'method': request.method,
-            'uri': request.path,
-            'version': protocol,
-        })
-        return HttpResponse(t.render(c))
+    protocol = request.META['SERVER_PROTOCOL']
+    t = Template(
+        '{{ method }} {{ uri }} {{ version }}',
+        name="TRACE Template",
+    )
+    c = Context({
+        'method': request.method,
+        'uri': request.path,
+        'version': protocol,
+    })
+    return HttpResponse(t.render(c))
 
 
 def post_view(request):

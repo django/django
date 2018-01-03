@@ -358,7 +358,7 @@ class RelatedField(FieldCacheMixin, Field):
         base_q = Q(**base_filter)
         if isinstance(descriptor_filter, dict):
             return base_q & Q(**descriptor_filter)
-        elif descriptor_filter:
+        if descriptor_filter:
             return base_q & descriptor_filter
         return base_q
 
@@ -834,7 +834,7 @@ class ForeignKey(ForeignObject):
                     id='fields.E320',
                 )
             ]
-        elif on_delete == SET_DEFAULT and not self.has_default():
+        if on_delete == SET_DEFAULT and not self.has_default():
             return [
                 checks.Error(
                     'Field specifies on_delete=SET_DEFAULT, but has no default value.',
@@ -843,8 +843,7 @@ class ForeignKey(ForeignObject):
                     id='fields.E321',
                 )
             ]
-        else:
-            return []
+        return []
 
     def _check_unique(self, **kwargs):
         return [
@@ -1501,11 +1500,10 @@ class ManyToManyField(RelatedField):
         """
         if self.remote_field.through is not None:
             return self.remote_field.through._meta.db_table
-        elif self.db_table:
+        if self.db_table:
             return self.db_table
-        else:
-            m2m_table_name = '%s_%s' % (utils.strip_quotes(opts.db_table), self.name)
-            return utils.truncate_name(m2m_table_name, connection.ops.max_name_length())
+        m2m_table_name = '%s_%s' % (utils.strip_quotes(opts.db_table), self.name)
+        return utils.truncate_name(m2m_table_name, connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):
         """

@@ -221,7 +221,7 @@ class Field(RegisterLookupMixin):
                     id='fields.E001',
                 )
             ]
-        elif LOOKUP_SEP in self.name:
+        if LOOKUP_SEP in self.name:
             return [
                 checks.Error(
                     'Field names must not contain "%s".' % (LOOKUP_SEP,),
@@ -229,7 +229,7 @@ class Field(RegisterLookupMixin):
                     id='fields.E002',
                 )
             ]
-        elif self.name == 'pk':
+        if self.name == 'pk':
             return [
                 checks.Error(
                     "'pk' is a reserved word that cannot be used as a field name.",
@@ -237,8 +237,7 @@ class Field(RegisterLookupMixin):
                     id='fields.E003',
                 )
             ]
-        else:
-            return []
+        return []
 
     def _check_choices(self):
         if self.choices:
@@ -250,9 +249,8 @@ class Field(RegisterLookupMixin):
                         id='fields.E004',
                     )
                 ]
-            elif any(isinstance(choice, str) or
-                     not is_iterable(choice) or len(choice) != 2
-                     for choice in self.choices):
+            if any(isinstance(choice, str) or not is_iterable(choice) or
+                    len(choice) != 2 for choice in self.choices):
                 return [
                     checks.Error(
                         "'choices' must be an iterable containing "
@@ -261,10 +259,7 @@ class Field(RegisterLookupMixin):
                         id='fields.E005',
                     )
                 ]
-            else:
-                return []
-        else:
-            return []
+        return []
 
     def _check_db_index(self):
         if self.db_index not in (None, True, False):
@@ -275,8 +270,7 @@ class Field(RegisterLookupMixin):
                     id='fields.E006',
                 )
             ]
-        else:
-            return []
+        return []
 
     def _check_null_allowed_for_primary_keys(self):
         if (self.primary_key and self.null and
@@ -293,8 +287,7 @@ class Field(RegisterLookupMixin):
                     id='fields.E007',
                 )
             ]
-        else:
-            return []
+        return []
 
     def _check_backend_specific_checks(self, **kwargs):
         app_label = self.model._meta.app_label
@@ -336,7 +329,7 @@ class Field(RegisterLookupMixin):
                     id=self.system_check_removed_details.get('id', 'fields.EXXX'),
                 )
             ]
-        elif self.system_check_deprecated_details is not None:
+        if self.system_check_deprecated_details is not None:
             return [
                 checks.Warning(
                     self.system_check_deprecated_details.get(
@@ -1053,7 +1046,7 @@ class CharField(Field):
                     id='fields.E120',
                 )
             ]
-        elif (not isinstance(self.max_length, int) or isinstance(self.max_length, bool) or
+        if (not isinstance(self.max_length, int) or isinstance(self.max_length, bool) or
                 self.max_length <= 0):
             return [
                 checks.Error(
@@ -1062,8 +1055,7 @@ class CharField(Field):
                     id='fields.E121',
                 )
             ]
-        else:
-            return []
+        return []
 
     def cast_db_type(self, connection):
         if self.max_length is None:
@@ -1348,7 +1340,7 @@ class DateTimeField(DateField):
 
     def to_python(self, value):
         if value is None:
-            return value
+            return None
         if isinstance(value, datetime.datetime):
             return value
         if isinstance(value, datetime.date):

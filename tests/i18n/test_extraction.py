@@ -79,8 +79,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         pattern = re.compile(r'^\#\:.*' + re.escape(needle), re.MULTILINE)
         if assert_presence:
             return self.assertRegex(po_contents, pattern, '"%s" not found in final .po file.' % needle)
-        else:
-            return self.assertNotRegex(po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle)
+        return self.assertNotRegex(po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle)
 
     def _get_token_line_number(self, path, token):
         with open(path) as f:

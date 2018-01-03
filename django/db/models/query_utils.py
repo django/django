@@ -68,7 +68,7 @@ class Q(tree.Node):
         if not other:
             return copy.deepcopy(self)
         # Or if this Q is empty, ignore it and just use `other`.
-        elif not self:
+        if not self:
             return copy.deepcopy(other)
 
         obj = type(self)()

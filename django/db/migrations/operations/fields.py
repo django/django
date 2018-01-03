@@ -104,9 +104,9 @@ class AddField(FieldOperation):
                         field=operation.field,
                     ),
                 ]
-            elif isinstance(operation, RemoveField):
+            if isinstance(operation, RemoveField):
                 return []
-            elif isinstance(operation, RenameField):
+            if isinstance(operation, RenameField):
                 return [
                     AddField(
                         model_name=self.model_name,
@@ -226,7 +226,7 @@ class AlterField(FieldOperation):
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, RemoveField) and self.is_same_field_operation(operation):
             return [operation]
-        elif isinstance(operation, RenameField) and self.is_same_field_operation(operation):
+        if isinstance(operation, RenameField) and self.is_same_field_operation(operation):
             return [
                 operation,
                 AlterField(

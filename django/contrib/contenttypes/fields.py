@@ -138,7 +138,7 @@ class GenericForeignKey(FieldCacheMixin):
                         id='contenttypes.E003',
                     )
                 ]
-            elif field.remote_field.model != ContentType:
+            if field.remote_field.model != ContentType:
                 return [
                     checks.Error(
                         "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
@@ -152,8 +152,7 @@ class GenericForeignKey(FieldCacheMixin):
                         id='contenttypes.E004',
                     )
                 ]
-            else:
-                return []
+            return []
 
     def get_cache_name(self):
         return self.name
@@ -162,11 +161,10 @@ class GenericForeignKey(FieldCacheMixin):
         if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(
                 obj, for_concrete_model=self.for_concrete_model)
-        elif id is not None:
+        if id is not None:
             return ContentType.objects.db_manager(using).get_for_id(id)
-        else:
-            # This should never happen. I love comments like this, don't you?
-            raise Exception("Impossible arguments to GFK.get_content_type!")
+        # This should never happen.
+        raise Exception("Impossible arguments to GFK.get_content_type!")
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is not None:

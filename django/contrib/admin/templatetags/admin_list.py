@@ -31,13 +31,14 @@ def paginator_number(cl, i):
     """
     if i == DOT:
         return '... '
-    elif i == cl.page_num:
+    if i == cl.page_num:
         return format_html('<span class="this-page">{}</span> ', i + 1)
-    else:
-        return format_html('<a href="{}"{}>{}</a> ',
-                           cl.get_query_string({PAGE_VAR: i}),
-                           mark_safe(' class="end"' if i == cl.paginator.num_pages - 1 else ''),
-                           i + 1)
+    return format_html(
+        '<a href="{}"{}>{}</a> ',
+        cl.get_query_string({PAGE_VAR: i}),
+        mark_safe(' class="end"' if i == cl.paginator.num_pages - 1 else ''),
+        i + 1,
+    )
 
 
 @register.inclusion_tag('admin/pagination.html')

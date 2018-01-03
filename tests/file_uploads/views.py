@@ -22,8 +22,7 @@ def file_upload_view(request):
         if os.path.dirname(form_data['file_field'].name) != '':
             return HttpResponseServerError()
         return HttpResponse('')
-    else:
-        return HttpResponseServerError()
+    return HttpResponseServerError()
 
 
 def file_upload_view_verify(request):
@@ -77,10 +76,7 @@ def file_upload_unicode_name(request):
     obj.delete()
     os.unlink(full_name)
 
-    if response:
-        return response
-    else:
-        return HttpResponse('')
+    return response or HttpResponse('')
 
 
 def file_upload_echo(request):

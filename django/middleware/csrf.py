@@ -106,9 +106,9 @@ def _sanitize_token(token):
     # Allow only ASCII alphanumerics
     if re.search('[^a-zA-Z0-9]', token):
         return _get_new_csrf_token()
-    elif len(token) == CSRF_TOKEN_LENGTH:
+    if len(token) == CSRF_TOKEN_LENGTH:
         return token
-    elif len(token) == CSRF_SECRET_LENGTH:
+    if len(token) == CSRF_SECRET_LENGTH:
         # Older Django versions set cookies to values of CSRF_SECRET_LENGTH
         # alphanumeric characters. For backwards compatibility, accept
         # such values as unsalted secrets.

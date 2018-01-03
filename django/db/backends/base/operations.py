@@ -166,8 +166,7 @@ class BaseDatabaseOperations:
         """
         if fields:
             raise NotSupportedError('DISTINCT ON fields is not supported by this database backend')
-        else:
-            return 'DISTINCT'
+        return 'DISTINCT'
 
     def fetch_returned_insert_id(self, cursor):
         """
@@ -207,7 +206,7 @@ class BaseDatabaseOperations:
         offset = low_mark or 0
         if high_mark is not None:
             return (high_mark - offset), offset
-        elif offset:
+        if offset:
             return self.connection.ops.no_limit_value(), offset
         return None, offset
 
@@ -472,14 +471,13 @@ class BaseDatabaseOperations:
         """
         if isinstance(value, datetime.datetime):   # must be before date
             return self.adapt_datetimefield_value(value)
-        elif isinstance(value, datetime.date):
+        if isinstance(value, datetime.date):
             return self.adapt_datefield_value(value)
-        elif isinstance(value, datetime.time):
+        if isinstance(value, datetime.time):
             return self.adapt_timefield_value(value)
-        elif isinstance(value, decimal.Decimal):
+        if isinstance(value, decimal.Decimal):
             return self.adapt_decimalfield_value(value)
-        else:
-            return value
+        return value
 
     def adapt_datefield_value(self, value):
         """
@@ -626,9 +624,9 @@ class BaseDatabaseOperations:
         if isinstance(start, int):
             if start < 0:
                 return '%d %s' % (abs(start), self.PRECEDING)
-            elif start == 0:
+            if start == 0:
                 return self.CURRENT_ROW
-        elif start is None:
+        if start is None:
             return self.UNBOUNDED_PRECEDING
         raise ValueError("start argument must be a negative integer, zero, or None, but got '%s'." % start)
 
@@ -636,9 +634,9 @@ class BaseDatabaseOperations:
         if isinstance(end, int):
             if end == 0:
                 return self.CURRENT_ROW
-            elif end > 0:
+            if end > 0:
                 return '%d %s' % (end, self.FOLLOWING)
-        elif end is None:
+        if end is None:
             return self.UNBOUNDED_FOLLOWING
         raise ValueError("end argument must be a positive integer, zero, or None, but got '%s'." % end)
 

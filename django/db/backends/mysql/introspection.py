@@ -41,12 +41,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if 'auto_increment' in description.extra:
             if field_type == 'IntegerField':
                 return 'AutoField'
-            elif field_type == 'BigIntegerField':
+            if field_type == 'BigIntegerField':
                 return 'BigAutoField'
         if description.is_unsigned:
             if field_type == 'IntegerField':
                 return 'PositiveIntegerField'
-            elif field_type == 'SmallIntegerField':
+            if field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'
         return field_type
 

@@ -66,8 +66,7 @@ class ContextList(list):
                 if key in subcontext:
                     return subcontext[key]
             raise KeyError(key)
-        else:
-            return super().__getitem__(key)
+        return super().__getitem__(key)
 
     def get(self, key, default=None):
         try:
@@ -374,7 +373,7 @@ class TestContextDecorator:
     def __call__(self, decorated):
         if isinstance(decorated, type):
             return self.decorate_class(decorated)
-        elif callable(decorated):
+        if callable(decorated):
             return self.decorate_callable(decorated)
         raise TypeError('Cannot decorate object of type %s' % type(decorated))
 

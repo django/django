@@ -109,8 +109,7 @@ class MonthMixin:
                 return date.replace(year=date.year + 1, month=1, day=1)
             except ValueError:
                 raise Http404(_("Date out of range"))
-        else:
-            return date.replace(month=date.month + 1, day=1)
+        return date.replace(month=date.month + 1, day=1)
 
     def _get_current_month(self, date):
         """Return the start date of the previous interval."""

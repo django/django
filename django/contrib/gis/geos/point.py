@@ -91,15 +91,14 @@ class Point(GEOSGeometry):
             return 0
         if self.hasz:
             return 3
-        else:
-            return 2
+        return 2
 
     def _get_single_external(self, index):
         if index == 0:
             return self.x
-        elif index == 1:
+        if index == 1:
             return self.y
-        elif index == 2:
+        if index == 2:
             return self.z
 
     _get_single_internal = _get_single_external

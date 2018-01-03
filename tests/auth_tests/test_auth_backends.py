@@ -332,9 +332,9 @@ class SimpleRowlevelBackend:
         if isinstance(obj, TestObj):
             if user.username == 'test2':
                 return True
-            elif user.is_anonymous and perm == 'anon':
+            if user.is_anonymous and perm == 'anon':
                 return True
-            elif not user.is_active and perm == 'inactive':
+            if not user.is_active and perm == 'inactive':
                 return True
         return False
 
@@ -354,8 +354,7 @@ class SimpleRowlevelBackend:
             return ['anon']
         if user.username == 'test2':
             return ['simple', 'advanced']
-        else:
-            return ['simple']
+        return ['simple']
 
     def get_group_permissions(self, user, obj=None):
         if not obj:
@@ -366,8 +365,7 @@ class SimpleRowlevelBackend:
 
         if 'test_group' in [group.name for group in user.groups.all()]:
             return ['group_perm']
-        else:
-            return ['none']
+        return ['none']
 
 
 @modify_settings(AUTHENTICATION_BACKENDS={

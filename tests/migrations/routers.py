@@ -9,5 +9,5 @@ class TestRouter:
         """
         if model_name == 'tribble':
             return db == 'other'
-        elif db == 'other':
+        if db == 'other':
             return False

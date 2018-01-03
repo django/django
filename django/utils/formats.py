@@ -193,15 +193,15 @@ def localize(value, use_l10n=None):
     """
     if isinstance(value, str):  # Handle strings first for performance reasons.
         return value
-    elif isinstance(value, bool):  # Make sure booleans don't get treated as numbers
+    if isinstance(value, bool):  # Make sure booleans don't get treated as numbers
         return str(value)
-    elif isinstance(value, (decimal.Decimal, float, int)):
+    if isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value, use_l10n=use_l10n)
-    elif isinstance(value, datetime.datetime):
+    if isinstance(value, datetime.datetime):
         return date_format(value, 'DATETIME_FORMAT', use_l10n=use_l10n)
-    elif isinstance(value, datetime.date):
+    if isinstance(value, datetime.date):
         return date_format(value, use_l10n=use_l10n)
-    elif isinstance(value, datetime.time):
+    if isinstance(value, datetime.time):
         return time_format(value, 'TIME_FORMAT', use_l10n=use_l10n)
     return value
 
@@ -213,19 +213,19 @@ def localize_input(value, default=None):
     """
     if isinstance(value, str):  # Handle strings first for performance reasons.
         return value
-    elif isinstance(value, bool):  # Don't treat booleans as numbers.
+    if isinstance(value, bool):  # Don't treat booleans as numbers.
         return str(value)
-    elif isinstance(value, (decimal.Decimal, float, int)):
+    if isinstance(value, (decimal.Decimal, float, int)):
         return number_format(value)
-    elif isinstance(value, datetime.datetime):
+    if isinstance(value, datetime.datetime):
         value = datetime_safe.new_datetime(value)
         format = default or get_format('DATETIME_INPUT_FORMATS')[0]
         return value.strftime(format)
-    elif isinstance(value, datetime.date):
+    if isinstance(value, datetime.date):
         value = datetime_safe.new_date(value)
         format = default or get_format('DATE_INPUT_FORMATS')[0]
         return value.strftime(format)
-    elif isinstance(value, datetime.time):
+    if isinstance(value, datetime.time):
         format = default or get_format('TIME_INPUT_FORMATS')[0]
         return value.strftime(format)
     return value

@@ -112,10 +112,9 @@ class BaseArchive:
         path = path.lstrip('/').lstrip('\\')
         if '/' in path and (('\\' in path and path.find('/') < path.find('\\')) or '\\' not in path):
             return path.split('/', 1)
-        elif '\\' in path:
+        if '\\' in path:
             return path.split('\\', 1)
-        else:
-            return path, ''
+        return path, ''
 
     def has_leading_dir(self, paths):
         """
@@ -127,7 +126,7 @@ class BaseArchive:
             prefix, rest = self.split_leading_dir(path)
             if not prefix:
                 return False
-            elif common_prefix is None:
+            if common_prefix is None:
                 common_prefix = prefix
             elif prefix != common_prefix:
                 return False

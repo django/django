@@ -193,7 +193,7 @@ class BoundField:
         auto_id = self.form.auto_id  # Boolean or string
         if auto_id and '%s' in str(auto_id):
             return auto_id % self.html_name
-        elif auto_id:
+        if auto_id:
             return self.html_name
         return ''
 

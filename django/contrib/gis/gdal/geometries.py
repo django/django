@@ -541,7 +541,7 @@ class Point(OGRGeometry):
         "Return the tuple of this point."
         if self.coord_dim == 2:
             return (self.x, self.y)
-        elif self.coord_dim == 3:
+        if self.coord_dim == 3:
             return (self.x, self.y, self.z)
     coords = tuple
 
@@ -556,9 +556,9 @@ class LineString(OGRGeometry):
             dim = self.coord_dim
             if dim == 1:
                 return (x.value,)
-            elif dim == 2:
+            if dim == 2:
                 return (x.value, y.value)
-            elif dim == 3:
+            if dim == 3:
                 return (x.value, y.value, z.value)
         else:
             raise IndexError('Index out of range when accessing points of a line string: %s.' % index)

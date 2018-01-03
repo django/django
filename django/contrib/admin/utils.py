@@ -393,22 +393,21 @@ def display_for_field(value, field, empty_value_display):
         return dict(field.flatchoices).get(value, empty_value_display)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
-    elif isinstance(field, (models.BooleanField, models.NullBooleanField)):
+    if isinstance(field, (models.BooleanField, models.NullBooleanField)):
         return _boolean_icon(value)
-    elif value is None:
+    if value is None:
         return empty_value_display
-    elif isinstance(field, models.DateTimeField):
+    if isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
-    elif isinstance(field, (models.DateField, models.TimeField)):
+    if isinstance(field, (models.DateField, models.TimeField)):
         return formats.localize(value)
-    elif isinstance(field, models.DecimalField):
+    if isinstance(field, models.DecimalField):
         return formats.number_format(value, field.decimal_places)
-    elif isinstance(field, (models.IntegerField, models.FloatField)):
+    if isinstance(field, (models.IntegerField, models.FloatField)):
         return formats.number_format(value)
-    elif isinstance(field, models.FileField) and value:
+    if isinstance(field, models.FileField) and value:
         return format_html('<a href="{}">{}</a>', value.url, value)
-    else:
-        return display_for_value(value, empty_value_display)
+    return display_for_value(value, empty_value_display)
 
 
 def display_for_value(value, empty_value_display, boolean=False):
@@ -416,18 +415,17 @@ def display_for_value(value, empty_value_display, boolean=False):
 
     if boolean:
         return _boolean_icon(value)
-    elif value is None:
+    if value is None:
         return empty_value_display
-    elif isinstance(value, datetime.datetime):
+    if isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
-    elif isinstance(value, (datetime.date, datetime.time)):
+    if isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, (int, decimal.Decimal, float)):
+    if isinstance(value, (int, decimal.Decimal, float)):
         return formats.number_format(value)
-    elif isinstance(value, (list, tuple)):
+    if isinstance(value, (list, tuple)):
         return ', '.join(str(v) for v in value)
-    else:
-        return str(value)
+    return str(value)
 
 
 class NotRelationField(Exception):
@@ -437,8 +435,7 @@ class NotRelationField(Exception):
 def get_model_from_relation(field):
     if hasattr(field, 'get_path_info'):
         return field.get_path_info()[-1].to_opts.model
-    else:
-        raise NotRelationField
+    raise NotRelationField
 
 
 def reverse_field_path(model, path):

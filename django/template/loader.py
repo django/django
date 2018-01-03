@@ -45,8 +45,7 @@ def select_template(template_name_list, using=None):
 
     if template_name_list:
         raise TemplateDoesNotExist(', '.join(template_name_list), chain=chain)
-    else:
-        raise TemplateDoesNotExist("No template names provided")
+    raise TemplateDoesNotExist('No template names provided')
 
 
 def render_to_string(template_name, context=None, request=None, using=None):

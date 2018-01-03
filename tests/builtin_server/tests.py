@@ -20,7 +20,7 @@ class ServerHandler(simple_server.ServerHandler):
         if not self.status:
             raise AssertionError("write() before start_response()")
 
-        elif not self.headers_sent:
+        if not self.headers_sent:
             # Before the first output, send the stored headers
             self.bytes_sent = len(data)    # make sure we know content-length
             self.send_headers()

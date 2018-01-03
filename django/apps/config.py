@@ -71,7 +71,7 @@ class AppConfig:
                 "The app module %r has multiple filesystem locations (%r); "
                 "you must configure this app with an AppConfig subclass "
                 "with a 'path' class attribute." % (module, paths))
-        elif not paths:
+        if not paths:
             raise ImproperlyConfigured(
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "

@@ -10,7 +10,7 @@ def assert_foo_contenttype_not_cached(apps, schema_editor):
     else:
         if not ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists():
             raise AssertionError('The contenttypes_tests.Foo ContentType should not be cached.')
-        elif content_type.model != 'foo':
+        if content_type.model != 'foo':
             raise AssertionError(
                 "The cached contenttypes_tests.Foo ContentType should have "
                 "its model set to 'foo'."

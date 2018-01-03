@@ -1092,10 +1092,9 @@ class QuerySet:
         """
         if self.query.extra_order_by or self.query.order_by:
             return True
-        elif self.query.default_ordering and self.query.get_meta().ordering:
+        if self.query.default_ordering and self.query.get_meta().ordering:
             return True
-        else:
-            return False
+        return False
 
     @property
     def db(self):

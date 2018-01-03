@@ -198,7 +198,7 @@ class TruncBase(TimezoneMixin, Transform):
             raise ValueError("Cannot truncate DateField '%s' to %s. " % (
                 field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'
             ))
-        elif isinstance(field, TimeField) and (
+        if isinstance(field, TimeField) and (
                 isinstance(output_field, DateTimeField) or copy.kind in ('year', 'quarter', 'month', 'day', 'date')):
             raise ValueError("Cannot truncate TimeField '%s' to %s. " % (
                 field.name, output_field.__class__.__name__ if has_explicit_output_field else 'DateTimeField'

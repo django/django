@@ -450,8 +450,7 @@ class PostAdmin(admin.ModelAdmin):
     def coolness(self, instance):
         if instance.pk:
             return "%d amount of cool." % instance.pk
-        else:
-            return "Unknown coolness."
+        return "Unknown coolness."
 
     def value(self, instance):
         return 1000

@@ -61,12 +61,11 @@ class OGRGeomType:
         """
         if isinstance(other, OGRGeomType):
             return self.num == other.num
-        elif isinstance(other, str):
+        if isinstance(other, str):
             return self.name.lower() == other.lower()
-        elif isinstance(other, int):
+        if isinstance(other, int):
             return self.num == other
-        else:
-            return False
+        return False
 
     @property
     def name(self):

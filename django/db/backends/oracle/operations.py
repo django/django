@@ -62,23 +62,21 @@ END;
         if lookup_type == 'week_day':
             # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
             return "TO_CHAR(%s, 'D')" % field_name
-        elif lookup_type == 'week':
+        if lookup_type == 'week':
             # IW = ISO week number
             return "TO_CHAR(%s, 'IW')" % field_name
-        elif lookup_type == 'quarter':
+        if lookup_type == 'quarter':
             return "TO_CHAR(%s, 'Q')" % field_name
-        else:
-            # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
-            return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+        # https://docs.oracle.com/database/121/SQLRF/functions067.htm#SQLRF00639
+        return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
         # https://docs.oracle.com/database/121/SQLRF/functions271.htm#SQLRF52058
         if lookup_type in ('year', 'month'):
             return "TRUNC(%s, '%s')" % (field_name, lookup_type.upper())
-        elif lookup_type == 'quarter':
+        if lookup_type == 'quarter':
             return "TRUNC(%s, 'Q')" % field_name
-        else:
-            return "TRUNC(%s)" % field_name
+        return "TRUNC(%s)" % field_name
 
     # Oracle crashes with "ORA-03113: end-of-file on communication channel"
     # if the time zone name is passed in parameter. Use interpolation instead.
@@ -499,15 +497,15 @@ END;
         lhs, rhs = sub_expressions
         if connector == '%%':
             return 'MOD(%s)' % ','.join(sub_expressions)
-        elif connector == '&':
+        if connector == '&':
             return 'BITAND(%s)' % ','.join(sub_expressions)
-        elif connector == '|':
+        if connector == '|':
             return 'BITAND(-%(lhs)s-1,%(rhs)s)+%(lhs)s' % {'lhs': lhs, 'rhs': rhs}
-        elif connector == '<<':
+        if connector == '<<':
             return '(%(lhs)s * POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
-        elif connector == '>>':
+        if connector == '>>':
             return 'FLOOR(%(lhs)s / POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
-        elif connector == '^':
+        if connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 

@@ -63,8 +63,7 @@ def _tx_resource_for_name(name):
     """ Return the Transifex resource name """
     if name == 'core':
         return "django.core"
-    else:
-        return "django.contrib-%s" % name
+    return "django.contrib-%s" % name
 
 
 def _check_diff(cat_name, base_path):
