@@ -760,6 +760,14 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIs(field.has_changed([1, 2], '1,2,3'), True)
         self.assertIs(field.has_changed([1, 2], 'a,b'), True)
 
+    def test_has_changed_empty(self):
+        field = SimpleArrayField(forms.CharField())
+        self.assertIs(field.has_changed(None, None), False)
+        self.assertIs(field.has_changed(None, ''), False)
+        self.assertIs(field.has_changed(None, []), False)
+        self.assertIs(field.has_changed([], None), False)
+        self.assertIs(field.has_changed([], ''), False)
+
 
 class TestSplitFormField(PostgreSQLTestCase):
 
