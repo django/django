@@ -236,8 +236,7 @@ def encode_file(boundary, key, file):
 
     if content_type is None:
         content_type = 'application/octet-stream'
-    if not filename:
-        filename = key
+    filename = filename or key
     return [
         to_bytes('--%s' % boundary),
         to_bytes('Content-Disposition: form-data; name="%s"; filename="%s"'

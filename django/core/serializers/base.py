@@ -96,8 +96,7 @@ class Serializer:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
             progress_bar.update(count)
-            if self.first:
-                self.first = False
+            self.first = self.first and False
         self.end_serialization()
         return self.getvalue()
 

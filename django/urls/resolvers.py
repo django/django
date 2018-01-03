@@ -393,9 +393,7 @@ class URLResolver:
         warnings = []
         for pattern in self.url_patterns:
             warnings.extend(check_resolver(pattern))
-        if not warnings:
-            warnings = self.pattern.check()
-        return warnings
+        return warnings or self.pattern.check()
 
     def _populate(self):
         # Short-circuit if called recursively in this thread to prevent

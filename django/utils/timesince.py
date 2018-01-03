@@ -35,8 +35,7 @@ def timesince(d, now=None, reversed=False):
     if now and not isinstance(now, datetime.datetime):
         now = datetime.datetime(now.year, now.month, now.day)
 
-    if not now:
-        now = datetime.datetime.now(utc if is_aware(d) else None)
+    now = now or datetime.datetime.now(utc if is_aware(d) else None)
 
     if reversed:
         d, now = now, d

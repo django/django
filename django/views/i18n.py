@@ -35,8 +35,7 @@ def set_language(request):
     if ((next or not request.is_ajax()) and
             not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
         next = request.META.get('HTTP_REFERER')
-        if next:
-            next = unquote(next)  # HTTP_REFERER may be encoded.
+        next = next and unquote(next)  # HTTP_REFERER may be encoded.
         if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             next = '/'
     response = HttpResponseRedirect(next) if next else HttpResponse(status=204)

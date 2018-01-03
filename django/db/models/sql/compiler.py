@@ -521,8 +521,7 @@ class SQLCompiler:
                 if grouping:
                     if distinct_fields:
                         raise NotImplementedError('annotate() + distinct(fields) is not implemented.')
-                    if not order_by:
-                        order_by = self.connection.ops.force_no_ordering()
+                    order_by = order_by or self.connection.ops.force_no_ordering()
                     result.append('GROUP BY %s' % ', '.join(grouping))
 
                 if having:
@@ -588,8 +587,7 @@ class SQLCompiler:
         if opts is None:
             opts = self.query.get_meta()
         only_load = self.deferred_to_columns()
-        if not start_alias:
-            start_alias = self.query.get_initial_alias()
+        start_alias = start_alias or self.query.get_initial_alias()
         # The 'seen_models' is used to optimize checking the needed parent
         # alias for a given field. This also includes None -> start_alias to
         # be used by local fields.
@@ -657,8 +655,7 @@ class SQLCompiler:
         # of the field is specified.
         if field.is_relation and opts.ordering and getattr(field, 'attname', None) != name:
             # Firstly, avoid infinite loops.
-            if not already_seen:
-                already_seen = set()
+            already_seen = already_seen or set()
             join_tuple = tuple(getattr(self.query.alias_map[j], 'join_cols', None) for j in joins)
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
@@ -680,8 +677,7 @@ class SQLCompiler:
         same input, as the prefixes of get_ordering() and get_distinct() must
         match. Executing SQL where this is not true is an error.
         """
-        if not alias:
-            alias = self.query.get_initial_alias()
+        alias = alias or self.query.get_initial_alias()
         field, targets, opts, joins, path = self.query.setup_joins(
             pieces, opts, alias)
         alias = joins[-1]
@@ -1037,8 +1033,7 @@ class SQLCompiler:
         is needed, as the filters describe an empty set. In that case, None is
         returned, to avoid any unnecessary database interaction.
         """
-        if not result_type:
-            result_type = NO_RESULTS
+        result_type = result_type or NO_RESULTS
         try:
             sql, params = self.as_sql()
             if not sql:

@@ -59,9 +59,7 @@ class File(FileProxyMixin):
         Read the file and yield chunks of ``chunk_size`` bytes (defaults to
         ``UploadedFile.DEFAULT_CHUNK_SIZE``).
         """
-        if not chunk_size:
-            chunk_size = self.DEFAULT_CHUNK_SIZE
-
+        chunk_size = chunk_size or self.DEFAULT_CHUNK_SIZE
         try:
             self.seek(0)
         except (AttributeError, UnsupportedOperation):
@@ -81,9 +79,7 @@ class File(FileProxyMixin):
         always return ``False`` -- there's no good reason to read from memory in
         chunks.
         """
-        if not chunk_size:
-            chunk_size = self.DEFAULT_CHUNK_SIZE
-        return self.size > chunk_size
+        return self.size > (chunk_size or self.DEFAULT_CHUNK_SIZE)
 
     def __iter__(self):
         # Iterate over this file-like object by newlines

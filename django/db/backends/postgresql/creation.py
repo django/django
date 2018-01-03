@@ -16,9 +16,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             suffix += " ENCODING '{}'".format(encoding)
         if template:
             suffix += " TEMPLATE {}".format(self._quote_name(template))
-        if suffix:
-            suffix = "WITH" + suffix
-        return suffix
+        return suffix and "WITH" + suffix
 
     def sql_table_creation_suffix(self):
         test_settings = self.connection.settings_dict['TEST']

@@ -42,8 +42,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         int_part, dec_part = str_number, ''
     if decimal_pos is not None:
         dec_part = dec_part + ('0' * (decimal_pos - len(dec_part)))
-    if dec_part:
-        dec_part = decimal_sep + dec_part
+    dec_part = dec_part and decimal_sep + dec_part
     # grouping
     if use_grouping:
         try:

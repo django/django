@@ -51,8 +51,7 @@ class DumpDataAssertMixin:
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = StringIO()
-        if filename:
-            filename = os.path.join(tempfile.gettempdir(), filename)
+        filename = filename and os.path.join(tempfile.gettempdir(), filename)
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,

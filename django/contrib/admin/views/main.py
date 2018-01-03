@@ -86,8 +86,7 @@ class ChangeList:
         """
         Return all params except IGNORED_PARAMS.
         """
-        if not params:
-            params = self.params
+        params = params or self.params
         lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.

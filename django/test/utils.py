@@ -50,9 +50,7 @@ class Approximate:
         return repr(self.val)
 
     def __eq__(self, other):
-        if self.val == other:
-            return True
-        return round(abs(self.val - other), self.places) == 0
+        return self.val == other or round(abs(self.val - other), self.places) == 0
 
 
 class ContextList(list):
@@ -300,9 +298,7 @@ def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
 
 
 def get_runner(settings, test_runner_class=None):
-    if not test_runner_class:
-        test_runner_class = settings.TEST_RUNNER
-
+    test_runner_class = test_runner_class or settings.TEST_RUNNER
     test_path = test_runner_class.split('.')
     # Allow for relative paths
     if len(test_path) > 1:

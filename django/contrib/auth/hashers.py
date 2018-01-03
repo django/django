@@ -73,10 +73,7 @@ def make_password(password, salt=None, hasher='default'):
     if password is None:
         return UNUSABLE_PASSWORD_PREFIX + get_random_string(UNUSABLE_PASSWORD_SUFFIX_LENGTH)
     hasher = get_hasher(hasher)
-
-    if not salt:
-        salt = hasher.salt()
-
+    salt = salt or hasher.salt()
     return hasher.encode(password, salt)
 
 
@@ -244,8 +241,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt, iterations=None):
         assert password is not None
         assert salt and '$' not in salt
-        if not iterations:
-            iterations = self.iterations
+        iterations = iterations or self.iterations
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
         hash = base64.b64encode(hash).decode('ascii').strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)

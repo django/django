@@ -186,15 +186,9 @@ class GDALBand(GDALRasterBase):
 
         Allowed input data types are bytes, memoryview, list, tuple, and array.
         """
-        if not offset:
-            offset = (0, 0)
-
-        if not size:
-            size = (self.width - offset[0], self.height - offset[1])
-
-        if not shape:
-            shape = size
-
+        offset = offset or (0, 0)
+        size = size or (self.width - offset[0], self.height - offset[1])
+        shape = shape or size
         if any(x <= 0 for x in size):
             raise ValueError('Offset too big for this raster.')
 

@@ -27,10 +27,7 @@ class SessionStore(SessionBase):
         try:
             return cls._storage_path
         except AttributeError:
-            storage_path = getattr(settings, "SESSION_FILE_PATH", None)
-            if not storage_path:
-                storage_path = tempfile.gettempdir()
-
+            storage_path = getattr(settings, 'SESSION_FILE_PATH', None) or tempfile.gettempdir()
             # Make sure the storage path is valid.
             if not os.path.isdir(storage_path):
                 raise ImproperlyConfigured(

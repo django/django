@@ -69,9 +69,7 @@ class Element:
                     other_value = other_attr
                 if attr != other_attr or value != other_value:
                     return False
-        if self.children != element.children:
-            return False
-        return True
+        return self.children == element.children
 
     def __hash__(self):
         return hash((self.name,) + tuple(a for a in self.attributes))

@@ -591,11 +591,7 @@ class FileField(Field):
         return data
 
     def has_changed(self, initial, data):
-        if self.disabled:
-            return False
-        if data is None:
-            return False
-        return True
+        return not self.disabled and data is not None
 
 
 class ImageField(FileField):

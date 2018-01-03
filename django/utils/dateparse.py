@@ -89,8 +89,7 @@ def parse_time(value):
     match = time_re.match(value)
     if match:
         kw = match.groupdict()
-        if kw['microsecond']:
-            kw['microsecond'] = kw['microsecond'].ljust(6, '0')
+        kw['microsecond'] = kw['microsecond'] and kw['microsecond'].ljust(6, '0')
         kw = {k: int(v) for k, v in kw.items() if v is not None}
         return datetime.time(**kw)
 
@@ -107,8 +106,7 @@ def parse_datetime(value):
     match = datetime_re.match(value)
     if match:
         kw = match.groupdict()
-        if kw['microsecond']:
-            kw['microsecond'] = kw['microsecond'].ljust(6, '0')
+        kw['microsecond'] = kw['microsecond'] and kw['microsecond'].ljust(6, '0')
         tzinfo = kw.pop('tzinfo')
         if tzinfo == 'Z':
             tzinfo = utc

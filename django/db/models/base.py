@@ -549,8 +549,7 @@ class Model(metaclass=ModelBase):
         self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
-        if not meta:
-            meta = self._meta
+        meta = meta or self._meta
         return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
@@ -852,7 +851,8 @@ class Model(metaclass=ModelBase):
             # exists.
             return update_fields is not None or filtered.exists()
         if self._meta.select_on_save and not forced_update:
-            if filtered.exists():
+            return (
+                filtered.exists() and
                 # It may happen that the object is deleted from the DB right after
                 # this check, causing the subsequent UPDATE to return zero matching
                 # rows. The same result can occur in some rare cases when the
@@ -860,9 +860,8 @@ class Model(metaclass=ModelBase):
                 # successfully (a row is matched and updated). In order to
                 # distinguish these two cases, the object's existence in the
                 # database is again checked for if the UPDATE query returns 0.
-                return filtered._update(values) > 0 or filtered.exists()
-            else:
-                return False
+                (filtered._update(values) > 0 or filtered.exists())
+            )
         return filtered._update(values) > 0
 
     def _do_insert(self, manager, using, fields, update_pk, raw):

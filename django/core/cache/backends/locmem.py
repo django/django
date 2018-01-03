@@ -98,9 +98,7 @@ class LocMemCache(BaseCache):
 
     def _has_expired(self, key):
         exp = self._expire_info.get(key, -1)
-        if exp is None or exp > time.time():
-            return False
-        return True
+        return exp is not None and exp <= time.time()
 
     def _cull(self):
         if self._cull_frequency == 0:

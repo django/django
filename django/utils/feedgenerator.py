@@ -86,8 +86,7 @@ class SyndicationFeed:
                  feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
         def to_str(s):
             return str(s) if s is not None else s
-        if categories:
-            categories = [str(c) for c in categories]
+        categories = categories and [str(c) for c in categories]
         self.feed = {
             'title': to_str(title),
             'link': iri_to_uri(link),
@@ -117,8 +116,7 @@ class SyndicationFeed:
         """
         def to_str(s):
             return str(s) if s is not None else s
-        if categories:
-            categories = [to_str(c) for c in categories]
+        categories = categories and [to_str(c) for c in categories]
         self.items.append({
             'title': to_str(title),
             'link': iri_to_uri(link),

@@ -805,9 +805,9 @@ class Query:
         if isinstance(self.group_by, tuple):
             self.group_by = tuple([col.relabeled_clone(change_map) for col in self.group_by])
         self.select = tuple([col.relabeled_clone(change_map) for col in self.select])
-        if self._annotations:
-            self._annotations = OrderedDict(
-                (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
+        self._annotations = self._annotations and OrderedDict(
+            (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items()
+        )
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
@@ -1061,9 +1061,7 @@ class Query:
         and get_transform().
         """
         # __exact is the default lookup if one isn't given.
-        if not lookups:
-            lookups = ['exact']
-
+        lookups = lookups or ['exact']
         for name in lookups[:-1]:
             lhs = self.try_transform(lhs, name)
         # First try get_lookup() so that the lookup takes precedence if the lhs
@@ -2050,10 +2048,10 @@ class Query:
         # used. The proper fix would be to defer all decisions where
         # is_nullable() is needed to the compiler stage, but that is not easy
         # to do currently.
-        if connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and field.empty_strings_allowed:
-            return True
-        else:
-            return field.null
+        return (
+            connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls and
+            field.empty_strings_allowed
+        ) or field.null
 
 
 def get_order_dir(field, default='ASC'):

@@ -79,12 +79,9 @@ class BoundField:
         attributes passed as attrs. If a widget isn't specified, use the
         field's default widget.
         """
-        if not widget:
-            widget = self.field.widget
-
+        widget = widget or self.field.widget
         if self.field.localize:
             widget.is_localized = True
-
         attrs = attrs or {}
         attrs = self.build_widget_attrs(attrs, widget)
         if self.auto_id and 'id' not in widget.attrs:
@@ -219,8 +216,7 @@ class BoundField:
         return data
 
     def build_widget_attrs(self, attrs, widget=None):
-        if not widget:
-            widget = self.field.widget
+        widget = widget or self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
         if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
             attrs['required'] = True

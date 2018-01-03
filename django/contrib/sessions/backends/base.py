@@ -240,8 +240,7 @@ class SessionBase:
 
         if isinstance(expiry, datetime):
             return expiry
-        if not expiry:   # Checks both None and 0 cases
-            expiry = settings.SESSION_COOKIE_AGE
+        expiry = expiry or settings.SESSION_COOKIE_AGE   # Checks both None and 0 cases
         return modification + timedelta(seconds=expiry)
 
     def set_expiry(self, value):

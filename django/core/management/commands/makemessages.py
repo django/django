@@ -502,8 +502,7 @@ class Command(BaseCommand):
                         if os.path.abspath(dirpath).startswith(os.path.dirname(path)):
                             locale_dir = path
                             break
-                    if not locale_dir:
-                        locale_dir = self.default_locale_path or NO_LOCALE_DIR
+                    locale_dir = locale_dir or self.default_locale_path or NO_LOCALE_DIR
                     all_files.append(self.translatable_file_class(dirpath, filename, locale_dir))
         return sorted(all_files)
 

@@ -73,10 +73,9 @@ class GeoIP2:
             raise GeoIP2Exception('Invalid GeoIP caching option: %s' % cache)
 
         # Getting the GeoIP data path.
+        path = path or GEOIP_SETTINGS['GEOIP_PATH']
         if not path:
-            path = GEOIP_SETTINGS['GEOIP_PATH']
-            if not path:
-                raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
+            raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
         if not isinstance(path, str):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
@@ -115,10 +114,7 @@ class GeoIP2:
 
     @property
     def _reader(self):
-        if self._country:
-            return self._country
-        else:
-            return self._city
+        return self._country or self._city
 
     @property
     def _country_or_city(self):

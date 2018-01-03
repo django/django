@@ -75,10 +75,8 @@ class TemplateTagIndexView(BaseAdminDocsView):
             for module_name, library in builtin_libs + app_libs:
                 for tag_name, tag_func in library.tags.items():
                     title, body, metadata = utils.parse_docstring(tag_func.__doc__)
-                    if title:
-                        title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
-                    if body:
-                        body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
+                    title = title and utils.parse_rst(title, 'tag', _('tag:') + tag_name)
+                    body = body and utils.parse_rst(body, 'tag', _('tag:') + tag_name)
                     for key in metadata:
                         metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
                     tag_library = module_name.split('.')[-1]
@@ -108,10 +106,8 @@ class TemplateFilterIndexView(BaseAdminDocsView):
             for module_name, library in builtin_libs + app_libs:
                 for filter_name, filter_func in library.filters.items():
                     title, body, metadata = utils.parse_docstring(filter_func.__doc__)
-                    if title:
-                        title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
-                    if body:
-                        body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
+                    title = title and utils.parse_rst(title, 'filter', _('filter:') + filter_name)
+                    body = body and utils.parse_rst(body, 'filter', _('filter:') + filter_name)
                     for key in metadata:
                         metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
                     tag_library = module_name.split('.')[-1]
@@ -174,10 +170,8 @@ class ViewDetailView(BaseAdminDocsView):
         if view_func is None:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
-        if title:
-            title = utils.parse_rst(title, 'view', _('view:') + view)
-        if body:
-            body = utils.parse_rst(body, 'view', _('view:') + view)
+        title = title and utils.parse_rst(title, 'view', _('view:') + view)
+        body = body and utils.parse_rst(body, 'view', _('view:') + view)
         for key in metadata:
             metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
         return super().get_context_data(**{
@@ -215,10 +209,8 @@ class ModelDetailView(BaseAdminDocsView):
         opts = model._meta
 
         title, body, metadata = utils.parse_docstring(model.__doc__)
-        if title:
-            title = utils.parse_rst(title, 'model', _('model:') + model_name)
-        if body:
-            body = utils.parse_rst(body, 'model', _('model:') + model_name)
+        title = title and utils.parse_rst(title, 'model', _('model:') + model_name)
+        body = body and utils.parse_rst(body, 'model', _('model:') + model_name)
 
         # Gather fields/field descriptions.
         fields = []
@@ -275,8 +267,9 @@ class ModelDetailView(BaseAdminDocsView):
                 except StopIteration:
                     continue
                 verbose = func.__doc__
-                if verbose:
-                    verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
+                verbose = verbose and (
+                    utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
+                )
                 # If a method has no arguments, show it as a 'field', otherwise
                 # as a 'method with arguments'.
                 if func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):

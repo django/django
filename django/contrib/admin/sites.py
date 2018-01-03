@@ -94,9 +94,7 @@ class AdminSite:
 
         If a model is abstract, raise ImproperlyConfigured.
         """
-        if not admin_class:
-            admin_class = ModelAdmin
-
+        admin_class = admin_class or ModelAdmin
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:

@@ -376,19 +376,17 @@ class QueryDict(MultiValueDict):
 
     def __init__(self, query_string=None, mutable=False, encoding=None):
         super().__init__()
-        if not encoding:
-            encoding = settings.DEFAULT_CHARSET
-        self.encoding = encoding
+        self.encoding = encoding or settings.DEFAULT_CHARSET
         query_string = query_string or ''
         parse_qsl_kwargs = {
             'keep_blank_values': True,
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
-            'encoding': encoding,
+            'encoding': self.encoding,
         }
         if isinstance(query_string, bytes):
             # query_string normally contains URL-encoded data, a subset of ASCII.
             try:
-                query_string = query_string.decode(encoding)
+                query_string = query_string.decode(self.encoding)
             except UnicodeDecodeError:
                 # ... but some user agents are misbehaving :-(
                 query_string = query_string.decode('iso-8859-1')

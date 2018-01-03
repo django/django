@@ -82,9 +82,7 @@ class ModelBackend:
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):
-        if not user_obj.is_active:
-            return False
-        return perm in self.get_all_permissions(user_obj, obj)
+        return user_obj.is_active and perm in self.get_all_permissions(user_obj, obj)
 
     def has_module_perms(self, user_obj, app_label):
         """

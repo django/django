@@ -107,8 +107,7 @@ class BaseManager:
         })
 
     def contribute_to_class(self, model, name):
-        if not self.name:
-            self.name = name
+        self.name = self.name or name
         self.model = model
 
         setattr(model, name, ManagerDescriptor(self))

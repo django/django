@@ -694,8 +694,7 @@ class Field(RegisterLookupMixin):
         return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
 
     def set_attributes_from_name(self, name):
-        if not self.name:
-            self.name = name
+        self.name = self.name or name
         self.attname, self.column = self.get_attname_column()
         self.concrete = self.column is not None
         if self.verbose_name is None and self.name:

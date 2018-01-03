@@ -309,11 +309,7 @@ class EmailMessage:
             self.attachments.append(filename)
         else:
             assert content is not None
-
-            if not mimetype:
-                mimetype, _ = mimetypes.guess_type(filename)
-                if not mimetype:
-                    mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+            mimetype = mimetype or mimetypes.guess_type(filename)[0] or DEFAULT_ATTACHMENT_MIME_TYPE
             basetype, subtype = mimetype.split('/', 1)
 
             if basetype == 'text':

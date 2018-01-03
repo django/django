@@ -314,9 +314,7 @@ class FileField(Field):
         if data is not None:
             # This value will be converted to str and stored in the
             # database, so leaving False as-is is not acceptable.
-            if not data:
-                data = ''
-            setattr(instance, self.name, data)
+            setattr(instance, self.name, data or '')
 
     def formfield(self, **kwargs):
         return super().formfield(**{

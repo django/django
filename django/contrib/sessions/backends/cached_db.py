@@ -41,9 +41,7 @@ class SessionStore(DBStore):
         return data
 
     def exists(self, session_key):
-        if session_key and (self.cache_key_prefix + session_key) in self._cache:
-            return True
-        return super().exists(session_key)
+        return session_key and (self.cache_key_prefix + session_key) in self._cache or super().exists(session_key)
 
     def save(self, must_create=False):
         super().save(must_create)

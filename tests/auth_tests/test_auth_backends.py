@@ -339,9 +339,7 @@ class SimpleRowlevelBackend:
         return False
 
     def has_module_perms(self, user, app_label):
-        if not user.is_anonymous and not user.is_active:
-            return False
-        return app_label == "app1"
+        return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
     def get_all_permissions(self, user, obj=None):
         if not obj:
