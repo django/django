@@ -1084,9 +1084,14 @@ class PicklingSideEffect:
         self.locked = False
 
     def __getstate__(self):
-        if self.cache._lock.active_writers:
-            self.locked = True
+        self.locked = self.cache._lock.locked()
         return {}
+
+
+limit_locmem_entries = override_settings(CACHES=caches_setting_for_tests(
+    BACKEND='django.core.cache.backends.locmem.LocMemCache',
+    OPTIONS={'MAX_ENTRIES': 9},
+))
 
 
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1143,6 +1148,47 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(expire, cache._expire_info[_key])
         cache.decr(key)
         self.assertEqual(expire, cache._expire_info[_key])
+
+    @limit_locmem_entries
+    def test_lru_get(self):
+        """get() moves cache keys."""
+        for key in range(9):
+            cache.set(key, key, timeout=None)
+        for key in range(6):
+            self.assertEqual(cache.get(key), key)
+        cache.set(9, 9, timeout=None)
+        for key in range(6):
+            self.assertEqual(cache.get(key), key)
+        for key in range(6, 9):
+            self.assertIsNone(cache.get(key))
+        self.assertEqual(cache.get(9), 9)
+
+    @limit_locmem_entries
+    def test_lru_set(self):
+        """set() moves cache keys."""
+        for key in range(9):
+            cache.set(key, key, timeout=None)
+        for key in range(3, 9):
+            cache.set(key, key, timeout=None)
+        cache.set(9, 9, timeout=None)
+        for key in range(3, 10):
+            self.assertEqual(cache.get(key), key)
+        for key in range(3):
+            self.assertIsNone(cache.get(key))
+
+    @limit_locmem_entries
+    def test_lru_incr(self):
+        """incr() moves cache keys."""
+        for key in range(9):
+            cache.set(key, key, timeout=None)
+        for key in range(6):
+            cache.incr(key)
+        cache.set(9, 9, timeout=None)
+        for key in range(6):
+            self.assertEqual(cache.get(key), key + 1)
+        for key in range(6, 9):
+            self.assertIsNone(cache.get(key))
+        self.assertEqual(cache.get(9), 9)
 
 
 # memcached backend isn't guaranteed to be available.
