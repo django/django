@@ -189,7 +189,7 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn: tn.startswith('inspectdb_special'),
                      stdout=out)
         output = out.getvalue()
-        base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
+        base_name = 'field' if connection.features.uppercases_column_names else 'Field'
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)

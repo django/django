@@ -841,12 +841,10 @@ class ModelAdmin(BaseModelAdmin):
         actions = filter(None, actions)
 
         # Convert the actions into an OrderedDict keyed by name.
-        actions = OrderedDict(
+        return OrderedDict(
             (name, (func, name, desc))
             for func, name, desc in actions
         )
-
-        return actions
 
     def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
         """
