@@ -281,7 +281,7 @@ def lookup_field(name, obj, model_admin=None):
         if callable(name):
             attr = name
             value = attr(obj)
-        elif model_admin is not None and hasattr(model_admin, name) and name != '__str__':
+        elif hasattr(model_admin, name) and name != '__str__':
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:
@@ -341,7 +341,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         else:
             if callable(name):
                 attr = name
-            elif model_admin is not None and hasattr(model_admin, name):
+            elif hasattr(model_admin, name):
                 attr = getattr(model_admin, name)
             elif hasattr(model, name):
                 attr = getattr(model, name)

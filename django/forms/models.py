@@ -1349,8 +1349,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
 
 def modelform_defines_fields(form_class):
-    return (form_class is not None and (
-            hasattr(form_class, '_meta') and
-            (form_class._meta.fields is not None or
-             form_class._meta.exclude is not None)
-            ))
+    return hasattr(form_class, '_meta') and (
+        form_class._meta.fields is not None or
+        form_class._meta.exclude is not None
+    )

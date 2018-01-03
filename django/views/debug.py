@@ -346,7 +346,7 @@ class ExceptionReporter:
         Return (pre_context_lineno, pre_context, context_line, post_context).
         """
         source = None
-        if loader is not None and hasattr(loader, "get_source"):
+        if hasattr(loader, 'get_source'):
             try:
                 source = loader.get_source(module_name)
             except ImportError:

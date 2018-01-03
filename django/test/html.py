@@ -52,9 +52,7 @@ class Element:
                 child.finalize()
 
     def __eq__(self, element):
-        if not hasattr(element, 'name'):
-            return False
-        if hasattr(element, 'name') and self.name != element.name:
+        if not hasattr(element, 'name') or self.name != element.name:
             return False
         if len(self.attributes) != len(element.attributes):
             return False

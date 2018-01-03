@@ -70,10 +70,10 @@ class FieldFile(File):
 
     def open(self, mode='rb'):
         self._require_file()
-        if hasattr(self, '_file') and self._file is not None:
-            self.file.open(mode)
-        else:
+        if getattr(self, '_file', None) is None:
             self.file = self.storage.open(self.name, mode)
+        else:
+            self.file.open(mode)
         return self
     # open() doesn't alter the file's contents, but it does reset the pointer
     open.alters_data = True
