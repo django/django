@@ -216,7 +216,7 @@ def sort_dependencies(app_list):
             # If all of the models in the dependency list are either already
             # on the final model list, or not on the original serialization list,
             # then we've found another model with all it's dependencies satisfied.
-            if all(candidate for candidate in ((d not in models or d in model_list) for d in deps)):
+            if all(d not in models or d in model_list for d in deps):
                 model_list.append(model)
                 changed = True
             else:
