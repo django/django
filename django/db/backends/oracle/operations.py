@@ -5,6 +5,7 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
+from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 
@@ -217,7 +218,14 @@ END;
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def fetch_returned_insert_id(self, cursor):
-        return int(cursor._insert_id_var.getvalue())
+        try:
+            return int(cursor._insert_id_var.getvalue())
+        except TypeError:
+            raise DatabaseError(
+                'The database did not return a new row id. Probably "ORA-1403: '
+                'no data found" was raised internally but was hidden by the '
+                'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
+            )
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
