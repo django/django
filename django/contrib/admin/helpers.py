@@ -203,8 +203,7 @@ class AdminReadonlyField:
             result_repr = self.empty_value_display
         else:
             if f is None:
-                boolean = getattr(attr, "boolean", False)
-                if boolean:
+                if getattr(attr, 'boolean', False):
                     result_repr = _boolean_icon(value)
                 else:
                     if hasattr(value, "__html__"):
@@ -331,14 +330,14 @@ class InlineAdminForm(AdminForm):
             )
 
     def needs_explicit_pk_field(self):
-        # Auto fields are editable (oddly), so need to check for auto or non-editable pk
-        if self.form._meta.model._meta.auto_field or not self.form._meta.model._meta.pk.editable:
-            return True
-        # Also search any parents for an auto field. (The pk info is propagated to child
-        # models so that does not need to be checked in parents.)
-        return any(
-            parent._meta.auto_field or not parent._meta.model._meta.pk.editable
-            for parent in self.form._meta.model._meta.get_parent_list()
+        return (
+            # Auto fields are editable, so check for auto or non-editable pk.
+            self.form._meta.model._meta.auto_field or not self.form._meta.model._meta.pk.editable or
+            # Also search any parents for an auto field. (The pk info is
+            # propagated to child models so that does not need to be checked
+            # in parents.)
+            any(parent._meta.auto_field or not parent._meta.model._meta.pk.editable
+                for parent in self.form._meta.model._meta.get_parent_list())
         )
 
     def pk_field(self):

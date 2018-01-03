@@ -301,7 +301,7 @@ class MigrationAutodetector:
                     if deps_satisfied:
                         chopped.append(operation)
                         dependencies.update(operation_dependencies)
-                        self.generated_operations[app_label] = self.generated_operations[app_label][1:]
+                        del self.generated_operations[app_label][0]
                     else:
                         break
                 # Make a migration! Well, only if there's stuff to put in it

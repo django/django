@@ -531,8 +531,7 @@ class DiscoverRunner:
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
             parallel_units = len(parallel_suite.subsuites)
-            if self.parallel > parallel_units:
-                self.parallel = parallel_units
+            self.parallel = min(self.parallel, parallel_units)
 
             # If there's only one TestCase, parallelization isn't needed.
             if self.parallel > 1:

@@ -151,8 +151,7 @@ class SessionBase:
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
-                break
-        return session_key
+                return session_key
 
     def _get_or_create_session_key(self):
         if self._session_key is None:
