@@ -506,7 +506,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         return request.user.has_module_perms(self.opts.app_label)
 
     def get_sortable_by(self, request):
-        return self.sortable_by or self.get_list_display(request)
+        return self.sortable_by if self.sortable_by is not None else self.get_list_display(request)
 
 
 class ModelAdmin(BaseModelAdmin):

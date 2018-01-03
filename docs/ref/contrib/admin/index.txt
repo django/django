@@ -1289,17 +1289,38 @@ subclass::
 
 .. attribute:: ModelAdmin.sortable_by
 
-    .. versionadded:: 1.10
+    .. versionadded:: 2.1
 
-    By default, Django admin allows to sort by all model fields and callables,
-    that have ``admin_order_field`` property set. However, you might want to
-    disable interactive sorting for any of them.
+    By default, the change list page allows users to interactively sort it by
+    all model fields (and callables that have the ``admin_order_field`` property
+    set) specified by :attr:`list_display`. However, you might want to disable
+    interactive sorting for any/all of them.
 
-    ``sortable_by`` is a list of fields and callables you would like to be
-    available for sorting in the changelist header.
+    With ``sortable_by`` you can specify a subset of these items. Set
+    ``sortable_by`` to a collection of these same items and they will be
+    available to sort by.
 
-    If you need to specify this list dynamically - you can implement a
-    :meth:`~ModelAdmin.get_sortable_by` method.
+    You can disable customization of such ordering by specifying an empty
+    collection.
+
+    If you need to specify this list dynamically you can implement a
+    :meth:`~ModelAdmin.get_sortable_by` method instead.
+
+    Example::
+
+        class Person(models.Model):
+            first_name = models.CharField(max_length=50)
+            last_name = models.CharField(max_length=50)
+            age = models.PositiveIntegerField()
+            ssn = models.CharField('SSN', max_length=11)
+
+            def full_name(self):
+                  return self.first_name + ' ' + self.last_name
+            full_name.admin_order_field = 'last_name'
+
+        class PersonAdmin(admin.ModelAdmin):
+            list_display = ('full_name', 'age', 'ssn')
+            sortable_by = ('full_name', 'age')
 
 .. attribute:: ModelAdmin.view_on_site
 
@@ -1488,19 +1509,25 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_sortable_by(request)
 
-    .. versionadded:: 1.10
+    .. versionadded:: 2.1
 
-    The ``get_sortable_by`` method is given the ``HttpRequest`` and is expected
-    to return a list or tuple of field names that will be available for the
-    interactive ordering in changelist header. If :attr:`sortable_by` is not
-    set, it returns field names from :meth:`get_list_display` method. You
-    could exclude one or more fields from ordering by overriding this
-    method::
+    The ``get_sortable_by`` method is passed the ``HttpRequest`` and is expected
+    to return a collection of field names that will be available to users for
+    interactive customization of the change list page ordering.
+
+    Its default implementation returns :attr:`sortable_by` if it's set,
+    otherwise it simply defers to :meth:`get_list_display`.
+
+    Just like with :attr:`sortable_by` you can disable customization of such
+    ordering by returning an empty collection.
+
+    For example, you could exclude one or more fields from ordering by
+    overriding this method like this::
 
         class PersonAdmin(admin.ModelAdmin):
 
             def get_sortable_by(self, request):
-                return set(self.get_list_display(request)) - {'rank'}
+                return {*self.get_list_display(request)} - {'rank'}
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)
 

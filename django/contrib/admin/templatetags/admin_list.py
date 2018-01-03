@@ -100,7 +100,7 @@ def result_headers(cl):
             model_admin=cl.model_admin,
             return_attr=True
         )
-        is_field_sortable = not cl.sortable_by or field_name in cl.sortable_by
+        is_field_sortable = cl.sortable_by is None or field_name in cl.sortable_by
         if attr:
             field_name = _coerce_field_name(field_name, i)
             # Potentially not sortable
