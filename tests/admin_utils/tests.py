@@ -210,6 +210,8 @@ class UtilsTests(SimpleTestCase):
             display_for_value(False, '', boolean=True),
             '<img src="/static/admin/img/icon-no.svg" alt="False" />'
         )
+        self.assertEqual(display_for_value(True, ''), 'True')
+        self.assertEqual(display_for_value(False, ''), 'False')
 
     def test_label_for_field(self):
         """

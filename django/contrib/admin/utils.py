@@ -418,6 +418,8 @@ def display_for_value(value, empty_value_display, boolean=False):
         return _boolean_icon(value)
     elif value is None:
         return empty_value_display
+    elif isinstance(value, bool):
+        return str(value)
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
