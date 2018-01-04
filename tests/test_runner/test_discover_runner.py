@@ -36,28 +36,28 @@ class DiscoverRunnerTest(TestCase):
 
     def test_dotted_test_module(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample"],
+            ['test_runner_apps.sample.tests_sample'],
         ).countTestCases()
 
-        self.assertEqual(count, 6)
+        self.assertEqual(count, 4)
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestVanillaUnittest"],
+            ['test_runner_apps.sample.tests_sample.TestVanillaUnittest'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
 
     def test_dotted_test_class_django_testcase(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestDjangoTestCase"],
+            ['test_runner_apps.sample.tests_sample.TestDjangoTestCase'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
 
     def test_dotted_test_method_django_testcase(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestDjangoTestCase.test_sample"],
+            ['test_runner_apps.sample.tests_sample.TestDjangoTestCase.test_sample'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
@@ -65,17 +65,17 @@ class DiscoverRunnerTest(TestCase):
     def test_pattern(self):
         count = DiscoverRunner(
             pattern="*_tests.py",
-        ).build_suite(["test_discovery_sample"]).countTestCases()
+        ).build_suite(['test_runner_apps.sample']).countTestCases()
 
         self.assertEqual(count, 1)
 
     def test_file_path(self):
         with change_cwd(".."):
             count = DiscoverRunner().build_suite(
-                ["test_discovery_sample/"],
+                ['test_runner_apps/sample/'],
             ).countTestCases()
 
-        self.assertEqual(count, 7)
+        self.assertEqual(count, 5)
 
     def test_empty_label(self):
         """
@@ -91,14 +91,14 @@ class DiscoverRunnerTest(TestCase):
 
     def test_empty_test_case(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.EmptyTestCase"],
+            ['test_runner_apps.sample.tests_sample.EmptyTestCase'],
         ).countTestCases()
 
         self.assertEqual(count, 0)
 
     def test_discovery_on_package(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests"],
+            ['test_runner_apps.sample.tests'],
         ).countTestCases()
 
         self.assertEqual(count, 1)
@@ -112,14 +112,14 @@ class DiscoverRunnerTest(TestCase):
         should not. The discover runner avoids this behavior.
         """
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.empty"],
+            ['test_runner_apps.sample.empty'],
         ).countTestCases()
 
         self.assertEqual(count, 0)
 
     def test_testcase_ordering(self):
         with change_cwd(".."):
-            suite = DiscoverRunner().build_suite(["test_discovery_sample/"])
+            suite = DiscoverRunner().build_suite(['test_runner_apps/sample/'])
             self.assertEqual(
                 suite._tests[0].__class__.__name__,
                 'TestDjangoTestCase',
@@ -149,10 +149,10 @@ class DiscoverRunnerTest(TestCase):
         """
         runner = DiscoverRunner(reverse=True)
         suite = runner.build_suite(
-            test_labels=('test_discovery_sample', 'test_discovery_sample2'))
-        self.assertIn('test_discovery_sample2', next(iter(suite)).id(),
+            test_labels=('test_runner_apps.sample', 'test_runner_apps.simple'))
+        self.assertIn('test_runner_apps.simple', next(iter(suite)).id(),
                       msg="Test labels should be reversed.")
-        suite = runner.build_suite(test_labels=('test_discovery_sample2',))
+        suite = runner.build_suite(test_labels=('test_runner_apps.simple',))
         suite = tuple(suite)
         self.assertIn('DjangoCase', suite[0].id(),
                       msg="Test groups should not be reversed.")
@@ -185,16 +185,16 @@ class DiscoverRunnerTest(TestCase):
 
     def test_tags(self):
         runner = DiscoverRunner(tags=['core'])
-        self.assertEqual(runner.build_suite(['test_discovery_sample.tests_sample']).countTestCases(), 1)
+        self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 1)
         runner = DiscoverRunner(tags=['fast'])
-        self.assertEqual(runner.build_suite(['test_discovery_sample.tests_sample']).countTestCases(), 2)
+        self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 2)
         runner = DiscoverRunner(tags=['slow'])
-        self.assertEqual(runner.build_suite(['test_discovery_sample.tests_sample']).countTestCases(), 2)
+        self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 2)
 
     def test_exclude_tags(self):
         runner = DiscoverRunner(tags=['fast'], exclude_tags=['core'])
-        self.assertEqual(runner.build_suite(['test_discovery_sample.tests_sample']).countTestCases(), 1)
+        self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 1)
         runner = DiscoverRunner(tags=['fast'], exclude_tags=['slow'])
-        self.assertEqual(runner.build_suite(['test_discovery_sample.tests_sample']).countTestCases(), 0)
+        self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 0)
         runner = DiscoverRunner(exclude_tags=['slow'])
-        self.assertEqual(runner.build_suite(['test_discovery_sample.tests_sample']).countTestCases(), 4)
+        self.assertEqual(runner.build_suite(['test_runner_apps.tagged.tests']).countTestCases(), 0)

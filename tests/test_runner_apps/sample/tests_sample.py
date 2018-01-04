@@ -1,7 +1,7 @@
 import doctest
 from unittest import TestCase
 
-from django.test import SimpleTestCase, TestCase as DjangoTestCase, tag
+from django.test import SimpleTestCase, TestCase as DjangoTestCase
 
 from . import doctests
 
@@ -27,18 +27,6 @@ class TestZimpleTestCase(SimpleTestCase):
 
 class EmptyTestCase(TestCase):
     pass
-
-
-@tag('slow')
-class TaggedTestCase(TestCase):
-
-    @tag('fast')
-    def test_single_tag(self):
-        self.assertEqual(1, 1)
-
-    @tag('fast', 'core')
-    def test_multiple_tags(self):
-        self.assertEqual(1, 1)
 
 
 def load_tests(loader, tests, ignore):

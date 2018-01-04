@@ -44,8 +44,7 @@ atexit.register(shutil.rmtree, TMPDIR)
 SUBDIRS_TO_SKIP = [
     'data',
     'import_error_package',
-    'test_discovery_sample',
-    'test_discovery_sample2',
+    'test_runner_apps',
 ]
 
 ALWAYS_INSTALLED_APPS = [
