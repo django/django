@@ -22,6 +22,7 @@ For definitions of the different versions of RSS, see:
 http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 import datetime
+import email
 from io import StringIO
 from urllib.parse import urlparse
 
@@ -32,24 +33,9 @@ from django.utils.xmlutils import SimplerXMLGenerator
 
 
 def rfc2822_date(date):
-    # We can't use strftime() because it produces locale-dependent results, so
-    # we have to map english month and day names manually
-    months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',)
-    days = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
-    # Support datetime objects older than 1900
-    date = datetime_safe.new_datetime(date)
-    # Timezone aware formatting. email.utils.formatdate() isn't tz aware.
-    dow = days[date.weekday()]
-    month = months[date.month - 1]
-    time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
-    offset = date.utcoffset()
-    # Historically, this function assumes that naive datetimes are in UTC.
-    if offset is None:
-        return time_str + '-0000'
-    else:
-        timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
-        hour, minute = divmod(timezone, 60)
-        return time_str + '%+03d%02d' % (hour, minute)
+    if not isinstance(date, datetime.datetime):
+        date = datetime.datetime.combine(date, datetime.time())
+    return email.utils.format_datetime(date)
 
 
 def rfc3339_date(date):
