@@ -970,6 +970,8 @@ class MultiValueField(Field):
         for f in fields:
             f.error_messages.setdefault('incomplete',
                                         self.error_messages['incomplete'])
+            if self.disabled:
+                f.disabled = True
             if self.require_all_fields:
                 # Set 'required' to False on the individual fields, because the
                 # required validation will be handled by MultiValueField, not
@@ -996,6 +998,8 @@ class MultiValueField(Field):
         """
         clean_data = []
         errors = []
+        if self.disabled and not isinstance(value, list):
+            value = self.widget.decompress(value)
         if not value or isinstance(value, (list, tuple)):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
