@@ -971,10 +971,23 @@ subclass::
       limit the ``list_filter`` choices to the users who have written a book
       instead of listing all users.
 
+      You can filter empty values using ``EmptyFieldListFilter``, which can
+      filter on both empty strings and nulls, depending on what the field
+      allows to store::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('title', admin.EmptyFieldListFilter),
+              )
+
       .. note::
 
         The ``FieldListFilter`` API is considered internal and might be
         changed.
+
+      .. versionadded:: 3.1
+
+          The ``EmptyFieldListFilter`` class was added.
 
     List filter's typically appear only if the filter has more than one choice.
     A filter's ``has_output()`` method controls whether or not it appears.

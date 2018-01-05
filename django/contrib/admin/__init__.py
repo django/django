@@ -1,8 +1,8 @@
 from django.contrib.admin.decorators import register
 from django.contrib.admin.filters import (
     AllValuesFieldListFilter, BooleanFieldListFilter, ChoicesFieldListFilter,
-    DateFieldListFilter, FieldListFilter, ListFilter, RelatedFieldListFilter,
-    RelatedOnlyFieldListFilter, SimpleListFilter,
+    DateFieldListFilter, EmptyFieldListFilter, FieldListFilter, ListFilter,
+    RelatedFieldListFilter, RelatedOnlyFieldListFilter, SimpleListFilter,
 )
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, StackedInline, TabularInline,
@@ -15,7 +15,8 @@ __all__ = [
     "TabularInline", "AdminSite", "site", "ListFilter", "SimpleListFilter",
     "FieldListFilter", "BooleanFieldListFilter", "RelatedFieldListFilter",
     "ChoicesFieldListFilter", "DateFieldListFilter",
-    "AllValuesFieldListFilter", "RelatedOnlyFieldListFilter", "autodiscover",
+    "AllValuesFieldListFilter", "EmptyFieldListFilter",
+    "RelatedOnlyFieldListFilter", "autodiscover",
 ]
 
 
