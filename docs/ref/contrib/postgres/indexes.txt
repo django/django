@@ -10,12 +10,21 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BrinIndex``
 =============
 
-.. class:: BrinIndex(pages_per_range=None, **options)
+.. class:: BrinIndex(autosummarize=None, pages_per_range=None, **options)
 
     Creates a `BRIN index
     <https://www.postgresql.org/docs/current/static/brin-intro.html>`_.
 
+    Set the ``autosummarize`` parameter to ``True`` to enable `automatic
+    summarization`_ to be performed by autovacuum.
+
     The ``pages_per_range`` argument takes a positive integer.
+
+    .. _automatic summarization: https://www.postgresql.org/docs/current/static/brin-intro.html#BRIN-OPERATION
+
+    .. versionchanged:: 2.2
+
+        The ``autosummarize`` parameter was added.
 
 ``GinIndex``
 ============

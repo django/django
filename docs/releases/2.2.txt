@@ -86,6 +86,9 @@ Minor features
   :class:`~django.contrib.postgres.indexes.SpGistIndex` classes allow
   creating ``hash`` and ``SP-GiST`` indexes in the database.
 
+* :class:`~django.contrib.postgres.indexes.BrinIndex` now has the
+  ``autosummarize`` parameter.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

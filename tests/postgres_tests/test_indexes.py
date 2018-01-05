@@ -31,11 +31,16 @@ class BrinIndexTests(IndexTestMixin, PostgreSQLTestCase):
         self.assertEqual(BrinIndex.suffix, 'brin')
 
     def test_deconstruction(self):
-        index = BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=16)
+        index = BrinIndex(fields=['title'], name='test_title_brin', autosummarize=True, pages_per_range=16)
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.contrib.postgres.indexes.BrinIndex')
         self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_brin', 'pages_per_range': 16})
+        self.assertEqual(kwargs, {
+            'fields': ['title'],
+            'name': 'test_title_brin',
+            'autosummarize': True,
+            'pages_per_range': 16,
+        })
 
     def test_invalid_pages_per_range(self):
         with self.assertRaisesMessage(ValueError, 'pages_per_range must be None or a positive integer'):
@@ -172,6 +177,19 @@ class SchemaTests(PostgreSQLTestCase):
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
         self.assertEqual(constraints[index_name]['type'], BrinIndex.suffix)
         self.assertEqual(constraints[index_name]['options'], ['pages_per_range=4'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(CharFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    @skipUnlessDBFeature('has_brin_index_support', 'has_brin_autosummarize')
+    def test_brin_parameters(self):
+        index_name = 'char_field_brin_params'
+        index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
+        with connection.schema_editor() as editor:
+            editor.add_index(CharFieldModel, index)
+        constraints = self.get_constraints(CharFieldModel._meta.db_table)
+        self.assertEqual(constraints[index_name]['type'], BrinIndex.suffix)
+        self.assertEqual(constraints[index_name]['options'], ['autosummarize=on'])
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
