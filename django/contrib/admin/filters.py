@@ -420,3 +420,43 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     def field_choices(self, field, request, model_admin):
         pk_qs = model_admin.get_queryset(request).distinct().values_list('%s__pk' % self.field_path, flat=True)
         return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs})
+
+
+class BlankFieldListFilter(FieldListFilter):
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        self.lookup_kwarg = '%s__blank' % field_path
+        self.lookup_val = request.GET.get(self.lookup_kwarg)
+        super().__init__(field, request, params, model, model_admin, field_path)
+
+    def queryset(self, request, queryset):
+        if self.lookup_kwarg not in self.used_parameters:
+            return queryset
+
+        kwargs = {self.field_path: ''}
+        blank = self.used_parameters.get(self.lookup_kwarg)
+        if blank == '1':
+            return queryset.filter(**kwargs)
+        elif blank == '0':
+            return queryset.exclude(**kwargs)
+        else:
+            raise IncorrectLookupParameters(
+                "Invalid 'blank' filter value: %r" % blank)
+
+    def expected_parameters(self):
+        return [self.lookup_kwarg]
+
+    def choices(self, changelist):
+        for lookup, title in (
+                (None, _('All')),
+                ('1', _('Blank')),
+                ('0', _('Not blank'))):
+            yield {
+                'selected':
+                    self.lookup_val == lookup,
+                'query_string':
+                    changelist.get_query_string({
+                        self.lookup_kwarg: lookup,
+                    }),
+                'display':
+                    title,
+            }

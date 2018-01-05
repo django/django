@@ -48,10 +48,13 @@ class Department(models.Model):
 
 class Employee(models.Model):
     department = models.ForeignKey(Department, models.CASCADE, to_field="code")
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return self.name
+        else:
+            return "Anonymous %d" % self.id
 
 
 class TaggedItem(models.Model):
