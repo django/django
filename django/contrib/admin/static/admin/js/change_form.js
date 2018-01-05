@@ -12,6 +12,10 @@
                 showAddAnotherPopup(this);
             }
         });
+        // prevent double submission by disabling submit buttons
+        $('form').submit(function() {
+            $(this).find(':submit').attr('disabled', 'disabled');
+        });
 
         if (modelName) {
             $('form#' + modelName + '_form :input:visible:enabled:first').focus();
