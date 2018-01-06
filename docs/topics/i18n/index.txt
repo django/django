@@ -48,7 +48,7 @@ here's a simplified definition:
 
 More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikipedia article`_ or the `GNU gettext documentation`_.
 
-.. _W3C Web Internationalization FAQ: http://www.w3.org/International/questions/qa-i18n
+.. _W3C Web Internationalization FAQ: https://www.w3.org/International/questions/qa-i18n
 .. _GNU gettext documentation: https://www.gnu.org/software/gettext/manual/gettext.html#Concepts
 .. _Wikipedia article: https://en.wikipedia.org/wiki/Internationalization_and_localization
 

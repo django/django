@@ -12,7 +12,7 @@ There's no ``.php`` or ``.cgi`` required, and certainly none of that
 See `Cool URIs don't change`_, by World Wide Web creator Tim Berners-Lee, for
 excellent arguments on why URLs should be clean and usable.
 
-.. _Cool URIs don't change: http://www.w3.org/Provider/Style/URI
+.. _Cool URIs don't change: https://www.w3.org/Provider/Style/URI
 
 Overview
 ========
