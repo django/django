@@ -19,7 +19,7 @@ Or, you can write fixtures by hand; fixtures can be written as JSON, XML or YAML
 </topics/serialization>` has more details about each of these supported
 :ref:`serialization formats <serialization-formats>`.
 
-.. _PyYAML: http://www.pyyaml.org/
+.. _PyYAML: https://www.pyyaml.org/
 
 As an example, though, here's what a fixture for a simple ``Person`` model might
 look like in JSON:

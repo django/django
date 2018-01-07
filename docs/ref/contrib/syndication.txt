@@ -942,7 +942,7 @@ They share this interface:
 
     All parameters should be strings, except ``categories``, which should be a
     sequence of strings. Beware that some control characters
-    are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
+    are `not allowed <https://www.w3.org/International/questions/qa-controls>`_
     in XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
 

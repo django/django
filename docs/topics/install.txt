@@ -59,7 +59,7 @@ very well with `nginx`_. Additionally, Django follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
 .. _Apache: https://httpd.apache.org/
-.. _nginx: http://nginx.org/
+.. _nginx: https://nginx.org/
 .. _mod_wsgi: http://www.modwsgi.org/
 
 .. _database-installation:

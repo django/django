@@ -165,7 +165,7 @@ Keyword Argument       Description
                        representation -- the default value is 8.
 =====================  =====================================================
 
-__ http://www.w3.org/Graphics/SVG/
+__ https://www.w3.org/Graphics/SVG/
 
 ``Azimuth``
 ===========

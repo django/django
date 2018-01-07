@@ -161,7 +161,7 @@ Use the ``django.test.Client`` class to make requests.
             HTTP request from the browser to the server should be passed
             as ``HTTP_HOST``.
 
-            .. _CGI: http://www.w3.org/CGI/
+            .. _CGI: https://www.w3.org/CGI/
 
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,

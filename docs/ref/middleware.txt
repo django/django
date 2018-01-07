@@ -358,7 +358,7 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     Django can't seem to tell when a request actually is already secure, you
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _nginx: http://nginx.org
+.. _nginx: https://nginx.org
 
 Session middleware
 ------------------

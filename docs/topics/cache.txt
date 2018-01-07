@@ -68,7 +68,7 @@ to handle high loads at LiveJournal.com and subsequently open-sourced by
 Danga Interactive. It is used by sites such as Facebook and Wikipedia to
 reduce database access and dramatically increase site performance.
 
-__ http://memcached.org/
+__ https://memcached.org/
 
 Memcached runs as a daemon and is allotted a specified amount of RAM. All it
 does is provide a fast interface for adding, retrieving and deleting data in
@@ -1248,7 +1248,7 @@ Here are some more examples:
 The full list of known directives can be found in the `IANA registry`_
 (note that not all of them apply to responses).
 
-.. _IANA registry: http://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
+.. _IANA registry: https://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
 
 If you want to use headers to disable caching altogether,
 :func:`~django.views.decorators.cache.never_cache` is a view decorator that

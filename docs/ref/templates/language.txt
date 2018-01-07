@@ -28,7 +28,7 @@ or Jinja2_, you should feel right at home with Django's templates.
     </howto/custom-template-tags>` to the template language as needed).
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
-.. _Smarty: http://www.smarty.net/
+.. _Smarty: https://www.smarty.net/
 .. _Jinja2: http://jinja.pocoo.org/
 
 Templates

@@ -344,9 +344,9 @@ mentioned above. Feel free to override this method to use your own
 hashing algorithm.
 
 .. _`far future Expires headers`: https://developer.yahoo.com/performance/rules.html#expires
-.. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
-.. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
-.. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
+.. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
+.. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
+.. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 
 ``CachedStaticFilesStorage``
 ----------------------------
