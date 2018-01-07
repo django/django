@@ -745,7 +745,7 @@ you just created. Browse to any of the ``WorldBorder`` entries -- the borders
 may be edited by clicking on a polygon and dragging the vertexes to the desired
 position.
 
-.. _OpenLayers: http://openlayers.org/
+.. _OpenLayers: https://openlayers.org/
 .. _Open Street Map: https://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: http://www.osgeo.org

@@ -1686,7 +1686,7 @@ This is only needed for people who either want to extract message IDs or compile
 message files (``.po``). Translation work itself just involves editing existing
 files of this type, but if you want to create your own message files, or want to
 test or compile a changed message file, download `a precompiled binary
-installer <http://mlocati.github.io/gettext-iconv-windows/>`_.
+installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
