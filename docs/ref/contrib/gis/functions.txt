@@ -285,7 +285,8 @@ representing the bounding box of the geometry.
 
 .. versionadded:: 2.1
 
-*Availability*: `PostGIS <https://postgis.net/docs/ST_ForcePolygonCW.html>`__
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ForcePolygonCW.html>`__,
+SpatiaLite
 
 Accepts a single geographic field or expression and returns a modified version
 of the polygon/multipolygon in which all exterior rings are oriented clockwise
