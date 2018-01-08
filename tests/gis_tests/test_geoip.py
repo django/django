@@ -145,7 +145,7 @@ class GeoIPTest(unittest.TestCase):
         fqdn = "messe-duesseldorf.com"
         if self._is_dns_available(fqdn):
             d = g.city(fqdn)
-            self.assertEqual('Düsseldorf', d['city'])
+            self.assertEqual('Essen', d['city'])
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
