@@ -27,6 +27,15 @@ class Command(BaseCommand):
         self.UserModel = get_user_model()
         self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
 
+    def check_username_uniqueness(self, username, database):
+        try:
+            self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
+        except self.UserModel.DoesNotExist:
+            pass
+        else:
+            return False
+        return True
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--%s' % self.UserModel.USERNAME_FIELD,
@@ -76,6 +85,8 @@ class Command(BaseCommand):
                 if not username:
                     raise CommandError("You must use --%s with --noinput." % self.UserModel.USERNAME_FIELD)
                 username = self.username_field.clean(username, None)
+                if self.username_field.unique and not self.check_username_uniqueness(username, database):
+                    raise CommandError("Error: That %s is already taken." % capfirst(verbose_field_name))
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     if options[field_name]:
@@ -112,17 +123,15 @@ class Command(BaseCommand):
                     username = self.get_input_data(self.username_field, input_msg, default_username)
                     if not username:
                         continue
-                    if self.username_field.unique:
-                        try:
-                            self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
-                        except self.UserModel.DoesNotExist:
-                            pass
-                        else:
-                            self.stderr.write("Error: That %s is already taken." % verbose_field_name)
-                            username = None
+                    if self.username_field.unique and not self.check_username_uniqueness(username, database):
+                        self.stderr.write("Error: That %s is already taken." % verbose_field_name)
+                        username = None
 
                 if not username:
                     raise CommandError('%s cannot be blank.' % capfirst(verbose_field_name))
+
+                if self.username_field.unique and not self.check_username_uniqueness(username, database):
+                    raise CommandError("Error: That %s is already taken." % capfirst(verbose_field_name))
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
