@@ -1,21 +1,13 @@
-import time
-from datetime import datetime, timedelta
-from http import cookies
 from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
-from django.http import (
-    HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
-)
+from django.http import HttpRequest, RawPostDataException, UnreadablePostError
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
-from django.test.utils import freeze_time
-from django.utils.http import http_date
-from django.utils.timezone import utc
 
 
 class RequestsTests(SimpleTestCase):
@@ -200,80 +192,6 @@ class RequestsTests(SimpleTestCase):
             request.build_absolute_uri(location="/path/with:colons"),
             'http://www.example.com/path/with:colons'
         )
-
-    def test_near_expiration(self):
-        "Cookie will expire when an near expiration time is provided"
-        response = HttpResponse()
-        # There is a timing weakness in this test; The
-        # expected result for max-age requires that there be
-        # a very slight difference between the evaluated expiration
-        # time, and the time evaluated in set_cookie(). If this
-        # difference doesn't exist, the cookie time will be
-        # 1 second larger. To avoid the problem, put in a quick sleep,
-        # which guarantees that there will be a time difference.
-        expires = datetime.utcnow() + timedelta(seconds=10)
-        time.sleep(0.001)
-        response.set_cookie('datetime', expires=expires)
-        datetime_cookie = response.cookies['datetime']
-        self.assertEqual(datetime_cookie['max-age'], 10)
-
-    def test_aware_expiration(self):
-        "Cookie accepts an aware datetime as expiration time"
-        response = HttpResponse()
-        expires = (datetime.utcnow() + timedelta(seconds=10)).replace(tzinfo=utc)
-        time.sleep(0.001)
-        response.set_cookie('datetime', expires=expires)
-        datetime_cookie = response.cookies['datetime']
-        self.assertEqual(datetime_cookie['max-age'], 10)
-
-    def test_create_cookie_after_deleting_cookie(self):
-        """
-        Setting a cookie after deletion should clear the expiry date.
-        """
-        response = HttpResponse()
-        response.set_cookie('c', 'old-value')
-        self.assertEqual(response.cookies['c']['expires'], '')
-        response.delete_cookie('c')
-        self.assertEqual(response.cookies['c']['expires'], 'Thu, 01 Jan 1970 00:00:00 GMT')
-        response.set_cookie('c', 'new-value')
-        self.assertEqual(response.cookies['c']['expires'], '')
-
-    def test_far_expiration(self):
-        "Cookie will expire when a distant expiration time is provided"
-        response = HttpResponse()
-        response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
-        datetime_cookie = response.cookies['datetime']
-        self.assertIn(
-            datetime_cookie['expires'],
-            # assertIn accounts for slight time dependency (#23450)
-            ('Sat, 01 Jan 2028 04:05:06 GMT', 'Sat, 01 Jan 2028 04:05:07 GMT')
-        )
-
-    def test_max_age_expiration(self):
-        "Cookie will expire if max_age is provided"
-        response = HttpResponse()
-        set_cookie_time = time.time()
-        with freeze_time(set_cookie_time):
-            response.set_cookie('max_age', max_age=10)
-        max_age_cookie = response.cookies['max_age']
-        self.assertEqual(max_age_cookie['max-age'], 10)
-        self.assertEqual(max_age_cookie['expires'], http_date(set_cookie_time + 10))
-
-    def test_httponly_cookie(self):
-        response = HttpResponse()
-        response.set_cookie('example', httponly=True)
-        example_cookie = response.cookies['example']
-        # A compat cookie may be in use -- check that it has worked
-        # both as an output string, and using the cookie attributes
-        self.assertIn('; %s' % cookies.Morsel._reserved['httponly'], str(example_cookie))
-        self.assertTrue(example_cookie['httponly'])
-
-    def test_unicode_cookie(self):
-        "Verify HttpResponse.set_cookie() works with unicode data."
-        response = HttpResponse()
-        cookie_value = '清風'
-        response.set_cookie('test', cookie_value)
-        self.assertEqual(cookie_value, response.cookies['test'].value)
 
     def test_limited_stream(self):
         # Read all of a limited stream
