@@ -52,17 +52,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = True
 
     @cached_property
-    def has_select_for_update_skip_locked(self):
+    def is_postgresql_9_5(self):
         return self.connection.pg_version >= 90500
 
-    @cached_property
-    def has_brin_index_support(self):
-        return self.connection.pg_version >= 90500
-
-    @cached_property
-    def has_jsonb_agg(self):
-        return self.connection.pg_version >= 90500
-
-    @cached_property
-    def has_gin_pending_list_limit(self):
-        return self.connection.pg_version >= 90500
+    has_select_for_update_skip_locked = is_postgresql_9_5
+    has_brin_index_support = is_postgresql_9_5
+    has_jsonb_agg = is_postgresql_9_5
+    has_gin_pending_list_limit = is_postgresql_9_5
