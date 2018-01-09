@@ -26,7 +26,7 @@ class PostgresConfig(AppConfig):
                 })
                 if conn.connection is not None:
                     register_type_handlers(conn)
-        connection_created.connect(register_type_handlers)
+        connection_created.connect(register_type_handlers, weak=False)
         CharField.register_lookup(Unaccent)
         TextField.register_lookup(Unaccent)
         CharField.register_lookup(SearchLookup)
