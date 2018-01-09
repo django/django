@@ -1,7 +1,6 @@
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
 import copy
-import datetime
 import io
 import os
 import pickle
@@ -1856,10 +1855,7 @@ class CacheI18nTest(TestCase):
     @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
     def test_cache_key_i18n_timezone(self):
         request = self.factory.get(self.path)
-        # This is tightly coupled to the implementation,
-        # but it's the most straightforward way to test the key.
         tz = timezone.get_current_timezone_name()
-        tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertIn(tz, key, "Cache keys should include the time zone name when time zones are active")
@@ -1871,23 +1867,10 @@ class CacheI18nTest(TestCase):
         request = self.factory.get(self.path)
         lang = translation.get_language()
         tz = timezone.get_current_timezone_name()
-        tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
         self.assertNotIn(lang, key, "Cache keys shouldn't include the language name when i18n isn't active")
         self.assertNotIn(tz, key, "Cache keys shouldn't include the time zone name when i18n isn't active")
-
-    @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
-    def test_cache_key_with_non_ascii_tzname(self):
-        # Timezone-dependent cache keys should use ASCII characters only
-        # (#17476).
-        request = self.factory.get(self.path)
-        response = HttpResponse()
-        with timezone.override(datetime.timezone(datetime.timedelta(), 'Hora estándar de Argentina')):
-            self.assertIn(
-                'Hora_estndar_de_Argentina', learn_cache_key(request, response),
-                "Cache keys should include the time zone name when time zones are active"
-            )
 
     @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX="test",
