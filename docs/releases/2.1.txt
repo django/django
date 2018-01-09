@@ -70,7 +70,9 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.GEOSGeometry.buffer_with_style` method is a version of
+  :meth:`~.GEOSGeometry.buffer` that allows customizing the style of the
+  buffer.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

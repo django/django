@@ -1,4 +1,5 @@
 import ctypes
+import itertools
 import json
 import pickle
 import random
@@ -650,21 +651,56 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(d1, a)
 
     def test_buffer(self):
-        "Testing buffer()."
-        for bg in self.geometries.buffer_geoms:
+        bg = self.geometries.buffer_geoms[0]
+        g = fromstr(bg.wkt)
+
+        # Can't use a floating-point for the number of quadsegs.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer(bg.width, quadsegs=1.1)
+
+        self._test_buffer(self.geometries.buffer_geoms, 'buffer')
+
+    def test_buffer_with_style(self):
+        bg = self.geometries.buffer_with_style_geoms[0]
+        g = fromstr(bg.wkt)
+
+        # Can't use a floating-point for the number of quadsegs.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer_with_style(bg.width, quadsegs=1.1)
+
+        # Can't use a floating-point for the end cap style.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer_with_style(bg.width, end_cap_style=1.2)
+        # Can't use a end cap style that is not in the enum.
+        with self.assertRaises(GEOSException):
+            g.buffer_with_style(bg.width, end_cap_style=55)
+
+        # Can't use a floating-point for the join style.
+        with self.assertRaises(ctypes.ArgumentError):
+            g.buffer_with_style(bg.width, join_style=1.3)
+        # Can't use a join style that is not in the enum.
+        with self.assertRaises(GEOSException):
+            g.buffer_with_style(bg.width, join_style=66)
+
+        self._test_buffer(
+            itertools.chain(self.geometries.buffer_geoms, self.geometries.buffer_with_style_geoms),
+            'buffer_with_style',
+        )
+
+    def _test_buffer(self, geometries, buffer_method_name):
+        for bg in geometries:
             g = fromstr(bg.wkt)
 
             # The buffer we expect
             exp_buf = fromstr(bg.buffer_wkt)
-            quadsegs = bg.quadsegs
-            width = bg.width
-
-            # Can't use a floating-point for the number of quadsegs.
-            with self.assertRaises(ctypes.ArgumentError):
-                g.buffer(width, float(quadsegs))
 
             # Constructing our buffer
-            buf = g.buffer(width, quadsegs)
+            buf_kwargs = {
+                kwarg_name: getattr(bg, kwarg_name)
+                for kwarg_name in ('width', 'quadsegs', 'end_cap_style', 'join_style', 'mitre_limit')
+                if hasattr(bg, kwarg_name)
+            }
+            buf = getattr(g, buffer_method_name)(**buf_kwargs)
             self.assertEqual(exp_buf.num_coords, buf.num_coords)
             self.assertEqual(len(exp_buf), len(buf))
 
