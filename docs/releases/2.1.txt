@@ -155,7 +155,8 @@ Internationalization
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`inspectdb --include-views` option allows creating models
+  for database views.
 
 Migrations
 ~~~~~~~~~~

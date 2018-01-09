@@ -22,6 +22,9 @@ class Command(BaseCommand):
             '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
         )
+        parser.add_argument(
+            '--include-views', action='store_true', help='Also output models for database views.',
+        )
 
     def handle(self, **options):
         try:
@@ -54,7 +57,11 @@ class Command(BaseCommand):
             yield "# Feel free to rename the models, but don't rename db_table values or field names."
             yield 'from %s import models' % self.db_module
             known_models = []
-            tables_to_introspect = options['table'] or connection.introspection.table_names(cursor)
+            table_info = connection.introspection.get_table_list(cursor)
+            tables_to_introspect = (
+                options['table'] or
+                sorted(info.name for info in table_info if options['include_views'] or info.type == 't')
+            )
 
             for table_name in tables_to_introspect:
                 if table_name_filter is not None and callable(table_name_filter):
@@ -160,7 +167,8 @@ class Command(BaseCommand):
                     if comment_notes:
                         field_desc += '  # ' + ' '.join(comment_notes)
                     yield '    %s' % field_desc
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name):
+                is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
+                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view):
                     yield meta_line
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
@@ -257,7 +265,7 @@ class Command(BaseCommand):
 
         return field_type, field_params, field_notes
 
-    def get_meta(self, table_name, constraints, column_to_field_name):
+    def get_meta(self, table_name, constraints, column_to_field_name, is_view):
         """
         Return a sequence comprising the lines of code necessary
         to construct the inner Meta class for the model corresponding
@@ -272,9 +280,10 @@ class Command(BaseCommand):
                     # so we build the string rather than interpolate the tuple
                     tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
                     unique_together.append(tup)
+        managed_comment = "  # Created from a view. Don't remove." if is_view else ""
         meta = ["",
                 "    class Meta:",
-                "        managed = False",
+                "        managed = False%s" % managed_comment,
                 "        db_table = '%s'" % table_name]
         if unique_together:
             tup = '(' + ', '.join(unique_together) + ',)'

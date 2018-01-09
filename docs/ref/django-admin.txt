@@ -350,8 +350,11 @@ Specifies the database to flush. Defaults to ``default``.
 
 Introspects the database tables in the database pointed-to by the
 :setting:`NAME` setting and outputs a Django model module (a ``models.py``
-file) to standard output. You may choose what tables to inspect by passing
-their names as arguments.
+file) to standard output.
+
+You may choose what tables or views to inspect by passing their names as
+arguments. If no arguments are provided, models are created for views only if
+the :option:`--include-views` option is used.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
@@ -404,6 +407,12 @@ it because ``True`` is its default value).
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
+
+.. django-admin-option:: --include-views
+
+.. versionadded:: 2.1
+
+If this option is provided, models are also created for database views.
 
 ``loaddata``
 ------------

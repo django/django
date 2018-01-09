@@ -151,7 +151,7 @@ class IntrospectionTests(TransactionTestCase):
         ]
         for statement in create_table_statements:
             with connection.cursor() as cursor:
-                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table)])
+                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table), 'table'])
                 relations = connection.introspection.get_relations(cursor, 'mocked_table')
             self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 

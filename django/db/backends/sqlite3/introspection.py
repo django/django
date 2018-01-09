@@ -96,13 +96,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         relations = {}
 
         # Schema for this table
-        cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
-        try:
-            results = cursor.fetchone()[0].strip()
-        except TypeError:
+        cursor.execute(
+            "SELECT sql, type FROM sqlite_master "
+            "WHERE tbl_name = %s AND type IN ('table', 'view')",
+            [table_name]
+        )
+        create_sql, table_type = cursor.fetchone()
+        if table_type == 'view':
             # It might be a view, then no results will be returned
             return relations
-        results = results[results.index('(') + 1:results.rindex(')')]
+        results = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
 
         # Walk through and look for references to other tables. SQLite doesn't
         # really have enforced references, but since it echoes out the SQL used
@@ -174,13 +177,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_primary_key_column(self, cursor, table_name):
         """Return the column name of the primary key for the given table."""
         # Don't use PRAGMA because that causes issues with some transactions
-        cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
+        cursor.execute(
+            "SELECT sql, type FROM sqlite_master "
+            "WHERE tbl_name = %s AND type IN ('table', 'view')",
+            [table_name]
+        )
         row = cursor.fetchone()
         if row is None:
             raise ValueError("Table %s does not exist" % table_name)
-        results = row[0].strip()
-        results = results[results.index('(') + 1:results.rindex(')')]
-        for field_desc in results.split(','):
+        create_sql, table_type = row
+        if table_type == 'view':
+            # Views don't have a primary key.
+            return None
+        fields_sql = create_sql[create_sql.index('(') + 1:create_sql.rindex(')')]
+        for field_desc in fields_sql.split(','):
             field_desc = field_desc.strip()
             m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?', field_desc)
             if m:
