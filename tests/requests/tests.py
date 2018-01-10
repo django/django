@@ -179,20 +179,6 @@ class RequestsTests(SimpleTestCase):
         # left percent-encoded in the path.
         self.assertEqual(request.path, "/caf%E9/")
 
-    def test_httprequest_location(self):
-        request = HttpRequest()
-        self.assertEqual(
-            request.build_absolute_uri(location="https://www.example.com/asdf"),
-            'https://www.example.com/asdf'
-        )
-
-        request.get_host = lambda: 'www.example.com'
-        request.path = ''
-        self.assertEqual(
-            request.build_absolute_uri(location="/path/with:colons"),
-            'http://www.example.com/path/with:colons'
-        )
-
     def test_limited_stream(self):
         # Read all of a limited stream
         stream = LimitedStream(BytesIO(b'test'), 2)
@@ -784,62 +770,36 @@ class HostValidationTests(SimpleTestCase):
         self.assertEqual(port, '8080')
 
 
-class BuildAbsoluteURITestCase(SimpleTestCase):
-    """
-    Regression tests for ticket #18314.
-    """
+class BuildAbsoluteURITests(SimpleTestCase):
+    factory = RequestFactory()
 
-    def setUp(self):
-        self.factory = RequestFactory()
+    def test_absolute_url(self):
+        request = HttpRequest()
+        url = 'https://www.example.com/asdf'
+        self.assertEqual(request.build_absolute_uri(location=url), url)
 
-    def test_build_absolute_uri_no_location(self):
-        """
-        ``request.build_absolute_uri()`` returns the proper value when
-        the ``location`` argument is not provided, and ``request.path``
-        begins with //.
-        """
-        # //// is needed to create a request with a path beginning with //
-        request = self.factory.get('////absolute-uri')
+    def test_host_retrieval(self):
+        request = HttpRequest()
+        request.get_host = lambda: 'www.example.com'
+        request.path = ''
         self.assertEqual(
-            request.build_absolute_uri(),
-            'http://testserver//absolute-uri'
+            request.build_absolute_uri(location='/path/with:colons'),
+            'http://www.example.com/path/with:colons'
         )
 
-    def test_build_absolute_uri_absolute_location(self):
-        """
-        ``request.build_absolute_uri()`` returns the proper value when
-        an absolute URL ``location`` argument is provided, and ``request.path``
-        begins with //.
-        """
-        # //// is needed to create a request with a path beginning with //
+    def test_request_path_begins_with_two_slashes(self):
+        # //// creates a request with a path beginning with //
         request = self.factory.get('////absolute-uri')
-        self.assertEqual(
-            request.build_absolute_uri(location='http://example.com/?foo=bar'),
-            'http://example.com/?foo=bar'
+        tests = (
+            # location isn't provided
+            (None, 'http://testserver//absolute-uri'),
+            # An absolute URL
+            ('http://example.com/?foo=bar', 'http://example.com/?foo=bar'),
+            # A schema-relative URL
+            ('//example.com/?foo=bar', 'http://example.com/?foo=bar'),
+            # A relative URL
+            ('/foo/bar/', 'http://testserver/foo/bar/'),
         )
-
-    def test_build_absolute_uri_schema_relative_location(self):
-        """
-        ``request.build_absolute_uri()`` returns the proper value when
-        a schema-relative URL ``location`` argument is provided, and
-        ``request.path`` begins with //.
-        """
-        # //// is needed to create a request with a path beginning with //
-        request = self.factory.get('////absolute-uri')
-        self.assertEqual(
-            request.build_absolute_uri(location='//example.com/?foo=bar'),
-            'http://example.com/?foo=bar'
-        )
-
-    def test_build_absolute_uri_relative_location(self):
-        """
-        ``request.build_absolute_uri()`` returns the proper value when
-        a relative URL ``location`` argument is provided, and ``request.path``
-        begins with //.
-        """
-        # //// is needed to create a request with a path beginning with //
-        request = self.factory.get('////absolute-uri')
-        self.assertEqual(
-            request.build_absolute_uri(location='/foo/bar/'),
-            'http://testserver/foo/bar/'
-        )
+        for location, expected_url in tests:
+            with self.subTest(location=location):
+                self.assertEqual(request.build_absolute_uri(location=location), expected_url)
