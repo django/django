@@ -797,8 +797,11 @@ class BuildAbsoluteURITests(SimpleTestCase):
             ('http://example.com/?foo=bar', 'http://example.com/?foo=bar'),
             # A schema-relative URL
             ('//example.com/?foo=bar', 'http://example.com/?foo=bar'),
-            # A relative URL
+            # Relative URLs
             ('/foo/bar/', 'http://testserver/foo/bar/'),
+            ('/foo/./bar/', 'http://testserver/foo/bar/'),
+            ('/foo/../bar/', 'http://testserver/bar/'),
+            ('///foo/bar/', 'http://testserver/foo/bar/'),
         )
         for location, expected_url in tests:
             with self.subTest(location=location):
