@@ -22,21 +22,9 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean('3.14'), decimal.Decimal("3.14"))
         self.assertEqual(f.clean(3.14), decimal.Decimal("3.14"))
         self.assertEqual(f.clean(decimal.Decimal('3.14')), decimal.Decimal("3.14"))
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('NaN')
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('Inf')
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('-Inf')
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('a')
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('łąść')
         self.assertEqual(f.clean('1.0 '), decimal.Decimal("1.0"))
         self.assertEqual(f.clean(' 1.0'), decimal.Decimal("1.0"))
         self.assertEqual(f.clean(' 1.0 '), decimal.Decimal("1.0"))
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('1.0a')
         with self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 4 digits in total.'"):
             f.clean('123.45')
         with self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 2 decimal places.'"):
@@ -54,12 +42,22 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f.clean('-000.123')
         with self.assertRaisesMessage(ValidationError, "'Ensure that there are no more than 4 digits in total.'"):
             f.clean('-000.12345')
-        with self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
-            f.clean('--0.12')
         self.assertEqual(f.max_digits, 4)
         self.assertEqual(f.decimal_places, 2)
         self.assertIsNone(f.max_value)
         self.assertIsNone(f.min_value)
+
+    def test_enter_a_number_error(self):
+        f = DecimalField(max_digits=4, decimal_places=2)
+        values = (
+            '-NaN', 'NaN', '+NaN',
+            '-Inf', 'Inf', '+Inf',
+            '-Infinity', 'Infinity', '+Infinity',
+            'a', 'łąść', '1.0a', '--0.12',
+        )
+        for value in values:
+            with self.subTest(value=value), self.assertRaisesMessage(ValidationError, "'Enter a number.'"):
+                f.clean(value)
 
     def test_decimalfield_2(self):
         f = DecimalField(max_digits=4, decimal_places=2, required=False)
