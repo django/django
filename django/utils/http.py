@@ -282,7 +282,7 @@ def is_same_domain(host, pattern):
     )
 
 
-def is_safe_url(url, allowed_hosts=None, require_https=False):
+def is_safe_url(url, allowed_hosts, require_https=False):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).

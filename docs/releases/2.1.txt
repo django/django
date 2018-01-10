@@ -245,6 +245,9 @@ Miscellaneous
   This change should be merely cosmetic except perhaps for antiquated browsers
   that don't parse the new format.
 
+* ``allowed_hosts`` is now a required argument of private API
+  ``django.utils.http.is_safe_url()``.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1
