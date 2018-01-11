@@ -908,8 +908,10 @@ loaders that come with Django:
     ``Template`` in memory. The cached ``Template`` instance is returned for
     subsequent requests to load the same template.
 
-    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
-    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+    This loader is automatically enabled if :setting:`OPTIONS['loaders']
+    <TEMPLATES-OPTIONS>` isn't specified and :setting:`OPTIONS['debug']
+    <TEMPLATES-OPTIONS>` is ``False`` (the latter option defaults to the value
+    of :setting:`DEBUG`).
 
     You can also enable template caching with some custom template loaders
     using settings like this::

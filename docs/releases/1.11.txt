@@ -698,8 +698,9 @@ Miscellaneous
   1.0) is removed.
 
 * The :class:`cached template loader <django.template.loaders.cached.Loader>`
-  is now enabled if :setting:`DEBUG` is ``False`` and
-  :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. This could
+  is now enabled if :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't
+  specified and :setting:`OPTIONS['debug'] <TEMPLATES-OPTIONS>` is ``False``
+  (the latter option defaults to the value of :setting:`DEBUG`). This could
   be backwards-incompatible if you have some :ref:`template tags that aren't
   thread safe <template_tag_thread_safety>`.
 
