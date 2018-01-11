@@ -351,7 +351,7 @@ class DecimalField(IntegerField):
         super().validate(value)
         if value in self.empty_values:
             return
-        if not math.isfinite(value):
+        if value.is_nan() or not math.isfinite(value):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
 
     def widget_attrs(self, widget):

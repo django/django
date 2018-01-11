@@ -51,6 +51,7 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = DecimalField(max_digits=4, decimal_places=2)
         values = (
             '-NaN', 'NaN', '+NaN',
+            '-sNaN', 'sNaN', '+sNaN',
             '-Inf', 'Inf', '+Inf',
             '-Infinity', 'Infinity', '+Infinity',
             'a', 'łąść', '1.0a', '--0.12',
