@@ -118,14 +118,15 @@ class BaseModelBackendTest:
 
         self.assertIs(user.has_perm('auth.test'), True)
         self.assertIs(user.has_perm('auth.test', 'object'), False)
-        self.assertIs(user.has_perm('auth.test', 'object', True), True) # override
+        self.assertIs(user.has_perm('auth.test', 'object', True), True)  # override
 
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
         self.assertEqual(user.get_all_permissions('object'), set())
-        self.assertEqual(user.get_all_permissions('object', True), {'auth.test'}) # override
+        self.assertEqual(user.get_all_permissions('object', True), {'auth.test'})  # override
 
     @override_settings(OBJECT_PERMISSION_FALLBACK_TO_MODEL=True)
     def test_has_no_object_perm_with_fallback(self):
+        """Regressiontest for #20218"""
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
@@ -134,12 +135,11 @@ class BaseModelBackendTest:
         # test with obj permissions fallback to model
         self.assertIs(user.has_perm('auth.test'), True)
         self.assertIs(user.has_perm('auth.test', 'object'), True)
-        self.assertIs(user.has_perm('auth.test', 'object', False), False) # override
+        self.assertIs(user.has_perm('auth.test', 'object', False), False)  # override
 
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
         self.assertEqual(user.get_all_permissions('object'), {'auth.test'})
-        self.assertEqual(user.get_all_permissions('object', False), set()) # override
-
+        self.assertEqual(user.get_all_permissions('object', False), set())  # override
 
     def test_anonymous_has_no_permissions(self):
         """

@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.conf import settings
 
 UserModel = get_user_model()
 
@@ -47,7 +47,7 @@ class ModelBackend:
         """
         fallback_to_model = self._get_fallback_setting(fallback_to_model)
         if not user_obj.is_active or user_obj.is_anonymous \
-                or obj is not None and fallback_to_model == False:
+                or obj is not None and fallback_to_model is False:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
@@ -82,7 +82,7 @@ class ModelBackend:
     def get_all_permissions(self, user_obj, obj=None, fallback_to_model=None):
         fallback_to_model = self._get_fallback_setting(fallback_to_model)
         if not user_obj.is_active or user_obj.is_anonymous \
-                or obj is not None and fallback_to_model == False:
+                or obj is not None and fallback_to_model is False:
             return set()
 
         if not hasattr(user_obj, '_perm_cache'):
@@ -94,7 +94,7 @@ class ModelBackend:
 
     def has_perm(self, user_obj, perm, obj=None, fallback_to_model=None):
         return user_obj.is_active \
-               and perm in self.get_all_permissions(user_obj, obj, fallback_to_model)
+            and perm in self.get_all_permissions(user_obj, obj, fallback_to_model)
 
     def has_module_perms(self, user_obj, app_label):
         """

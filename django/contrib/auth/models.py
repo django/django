@@ -6,8 +6,8 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
 
@@ -168,12 +168,12 @@ def _user_get_all_permissions(user, obj, fallback_to_model=None):
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
             try:
-                permissions.update(backend.get_all_permissions(user, obj,
-                                                           fallback_to_model))
+                permissions.update(backend.get_all_permissions(
+                    user, obj, fallback_to_model))
             except TypeError:
                 permissions.update(backend.get_all_permissions(user, obj))
                 raise RemovedInDjango30Warning(
-                        'Method required to admit a `fallback_to_model` kwarg')
+                    'Method required to admit a `fallback_to_model` kwarg')
 
     return permissions
 
@@ -264,7 +264,7 @@ class PermissionsMixin(models.Model):
                 except TypeError:
                     permissions.update(
                         backend.get_group_permissions(self, obj))
-                    raise RemovedInDjango30Warning (
+                    raise RemovedInDjango30Warning(
                         'Method required to admit a `fallback_to_model` kwarg')
         return permissions
 
@@ -291,8 +291,8 @@ class PermissionsMixin(models.Model):
         Return True if the user has each of the specified permissions. If
         object is passed, check if the user has all required perms for it.
         """
-        return all(self.has_perm(perm, obj, fallback_to_model) \
-                       for perm in perm_list)
+        return all(self.has_perm(perm, obj, fallback_to_model)
+                   for perm in perm_list)
 
     def has_module_perms(self, app_label):
         """
