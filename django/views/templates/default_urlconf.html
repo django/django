@@ -224,9 +224,8 @@
             color: #747755;
           }
           footer {
-            padding: 30px 0;
+            padding: 25px 0;
             position: fixed;
-            height: 30px;
             left: 50%;
             bottom: 0;
             width: 960px;
@@ -237,21 +236,10 @@
             border-top: 1px solid #efefef;
           }
           .option {
-            position: absolute;
-            width: 260px;
-            top: 25px;
-          }
-          .one {
-            left: 0px;
-          }
-          .two {
-            left: 50%;
-            margin-left: 5px;
-            -webkit-transform: translateX(-50%);
-            transform: translateX(-50%);
-          }
-          .three {
-            right: 0px;
+            float: left;
+            width: 33.33%;
+            box-sizing: border-box;
+            padding-right: 5px;
           }
           .option svg {
             width: 25px;
@@ -262,6 +250,9 @@
             border-radius: 100%;
             float: left;
             margin-right: 10px;
+          }
+          .option div {
+            display: table;
           }
           .option h4 {
             color: #19865C;
@@ -280,9 +271,6 @@
             .logo h2 {
               margin-left: 0px;
             }
-            .two {
-              margin-left: 5px;
-            }
           }
           @media (max-width: 800px) {
             footer, main {
@@ -297,6 +285,8 @@
               left: auto;
               right: auto;
               top: auto;
+              padding: 0 25px;
+              margin-bottom: 60px;
             }
             .two {
               margin-left: 0px;
@@ -326,11 +316,6 @@
               overflow: hidden;
               width: 100%;
               margin-top: 50px;
-            }
-            .option {
-              padding: 0 25px;
-              width: 100%;
-              margin-bottom: 60px;
             }
           }
           @media (min-width: 801px) and (max-height: 730px) {
@@ -394,8 +379,10 @@
                 </clipPath>
                 <path clip-path="url(#b)" d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"></path>
             </svg>
-            <h4>{% trans "Django Documentation" %}</h4>
-            <p>{% trans "Topics, references, &amp; how-to's" %}</p>
+            <div>
+                <h4>{% trans "Django Documentation" %}</h4>
+                <p>{% trans "Topics, references, &amp; how-to's" %}</p>
+            </div>
         </div>
       </a>
       <a href="https://docs.djangoproject.com/en/{{ version }}/intro/tutorial01/" target="_blank" rel="noopener">
@@ -404,8 +391,10 @@
             <path d="M0 0h24v24H0V0z" fill="none"></path>
             <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path>
           </svg>
-          <h4>{% trans "Tutorial: A Polling App" %}</h4>
-          <p>{% trans "Get started with Django" %}</p>
+          <div>
+            <h4>{% trans "Tutorial: A Polling App" %}</h4>
+            <p>{% trans "Get started with Django" %}</p>
+          </div>
         </div>
       </a>
       <a href="https://www.djangoproject.com/community/" target="_blank" rel="noopener">
@@ -414,8 +403,10 @@
             <path d="M0 0h24v24H0z" fill="none"></path>
             <path d="M16.5 13c-1.2 0-3.07.34-4.5 1-1.43-.67-3.3-1-4.5-1C5.33 13 1 14.08 1 16.25V19h22v-2.75c0-2.17-4.33-3.25-6.5-3.25zm-4 4.5h-10v-1.25c0-.54 2.56-1.75 5-1.75s5 1.21 5 1.75v1.25zm9 0H14v-1.25c0-.46-.2-.86-.52-1.22.88-.3 1.96-.53 3.02-.53 2.44 0 5 1.21 5 1.75v1.25zM7.5 12c1.93 0 3.5-1.57 3.5-3.5S9.43 5 7.5 5 4 6.57 4 8.5 5.57 12 7.5 12zm0-5.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 5.5c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5 13 6.57 13 8.5s1.57 3.5 3.5 3.5zm0-5.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"></path>
           </svg>
-          <h4>{% trans "Django Community" %}</h4>
-          <p>{% trans "Connect, get help, or contribute" %}</p>
+          <div>
+            <h4>{% trans "Django Community" %}</h4>
+            <p>{% trans "Connect, get help, or contribute" %}</p>
+          </div>
         </div>
       </a>
       </footer>

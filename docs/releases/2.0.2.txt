@@ -9,4 +9,5 @@ Django 2.0.2 fixes several bugs in 2.0.1.
 Bugfixes
 ========
 
-* ...
+* Fixed hidden content at the bottom of the "The install worked successfully!"
+  page for some languages (:ticket:`28885`).
