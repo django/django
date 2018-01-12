@@ -381,28 +381,6 @@ We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
 the Python import path to your :file:`mysite/settings.py` file.
 
-.. admonition:: Bypassing manage.py
-
-    If you'd rather not use :file:`manage.py`, no problem. Just set the
-    :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
-    ``mysite.settings``, start a plain Python shell, and set up Django:
-
-    .. code-block:: pycon
-
-        >>> import django
-        >>> django.setup()
-
-    If this raises an :exc:`AttributeError`, you're probably using
-    a version of Django that doesn't match this tutorial version. You'll want
-    to either switch to the older tutorial or the newer Django version.
-
-    You must run ``python`` from the same directory :file:`manage.py` is in,
-    or ensure that directory is on the Python path, so that ``import mysite``
-    works.
-
-    For more information on all of this, see the :doc:`django-admin
-    documentation </ref/django-admin>`.
-
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
     >>> from polls.models import Question, Choice   # Import the model classes we just wrote.
