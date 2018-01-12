@@ -570,12 +570,11 @@ class BaseDatabaseSchemaEditor:
             # db_index=True.
             index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
             for index_name in index_names:
-                if index_name in meta_index_names:
+                if index_name not in meta_index_names:
                     # The only way to check if an index was created with
                     # db_index=True or with Index(['field'], name='foo')
                     # is to look at its name (refs #28053).
-                    continue
-                self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)

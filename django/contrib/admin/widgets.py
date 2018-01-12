@@ -438,8 +438,7 @@ class AutocompleteMixin:
                 str(option_value) in value and
                 (has_selected is False or self.allow_multiple_selected)
             )
-            if selected is True and has_selected is False:
-                has_selected = True
+            has_selected |= selected
             index = len(default[1])
             subgroup = default[1]
             subgroup.append(self.create_option(name, option_value, option_label, selected_choices, index))

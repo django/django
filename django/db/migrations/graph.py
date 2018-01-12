@@ -367,9 +367,7 @@ class MigrationGraph:
         plan = []
         for node in nodes:
             for migration in self.forwards_plan(node):
-                if migration not in plan:
-                    if not at_end and migration in nodes:
-                        continue
+                if migration in plan or at_end or migration not in nodes:
                     plan.append(migration)
         project_state = ProjectState(real_apps=real_apps)
         for node in plan:

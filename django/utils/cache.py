@@ -376,9 +376,8 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         headerlist = []
         for header in cc_delim_re.split(response['Vary']):
             header = header.upper().replace('-', '_')
-            if header == 'ACCEPT_LANGUAGE' and is_accept_language_redundant:
-                continue
-            headerlist.append('HTTP_' + header)
+            if header != 'ACCEPT_LANGUAGE' or not is_accept_language_redundant:
+                headerlist.append('HTTP_' + header)
         headerlist.sort()
         cache.set(cache_key, headerlist, cache_timeout)
         return _generate_cache_key(request, request.method, headerlist, key_prefix)

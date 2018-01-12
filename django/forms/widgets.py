@@ -599,8 +599,7 @@ class ChoiceWidget(Widget):
                     str(subvalue) in value and
                     (not has_selected or self.allow_multiple_selected)
                 )
-                if selected and not has_selected:
-                    has_selected = True
+                has_selected |= selected
                 subgroup.append(self.create_option(
                     name, subvalue, sublabel, selected, index,
                     subindex=subindex, attrs=attrs,

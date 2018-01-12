@@ -109,11 +109,7 @@ class RelatedField(FieldCacheMixin, Field):
         related_name = self.remote_field.related_name
         if related_name is None:
             return []
-        is_valid_id = True
-        if keyword.iskeyword(related_name):
-            is_valid_id = False
-        if not related_name.isidentifier():
-            is_valid_id = False
+        is_valid_id = not keyword.iskeyword(related_name) and related_name.isidentifier()
         if not (is_valid_id or related_name.endswith('+')):
             return [
                 checks.Error(

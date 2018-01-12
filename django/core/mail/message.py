@@ -271,9 +271,8 @@ class EmailMessage:
             # Use cached DNS_NAME for performance
             msg['Message-ID'] = make_msgid(domain=DNS_NAME)
         for name, value in self.extra_headers.items():
-            if name.lower() == 'from':  # From is already handled
-                continue
-            msg[name] = value
+            if name.lower() != 'from':  # From is already handled
+                msg[name] = value
         return msg
 
     def recipients(self):

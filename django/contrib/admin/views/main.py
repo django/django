@@ -378,9 +378,8 @@ class ChangeList:
             else:
                 if isinstance(field.remote_field, models.ManyToOneRel):
                     # <FK>_id field names don't require a join.
-                    if field_name == field.get_attname():
-                        continue
-                    return True
+                    if field_name != field.get_attname():
+                        return True
         return False
 
     def url_for_result(self, result):

@@ -367,9 +367,8 @@ class InlineFieldset(Fieldset):
     def __iter__(self):
         fk = getattr(self.formset, "fk", None)
         for field in self.fields:
-            if fk and fk.name == field:
-                continue
-            yield Fieldline(self.form, field, self.readonly_fields, model_admin=self.model_admin)
+            if not fk or fk.name != field:
+                yield Fieldline(self.form, field, self.readonly_fields, model_admin=self.model_admin)
 
 
 class AdminErrorList(forms.utils.ErrorList):

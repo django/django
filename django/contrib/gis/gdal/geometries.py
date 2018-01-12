@@ -142,12 +142,9 @@ class OGRGeometry(GDALBase):
     def _from_json(geom_input):
         ptr = capi.from_json(geom_input)
         if GDAL_VERSION < (2, 0):
-            has_srs = True
             try:
                 capi.get_geom_srs(ptr)
             except SRSException:
-                has_srs = False
-            if not has_srs:
                 srs = SpatialReference(4326)
                 capi.assign_srs(ptr, srs.ptr)
         return ptr

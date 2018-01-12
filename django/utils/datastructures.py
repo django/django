@@ -275,11 +275,9 @@ class DictWrapper(dict):
         present). If the prefix is present, pass the value through self.func
         before returning, otherwise return the raw value.
         """
-        if key.startswith(self.prefix):
-            use_func = True
+        use_func = key.startswith(self.prefix)
+        if use_func:
             key = key[len(self.prefix):]
-        else:
-            use_func = False
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)

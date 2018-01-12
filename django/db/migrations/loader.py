@@ -172,10 +172,9 @@ class MigrationLoader:
         dependencies find the correct root node.
         """
         for parent in migration.dependencies:
-            if parent[0] != key[0] or parent[1] == '__first__':
-                # Ignore __first__ references to the same app (#22325).
-                continue
-            self.graph.add_dependency(migration, key, parent, skip_validation=True)
+            # Ignore __first__ references to the same app.
+            if parent[0] == key[0] and parent[1] != '__first__':
+                self.graph.add_dependency(migration, key, parent, skip_validation=True)
 
     def add_external_dependencies(self, key, migration):
         for parent in migration.dependencies:

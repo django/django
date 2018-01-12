@@ -261,8 +261,8 @@ class MigrationAutodetector:
                     deps_satisfied = True
                     operation_dependencies = set()
                     for dep in operation._auto_deps:
-                        is_swappable_dep = False
-                        if dep[0] == "__setting__":
+                        is_swappable_dep = dep[0] == '__setting__'
+                        if is_swappable_dep:
                             # We need to temporarily resolve the swappable dependency to prevent
                             # circular references. While keeping the dependency checks on the
                             # resolved model we still add the swappable dependencies.
@@ -270,7 +270,6 @@ class MigrationAutodetector:
                             resolved_app_label, resolved_object_name = getattr(settings, dep[1]).split('.')
                             original_dep = dep
                             dep = (resolved_app_label, resolved_object_name.lower(), dep[2], dep[3])
-                            is_swappable_dep = True
                         if dep[0] != app_label and dep[0] != "__setting__":
                             # External app dependency. See if it's not yet
                             # satisfied.
@@ -831,18 +830,18 @@ class MigrationAutodetector:
             dependencies.extend(self._get_dependencies_for_foreign_key(field))
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
-        preserve_default = True
         time_fields = (models.DateField, models.DateTimeField, models.TimeField)
-        if (not field.null and not field.has_default() and
-                not field.many_to_many and
-                not (field.blank and field.empty_strings_allowed) and
-                not (isinstance(field, time_fields) and field.auto_now)):
+        preserve_default = (
+            field.null or field.has_default() or field.many_to_many or
+            (field.blank and field.empty_strings_allowed) or
+            (isinstance(field, time_fields) and field.auto_now)
+        )
+        if not preserve_default:
             field = field.clone()
             if isinstance(field, time_fields) and field.auto_now_add:
                 field.default = self.questioner.ask_auto_now_add_addition(field_name, model_name)
             else:
                 field.default = self.questioner.ask_not_null_addition(field_name, model_name)
-            preserve_default = False
         self.add_operation(
             app_label,
             operations.AddField(

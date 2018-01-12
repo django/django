@@ -128,10 +128,9 @@ def result_headers(cl):
         order_type = ''
         new_order_type = 'asc'
         sort_priority = 0
-        sorted = False
         # Is it currently being sorted on?
-        if i in ordering_field_columns:
-            sorted = True
+        is_sorted = i in ordering_field_columns
+        if is_sorted:
             order_type = ordering_field_columns.get(i).lower()
             sort_priority = list(ordering_field_columns).index(i) + 1
             th_classes.append('sorted %sending' % order_type)
@@ -165,7 +164,7 @@ def result_headers(cl):
         yield {
             "text": text,
             "sortable": True,
-            "sorted": sorted,
+            "sorted": is_sorted,
             "ascending": order_type == "asc",
             "sort_priority": sort_priority,
             "url_primary": cl.get_query_string({ORDER_VAR: '.'.join(o_list_primary)}),

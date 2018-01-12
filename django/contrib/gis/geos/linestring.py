@@ -49,7 +49,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                 )
             )
 
-        if isinstance(coords, (tuple, list)):
+        numpy_coords = not isinstance(coords, (tuple, list))
+        if numpy_coords:
+            shape = coords.shape  # Using numpy's shape.
+            if len(shape) != 2:
+                raise TypeError('Too many dimensions.')
+            self._checkdim(shape[1])
+            ndim = shape[1]
+        else:
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ndim = None
@@ -63,14 +70,6 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                     self._checkdim(ndim)
                 elif len(coord) != ndim:
                     raise TypeError('Dimension mismatch.')
-            numpy_coords = False
-        else:
-            shape = coords.shape  # Using numpy's shape.
-            if len(shape) != 2:
-                raise TypeError('Too many dimensions.')
-            self._checkdim(shape[1])
-            ndim = shape[1]
-            numpy_coords = True
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using its methods.

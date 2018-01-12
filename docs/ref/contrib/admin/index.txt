@@ -1694,9 +1694,8 @@ templates used by the :class:`ModelAdmin` views:
             def get_formsets_with_inlines(self, request, obj=None):
                 for inline in self.get_inline_instances(request, obj):
                     # hide MyInline in the add view
-                    if isinstance(inline, MyInline) and obj is None:
-                        continue
-                    yield inline.get_formset(request, obj), inline
+                    if not isinstance(inline, MyInline) or obj is not None:
+                        yield inline.get_formset(request, obj), inline
 
 .. method:: ModelAdmin.formfield_for_foreignkey(db_field, request, **kwargs)
 

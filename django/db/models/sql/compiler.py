@@ -114,13 +114,10 @@ class SQLCompiler:
             for col in cols:
                 expressions.append(col)
         for expr, (sql, params, is_ref) in order_by:
-            if expr.contains_aggregate:
-                continue
-            # We can skip References to select clause, as all expressions in
-            # the select clause are already part of the group by.
-            if is_ref:
-                continue
-            expressions.extend(expr.get_source_expressions())
+            # Skip References to the select clause, as all expressions in the
+            # select clause are already part of the group by.
+            if not expr.contains_aggregate and not is_ref:
+                expressions.extend(expr.get_source_expressions())
         having_group_by = self.having.get_group_by_cols() if self.having else ()
         for expr in having_group_by:
             expressions.append(expr)
@@ -283,7 +280,7 @@ class SQLCompiler:
                 continue
 
             col, order = get_order_dir(field, asc)
-            descending = True if order == 'DESC' else False
+            descending = order == 'DESC'
 
             if col in self.query.annotation_select:
                 # Reference to expression in SELECT clause
@@ -646,7 +643,7 @@ class SQLCompiler:
         The 'name' is of the form 'field1__field2__...__fieldN'.
         """
         name, order = get_order_dir(name, default_order)
-        descending = True if order == 'DESC' else False
+        descending = order == 'DESC'
         pieces = name.split(LOOKUP_SEP)
         field, targets, alias, joins, path, opts = self._setup_joins(pieces, opts, alias)
 
@@ -747,11 +744,9 @@ class SQLCompiler:
         # included in the related selection.
         fields_found = set()
         if requested is None:
-            if isinstance(self.query.select_related, dict):
+            restricted = isinstance(self.query.select_related, dict)
+            if restricted:
                 requested = self.query.select_related
-                restricted = True
-            else:
-                restricted = False
 
         def get_related_klass_infos(klass_info, related_klass_infos):
             klass_info['related_klass_infos'] = related_klass_infos
