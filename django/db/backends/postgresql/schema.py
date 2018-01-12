@@ -54,6 +54,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
         return None
 
+    def _create_like_index_name(self, model, field):
+        return self._create_index_name(model._meta.db_table, [field.column], suffix='_like')
+
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
         """Make ALTER TYPE with SERIAL make sense."""
         table = model._meta.db_table
@@ -114,8 +117,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             (old_type.startswith('text') and not new_type.startswith('text')) or
             (old_type.startswith('citext') and not new_type.startswith('citext'))
         ):
-            index_name = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
-            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+            index_name = self._create_like_index_name(model, old_field)
+            removed_deferred_statements = self._remove_deferred_index_creation(model, new_field, index_name=index_name)
+            if not removed_deferred_statements:
+                self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
 
         super()._alter_field(
             model, old_field, new_field, old_type, new_type, old_db_params,
@@ -124,11 +129,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Added an index? Create any PostgreSQL-specific indexes.
         if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
                 (not old_field.unique and new_field.unique)):
+            index_name = self._create_like_index_name(model, old_field)
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
+                self._remove_deferred_index_creation(model, new_field, index_name=index_name)
                 self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
         if old_field.unique and not (new_field.db_index or new_field.unique):
-            index_to_remove = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
-            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_to_remove))
+            index_name = self._create_like_index_name(model, old_field)
+            removed_deferred_statements = self._remove_deferred_index_creation(model, new_field, index_name=index_name)
+            if not removed_deferred_statements:
+                self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
