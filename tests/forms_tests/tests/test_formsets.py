@@ -6,7 +6,7 @@ from django.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
     SplitDateTimeField, ValidationError, formsets,
 )
-from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms.formsets import BaseFormSet, all_valid, formset_factory
 from django.forms.utils import ErrorList
 from django.test import SimpleTestCase
 
@@ -1320,3 +1320,43 @@ class TestEmptyFormSet(SimpleTestCase):
         class FileForm(Form):
             file = FileField()
         self.assertTrue(formset_factory(FileForm, extra=0)().is_multipart())
+
+
+class AllValidTests(SimpleTestCase):
+
+    def test_valid(self):
+        data = {
+            'choices-TOTAL_FORMS': '2',
+            'choices-INITIAL_FORMS': '0',
+            'choices-MIN_NUM_FORMS': '0',
+            'choices-0-choice': 'Zero',
+            'choices-0-votes': '0',
+            'choices-1-choice': 'One',
+            'choices-1-votes': '1',
+        }
+        ChoiceFormSet = formset_factory(Choice)
+        formset1 = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        formset2 = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertIs(all_valid((formset1, formset2)), True)
+        expected_errors = [{}, {}]
+        self.assertEqual(formset1._errors, expected_errors)
+        self.assertEqual(formset2._errors, expected_errors)
+
+    def test_invalid(self):
+        """all_valid() validates all forms, even when some are invalid."""
+        data = {
+            'choices-TOTAL_FORMS': '2',
+            'choices-INITIAL_FORMS': '0',
+            'choices-MIN_NUM_FORMS': '0',
+            'choices-0-choice': 'Zero',
+            'choices-0-votes': '',
+            'choices-1-choice': 'One',
+            'choices-1-votes': '',
+        }
+        ChoiceFormSet = formset_factory(Choice)
+        formset1 = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        formset2 = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertIs(all_valid((formset1, formset2)), False)
+        expected_errors = [{'votes': ['This field is required.']}, {'votes': ['This field is required.']}]
+        self.assertEqual(formset1._errors, expected_errors)
+        self.assertEqual(formset2._errors, expected_errors)
