@@ -685,6 +685,28 @@ that deal with time-parts can be used with ``TimeField``::
 Text functions
 ==============
 
+``Chr``
+-------
+
+.. class:: Chr(expression, **extra)
+
+.. versionadded:: 2.1
+
+Accepts a numeric field or expression and returns the text representation of
+the expression as a single character. It works the same as Python's :func:`chr`
+function.
+
+Like :class:`Length`, it can be registered as a transform on ``IntegerField``.
+The default lookup name is ``chr``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Chr
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.filter(name__startswith=Chr(ord('M'))).get()
+    >>> print(author.name)
+    Margaret Smith
+
 ``Concat``
 ----------
 
@@ -715,6 +737,23 @@ Usage example::
     ... ).get()
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
+
+``Left``
+--------
+
+.. class:: Left(expression, length, **extra)
+
+.. versionadded:: 2.1
+
+Returns the first ``length`` characters of the given text field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Left
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(first_initial=Left('name', 1)).get()
+    >>> print(author.first_initial)
+    M
 
 ``Length``
 ----------
@@ -761,6 +800,29 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
+``Ord``
+-------
+
+.. class:: Ord(expression, **extra)
+
+.. versionadded:: 2.1
+
+Accepts a single text field or expression and returns the Unicode code point
+value for the first character of that expression. It works similar to Python's
+:func:`ord` function, but an exception isn't raised if the expression is more
+than one character long.
+
+It can also be registered as a transform as described in :class:`Length`.
+The default lookup name is ``ord``.
+
+Usage example::
+
+    >>> from django.db.models.functions import Ord
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(name_code_point=Ord('name')).get()
+    >>> print(author.name_code_point)
+    77
+
 ``Replace``
 -----------
 
@@ -782,6 +844,23 @@ Usage example::
     2
     >>> Author.objects.values('name')
     <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>
+
+``Right``
+---------
+
+.. class:: Right(expression, length, **extra)
+
+.. versionadded:: 2.1
+
+Returns the last ``length`` characters of the given text field or expression.
+
+Usage example::
+
+    >>> from django.db.models.functions import Right
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> author = Author.objects.annotate(last_letter=Right('name', 1)).get()
+    >>> print(author.last_letter)
+    h
 
 ``StrIndex``
 ------------
