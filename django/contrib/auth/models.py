@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .validators import UnicodeUsernameValidator
 
@@ -166,7 +167,14 @@ def _user_get_all_permissions(user, obj, fallback_to_model=None):
     permissions = set()
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
-            permissions.update(backend.get_all_permissions(user, obj, fallback_to_model))
+            try:
+                permissions.update(backend.get_all_permissions(user, obj,
+                                                           fallback_to_model))
+            except TypeError:
+                permissions.update(backend.get_all_permissions(user, obj))
+                raise RemovedInDjango30Warning(
+                        'Method required to admit a `fallback_to_model` kwarg')
+
     return permissions
 
 
@@ -180,6 +188,11 @@ def _user_has_perm(user, perm, obj, fallback_to_model=None):
         try:
             if backend.has_perm(user, perm, obj, fallback_to_model):
                 return True
+        except TypeError:
+            if backend.has_perm(user, perm, obj):
+                return True
+            raise RemovedInDjango30Warning(
+                'Method required to admit a `fallback_to_model` kwarg')
         except PermissionDenied:
             return False
     return False
@@ -245,8 +258,14 @@ class PermissionsMixin(models.Model):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                permissions.update(
-                    backend.get_group_permissions(self, obj, fallback_to_model))
+                try:
+                    permissions.update(
+                        backend.get_group_permissions(self, obj, fallback_to_model))
+                except TypeError:
+                    permissions.update(
+                        backend.get_group_permissions(self, obj))
+                    raise RemovedInDjango30Warning (
+                        'Method required to admit a `fallback_to_model` kwarg')
         return permissions
 
     def get_all_permissions(self, obj=None, fallback_to_model=None):

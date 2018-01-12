@@ -55,6 +55,8 @@ Minor features
   :class:`~django.contrib.auth.forms.UserChangeForm` no longer need to be
   rewritten for a custom user model.
 
+* :
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -262,6 +264,13 @@ Miscellaneous
 * ``django.utils.http.cookie_date()`` is deprecated in favor of
   :func:`~django.utils.http.http_date`, which follows the format of the latest
   RFC.
+
+* Support for the following authorization backend methods without a
+  ``fallback_to_model=None`` keyword argument is deprecated:
+
+    * ``ModelBackend.has_perm()``
+    * ``ModelBackend.get_group_permissions()``
+    * ``ModelBackend.get_all_permissions()``
 
 .. _removed-features-2.1:
 
