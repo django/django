@@ -108,6 +108,7 @@ class BaseModelBackendTest:
         self.assertIs(user.has_perm('test'), False)
         self.assertIs(user.has_perms(['auth.test2', 'auth.test3']), False)
 
+    # default settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL=False
     def test_has_no_object_perm(self):
         """Regressiontest for #12462"""
         user = self.UserModel._default_manager.get(pk=self.user.pk)
@@ -115,10 +116,30 @@ class BaseModelBackendTest:
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
 
-        self.assertIs(user.has_perm('auth.test', 'object'), False)
-        self.assertEqual(user.get_all_permissions('object'), set())
         self.assertIs(user.has_perm('auth.test'), True)
+        self.assertIs(user.has_perm('auth.test', 'object'), False)
+        self.assertIs(user.has_perm('auth.test', 'object', True), True) # override
+
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertEqual(user.get_all_permissions('object'), set())
+        self.assertEqual(user.get_all_permissions('object', True), {'auth.test'}) # override
+
+    @override_settings(OBJECT_PERMISSION_FALLBACK_TO_MODEL=True)
+    def test_has_no_object_perm_with_fallback(self):
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+        content_type = ContentType.objects.get_for_model(Group)
+        perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
+        user.user_permissions.add(perm)
+
+        # test with obj permissions fallback to model
+        self.assertIs(user.has_perm('auth.test'), True)
+        self.assertIs(user.has_perm('auth.test', 'object'), True)
+        self.assertIs(user.has_perm('auth.test', 'object', False), False) # override
+
+        self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertEqual(user.get_all_permissions('object'), {'auth.test'})
+        self.assertEqual(user.get_all_permissions('object', False), set()) # override
+
 
     def test_anonymous_has_no_permissions(self):
         """
@@ -325,7 +346,7 @@ class TestObj:
 
 
 class SimpleRowlevelBackend:
-    def has_perm(self, user, perm, obj=None):
+    def has_perm(self, user, perm, obj=None, fallback_to_model=None):
         if not obj:
             return  # We only support row level perms
 
@@ -341,7 +362,7 @@ class SimpleRowlevelBackend:
     def has_module_perms(self, user, app_label):
         return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
-    def get_all_permissions(self, user, obj=None):
+    def get_all_permissions(self, user, obj=None, fallback_to_model=None):
         if not obj:
             return []  # We only support row level perms
 
@@ -355,7 +376,7 @@ class SimpleRowlevelBackend:
         else:
             return ['simple']
 
-    def get_group_permissions(self, user, obj=None):
+    def get_group_permissions(self, user, obj=None, fallback_to_model=None):
         if not obj:
             return  # We only support row level perms
 
@@ -479,7 +500,7 @@ class PermissionDeniedBackend:
     def authenticate(self, request, username=None, password=None):
         raise PermissionDenied
 
-    def has_perm(self, user_obj, perm, obj=None):
+    def has_perm(self, user_obj, perm, obj=None, fallback_to_model=None):
         raise PermissionDenied
 
     def has_module_perms(self, user_obj, app_label):
