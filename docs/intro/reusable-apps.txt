@@ -238,8 +238,8 @@ this. For a small app like polls, this process isn't too difficult.
 
        include LICENSE
        include README.rst
-       recursive-include polls/static *
-       recursive-include polls/templates *
+       recursive-include static/polls *
+       recursive-include templates/polls *
 
 7. It's optional, but recommended, to include detailed documentation with your
    app. Create an empty directory ``django-polls/docs`` for future
