@@ -1,3 +1,5 @@
+import inspect
+
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.contenttypes.models import ContentType
@@ -167,10 +169,11 @@ def _user_get_all_permissions(user, obj, fallback_to_model=None):
     permissions = set()
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
-            try:
+            if 'fallback_to_model' in inspect.signature(
+                    backend.get_all_permissions).parameters:
                 permissions.update(backend.get_all_permissions(
                     user, obj, fallback_to_model))
-            except TypeError:
+            else:
                 permissions.update(backend.get_all_permissions(user, obj))
                 raise RemovedInDjango30Warning(
                     'Method required to admit a `fallback_to_model` kwarg')
@@ -186,13 +189,15 @@ def _user_has_perm(user, perm, obj, fallback_to_model=None):
         if not hasattr(backend, 'has_perm'):
             continue
         try:
-            if backend.has_perm(user, perm, obj, fallback_to_model):
-                return True
-        except TypeError:
-            if backend.has_perm(user, perm, obj):
-                return True
-            raise RemovedInDjango30Warning(
-                'Method required to admit a `fallback_to_model` kwarg')
+            if 'fallback_to_model' in inspect.signature(backend.has_perm)\
+                    .parameters:
+                if backend.has_perm(user, perm, obj, fallback_to_model):
+                    return True
+            else:
+                if backend.has_perm(user, perm, obj):
+                    return True
+                raise RemovedInDjango30Warning(
+                    'Method required to admit a `fallback_to_model` kwarg')
         except PermissionDenied:
             return False
     return False
@@ -258,12 +263,12 @@ class PermissionsMixin(models.Model):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                try:
+                if 'fallback_to_model' in inspect.signature(
+                        backend.get_group_permissions).parameters:
                     permissions.update(
                         backend.get_group_permissions(self, obj, fallback_to_model))
-                except TypeError:
-                    permissions.update(
-                        backend.get_group_permissions(self, obj))
+                else:
+                    permissions.update(backend.get_group_permissions(self, obj))
                     raise RemovedInDjango30Warning(
                         'Method required to admit a `fallback_to_model` kwarg')
         return permissions
