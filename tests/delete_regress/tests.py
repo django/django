@@ -4,7 +4,7 @@ from django.db import connection, models, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Award, AwardNote, Book, Child, Eaten, Email, File, Food, FooFile,
+    Award, AwardNote, Book, Child, Contact, Eaten, Email, File, Food, FooFile,
     FooFileProxy, FooImage, FooPhoto, House, Image, Item, Location, Login,
     OrderedPerson, OrgUnit, Person, Photo, PlayedWith, PlayedWithNote, Policy,
     Researcher, Toy, Version,
@@ -334,7 +334,7 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
 
-class OrderedDeleteTests(TestCase):
+class DeleteTests(TestCase):
     def test_meta_ordered_delete(self):
         # When a subquery is performed by deletion code, the subquery must be
         # cleared of all ordering. There was a but that caused _meta ordering
@@ -344,3 +344,27 @@ class OrderedDeleteTests(TestCase):
         OrderedPerson.objects.create(name='Bob', lives_in=h)
         OrderedPerson.objects.filter(lives_in__address='Foo').delete()
         self.assertEqual(OrderedPerson.objects.count(), 0)
+
+    def test_foreign_key_delete_nullifies_correct_columns(self):
+        """
+        With a model (Researcher) that has two foreign keys pointing to the
+        same model (Contact), deleting an instance of the target model
+        (contact1) nullifies the correct fields of Researcher.
+        """
+        contact1 = Contact.objects.create(label='Contact 1')
+        contact2 = Contact.objects.create(label='Contact 2')
+        researcher1 = Researcher.objects.create(
+            primary_contact=contact1,
+            secondary_contact=contact2,
+        )
+        researcher2 = Researcher.objects.create(
+            primary_contact=contact2,
+            secondary_contact=contact1,
+        )
+        contact1.delete()
+        researcher1.refresh_from_db()
+        researcher2.refresh_from_db()
+        self.assertIsNone(researcher1.primary_contact)
+        self.assertEqual(researcher1.secondary_contact, contact2)
+        self.assertEqual(researcher2.primary_contact, contact2)
+        self.assertIsNone(researcher2.secondary_contact)

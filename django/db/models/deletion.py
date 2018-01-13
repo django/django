@@ -285,8 +285,8 @@ class Collector:
 
             # update fields
             for model, instances_for_fieldvalues in self.field_updates.items():
-                query = sql.UpdateQuery(model)
                 for (field, value), instances in instances_for_fieldvalues.items():
+                    query = sql.UpdateQuery(model)
                     query.update_batch([obj.pk for obj in instances],
                                        {field.name: value}, self.using)
 
