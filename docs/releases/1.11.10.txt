@@ -9,4 +9,5 @@ Django 1.11.10 fixes several bugs in 1.11.9.
 Bugfixes
 ========
 
-* ...
+* Fixed incorrect foreign key nullification if a model has two foreign keys to
+  the same model and a target model is deleted (:ticket:`29016`).

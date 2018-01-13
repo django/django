@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed hidden content at the bottom of the "The install worked successfully!"
   page for some languages (:ticket:`28885`).
+
+* Fixed incorrect foreign key nullification if a model has two foreign keys to
+  the same model and a target model is deleted (:ticket:`29016`).
