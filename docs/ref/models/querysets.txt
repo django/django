@@ -1965,6 +1965,21 @@ This has a number of caveats though:
   does not retrieve and set the primary key attribute, as ``save()`` does,
   unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
+* It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
+  generator. The cast allows inspecting all objects so that any objects with a
+  manually set primary key can be inserted first. If you want to insert objects
+  in batches without evaluating the entire generator at once, you can use this
+  technique as long as the objects don't have any manually set primary keys::
+
+    from itertools import islice
+
+    batch_size = 100
+    objs = (Entry(headling'Test %s' % i) for i in range(1000))
+    while True:
+        batch = list(islice(objs, batch_size))
+        if not batch:
+            break
+        Entry.objects.bulk_create(batch, batch_size)
 
 The ``batch_size`` parameter controls how many objects are created in a single
 query. The default is to create all objects in one batch, except for SQLite
