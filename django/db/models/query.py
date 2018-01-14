@@ -701,6 +701,8 @@ class QuerySet:
             "Cannot update a query once a slice has been taken."
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
+        # Clear any annotations so that they won't be present in subqueries.
+        query._annotations = None
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
     _update.alters_data = True
