@@ -1,4 +1,4 @@
-from .comparison import Cast, Coalesce, Greatest, Least
+from .comparison import Cast, Coalesce, Greatest, Least, NullIf
 from .datetime import (
     Extract, ExtractDay, ExtractHour, ExtractIsoYear, ExtractMinute,
     ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
@@ -20,7 +20,7 @@ from .window import (
 
 __all__ = [
     # comparison and conversion
-    'Cast', 'Coalesce', 'Greatest', 'Least',
+    'Cast', 'Coalesce', 'Greatest', 'Least', 'NullIf',
     # datetime
     'Extract', 'ExtractDay', 'ExtractHour', 'ExtractMinute', 'ExtractMonth',
     'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay',

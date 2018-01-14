@@ -899,6 +899,8 @@ occur when an Oracle datatype is used as a column name.  In
 particular, take care to avoid using the names ``date``,
 ``timestamp``, ``number`` or ``float`` as a field name.
 
+.. _oracle-null-empty-strings:
+
 NULL and empty strings
 ----------------------
 

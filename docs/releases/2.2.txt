@@ -220,6 +220,9 @@ Models
 
 * Added many :ref:`math database functions <math-functions>`.
 
+* The new :class:`~django.db.models.functions.NullIf` database function
+  returns ``None`` if the two expressions are equal.
+
 * Setting the new ``ignore_conflicts`` parameter of
   :meth:`.QuerySet.bulk_create` to ``True`` tells the database to ignore
   failure to insert rows that fail uniqueness constraints or other checks.

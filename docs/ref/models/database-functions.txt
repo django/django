@@ -149,6 +149,25 @@ will result in a database error.
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible maximum value to provide as a default.
 
+``NullIf``
+----------
+
+.. class:: NullIf(expression1, expression2)
+
+.. versionadded:: 2.2
+
+Accepts two expressions and returns ``None`` if they are equal, otherwise
+returns ``expression1``.
+
+.. admonition:: Caveats on Oracle
+
+    Due to an :ref:`Oracle convention<oracle-null-empty-strings>`, this
+    function returns the empty string instead of ``None`` when the expressions
+    are of type :class:`~django.db.models.CharField`.
+
+    Passing ``Value(None)`` to ``expression1`` is prohibited on Oracle since
+    Oracle doesn't accept ``NULL`` as the first argument.
+
 .. _date-functions:
 
 Date functions
