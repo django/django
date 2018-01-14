@@ -169,6 +169,9 @@ Models
 * A ``BinaryField`` may now be set to ``editable=True`` if you wish to include
   it in model forms.
 
+* The new :class:`~django.db.models.functions.Replace` database function
+  replaces strings in an expression.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

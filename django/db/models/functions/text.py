@@ -70,6 +70,13 @@ class Lower(Transform):
     lookup_name = 'lower'
 
 
+class Replace(Func):
+    function = 'REPLACE'
+
+    def __init__(self, expression, text, replacement=Value(''), **extra):
+        super().__init__(expression, text, replacement, **extra)
+
+
 class StrIndex(Func):
     """
     Return a positive integer corresponding to the 1-indexed position of the
