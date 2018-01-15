@@ -1334,10 +1334,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         open() returns whether it opened a connection.
         """
         backend = smtp.EmailBackend(username='', password='')
-        self.assertFalse(backend.connection)
+        self.assertIsNone(backend.connection)
         opened = backend.open()
         backend.close()
-        self.assertTrue(opened)
+        self.assertIs(opened, True)
+
+    def test_reopen_connection(self):
+        backend = smtp.EmailBackend()
+        # Simulate an already open connection.
+        backend.connection = True
+        self.assertIs(backend.open(), False)
 
     def test_server_login(self):
         """
@@ -1365,6 +1371,14 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_email_tls_default_disabled(self):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_tls)
+
+    def test_ssl_tls_mutually_exclusive(self):
+        msg = (
+            'EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set '
+            'one of those settings to True.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            smtp.EmailBackend(use_ssl=True, use_tls=True)
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_use_settings(self):
@@ -1492,6 +1506,14 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend.open = lambda: None
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         self.assertEqual(backend.send_messages([email]), None)
+
+    def test_send_messages_zero_sent(self):
+        """A message isn't sent if it doesn't have any recipients."""
+        backend = smtp.EmailBackend()
+        backend.connection = True
+        email = EmailMessage('Subject', 'Content', 'from@example.com', to=[])
+        sent = backend.send_messages([email])
+        self.assertEqual(sent, 0)
 
 
 class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
