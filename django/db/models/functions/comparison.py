@@ -21,7 +21,9 @@ class Cast(Func):
 
     def as_postgresql(self, compiler, connection):
         # CAST would be valid too, but the :: shortcut syntax is more readable.
-        return self.as_sql(compiler, connection, template='%(expressions)s::%(db_type)s')
+        # 'expressions' is wrapped in parentheses in case it's a complex
+        # expression.
+        return self.as_sql(compiler, connection, template='(%(expressions)s)::%(db_type)s')
 
 
 class Coalesce(Func):
