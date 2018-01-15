@@ -1,6 +1,8 @@
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.db.models import Count, F, Max
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 
 from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
 
@@ -97,6 +99,13 @@ class AdvancedTests(TestCase):
         self.assertEqual(resp, 1)
         resp = RelatedPoint.objects.filter(data__name="d0")
         self.assertEqual(list(resp), [self.r1])
+
+    def test_update_annotate(self):
+        from django.db.models.sql.compiler import SQLUpdateCompiler
+        with CaptureQueriesContext(connection=connection) as capture:
+            qs = DataPoint.objects.annotate(Count('relatedpoint__name'))._get_called_qs().update(value='foo')
+            self.assertTrue(isinstance(qs, SQLUpdateCompiler))
+            self.assertEqual(capture.captured_queries, [])
 
     def test_update_multiple_fields(self):
         """

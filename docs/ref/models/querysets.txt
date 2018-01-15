@@ -119,6 +119,21 @@ described here.
     unpickle a queryset in a Django version that is different than the one in
     which it was pickled.
 
+Generated queries
+-----------------
+
+It's difficult to intuit how the ORM will translate complex querysets into SQL
+queries so when in doubt, inspect the SQL with ``str(queryset.query)`` and
+write plenty of tests.
+
+The queries returned by ``str(queryset.query)`` may be incorrect. The following
+should be taken into consideration
+
+* Strings in returned queries may not be quoted correctly according to the
+  database adapter. Not in all cases is the quoting and escaping done
+  correctly. Thus, it may be needed to manually modify the query and handle
+  escaping according to the database backend.
+
 .. _queryset-api:
 
 ``QuerySet`` API
