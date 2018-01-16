@@ -173,10 +173,10 @@ def _user_get_all_permissions(user, obj, backends):
 def _get_backends(backends):
     if backends == "All":
         return auth.get_backends()
-    backends = [be.lower() for be in backends]
+    backends = [be.lower().replace('backend', '') for be in backends]
     return [be for be in auth.get_backends()
-            if be.slice('.')[:-1].lower() in backends or be.lower() + 'backend' in backends]
-    # last word in the dot separated name or + 'backend' must be in the `backends` given
+            if be.__class__.__name__.lower().replace('backend', '') in backends]
+    # backend class name (possibly - 'backend') must be in the `backends` given
 
 
 def _user_has_perm(user, perm, obj, backends):

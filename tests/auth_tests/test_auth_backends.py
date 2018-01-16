@@ -6,7 +6,9 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import MD5PasswordHasher
-from django.contrib.auth.models import AnonymousUser, Group, Permission, User
+from django.contrib.auth.models import (
+    AnonymousUser, Group, Permission, User, _get_backends,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
@@ -383,6 +385,30 @@ class SimpleRowlevelBackend:
             return ['group_perm']
         else:
             return ['none']
+
+
+@override_settings(
+    AUTHENTICATION_BACKENDS=[
+        'auth_tests.test_auth_backends.SimpleRowlevelBackend',
+        'auth_tests.test_auth_backends.NewModelBackend',
+        'auth_tests.test_auth_backends.PermissionDeniedBackend',
+    ],
+)
+class ChooseBackendTest(TestCase):
+
+    def test_choose_backend(self):
+        self.assertEqual(_get_backends('All').__len__(), 3)
+
+        self.assertEqual(_get_backends(('SimpleRowlevelBackend',)).__len__(), 1)
+        self.assertEqual(_get_backends(('simplerowlevelbackend',)).__len__(), 1)
+        self.assertEqual(_get_backends(('SimpleRowlevel',)).__len__(), 1)
+        self.assertEqual(_get_backends(('simplerowlevel',)).__len__(), 1)
+
+        self.assertEqual(_get_backends(
+            ('SimpleRowlevel', 'PermissionDenied',)).__len__(), 2)
+
+        self.assertEqual(_get_backends(
+            ('SimpleRowlevel', 'PermissionDenied', 'NewModelBackend')).__len__(), 3)
 
 
 @modify_settings(AUTHENTICATION_BACKENDS={
