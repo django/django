@@ -36,14 +36,6 @@ details on these changes.
 See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
 details on these changes.
 
-* Support for the following authorization backend methods without a
-  ``fallback_to_model=None`` keyword argument will be removed:
-
-    * ``ModelBackend.has_perm()``
-    * ``ModelBackend.get_group_permissions()``
-    * ``ModelBackend.get_all_permissions()``
-
-
 .. _deprecation-removed-in-2.1:
 
 2.1

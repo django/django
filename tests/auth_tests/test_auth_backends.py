@@ -118,11 +118,9 @@ class BaseModelBackendTest:
 
         self.assertIs(user.has_perm('auth.test'), True)
         self.assertIs(user.has_perm('auth.test', 'object'), False)
-        self.assertIs(user.has_perm('auth.test', 'object', True), True)  # override
 
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
         self.assertEqual(user.get_all_permissions('object'), set())
-        self.assertEqual(user.get_all_permissions('object', True), {'auth.test'})  # override
 
     @override_settings(OBJECT_PERMISSION_FALLBACK_TO_MODEL=True)
     def test_has_no_object_perm_with_fallback(self):
@@ -135,11 +133,9 @@ class BaseModelBackendTest:
         # test with obj permissions fallback to model
         self.assertIs(user.has_perm('auth.test'), True)
         self.assertIs(user.has_perm('auth.test', 'object'), True)
-        self.assertIs(user.has_perm('auth.test', 'object', False), False)  # override
 
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
         self.assertEqual(user.get_all_permissions('object'), {'auth.test'})
-        self.assertEqual(user.get_all_permissions('object', False), set())  # override
 
     def test_anonymous_has_no_permissions(self):
         """
@@ -346,7 +342,7 @@ class TestObj:
 
 
 class SimpleRowlevelBackend:
-    def has_perm(self, user, perm, obj=None, fallback_to_model=None):
+    def has_perm(self, user, perm, obj=None):
         if not obj:
             return  # We only support row level perms
 
@@ -362,7 +358,7 @@ class SimpleRowlevelBackend:
     def has_module_perms(self, user, app_label):
         return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
-    def get_all_permissions(self, user, obj=None, fallback_to_model=None):
+    def get_all_permissions(self, user, obj=None):
         if not obj:
             return []  # We only support row level perms
 
@@ -376,7 +372,7 @@ class SimpleRowlevelBackend:
         else:
             return ['simple']
 
-    def get_group_permissions(self, user, obj=None, fallback_to_model=None):
+    def get_group_permissions(self, user, obj=None):
         if not obj:
             return  # We only support row level perms
 
@@ -500,7 +496,7 @@ class PermissionDeniedBackend:
     def authenticate(self, request, username=None, password=None):
         raise PermissionDenied
 
-    def has_perm(self, user_obj, perm, obj=None, fallback_to_model=None):
+    def has_perm(self, user_obj, perm, obj=None):
         raise PermissionDenied
 
     def has_module_perms(self, user_obj, app_label):

@@ -1,5 +1,3 @@
-import inspect
-
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.contenttypes.models import ContentType
@@ -8,7 +6,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.translation import gettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
@@ -165,23 +162,15 @@ class UserManager(BaseUserManager):
 
 
 # A few helper functions for common logic between User and AnonymousUser.
-def _user_get_all_permissions(user, obj, fallback_to_model=None):
+def _user_get_all_permissions(user, obj):
     permissions = set()
     for backend in auth.get_backends():
         if hasattr(backend, "get_all_permissions"):
-            if 'fallback_to_model' in inspect.signature(
-                    backend.get_all_permissions).parameters:
-                permissions.update(backend.get_all_permissions(
-                    user, obj, fallback_to_model))
-            else:
-                permissions.update(backend.get_all_permissions(user, obj))
-                raise RemovedInDjango30Warning(
-                    'Method required to admit a `fallback_to_model` kwarg')
-
+            permissions.update(backend.get_all_permissions(user, obj))
     return permissions
 
 
-def _user_has_perm(user, perm, obj, fallback_to_model=None):
+def _user_has_perm(user, perm, obj):
     """
     A backend can raise `PermissionDenied` to short-circuit permission checking.
     """
@@ -189,15 +178,8 @@ def _user_has_perm(user, perm, obj, fallback_to_model=None):
         if not hasattr(backend, 'has_perm'):
             continue
         try:
-            if 'fallback_to_model' in inspect.signature(backend.has_perm)\
-                    .parameters:
-                if backend.has_perm(user, perm, obj, fallback_to_model):
-                    return True
-            else:
-                if backend.has_perm(user, perm, obj):
-                    return True
-                raise RemovedInDjango30Warning(
-                    'Method required to admit a `fallback_to_model` kwarg')
+            if backend.has_perm(user, perm, obj):
+                return True
         except PermissionDenied:
             return False
     return False
@@ -254,7 +236,7 @@ class PermissionsMixin(models.Model):
     class Meta:
         abstract = True
 
-    def get_group_permissions(self, obj=None, fallback_to_model=None):
+    def get_group_permissions(self, obj=None):
         """
         Return a list of permission strings that this user has through their
         groups. Query all available auth backends. If an object is passed in,
@@ -263,20 +245,13 @@ class PermissionsMixin(models.Model):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_group_permissions"):
-                if 'fallback_to_model' in inspect.signature(
-                        backend.get_group_permissions).parameters:
-                    permissions.update(
-                        backend.get_group_permissions(self, obj, fallback_to_model))
-                else:
-                    permissions.update(backend.get_group_permissions(self, obj))
-                    raise RemovedInDjango30Warning(
-                        'Method required to admit a `fallback_to_model` kwarg')
+                permissions.update(backend.get_group_permissions(self, obj))
         return permissions
 
-    def get_all_permissions(self, obj=None, fallback_to_model=None):
-        return _user_get_all_permissions(self, obj, fallback_to_model)
+    def get_all_permissions(self, obj=None):
+        return _user_get_all_permissions(self, obj)
 
-    def has_perm(self, perm, obj=None, fallback_to_model=None):
+    def has_perm(self, perm, obj=None):
         """
         Return True if the user has the specified permission. Query all
         available auth backends, but return immediately if any backend returns
@@ -289,15 +264,14 @@ class PermissionsMixin(models.Model):
             return True
 
         # Otherwise we need to check the backends.
-        return _user_has_perm(self, perm, obj, fallback_to_model)
+        return _user_has_perm(self, perm, obj)
 
-    def has_perms(self, perm_list, obj=None, fallback_to_model=None):
+    def has_perms(self, perm_list, obj=None):
         """
         Return True if the user has each of the specified permissions. If
         object is passed, check if the user has all required perms for it.
         """
-        return all(self.has_perm(perm, obj, fallback_to_model)
-                   for perm in perm_list)
+        return all(self.has_perm(perm, obj) for perm in perm_list)
 
     def has_module_perms(self, app_label):
         """

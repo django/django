@@ -39,15 +39,14 @@ class ModelBackend:
         user_groups_query = 'group__%s' % user_groups_field.related_query_name()
         return Permission.objects.filter(**{user_groups_query: user_obj})
 
-    def _get_permissions(self, user_obj, obj, from_name, fallback_to_model=None):
+    def _get_permissions(self, user_obj, obj, from_name):
         """
         Return the permissions of `user_obj` from `from_name`. `from_name` can
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        fallback_to_model = self._get_fallback_setting(fallback_to_model)
-        if not user_obj.is_active or user_obj.is_anonymous \
-                or obj is not None and fallback_to_model is False:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None \
+                and settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL is False:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
@@ -60,29 +59,23 @@ class ModelBackend:
             setattr(user_obj, perm_cache_name, {"%s.%s" % (ct, name) for ct, name in perms})
         return getattr(user_obj, perm_cache_name)
 
-    def get_user_permissions(self, user_obj, obj=None, fallback_to_model=None):
+    def get_user_permissions(self, user_obj, obj=None):
         """
         Return a set of permission strings the user `user_obj` has from their
         `user_permissions`.
         """
-        return self._get_permissions(user_obj, obj, 'user', fallback_to_model)
+        return self._get_permissions(user_obj, obj, 'user')
 
-    def get_group_permissions(self, user_obj, obj=None, fallback_to_model=None):
+    def get_group_permissions(self, user_obj, obj=None):
         """
         Return a set of permission strings the user `user_obj` has from the
         groups they belong.
         """
-        return self._get_permissions(user_obj, obj, 'group', fallback_to_model)
+        return self._get_permissions(user_obj, obj, 'group')
 
-    def _get_fallback_setting(self, fallback_to_model):
-        if fallback_to_model is not None:
-            return fallback_to_model
-        return settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL
-
-    def get_all_permissions(self, user_obj, obj=None, fallback_to_model=None):
-        fallback_to_model = self._get_fallback_setting(fallback_to_model)
-        if not user_obj.is_active or user_obj.is_anonymous \
-                or obj is not None and fallback_to_model is False:
+    def get_all_permissions(self, user_obj, obj=None):
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None \
+                and settings.OBJECT_PERMISSION_FALLBACK_TO_MODEL is False:
             return set()
 
         if not hasattr(user_obj, '_perm_cache'):
@@ -92,9 +85,9 @@ class ModelBackend:
             }
         return user_obj._perm_cache
 
-    def has_perm(self, user_obj, perm, obj=None, fallback_to_model=None):
+    def has_perm(self, user_obj, perm, obj=None):
         return user_obj.is_active \
-            and perm in self.get_all_permissions(user_obj, obj, fallback_to_model)
+            and perm in self.get_all_permissions(user_obj, obj)
 
     def has_module_perms(self, user_obj, app_label):
         """

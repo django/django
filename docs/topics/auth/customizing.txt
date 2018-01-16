@@ -263,17 +263,10 @@ there is no implementation for it in the core. That means that checking for
 object permissions will always return ``False`` or an empty list (depending on
 the check performed). This behavior, however, can be changed by adding
 ``OBJECT_PERMISSION_FALLBACK_TO_MODEL = True`` to the settings, in case of
-which, model level permissions will be returned instead. Besides, permission
-methods that admit an ``obj`` argument also admits a ``fallback_to_model``
-keyword argument, which overrides the global setting at the functional
-level. This might be especially helpful for apps that use 3rd party backends
-be able to bring object and model permissions in one trip. Django will poll
-all backends defined in :setting:`AUTHENTICATION_BACKENDS` in order until one
-returns a value evaluates to ``True``.
-
-An authentication backend will receive the keyword parameters ``obj``,
-``user_obj``, and ``fallback_to_model`` for each object related authorization
-method and can return the object level permission as appropriate.
+which, model level permissions will be returned instead. An authentication
+backend will receive the keyword parameters ``obj`` and ``user_obj`` for each
+object related authorization method and can return the object level permission
+as appropriate.
 
 .. _custom-permissions:
 
