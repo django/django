@@ -5,6 +5,7 @@ from .datetime import (
     Now, Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
     TruncQuarter, TruncSecond, TruncTime, TruncYear,
 )
+from .math import Abs
 from .text import Concat, ConcatPair, Length, Lower, StrIndex, Substr, Upper
 from .window import (
     CumeDist, DenseRank, FirstValue, Lag, LastValue, Lead, NthValue, Ntile,
@@ -20,6 +21,8 @@ __all__ = [
     'ExtractYear', 'Now', 'Trunc', 'TruncDate', 'TruncDay', 'TruncHour',
     'TruncMinute', 'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime',
     'TruncYear',
+    # math
+    'Abs',
     # text
     'Concat', 'ConcatPair', 'Length', 'Lower', 'StrIndex', 'Substr', 'Upper',
     # window

@@ -670,6 +670,45 @@ that deal with time-parts can be used with ``TimeField``::
     2014-06-16 00:00:00+10:00 2
     2016-01-01 04:00:00+11:00 1
 
+.. _math-functions:
+
+Math functions
+==============
+
+We'll be using the following model in examples of math functions::
+
+    class Vector(models.Model):
+        x = models.FloatField()
+        y = models.FloatField()
+
+``Abs``
+----------
+
+.. class:: Abs(expression, **extra)
+
+.. versionadded:: 2.1
+
+Accepts a single numeric field or expression and returns the absolute value.
+
+Usage example::
+
+    >>> # Get the absolute value of the coordinates
+    >>> from django.db.models.functions import Abs
+    >>> Vector.objects.create(x=-0.5, y=1.1)
+    >>> vector = Vector.objects.annotate(
+    ...    x_abs=Abs('x'),
+    ...    y_abs=Abs('y')).get()
+    >>> print(vector.x_abs, vector.y_abs)
+    (0.5, 1.1)
+
+It can also be registered as a transform. For example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Abs
+    >>> FloatField.register_lookup(Abs, 'abs')
+    >>> # Get vectors inside the unit cube
+    >>> vectors = Vector.objects.filter(x__abs__lt=1, y__abs__lt=1)
+
 .. _text-functions:
 
 Text functions
