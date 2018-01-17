@@ -1152,18 +1152,21 @@ class QuerySet:
         obj.__dict__.update(kwargs)
         return obj
 
+    _clone_attrs = ('_sticky_filter', '_for_write', '_prefetch_related_lookups', '_iterable_class', '_fields')
+
     def _clone(self):
         """
         Return a copy of the current QuerySet. A lightweight alternative
         to deepcopy().
         """
         c = self.__class__(model=self.model, query=self.query.chain(), using=self._db, hints=self._hints)
-        c._sticky_filter = self._sticky_filter
-        c._for_write = self._for_write
-        c._prefetch_related_lookups = self._prefetch_related_lookups
+        for attr in self._clone_attrs:
+            try:
+                value = self.__dict__[attr]
+            except KeyError:
+                continue
+            setattr(c, attr, value)
         c._known_related_objects = self._known_related_objects
-        c._iterable_class = self._iterable_class
-        c._fields = self._fields
         return c
 
     def _fetch_all(self):
