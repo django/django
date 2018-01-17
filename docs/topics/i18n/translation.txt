@@ -1652,13 +1652,13 @@ To workaround this, you can escape percent signs by adding a second percent
 sign::
 
     from django.utils.translation import gettext as _
-    output = _("10%% interest)
+    output = _("10%% interest")
 
 Or you can use ``no-python-format`` so that all percent signs are treated as
 literals::
 
     # xgettext:no-python-format
-    output = _("10% interest)
+    output = _("10% interest")
 
 .. _creating-message-files-from-js-code:
 
