@@ -213,9 +213,9 @@ we'll rewind Django's version history in git to before that ticket's patch was
 applied. This will allow us to go through all of the steps involved in writing
 that patch from scratch, including running Django's test suite.
 
-**Keep in mind that while we'll be using an older revision of Django's trunk
-for the purposes of the tutorial below, you should always use the current
-development revision of Django when working on your own patch for a ticket!**
+**Keep in mind that while we'll be using an older revision of Django for this
+tutorial, you should always use the current version of the master branch when
+working on your own patch for a ticket!**
 
 .. note::
 
@@ -292,8 +292,8 @@ errors make sure you've followed all of the previous steps properly. See
 related to deprecation warnings that you can ignore. These failures have since
 been fixed in Django.
 
-Note that the latest Django trunk may not always be stable. When developing
-against trunk, you can check `Django's continuous integration builds`__ to
+Note that the latest Django master may not always be stable. When developing
+against master, you can check `Django's continuous integration builds`__ to
 determine if the failures are specific to your machine or if they are also
 present in Django's official builds. If you click to view a particular build,
 you can view the "Configuration Matrix" which shows failures broken down by
