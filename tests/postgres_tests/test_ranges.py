@@ -100,7 +100,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             datetime.datetime(year=2016, month=2, day=2),
         ]
         cls.aware_timestamps = [
-            timezone.make_aware(timestamp, timezone.get_current_timezone())
+            timezone.make_aware(timestamp)
             for timestamp in cls.timestamps
         ]
         cls.dates = [
