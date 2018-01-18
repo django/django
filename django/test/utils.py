@@ -186,8 +186,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
 
     # Configure the test mirrors.
     for alias, mirror_alias in mirrored_aliases.items():
-        connections[alias].creation.set_as_test_mirror(
-            connections[mirror_alias].settings_dict)
+        connections[alias] = connections[mirror_alias]
 
     if debug_sql:
         for alias in connections:

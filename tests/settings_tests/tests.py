@@ -14,6 +14,8 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 
+from .models import Simple
+
 
 @modify_settings(ITEMS={
     'prepend': ['b'],
@@ -445,3 +447,25 @@ class TestListSettings(unittest.TestCase):
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
+
+
+class TestDatabaseMirror(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def test_without_mirror(self):
+        Simple.objects.using('default').create()
+        Simple.objects.using('other').create()
+
+        self.assertEqual(Simple.objects.count(), 2)
+
+    def test_with_mirror(self):
+        databases = settings.DATABASES
+        databases['other']['TEST']['MIRROR'] = 'default'
+
+        with override_settings(DATABAES=databases):
+
+            Simple.objects.using('default').create()
+            Simple.objects.using('other').create()
+
+            self.assertEqual(Simple.objects.count(), 1)
