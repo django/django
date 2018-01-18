@@ -751,6 +751,28 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
+``Replace``
+~~~~~~~~~~~
+
+.. class:: Replace(expression, text, replacement=Value(''), **extra)
+
+.. versionadded:: 2.1
+
+Replaces all occurrences of ``text`` with ``replacement`` in ``expression``.
+The default replacement text is the empty string. The arguments to the function
+are case-sensitive.
+
+Usage example::
+
+    >>> from django.db.models import Value
+    >>> from django.db.models.functions import Replace
+    >>> Author.objects.create(name='Margaret Johnson')
+    >>> Author.objects.create(name='Margaret Smith')
+    >>> Author.objects.update(name=Replace('name', Value('Margaret'), Value('Margareth')))
+    2
+    >>> Author.objects.values('name')
+    <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>
+
 ``StrIndex``
 ------------
 
