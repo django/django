@@ -301,10 +301,9 @@ class Query:
         obj.external_aliases = self.external_aliases.copy()
         obj.table_map = self.table_map.copy()
         obj.where = self.where.clone()
-        obj._annotations = self._annotations.copy() if self._annotations is not None else None
-        if self.annotation_select_mask is None:
-            obj.annotation_select_mask = None
-        else:
+        if self._annotations is not None:
+            obj._annotations = self._annotations.copy()
+        if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
         # _annotation_select_cache cannot be copied, as doing so breaks the
         # (necessary) state in which both annotations and
@@ -312,14 +311,11 @@ class Query:
         # It will get re-populated in the cloned queryset the next time it's
         # used.
         obj._annotation_select_cache = None
-        obj._extra = self._extra.copy() if self._extra is not None else None
-        if self.extra_select_mask is None:
-            obj.extra_select_mask = None
-        else:
+        if self._extra is not None:
+            obj._extra = self._extra.copy()
+        if self.extra_select_mask is not None:
             obj.extra_select_mask = self.extra_select_mask.copy()
-        if self._extra_select_cache is None:
-            obj._extra_select_cache = None
-        else:
+        if self._extra_select_cache is not None:
             obj._extra_select_cache = self._extra_select_cache.copy()
         if 'subq_aliases' in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
