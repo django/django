@@ -359,7 +359,7 @@ foundation for custom widgets.
 
                 def decompress(self, value):
                     if value:
-                        return [value.date(), value.time().replace(microsecond=0)]
+                        return [value.date(), value.time()]
                     return [None, None]
 
         .. tip::
