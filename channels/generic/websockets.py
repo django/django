@@ -51,7 +51,7 @@ class WebsocketConsumer(SyncConsumer):
         """
         Sends a reply back down the WebSocket
         """
-        if text is not None:
+        if text_data is not None:
             super(WebsocketConsumer, self).send(
                 {"type": "websocket.send", "text": text_data},
             )
@@ -97,19 +97,19 @@ class JsonWebsocketConsumer(WebsocketConsumer):
     error on binary data.
     """
 
-    def raw_receive(self, message, **kwargs):
-        if "text" in message:
-            self.receive(self.decode_json(message['text']), **kwargs)
+    def receive(self, text_data=None, bytes_data=None, **kwargs):
+        if text_data:
+            self.receive_json(self.decode_json(text_data), **kwargs)
         else:
             raise ValueError("No text section for incoming WebSocket frame!")
 
-    def receive(self, content, **kwargs):
+    def receive_json(self, content, **kwargs):
         """
         Called with decoded JSON content.
         """
         pass
 
-    def send(self, content, close=False):
+    def send_json(self, content, close=False):
         """
         Encode the given content as JSON and send it to the client.
         """
@@ -191,7 +191,7 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
     # Optionally use a custom multiplexer class
     multiplexer_class = WebsocketMultiplexer
 
-    def receive(self, content, **kwargs):
+    def receive_json(self, content, **kwargs):
         """Forward messages to all consumers."""
         # Check the frame looks good
         if isinstance(content, dict) and "stream" in content and "payload" in content:

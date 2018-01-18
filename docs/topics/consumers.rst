@@ -157,10 +157,10 @@ to JSON sent as WebSocket text frames.
 
 The only API differences are:
 
-* Your ``receive`` method must take a single argument, ``content``, that is
-  the decoded JSON object.
+* Your ``receive_json`` method must take a single argument, ``content``, that
+  is the decoded JSON object.
 
-* ``self.send`` takes only a single argument, ``content``, which will be
+* ``self.send_json`` takes only a single argument, ``content``, which will be
   encoded to JSON for you.
 
 If you want to customise the JSON encoding and decoding, you can override
