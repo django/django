@@ -540,10 +540,10 @@ within the same ``values()`` clause. If you need to group by another value,
 add it to an earlier ``values()`` clause instead. For example::
 
     >>> from django.db.models import Count
-    >>> Blog.objects.values('author', entries=Count('entry'))
-    <QuerySet [{'author': 1, 'entries': 20}, {'author': 1, 'entries': 13}]>
-    >>> Blog.objects.values('author').annotate(entries=Count('entry'))
-    <QuerySet [{'author': 1, 'entries': 33}]>
+    >>> Blog.objects.values('entry__authors', entries=Count('entry'))
+    <QuerySet [{'entry__authors': 1, 'entries': 20}, {'entry__authors': 1, 'entries': 13}]>
+    >>> Blog.objects.values('entry__authors').annotate(entries=Count('entry'))
+    <QuerySet [{'entry__authors': 1, 'entries': 33}]>
 
 A few subtleties that are worth mentioning:
 
