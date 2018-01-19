@@ -404,7 +404,7 @@ def force_escape(value):
 def linebreaks_filter(value, autoescape=True):
     """
     Replace line breaks in plain text with appropriate HTML; a single
-    newline becomes an HTML line break (``<br />``) and a new line
+    newline becomes an HTML line break (``<br>``) and a new line
     followed by a blank line becomes a paragraph break (``</p>``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
@@ -416,13 +416,13 @@ def linebreaks_filter(value, autoescape=True):
 def linebreaksbr(value, autoescape=True):
     """
     Convert all newlines in a piece of plain text to HTML line breaks
-    (``<br />``).
+    (``<br>``).
     """
     autoescape = autoescape and not isinstance(value, SafeData)
     value = normalize_newlines(value)
     if autoescape:
         value = escape(value)
-    return mark_safe(value.replace('\n', '<br />'))
+    return mark_safe(value.replace('\n', '<br>'))
 
 
 @register.filter(is_safe=True)

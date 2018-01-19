@@ -1485,7 +1485,7 @@ your test suite.
         self.assertHTMLEqual(
             '<p>Hello <b>world!</p>',
             '''<p>
-                Hello   <b>world! <b/>
+                Hello   <b>world! </b>
             </p>'''
         )
         self.assertHTMLEqual(

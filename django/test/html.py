@@ -118,7 +118,7 @@ class Element:
             output += ''.join(str(c) for c in self.children)
             output += '\n</%s>' % self.name
         else:
-            output += ' />'
+            output += '>'
         return output
 
     def __repr__(self):

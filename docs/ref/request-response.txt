@@ -124,7 +124,7 @@ All attributes should be considered read-only, unless stated otherwise.
 .. attribute:: HttpRequest.FILES
 
     A dictionary-like object containing all uploaded files. Each key in
-    ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
+    ``FILES`` is the ``name`` from the ``<input type="file" name="">``. Each
     value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.

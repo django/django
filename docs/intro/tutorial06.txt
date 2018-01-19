@@ -70,7 +70,7 @@ Next, add the following at the top of ``polls/templates/polls/index.html``:
 
     {% load static %}
 
-    <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
 
 The ``{% static %}`` template tag generates the absolute URL of static files.
 

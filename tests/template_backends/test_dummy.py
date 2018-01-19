@@ -81,7 +81,7 @@ class TemplateStringsTests(SimpleTestCase):
         template = self.engine.get_template('template_backends/csrf.html')
         content = template.render(request=request)
 
-        expected = '<input type="hidden" name="csrfmiddlewaretoken" value="([^"]+)" />'
+        expected = '<input type="hidden" name="csrfmiddlewaretoken" value="([^"]+)">'
         match = re.match(expected, content) or re.match(expected.replace('"', "'"), content)
         self.assertTrue(match, "hidden csrftoken field not found in output")
         self.assertTrue(equivalent_tokens(match.group(1), get_token(request)))

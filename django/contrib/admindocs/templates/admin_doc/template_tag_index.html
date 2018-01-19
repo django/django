@@ -20,12 +20,12 @@
 {% for library in tag_libraries %}
 <div class="module">
     <h2>{% firstof library.grouper _("Built-in tags") %}</h2>
-    {% if library.grouper %}<p class="small quiet">{% blocktrans with code="{"|add:"% load "|add:library.grouper|add:" %"|add:"}" %}To use these tags, put <code>{{ code }}</code> in your template before using the tag.{% endblocktrans %}</p><hr />{% endif %}
+    {% if library.grouper %}<p class="small quiet">{% blocktrans with code="{"|add:"% load "|add:library.grouper|add:" %"|add:"}" %}To use these tags, put <code>{{ code }}</code> in your template before using the tag.{% endblocktrans %}</p><hr>{% endif %}
     {% for tag in library.list|dictsort:"name" %}
     <h3 id="{{ library.grouper|default:"built_in" }}-{{ tag.name }}">{{ tag.name }}</h3>
     <h4>{{ tag.title|striptags }}</h4>
     {{ tag.body }}
-    {% if not forloop.last %}<hr />{% endif %}
+    {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
 </div>
 {% endfor %}

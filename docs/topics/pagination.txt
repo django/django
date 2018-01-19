@@ -101,7 +101,7 @@ pages along with any interesting information from the objects themselves::
 
     {% for contact in contacts %}
         {# Each "contact" is a Contact model object. #}
-        {{ contact.full_name|upper }}<br />
+        {{ contact.full_name|upper }}<br>
         ...
     {% endfor %}
 

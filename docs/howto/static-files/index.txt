@@ -30,7 +30,7 @@ Configuring static files
    .. code-block:: html+django
 
         {% load static %}
-        <img src="{% static "my_app/example.jpg" %}" alt="My image"/>
+        <img src="{% static "my_app/example.jpg" %}" alt="My image">
 
 4. Store your static files in a folder called ``static`` in your app. For
    example ``my_app/static/my_app/example.jpg``.

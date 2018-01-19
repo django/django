@@ -909,13 +909,13 @@ class FormattingTests(SimpleTestCase):
             self.assertHTMLEqual(
                 form6.as_ul(),
                 '<li><label for="id_name">Name:</label>'
-                '<input id="id_name" type="text" name="name" value="acme" maxlength="50" required /></li>'
+                '<input id="id_name" type="text" name="name" value="acme" maxlength="50" required></li>'
                 '<li><label for="id_date_added">Date added:</label>'
-                '<input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" required /></li>'
+                '<input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" required></li>'
                 '<li><label for="id_cents_paid">Cents paid:</label>'
-                '<input type="text" name="cents_paid" value="59,47" id="id_cents_paid" required /></li>'
+                '<input type="text" name="cents_paid" value="59,47" id="id_cents_paid" required></li>'
                 '<li><label for="id_products_delivered">Products delivered:</label>'
-                '<input type="text" name="products_delivered" value="12000" id="id_products_delivered" required />'
+                '<input type="text" name="products_delivered" value="12000" id="id_products_delivered" required>'
                 '</li>'
             )
             self.assertEqual(localize_input(datetime.datetime(2009, 12, 31, 6, 0, 0)), '31.12.2009 06:00:00')
@@ -924,7 +924,7 @@ class FormattingTests(SimpleTestCase):
                 # Checking for the localized "products_delivered" field
                 self.assertInHTML(
                     '<input type="text" name="products_delivered" '
-                    'value="12.000" id="id_products_delivered" required />',
+                    'value="12.000" id="id_products_delivered" required>',
                     form6.as_ul()
                 )
 
@@ -1073,18 +1073,18 @@ class FormattingTests(SimpleTestCase):
 
             self.assertHTMLEqual(
                 template.render(context),
-                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required />;'
-                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required />'
+                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required>;'
+                '<input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required>'
             )
             self.assertHTMLEqual(
                 template_as_text.render(context),
-                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required />;'
-                ' <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required />'
+                '<input id="id_date_added" name="date_added" type="text" value="31.12.2009 06:00:00" required>;'
+                ' <input id="id_cents_paid" name="cents_paid" type="text" value="59,47" required>'
             )
             self.assertHTMLEqual(
                 template_as_hidden.render(context),
-                '<input id="id_date_added" name="date_added" type="hidden" value="31.12.2009 06:00:00" />;'
-                '<input id="id_cents_paid" name="cents_paid" type="hidden" value="59,47" />'
+                '<input id="id_date_added" name="date_added" type="hidden" value="31.12.2009 06:00:00">;'
+                '<input id="id_cents_paid" name="cents_paid" type="hidden" value="59,47">'
             )
 
     def test_format_arbitrary_settings(self):

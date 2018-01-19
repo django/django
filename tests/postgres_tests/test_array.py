@@ -805,9 +805,9 @@ class TestSplitFormField(PostgreSQLTestCase):
             <tr>
                 <th><label for="id_array_0">Array:</label></th>
                 <td>
-                    <input id="id_array_0" name="array_0" type="text" required />
-                    <input id="id_array_1" name="array_1" type="text" required />
-                    <input id="id_array_2" name="array_2" type="text" required />
+                    <input id="id_array_0" name="array_0" type="text" required>
+                    <input id="id_array_1" name="array_1" type="text" required>
+                    <input id="id_array_2" name="array_2" type="text" required>
                 </td>
             </tr>
         ''')
@@ -876,8 +876,8 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.check_html(
             SplitArrayWidget(forms.TextInput(), size=2), 'array', None,
             """
-            <input name="array_0" type="text" />
-            <input name="array_1" type="text" />
+            <input name="array_0" type="text">
+            <input name="array_1" type="text">
             """
         )
 
@@ -887,8 +887,8 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
             'array', ['val1', 'val2'], attrs={'id': 'foo'},
             html=(
                 """
-                <input id="foo_0" name="array_0" type="text" value="val1" />
-                <input id="foo_1" name="array_1" type="text" value="val2" />
+                <input id="foo_0" name="array_0" type="text" value="val1">
+                <input id="foo_1" name="array_1" type="text" value="val2">
                 """
             )
         )

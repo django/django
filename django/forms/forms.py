@@ -274,7 +274,7 @@ class BaseForm:
             normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
             error_row='<tr><td colspan="2">%s</td></tr>',
             row_ender='</td></tr>',
-            help_text_html='<br /><span class="helptext">%s</span>',
+            help_text_html='<br><span class="helptext">%s</span>',
             errors_on_separate_row=False)
 
     def as_ul(self):

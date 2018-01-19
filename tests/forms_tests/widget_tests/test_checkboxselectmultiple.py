@@ -13,20 +13,20 @@ class CheckboxSelectMultipleTest(WidgetTest):
     def test_render_value(self):
         self.check_html(self.widget(choices=self.beatles), 'beatles', ['J'], html=(
             """<ul>
-            <li><label><input checked type="checkbox" name="beatles" value="J" /> John</label></li>
-            <li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
-            <li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
-            <li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
+            <li><label><input checked type="checkbox" name="beatles" value="J"> John</label></li>
+            <li><label><input type="checkbox" name="beatles" value="P"> Paul</label></li>
+            <li><label><input type="checkbox" name="beatles" value="G"> George</label></li>
+            <li><label><input type="checkbox" name="beatles" value="R"> Ringo</label></li>
             </ul>"""
         ))
 
     def test_render_value_multiple(self):
         self.check_html(self.widget(choices=self.beatles), 'beatles', ['J', 'P'], html=(
             """<ul>
-            <li><label><input checked type="checkbox" name="beatles" value="J" /> John</label></li>
-            <li><label><input checked type="checkbox" name="beatles" value="P" /> Paul</label></li>
-            <li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
-            <li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
+            <li><label><input checked type="checkbox" name="beatles" value="J"> John</label></li>
+            <li><label><input checked type="checkbox" name="beatles" value="P"> Paul</label></li>
+            <li><label><input type="checkbox" name="beatles" value="G"> George</label></li>
+            <li><label><input type="checkbox" name="beatles" value="R"> Ringo</label></li>
             </ul>"""
         ))
 
@@ -36,10 +36,10 @@ class CheckboxSelectMultipleTest(WidgetTest):
         """
         self.check_html(self.widget(choices=self.beatles), 'beatles', None, html=(
             """<ul>
-            <li><label><input type="checkbox" name="beatles" value="J" /> John</label></li>
-            <li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
-            <li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
-            <li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
+            <li><label><input type="checkbox" name="beatles" value="J"> John</label></li>
+            <li><label><input type="checkbox" name="beatles" value="P"> Paul</label></li>
+            <li><label><input type="checkbox" name="beatles" value="G"> George</label></li>
+            <li><label><input type="checkbox" name="beatles" value="R"> Ringo</label></li>
             </ul>"""
         ))
 
@@ -52,25 +52,25 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <ul id="media">
         <li>
-        <label for="media_0"><input id="media_0" name="nestchoice" type="checkbox" value="unknown" /> Unknown</label>
+        <label for="media_0"><input id="media_0" name="nestchoice" type="checkbox" value="unknown"> Unknown</label>
         </li>
         <li>Audio<ul id="media_1">
         <li>
         <label for="media_1_0">
-        <input checked id="media_1_0" name="nestchoice" type="checkbox" value="vinyl" /> Vinyl
+        <input checked id="media_1_0" name="nestchoice" type="checkbox" value="vinyl"> Vinyl
         </label>
         </li>
         <li>
-        <label for="media_1_1"><input id="media_1_1" name="nestchoice" type="checkbox" value="cd" /> CD</label>
+        <label for="media_1_1"><input id="media_1_1" name="nestchoice" type="checkbox" value="cd"> CD</label>
         </li>
         </ul></li>
         <li>Video<ul id="media_2">
         <li>
-        <label for="media_2_0"><input id="media_2_0" name="nestchoice" type="checkbox" value="vhs" /> VHS</label>
+        <label for="media_2_0"><input id="media_2_0" name="nestchoice" type="checkbox" value="vhs"> VHS</label>
         </li>
         <li>
         <label for="media_2_1">
-        <input checked id="media_2_1" name="nestchoice" type="checkbox" value="dvd" /> DVD
+        <input checked id="media_2_1" name="nestchoice" type="checkbox" value="dvd"> DVD
         </label>
         </li>
         </ul></li>
@@ -90,25 +90,25 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <ul>
         <li>
-        <label><input name="nestchoice" type="checkbox" value="unknown" /> Unknown</label>
+        <label><input name="nestchoice" type="checkbox" value="unknown"> Unknown</label>
         </li>
         <li>Audio<ul>
         <li>
         <label>
-        <input checked name="nestchoice" type="checkbox" value="vinyl" /> Vinyl
+        <input checked name="nestchoice" type="checkbox" value="vinyl"> Vinyl
         </label>
         </li>
         <li>
-        <label><input name="nestchoice" type="checkbox" value="cd" /> CD</label>
+        <label><input name="nestchoice" type="checkbox" value="cd"> CD</label>
         </li>
         </ul></li>
         <li>Video<ul>
         <li>
-        <label><input name="nestchoice" type="checkbox" value="vhs" /> VHS</label>
+        <label><input name="nestchoice" type="checkbox" value="vhs"> VHS</label>
         </li>
         <li>
         <label>
-        <input checked name="nestchoice" type="checkbox" value="dvd" /> DVD
+        <input checked name="nestchoice" type="checkbox" value="dvd"> DVD
         </label>
         </li>
         </ul></li>
@@ -124,11 +124,11 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <ul id="abc">
         <li>
-        <label for="abc_0"><input checked type="checkbox" name="letters" value="a" id="abc_0" /> A</label>
+        <label for="abc_0"><input checked type="checkbox" name="letters" value="a" id="abc_0"> A</label>
         </li>
-        <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
+        <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1"> B</label></li>
         <li>
-        <label for="abc_2"><input checked type="checkbox" name="letters" value="c" id="abc_2" /> C</label>
+        <label for="abc_2"><input checked type="checkbox" name="letters" value="c" id="abc_2"> C</label>
         </li>
         </ul>
         """
@@ -142,11 +142,11 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <ul id="abc">
         <li>
-        <label for="abc_0"><input checked type="checkbox" name="letters" value="a" id="abc_0" /> A</label>
+        <label for="abc_0"><input checked type="checkbox" name="letters" value="a" id="abc_0"> A</label>
         </li>
-        <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
+        <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1"> B</label></li>
         <li>
-        <label for="abc_2"><input checked type="checkbox" name="letters" value="c" id="abc_2" /> C</label>
+        <label for="abc_2"><input checked type="checkbox" name="letters" value="c" id="abc_2"> C</label>
         </li>
         </ul>
         """
@@ -161,9 +161,9 @@ class CheckboxSelectMultipleTest(WidgetTest):
         ]
         html = """
         <ul>
-        <li><label><input type="checkbox" name="numbers" value="1" /> One</label></li>
-        <li><label><input type="checkbox" name="numbers" value="1000" /> One thousand</label></li>
-        <li><label><input type="checkbox" name="numbers" value="1000000" /> One million</label></li>
+        <li><label><input type="checkbox" name="numbers" value="1"> One</label></li>
+        <li><label><input type="checkbox" name="numbers" value="1000"> One thousand</label></li>
+        <li><label><input type="checkbox" name="numbers" value="1000000"> One million</label></li>
         </ul>
         """
         self.check_html(self.widget(choices=choices), 'numbers', None, html=html)
@@ -174,8 +174,8 @@ class CheckboxSelectMultipleTest(WidgetTest):
         ]
         html = """
         <ul>
-        <li><label><input type="checkbox" name="times" value="00:00:00" /> midnight</label></li>
-        <li><label><input type="checkbox" name="times" value="12:00:00" /> noon</label></li>
+        <li><label><input type="checkbox" name="times" value="00:00:00"> midnight</label></li>
+        <li><label><input type="checkbox" name="times" value="12:00:00"> noon</label></li>
         </ul>
         """
         self.check_html(self.widget(choices=choices), 'times', None, html=html)
