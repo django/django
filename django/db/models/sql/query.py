@@ -135,6 +135,72 @@ class Query:
 
     compiler = 'SQLCompiler'
 
+    default_cols = True
+    default_ordering = True
+    standard_ordering = True
+    filter_is_sticky = False
+    subquery = False
+    # SQL-related attributes
+    # Select and related select clauses are expressions to use in the
+    # SELECT clause of the query.
+    # The select is used for cases where we want to set up the select
+    # clause to contain other than default fields (values(), subqueries...)
+    # Note that annotations go to annotations dictionary.
+    select = ()
+    # The group_by attribute can have one of the following forms:
+    #  - None: no group by at all in the query
+    #  - A tuple of expressions: group by (at least) those expressions.
+    #    String refs are also allowed for now.
+    #  - True: group by all select fields of the model
+    # See compiler.get_group_by() for details.
+    group_by = None
+    order_by = ()
+    low_mark, high_mark = 0, None  # Used for offset/limit
+
+    distinct = False
+    distinct_fields = ()
+
+    select_for_update = False
+    select_for_update_nowait = False
+    select_for_update_skip_locked = False
+    select_for_update_of = ()
+
+    select_related = False
+    # Arbitrary limit for select_related to prevents infinite recursion.
+    max_depth = 5
+
+    # Holds the selects defined by a call to values() or values_list()
+    # excluding annotation_select and extra_select.
+    values_select = ()
+
+    # SQL annotation-related attributes
+    # The _annotations will be an OrderedDict when used. Due to the cost
+    # of creating OrderedDict this attribute is created lazily (in
+    # self.annotations property).
+    _annotations = None  # Maps alias -> Annotation Expression
+    annotation_select_mask = None
+    _annotation_select_cache = None
+
+    # Set combination attributes
+    combinator = None
+    combinator_all = False
+    combined_queries = ()
+
+    # verbatim to the appropriate clause.
+    # The _extra attribute is an OrderedDict, lazily created similarly to
+    # .annotations
+    _extra = None  # Maps col_alias -> (col_sql, params).
+    extra_select_mask = None
+    _extra_select_cache = None
+
+    extra_tables = ()
+    extra_order_by = ()
+
+    # A tuple that is a set of model field names and either True, if these
+    # are the fields to defer, or False if these are the only fields to
+    # load.
+    deferred_loading = (frozenset(), True)
+
     def __init__(self, model, where=WhereNode):
         self.model = model
         self.alias_refcount = {}
@@ -149,74 +215,11 @@ class Query:
         # aliases too.
         self.external_aliases = set()
         self.table_map = {}     # Maps table names to list of aliases.
-        self.default_cols = True
-        self.default_ordering = True
-        self.standard_ordering = True
         self.used_aliases = set()
-        self.filter_is_sticky = False
-        self.subquery = False
 
         # SQL-related attributes
-        # Select and related select clauses are expressions to use in the
-        # SELECT clause of the query.
-        # The select is used for cases where we want to set up the select
-        # clause to contain other than default fields (values(), subqueries...)
-        # Note that annotations go to annotations dictionary.
-        self.select = ()
         self.where = where()
         self.where_class = where
-        # The group_by attribute can have one of the following forms:
-        #  - None: no group by at all in the query
-        #  - A tuple of expressions: group by (at least) those expressions.
-        #    String refs are also allowed for now.
-        #  - True: group by all select fields of the model
-        # See compiler.get_group_by() for details.
-        self.group_by = None
-        self.order_by = ()
-        self.low_mark, self.high_mark = 0, None  # Used for offset/limit
-        self.distinct = False
-        self.distinct_fields = ()
-        self.select_for_update = False
-        self.select_for_update_nowait = False
-        self.select_for_update_skip_locked = False
-        self.select_for_update_of = ()
-
-        self.select_related = False
-        # Arbitrary limit for select_related to prevents infinite recursion.
-        self.max_depth = 5
-
-        # Holds the selects defined by a call to values() or values_list()
-        # excluding annotation_select and extra_select.
-        self.values_select = ()
-
-        # SQL annotation-related attributes
-        # The _annotations will be an OrderedDict when used. Due to the cost
-        # of creating OrderedDict this attribute is created lazily (in
-        # self.annotations property).
-        self._annotations = None  # Maps alias -> Annotation Expression
-        self.annotation_select_mask = None
-        self._annotation_select_cache = None
-
-        # Set combination attributes
-        self.combinator = None
-        self.combinator_all = False
-        self.combined_queries = ()
-
-        # These are for extensions. The contents are more or less appended
-        # verbatim to the appropriate clause.
-        # The _extra attribute is an OrderedDict, lazily created similarly to
-        # .annotations
-        self._extra = None  # Maps col_alias -> (col_sql, params).
-        self.extra_select_mask = None
-        self._extra_select_cache = None
-
-        self.extra_tables = ()
-        self.extra_order_by = ()
-
-        # A tuple that is a set of model field names and either True, if these
-        # are the fields to defer, or False if these are the only fields to
-        # load.
-        self.deferred_loading = (frozenset(), True)
 
         self._filtered_relations = {}
 
@@ -298,10 +301,9 @@ class Query:
         obj.external_aliases = self.external_aliases.copy()
         obj.table_map = self.table_map.copy()
         obj.where = self.where.clone()
-        obj._annotations = self._annotations.copy() if self._annotations is not None else None
-        if self.annotation_select_mask is None:
-            obj.annotation_select_mask = None
-        else:
+        if self._annotations is not None:
+            obj._annotations = self._annotations.copy()
+        if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
         # _annotation_select_cache cannot be copied, as doing so breaks the
         # (necessary) state in which both annotations and
@@ -309,14 +311,11 @@ class Query:
         # It will get re-populated in the cloned queryset the next time it's
         # used.
         obj._annotation_select_cache = None
-        obj._extra = self._extra.copy() if self._extra is not None else None
-        if self.extra_select_mask is None:
-            obj.extra_select_mask = None
-        else:
+        if self._extra is not None:
+            obj._extra = self._extra.copy()
+        if self.extra_select_mask is not None:
             obj.extra_select_mask = self.extra_select_mask.copy()
-        if self._extra_select_cache is None:
-            obj._extra_select_cache = None
-        else:
+        if self._extra_select_cache is not None:
             obj._extra_select_cache = self._extra_select_cache.copy()
         if 'subq_aliases' in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()

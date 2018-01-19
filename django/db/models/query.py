@@ -178,20 +178,20 @@ class FlatValuesListIterable(BaseIterable):
 
 class QuerySet:
     """Represent a lazy database lookup for a set of objects."""
+    _result_cache = None
+    _sticky_filter = False
+    _for_write = False
+    _prefetch_related_lookups = ()
+    _prefetch_done = False
+    _iterable_class = ModelIterable
+    _fields = None
 
     def __init__(self, model=None, query=None, using=None, hints=None):
         self.model = model
         self._db = using
         self._hints = hints or {}
         self.query = query or sql.Query(self.model)
-        self._result_cache = None
-        self._sticky_filter = False
-        self._for_write = False
-        self._prefetch_related_lookups = ()
-        self._prefetch_done = False
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
-        self._iterable_class = ModelIterable
-        self._fields = None
 
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
@@ -1152,18 +1152,21 @@ class QuerySet:
         obj.__dict__.update(kwargs)
         return obj
 
+    _clone_attrs = ('_sticky_filter', '_for_write', '_prefetch_related_lookups', '_iterable_class', '_fields')
+
     def _clone(self):
         """
         Return a copy of the current QuerySet. A lightweight alternative
         to deepcopy().
         """
         c = self.__class__(model=self.model, query=self.query.chain(), using=self._db, hints=self._hints)
-        c._sticky_filter = self._sticky_filter
-        c._for_write = self._for_write
-        c._prefetch_related_lookups = self._prefetch_related_lookups[:]
+        for attr in self._clone_attrs:
+            try:
+                value = self.__dict__[attr]
+            except KeyError:
+                continue
+            setattr(c, attr, value)
         c._known_related_objects = self._known_related_objects
-        c._iterable_class = self._iterable_class
-        c._fields = self._fields
         return c
 
     def _fetch_all(self):
