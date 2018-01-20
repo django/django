@@ -5,7 +5,6 @@ from django.apps import AppConfig
 # (e.g. raven does this).
 import daphne.server  # noqa
 
-#from .binding.base import BindingMetaclass
 from .package_checks import check_all
 
 
@@ -20,5 +19,3 @@ class ChannelsConfig(AppConfig):
         # Do django monkeypatches
         from .hacks import monkeypatch_django
         monkeypatch_django()
-        # Instantiate bindings
-        #BindingMetaclass.register_all()

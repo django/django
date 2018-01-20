@@ -4,9 +4,8 @@ import pytest
 from django.test import override_settings
 
 from channels import DEFAULT_CHANNEL_LAYER
-from channels.layers import channel_layers, InMemoryChannelLayer
 from channels.exceptions import InvalidChannelLayerError
-
+from channels.layers import InMemoryChannelLayer, channel_layers
 
 ### Channel layer tests
 

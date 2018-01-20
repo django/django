@@ -1,16 +1,16 @@
 import datetime
 import sys
 
-from daphne.server import Server
-from daphne.endpoints import build_endpoint_description_strings
 from django.conf import settings
 from django.core.management import CommandError
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.utils import six
 from django.utils.encoding import get_system_encoding
 
-from channels.routing import get_default_application
 from channels.log import setup_logger
+from channels.routing import get_default_application
+from daphne.endpoints import build_endpoint_description_strings
+from daphne.server import Server
 
 
 class Command(RunserverCommand):

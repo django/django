@@ -19,6 +19,6 @@ install:
 script:
   - pytest
   - flake8
-  - isort --check-only --recursive channels
+  - isort --check-only --recursive channels tests
   - unify --check-only --recursive --quote \" channels
 #  - cd js_client && npm install --progress=false && npm test && cd ..

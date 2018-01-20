@@ -1,7 +1,7 @@
 import asyncio
 import functools
 
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 
 from .layers import get_channel_layer
 from .utils import await_many_dispatch

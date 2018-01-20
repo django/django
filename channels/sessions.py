@@ -1,6 +1,5 @@
 import datetime
 import time
-from django.utils import timezone
 from importlib import import_module
 
 from django.conf import settings
@@ -8,6 +7,7 @@ from django.contrib.sessions.backends.base import UpdateError
 from django.core.exceptions import SuspiciousOperation
 from django.http import parse_cookie
 from django.http.cookie import SimpleCookie
+from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import cookie_date
 

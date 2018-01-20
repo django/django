@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 from channels import DEFAULT_CHANNEL_LAYER
+
 from .exceptions import InvalidChannelLayerError
 
 

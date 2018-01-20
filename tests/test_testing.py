@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from channels.testing import HttpCommunicator
 from channels.consumer import AsyncConsumer
+from channels.testing import HttpCommunicator
 
 
 class SimpleHttpApp(AsyncConsumer):
