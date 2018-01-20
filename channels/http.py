@@ -17,7 +17,6 @@ from django.utils.functional import cached_property
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.exceptions import RequestAborted, RequestTimeout
 
-
 logger = logging.getLogger("django.request")
 
 
