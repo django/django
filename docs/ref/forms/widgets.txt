@@ -664,7 +664,7 @@ that specifies the template used to render each choice. For example, for the
     * ``option_template_name``: ``'django/forms/widgets/select_option.html'``
 
     Similar to :class:`Select`, but allows multiple selection:
-    ``<select multiple="multiple">...</select>``
+    ``<select multiple>...</select>``
 
 ``RadioSelect``
 ~~~~~~~~~~~~~~~

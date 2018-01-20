@@ -116,13 +116,13 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="3">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-choice_int" value="1" id="initial-id_choice_int" /></p>
 <p><label for="id_multi_choice">Multi choice:</label>
-<select multiple="multiple" name="multi_choice" id="id_multi_choice" required>
+<select multiple name="multi_choice" id="id_multi_choice" required>
 <option value="1" selected>ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label>
-<select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int" required>
+<select multiple name="multi_choice_int" id="id_multi_choice_int" required>
 <option value="1" selected>ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
@@ -152,14 +152,14 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="3">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-choice_int" value="2" id="initial-id_choice_int" /></p>
 <p><label for="id_multi_choice">Multi choice:</label>
-<select multiple="multiple" name="multi_choice" id="id_multi_choice" required>
+<select multiple name="multi_choice" id="id_multi_choice" required>
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected>ChoiceOption 2</option>
 <option value="3" selected>ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0" />
 <input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label>
-<select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int" required>
+<select multiple name="multi_choice_int" id="id_multi_choice_int" required>
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected>ChoiceOption 2</option>
 <option value="3" selected>ChoiceOption 3</option>

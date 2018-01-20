@@ -760,7 +760,7 @@ Java</label></li>
             composers = MultipleChoiceField()
 
         f = SongForm(auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers" required>
+        self.assertHTMLEqual(str(f['composers']), """<select multiple name="composers" required>
 </select>""")
 
         class SongForm(Form):
@@ -768,13 +768,13 @@ Java</label></li>
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')])
 
         f = SongForm(auto_id=False)
-        self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers" required>
+        self.assertHTMLEqual(str(f['composers']), """<select multiple name="composers" required>
 <option value="J">John Lennon</option>
 <option value="P">Paul McCartney</option>
 </select>""")
         f = SongForm({'name': 'Yesterday', 'composers': ['P']}, auto_id=False)
         self.assertHTMLEqual(str(f['name']), '<input type="text" name="name" value="Yesterday" required />')
-        self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers" required>
+        self.assertHTMLEqual(str(f['composers']), """<select multiple name="composers" required>
 <option value="J">John Lennon</option>
 <option value="P" selected>Paul McCartney</option>
 </select>""")
@@ -1865,7 +1865,7 @@ Password: <input type="password" name="password" required /></li>"""
             p.as_ul(),
             """<li>Username: <input type="text" name="username" value="django" maxlength="10" required /></li>
 <li>Password: <input type="password" name="password" required /></li>
-<li>Options: <select multiple="multiple" name="options" required>
+<li>Options: <select multiple name="options" required>
 <option value="f" selected>foo</option>
 <option value="b" selected>bar</option>
 <option value="w">whiz</option>
@@ -1881,7 +1881,7 @@ Username: <input type="text" name="username" maxlength="10" required /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" required /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
-Options: <select multiple="multiple" name="options" required>
+Options: <select multiple name="options" required>
 <option value="f">foo</option>
 <option value="b">bar</option>
 <option value="w">whiz</option>
@@ -1895,7 +1895,7 @@ Options: <select multiple="multiple" name="options" required>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" required /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
-Options: <select multiple="multiple" name="options" required>
+Options: <select multiple name="options" required>
 <option value="f">foo</option>
 <option value="b">bar</option>
 <option value="w">whiz</option>
@@ -1909,7 +1909,7 @@ Options: <select multiple="multiple" name="options" required>
             """<li>Username: <input type="text" name="username" value="foo" maxlength="10" required /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" required /></li>
-<li>Options: <select multiple="multiple" name="options" required>
+<li>Options: <select multiple name="options" required>
 <option value="f" selected>foo</option>
 <option value="b" selected>bar</option>
 <option value="w">whiz</option>
@@ -1938,7 +1938,7 @@ Password: <input type="password" name="password" required /></li>
             p.as_ul(),
             """<li>Username: <input type="text" name="username" value="django" maxlength="10" required /></li>
 <li>Password: <input type="password" name="password" required /></li>
-<li>Options: <select multiple="multiple" name="options" required>
+<li>Options: <select multiple name="options" required>
 <option value="f">foo</option>
 <option value="b" selected>bar</option>
 <option value="w" selected>whiz</option>
@@ -1949,7 +1949,7 @@ Password: <input type="password" name="password" required /></li>
             p.as_ul(),
             """<li>Username: <input type="text" name="username" value="stephane" maxlength="10" required /></li>
 <li>Password: <input type="password" name="password" required /></li>
-<li>Options: <select multiple="multiple" name="options" required>
+<li>Options: <select multiple name="options" required>
 <option value="f" selected>foo</option>
 <option value="b" selected>bar</option>
 <option value="w">whiz</option>

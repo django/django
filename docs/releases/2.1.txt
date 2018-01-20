@@ -251,6 +251,10 @@ Miscellaneous
 * ``allowed_hosts`` is now a required argument of private API
   ``django.utils.http.is_safe_url()``.
 
+* The ``multiple`` attribute rendered by the
+  :class:`~django.forms.SelectMultiple` widget now uses HTML5 boolean syntax
+  rather than XHTML's ``mulitple="multiple"``.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1

@@ -155,7 +155,7 @@ class MultiWidgetTest(WidgetTest):
         self.check_html(widget, 'name', 'some text,JP,2007-04-25 06:24:00', html=(
             """
             <input type="text" name="name_0" value="some text" />
-            <select multiple="multiple" name="name_1">
+            <select multiple name="name_1">
                 <option value="J" selected>John</option>
                 <option value="P" selected>Paul</option>
                 <option value="G">George</option>
