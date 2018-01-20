@@ -16,7 +16,7 @@ We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed and which version by running the following command
 in a shell prompt (indicated by the $ prefix):
 
-.. code-block:: console
+.. console::
 
     $ python -m django --version
 
@@ -52,7 +52,7 @@ application-specific settings.
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the following command:
 
-.. code-block:: console
+.. console::
 
    $ django-admin startproject mysite
 
@@ -123,7 +123,7 @@ The development server
 Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
-.. code-block:: console
+.. console::
 
    $ python manage.py runserver
 
@@ -169,7 +169,7 @@ It worked!
     it as a command-line argument. For instance, this command starts the server
     on port 8080:
 
-    .. code-block:: console
+    .. console::
 
         $ python manage.py runserver 8080
 
@@ -178,7 +178,7 @@ It worked!
     running Vagrant or want to show off your work on other computers on the
     network), use:
 
-    .. code-block:: console
+    .. console::
 
         $ python manage.py runserver 0:8000
 
@@ -219,7 +219,7 @@ submodule of ``mysite``.
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py startapp polls
 
@@ -316,7 +316,7 @@ app will still work.
 You have now wired an ``index`` view into the URLconf. Lets verify it's
 working, run the following command:
 
-.. code-block:: console
+.. console::
 
    $ python manage.py runserver
 

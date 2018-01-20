@@ -96,12 +96,6 @@ To check whether or not you have Git installed, enter ``git`` into the command
 line. If you get messages saying that this command could not be found, you'll
 have to download and install it, see `Git's download page`__.
 
-.. admonition:: For Windows users
-
-    When installing Git on Windows, it is recommended that you pick the
-    "Git Bash" option so that Git runs in its own shell. This tutorial assumes
-    that's how you have installed it.
-
 If you're not that familiar with Git, you can always find out more about its
 commands (once it's installed) by typing ``git help`` into the command line.
 
@@ -117,7 +111,7 @@ where you'll want your local copy of Django to live.
 
 Download the Django source code repository using the following command:
 
-.. code-block:: console
+.. console::
 
     $ git clone git@github.com:YourGitHubName/django.git
 
@@ -130,29 +124,17 @@ your projects so that they don't interfere with each other.
 It's a good idea to keep all your virtualenvs in one place, for example in
 ``.virtualenvs/`` in your home directory. Create it if it doesn't exist yet:
 
-.. code-block:: console
+.. console::
 
     $ mkdir ~/.virtualenvs
 
 Now create a new virtualenv by running:
 
-.. code-block:: console
+.. console::
 
-    $ python3 -m venv ~/.virtualenvs/djangodev
+    $ python -m venv ~/.virtualenvs/djangodev
 
 The path is where the new environment will be saved on your computer.
-
-.. admonition:: For Windows users
-
-    Using the built-in ``venv`` module will not work if you are also using the
-    Git Bash shell on Windows, since activation scripts are only created for the
-    system shell (``.bat``) and PowerShell (``.ps1``). Use the ``virtualenv``
-    package instead:
-
-    .. code-block:: none
-
-        $ pip install virtualenv
-        $ virtualenv ~/.virtualenvs/djangodev
 
 .. admonition:: For Ubuntu users
 
@@ -182,9 +164,9 @@ If the ``source`` command is not available, you can try using a dot instead:
 
     To activate your virtualenv on Windows, run:
 
-    .. code-block:: none
+    .. code-block:: doscon
 
-        $ source ~/virtualenvs/djangodev/Scripts/activate
+        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
 You have to activate the virtualenv whenever you open a new terminal window.
 virtualenvwrapper__ is a useful tool for making this more convenient.
@@ -197,7 +179,7 @@ name of the currently activated virtualenv is displayed on the command line to
 help you keep track of which one you are using. Go ahead and install the
 previously cloned copy of Django:
 
-.. code-block:: console
+.. console::
 
     $ pip install -e /path/to/your/local/clone/django/
 
@@ -231,7 +213,7 @@ Navigate into Django's root directory (that's the one that contains ``django``,
 ``docs``, ``tests``, ``AUTHORS``, etc.). You can then check out the older
 revision of Django that we'll be using in the tutorial below:
 
-.. code-block:: console
+.. console::
 
     $ git checkout 4ccfc4439a7add24f8db4ef3960d02ef8ae09887
 
@@ -249,7 +231,7 @@ what its output is supposed to look like.
 Before running the test suite, install its dependencies by first ``cd``-ing
 into the Django ``tests/`` directory and then running:
 
-.. code-block:: console
+.. console::
 
     $ pip install -r requirements/py3.txt
 
@@ -261,7 +243,7 @@ encounter.
 Now we are ready to run the test suite. If you're using GNU/Linux, macOS, or
 some other flavor of Unix, run:
 
-.. code-block:: console
+.. console::
 
     $ ./runtests.py
 
@@ -313,7 +295,7 @@ Creating a branch for your patch
 
 Before making any changes, create a new branch for the ticket:
 
-.. code-block:: console
+.. console::
 
     $ git checkout -b ticket_24788
 
@@ -406,7 +388,7 @@ so our tests are going to fail. Let's run all the tests in the ``forms_tests``
 folder to make sure that's really what happens. From the command line, ``cd``
 into the Django ``tests/`` directory and run:
 
-.. code-block:: console
+.. console::
 
     $ ./runtests.py forms_tests
 
@@ -443,7 +425,7 @@ earlier pass, so we can see whether the code we wrote above is working
 correctly. To run the tests in the ``forms_tests`` folder, ``cd`` into the
 Django ``tests/`` directory and run:
 
-.. code-block:: console
+.. console::
 
     $ ./runtests.py forms_tests
 
@@ -475,7 +457,7 @@ help identify many bugs and regressions that might otherwise go unnoticed.
 To run the entire Django test suite, ``cd`` into the Django ``tests/``
 directory and run:
 
-.. code-block:: console
+.. console::
 
     $ ./runtests.py
 
@@ -517,7 +499,7 @@ Now it's time to go through all the changes made in our patch. To display the
 differences between your current copy of Django (with your changes) and the
 revision that you initially checked out earlier in the tutorial:
 
-.. code-block:: console
+.. console::
 
     $ git diff
 
@@ -612,7 +594,7 @@ Committing the changes in the patch
 
 To commit the changes:
 
-.. code-block:: console
+.. console::
 
     $ git commit -a
 
@@ -629,7 +611,7 @@ Pushing the commit and making a pull request
 After committing the patch, send it to your fork on GitHub (substitute
 "ticket_24788" with the name of your branch if it's different):
 
-.. code-block:: console
+.. console::
 
     $ git push origin ticket_24788
 

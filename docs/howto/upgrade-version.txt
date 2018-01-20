@@ -62,7 +62,7 @@ In Python, deprecation warnings are silenced by default. You must turn them on
 using the ``-Wall`` Python command line option or the :envvar:`PYTHONWARNINGS`
 environment variable. For example, to show warnings while running tests:
 
-.. code-block:: console
+.. console::
 
     $ python -Wall manage.py test
 
@@ -92,7 +92,7 @@ might want to set up a new environment with all the dependencies first.
 Exactly which steps you will need to take depends on your installation process.
 The most convenient way is to use pip_ with the ``--upgrade`` or ``-U`` flag:
 
-.. code-block:: console
+.. console::
 
    $ pip install -U Django
 
@@ -113,7 +113,7 @@ When the new environment is set up, :doc:`run the full test suite
 on deprecation warnings on so they're shown in the test output (you can also
 use the flag if you test your app manually using ``manage.py runserver``):
 
-.. code-block:: console
+.. console::
 
     $ python -Wall manage.py test
 
