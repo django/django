@@ -79,7 +79,7 @@ responses or long-polling, which aren't supported in ``HttpCommunicator`` yet.
 
 
 HttpCommunicator
-================
+----------------
 
 ``HttpCommunicator`` is a subclass of ``ApplicationCommunicator`` specifically
 tailored for HTTP requests. You need only instantiate it with your desired
@@ -108,6 +108,93 @@ keys::
 
 
 WebsocketCommunicator
-=====================
+---------------------
 
-TODO
+``WebsocketCommunicator`` allows you to more easily test WebSocket consumers.
+It provides several convenience methods for interacting with a WebSocket
+application, as shown in this example::
+
+    from channels.testing import WebsocketCommunicator
+    communicator = WebsocketCommunicator(SimpleWebsocketApp, "/testws/")
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    # Test sending text
+    await communicator.send_to(text_data="hello")
+    response = await communicator.receive_from()
+    assert response == "hello"
+    # Close
+    communicator.disconnect()
+
+.. note::
+
+    All of these methods are coroutines, which means you must ``await`` them.
+    If you do not, your test will either time out (if you forgot to await a
+    send) or try comparing things to a coroutine object (if you forgot to
+    await a receive).
+
+.. important::
+
+    If you don't call ``WebsocketCommunicator.disconnect()`` before your test
+    suite ends, you may find yourself getting ``RuntimeWarnings`` about
+    things never being awaited, as you will be killing your app off in the
+    middle of its lifecycle.
+
+connect
+~~~~~~~
+
+Triggers the connection phase of the WebSocket and waits for the application
+to either accept or deny the connection. Takes no parameters and returns
+either:
+
+* ``(True, <chosen_subprotocol>)`` if the socket was accepted.
+  ``chosen_subprotocol`` defaults to ``None``.
+* ``(False, <close_code>)`` if the socket was rejected.
+  ``close_code`` defaults to ``1000``.
+
+send_to
+~~~~~~~
+
+Sends a data frame to the application. Takes exactly one of ``bytes_data``
+or ``text_data`` as parameters, and returns nothing::
+
+    await communicator.send_to(bytes_data=b"hi\0")
+
+This method will type-check your parameters for you to ensure what you are
+sending really is text or bytes.
+
+send_json_to
+~~~~~~~~~~~~
+
+Sends a JSON payload to the application as a text frame. Call it with
+an object and it will JSON-encode it for you, and return nothing::
+
+    await communicator.send_json_to({"hello": "world"})
+
+receive_from
+~~~~~~~~~~~~
+
+Receives a frame from the application and gives you either ``bytes`` or
+``text`` back depending on the frame type::
+
+    response = await communicator.receive_from()
+
+Takes an optional ``timeout`` argument with a number of seconds to wait before
+timing out, which defaults to 1. It will typecheck your application's responses
+for you as well, to ensure that text frames contain text data, and binary
+frames contain binary data.
+
+receive_json_from
+~~~~~~~~~~~~~~~~~
+
+Receives a text frame from the application and decodes it for you::
+
+    response = await communicator.receive_json_from()
+    assert response == {"hello": "world"}
+
+Takes an optional ``timeout`` argument with a number of seconds to wait before
+timing out, which defaults to 1.
+
+disconnect
+~~~~~~~~~~
+
+Closes the socket from the client side. Takes nothing and returns nothing.

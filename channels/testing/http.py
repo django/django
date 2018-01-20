@@ -12,12 +12,13 @@ class HttpCommunicator(ApplicationCommunicator):
     directly.
     """
 
-    def __init__(self, application, method, path, body=b""):
+    def __init__(self, application, method, path, body=b"", headers=None):
         self.scope = {
             "type": "http",
             "http_version": "1.1",
             "method": method.upper(),
             "path": path,
+            "headers": headers or [],
         }
         assert isinstance(body, bytes)
         self.body = body

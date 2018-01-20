@@ -116,7 +116,7 @@ rewrite it, specifically for HTTP and WebSocket handling.
 WebsocketConsumer
 ~~~~~~~~~~~~~~~~~
 
-Available as ``channels.generic.websockets.WebsocketConsumer``, this
+Available as ``channels.generic.websocket.WebsocketConsumer``, this
 wraps the verbose plain-ASGI message sending and receiving into handling that
 just deals with text and binary frames::
 
@@ -151,7 +151,7 @@ authentication or rate-limiting code that doesn't need to use mixins.
 JsonWebsocketConsumer
 ~~~~~~~~~~~~~~~~~~~~~
 
-Available as ``channels.generic.websockets.JsonWebsocketConsumer``, this
+Available as ``channels.generic.websocket.JsonWebsocketConsumer``, this
 works like ``WebsocketConsumer``, except it will auto-encode and decode
 to JSON sent as WebSocket text frames.
 

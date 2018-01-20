@@ -16,13 +16,13 @@ class WebsocketConsumer(SyncConsumer):
         """
         # TODO: group joining
         try:
-            self.connect(message)
+            self.connect()
         except AcceptConnection:
             self.accept()
         except DenyConnection:
             self.close()
 
-    def connect(self, message):
+    def connect(self):
         self.accept()
 
     def accept(self):
@@ -59,6 +59,8 @@ class WebsocketConsumer(SyncConsumer):
             super(WebsocketConsumer, self).send(
                 {"type": "websocket.send", "bytes": bytes_data},
             )
+        else:
+            raise ValueError("You must pass one of bytes_data or text_data")
         if close:
             self.close(close)
 
