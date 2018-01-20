@@ -718,3 +718,8 @@ class RelatedIndividual(models.Model):
 
     class Meta:
         db_table = 'RelatedIndividual'
+
+
+class CustomDbColumn(models.Model):
+    custom_column = models.IntegerField(db_column='custom_name', null=True)
+    ip_address = models.GenericIPAddressField(null=True)

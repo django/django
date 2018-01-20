@@ -2089,6 +2089,42 @@ instance (if the database normally supports it).
 
     The ``ignore_conflicts`` parameter was added.
 
+``bulk_update()``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 2.2
+
+.. method:: bulk_update(objs, fields, batch_size=None)
+
+This method efficiently updates the given fields on the provided model
+instances, generally with one query::
+
+    >>> objs = [
+    ...    Entry.objects.create(headline='Entry 1'),
+    ...    Entry.objects.create(headline='Entry 2'),
+    ... ]
+    >>> objs[0].headline = 'This is entry 1'
+    >>> objs[1].headline = 'This is entry 2'
+    >>> Entry.objects.bulk_update(objs, ['headline'])
+
+:meth:`.QuerySet.update` is used to save the changes, so this is more efficient
+than iterating through the list of models and calling ``save()`` on each of
+them, but it has a few caveats:
+
+* You cannot update the model's primary key.
+* Each model's ``save()`` method isn't called, and the
+  :attr:`~django.db.models.signals.pre_save` and
+  :attr:`~django.db.models.signals.post_save` signals aren't sent.
+* If updating a large number of columns in a large number of rows, the SQL
+  generated can be very large. Avoid this by specifying a suitable
+  ``batch_size``.
+* Updating fields defined on multi-table inheritance ancestors will incur an
+  extra query per ancestor.
+
+The ``batch_size`` parameter controls how many objects are saved in a single
+query. The default is to create all objects in one batch, except for SQLite
+and Oracle which have restrictions on the number of variables used in a query.
+
 ``count()``
 ~~~~~~~~~~~
 

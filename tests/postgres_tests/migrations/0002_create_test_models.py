@@ -56,9 +56,9 @@ class Migration(migrations.Migration):
             name='OtherTypesArrayModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('ips', ArrayField(models.GenericIPAddressField(), size=None)),
-                ('uuids', ArrayField(models.UUIDField(), size=None)),
-                ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None)),
+                ('ips', ArrayField(models.GenericIPAddressField(), size=None, default=list)),
+                ('uuids', ArrayField(models.UUIDField(), size=None, default=list)),
+                ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None, default=list)),
                 ('tags', ArrayField(TagField(), blank=True, null=True, size=None)),
                 ('json', ArrayField(JSONField(default={}), default=[])),
                 ('int_ranges', ArrayField(IntegerRangeField(), null=True, blank=True)),

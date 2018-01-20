@@ -199,6 +199,9 @@ Models
   :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_year`
   lookup allows querying by an ISO-8601 week-numbering year.
 
+* The new :meth:`.QuerySet.bulk_update` method allows efficiently updating
+  specific fields on multiple model instances.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -48,6 +48,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             V_I := P_I;
         END;
     $$ LANGUAGE plpgsql;"""
+    requires_casted_case_in_updates = True
     supports_over_clause = True
     supports_aggregate_filter_clause = True
     supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
