@@ -41,17 +41,17 @@ class CookieMiddleware:
 
     @classmethod
     def set_cookie(
-            cls,
-            message,
-            key,
-            value="",
-            max_age=None,
-            expires=None,
-            path="/",
-            domain=None,
-            secure=False,
-            httponly=False
-        ):
+        cls,
+        message,
+        key,
+        value="",
+        max_age=None,
+        expires=None,
+        path="/",
+        domain=None,
+        secure=False,
+        httponly=False,
+    ):
         """
         Sets a cookie in the passed HTTP response message.
 
@@ -84,8 +84,7 @@ class CookieMiddleware:
             cookies[key]["max-age"] = max_age
             # IE requires expires, so set it if hasn't been already.
             if not expires:
-                cookies[key]["expires"] = cookie_date(time.time() +
-                                                           max_age)
+                cookies[key]["expires"] = cookie_date(time.time() + max_age)
         if path is not None:
             cookies[key]["path"] = path
         if domain is not None:

@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 import cgi
 import codecs
 import logging
 import sys
-import time
 import traceback
 from io import BytesIO
 
@@ -13,17 +10,13 @@ from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.http import FileResponse, HttpResponse, HttpResponseServerError
+from django.urls import set_script_prefix
 from django.utils import six
 from django.utils.functional import cached_property
 
 from asgiref.sync import async_to_sync, sync_to_async
 from channels.exceptions import RequestAborted, RequestTimeout
 
-try:
-    from django.urls import set_script_prefix
-except ImportError:
-    # Django < 1.10
-    from django.core.urlresolvers import set_script_prefix
 
 logger = logging.getLogger("django.request")
 
@@ -239,7 +232,7 @@ class AsgiHandler(base.BaseHandler):
         # so translate it into a plain text response.
         try:
             return super(AsgiHandler, self).handle_uncaught_exception(request, resolver, exc_info)
-        except:
+        except Exception:
             return HttpResponseServerError(
                 traceback.format_exc() if settings.DEBUG else "Internal Server Error",
                 content_type="text/plain",

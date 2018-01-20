@@ -1,8 +1,3 @@
-from __future__ import unicode_literals
-
-import six
-
-
 class RequestAborted(Exception):
     """
     Raised when the incoming request tells us it's aborted partway through

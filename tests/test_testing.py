@@ -1,6 +1,3 @@
-import unittest
-from unittest.mock import MagicMock
-
 import pytest
 
 from channels.consumer import AsyncConsumer
