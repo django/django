@@ -15,17 +15,18 @@ from django.test.utils import CaptureQueriesContext
 from .models import (
     FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
     CategoryRelationship, Celebrity, Channel, Chapter, Child, ChildObjectA,
-    Classroom, Company, Cover, CustomPk, CustomPkTag, Detail, DumbCategory,
-    Eaten, Employment, ExtraInfo, Fan, Food, Identifier, Individual, Item, Job,
-    JobResponsibilities, Join, LeafA, LeafB, LoopX, LoopZ, ManagedModel,
-    Member, ModelA, ModelB, ModelC, ModelD, MyObject, NamedCategory, Node,
-    Note, NullableName, Number, ObjectA, ObjectB, ObjectC, OneToOneCategory,
-    Order, OrderItem, Page, Paragraph, Person, Plaything, PointerA, Program,
-    ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking, Related,
-    RelatedIndividual, RelatedObject, Report, ReportComment, ReservedName,
-    Responsibility, School, SharedConnection, SimpleCategory, SingleObject,
-    SpecialCategory, Staff, StaffUser, Student, Tag, Task, Teacher,
-    Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
+    Classroom, CommonMixedCaseForeignKeys, Company, Cover, CustomPk,
+    CustomPkTag, Detail, DumbCategory, Eaten, Employment, ExtraInfo, Fan, Food,
+    Identifier, Individual, Item, Job, JobResponsibilities, Join, LeafA, LeafB,
+    LoopX, LoopZ, ManagedModel, Member, MixedCaseDbColumnCategoryItem,
+    MixedCaseFieldCategoryItem, ModelA, ModelB, ModelC, ModelD, MyObject,
+    NamedCategory, Node, Note, NullableName, Number, ObjectA, ObjectB, ObjectC,
+    OneToOneCategory, Order, OrderItem, Page, Paragraph, Person, Plaything,
+    PointerA, Program, ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking,
+    Related, RelatedIndividual, RelatedObject, Report, ReportComment,
+    ReservedName, Responsibility, School, SharedConnection, SimpleCategory,
+    SingleObject, SpecialCategory, Staff, StaffUser, Student, Tag, Task,
+    Teacher, Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
     Ticket23605C, TvChef, Valid, X,
 )
 
@@ -1171,6 +1172,32 @@ class Queries1Tests(TestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(unknown_field__name='generic')
+
+    def test_common_mixed_case_foreign_keys(self):
+        """
+        Valid query should be generated when fields fetched from joined tables
+        include FKs whose names only differ by case.
+        """
+        c1 = SimpleCategory.objects.create(name='c1')
+        c2 = SimpleCategory.objects.create(name='c2')
+        c3 = SimpleCategory.objects.create(name='c3')
+        category = CategoryItem.objects.create(category=c1)
+        mixed_case_field_category = MixedCaseFieldCategoryItem.objects.create(CaTeGoRy=c2)
+        mixed_case_db_column_category = MixedCaseDbColumnCategoryItem.objects.create(category=c3)
+        CommonMixedCaseForeignKeys.objects.create(
+            category=category,
+            mixed_case_field_category=mixed_case_field_category,
+            mixed_case_db_column_category=mixed_case_db_column_category,
+        )
+        qs = CommonMixedCaseForeignKeys.objects.values(
+            'category',
+            'mixed_case_field_category',
+            'mixed_case_db_column_category',
+            'category__category',
+            'mixed_case_field_category__CaTeGoRy',
+            'mixed_case_db_column_category__category',
+        )
+        self.assertTrue(qs.first())
 
 
 class Queries2Tests(TestCase):
