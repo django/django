@@ -49,6 +49,7 @@ Topics
    topics/channel_layers
    topics/sessions
    topics/authentication
+   topics/testing
    topics/worker
    deploying
    one-to-two

@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 
 import pytest
 from django.http import HttpResponse
@@ -164,7 +165,7 @@ class MockHandler(AsgiHandler):
     ripped out.
     """
 
-    request_class = unittest.mock.MagicMock()
+    request_class = MagicMock()
 
     def get_response(self, request):
         return HttpResponse("fake")
@@ -181,7 +182,7 @@ async def test_handler_basic():
         "method": "GET",
         "path": "/test/",
     }
-    handler = ApplicationCommunicator(MockHandler(scope))
+    handler = ApplicationCommunicator(MockHandler, scope)
     await handler.send_input({
         "type": "http.request",
     })
@@ -200,7 +201,7 @@ async def test_handler_body_single():
         "method": "GET",
         "path": "/test/",
     }
-    handler = ApplicationCommunicator(MockHandler(scope))
+    handler = ApplicationCommunicator(MockHandler, scope)
     await handler.send_input({
         "type": "http.request",
         "body": b"chunk one \x01 chunk two",
@@ -220,7 +221,7 @@ async def test_handler_body_multiple():
         "method": "GET",
         "path": "/test/",
     }
-    handler = ApplicationCommunicator(MockHandler(scope))
+    handler = ApplicationCommunicator(MockHandler, scope)
     await handler.send_input({
         "type": "http.request",
         "body": b"chunk one",
@@ -239,7 +240,6 @@ async def test_handler_body_multiple():
     MockHandler.request_class.assert_called_with(scope, b"chunk one \x01 chunk two")
 
 
-
 @pytest.mark.asyncio
 async def test_handler_body_ignore_extra():
     """
@@ -251,7 +251,7 @@ async def test_handler_body_ignore_extra():
         "method": "GET",
         "path": "/test/",
     }
-    handler = ApplicationCommunicator(MockHandler(scope))
+    handler = ApplicationCommunicator(MockHandler, scope)
     await handler.send_input({
         "type": "http.request",
         "body": b"chunk one",

@@ -8,6 +8,8 @@ from channels.layers import channel_layers, InMemoryChannelLayer
 from channels.exceptions import InvalidChannelLayerError
 
 
+### Channel layer tests
+
 class TestChannelLayerManager(unittest.TestCase):
 
     @override_settings(CHANNEL_LAYERS={
