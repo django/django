@@ -751,9 +751,6 @@ Enables fixing of migration conflicts.
 
 Allows naming the generated migration(s) instead of using a generated name.
 
-Makes ``makemigrations`` exit with error code 1 when no migrations are created
-(or would have been created, if combined with ``--dry-run``).
-
 .. django-admin-option:: --check
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
