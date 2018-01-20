@@ -12,6 +12,7 @@ env:
 
 install:
   - nvm install 7
+  - pip install git+https://github.com/django/daphne@2.0
   - pip install -U pip wheel setuptools flake8 isort unify
   - pip install $DJANGO -e .[tests]
   - pip freeze
