@@ -186,7 +186,8 @@ async def test_handler_basic():
     await handler.send_input({
         "type": "http.request",
     })
-    await handler.receive_output(1)
+    await handler.receive_output(1)  # response start
+    await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"")
 
 
@@ -206,7 +207,8 @@ async def test_handler_body_single():
         "type": "http.request",
         "body": b"chunk one \x01 chunk two",
     })
-    await handler.receive_output(1)
+    await handler.receive_output(1)  # response start
+    await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one \x01 chunk two")
 
 
@@ -236,7 +238,8 @@ async def test_handler_body_multiple():
         "type": "http.request",
         "body": b"chunk two",
     })
-    await handler.receive_output(1)
+    await handler.receive_output(1)  # response start
+    await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one \x01 chunk two")
 
 
@@ -261,5 +264,6 @@ async def test_handler_body_ignore_extra():
         "type": "http.request",
         "body": b" \x01 ",
     })
-    await handler.receive_output(1)
+    await handler.receive_output(1)  # response start
+    await handler.receive_output(1)  # response body
     MockHandler.request_class.assert_called_with(scope, b"chunk one")
