@@ -109,13 +109,13 @@ class RequestTests(unittest.TestCase):
         Tests POSTing files using multipart form data.
         """
         body = (
-            b'--BOUNDARY\r\n' +
+            b"--BOUNDARY\r\n" +
             b'Content-Disposition: form-data; name="title"\r\n\r\n' +
-            b'My First Book\r\n' +
-            b'--BOUNDARY\r\n' +
+            b"My First Book\r\n" +
+            b"--BOUNDARY\r\n" +
             b'Content-Disposition: form-data; name="pdf"; filename="book.pdf"\r\n\r\n' +
-            b'FAKEPDFBYTESGOHERE' +
-            b'--BOUNDARY--'
+            b"FAKEPDFBYTESGOHERE" +
+            b"--BOUNDARY--"
         )
         request = AsgiRequest(
             {

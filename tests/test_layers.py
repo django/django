@@ -12,8 +12,8 @@ from channels.layers import InMemoryChannelLayer, channel_layers
 class TestChannelLayerManager(unittest.TestCase):
 
     @override_settings(CHANNEL_LAYERS={
-        'default': {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
         },
     })
     def test_config_error(self):
@@ -26,10 +26,10 @@ class TestChannelLayerManager(unittest.TestCase):
             channel_layers.make_test_backend(DEFAULT_CHANNEL_LAYER)
 
     @override_settings(CHANNEL_LAYERS={
-        'default': {
-            'BACKEND': 'channels.layers.InMemoryChannelLayer',
-            'TEST_CONFIG': {
-                'expiry': 100500,
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+            "TEST_CONFIG": {
+                "expiry": 100500,
             },
         },
     })

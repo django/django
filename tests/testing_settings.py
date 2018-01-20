@@ -1,11 +1,11 @@
-SECRET_KEY = 'cat'
+SECRET_KEY = "cat"
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.admin',
-    'channels',
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.admin",
+    "channels",
 )
 
 DATABASES = {}
