@@ -25,7 +25,7 @@ except ImportError:
     # Django < 1.10
     from django.core.urlresolvers import set_script_prefix
 
-logger = logging.getLogger('django.request')
+logger = logging.getLogger("django.request")
 
 
 class AsgiRequest(http.HttpRequest):
@@ -45,19 +45,19 @@ class AsgiRequest(http.HttpRequest):
         self._read_started = False
         self.resolver_match = None
         # Path info
-        self.path = self.scope['path']
-        self.script_name = self.scope.get('root_path', '')
+        self.path = self.scope["path"]
+        self.script_name = self.scope.get("root_path", "")
         if self.script_name and self.path.startswith(self.script_name):
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = self.path[len(self.script_name):]
         else:
             self.path_info = self.path
         # HTTP basics
-        self.method = self.scope['method'].upper()
+        self.method = self.scope["method"].upper()
         # fix https://github.com/django/channels/issues/622
-        query_string = self.scope.get('query_string', '')
+        query_string = self.scope.get("query_string", "")
         if isinstance(query_string, bytes):
-            query_string = query_string.decode('utf-8')
+            query_string = query_string.decode("utf-8")
         self.META = {
             "REQUEST_METHOD": self.method,
             "QUERY_STRING": query_string,
@@ -67,31 +67,31 @@ class AsgiRequest(http.HttpRequest):
             "wsgi.multithread": True,
             "wsgi.multiprocess": True,
         }
-        if self.scope.get('client', None):
-            self.META['REMOTE_ADDR'] = self.scope['client'][0]
-            self.META['REMOTE_HOST'] = self.META['REMOTE_ADDR']
-            self.META['REMOTE_PORT'] = self.scope['client'][1]
-        if self.scope.get('server', None):
-            self.META['SERVER_NAME'] = self.scope['server'][0]
-            self.META['SERVER_PORT'] = six.text_type(self.scope['server'][1])
+        if self.scope.get("client", None):
+            self.META["REMOTE_ADDR"] = self.scope["client"][0]
+            self.META["REMOTE_HOST"] = self.META["REMOTE_ADDR"]
+            self.META["REMOTE_PORT"] = self.scope["client"][1]
+        if self.scope.get("server", None):
+            self.META["SERVER_NAME"] = self.scope["server"][0]
+            self.META["SERVER_PORT"] = six.text_type(self.scope["server"][1])
         else:
-            self.META['SERVER_NAME'] = "unknown"
-            self.META['SERVER_PORT'] = "0"
+            self.META["SERVER_NAME"] = "unknown"
+            self.META["SERVER_PORT"] = "0"
         # Handle old style-headers for a transition period
-        if "headers" in self.scope and isinstance(self.scope['headers'], dict):
-            self.scope['headers'] = [
+        if "headers" in self.scope and isinstance(self.scope["headers"], dict):
+            self.scope["headers"] = [
                 (x.encode("latin1"), y) for x, y in
-                self.scope['headers'].items()
+                self.scope["headers"].items()
             ]
         # Headers go into META
-        for name, value in self.scope.get('headers', []):
+        for name, value in self.scope.get("headers", []):
             name = name.decode("latin1")
             if name == "content-length":
                 corrected_name = "CONTENT_LENGTH"
             elif name == "content-type":
                 corrected_name = "CONTENT_TYPE"
             else:
-                corrected_name = 'HTTP_%s' % name.upper().replace("-", "_")
+                corrected_name = "HTTP_%s" % name.upper().replace("-", "_")
             # HTTPbis say only ASCII chars are allowed in headers, but we latin1 just in case
             value = value.decode("latin1")
             if corrected_name in self.META:
@@ -100,19 +100,19 @@ class AsgiRequest(http.HttpRequest):
         # Pull out request encoding if we find it
         if "CONTENT_TYPE" in self.META:
             self.content_type, self.content_params = cgi.parse_header(self.META["CONTENT_TYPE"])
-            if 'charset' in self.content_params:
+            if "charset" in self.content_params:
                 try:
-                    codecs.lookup(self.content_params['charset'])
+                    codecs.lookup(self.content_params["charset"])
                 except LookupError:
                     pass
                 else:
-                    self.encoding = self.content_params['charset']
+                    self.encoding = self.content_params["charset"]
         else:
             self.content_type, self.content_params = "", {}
         # Pull out content length info
-        if self.META.get('CONTENT_LENGTH', None):
+        if self.META.get("CONTENT_LENGTH", None):
             try:
-                self._content_length = int(self.META['CONTENT_LENGTH'])
+                self._content_length = int(self.META["CONTENT_LENGTH"])
             except (ValueError, TypeError):
                 pass
         # Body handling
@@ -126,13 +126,13 @@ class AsgiRequest(http.HttpRequest):
 
     @cached_property
     def GET(self):
-        return http.QueryDict(self.scope.get('query_string', ''))
+        return http.QueryDict(self.scope.get("query_string", ""))
 
     def _get_scheme(self):
         return self.scope.get("scheme", "http")
 
     def _get_post(self):
-        if not hasattr(self, '_post'):
+        if not hasattr(self, "_post"):
             self._read_started = False
             self._load_post_and_files()
         return self._post
@@ -141,7 +141,7 @@ class AsgiRequest(http.HttpRequest):
         self._post = post
 
     def _get_files(self):
-        if not hasattr(self, '_files'):
+        if not hasattr(self, "_files"):
             self._read_started = False
             self._load_post_and_files()
         return self._files
@@ -151,7 +151,7 @@ class AsgiRequest(http.HttpRequest):
 
     @cached_property
     def COOKIES(self):
-        return http.parse_cookie(self.META.get('HTTP_COOKIE', ''))
+        return http.parse_cookie(self.META.get("HTTP_COOKIE", ""))
 
 
 class AsgiHandler(base.BaseHandler):
@@ -200,17 +200,17 @@ class AsgiHandler(base.BaseHandler):
         Synchronous message processing.
         """
         # Set script prefix from message root_path, turning None into empty string
-        set_script_prefix(self.scope.get('root_path', '') or '')
+        set_script_prefix(self.scope.get("root_path", "") or "")
         signals.request_started.send(sender=self.__class__, scope=self.scope)
         # Run request through view system
         try:
             request = self.request_class(self.scope, body)
         except UnicodeDecodeError:
             logger.warning(
-                'Bad Request (UnicodeDecodeError)',
+                "Bad Request (UnicodeDecodeError)",
                 exc_info=sys.exc_info(),
                 extra={
-                    'status_code': 400,
+                    "status_code": 400,
                 }
             )
             response = http.HttpResponseBadRequest()
@@ -268,8 +268,8 @@ class AsgiHandler(base.BaseHandler):
         for c in response.cookies.values():
             response_headers.append(
                 (
-                    b'Set-Cookie',
-                    c.output(header='').encode("ascii"),
+                    b"Set-Cookie",
+                    c.output(header="").encode("ascii"),
                 )
             )
         # Make initial response message

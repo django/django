@@ -34,7 +34,7 @@ class Command(BaseCommand):
         if self.channel_layer is None:
             raise CommandError("You do not have any CHANNEL_LAYERS configured.")
         # Run the worker
-        self.logger = setup_logger('django.channels', self.verbosity)
+        self.logger = setup_logger("django.channels", self.verbosity)
         self.logger.info("Running worker for channels %s", options["channels"])
         worker = Worker(
             application=get_default_application(),

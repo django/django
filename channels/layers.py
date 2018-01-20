@@ -55,7 +55,7 @@ class ChannelLayerManager:
             raise InvalidChannelLayerError("No BACKEND specified for %s" % name)
         except ImportError:
             raise InvalidChannelLayerError(
-                "Cannot import BACKEND %r specified for %s" % (self.configs[name]['BACKEND'], name)
+                "Cannot import BACKEND %r specified for %s" % (self.configs[name]["BACKEND"], name)
             )
         # Initialise and pass config
         return backend_class(**config)
@@ -183,7 +183,7 @@ class InMemoryChannelLayer(BaseChannelLayer):
         assert "__asgi_channel__" not in message
         if "!" in channel:
             message = dict(message.items())
-            message['__asgi_channel__'] = channel
+            message["__asgi_channel__"] = channel
             channel = self.non_local_name(channel)
         # Store it in our channels list
         self.channels.setdefault(channel, []).append(message)

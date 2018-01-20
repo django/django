@@ -14,22 +14,22 @@ from daphne.server import Server
 
 
 class Command(RunserverCommand):
-    protocol = 'http'
+    protocol = "http"
     server_cls = Server
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
-        parser.add_argument('--noasgi', action='store_false', dest='use_asgi', default=True,
-            help='Run the old WSGI-based runserver rather than the ASGI-based one')
-        parser.add_argument('--http_timeout', action='store', dest='http_timeout', type=int, default=60,
-            help='Specify the daphne http_timeout interval in seconds (default: 60)')
-        parser.add_argument('--websocket_handshake_timeout', action='store', dest='websocket_handshake_timeout',
+        parser.add_argument("--noasgi", action="store_false", dest="use_asgi", default=True,
+            help="Run the old WSGI-based runserver rather than the ASGI-based one")
+        parser.add_argument("--http_timeout", action="store", dest="http_timeout", type=int, default=60,
+            help="Specify the daphne http_timeout interval in seconds (default: 60)")
+        parser.add_argument("--websocket_handshake_timeout", action="store", dest="websocket_handshake_timeout",
             type=int, default=5,
-            help='Specify the daphne websocket_handshake_timeout interval in seconds (default: 5)')
+            help="Specify the daphne websocket_handshake_timeout interval in seconds (default: 5)")
 
     def handle(self, *args, **options):
         self.verbosity = options.get("verbosity", 1)
-        self.logger = setup_logger('django.channels', self.verbosity)
+        self.logger = setup_logger("django.channels", self.verbosity)
         self.http_timeout = options.get("http_timeout", 60)
         self.websocket_handshake_timeout = options.get("websocket_handshake_timeout", 5)
         # Check Channels is installed right
@@ -49,8 +49,8 @@ class Command(RunserverCommand):
         self.check(display_num_errors=True)
         self.check_migrations()
         # Print helpful text
-        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
-        now = datetime.datetime.now().strftime('%B %d, %Y - %X')
+        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
+        now = datetime.datetime.now().strftime("%B %d, %Y - %X")
         if six.PY2:
             now = now.decode(get_system_encoding())
         self.stdout.write(now)
@@ -62,7 +62,7 @@ class Command(RunserverCommand):
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
             "protocol": self.protocol,
-            "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
+            "addr": "[%s]" % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
         })
@@ -77,16 +77,16 @@ class Command(RunserverCommand):
             self.server_cls(
                 application=get_default_application(),
                 endpoints=endpoints,
-                signal_handlers=not options['use_reloader'],
+                signal_handlers=not options["use_reloader"],
                 action_logger=self.log_action,
                 http_timeout=self.http_timeout,
-                ws_protocols=getattr(settings, 'CHANNELS_WS_PROTOCOLS', None),
-                root_path=getattr(settings, 'FORCE_SCRIPT_NAME', '') or '',
+                ws_protocols=getattr(settings, "CHANNELS_WS_PROTOCOLS", None),
+                root_path=getattr(settings, "FORCE_SCRIPT_NAME", "") or "",
                 websocket_handshake_timeout=self.websocket_handshake_timeout,
             ).run()
             self.logger.debug("Daphne exited")
         except KeyboardInterrupt:
-            shutdown_message = options.get('shutdown_message', '')
+            shutdown_message = options.get("shutdown_message", "")
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             return
@@ -101,18 +101,18 @@ class Command(RunserverCommand):
         if protocol == "http" and action == "complete":
             msg += "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]\n" % details
             # Utilize terminal colors, if available
-            if 200 <= details['status'] < 300:
+            if 200 <= details["status"] < 300:
                 # Put 2XX first, since it should be the common case
                 msg = self.style.HTTP_SUCCESS(msg)
-            elif 100 <= details['status'] < 200:
+            elif 100 <= details["status"] < 200:
                 msg = self.style.HTTP_INFO(msg)
-            elif details['status'] == 304:
+            elif details["status"] == 304:
                 msg = self.style.HTTP_NOT_MODIFIED(msg)
-            elif 300 <= details['status'] < 400:
+            elif 300 <= details["status"] < 400:
                 msg = self.style.HTTP_REDIRECT(msg)
-            elif details['status'] == 404:
+            elif details["status"] == 404:
                 msg = self.style.HTTP_NOT_FOUND(msg)
-            elif 400 <= details['status'] < 500:
+            elif 400 <= details["status"] < 500:
                 msg = self.style.HTTP_BAD_REQUEST(msg)
             else:
                 # Any 5XX, or any other response

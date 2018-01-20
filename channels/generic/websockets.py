@@ -37,9 +37,9 @@ class WebsocketConsumer(SyncConsumer):
         to receive().
         """
         if "text" in message:
-            self.receive(text_data=message['text'])
+            self.receive(text_data=message["text"])
         else:
-            self.receive(bytes_data=message['bytes'])
+            self.receive(bytes_data=message["bytes"])
 
     def receive(self, text_data=None, bytes_data=None):
         """
@@ -197,15 +197,15 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
         if isinstance(content, dict) and "stream" in content and "payload" in content:
             # Match it to a channel
             for stream, consumer in self.consumers.items():
-                if stream == content['stream']:
+                if stream == content["stream"]:
                     # Extract payload and add in reply_channel
-                    payload = content['payload']
+                    payload = content["payload"]
                     if not isinstance(payload, dict):
                         raise ValueError("Multiplexed frame payload is not a dict")
                     # The json consumer expects serialized JSON
-                    self.message.content['text'] = self.encode_json(payload)
+                    self.message.content["text"] = self.encode_json(payload)
                     # Send demultiplexer to the consumer, to be able to answer
-                    kwargs['multiplexer'] = self.multiplexer_class(stream, self.message.reply_channel)
+                    kwargs["multiplexer"] = self.multiplexer_class(stream, self.message.reply_channel)
                     # Patch send to avoid sending not formatted messages from the consumer
                     if hasattr(consumer, "send"):
                         consumer.send = self.send
@@ -221,13 +221,13 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
         """Forward connection to all consumers."""
         self.message.reply_channel.send({"accept": True})
         for stream, consumer in self.consumers.items():
-            kwargs['multiplexer'] = self.multiplexer_class(stream, self.message.reply_channel)
+            kwargs["multiplexer"] = self.multiplexer_class(stream, self.message.reply_channel)
             consumer(message, **kwargs)
 
     def disconnect(self, message, **kwargs):
         """Forward disconnection to all consumers."""
         for stream, consumer in self.consumers.items():
-            kwargs['multiplexer'] = self.multiplexer_class(stream, self.message.reply_channel)
+            kwargs["multiplexer"] = self.multiplexer_class(stream, self.message.reply_channel)
             consumer(message, **kwargs)
 
     def send(self, *args):

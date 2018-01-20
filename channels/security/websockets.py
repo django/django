@@ -35,7 +35,7 @@ class BaseOriginValidator(object):
         return self.func(message, *args, **kwargs)
 
     def get_header(self, message, name):
-        headers = message.content['headers']
+        headers = message.content["headers"]
         for header in headers:
             try:
                 if header[0] == name:
@@ -52,11 +52,11 @@ class BaseOriginValidator(object):
         header.
         """
         try:
-            header = self.get_header(message, b'origin')[0]
+            header = self.get_header(message, b"origin")[0]
         except (IndexError, KeyError):
             raise DenyConnection
         try:
-            origin = header.decode('ascii')
+            origin = header.decode("ascii")
         except UnicodeDecodeError:
             raise DenyConnection
         return origin
@@ -67,7 +67,7 @@ class BaseOriginValidator(object):
 
         Must be overwritten by subclasses.
         """
-        raise NotImplemented('You must overwrite this method.')
+        raise NotImplemented("You must overwrite this method.")
 
 
 class AllowedHostsOnlyOriginValidator(BaseOriginValidator):
@@ -79,7 +79,7 @@ class AllowedHostsOnlyOriginValidator(BaseOriginValidator):
     def validate_origin(self, message, origin):
         allowed_hosts = settings.ALLOWED_HOSTS
         if settings.DEBUG and not allowed_hosts:
-            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
+            allowed_hosts = ["localhost", "127.0.0.1", "[::1]"]
 
         origin_hostname = urlparse(origin).hostname
         valid = (origin_hostname and

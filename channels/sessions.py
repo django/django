@@ -44,10 +44,10 @@ class CookieMiddleware:
             cls,
             message,
             key,
-            value='',
+            value="",
             max_age=None,
             expires=None,
-            path='/',
+            path="/",
             domain=None,
             secure=False,
             httponly=False
@@ -77,31 +77,31 @@ class CookieMiddleware:
                 expires = None
                 max_age = max(0, delta.days * 86400 + delta.seconds)
             else:
-                cookies[key]['expires'] = expires
+                cookies[key]["expires"] = expires
         else:
-            cookies[key]['expires'] = ''
+            cookies[key]["expires"] = ""
         if max_age is not None:
-            cookies[key]['max-age'] = max_age
+            cookies[key]["max-age"] = max_age
             # IE requires expires, so set it if hasn't been already.
             if not expires:
-                cookies[key]['expires'] = cookie_date(time.time() +
+                cookies[key]["expires"] = cookie_date(time.time() +
                                                            max_age)
         if path is not None:
-            cookies[key]['path'] = path
+            cookies[key]["path"] = path
         if domain is not None:
-            cookies[key]['domain'] = domain
+            cookies[key]["domain"] = domain
         if secure:
-            cookies[key]['secure'] = True
+            cookies[key]["secure"] = True
         if httponly:
-            cookies[key]['httponly'] = True
+            cookies[key]["httponly"] = True
         # Write out the cookies to the response
         for c in cookies.values():
             message.setdefault("headers", []).append(
-                (b'Set-Cookie', bytes(c.output(header=''))),
+                (b"Set-Cookie", bytes(c.output(header=""))),
             )
 
     @classmethod
-    def delete_cookie(cls, message, key, path='/', domain=None):
+    def delete_cookie(cls, message, key, path="/", domain=None):
         """
         Deletes a cookie in a response.
         """
@@ -111,7 +111,7 @@ class CookieMiddleware:
             max_age=0,
             path=path,
             domain=domain,
-            expires='Thu, 01-Jan-1970 00:00:00 GMT',
+            expires="Thu, 01-Jan-1970 00:00:00 GMT",
         )
 
 

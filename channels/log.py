@@ -9,7 +9,7 @@ def setup_logger(name, verbosity=1):
     """
 
     formatter = logging.Formatter(
-        fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
+        fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s")
 
     handler.setFormatter(formatter)
 
