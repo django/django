@@ -2,9 +2,9 @@ What's new in Channels 2?
 =========================
 
 Channels 1 and Channels 2 are substantially different codebases, and the upgrade
-is a major one. While we have attempted to keep things as familiar and
+**is a major one**. While we have attempted to keep things as familiar and
 backwards-compatible as possible, major architectural shifts mean you will
-likely need at least some code changes to upgrade.
+need at least some code changes to upgrade.
 
 
 Requirements
@@ -106,6 +106,15 @@ How to Upgrade
 While this is not an exhaustive guide, here are some rough rules on how to
 proceed with an upgrade.
 
+Given the major changes to the architecture and layout of Channels 2, it is
+likely that upgrading will be a significant rewrite of your code, depending on
+what you are doing.
+
+It is **not** a drop-in replacement; we would have done this if we could,
+but changing to ``asyncio`` and Python 3 made it almost impossible to keep
+things backwards-compatible, and we wanted to correct some major design
+decisions.
+
 
 Function-based consumers and Routing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,3 +198,14 @@ you can now instead use an ``AsyncConsumer`` and ``asyncio.sleep``::
                 "text": "pong",
             })
 
+Testing
+~~~~~~~
+
+The :doc:`testing framework </topics/testing>` has been entirely rewritten to
+be async-based.
+
+While this does make writing tests a lot easier and cleaner,
+it means you must entirely rewrite any consumer tests completely - there is no
+backwards-compatible interface with the old testing client as it was
+synchronous. You can read more about the new testing framework in the
+:doc:`testing documentation </topics/testing>`.

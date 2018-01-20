@@ -27,10 +27,8 @@ Channels is comprised of several packages:
 
 * `Channels <https://github.com/django/channels/>`_, the Django integration layer
 * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
-* `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library/memory backend
-* `asgi_redis <https://github.com/django/asgi_redis/>`_, the Redis channel backend
-* `asgi_rabbitmq <https://github.com/proofit404/asgi_rabbitmq/>`_, the RabbitMQ channel backend
-* `asgi_ipc <https://github.com/django/asgi_ipc/>`_, the POSIX IPC channel backend
+* `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library
+* `asgi_redis <https://github.com/django/asgi_redis/>`_, the Redis channel layer backend (optional)
 
 This documentation covers the system as a whole; individual release notes and
 instructions can be found in the individual repositories.
