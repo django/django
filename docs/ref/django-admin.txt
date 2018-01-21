@@ -783,8 +783,8 @@ Specifies the database to migrate. Defaults to ``default``.
 
 .. django-admin-option:: --fake
 
-Tells Django to mark the migrations as having been applied or unapplied, but
-without actually running the SQL to change your database schema.
+Marks the migrations up to the target one (following the rules above) as
+applied, but without actually running the SQL to change your database schema.
 
 This is intended for advanced users to manipulate the
 current migration state directly if they're manually applying changes;
