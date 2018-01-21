@@ -253,7 +253,7 @@ Miscellaneous
 
 * The ``multiple`` attribute rendered by the
   :class:`~django.forms.SelectMultiple` widget now uses HTML5 boolean syntax
-  rather than XHTML's ``mulitple="multiple"``.
+  rather than XHTML's ``multiple="multiple"``.
 
 .. _deprecated-features-2.1:
 
