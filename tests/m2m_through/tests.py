@@ -66,6 +66,12 @@ class M2mThroughTests(TestCase):
         )
         self.assertEqual(self.rock.membership_set.get().invite_reason, 'He is good.')
 
+        self.rock.members.add(self.jim)
+        self.assertSequenceEqual(
+            self.rock.members.all(),
+            [self.bob, self.jim]
+        )
+
     def test_create_on_m2m_with_intermediary_model(self):
         annie = self.rock.members.create(name='Annie', through_defaults={'invite_reason': 'She was just awesome.'})
 
@@ -75,9 +81,11 @@ class M2mThroughTests(TestCase):
         )
         self.assertEqual(self.rock.membership_set.get().invite_reason, 'She was just awesome.')
 
-    def test_create_on_m2m_with_intermediary_model_value_required(self):
-        with self.assertRaises(IntegrityError):
-            self.rock.required_through.add(self.jim)
+        janis = self.rock.members.create(name='Janis')
+        self.assertSequenceEqual(
+            self.rock.members.all(),
+            [annie, janis]
+        )
 
     def test_remove_on_m2m_with_intermediary_model(self):
         Membership.objects.create(person=self.jim, group=self.rock)
@@ -111,6 +119,49 @@ class M2mThroughTests(TestCase):
             self.rock.members.all(),
             [self.bob, self.jim]
         )
+
+    def test_add_on_m2m_with_intermediary_model_value_required(self):
+        self.rock.required_through.add(self.bob, through_defaults={'required': 2})
+
+        self.assertSequenceEqual(
+            self.rock.required_through.all(),
+            [self.bob]
+        )
+        self.assertEqual(self.rock.requiredthrough_set.get().required, 2)
+
+        with self.assertRaises(IntegrityError):
+            self.rock.required_through.add(self.jim)
+
+    def test_create_on_m2m_with_intermediary_model_value_required(self):
+        amy = self.rock.required_through.create(name='Amy', through_defaults={'required': 20})
+
+        self.assertSequenceEqual(
+            self.rock.required_through.all(),
+            [amy]
+        )
+        self.assertEqual(self.rock.requiredthrough_set.get().required, 20)
+
+        with self.assertRaises(IntegrityError):
+            self.rock.required_through.create(name='Stevie')
+
+    def test_set_on_m2m_with_intermediary_model_value_required(self):
+        people_set = list(Person.objects.filter(name__in=['Bob', 'Jim']))
+
+        self.rock.required_through.set(people_set, through_defaults={'required': 3})
+
+        self.assertSequenceEqual(
+            self.rock.required_through.all(),
+            [self.bob, self.jim]
+        )
+
+        # Through_defaults are shared by all items in set
+        for person in self.rock.required_through.all():
+            with self.subTest(Person=person):
+                self.assertEqual(self.rock.requiredthrough_set.get(person=person).required, 3)
+
+        people_set = list(Person.objects.filter(name__in=['Jim', 'Jane']))
+        with self.assertRaises(IntegrityError):
+            self.rock.required_through.set(people_set)
 
     def test_clear_removes_all_the_m2m_relationships(self):
         Membership.objects.create(person=self.jim, group=self.rock)
