@@ -33,6 +33,11 @@ details on these changes.
 
 * ``django.utils.http.cookie_date()`` will be removed.
 
+* The ``staticfiles`` and ``admin_static`` template tag libraries will be
+  removed.
+
+* ``django.contrib.staticfiles.templatetags.static()`` will be removed.
+
 See the :ref:`Django 2.1 release notes <deprecated-features-2.1>` for more
 details on these changes.
 

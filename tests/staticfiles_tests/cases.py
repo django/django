@@ -34,8 +34,8 @@ class BaseStaticFilesMixin:
 
     def static_template_snippet(self, path, asvar=False):
         if asvar:
-            return "{%% load static from staticfiles %%}{%% static '%s' as var %%}{{ var }}" % path
-        return "{%% load static from staticfiles %%}{%% static '%s' %%}" % path
+            return "{%% load static from static %%}{%% static '%s' as var %%}{{ var }}" % path
+        return "{%% load static from static %%}{%% static '%s' %%}" % path
 
     def assertStaticRenders(self, path, result, asvar=False, **kwargs):
         template = self.static_template_snippet(path, asvar)

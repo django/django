@@ -1,8 +1,8 @@
 from urllib.parse import urljoin
 
 from django.contrib.staticfiles import storage
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.forms import Media
+from django.templatetags.static import static
 from django.test import SimpleTestCase, override_settings
 
 

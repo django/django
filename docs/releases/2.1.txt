@@ -274,6 +274,12 @@ Miscellaneous
   :func:`~django.utils.http.http_date`, which follows the format of the latest
   RFC.
 
+* ``{% load staticfiles %}`` and ``{% load admin_static %}`` are deprecated
+  in favor of ``{% load static %}``, which works the same.
+
+* ``django.contrib.staticfiles.templatetags.static()`` is deprecated in favor
+  of ``django.templatetags.static.static()``.
+
 .. _removed-features-2.1:
 
 Features removed in 2.1
