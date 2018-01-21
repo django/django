@@ -1056,8 +1056,8 @@ implementation details see :ref:`using-the-views`.
         </tr>
         </table>
 
-        <input type="submit" value="login" />
-        <input type="hidden" name="next" value="{{ next }}" />
+        <input type="submit" value="login">
+        <input type="hidden" name="next" value="{{ next }}">
         </form>
 
         {# Assumes you setup the password_reset view in your URLconf #}

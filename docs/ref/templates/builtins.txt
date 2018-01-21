@@ -1192,7 +1192,7 @@ value to a maximum value, and then applies that ratio to a constant.
 For example::
 
     <img src="bar.png" alt="Bar"
-         height="10" width="{% widthratio this_value max_value max_width %}" />
+         height="10" width="{% widthratio this_value max_value max_width %}">
 
 If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100, the
 image in the above example will be 88 pixels wide
@@ -1832,14 +1832,14 @@ If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 --------------
 
 Replaces line breaks in plain text with appropriate HTML; a single
-newline becomes an HTML line break (``<br />``) and a new line
+newline becomes an HTML line break (``<br>``) and a new line
 followed by a blank line becomes a paragraph break (``</p>``).
 
 For example::
 
     {{ value|linebreaks }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br />is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
 slug</p>``.
 
 .. templatefilter:: linebreaksbr
@@ -1848,13 +1848,13 @@ slug</p>``.
 ----------------
 
 Converts all newlines in a piece of plain text to HTML line breaks
-(``<br />``).
+(``<br>``).
 
 For example::
 
     {{ value|linebreaksbr }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br />is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br>is a
 slug``.
 
 .. templatefilter:: linenumbers
@@ -2531,20 +2531,20 @@ app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!">
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
-    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen">
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call::
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}"></img>
+    <img src="{{ myphoto }}">
 
 .. admonition:: Using Jinja2 templates?
 
@@ -2561,7 +2561,7 @@ over exactly where and how :setting:`STATIC_URL` is injected into the template,
 you can use the :ttag:`get_static_prefix` template tag::
 
     {% load static %}
-    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!" />
+    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!">
 
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times::
@@ -2569,8 +2569,8 @@ the value multiple times::
     {% load static %}
     {% get_static_prefix as STATIC_PREFIX %}
 
-    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!" />
-    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!" />
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!">
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!">
 
 .. templatetag:: get_media_prefix
 

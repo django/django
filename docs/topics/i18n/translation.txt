@@ -610,7 +610,7 @@ filters::
     </h1>
     <p>
     {% for stage in tour_stages %}
-        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br />{% else %}, {% endif %}
+        {% cycle start end %}: {{ stage }}{% if forloop.counter|divisibleby:2 %}<br>{% else %}, {% endif %}
     {% endfor %}
     </p>
 
@@ -891,9 +891,9 @@ use the ``{% get_language_info %}`` tag::
 
 You can then access the information::
 
-    Language code: {{ lang.code }}<br />
-    Name of language: {{ lang.name_local }}<br />
-    Name in English: {{ lang.name }}<br />
+    Language code: {{ lang.code }}<br>
+    Name of language: {{ lang.name_local }}<br>
+    Name in English: {{ lang.name }}<br>
     Bi-directional: {{ lang.bidi }}
     Name in the active language: {{ lang.name_translated }}
 
@@ -1788,7 +1788,7 @@ Here's example HTML template code:
     {% load i18n %}
 
     <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
-        <input name="next" type="hidden" value="{{ redirect_to }}" />
+        <input name="next" type="hidden" value="{{ redirect_to }}">
         <select name="language">
             {% get_current_language as LANGUAGE_CODE %}
             {% get_available_languages as LANGUAGES %}
@@ -1799,7 +1799,7 @@ Here's example HTML template code:
                 </option>
             {% endfor %}
         </select>
-        <input type="submit" value="Go" />
+        <input type="submit" value="Go">
     </form>
 
 In this example, Django looks up the URL of the page to which the user will be

@@ -30,24 +30,24 @@ class GenericInlineFormsetTests(TestCase):
             ''.join(form.as_p() for form in formset.forms),
             """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
 Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text"
-name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
+name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50"></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
 <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" />
+id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">
 <input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id"
-id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
+id="id_generic_relations-taggeditem-content_type-object_id-0-id"></p>"""
         )
         formset = GenericFormSet(instance=Animal())
         self.assertHTMLEqual(
             ''.join(form.as_p() for form in formset.forms),
             """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">
 Tag:</label> <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag"
-type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50" /></p>
+type="text" name="generic_relations-taggeditem-content_type-object_id-0-tag" maxlength="50"></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
 <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" /><input type="hidden"
+id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE"><input type="hidden"
 name="generic_relations-taggeditem-content_type-object_id-0-id"
-id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
+id="id_generic_relations-taggeditem-content_type-object_id-0-id"></p>"""
         )
         platypus = Animal.objects.create(
             common_name='Platypus', latin_name='Ornithorhynchus anatinus',
@@ -60,29 +60,29 @@ id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>"""
             ''.join(form.as_p() for form in formset.forms),
             """<p><label for="id_generic_relations-taggeditem-content_type-object_id-0-tag">Tag:</label>
 <input id="id_generic_relations-taggeditem-content_type-object_id-0-tag" type="text"
-name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50" /></p>
+name="generic_relations-taggeditem-content_type-object_id-0-tag" value="shiny" maxlength="50"></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">Delete:</label>
 <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-0-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE" />
+id="id_generic_relations-taggeditem-content_type-object_id-0-DELETE">
 <input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id"
-value="%s" id="id_generic_relations-taggeditem-content_type-object_id-0-id" /></p>
+value="%s" id="id_generic_relations-taggeditem-content_type-object_id-0-id"></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-1-tag">Tag:</label>
 <input id="id_generic_relations-taggeditem-content_type-object_id-1-tag" type="text"
-name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50" /></p>
+name="generic_relations-taggeditem-content_type-object_id-1-tag" maxlength="50"></p>
 <p><label for="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">Delete:</label>
 <input type="checkbox" name="generic_relations-taggeditem-content_type-object_id-1-DELETE"
-id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE" />
+id="id_generic_relations-taggeditem-content_type-object_id-1-DELETE">
 <input type="hidden" name="generic_relations-taggeditem-content_type-object_id-1-id"
-id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tagged_item_id
+id="id_generic_relations-taggeditem-content_type-object_id-1-id"></p>""" % tagged_item_id
         )
         lion = Animal.objects.create(common_name='Lion', latin_name='Panthera leo')
         formset = GenericFormSet(instance=lion, prefix='x')
         self.assertHTMLEqual(
             ''.join(form.as_p() for form in formset.forms),
             """<p><label for="id_x-0-tag">Tag:</label>
-<input id="id_x-0-tag" type="text" name="x-0-tag" maxlength="50" /></p>
-<p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE" />
-<input type="hidden" name="x-0-id" id="id_x-0-id" /></p>"""
+<input id="id_x-0-tag" type="text" name="x-0-tag" maxlength="50"></p>
+<p><label for="id_x-0-DELETE">Delete:</label> <input type="checkbox" name="x-0-DELETE" id="id_x-0-DELETE">
+<input type="hidden" name="x-0-id" id="id_x-0-id"></p>"""
         )
 
     def test_options(self):
@@ -101,7 +101,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         self.assertHTMLEqual(
             formset.forms[0].as_p(),
             '<input type="hidden" name="generic_relations-taggeditem-content_type-object_id-0-id" value="%s" '
-            'id="id_generic_relations-taggeditem-content_type-object_id-0-id" />' % harmless.pk
+            'id="id_generic_relations-taggeditem-content_type-object_id-0-id">' % harmless.pk
         )
         self.assertEqual(formset.forms[0].instance, harmless)
         self.assertEqual(formset.forms[1].instance, mammal)

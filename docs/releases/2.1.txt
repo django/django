@@ -255,6 +255,10 @@ Miscellaneous
   :class:`~django.forms.SelectMultiple` widget now uses HTML5 boolean syntax
   rather than XHTML's ``multiple="multiple"``.
 
+* HTML rendered by form widgets no longer includes a closing slash on void
+  elements, e.g. ``<br>``. This is incompatible within XHTML, although some
+  widgets already used aspects of HTML5 such as boolean attributes.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1

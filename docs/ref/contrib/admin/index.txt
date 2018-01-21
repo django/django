@@ -1180,7 +1180,7 @@ subclass::
                 # for each line of the address and you want to separate each
                 # line by a linebreak
                 return format_html_join(
-                    mark_safe('<br/>'),
+                    mark_safe('<br>'),
                     '{}',
                     ((line,) for line in instance.get_full_address()),
                 ) or mark_safe("<span class='errors'>I can't determine this address.</span>")

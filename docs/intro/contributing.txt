@@ -535,8 +535,8 @@ Use the arrow keys to move up and down.
     +++ b/docs/ref/forms/api.txt
     @@ -1065,3 +1065,13 @@ You can put several Django forms inside one ``<form>`` tag. To give each
          >>> print(father.as_ul())
-         <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" /></li>
-         <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" /></li>
+         <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name"></li>
+         <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name"></li>
     +
     +The prefix can also be specified on the form class::
     +
