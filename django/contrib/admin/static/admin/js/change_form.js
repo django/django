@@ -13,6 +13,11 @@
             }
         });
 
+        // disabling submit button to prevent double submission
+        $('form').submit(function() {
+            $(this).find(':submit').prop('disabled', true);
+        });
+
         if (modelName) {
             $('form#' + modelName + '_form :input:visible:enabled:first').focus();
         }
