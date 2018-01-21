@@ -83,7 +83,7 @@ we could crawl the database), and use ``channel_layer.send``::
     from channels.layers import get_channel_layer
 
     channel_layer = get_channel_layer()
-    channel_layer.send({
+    channel_layer.send("channel_name", {
         "type": "chat.message",
         "text": "Hello there!",
     })
