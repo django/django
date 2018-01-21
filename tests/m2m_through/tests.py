@@ -159,6 +159,21 @@ class M2mThroughTests(TestCase):
             with self.subTest(Person=person):
                 self.assertEqual(self.rock.requiredthrough_set.get(person=person).required, 3)
 
+        self.rock.required_through.clear()
+
+        values = [{'required': 1}, {'required': 2}]
+        self.rock.required_through.set(people_set, through_defaults=values)
+
+        self.assertSequenceEqual(
+            self.rock.required_through.all(),
+            [self.bob, self.jim]
+        )
+
+        # Intermediate values are set correctly
+        for person, value in zip(self.rock.required_through.all(), values):
+            with self.subTest(Person=person):
+                self.assertEqual(self.rock.requiredthrough_set.get(person=person).required, value['required'])
+
         people_set = list(Person.objects.filter(name__in=['Jim', 'Jane']))
         with self.assertRaises(IntegrityError):
             self.rock.required_through.set(people_set)

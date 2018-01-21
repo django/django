@@ -514,14 +514,16 @@ the intermediate model::
 You can also use ``add()``, ``create()``, or ``set()`` to create relationships,
 as long as your specify ``through_defaults`` for any required fields::
 
-    >>> # The following statements will not work
     >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
     >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
     >>> beatles.members.set([john, paul, ringo, george], through_defaults={'date_joined': date(1960, 8, 1)})
 
-The simple ``add``, ``create`` and ``set`` calls don't provide a way to
-specify different details for different objects. You may prefer to create
-instances of the intermediate model directly instead.
+For ``add()`` and ``set()`` you may either specify a single 'default' dictionary or a list of dictionaries
+if you wish to specify details for each object.
+
+    >>> dates_joined = [{'date_joined': date(1957, 3, 1)},{'date_joined': date(1957, 7, 1)}]
+    >>> beatles.members.add([john, paul], through_defaults=dates_joined)
+    >>> beatles.members.set([john, paul], through_defaults=dates_joined)
 
 If the custom through table defined by the intermediate model does not enforce
 uniqueness on the ``(model1, model2)`` pair, allowing multiple values, the

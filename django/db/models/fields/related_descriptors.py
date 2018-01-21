@@ -911,12 +911,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(
-                    self.source_field_name, self.target_field_name, *objs, through_defaults=through_defaults)
+                    self.source_field_name, self.target_field_name, *objs, intermediate_values=through_defaults)
 
                 # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
                 if self.symmetrical:
                     self._add_items(
-                        self.target_field_name, self.source_field_name, *objs, through_defaults=through_defaults)
+                        self.target_field_name, self.source_field_name, *objs, intermediate_values=through_defaults)
         add.alters_data = True
 
         def remove(self, *objs):
@@ -998,11 +998,17 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return obj, created
         update_or_create.alters_data = True
 
-        def _add_items(self, source_field_name, target_field_name, *objs, through_defaults=None):
+        def _add_items(self, source_field_name, target_field_name, *objs, intermediate_values=None):
             # source_field_name: the PK fieldname in join table for the source object
             # target_field_name: the PK fieldname in join table for the target object
-            # *objs - objects to add. Either object instances, or primary keys of object instances.
-            through_defaults = through_defaults or {}
+            # *objs: objects to add. Either object instances, or primary keys of object instances.
+            # through_defaults: Extra values for fields on the through model.
+            #               Either a dict of defaults, or a list of dictionaries for each obj
+            intermediate_values = intermediate_values or {}
+            if isinstance(intermediate_values, dict):
+                intermediate_values = [
+                    intermediate_values for obj in objs
+                ]
 
             # If there aren't any objects, there is nothing to do.
             from django.db.models import Model
@@ -1052,11 +1058,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
                     # Add the ones that aren't there already
                     self.through._default_manager.using(db).bulk_create([
-                        self.through(**dict(through_defaults, **{
+                        self.through(**dict(extra_values, **{
                             '%s_id' % source_field_name: self.related_val[0],
                             '%s_id' % target_field_name: obj_id,
                         }))
-                        for obj_id in new_ids
+                        for obj_id, extra_values in zip(new_ids, intermediate_values)
                     ])
 
                     if self.reverse or source_field_name == self.source_field_name:
