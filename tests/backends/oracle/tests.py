@@ -30,17 +30,6 @@ class Tests(unittest.TestCase):
             cursor.execute("BEGIN %s := 'X'; END; ", [var])
             self.assertEqual(var.getvalue(), 'X')
 
-    def test_long_string(self):
-        """Text longer than 4000 chars can be saved and read."""
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-            long_str = ''.join(str(x) for x in range(4000))
-            cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
-            cursor.execute('SELECT text FROM ltext')
-            row = cursor.fetchone()
-            self.assertEqual(long_str, row[0].read())
-            cursor.execute('DROP TABLE ltext')
-
     def test_client_encoding(self):
         """Client encoding is set correctly."""
         connection.ensure_connection()
