@@ -194,15 +194,6 @@ class AuthenticationForm(forms.Form):
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
-                # An authentication backend may reject inactive users. Check
-                # if the user exists and is inactive, and raise the 'inactive'
-                # error if so.
-                try:
-                    self.user_cache = UserModel._default_manager.get_by_natural_key(username)
-                except UserModel.DoesNotExist:
-                    pass
-                else:
-                    self.confirm_login_allowed(self.user_cache)
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
                     code='invalid_login',

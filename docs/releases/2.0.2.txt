@@ -2,9 +2,28 @@
 Django 2.0.2 release notes
 ==========================
 
-*Expected February 1, 2018*
+*February 1, 2018*
 
-Django 2.0.2 fixes several bugs in 2.0.1.
+Django 2.0.2 fixes a security issue and several bugs in 2.0.1.
+
+CVE-2018-6188: Information leakage in ``AuthenticationForm``
+============================================================
+
+A regression in Django 1.11.8 made
+:class:`~django.contrib.auth.forms.AuthenticationForm` run its
+``confirm_login_allowed()`` method even if an incorrect password is entered.
+This can leak information about a user, depending on what messages
+``confirm_login_allowed()`` raises. If ``confirm_login_allowed()`` isn't
+overridden, an attacker enter an arbitrary username and see if that user has
+been set to ``is_active=False``. If ``confirm_login_allowed()`` is overridden,
+more sensitive details could be leaked.
+
+This issue is fixed with the caveat that ``AuthenticationForm`` can no longer
+raise the "This account is inactive." error if the authentication backend
+rejects inactive users (the default authentication backend, ``ModelBackend``,
+has done that since Django 1.10). This issue will be revisited for Django 2.1
+as a fix to address the caveat will likely be too invasive for inclusion in
+older versions.
 
 Bugfixes
 ========
