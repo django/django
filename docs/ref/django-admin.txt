@@ -1201,7 +1201,7 @@ files is:
     to template rendering, it might result in an incorrect example.
 
     To work around this problem, you can use the :ttag:`templatetag`
-    templatetag to "escape" the various parts of the template syntax.
+    template tag to "escape" the various parts of the template syntax.
 
     In addition, to allow Python template files that contain Django template
     language syntax while also preventing packaging systems from trying to
