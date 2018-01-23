@@ -6,8 +6,8 @@ from django.db import connection
 from django.db.models import CharField, TextField, Value as V
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
-    Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now, Substr,
-    Upper,
+    Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now,
+    StrIndex, Substr, Upper,
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import timezone
@@ -510,11 +510,12 @@ class FunctionTests(TestCase):
     def test_substr_with_expressions(self):
         Author.objects.create(name='John Smith', alias='smithj')
         Author.objects.create(name='Rhonda')
-        authors = Author.objects.annotate(name_part=Substr('name', 5, 3))
+        substr = Substr(Upper('name'), StrIndex('name', V('h')), 5, output_field=CharField())
+        authors = Author.objects.annotate(name_part=substr)
         self.assertQuerysetEqual(
             authors.order_by('name'), [
-                ' Sm',
-                'da',
+                'HN SM',
+                'HONDA',
             ],
             lambda a: a.name_part
         )
