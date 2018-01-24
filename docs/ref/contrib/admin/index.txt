@@ -1287,6 +1287,41 @@ subclass::
     a full count on the table which can be expensive if the table contains a
     large number of rows.
 
+.. attribute:: ModelAdmin.sortable_by
+
+    .. versionadded:: 2.1
+
+    By default, the change list page allows users to interactively sort it by
+    all model fields (and callables that have the ``admin_order_field`` property
+    set) specified by :attr:`list_display`. However, you might want to disable
+    interactive sorting for any/all of them.
+
+    With ``sortable_by`` you can specify a subset of these items. Set
+    ``sortable_by`` to a collection of these same items and they will be
+    available to sort by.
+
+    You can disable customization of such ordering by specifying an empty
+    collection.
+
+    If you need to specify this list dynamically you can implement a
+    :meth:`~ModelAdmin.get_sortable_by` method instead.
+
+    Example::
+
+        class Person(models.Model):
+            first_name = models.CharField(max_length=50)
+            last_name = models.CharField(max_length=50)
+            age = models.PositiveIntegerField()
+            ssn = models.CharField('SSN', max_length=11)
+
+            def full_name(self):
+                  return self.first_name + ' ' + self.last_name
+            full_name.admin_order_field = 'last_name'
+
+        class PersonAdmin(admin.ModelAdmin):
+            list_display = ('full_name', 'age', 'ssn')
+            sortable_by = ('full_name', 'age')
+
 .. attribute:: ModelAdmin.view_on_site
 
     Set ``view_on_site`` to control whether or not to display the "View on site" link.
@@ -1471,6 +1506,28 @@ templates used by the :class:`ModelAdmin` views:
     ('name', '=age')`` which results in a string comparison for the numeric
     field, for example ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')``
     on PostgreSQL.
+
+.. method:: ModelAdmin.get_sortable_by(request)
+
+    .. versionadded:: 2.1
+
+    The ``get_sortable_by`` method is passed the ``HttpRequest`` and is expected
+    to return a collection of field names that will be available to users for
+    interactive customization of the change list page ordering.
+
+    Its default implementation returns :attr:`sortable_by` if it's set,
+    otherwise it simply defers to :meth:`get_list_display`.
+
+    Just like with :attr:`sortable_by` you can disable customization of such
+    ordering by returning an empty collection.
+
+    For example, you could exclude one or more fields from ordering by
+    overriding this method like this::
+
+        class PersonAdmin(admin.ModelAdmin):
+
+            def get_sortable_by(self, request):
+                return {*self.get_list_display(request)} - {'rank'}
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)
 

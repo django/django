@@ -35,7 +35,7 @@ IGNORED_PARAMS = (
 class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
-                 list_per_page, list_max_show_all, list_editable, model_admin):
+                 list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -50,6 +50,7 @@ class ChangeList:
         self.list_max_show_all = list_max_show_all
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
+        self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
         try:
