@@ -322,10 +322,16 @@ memory stores. If you only have one ``locmem`` cache, you can omit the
 memory cache, you will need to assign a name to at least one of them in
 order to keep them separate.
 
+The cache uses a least-recently-used (LRU) culling strategy.
+
 Note that each process will have its own private cache instance, which means no
 cross-process caching is possible. This obviously also means the local memory
 cache isn't particularly memory-efficient, so it's probably not a good choice
 for production environments. It's nice for development.
+
+.. versionchanged:: 2.1
+
+    Older versions use a pseudo-random culling strategy rather than LRU.
 
 Dummy caching (for development)
 -------------------------------

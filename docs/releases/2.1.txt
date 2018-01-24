@@ -108,7 +108,8 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* The :ref:`local-memory cache backend <local-memory-caching>` now uses a
+  least-recently-used (LRU) culling strategy rather than a pseudo-random one.
 
 CSRF
 ~~~~
