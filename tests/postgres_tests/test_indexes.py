@@ -3,39 +3,32 @@ from django.db import connection
 from django.test import skipUnlessDBFeature
 
 from . import PostgreSQLTestCase
-from .models import CharFieldModel, DateTimeArrayModel, IntegerArrayModel
+from .models import CharFieldModel, IntegerArrayModel
+
+
+class IndexTestMixin:
+
+    def test_name_auto_generation(self):
+        index = self.index_class(fields=['field'])
+        index.set_name_with_model(CharFieldModel)
+        self.assertRegex(index.name, r'postgres_te_field_[0-9a-f]{6}_%s' % self.index_class.suffix)
+
+    def test_deconstruction_no_customization(self):
+        index = self.index_class(fields=['title'], name='test_title_%s' % self.index_class.suffix)
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.indexes.%s' % self.index_class.__name__)
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_%s' % self.index_class.suffix})
 
 
 @skipUnlessDBFeature('has_brin_index_support')
-class BrinIndexTests(PostgreSQLTestCase):
+class BrinIndexTests(IndexTestMixin, PostgreSQLTestCase):
+    index_class = BrinIndex
 
     def test_suffix(self):
         self.assertEqual(BrinIndex.suffix, 'brin')
 
-    def test_not_eq(self):
-        index = BrinIndex(fields=['title'])
-        index_with_page_range = BrinIndex(fields=['title'], pages_per_range=16)
-        self.assertNotEqual(index, index_with_page_range)
-
-    def test_name_auto_generation(self):
-        """
-        A name longer than 30 characters (since len(BrinIndex.suffix) is 4
-        rather than usual limit of 3) is okay for PostgreSQL. For this test,
-        the name of the field ('datetimes') must be at least 7 characters to
-        generate a name longer than 30 characters.
-        """
-        index = BrinIndex(fields=['datetimes'])
-        index.set_name_with_model(DateTimeArrayModel)
-        self.assertEqual(index.name, 'postgres_te_datetim_abf104_brin')
-
     def test_deconstruction(self):
-        index = BrinIndex(fields=['title'], name='test_title_brin')
-        path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.indexes.BrinIndex')
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_brin'})
-
-    def test_deconstruction_with_pages_per_range(self):
         index = BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=16)
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.contrib.postgres.indexes.BrinIndex')
@@ -47,22 +40,11 @@ class BrinIndexTests(PostgreSQLTestCase):
             BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=0)
 
 
-class GinIndexTests(PostgreSQLTestCase):
+class GinIndexTests(IndexTestMixin, PostgreSQLTestCase):
+    index_class = GinIndex
 
     def test_suffix(self):
         self.assertEqual(GinIndex.suffix, 'gin')
-
-    def test_eq(self):
-        index = GinIndex(fields=['title'])
-        same_index = GinIndex(fields=['title'])
-        another_index = GinIndex(fields=['author'])
-        self.assertEqual(index, same_index)
-        self.assertNotEqual(index, another_index)
-
-    def test_name_auto_generation(self):
-        index = GinIndex(fields=['field'])
-        index.set_name_with_model(IntegerArrayModel)
-        self.assertEqual(index.name, 'postgres_te_field_def2f8_gin')
 
     def test_deconstruction(self):
         index = GinIndex(
@@ -74,62 +56,31 @@ class GinIndexTests(PostgreSQLTestCase):
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.contrib.postgres.indexes.GinIndex')
         self.assertEqual(args, ())
-        self.assertEqual(
-            kwargs,
-            {
-                'fields': ['title'],
-                'name': 'test_title_gin',
-                'fastupdate': True,
-                'gin_pending_list_limit': 128,
-            }
-        )
-
-    def test_deconstruct_no_args(self):
-        index = GinIndex(fields=['title'], name='test_title_gin')
-        path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.indexes.GinIndex')
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_gin'})
+        self.assertEqual(kwargs, {
+            'fields': ['title'],
+            'name': 'test_title_gin',
+            'fastupdate': True,
+            'gin_pending_list_limit': 128,
+        })
 
 
-class GistIndexTests(PostgreSQLTestCase):
+class GistIndexTests(IndexTestMixin, PostgreSQLTestCase):
+    index_class = GistIndex
 
     def test_suffix(self):
         self.assertEqual(GistIndex.suffix, 'gist')
-
-    def test_eq(self):
-        index = GistIndex(fields=['title'], fillfactor=64)
-        same_index = GistIndex(fields=['title'], fillfactor=64)
-        another_index = GistIndex(fields=['author'], buffering=True)
-        self.assertEqual(index, same_index)
-        self.assertNotEqual(index, another_index)
-
-    def test_name_auto_generation(self):
-        index = GistIndex(fields=['field'])
-        index.set_name_with_model(CharFieldModel)
-        self.assertEqual(index.name, 'postgres_te_field_1e0206_gist')
 
     def test_deconstruction(self):
         index = GistIndex(fields=['title'], name='test_title_gist', buffering=False, fillfactor=80)
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.contrib.postgres.indexes.GistIndex')
         self.assertEqual(args, ())
-        self.assertEqual(
-            kwargs,
-            {
-                'fields': ['title'],
-                'name': 'test_title_gist',
-                'buffering': False,
-                'fillfactor': 80,
-            }
-        )
-
-    def test_deconstruction_no_customization(self):
-        index = GistIndex(fields=['title'], name='test_title_gist')
-        path, args, kwargs = index.deconstruct()
-        self.assertEqual(path, 'django.contrib.postgres.indexes.GistIndex')
-        self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_gist'})
+        self.assertEqual(kwargs, {
+            'fields': ['title'],
+            'name': 'test_title_gist',
+            'buffering': False,
+            'fillfactor': 80,
+        })
 
 
 class SchemaTests(PostgreSQLTestCase):
