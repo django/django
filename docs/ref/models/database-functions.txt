@@ -752,7 +752,7 @@ Usage example::
     margaret smith
 
 ``Replace``
-~~~~~~~~~~~
+-----------
 
 .. class:: Replace(expression, text, replacement=Value(''), **extra)
 
