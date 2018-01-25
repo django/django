@@ -48,6 +48,12 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.kwargs, {'lang': 'en', 'url': 'foo'})
         self.assertEqual(match.route, '<lang>/<path:url>/')
 
+    def test_re_path(self):
+        match = resolve('/regex/1/')
+        self.assertEqual(match.url_name, 'regex')
+        self.assertEqual(match.kwargs, {'pk': '1'})
+        self.assertEqual(match.route, '^regex/(?P<pk>[0-9]+)/$')
+
     def test_path_reverse_without_parameter(self):
         url = reverse('articles-2003')
         self.assertEqual(url, '/articles/2003/')

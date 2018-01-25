@@ -132,10 +132,9 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.route
 
-        .. versionadded:: 2.0
+        .. versionadded:: 2.1
 
-        The route of the URL pattern that matches the URL. This attribute is
-        only set if the URL pattern was defined using :func:`django.urls.path`.
+        The route of the URL pattern that matches the URL.
 
     .. attribute:: ResolverMatch.app_name
 

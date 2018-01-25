@@ -56,9 +56,9 @@ class ResolverMatch:
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s, route=%s)" % (
             self._func_path, self.args, self.kwargs, self.url_name,
-            self.app_names, self.namespaces,
+            self.app_names, self.namespaces, self.route,
         )
 
 
@@ -318,6 +318,9 @@ class URLPattern:
         self.default_args = default_args or {}
         self.name = name
 
+    def __str__(self):
+        return str(self.pattern)
+
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.pattern.describe())
 
@@ -346,8 +349,7 @@ class URLPattern:
             new_path, args, kwargs = match
             # Pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
-            return ResolverMatch(self.callback, args, kwargs, self.pattern.name,
-                                 route=getattr(self.pattern, '_route', None))
+            return ResolverMatch(self.callback, args, kwargs, self.pattern.name, route=str(self.pattern))
 
     @cached_property
     def lookup_str(self):
@@ -543,7 +545,7 @@ class URLResolver:
                             sub_match.url_name,
                             [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces,
-                            getattr(pattern.pattern, '_route', None),
+                            str(pattern),
                         )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
