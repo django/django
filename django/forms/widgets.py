@@ -579,6 +579,9 @@ class ChoiceWidget(Widget):
         groups = []
         has_selected = False
 
+        subgroup_None_index = -1
+        subgroup_None = None
+
         for index, (option_value, option_label) in enumerate(self.choices):
             if option_value is None:
                 option_value = ''
@@ -588,11 +591,17 @@ class ChoiceWidget(Widget):
                 group_name = option_value
                 subindex = 0
                 choices = option_label
+                groups.append((group_name, subgroup, index))
             else:
-                group_name = None
-                subindex = None
+                if subgroup_None is None:
+                    print("Subgroup is none adding it")
+                    subgroup_None = []
+                    groups.append((None, subgroup_None, index))
+
+                subgroup_None_index += 1
+                subindex = subgroup_None_index
+                subgroup = subgroup_None
                 choices = [(option_value, option_label)]
-            groups.append((group_name, subgroup, index))
 
             for subvalue, sublabel in choices:
                 selected = (
@@ -604,8 +613,8 @@ class ChoiceWidget(Widget):
                     name, subvalue, sublabel, selected, index,
                     subindex=subindex, attrs=attrs,
                 ))
-                if subindex is not None:
-                    subindex += 1
+
+                subindex += 1
         return groups
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
