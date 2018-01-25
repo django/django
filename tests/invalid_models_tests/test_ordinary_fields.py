@@ -5,6 +5,7 @@ from django.db import connection, models
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 
 @isolate_apps('invalid_models_tests')
@@ -198,6 +199,12 @@ class CharFieldTests(TestCase):
             ),
         ])
 
+    def test_choices_containing_lazy(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=[['1', _('1')], ['2', _('2')]])
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
     def test_choices_named_group(self):
         class Model(models.Model):
             field = models.CharField(
@@ -247,6 +254,17 @@ class CharFieldTests(TestCase):
                 id='fields.E005',
             ),
         ])
+
+    def test_choices_named_group_lazy(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=10, choices=[
+                    [_('knights'), [['L', _('Lancelot')], ['G', _('Galahad')]]],
+                    ['R', _('Random character')],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
 
     def test_bad_db_index_value(self):
         class Model(models.Model):

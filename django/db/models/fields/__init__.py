@@ -245,7 +245,7 @@ class Field(RegisterLookupMixin):
             return []
 
         def is_value(value):
-            return isinstance(value, str) or not is_iterable(value)
+            return isinstance(value, (str, Promise)) or not is_iterable(value)
 
         if is_value(self.choices):
             return [
