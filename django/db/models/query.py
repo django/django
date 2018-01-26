@@ -7,7 +7,6 @@ import operator
 import warnings
 from collections import OrderedDict, namedtuple
 from functools import lru_cache
-from itertools import chain
 
 from django.conf import settings
 from django.core import exceptions
@@ -176,7 +175,8 @@ class FlatValuesListIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
-        return chain.from_iterable(compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size))
+        for row in compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size):
+            yield row[0]
 
 
 class QuerySet:
