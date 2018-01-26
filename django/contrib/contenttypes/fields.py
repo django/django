@@ -283,6 +283,8 @@ class GenericRelation(ForeignObject):
 
     rel_class = GenericRel
 
+    mti_inherited = False
+
     def __init__(self, to, object_id_field='object_id', content_type_field='content_type',
                  for_concrete_model=True, related_query_name=None, limit_choices_to=None, **kwargs):
         kwargs['rel'] = self.rel_class(
@@ -427,6 +429,12 @@ class GenericRelation(ForeignObject):
         kwargs['private_only'] = True
         super().contribute_to_class(cls, name, **kwargs)
         self.model = cls
+        # Disable the reverse relation for fields inherited by subclasses of a
+        # model in multi-table inheritance. The reverse relation points to the
+        # field of the base model.
+        if self.mti_inherited:
+            self.remote_field.related_name = '+'
+            self.remote_field.related_query_name = None
         setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
 
         # Add get_RELATED_order() and set_RELATED_order() to the model this
