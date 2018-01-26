@@ -168,12 +168,21 @@ class ConnectionHandler:
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
-        conn.setdefault('ATOMIC_REQUESTS', False)
-        conn.setdefault('AUTOCOMMIT', True)
+        if hasattr(settings, 'ATOMIC_REQUESTS'):
+            conn.setdefault('ATOMIC_REQUESTS', settings.ATOMIC_REQUESTS)
+        else:
+            conn.setdefault('ATOMIC_REQUESTS', False)
+        if hasattr(settings, 'AUTOCOMMIT'):
+            conn.setdefault('AUTOCOMMIT', settings.AUTOCOMMIT)
+        else:
+            conn.setdefault('AUTOCOMMIT', True)
+        if hasattr(settings, 'CONN_MAX_AGE'):
+            conn.setdefault('CONN_MAX_AGE', settings.CONN_MAX_AGE)
+        else:
+            conn.setdefault('CONN_MAX_AGE', 0)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
             conn['ENGINE'] = 'django.db.backends.dummy'
-        conn.setdefault('CONN_MAX_AGE', 0)
         conn.setdefault('OPTIONS', {})
         conn.setdefault('TIME_ZONE', None)
         for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
