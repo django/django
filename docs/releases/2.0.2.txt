@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed incorrect foreign key nullification if a model has two foreign keys to
   the same model and a target model is deleted (:ticket:`29016`).
+
+* Fixed regression in the use of ``QuerySet.values_list(..., flat=True)``
+  followed by ``annotate()`` (:ticket:`29067`).
