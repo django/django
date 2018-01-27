@@ -144,6 +144,9 @@ class GEOSGeometryBase(GEOSBase):
                 return False
         return isinstance(other, GEOSGeometry) and self.srid == other.srid and self.equals_exact(other)
 
+    def __hash__(self):
+        return hash((self.srid, self.wkt))
+
     # ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:
     #  http://lists.gispython.org/pipermail/community/2007-July/001034.html
