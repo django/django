@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed regression in the use of ``QuerySet.values_list(..., flat=True)``
   followed by ``annotate()`` (:ticket:`29067`).
+
+* Fixed a regression where a queryset that annotates with geometry objects
+  crashes (:ticket:`29054`).

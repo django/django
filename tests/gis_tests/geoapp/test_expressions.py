@@ -3,10 +3,11 @@ from unittest import skipUnless
 from django.contrib.gis.db.models import F, GeometryField, Value, functions
 from django.contrib.gis.geos import Point, Polygon
 from django.db import connection
+from django.db.models import Count
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import postgis
-from .models import City, ManyPointModel
+from .models import City, ManyPointModel, MultiFields
 
 
 class GeoExpressionsTests(TestCase):
@@ -47,6 +48,17 @@ class GeoExpressionsTests(TestCase):
             ManyPointModel.objects.filter(pk=obj.pk).update(point3=F('point1'))
             obj.refresh_from_db()
             self.assertTrue(obj.point3.equals_exact(p1.transform(3857, clone=True), 0.1))
+
+    def test_multiple_annotation(self):
+        multi_field = MultiFields.objects.create(
+            point=Point(1, 1),
+            city=City.objects.get(name='Houston'),
+            poly=Polygon(((1, 1), (1, 2), (2, 2), (2, 1), (1, 1))),
+        )
+        qs = City.objects.values('name').annotate(
+            distance=functions.Distance('multifields__point', multi_field.city.point),
+        ).annotate(count=Count('multifields'))
+        self.assertTrue(qs.first())
 
     @skipUnlessDBFeature('has_Translate_function')
     def test_update_with_expression(self):
