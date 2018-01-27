@@ -115,6 +115,11 @@ class AbstractBaseUser(models.Model):
         self.password = make_password(None)
 
     def has_usable_password(self):
+        """
+        Return False if set_unusable_password() has been called for this user,
+        or if the password is None, or if the password uses a hasher that's not
+        in the PASSWORD_HASHERS setting.
+        """
         return is_password_usable(self.password)
 
     def get_session_auth_hash(self):
