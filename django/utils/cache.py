@@ -24,7 +24,7 @@ import time
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import force_bytes, iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
@@ -297,9 +297,7 @@ def _i18n_cache_key_suffix(request, cache_key):
     if settings.USE_TZ:
         # The datetime module doesn't restrict the output of tzname().
         # Windows is known to use non-standard, locale-dependent names.
-        # User-defined tzinfo classes may return absolutely anything.
-        # Hence this paranoid conversion to create a valid cache key.
-        tz_name = force_text(get_current_timezone_name(), errors='ignore')
+        tz_name = get_current_timezone_name()
         cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
     return cache_key
 

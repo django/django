@@ -1,6 +1,7 @@
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
 import copy
+import datetime
 import io
 import os
 import pickle
@@ -1879,25 +1880,12 @@ class CacheI18nTest(TestCase):
     @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
     def test_cache_key_with_non_ascii_tzname(self):
         # Timezone-dependent cache keys should use ASCII characters only
-        # (#17476). The implementation here is a bit odd (timezone.utc is an
-        # instance, not a class), but it simulates the correct conditions.
-        class CustomTzName(timezone.utc):
-            pass
-
+        # (#17476).
         request = self.factory.get(self.path)
         response = HttpResponse()
-        with timezone.override(CustomTzName):
-            CustomTzName.zone = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
-            sanitized_name = 'Hora_estndar_de_Argentina'
+        with timezone.override(datetime.timezone(datetime.timedelta(), 'Hora estándar de Argentina')):
             self.assertIn(
-                sanitized_name, learn_cache_key(request, response),
-                "Cache keys should include the time zone name when time zones are active"
-            )
-
-            CustomTzName.name = 'Hora estándar de Argentina'    # unicode
-            sanitized_name = 'Hora_estndar_de_Argentina'
-            self.assertIn(
-                sanitized_name, learn_cache_key(request, response),
+                'Hora_estndar_de_Argentina', learn_cache_key(request, response),
                 "Cache keys should include the time zone name when time zones are active"
             )
 
