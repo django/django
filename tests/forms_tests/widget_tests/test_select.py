@@ -354,6 +354,86 @@ class SelectTest(WidgetTest):
         label, options, index = groups[0]
         self.assertEqual(options[0]['value'], 0)
 
+    def test_optgroups_grouping_of_nogroup_choices(self):
+        choices = [
+            ("one", 1),
+            [
+                "italian", (
+                    ("uno", 1),
+                    ("due", 2)
+                )
+            ],
+            ("two", 2),
+        ]
+
+        groups = list(self.widget(choices=choices).optgroups(
+            'name', ['one'], attrs={'class': 'super'},
+        ))
+
+        self.assertEqual(groups.__len__(), 2)
+
+        null_group, italian_group = groups
+
+        label, options, index = null_group
+        self.assertEqual(label, None)
+        self.assertEqual(
+            options,
+            [
+                {
+                    "template_name": "django/forms/widgets/select_option.html",
+                    "type": "select",
+                    "index": "0",
+                    "name": "name",
+                    "label": 1,
+                    "value": "one",
+                    "selected": True,
+                    "attrs": {
+                        "selected": True
+                    }
+                },
+                {
+                    "template_name": "django/forms/widgets/select_option.html",
+                    "type": "select",
+                    "index": "2",
+                    "name": "name",
+                    "label": 2,
+                    "value": "two",
+                    "selected": False,
+                    "attrs": {}
+                }
+            ]
+        )
+        self.assertEqual(index, 0)
+
+        label, options, index = italian_group
+        self.assertEqual(label, 'italian')
+        self.assertEqual(
+            options,
+            [
+                {
+                    "template_name": "django/forms/widgets/select_option.html",
+                    "type": "select",
+                    "index": "1_0",
+                    "name": "name",
+                    "label": 1,
+                    "value": "uno",
+                    "selected": False,
+                    "attrs": {}
+                },
+                {
+                    "template_name": "django/forms/widgets/select_option.html",
+                    "type": "select",
+                    "index": "1_1",
+                    "name": "name",
+                    "label": 2,
+                    "value": "due",
+                    "selected": False,
+                    "attrs": {}
+                }
+            ]
+        )
+        self.assertEqual(index, 1)
+
     def test_deepcopy(self):
         """
         __deepcopy__() should copy all attributes properly (#25085).
