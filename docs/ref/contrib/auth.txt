@@ -212,7 +212,9 @@ Methods
 
         Returns ``False`` if
         :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
-        been called for this user.
+        been called for this user, or if the password is ``None``, or if the
+        password uses a hasher that's not in the :setting:`PASSWORD_HASHERS`
+        setting.
 
     .. method:: get_group_permissions(obj=None)
 
