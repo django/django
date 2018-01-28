@@ -178,6 +178,8 @@ Models
   :class:`~django.db.models.DateField` and
   :class:`~django.db.models.DateTimeField` to the Monday of a week.
 
+* Query expressions can now be negated using a minus sign.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

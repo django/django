@@ -1425,6 +1425,10 @@ class ReprTests(TestCase):
 class CombinableTests(SimpleTestCase):
     bitwise_msg = 'Use .bitand() and .bitor() for bitwise logical operations.'
 
+    def test_negation(self):
+        c = Combinable()
+        self.assertEqual(-c, c * -1)
+
     def test_and(self):
         with self.assertRaisesMessage(NotImplementedError, self.bitwise_msg):
             Combinable() & Combinable()
