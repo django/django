@@ -134,8 +134,8 @@ right away: the ``Question.was_published_recently()`` method returns ``True`` if
 the ``Question`` was published within the last day (which is correct) but also if
 the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
 
-To check if the bug really exists, using the Admin create a question whose date
-lies in the future and check the method using the :djadmin:`shell`:
+Confirm the bug by using the :djadmin:`shell` to check the method on a question
+whose date lies in the future:
 
 .. console::
 
