@@ -935,11 +935,13 @@ following models::
 ... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
 will cache the related ``Person`` *and* the related ``City``::
 
+    # Hits the database with joins to the author and hometown tables.
     b = Book.objects.select_related('author__hometown').get(id=4)
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Doesn't hit the database.
 
-    b = Book.objects.get(id=4) # No select_related() in this example.
+    # Without select_related()...
+    b = Book.objects.get(id=4)  # Hits the database.
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
