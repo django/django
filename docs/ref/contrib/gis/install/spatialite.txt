@@ -23,7 +23,7 @@ __ https://www.gaia-gis.it/gaia-sins/
 
 .. admonition:: ``SPATIALITE_LIBRARY_PATH`` setting required for SpatiaLite 4.2+
 
-    If you're using SpatiaLite 4.2+, you must put this in your settings::
+    If you're using SpatiaLite 4.2+, you must put this in your ``settings.py``::
 
         SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
