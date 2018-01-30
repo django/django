@@ -137,12 +137,7 @@ following is done:
 
 1. All non-deferred fields of the model are updated to the values currently
    present in the database.
-2. The previously loaded related instances for which the relation's value is no
-   longer valid are removed from the reloaded instance. For example, if you have
-   a foreign key from the reloaded instance to another model with name
-   ``Author``, then if ``obj.author_id != obj.author.id``, ``obj.author`` will
-   be thrown away, and when next accessed it will be reloaded with the value of
-   ``obj.author_id``.
+2. Any cached relations are cleared from the reloaded instance.
 
 Only fields of the model are reloaded from the database. Other
 database-dependent values such as annotations aren't reloaded. Any
