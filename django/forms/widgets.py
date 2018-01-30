@@ -1004,7 +1004,10 @@ class SelectDateWidget(Widget):
         if isinstance(value, (datetime.date, datetime.datetime)):
             year, month, day = value.year, value.month, value.day
         elif isinstance(value, str):
-            if settings.USE_L10N:
+            match = self.date_re.match(value)
+            if match:
+                year, month, day = [int(val) for val in match.groups()]
+            elif settings.USE_L10N:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
                     d = datetime.datetime.strptime(value, input_format)
@@ -1012,9 +1015,6 @@ class SelectDateWidget(Widget):
                     pass
                 else:
                     year, month, day = d.year, d.month, d.day
-            match = self.date_re.match(value)
-            if match:
-                year, month, day = [int(val) for val in match.groups()]
         return {'year': year, 'month': month, 'day': day}
 
     @staticmethod
