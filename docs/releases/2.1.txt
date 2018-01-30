@@ -265,6 +265,10 @@ Miscellaneous
   elements, e.g. ``<br>``. This is incompatible within XHTML, although some
   widgets already used aspects of HTML5 such as boolean attributes.
 
+* The value of :class:`~django.forms.SelectDateWidget`'s empty options is
+  changed from 0 to an empty string, which mainly may require some adjustments
+  in tests that compare HTML.
+
 .. _deprecated-features-2.1:
 
 Features deprecated in 2.1
