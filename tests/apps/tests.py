@@ -45,9 +45,9 @@ class AppsTests(SimpleTestCase):
         Tests the ready property of the master registry.
         """
         # The master app registry is always ready when the tests run.
-        self.assertTrue(apps.ready)
+        self.assertIs(apps.ready, True)
         # Non-master app registries are populated in __init__.
-        self.assertTrue(Apps().ready)
+        self.assertIs(Apps().ready, True)
 
     def test_bad_app_config(self):
         """
@@ -124,10 +124,10 @@ class AppsTests(SimpleTestCase):
         """
         Tests apps.is_installed().
         """
-        self.assertTrue(apps.is_installed('django.contrib.admin'))
-        self.assertTrue(apps.is_installed('django.contrib.auth'))
-        self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
-        self.assertFalse(apps.is_installed('django.contrib.admindocs'))
+        self.assertIs(apps.is_installed('django.contrib.admin'), True)
+        self.assertIs(apps.is_installed('django.contrib.auth'), True)
+        self.assertIs(apps.is_installed('django.contrib.staticfiles'), True)
+        self.assertIs(apps.is_installed('django.contrib.admindocs'), False)
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
@@ -183,6 +183,19 @@ class AppsTests(SimpleTestCase):
         with self.assertRaises(LookupError):
             new_apps.get_model("apps", "TotallyNormal")
         self.assertEqual(new_apps.get_model("apps", "SoAlternative"), SoAlternative)
+
+    def test_models_not_loaded(self):
+        """
+        apps.get_models() raises an exception if apps.models_ready isn't True.
+        """
+        apps.models_ready = False
+        try:
+            # The cache must be cleared to trigger the exception.
+            apps.get_models.cache_clear()
+            with self.assertRaisesMessage(AppRegistryNotReady, "Models aren't loaded yet."):
+                apps.get_models()
+        finally:
+            apps.models_ready = True
 
     def test_dynamic_load(self):
         """
