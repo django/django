@@ -89,6 +89,12 @@ Database installation
     postgis
     spatialite
 
+:setting:`DATABASES` configuration
+----------------------------------
+
+Set the :setting:`ENGINE <DATABASE-ENGINE>` setting to one of the :ref:`spatial
+backends <spatial-backends>`.
+
 Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
 
