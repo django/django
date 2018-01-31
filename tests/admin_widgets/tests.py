@@ -14,7 +14,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import CharField, DateField, DateTimeField
+from django.db.models import CharField, DateField, DateTimeField, UUIDField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
@@ -247,6 +247,12 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         lookup1 = widgets.url_params_from_lookup_dict({'myfield': my_callable})
         lookup2 = widgets.url_params_from_lookup_dict({'myfield': my_callable()})
         self.assertEqual(lookup1, lookup2)
+
+    def test_label_and_url_for_value_invalid_uuid(self):
+        field = Bee._meta.get_field('honeycomb')
+        self.assertIsInstance(field.target_field, UUIDField)
+        widget = widgets.ForeignKeyRawIdWidget(field.remote_field, admin.site)
+        self.assertEqual(widget.label_and_url_for_value('invalid-uuid'), ('', ''))
 
 
 class FilteredSelectMultipleWidgetTest(SimpleTestCase):
