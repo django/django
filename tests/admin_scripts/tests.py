@@ -22,7 +22,9 @@ from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
 from django.core.management.commands.loaddata import Command as LoaddataCommand
-from django.core.management.commands.runserver import Command as RunserverCommand
+from django.core.management.commands.runserver import (
+    Command as RunserverCommand,
+)
 from django.db import ConnectionHandler, connection
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
