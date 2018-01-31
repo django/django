@@ -14,7 +14,6 @@ from django.core.management.base import (
 )
 from django.core.management.color import color_style
 from django.utils import autoreload
-from django.utils.encoding import force_text
 
 
 def find_commands(management_dir):
@@ -117,7 +116,7 @@ def call_command(command_name, *args, **options):
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-    defaults = parser.parse_args(args=[force_text(a) for a in args])
+    defaults = parser.parse_args(args=[str(a) for a in args])
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Raise an error if any unknown options were passed.
     stealth_options = set(command.base_stealth_options + command.stealth_options)

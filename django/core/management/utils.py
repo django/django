@@ -3,7 +3,7 @@ from subprocess import PIPE, Popen
 
 from django.apps import apps as installed_apps
 from django.utils.crypto import get_random_string
-from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_text
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
 from .base import CommandError
 
@@ -20,8 +20,8 @@ def popen_wrapper(args, stdout_encoding='utf-8'):
         raise CommandError('Error executing %s' % args[0]) from err
     output, errors = p.communicate()
     return (
-        force_text(output, stdout_encoding, strings_only=True, errors='strict'),
-        force_text(errors, DEFAULT_LOCALE_ENCODING, strings_only=True, errors='replace'),
+        output.decode(stdout_encoding),
+        errors.decode(DEFAULT_LOCALE_ENCODING, errors='replace'),
         p.returncode
     )
 
