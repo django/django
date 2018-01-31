@@ -13,7 +13,6 @@ from django.dispatch import receiver
 from django.utils.crypto import (
     constant_time_compare, get_random_string, pbkdf2,
 )
-from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -302,8 +301,8 @@ class Argon2PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         argon2 = self._load_library()
         data = argon2.low_level.hash_secret(
-            force_bytes(password),
-            force_bytes(salt),
+            password.encode(),
+            salt.encode(),
             time_cost=self.time_cost,
             memory_cost=self.memory_cost,
             parallelism=self.parallelism,
@@ -318,8 +317,8 @@ class Argon2PasswordHasher(BasePasswordHasher):
         assert algorithm == self.algorithm
         try:
             return argon2.low_level.verify_secret(
-                force_bytes('$' + rest),
-                force_bytes(password),
+                ('$' + rest).encode('ascii'),
+                password.encode(),
                 type=argon2.low_level.Type.I,
             )
         except argon2.exceptions.VerificationError:
@@ -405,21 +404,20 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
+        password = password.encode()
         # Hash the password prior to using bcrypt to prevent password
         # truncation as described in #20138.
         if self.digest is not None:
             # Use binascii.hexlify() because a hex encoded bytestring is str.
-            password = binascii.hexlify(self.digest(force_bytes(password)).digest())
-        else:
-            password = force_bytes(password)
+            password = binascii.hexlify(self.digest(password).digest())
 
         data = bcrypt.hashpw(password, salt)
-        return "%s$%s" % (self.algorithm, force_text(data))
+        return "%s$%s" % (self.algorithm, data.decode('ascii'))
 
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, force_bytes(data))
+        encoded_2 = self.encode(password, data.encode('ascii'))
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
@@ -444,7 +442,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         # work factor is logarithmic, adding one doubles the load.
         diff = 2**(self.rounds - int(rounds)) - 1
         while diff > 0:
-            self.encode(password, force_bytes(salt))
+            self.encode(password, salt.encode('ascii'))
             diff -= 1
 
 
@@ -476,7 +474,7 @@ class SHA1PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password is not None
         assert salt and '$' not in salt
-        hash = hashlib.sha1(force_bytes(salt + password)).hexdigest()
+        hash = hashlib.sha1((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -507,7 +505,7 @@ class MD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         assert password is not None
         assert salt and '$' not in salt
-        hash = hashlib.md5(force_bytes(salt + password)).hexdigest()
+        hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def verify(self, password, encoded):
@@ -545,7 +543,7 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         assert salt == ''
-        hash = hashlib.sha1(force_bytes(password)).hexdigest()
+        hash = hashlib.sha1(password.encode()).hexdigest()
         return 'sha1$$%s' % hash
 
     def verify(self, password, encoded):
@@ -582,7 +580,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         assert salt == ''
-        return hashlib.md5(force_bytes(password)).hexdigest()
+        return hashlib.md5(password.encode()).hexdigest()
 
     def verify(self, password, encoded):
         if len(encoded) == 37 and encoded.startswith('md5$$'):
