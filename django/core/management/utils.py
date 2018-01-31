@@ -8,7 +8,7 @@ from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_text
 from .base import CommandError
 
 
-def popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding='utf-8'):
+def popen_wrapper(args, stdout_encoding='utf-8'):
     """
     Friendly wrapper around Popen.
 
@@ -17,7 +17,7 @@ def popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding='utf-8'):
     try:
         p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
     except OSError as err:
-        raise os_err_exc_type('Error executing %s' % args[0]) from err
+        raise CommandError('Error executing %s' % args[0]) from err
     output, errors = p.communicate()
     return (
         force_text(output, stdout_encoding, strings_only=True, errors='strict'),
