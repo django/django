@@ -8,7 +8,7 @@ version has several benefits:
 * New features and improvements are added.
 * Bugs are fixed.
 * Older version of Django will eventually no longer receive security updates.
-  (see :ref:`backwards-compatibility-policy`).
+  (see :ref:`supported-versions-policy`).
 * Upgrading as each new Django release is available makes future upgrades less
   painful by keeping your code base up to date.
 
