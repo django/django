@@ -349,7 +349,8 @@ bytestrings and unicode strings. Now that Python 2 support is dropped,
 bytestrings should only be encountered around input/output boundaries (handling
 of binary fields or HTTP streams, for example). You might have to update your
 code to limit bytestring usage to a minimum, as Django no longer accepts
-bytestrings in certain code paths.
+bytestrings in certain code paths. Python's :option:`-b` option may help detect
+that mistake in your code.
 
 For example, ``reverse()`` now uses ``str()`` instead of ``force_text()`` to
 coerce the ``args`` and ``kwargs`` it receives, prior to their placement in
