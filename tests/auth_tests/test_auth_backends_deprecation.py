@@ -13,6 +13,18 @@ class NoRequestBackend(object):
         pass
 
 
+class NoRequestWithKwargs:
+    def authenticate(self, username=None, password=None, **kwargs):
+        pass
+
+
+class RequestPositionalArg:
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        assert username == 'username'
+        assert password == 'pass'
+        assert request is mock_request
+
+
 class RequestNotPositionArgBackend:
     def authenticate(self, username=None, password=None, request=None):
         assert username == 'username'
@@ -34,6 +46,8 @@ class AcceptsRequestBackendTest(SimpleTestCase):
     method without a request parameter.
     """
     no_request_backend = '%s.NoRequestBackend' % __name__
+    no_request_with_kwargs_backend = '%s.NoRequestWithKwargs' % __name__
+    request_positional_arg_backend = '%s.RequestPositionalArg' % __name__
     request_not_positional_backend = '%s.RequestNotPositionArgBackend' % __name__
     request_not_positional_with_used_kwarg_backend = '%s.RequestNotPositionArgWithUsedKwargBackend' % __name__
 
@@ -77,6 +91,21 @@ class AcceptsRequestBackendTest(SimpleTestCase):
             str(warns[1].message),
             "Update %s.authenticate() to accept a positional `request` "
             "argument." % self.no_request_backend
+        )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[no_request_with_kwargs_backend, request_positional_arg_backend])
+    def test_credentials_not_mutated(self):
+        """
+        No problem if a backend doesn't accept `request` and a later one does.
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            authenticate(mock_request, username='username', password='pass')
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "In %s.authenticate(), move the `request` keyword argument to the "
+            "first positional argument." % self.no_request_with_kwargs_backend
         )
 
     @override_settings(AUTHENTICATION_BACKENDS=[request_not_positional_with_used_kwarg_backend])
