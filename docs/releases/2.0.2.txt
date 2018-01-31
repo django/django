@@ -20,3 +20,7 @@ Bugfixes
 
 * Fixed a regression where a queryset that annotates with geometry objects
   crashes (:ticket:`29054`).
+
+* Fixed a regression where ``contrib.auth.authenticate()`` crashes if an
+  authentication backend doesn't accept ``request`` and a later one does
+  (:ticket:`29071`).

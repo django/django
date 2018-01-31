@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed incorrect foreign key nullification if a model has two foreign keys to
   the same model and a target model is deleted (:ticket:`29016`).
+
+* Fixed a regression where ``contrib.auth.authenticate()`` crashes if an
+  authentication backend doesn't accept ``request`` and a later one does
+  (:ticket:`29071`).
