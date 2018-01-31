@@ -6,6 +6,7 @@ import json
 
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models.deletion import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -187,7 +188,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
-        except (ValueError, self.rel.model.DoesNotExist):
+        except (ValueError, self.rel.model.DoesNotExist, ValidationError):
             return '', ''
 
         try:

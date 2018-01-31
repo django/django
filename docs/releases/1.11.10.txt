@@ -15,3 +15,6 @@ Bugfixes
 * Fixed a regression where ``contrib.auth.authenticate()`` crashes if an
   authentication backend doesn't accept ``request`` and a later one does
   (:ticket:`29071`).
+
+* Fixed crash when entering an invalid uuid in ``ModelAdmin.raw_id_fields``
+  (:ticket:`29094`).

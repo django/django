@@ -27,3 +27,6 @@ Bugfixes
 
 * Fixed a regression where ``makemigrations`` crashes if a migrations directory
   doesn't have an ``__init__.py`` file (:ticket:`29091`).
+
+* Fixed crash when entering an invalid uuid in ``ModelAdmin.raw_id_fields``
+  (:ticket:`29094`).
