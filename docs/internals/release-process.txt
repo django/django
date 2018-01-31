@@ -116,7 +116,7 @@ A more generic example:
   LTS to LTS upgrades).
 * Z.0: Drop deprecation shims added in Y.0 and Y.1.
 
-.. _backwards-compatibility-policy:
+.. _supported-versions-policy:
 
 Supported versions
 ==================
