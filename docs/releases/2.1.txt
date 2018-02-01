@@ -189,6 +189,69 @@ Models
 
 * :meth:`.QuerySet.order_by` and :meth:`distinct(*fields) <.QuerySet.distinct>`
   now support using field transforms.
+* The new :class:`~django.db.models.functions.Abs` database function returns
+  the absolute value of an expression.
+
+* The new :class:`~django.db.models.functions.ACos` database function returns
+  the arc cosine of an expression.
+
+* The new :class:`~django.db.models.functions.ASin` database function returns
+  the arc sine of an expression.
+
+* The new :class:`~django.db.models.functions.ATan` database function returns
+  the arc tangent of an expression.
+
+* The new :class:`~django.db.models.functions.ATan2` database function returns
+  the arc tangent of two expressions.
+
+* The new :class:`~django.db.models.functions.Ceil` database function returns
+  the smallest integer greater than or equal to an expression.
+
+* The new :class:`~django.db.models.functions.Cos` database function returns
+  the cosine of an expression.
+
+* The new :class:`~django.db.models.functions.Cot` database function returns
+  the cotangent of an expression.
+
+* The new :class:`~django.db.models.functions.Degrees` database function returns
+  the degrees of an expression.
+
+* The new :class:`~django.db.models.functions.Exp` database function returns
+  the the value of e (the base of natural logarithms) raised to the power of an
+  expression.
+
+* The new :class:`~django.db.models.functions.Floor` database function returns
+  the largest integer value not greater than an expression.
+
+* The new :class:`~django.db.models.functions.Ln` database function returns
+  the natural logarithm of an expression.
+
+* The new :class:`~django.db.models.functions.Log` database function returns
+  the logarithm to base b of an expression.
+
+* The new :class:`~django.db.models.functions.Mod` database function returns
+  the modulo value of two expressions.
+
+* The new :class:`~django.db.models.functions.Pi` database function returns
+  π (3.141592...).
+
+* The new :class:`~django.db.models.functions.Power` database function returns
+  the power of two expressions.
+
+* The new :class:`~django.db.models.functions.Radians` database function returns
+  the radians of an expression.
+
+* The new :class:`~django.db.models.functions.Round` database function returns
+  the nearest integer of an expression.
+
+* The new :class:`~django.db.models.functions.Sin` database function returns
+  the sine of an expression.
+
+* The new :class:`~django.db.models.functions.Sqrt` database function returns
+  the square root of an expression.
+
+* The new :class:`~django.db.models.functions.Tan` database function returns
+  the tangent of an expression.
 
 * :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
   encouraged instead of :class:`~django.db.models.NullBooleanField`, which will

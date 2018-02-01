@@ -5,6 +5,10 @@ from .datetime import (
     Now, Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
     TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
 )
+from .math import (
+    Abs, ACos, ASin, ATan, ATan2, Ceil, Cos, Cot, Degrees, Exp, Floor, Ln, Log,
+    Mod, Pi, Power, Radians, Round, Sin, Sqrt, Tan,
+)
 from .text import (
     Chr, Concat, ConcatPair, Left, Length, Lower, LPad, LTrim, Ord, Repeat,
     Replace, Right, RPad, RTrim, StrIndex, Substr, Trim, Upper,
@@ -23,6 +27,10 @@ __all__ = [
     'ExtractYear', 'Now', 'Trunc', 'TruncDate', 'TruncDay', 'TruncHour',
     'TruncMinute', 'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime',
     'TruncWeek', 'TruncYear',
+    # math
+    'Abs', 'ACos', 'ASin', 'ATan', 'ATan2', 'Ceil', 'Cos', 'Cot', 'Degrees',
+    'Exp', 'Floor', 'Ln', 'Log', 'Mod', 'Pi', 'Power', 'Radians', 'Round',
+    'Sin', 'Sqrt', 'Tan',
     # text
     'Chr', 'Concat', 'ConcatPair', 'Left', 'Length', 'Lower', 'LPad', 'LTrim',
     'Ord', 'Repeat', 'Replace', 'Right', 'RPad', 'RTrim', 'StrIndex', 'Substr',
