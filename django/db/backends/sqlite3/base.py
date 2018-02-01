@@ -227,13 +227,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         `disable_constraint_checking()` and `enable_constraint_checking()`, to
         determine if rows with invalid references were entered while constraint
         checks were off.
-
-        Raise an IntegrityError on the first invalid foreign key reference
-        encountered (if any) and provide detailed information about the
-        invalid reference in the error message.
-
-        Backends can override this method if they can more directly apply
-        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         with self.cursor() as cursor:
             if table_names is None:
