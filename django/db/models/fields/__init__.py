@@ -8,7 +8,6 @@ import warnings
 from base64 import b64decode, b64encode
 from functools import partialmethod, total_ordering
 
-from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.core import checks, exceptions, validators
@@ -19,6 +18,12 @@ from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.forms import (
+    BooleanField, CharField, DateField, DateTimeField, DurationField,
+    DecimalField, EmailField, FileField, FilePathField, FloatField,
+    GenericIPAddressField, IntegerField, NullBooleanField, SlugField,
+    TimeField, TypedChoiceField, Textarea, URLField, UUIDField,
+)
 from django.utils import timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -876,7 +881,7 @@ class Field(RegisterLookupMixin):
             if choices_form_class is not None:
                 form_class = choices_form_class
             else:
-                form_class = forms.TypedChoiceField
+                form_class = TypedChoiceField
             # Many of the subclass-specific formfield arguments (min_value,
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that TypedChoiceField will understand.
@@ -887,7 +892,7 @@ class Field(RegisterLookupMixin):
                     del kwargs[k]
         defaults.update(kwargs)
         if form_class is None:
-            form_class = forms.CharField
+            form_class = CharField
         return form_class(**defaults)
 
     def value_from_object(self, obj):
@@ -1049,7 +1054,7 @@ class BooleanField(Field):
             include_blank = not (self.has_default() or 'initial' in kwargs)
             defaults = {'choices': self.get_choices(include_blank=include_blank)}
         else:
-            defaults = {'form_class': forms.BooleanField}
+            defaults = {'form_class': BooleanField}
         defaults.update(kwargs)
         return super().formfield(**defaults)
 
@@ -1303,7 +1308,7 @@ class DateField(DateTimeCheckMixin, Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.DateField,
+            'form_class': DateField,
             **kwargs,
         })
 
@@ -1459,7 +1464,7 @@ class DateTimeField(DateField):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.DateTimeField,
+            'form_class': DateTimeField,
             **kwargs,
         })
 
@@ -1594,7 +1599,7 @@ class DecimalField(Field):
         return super().formfield(**{
             'max_digits': self.max_digits,
             'decimal_places': self.decimal_places,
-            'form_class': forms.DecimalField,
+            'form_class': DecimalField,
             **kwargs,
         })
 
@@ -1654,7 +1659,7 @@ class DurationField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.DurationField,
+            'form_class': DurationField,
             **kwargs,
         })
 
@@ -1678,7 +1683,7 @@ class EmailField(CharField):
         # As with CharField, this will cause email validation to be performed
         # twice.
         return super().formfield(**{
-            'form_class': forms.EmailField,
+            'form_class': EmailField,
             **kwargs,
         })
 
@@ -1737,7 +1742,7 @@ class FilePathField(Field):
             'path': self.path,
             'match': self.match,
             'recursive': self.recursive,
-            'form_class': forms.FilePathField,
+            'form_class': FilePathField,
             'allow_files': self.allow_files,
             'allow_folders': self.allow_folders,
             **kwargs,
@@ -1777,7 +1782,7 @@ class FloatField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.FloatField,
+            'form_class': FloatField,
             **kwargs,
         })
 
@@ -1847,7 +1852,7 @@ class IntegerField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.IntegerField,
+            'form_class': IntegerField,
             **kwargs,
         })
 
@@ -1974,7 +1979,7 @@ class GenericIPAddressField(Field):
     def formfield(self, **kwargs):
         return super().formfield(**{
             'protocol': self.protocol,
-            'form_class': forms.GenericIPAddressField,
+            'form_class': GenericIPAddressField,
             **kwargs,
         })
 
@@ -2025,7 +2030,7 @@ class NullBooleanField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.NullBooleanField,
+            'form_class': NullBooleanField,
             **kwargs,
         })
 
@@ -2100,7 +2105,7 @@ class SlugField(CharField):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.SlugField,
+            'form_class': SlugField,
             'allow_unicode': self.allow_unicode,
             **kwargs,
         })
@@ -2134,7 +2139,7 @@ class TextField(Field):
         # the value in the form field (to pass into widget for example).
         return super().formfield(**{
             'max_length': self.max_length,
-            **({} if self.choices else {'widget': forms.Textarea}),
+            **({} if self.choices else {'widget': Textarea}),
             **kwargs,
         })
 
@@ -2266,7 +2271,7 @@ class TimeField(DateTimeCheckMixin, Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.TimeField,
+            'form_class': TimeField,
             **kwargs,
         })
 
@@ -2289,7 +2294,7 @@ class URLField(CharField):
         # As with CharField, this will cause URL validation to be performed
         # twice.
         return super().formfield(**{
-            'form_class': forms.URLField,
+            'form_class': URLField,
             **kwargs,
         })
 
@@ -2386,6 +2391,6 @@ class UUIDField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.UUIDField,
+            'form_class': UUIDField,
             **kwargs,
         })

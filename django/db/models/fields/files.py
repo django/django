@@ -8,6 +8,7 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
+from django.forms import FileField, ImageField
 from django.utils.translation import gettext_lazy as _
 
 
@@ -318,7 +319,7 @@ class FileField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.FileField,
+            'form_class': FileField,
             'max_length': self.max_length,
             **kwargs,
         })
@@ -461,6 +462,6 @@ class ImageField(FileField):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'form_class': forms.ImageField,
+            'form_class': ImageField,
             **kwargs,
         })

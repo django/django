@@ -2,7 +2,6 @@ import functools
 import inspect
 from functools import partial
 
-from django import forms
 from django.apps import apps
 from django.core import checks, exceptions
 from django.db import connection, router
@@ -12,6 +11,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
+from django.forms import ModelChoiceField, ModelMultipleChoiceField
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -949,7 +949,7 @@ class ForeignKey(ForeignObject):
                              "its related model %r has not been loaded yet" %
                              (self.name, self.remote_field.model))
         return super().formfield(**{
-            'form_class': forms.ModelChoiceField,
+            'form_class': ModelChoiceField,
             'queryset': self.remote_field.model._default_manager.using(using),
             'to_field_name': self.remote_field.field_name,
             **kwargs,
@@ -1616,7 +1616,7 @@ class ManyToManyField(RelatedField):
 
     def formfield(self, *, using=None, **kwargs):
         defaults = {
-            'form_class': forms.ModelMultipleChoiceField,
+            'form_class': ModelMultipleChoiceField,
             'queryset': self.remote_field.model._default_manager.using(using),
             **kwargs,
         }
