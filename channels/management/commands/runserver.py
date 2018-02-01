@@ -1,6 +1,7 @@
 import datetime
 import sys
 
+from django.apps import apps
 from django.conf import settings
 from django.core.management import CommandError
 from django.core.management.commands.runserver import Command as RunserverCommand
@@ -11,6 +12,8 @@ from channels.log import setup_logger
 from channels.routing import get_default_application
 from daphne.endpoints import build_endpoint_description_strings
 from daphne.server import Server
+
+from ...staticfiles import StaticFilesWrapper
 
 
 class Command(RunserverCommand):
@@ -75,7 +78,7 @@ class Command(RunserverCommand):
         endpoints = build_endpoint_description_strings(host=self.addr, port=self.port)
         try:
             self.server_cls(
-                application=get_default_application(),
+                application=self.get_application(options),
                 endpoints=endpoints,
                 signal_handlers=not options["use_reloader"],
                 action_logger=self.log_action,
@@ -90,6 +93,20 @@ class Command(RunserverCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             return
+
+    def get_application(self, options):
+        """
+        Returns the static files serving application wrapping the default application,
+        if static files should be served. Otherwise just returns the default
+        handler.
+        """
+        staticfiles_installed = apps.is_installed("django.contrib.staticfiles")
+        use_static_handler = options.get("use_static_handler", staticfiles_installed)
+        insecure_serving = options.get("insecure_serving", False)
+        if use_static_handler and (settings.DEBUG or insecure_serving):
+            return StaticFilesWrapper(get_default_application())
+        else:
+            return get_default_application()
 
     def log_action(self, protocol, action, details):
         """

@@ -151,6 +151,11 @@ class AsgiHandler(base.BaseHandler):
     Handler for ASGI requests for the view system only (it will have got here
     after traversing the dispatch-by-channel-name system, which decides it's
     a HTTP request)
+
+    You can also manually construct it with a get_response callback if you
+    want to run a single Django view yourself. If you do this, though, it will
+    not do any URL routing or middleware (Channels uses it for staticfiles'
+    serving code)
     """
 
     request_class = AsgiRequest
