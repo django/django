@@ -845,3 +845,15 @@ Versions affected
 
 * Django 1.11 `(patch) <https://github.com/django/django/commit/e35a0c56086924f331e9422daa266e907a4784cc>`__
 * Django 1.10 `(patch) <https://github.com/django/django/commit/58e08e80e362db79eb0fd775dc81faad90dca47a>`__
+
+February 1, 2018 - :cve:`2018-6188`
+-----------------------------------
+
+Information leakage in ``AuthenticationForm``. `Full description
+<https://www.djangoproject.com/weblog/2018/feb/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.0 `(patch) <https://github.com/django/django/commit/c37bb28677295f6edda61d8ac461014ef0d3aeb2>`__
+* Django 1.11 `(patch) <https://github.com/django/django/commit/57b95fedad5e0b83fc9c81466b7d1751c6427aae>`__
