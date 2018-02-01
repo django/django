@@ -20,6 +20,12 @@ layer that uses Redis as a transport and what we'll focus the examples on here.
     If you don't want to use them, just leave ``CHANNEL_LAYERS`` unset, or
     set it to the empty dict ``{}``.
 
+.. warning::
+
+    Channel layers have a purely async interface (for both send and receive);
+    you will need to wrap them in a converter if you want to call them from
+    synchronous code (see below).
+
 
 Configuration
 -------------
@@ -39,6 +45,19 @@ generally looks something like this::
 You can get the default channel layer from a project with
 ``channels.layers.get_channel_layer()``, but if you are using consumers a copy
 is automatically provided for you on the consumer as ``self.channel_layer``.
+
+
+Synchronous Functions
+---------------------
+
+By default the ``send()``, ``group_send()``, ``group_add()`` and other functions
+are async functions, meaning you have to ``await`` them. If you need to call
+them from synchronous code, you'll need to use the handy
+``asgiref.sync.AsyncToSync`` wrapper::
+
+    from asgiref.sync import AsyncToSync
+
+    AsyncToSync(channel_layer.send)("channel_name", {...})
 
 
 Single Channels
@@ -83,7 +102,7 @@ we could crawl the database), and use ``channel_layer.send``::
     from channels.layers import get_channel_layer
 
     channel_layer = get_channel_layer()
-    channel_layer.send("channel_name", {
+    await channel_layer.send("channel_name", {
         "type": "chat.message",
         "text": "Hello there!",
     })
@@ -116,13 +135,17 @@ one.
 You use groups by adding a channel to them during connection, and removing it
 during disconnection, illustrated here on the WebSocket generic consumer::
 
+    # This example uses WebSocket consumer, which is synchronous, and so
+    # needs the async channel layer functions to be converted.
+    from asgiref.sync import AsyncToSync
+
     class ChatConsumer(WebsocketConsumer):
 
         def connect(self):
-            self.channel_layer.group_add("chat", self.channel_name)
+            AsyncToSync(self.channel_layer.group_add)("chat", self.channel_name)
 
         def disconnect(self):
-            self.channel_layer.group_discard("chat", self.channel_name)
+            AsyncToSync(self.channel_layer.group_discard)("chat", self.channel_name)
 
 Then, to send to a group, use ``group_send``, like in this small example
 which broadcasts chat messages to every connected socket when combined with
@@ -133,7 +156,7 @@ the code above::
         ...
 
         def receive(self, text_data):
-            self.channel_layer.group_send(
+            AsyncToSync(self.channel_layer.group_send)(
                 "chat",
                 {
                     "type": "chat.message",
