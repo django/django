@@ -8,8 +8,7 @@ from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
 
 from .models import (
-    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL,
-    Site as MockSite,
+    Article, Author, ModelWithNullFKToSite, SchemeIncludedURL, Site as MockSite,
 )
 
 

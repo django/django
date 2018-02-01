@@ -14,7 +14,6 @@ from django.utils import timezone
 
 from .models import Article, Author, DecimalModel, Fan
 
-
 lorem_ipsum = """
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
     tempor incididunt ut labore et dolore magna aliqua."""

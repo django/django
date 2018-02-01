@@ -5,8 +5,7 @@ models for GeoDjango and/or mapping dictionaries for use with the
 """
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
-    OFTTime,
+    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString, OFTTime,
 )
 
 

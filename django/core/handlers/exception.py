@@ -5,8 +5,7 @@ from functools import wraps
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import (
-    PermissionDenied, RequestDataTooBig, SuspiciousOperation,
-    TooManyFieldsSent,
+    PermissionDenied, RequestDataTooBig, SuspiciousOperation, TooManyFieldsSent,
 )
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
