@@ -3,8 +3,7 @@ from datetime import date
 from django import forms
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.options import (
-    HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
-    get_content_type_for_model,
+    HORIZONTAL, VERTICAL, ModelAdmin, TabularInline, get_content_type_for_model,
 )
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import (

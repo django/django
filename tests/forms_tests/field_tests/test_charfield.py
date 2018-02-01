@@ -1,6 +1,5 @@
 from django.forms import (
-    CharField, HiddenInput, PasswordInput, Textarea, TextInput,
-    ValidationError,
+    CharField, HiddenInput, PasswordInput, Textarea, TextInput, ValidationError,
 )
 from django.test import SimpleTestCase
 
