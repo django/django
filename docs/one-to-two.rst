@@ -183,6 +183,34 @@ more - just wrap the auth middleware around and the user will be in the scope
 for the lifetime of the connection.
 
 
+Channel Layers
+~~~~~~~~~~~~~~
+
+Channel layers are now an optional part of Channels, and the interface they
+need to provide has changed to be async. Only ``channels_redis``, formerly known as
+``asgi_redis``, has been updated to match so far.
+
+Settings are still similar to before, but there is no longer a ``ROUTING``
+key (the base routing is instead defined with ``ASGI_APPLICATION``)::
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("redis-server-name", 6379)],
+            },
+        },
+    }
+
+All consumers have a ``self.channel_layer`` and ``self.channel_name`` object
+that is populated if you've configured a channel layer. Any messages you send
+to the ``channel_name`` will now go to the consumer rather than directly to the
+client - see the :doc:`/topics/channel_layers` documentation for more.
+
+The method names are largely the same, but they're all now awaitables rather
+than synchronous functions, and ``send_group`` is now ``group_send``.
+
+
 Delay server
 ~~~~~~~~~~~~
 
