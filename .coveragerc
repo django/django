@@ -10,14 +10,3 @@ omit = tests/*
 
 [html]
 directory = coverage_html
-
-[paths]
-django_19 =
-    .tox/py27-django-18/lib/python2.7
-    .tox/py34-django-18/lib/python3.4
-    .tox/py35-django-18/lib/python3.5
-
-django_18 =
-    .tox/py27-django-19/lib/python2.7
-    .tox/py34-django-19/lib/python3.4
-    .tox/py35-django-19/lib/python3.5
