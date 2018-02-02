@@ -41,7 +41,7 @@ Let's look at a basic example of a ``SyncConsumer``::
         def websocket_receive(self, event):
             self.send({
                 "type": "websocket.send",
-                "text": text,
+                "text": event["text"],
             })
 
 This is a very simple WebSocket echo server - it will accept all incoming
