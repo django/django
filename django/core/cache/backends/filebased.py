@@ -10,7 +10,6 @@ import zlib
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files.move import file_move_safe
-from django.utils.encoding import force_bytes
 
 
 class FileBasedCache(BaseCache):
@@ -106,7 +105,7 @@ class FileBasedCache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         return os.path.join(self._dir, ''.join(
-            [hashlib.md5(force_bytes(key)).hexdigest(), self.cache_suffix]))
+            [hashlib.md5(key.encode()).hexdigest(), self.cache_suffix]))
 
     def clear(self):
         """
