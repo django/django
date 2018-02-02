@@ -198,3 +198,19 @@ disconnect
 ~~~~~~~~~~
 
 Closes the socket from the client side. Takes nothing and returns nothing.
+
+
+ChannelsLiveServerTestCase
+--------------------------
+
+If you just want to run standard Selenium or other tests that require a
+webserver to be running for external programs, you can use
+``ChannelsLiveServerTestCase``, which is a drop-in replacement for the
+standard Django ``LiveServerTestCase``::
+
+    from channels.testing import ChannelsLiveServerTestCase
+
+    class SomeLiveTests(ChannelsLiveServerTestCase):
+
+        def test_live_stuff(self):
+            call_external_testing_thing(self.live_server_url)

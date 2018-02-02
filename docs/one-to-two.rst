@@ -209,3 +209,7 @@ it means you must entirely rewrite any consumer tests completely - there is no
 backwards-compatible interface with the old testing client as it was
 synchronous. You can read more about the new testing framework in the
 :doc:`testing documentation </topics/testing>`.
+
+Also of note is that the live test case class has been renamed from
+``ChannelLiveServerTestCase`` to ``ChannelsLiveServerTestCase`` - note the extra
+``s``.
