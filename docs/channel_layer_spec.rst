@@ -2,21 +2,14 @@
 Channel Layer Specification
 ===========================
 
-.. note::
-  This is still in progress.
-
 
 Abstract
 ========
 
 This document outlines a set of standardized definitions for *channels* and
 a *channel layer* which provides a mechanism to send and receive messages over
-them.
-
-This layer is intended to provide standard, predictable inter-process
-communication that other Python applications can build on top of to provide
-rich functionality. The primary design user is the
-:doc:`ASGI specification </asgi>` and Django's Channels project.
+them. They allow inter-process communication between different processes to
+help build applications that have messaging and events between different clients.
 
 
 Overview
@@ -109,7 +102,6 @@ The extensions defined here are:
 
 * ``groups``: Allows grouping of channels to allow broadcast; see below for more.
 * ``flush``: Allows easier testing and development with channel layers.
-* ``statistics``: Allows channel layers to provide global and per-channel statistics.
 
 There is potential to add further extensions; these may be defined by
 a separate specification, or a new version of this specification.
@@ -123,17 +115,9 @@ extension-not-found errors to process startup rather than message handling.
 Asynchronous Support
 --------------------
 
-Channel layers may provide either a synchronous implementation, or an
-asynchronous implementation compliant with Python 3's built-in
-``asyncio``/``Promise`` style.
-
-The asynchronous implementation must have every single method on the class
-(as defined below) be asynchronous.
-
-Channel layers that are asynchronous must define ``async = True`` on the class
-body, and those which are synchronous must define ``async = False``.
-
-A channel layer library may provide both implementations via two subclasses.
+All channel layers must provide asynchronous (coroutine) methods for their
+primary endpoints. End-users will be able to achieve synchronous versions
+using the ``asyncio.AsyncToSync`` wrapper.
 
 
 Groups
@@ -145,31 +129,10 @@ notifying many users at once when an event occurs - imagine a live blog,
 for example, where every viewer should get a long poll response or
 WebSocket packet when a new entry is posted.
 
-This concept could be kept external to the ASGI spec, and would be, if it
-were not for the significant performance gains a channel layer implementation
-can make on the send-group operation by having it included - the
-alternative being a ``send_many`` callable that might have to take
-tens of thousands of destination channel names in a single call. However,
-the group feature is still optional; its presence is indicated by the
-``groups`` member of the ``extensions`` attribute.
-
-Thus, there is a simple Group concept in ASGI, which acts as the
-broadcast/multicast mechanism across channels. Channels are added to a group,
-and then messages sent to that group are sent to all members of the group.
-Channels can be removed from a group manually (e.g. based on a disconnect
-event), and the channel layer will garbage collect "old" channels in groups
-on a periodic basis.
-
-How this garbage collection happens is not specified here, as it depends on
-the internal implementation of the channel layer. The recommended approach,
-however, is when a message on a process-specific channel expires, the channel
-layer should remove that channel from all groups it's currently a member of;
-this is deemed an acceptable indication that the channel's listener is gone.
-
-*Implementation of the group functionality is optional*. If it is not provided
-and an application or protocol server requires it, they should hard error
-and exit with an appropriate error message. It is expected that protocol
-servers will not need to use groups.
+Thus, there is an *optional* groups extension which allows easier broadcast
+messaging to groups of channels. End-users are free, of course, to use just
+channel names and direct sending and build their own persistence/broadcast
+system instead.
 
 
 Capacity
@@ -202,11 +165,11 @@ Specification Details
 A *channel layer* must provide an object with these attributes
 (all function arguments are positional):
 
-* ``send(channel, message)``, a callable that takes two arguments: the
+* ``coroutine send(channel, message)``, that takes two arguments: the
   channel to send on, as a unicode string, and the message
   to send, as a serializable ``dict``.
 
-* ``receive(channels, block=False)``, a callable that takes a list of channel
+* ``coroutine receive(channels, block=False)``, that takes a list of channel
   names as unicode strings, and returns with either ``(None, None)``
   or ``(channel, message)`` if a message is available. If ``block`` is True, then
   it will not return a message arrives (or optionally, a built-in timeout,
@@ -216,7 +179,7 @@ A *channel layer* must provide an object with these attributes
   ``block`` means that the call can take as long as it likes before returning
   a message or nothing, not that it must block until it gets one.
 
-* ``new_channel(pattern)``, a callable that takes a unicode string pattern,
+* ``coroutine new_channel(pattern)``, that takes a unicode string pattern,
   and returns a new valid channel name that does not already exist, by
   adding a unicode string after the ``!`` or ``?`` character in ``pattern``,
   and checking for existence of that name in the channel layer. The ``pattern``
@@ -238,19 +201,14 @@ A *channel layer* must provide an object with these attributes
 
 A channel layer implementing the ``groups`` extension must also provide:
 
-* ``group_add(group, channel)``, a callable that takes a ``channel`` and adds
+* ``coroutine group_add(group, channel)``, that takes a ``channel`` and adds
   it to the group given by ``group``. Both are unicode strings. If the channel
   is already in the group, the function should return normally.
 
-* ``group_discard(group, channel)``, a callable that removes the ``channel``
+* ``coroutine group_discard(group, channel)``, that removes the ``channel``
   from the ``group`` if it is in it, and does nothing otherwise.
 
-* ``group_channels(group)``, a callable that returns an iterable which yields
-  all of the group's member channel names. The return value should be serializable
-  with regards to local adds and discards, but best-effort with regards to
-  adds and discards on other nodes.
-
-* ``send_group(group, message)``, a callable that takes two positional
+* ``coroutine group_send(group, message)``, that takes two positional
   arguments; the group to send to, as a unicode string, and the message
   to send, as a serializable ``dict``. It may raise MessageTooLarge but cannot
   raise ChannelFull.
@@ -259,44 +217,13 @@ A channel layer implementing the ``groups`` extension must also provide:
   membership is valid for after the most recent ``group_add`` call (see
   *Persistence* below)
 
-A channel layer implementing the ``statistics`` extension must also provide:
-
-* ``global_statistics()``, a callable that returns statistics across all channels
-* ``channel_statistics(channel)``, a callable that returns statistics for specified channel
-
-* in both cases statistics are a dict with zero or more of (unicode string keys):
-
-  * ``messages_count``, the number of messages processed since server start
-  * ``messages_count_per_second``, the number of messages processed in the last second
-  * ``messages_pending``, the current number of messages waiting
-  * ``messages_max_age``, how long the oldest message has been waiting, in seconds
-  * ``channel_full_count``, the number of times `ChannelFull` exception has been risen since server start
-  * ``channel_full_count_per_second``, the number of times `ChannelFull` exception has been risen in the last second
-
-* Implementation may provide total counts, counts per seconds or both.
-
-
 A channel layer implementing the ``flush`` extension must also provide:
 
-* ``flush()``, a callable that resets the channel layer to a blank state,
+* ``coroutine flush()``, that resets the channel layer to a blank state,
   containing no messages and no groups (if the groups extension is
   implemented). This call must block until the system is cleared and will
   consistently look empty to any client, if the channel layer is distributed.
 
-A channel layer implementing the ``twisted`` extension must also provide:
-
-* ``receive_twisted(channels)``, a function that behaves
-  like ``receive`` but that returns a Twisted Deferred that eventually
-  returns either ``(channel, message)`` or ``(None, None)``. It is not possible
-  to run it in nonblocking mode; use the normal ``receive`` for that.
-
-A channel layer implementing the ``async`` extension must also provide:
-
-* ``receive_async(channels)``, a function that behaves
-  like ``receive`` but that fulfills the asyncio coroutine contract to
-  block until either a result is available or an internal timeout is reached
-  and ``(None, None)`` is returned. It is not possible
-  to run it in nonblocking mode; use the normal ``receive`` for that.
 
 Channel Semantics
 -----------------
@@ -333,16 +260,6 @@ Channel layers do not need to persist data long-term; group
 memberships only need to live as long as a connection does, and messages
 only as long as the message expiry time, which is usually a couple of minutes.
 
-That said, if a channel server goes down momentarily and loses all data,
-persistent socket connections will continue to transfer incoming data and
-send out new generated data, but will have lost all of their group memberships
-and in-flight messages.
-
-In order to avoid a nasty set of bugs caused by these half-deleted sockets,
-protocol servers should quit and hard restart if they detect that the channel
-layer has gone down or lost data; shedding all existing connections and letting
-clients reconnect will immediately resolve the problem.
-
 If a channel layer implements the ``groups`` extension, it must persist group
 membership until at least the time when the member channel has a message
 expire due to non-consumption, after which it may drop membership at any time.
@@ -353,19 +270,6 @@ Channel layers must also drop group membership after a configurable long timeout
 after the most recent ``group_add`` call for that membership, the default being
 86,400 seconds (one day). The value of this timeout is exposed as the
 ``group_expiry`` property on the channel layer.
-
-Protocol servers must have a configurable timeout value for every connection-based
-protocol they serve that closes the connection after the timeout, and should
-default this value to the value of ``group_expiry``, if the channel
-layer provides it. This allows old group memberships to be cleaned up safely,
-knowing that after the group expiry the original connection must have closed,
-or is about to be in the next few seconds.
-
-It's recommended that end developers put the timeout setting much lower - on
-the order of hours or minutes - to enable better protocol design and testing.
-Even with ASGI's separation of protocol server restart from business logic
-restart, you will likely need to move and reprovision protocol servers, and
-making sure your code can cope with this is important.
 
 
 Approximate Global Ordering
