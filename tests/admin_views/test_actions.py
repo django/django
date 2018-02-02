@@ -12,7 +12,8 @@ from django.urls import reverse
 from .admin import SubscriberAdmin
 from .forms import MediaActionForm
 from .models import (
-    Actor, Answer, ExternalSubscriber, Question, Subscriber, UnchangeableObject,
+    Actor, Answer, ExternalSubscriber, Question, Subscriber,
+    UnchangeableObject,
 )
 
 
