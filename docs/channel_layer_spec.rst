@@ -2,6 +2,11 @@
 Channel Layer Specification
 ===========================
 
+.. note::
+
+    Channel layers are now internal only to Channels, and not used as part of
+    ASGI. This spec defines what Channels and applications written using it
+    expect a channel layer to provide.
 
 Abstract
 ========
