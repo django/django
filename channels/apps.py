@@ -5,8 +5,6 @@ from django.apps import AppConfig
 # (e.g. raven does this).
 import daphne.server  # noqa
 
-from .package_checks import check_all
-
 
 class ChannelsConfig(AppConfig):
 
@@ -14,8 +12,6 @@ class ChannelsConfig(AppConfig):
     verbose_name = "Channels"
 
     def ready(self):
-        # Check versions
-        check_all()
         # Do django monkeypatches
         from .hacks import monkeypatch_django
         monkeypatch_django()
