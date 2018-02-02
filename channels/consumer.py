@@ -39,7 +39,7 @@ class AsyncConsumer:
         # Initalize channel layer
         self.channel_layer = get_channel_layer()
         if self.channel_layer is not None:
-            self.channel_name = self.channel_layer.new_channel()
+            self.channel_name = await self.channel_layer.new_channel()
             self.channel_receive = functools.partial(self.channel_layer.receive, self.channel_name)
         # Store send function
         if self._sync:

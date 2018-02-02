@@ -212,7 +212,7 @@ class InMemoryChannelLayer(BaseChannelLayer):
             else:
                 return message
 
-    def new_channel(self, prefix="specific."):
+    async def new_channel(self, prefix="specific."):
         """
         Returns a new channel name that can be used by something in our
         process as a specific channel.

@@ -15,9 +15,9 @@ take a look at :doc:`one-to-two` to get an overview of the changes; things
 are substantially different.
 
 .. warning::
-   This is incomplete documentation for an upcoming release. If you are looking
-   for documentation for the stable release of Channels, please select "stable"
-   in the bottom-left corner of the page.
+   This is documentation for the **2.x series** of Channels. If you are looking
+   for documentation for the legacy Channels 1, you can select ``1.x`` from the
+   versions selector in the bottom-left corner.
 
 
 Projects

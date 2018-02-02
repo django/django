@@ -1,6 +1,14 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.0.0 (2018-02-01)
+------------------
+
+* Major backwards-incompatible rewrite to move to an asyncio base and remove
+  the requirement to transport data over the network, as well as overhauled
+  generic consumers, test helpers, routing and more.
+
+
 1.1.6 (2017-06-28)
 ------------------
 
