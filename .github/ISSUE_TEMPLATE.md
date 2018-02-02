@@ -9,7 +9,7 @@ If you're submitting a feature request, please try to include:
 If you're submitting a bug report, please include:
 
 - Your OS and runtime environment, and browser if applicable
-- The versions of Channels, Daphne, Django, Twisted, and your ASGI backend (asgi_ipc or asgi_redis normally)
+- The versions of Channels, Daphne, Django, Twisted, and your ASGI backend (channels_redis normally)
 - What you expected to happen vs. what actually happened
 - How you're running Channels (runserver? daphne/runworker? Nginx/Apache in front?)
 - Console logs and full tracebacks of any errors

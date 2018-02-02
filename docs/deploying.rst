@@ -38,7 +38,7 @@ here's an example for a remote Redis server::
 
     CHANNEL_LAYERS = {
         "default": {
-            "BACKEND": "asgi_redis.RedisChannelLayer",
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
                 "hosts": [("redis-server-name", 6379)],
             },
@@ -47,20 +47,7 @@ here's an example for a remote Redis server::
 
 To use the Redis backend you have to install it::
 
-    pip install -U asgi_redis
-
-Some backends, though, don't require an extra server, like the IPC backend,
-which works between processes on the same machine but not over the network
-(it's available in the ``asgi_ipc`` package)::
-
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "asgi_ipc.IPCChannelLayer",
-            "CONFIG": {
-                "prefix": "mysite",
-            },
-        },
-    }
+    pip install -U channels_redis
 
 
 Run protocol servers
