@@ -22,7 +22,7 @@ To use the middleware, wrap it around the appropriate level of consumer
 in your ``routing.py``::
 
     from channels.routing import ProtocolTypeRouter, URLRouter
-    from channels.session import SessionMiddlewareStack
+    from channels.sessions import SessionMiddlewareStack
 
     from myapp import consumers
 
