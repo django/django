@@ -148,7 +148,7 @@ Underneath, Channels is running on a fully asynchronous event loop, and
 if you write code like above, it will get called in a synchronous thread.
 This means you can safely do blocking operations, like calling the Django ORM::
 
-    class LogConsumer(WebsocketConsumer)L
+    class LogConsumer(WebsocketConsumer):
 
         def connect(self, message):
             Log.objects.create(
@@ -206,7 +206,7 @@ WebSockets and chat requests::
         "websocket": URLRouter([
             url("^chat/admin/$", AdminChatConsumer),
             url("^chat/$", PublicChatConsumer),
-        ])
+        ]),
 
         "telegram": TelegramConsumer,
     })
