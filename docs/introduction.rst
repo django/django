@@ -124,17 +124,17 @@ A basic consumer looks like this::
 
     class ChatConsumer(WebsocketConsumer):
 
-        def connect(self, message):
+        def connect(self):
             self.username = "Anonymous"
             self.accept()
-            self.send(text="[Welcome %s!]" % self.username)
+            self.send(text_data="[Welcome %s!]" % self.username)
 
         def receive(self, text, bytes=None):
             if text.startswith("/name"):
                 self.username = text[5:].strip()
-                self.send(text="[set your username to %s]" % self.username)
+                self.send(text_data="[set your username to %s]" % self.username)
             else:
-                self.send(text=self.username + ": " + text)
+                self.send(text_data=self.username + ": " + text)
 
         def disconnect(self, message):
             pass
