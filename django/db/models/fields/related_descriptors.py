@@ -575,7 +575,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         def _remove_prefetched_objects(self):
             try:
-                self.instance._prefetched_objects_cache.pop(self.field.related_query_name())
+                self.instance._prefetched_objects_cache.pop(self.field.remote_field.get_cache_name())
             except (AttributeError, KeyError):
                 pass  # nothing to clear from cache
 
