@@ -170,6 +170,12 @@ Management Commands
 * The new :option:`inspectdb --include-views` option allows creating models
   for database views.
 
+* :djadmin:`test` now features colored output. If necessary, colored output
+  can be disabled using the :option:`--no-color` option. Windows users
+  will need to have the `ANSICON library`_ installed for this to work.
+
+.. _ANSICON library: https://github.com/adoxa/ansicon
+
 Migrations
 ~~~~~~~~~~
 

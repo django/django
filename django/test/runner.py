@@ -5,11 +5,16 @@ import multiprocessing
 import os
 import pickle
 import textwrap
+import time
 import unittest
+import warnings
 from importlib import import_module
 from io import StringIO
 
 from django.core.management import call_command
+from django.core.management.color import (
+    TERMINATOR, color_style, no_style, supports_color,
+)
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
@@ -24,11 +29,200 @@ except ImportError:
     tblib = None
 
 
-class DebugSQLTextTestResult(unittest.TextTestResult):
-    def __init__(self, stream, descriptions, verbosity):
+def get_traceback_highlighter(bg):
+    try:
+        from pygments import highlight
+        from pygments.formatters import TerminalFormatter as Formatter
+    except ImportError:
+        return lambda tb: tb
+    from pygments.lexers import Python3TracebackLexer as Lexer
+
+    return lambda tb: highlight(tb, Lexer(), Formatter(bg=bg))
+
+
+def get_sql_highlighter(bg):
+    try:
+        from pygments import highlight
+        from pygments.formatters import TerminalFormatter as Formatter
+    except ImportError:
+        return lambda tb: tb
+    from pygments.lexers.sql import SqlLexer as Lexer
+
+    return lambda sql: highlight(sql, Lexer(), Formatter(bg=bg))
+
+
+class ColoredTextTestResult(unittest.TextTestResult):
+
+    def __init__(self, *args, **kwargs):
+        no_color = kwargs.pop('no_color')
+        super().__init__(*args, **kwargs)
+        if no_color:
+            self.style = no_style()
+            self.highlight_tb = lambda tb: tb
+            self.terminator = ''
+        else:
+            self.style = color_style()
+            tb_higlighter_bg = 'dark' if self.style.is_dark else 'light'
+            self.highlight_tb = get_traceback_highlighter(tb_higlighter_bg)
+            self.terminator = TERMINATOR
+
+    def getDescription(self, test):
+        doc_first_line = test.shortDescription()
+        description_parts = str(test).split(' ', 1)
+        description_parts[0] = self.style.TEST_INFO(description_parts[0])
+        description = ' '.join(description_parts)
+        if self.descriptions and doc_first_line:
+            return '{}\n{}'.format(description, doc_first_line)
+        else:
+            return description
+
+    def addSuccess(self, test):
+        self.stream.write(self.style.TEST_SUCCESS(''))
+        super().addSuccess(test)
+        self.stream.write(self.terminator)
+
+    def addFailure(self, test, err):
+        self.stream.write(self.style.TEST_FAIL(''))
+        super().addFailure(test, err)
+        self.stream.write(self.terminator)
+
+    def addError(self, test, err):
+        self.stream.write(self.style.TEST_ERROR(''))
+        super().addError(test, err)
+        self.stream.write(self.terminator)
+
+    def addExpectedFailure(self, test, err):
+        self.stream.write(self.style.TEST_EXPECTED_FAILURE(''))
+        super().addExpectedFailure(test, err)
+        self.stream.write(self.terminator)
+
+    def addUnexpectedSuccess(self, test):
+        self.stream.write(self.style.TEST_UNEXPECTED_SUCCESS(''))
+        super().addUnexpectedSuccess(test)
+        self.stream.write(self.terminator)
+
+    def addSkip(self, test, reason):
+        super(unittest.TextTestResult, self).addSkip(test, reason)
+        if self.showAll:
+            self.stream.writeln("skipped {}".format(self.style.TEST_INFO("{!r}".format(reason))))
+        elif self.dots:
+            self.stream.write("s")
+            self.stream.flush()
+
+    def printErrorList(self, flavour, errors):
+        for test, err in errors:
+            self.stream.writeln(self.separator1)
+            self.stream.write(getattr(self.style, 'TEST_{}'.format(flavour))(''))
+            self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
+            self.stream.write(self.terminator)
+            self.stream.writeln(self.separator2)
+            self.stream.writeln(self.highlight_tb(err))
+
+    def _reset_styles(self):
+        self.stream.write(self.terminator)
+
+
+class ColoredTextTestRunner(unittest.TextTestRunner):
+    def __init__(self, no_color=False, **kwargs):
+        super().__init__(**kwargs)
+        self.no_color = no_color
+
+    def run(self, test):
+        "Run the given test case or test suite."
+        result = self._makeResult()
+        if hasattr(result, 'style'):
+            style = result.style
+        else:
+            if self.no_color:
+                style = no_style()
+            else:
+                style = color_style()
+        unittest.registerResult(result)
+        result.failfast = self.failfast
+        result.buffer = self.buffer
+        result.tb_locals = self.tb_locals
+        with warnings.catch_warnings():
+            if self.warnings:
+                # if self.warnings is set, use it to filter all the warnings
+                warnings.simplefilter(self.warnings)
+                # if the filter is 'default' or 'always', special-case the
+                # warnings from the deprecated unittest methods to show them
+                # no more than once per module, because they can be fairly
+                # noisy.  The -Wd and -Wa flags can be used to bypass this
+                # only when self.warnings is None.
+                if self.warnings in ['default', 'always']:
+                    warnings.filterwarnings(
+                        'module', category=DeprecationWarning, message=r'Please use assert\w+ instead.')
+            startTime = time.time()
+            startTestRun = getattr(result, 'startTestRun', None)
+            if startTestRun is not None:
+                startTestRun()
+            try:
+                test(result)
+            finally:
+                stopTestRun = getattr(result, 'stopTestRun', None)
+                if stopTestRun is not None:
+                    stopTestRun()
+            stopTime = time.time()
+        timeTaken = stopTime - startTime
+        result.printErrors()
+        if hasattr(result, 'separator2'):
+            self.stream.writeln(result.separator2)
+        run = result.testsRun
+        self.stream.writeln("Ran {} test{} in {}s".format(
+            style.TEST_INFO(run), run != 1 and "s" or "", style.TEST_INFO("{:.3f}".format(timeTaken))))
+        self.stream.writeln()
+
+        expectedFails = unexpectedSuccesses = skipped = 0
+        try:
+            results = map(len, (result.expectedFailures,
+                                result.unexpectedSuccesses,
+                                result.skipped))
+        except AttributeError:
+            pass
+        else:
+            expectedFails, unexpectedSuccesses, skipped = results
+
+        infos = []
+        if not result.wasSuccessful():
+            self.stream.write(style.TEST_FAIL("FAILED"))
+            self.stream.write(result.terminator)
+            failed, errored = len(result.failures), len(result.errors)
+            if failed:
+                infos.append("failures={}{}".format(style.TEST_FAIL(failed), result.terminator))
+            if errored:
+                infos.append("errors={}{}".format(style.TEST_ERROR(errored), result.terminator))
+        else:
+            self.stream.write(style.TEST_SUCCESS("OK"))
+            self.stream.write(result.terminator)
+        if skipped:
+            infos.append("skipped={}".format(style.TEST_INFO(skipped)))
+        if expectedFails:
+            infos.append("expected failures={}{}".format(
+                style.TEST_EXPECTED_FAILURE(expectedFails), result.terminator))
+        if unexpectedSuccesses:
+            infos.append("unexpected successes={}{}".format(
+                style.TEST_UNEXPECTED_SUCCESS(unexpectedSuccesses), result.terminator))
+        if infos:
+            self.stream.writeln(" (%s)" % (", ".join(infos),))
+        else:
+            self.stream.write("\n")
+        return result
+
+    def _makeResult(self):
+        return self.resultclass(self.stream, self.descriptions, self.verbosity, no_color=self.no_color)
+
+
+class DebugSQLTextTestResult(ColoredTextTestResult):
+    def __init__(self, stream, descriptions, verbosity, no_color=False):
         self.logger = logging.getLogger('django.db.backends')
         self.logger.setLevel(logging.DEBUG)
-        super().__init__(stream, descriptions, verbosity)
+        super().__init__(stream, descriptions, verbosity, no_color=no_color)
+        if no_color:
+            self.highlight_sql = lambda sql: sql
+        else:
+            sql_higlighter_bg = 'dark' if self.style.is_dark else 'light'
+            self.highlight_sql = get_sql_highlighter(sql_higlighter_bg)
 
     def startTest(self, test):
         self.debug_sql_stream = StringIO()
@@ -41,8 +235,10 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
         self.logger.removeHandler(self.handler)
         if self.showAll:
             self.debug_sql_stream.seek(0)
-            self.stream.write(self.debug_sql_stream.read())
-            self.stream.writeln(self.separator2)
+            sql_debug = self.debug_sql_stream.read()
+            if sql_debug:
+                self.stream.write(self.highlight_sql(sql_debug))
+                self.stream.writeln(self.separator2)
 
     def addError(self, test, err):
         super().addError(test, err)
@@ -64,11 +260,14 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def printErrorList(self, flavour, errors):
         for test, err, sql_debug in errors:
             self.stream.writeln(self.separator1)
+            self.stream.write(getattr(self.style, 'TEST_{}'.format(flavour))(''))
             self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
+            self.stream.write(self.terminator)
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
-            self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % sql_debug)
+            self.stream.writeln(self.highlight_tb(err))
+            if sql_debug:
+                self.stream.writeln(self.separator2)
+                self.stream.writeln(self.highlight_sql(sql_debug))
 
 
 class RemoteTestResult:
@@ -396,14 +595,14 @@ class DiscoverRunner:
 
     test_suite = unittest.TestSuite
     parallel_test_suite = ParallelTestSuite
-    test_runner = unittest.TextTestRunner
+    test_runner = ColoredTextTestRunner
     test_loader = unittest.defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
-                 tags=None, exclude_tags=None, **kwargs):
+                 tags=None, exclude_tags=None, no_color=False, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -417,6 +616,7 @@ class DiscoverRunner:
         self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
+        self.no_color = no_color if supports_color() else True
 
     @classmethod
     def add_arguments(cls, parser):
@@ -551,13 +751,16 @@ class DiscoverRunner:
         )
 
     def get_resultclass(self):
-        return DebugSQLTextTestResult if self.debug_sql else None
+        if self.debug_sql:
+            return DebugSQLTextTestResult
+        return ColoredTextTestResult
 
     def get_test_runner_kwargs(self):
         return {
             'failfast': self.failfast,
             'resultclass': self.get_resultclass(),
             'verbosity': self.verbosity,
+            'no_color': self.no_color,
         }
 
     def run_checks(self):
